@@ -337,6 +337,76 @@ keyword_enum! {
     }
 }
 
+/// `cir.is_fp_class`'s `flags` field: a bitmask of individual FP class bits
+/// (composite groups like `fcNan` are just multiple bits OR'd together, not
+/// separate encodings). Bit positions mirror LLVM's `FPClassTest` layout, per
+/// `FPClassTestEnum` in `CIROps.td:6841-6889`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct FpClassFlags(pub u32);
+
+impl FpClassFlags {
+    pub const SIGNALING_NAN: u32 = 1 << 0;
+    pub const QUIET_NAN: u32 = 1 << 1;
+    pub const NEGATIVE_INFINITY: u32 = 1 << 2;
+    pub const NEGATIVE_NORMAL: u32 = 1 << 3;
+    pub const NEGATIVE_SUBNORMAL: u32 = 1 << 4;
+    pub const NEGATIVE_ZERO: u32 = 1 << 5;
+    pub const POSITIVE_ZERO: u32 = 1 << 6;
+    pub const POSITIVE_SUBNORMAL: u32 = 1 << 7;
+    pub const POSITIVE_NORMAL: u32 = 1 << 8;
+    pub const POSITIVE_INFINITY: u32 = 1 << 9;
+
+    const NAMED_BITS: [(u32, &'static str); 10] = [
+        (Self::SIGNALING_NAN, "fcSNan"),
+        (Self::QUIET_NAN, "fcQNan"),
+        (Self::NEGATIVE_INFINITY, "fcNegInf"),
+        (Self::NEGATIVE_NORMAL, "fcNegNormal"),
+        (Self::NEGATIVE_SUBNORMAL, "fcNegSubnormal"),
+        (Self::NEGATIVE_ZERO, "fcNegZero"),
+        (Self::POSITIVE_ZERO, "fcPosZero"),
+        (Self::POSITIVE_SUBNORMAL, "fcPosSubnormal"),
+        (Self::POSITIVE_NORMAL, "fcPosNormal"),
+        (Self::POSITIVE_INFINITY, "fcPosInf"),
+    ];
+
+    pub fn contains(self, bit: u32) -> bool {
+        self.0 & bit != 0
+    }
+}
+
+impl From<u32> for FpClassFlags {
+    fn from(value: u32) -> Self {
+        FpClassFlags(value)
+    }
+}
+
+/// Decodes from `cir.is_fp_class`'s plain integer-valued `flags` field.
+impl TryFrom<&Attribute> for FpClassFlags {
+    type Error = ParseEnumError;
+    fn try_from(attr: &Attribute) -> Result<Self, Self::Error> {
+        let value = attr.as_int().ok_or_else(|| ParseEnumError {
+            type_name: "FpClassFlags",
+            input: format!("{attr:?}"),
+        })?;
+        Ok(FpClassFlags(value as u32))
+    }
+}
+
+impl fmt::Display for FpClassFlags {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.0 == 0 {
+            return write!(f, "fcNone");
+        }
+        let names: Vec<&str> = Self::NAMED_BITS
+            .iter()
+            .filter(|(bit, _)| self.0 & bit != 0)
+            .map(|(_, name)| *name)
+            .collect();
+        write!(f, "{}", names.join("|"))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -395,5 +465,19 @@ mod tests {
         assert_eq!(CastKind::ArrayToPtrDecay.to_string(), "array_to_ptrdecay");
         assert_eq!("no_inline".parse(), Ok(InlineKind::NoInline));
         assert_eq!(InlineKind::NoInline.to_string(), "no_inline");
+    }
+
+    #[test]
+    fn fp_class_flags_decodes_composite_group() {
+        // `fcNan` is `fcSNan | fcQNan` (bits 0 and 1).
+        let attr = Attribute::Int { value: 3, ty: None };
+        let flags = FpClassFlags::try_from(&attr).unwrap();
+        assert_eq!(flags.0, 3);
+        assert_eq!(flags.to_string(), "fcSNan|fcQNan");
+    }
+
+    #[test]
+    fn fp_class_flags_none_displays_as_fc_none() {
+        assert_eq!(FpClassFlags(0).to_string(), "fcNone");
     }
 }

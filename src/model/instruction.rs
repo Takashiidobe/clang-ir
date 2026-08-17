@@ -10,7 +10,7 @@
 //! "structural-with-fallback" approach used for types/attributes.
 
 use crate::ast::{Attribute, Block, Operation, Region, Type, ValueId};
-use crate::model::enums::{CaseOpKind, CastKind, CmpOpKind, SideEffect};
+use crate::model::enums::{CaseOpKind, CastKind, CmpOpKind, FpClassFlags, SideEffect};
 
 /// A lowered region: almost always a single unlabeled block, but CIR can
 /// still produce multiple blocks within a region (e.g. `goto` crossing
@@ -392,6 +392,20 @@ pub enum Instruction {
         rhs: ValueId,
     },
 
+    // -- vectors --
+    /// Broadcasts a scalar into every lane of a vector: `cir.vec.splat`.
+    VecSplat {
+        result: ValueId,
+        ty: Type,
+        value: ValueId,
+    },
+    VecExtract {
+        result: ValueId,
+        ty: Type,
+        vec: ValueId,
+        index: ValueId,
+    },
+
     // -- math / bit-count builtins --
     MathUnary {
         result: ValueId,
@@ -401,6 +415,13 @@ pub enum Instruction {
         /// `poison_zero` (clz/ctz) or `min_is_poison` (abs); always `false`
         /// for kinds that don't carry one.
         poison_flag: bool,
+    },
+    /// `__builtin_isfpclass`-style test: `cir.is_fp_class`.
+    IsFpClass {
+        result: ValueId,
+        ty: Type,
+        operand: ValueId,
+        flags: FpClassFlags,
     },
     Copysign {
         result: ValueId,
@@ -850,6 +871,33 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 ty: ty.clone(),
                 lhs: operand(op, 0)?.clone(),
                 rhs: operand(op, 1)?.clone(),
+            })
+        }
+        "vec.splat" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::VecSplat {
+                result: result.clone(),
+                ty: ty.clone(),
+                value: operand(op, 0)?.clone(),
+            })
+        }
+        "vec.extract" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::VecExtract {
+                result: result.clone(),
+                ty: ty.clone(),
+                vec: operand(op, 0)?.clone(),
+                index: operand(op, 1)?.clone(),
+            })
+        }
+        "is_fp_class" => {
+            let (result, ty) = single_result(op)?;
+            let flags = FpClassFlags::try_from(op.attr("flags")?).ok()?;
+            Some(Instruction::IsFpClass {
+                result: result.clone(),
+                ty: ty.clone(),
+                operand: operand(op, 0)?.clone(),
+                flags,
             })
         }
         "fabs" | "floor" | "ffs" | "clz" | "ctz" | "abs" | "signbit" => {
@@ -1400,6 +1448,19 @@ fn write_instruction(
             write_indent(f, level)?;
             writeln!(f, "%{result} = ptr_diff %{lhs}, %{rhs} : {ty}")
         }
+        VecSplat { result, ty, value } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = vec.splat %{value} : {ty}")
+        }
+        VecExtract {
+            result,
+            ty,
+            vec,
+            index,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = vec.extract %{vec}[%{index}] : {ty}")
+        }
         MathUnary {
             result,
             ty,
@@ -1411,6 +1472,15 @@ fn write_instruction(
             write!(f, "%{result} = {kind} %{operand} : {ty}")?;
             write_flags(f, &[("poison", *poison_flag)])?;
             writeln!(f)
+        }
+        IsFpClass {
+            result,
+            ty,
+            operand,
+            flags,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = is_fp_class %{operand}, {flags} : {ty}")
         }
         Copysign {
             result,
@@ -1695,4 +1765,66 @@ fn write_flags(f: &mut std::fmt::Formatter<'_>, flags: &[(&str, bool)]) -> std::
         write!(f, " [{}]", set.join(", "))?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn lower_single_op(src: &str) -> Instruction {
+        let module = crate::parser::parse_generic_module(src).unwrap();
+        lower_op(&module.ops[0])
+    }
+
+    #[test]
+    fn vec_splat_lowers() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.vec.splat"(%0) : (!cir.int<s, 32>) -> !cir.vector<4 x !cir.int<s, 32>>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::VecSplat { ref result, ref value, .. }
+                if result == "1" && value == "0"
+        ));
+        assert_eq!(instr.to_string(), "%1 = vec.splat %0 : vector<4 x s32>\n");
+    }
+
+    #[test]
+    fn vec_extract_lowers() {
+        let instr = lower_single_op(
+            r#"%2 = "cir.vec.extract"(%0, %1) : (!cir.vector<4 x !cir.int<s, 32>>, !cir.int<s, 32>) -> !cir.int<s, 32>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::VecExtract { ref result, ref vec, ref index, .. }
+                if result == "2" && vec == "0" && index == "1"
+        ));
+        assert_eq!(instr.to_string(), "%2 = vec.extract %0[%1] : s32\n");
+    }
+
+    #[test]
+    fn is_fp_class_lowers() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.is_fp_class"(%0) <{flags = 3 : i32}> : (!cir.double) -> !cir.bool"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::IsFpClass { ref result, ref operand, flags, .. }
+                if result == "1" && operand == "0" && flags.0 == 3
+        ));
+        assert_eq!(
+            instr.to_string(),
+            "%1 = is_fp_class %0, fcSNan|fcQNan : bool\n"
+        );
+    }
+
+    #[test]
+    fn unrecognized_flags_still_lower_via_raw_bitmask() {
+        // Not a documented composite group, just an arbitrary bit combination
+        // (positive infinity | negative zero) - still a valid `flags` value.
+        let instr = lower_single_op(
+            r#"%1 = "cir.is_fp_class"(%0) <{flags = 544 : i32}> : (!cir.float) -> !cir.bool"#,
+        );
+        assert!(matches!(instr, Instruction::IsFpClass { flags, .. } if flags.0 == 544));
+    }
 }
