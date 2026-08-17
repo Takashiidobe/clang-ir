@@ -63,9 +63,48 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %14, %12, align 4
         %15 = load %12 : s32i, align 4
         %16 = cast(integral) %15 : u64i
-        <unmodeled: cir.stacksave>
+        %17 = stacksave : u8i*
         store %17, %13, align 8
-        <unmodeled: cir.cleanup.scope>
+        cleanup.scope {
+            %19 = alloca s32i, "values", align 16, dynamic %16
+            scope {
+                %22 = alloca s32i, "index", align 4
+                %23 = const 0 : s32i
+                store %23, %22, align 4
+                for cond: {
+                    %32 = load %22 : s32i, align 4
+                    %33 = load %12 : s32i, align 4
+                    %34 = cmp lt %32, %33 : bool
+                    condition %34
+                } step: {
+                    %24 = load %22 : s32i, align 4
+                    %25 = inc %24 : s32i [nsw]
+                    store %25, %22, align 4
+                    yield
+                } do {
+                    scope {
+                        %26 = load %22 : s32i, align 4
+                        %27 = const 3 : s32i
+                        %28 = add %26, %27 : s32i [nsw]
+                        %29 = load %22 : s32i, align 4
+                        %30 = cast(integral) %29 : s64i
+                        %31 = ptr_stride %19, %30 : s32i*
+                        store %28, %31, align 4
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            %20 = load %12 : s32i, align 4
+            %21 = call @sum_vla(%20, %19) : s32i [all]
+            store %21, %1, align 4
+            yield
+        } cleanup normal {
+            %18 = load %13 : u8i*, align 8
+            <unmodeled: cir.stackrestore>
+            yield
+        }
         yield
     }
     %3 = get_global @printf : ((s8i*, ...) -> s32i)*

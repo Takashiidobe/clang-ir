@@ -272,6 +272,36 @@ int_enum! {
 }
 
 int_enum! {
+    /// `cir.atomic.fetch`'s `binop` field.
+    AtomicFetchKind from "CIROps.td:8798-8817" {
+        Add = 0 => "add",
+        Sub = 1 => "sub",
+        And = 2 => "and",
+        Xor = 3 => "xor",
+        Or = 4 => "or",
+        Nand = 5 => "nand",
+        Max = 6 => "max",
+        Min = 7 => "min",
+        UIncWrap = 8 => "uinc_wrap",
+        UDecWrap = 9 => "udec_wrap",
+        Maximum = 10 => "maximum",
+        Minimum = 11 => "minimum",
+        MaximumNum = 12 => "maximum_num",
+        MinimumNum = 13 => "minimum_num",
+    }
+}
+
+keyword_enum! {
+    /// `cir.cleanup.scope`'s `cleanupKind` field, printed via a custom
+    /// attribute (`#cir.cleanup_kind<all>`), never as a raw integer.
+    CleanupKind from "CIROps.td:1340-1354" {
+        Normal => "normal",
+        EH => "eh",
+        All => "all",
+    }
+}
+
+int_enum! {
     /// `cir.case`'s `kind` field.
     CaseOpKind from "CIROps.td:1515-1520" {
         Default = 0 => "default",

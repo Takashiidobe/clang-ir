@@ -16,9 +16,44 @@ fn f1(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %55
         %57 = load %55 : s32i, align 4
         %58 = cast(integral) %57 : u64i
-        <unmodeled: cir.stacksave>
+        %59 = stacksave : u8i*
         store %59, %56, align 8
-        <unmodeled: cir.cleanup.scope>
+        cleanup.scope {
+            %61 = alloca s8i, "test", align 16, dynamic %58
+            scope {
+                %66 = const 0 : s32i
+                %67 = cast(int_to_bool) %66 : bool
+                if %67 {
+                    br ^bb1
+                    ^bb1():
+                        label label:
+                        %68 = get_global @printf : ((s8i*, ...) -> s32i)*
+                        %69 = get_global @.str : s8i[7]*
+                        %70 = cast(array_to_ptrdecay) %69 : s8i*
+                        %71 = call @printf(%70) : s32i [all]
+                        yield
+                }
+                yield
+            }
+            scope {
+                %62 = load %55 : s32i, align 4
+                %63 = dec %62 : s32i [nsw]
+                store %63, %55, align 4
+                %64 = const 0 : s32i
+                %65 = cmp eq %62, %64 : bool
+                if %65 {
+                    return
+                }
+                yield
+            }
+            goto label
+            ^bb1():
+                yield
+        } cleanup normal {
+            %60 = load %56 : u8i*, align 8
+            <unmodeled: cir.stackrestore>
+            yield
+        }
         return
 }
 fn f2() -> void [external, c, no_inline, dso_local, nothrow] {

@@ -10,7 +10,10 @@
 //! "structural-with-fallback" approach used for types/attributes.
 
 use crate::ast::{Attribute, Block, Operation, Region, Type, ValueId};
-use crate::model::enums::{AsmFlavor, CaseOpKind, CastKind, CmpOpKind, FpClassFlags, SideEffect};
+use crate::model::enums::{
+    AsmFlavor, AtomicFetchKind, CaseOpKind, CastKind, CleanupKind, CmpOpKind, FpClassFlags,
+    MemOrder, SideEffect, SyncScopeKind,
+};
 
 /// A lowered region: almost always a single unlabeled block, but CIR can
 /// still produce multiple blocks within a region (e.g. `goto` crossing
@@ -410,6 +413,14 @@ pub enum Instruction {
         ty: Type,
         elements: Vec<ValueId>,
     },
+    /// Element-wise vector comparison: `cir.vec.cmp`.
+    VecCmp {
+        result: ValueId,
+        ty: Type,
+        kind: CmpOpKind,
+        lhs: ValueId,
+        rhs: ValueId,
+    },
 
     // -- math / bit-count builtins --
     MathUnary {
@@ -479,6 +490,18 @@ pub enum Instruction {
         ty: Type,
         operand: ValueId,
     },
+    /// Address of a complex value's imaginary component: `cir.complex.imag_ptr`.
+    ComplexImagPtr {
+        result: ValueId,
+        ty: Type,
+        operand: ValueId,
+    },
+    ComplexAdd {
+        result: ValueId,
+        ty: Type,
+        lhs: ValueId,
+        rhs: ValueId,
+    },
 
     // -- varargs --
     VaStart {
@@ -525,10 +548,60 @@ pub enum Instruction {
         side_effects: bool,
         flavor: AsmFlavor,
     },
+    /// Saves the function stack pointer for a later `cir.stackrestore`, used
+    /// when lowering variable-length-array allocas: `cir.stacksave`.
+    StackSave {
+        result: ValueId,
+        ty: Type,
+    },
+    /// libc `memchr`: `cir.libc.memchr`.
+    MemChr {
+        result: ValueId,
+        ty: Type,
+        src: ValueId,
+        pattern: ValueId,
+        len: ValueId,
+    },
+    /// Call to an LLVM intrinsic with no CIR-level modeling: `cir.call_llvm_intrinsic`.
+    CallLlvmIntrinsic {
+        result: Option<(ValueId, Type)>,
+        intrinsic_name: String,
+        args: Vec<ValueId>,
+    },
+
+    // -- atomics --
+    AtomicFetch {
+        result: ValueId,
+        ty: Type,
+        ptr: ValueId,
+        val: ValueId,
+        binop: AtomicFetchKind,
+        mem_order: MemOrder,
+        sync_scope: SyncScopeKind,
+        is_volatile: bool,
+        /// If set, the result is the value loaded *before* the binary
+        /// operation rather than the operation's result.
+        fetch_first: bool,
+    },
+    AtomicXchg {
+        result: ValueId,
+        ty: Type,
+        ptr: ValueId,
+        val: ValueId,
+        mem_order: MemOrder,
+        sync_scope: SyncScopeKind,
+        is_volatile: bool,
+    },
 
     // -- structured control flow --
     Scope {
         body: Body,
+    },
+    /// A scope with an associated cleanup region run on exit: `cir.cleanup.scope`.
+    CleanupScope {
+        kind: CleanupKind,
+        body: Body,
+        cleanup: Body,
     },
     If {
         condition: ValueId,
@@ -940,6 +1013,17 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 elements: op.operands.clone(),
             })
         }
+        "vec.cmp" => {
+            let (result, ty) = single_result(op)?;
+            let kind = CmpOpKind::try_from(op.attr("kind")?).ok()?;
+            Some(Instruction::VecCmp {
+                result: result.clone(),
+                ty: ty.clone(),
+                kind,
+                lhs: operand(op, 0)?.clone(),
+                rhs: operand(op, 1)?.clone(),
+            })
+        }
         "is_fp_class" => {
             let (result, ty) = single_result(op)?;
             let flags = FpClassFlags::try_from(op.attr("flags")?).ok()?;
@@ -1037,6 +1121,23 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 operand: operand(op, 0)?.clone(),
             })
         }
+        "complex.imag_ptr" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::ComplexImagPtr {
+                result: result.clone(),
+                ty: ty.clone(),
+                operand: operand(op, 0)?.clone(),
+            })
+        }
+        "complex.add" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::ComplexAdd {
+                result: result.clone(),
+                ty: ty.clone(),
+                lhs: operand(op, 0)?.clone(),
+                rhs: operand(op, 1)?.clone(),
+            })
+        }
         "va_start" => Some(Instruction::VaStart {
             addr: operand(op, 0)?.clone(),
         }),
@@ -1103,6 +1204,62 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 flavor: AsmFlavor::try_from(op.attr("asm_flavor")?).ok()?,
             })
         }
+        "stacksave" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::StackSave {
+                result: result.clone(),
+                ty: ty.clone(),
+            })
+        }
+        "libc.memchr" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::MemChr {
+                result: result.clone(),
+                ty: ty.clone(),
+                src: operand(op, 0)?.clone(),
+                pattern: operand(op, 1)?.clone(),
+                len: operand(op, 2)?.clone(),
+            })
+        }
+        "call_llvm_intrinsic" => Some(Instruction::CallLlvmIntrinsic {
+            result: single_result(op).cloned(),
+            intrinsic_name: op
+                .attr("intrinsic_name")
+                .and_then(Attribute::as_str)?
+                .to_string(),
+            args: op.operands.clone(),
+        }),
+        "atomic.fetch" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::AtomicFetch {
+                result: result.clone(),
+                ty: ty.clone(),
+                ptr: operand(op, 0)?.clone(),
+                val: operand(op, 1)?.clone(),
+                binop: AtomicFetchKind::try_from(op.attr("binop")?).ok()?,
+                mem_order: MemOrder::try_from(op.attr("mem_order")?).ok()?,
+                sync_scope: SyncScopeKind::try_from(op.attr("sync_scope")?).ok()?,
+                is_volatile: flag(op, "is_volatile"),
+                fetch_first: flag(op, "fetch_first"),
+            })
+        }
+        "atomic.xchg" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::AtomicXchg {
+                result: result.clone(),
+                ty: ty.clone(),
+                ptr: operand(op, 0)?.clone(),
+                val: operand(op, 1)?.clone(),
+                mem_order: MemOrder::try_from(op.attr("mem_order")?).ok()?,
+                sync_scope: SyncScopeKind::try_from(op.attr("sync_scope")?).ok()?,
+                is_volatile: flag(op, "is_volatile"),
+            })
+        }
+        "cleanup.scope" => Some(Instruction::CleanupScope {
+            kind: CleanupKind::try_from(op.attr("cleanupKind")?).ok()?,
+            body: lower_region(region(op, 0)?),
+            cleanup: lower_region(region(op, 1)?),
+        }),
         "scope" => Some(Instruction::Scope {
             body: lower_region(region(op, 0)?),
         }),
@@ -1556,6 +1713,16 @@ fn write_instruction(
             write_value_list(f, elements)?;
             writeln!(f, ") : {ty}")
         }
+        VecCmp {
+            result,
+            ty,
+            kind,
+            lhs,
+            rhs,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = vec.cmp {kind} %{lhs}, %{rhs} : {ty}")
+        }
         MathUnary {
             result,
             ty,
@@ -1655,6 +1822,23 @@ fn write_instruction(
             write_indent(f, level)?;
             writeln!(f, "%{result} = complex.real_ptr %{operand} : {ty}")
         }
+        ComplexImagPtr {
+            result,
+            ty,
+            operand,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = complex.imag_ptr %{operand} : {ty}")
+        }
+        ComplexAdd {
+            result,
+            ty,
+            lhs,
+            rhs,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = complex.add %{lhs}, %{rhs} : {ty}")
+        }
         VaStart { addr } => {
             write_indent(f, level)?;
             writeln!(f, "va_start %{addr}")
@@ -1724,7 +1908,94 @@ fn write_instruction(
             }
             writeln!(f)
         }
+        StackSave { result, ty } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = stacksave : {ty}")
+        }
+        MemChr {
+            result,
+            ty,
+            src,
+            pattern,
+            len,
+        } => {
+            write_indent(f, level)?;
+            writeln!(
+                f,
+                "%{result} = libc.memchr(%{src}, %{pattern}, %{len}) : {ty}"
+            )
+        }
+        CallLlvmIntrinsic {
+            result,
+            intrinsic_name,
+            args,
+        } => {
+            write_indent(f, level)?;
+            if let Some((r, _)) = result {
+                write!(f, "%{r} = ")?;
+            }
+            write!(f, "call_llvm_intrinsic {intrinsic_name}(")?;
+            write_value_list(f, args)?;
+            write!(f, ")")?;
+            if let Some((_, ty)) = result {
+                write!(f, " : {ty}")?;
+            }
+            writeln!(f)
+        }
+        AtomicFetch {
+            result,
+            ty,
+            ptr,
+            val,
+            binop,
+            mem_order,
+            sync_scope,
+            is_volatile,
+            fetch_first,
+        } => {
+            write_indent(f, level)?;
+            write!(
+                f,
+                "%{result} = atomic.fetch {binop} {mem_order} syncscope({sync_scope}) %{ptr}, %{val} : {ty}"
+            )?;
+            write_flags(
+                f,
+                &[("volatile", *is_volatile), ("fetch_first", *fetch_first)],
+            )?;
+            writeln!(f)
+        }
+        AtomicXchg {
+            result,
+            ty,
+            ptr,
+            val,
+            mem_order,
+            sync_scope,
+            is_volatile,
+        } => {
+            write_indent(f, level)?;
+            write!(
+                f,
+                "%{result} = atomic.xchg {mem_order} syncscope({sync_scope}) %{ptr}, %{val} : {ty}"
+            )?;
+            write_flags(f, &[("volatile", *is_volatile)])?;
+            writeln!(f)
+        }
         Scope { body } => write_nested(f, level, "scope", body),
+        CleanupScope {
+            kind,
+            body,
+            cleanup,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "cleanup.scope {{")?;
+            write_body(body, f, level + 1)?;
+            write_indent(f, level)?;
+            writeln!(f, "}} cleanup {kind} {{")?;
+            write_body(cleanup, f, level + 1)?;
+            write_indent(f, level)?;
+            writeln!(f, "}}")
+        }
         If {
             condition,
             then_body,
@@ -2048,6 +2319,135 @@ mod tests {
                 && outputs.is_empty()
                 && inputs.is_empty()
                 && in_outs == &["0".to_string()]
+        ));
+    }
+
+    #[test]
+    fn vec_cmp_lowers() {
+        let instr = lower_single_op(
+            r#"%2 = "cir.vec.cmp"(%0, %1) <{kind = 4 : i32}> : (!cir.vector<4 x !cir.int<s, 32>>, !cir.vector<4 x !cir.int<s, 32>>) -> !cir.vector<4 x !cir.int<s, 32>>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::VecCmp { ref result, kind: CmpOpKind::Eq, ref lhs, ref rhs, .. }
+                if result == "2" && lhs == "0" && rhs == "1"
+        ));
+        assert_eq!(
+            instr.to_string(),
+            "%2 = vec.cmp eq %0, %1 : vector<4 x s32>\n"
+        );
+    }
+
+    #[test]
+    fn complex_imag_ptr_lowers() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.complex.imag_ptr"(%0) : (!cir.ptr<!cir.complex<!cir.double>>) -> !cir.ptr<!cir.double>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::ComplexImagPtr { ref result, ref operand, .. }
+                if result == "1" && operand == "0"
+        ));
+    }
+
+    #[test]
+    fn complex_add_lowers() {
+        let instr = lower_single_op(
+            r#"%2 = "cir.complex.add"(%0, %1) : (!cir.complex<!cir.float>, !cir.complex<!cir.float>) -> !cir.complex<!cir.float>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::ComplexAdd { ref result, ref lhs, ref rhs, .. }
+                if result == "2" && lhs == "0" && rhs == "1"
+        ));
+    }
+
+    #[test]
+    fn stacksave_lowers() {
+        let instr = lower_single_op(r#"%0 = "cir.stacksave"() : () -> !cir.ptr<!cir.int<u, 8>>"#);
+        assert!(matches!(instr, Instruction::StackSave { ref result, .. } if result == "0"));
+    }
+
+    #[test]
+    fn memchr_lowers() {
+        let instr = lower_single_op(
+            r#"%3 = "cir.libc.memchr"(%0, %1, %2) : (!cir.ptr<!cir.void>, !cir.int<s, 32>, !cir.int<u, 64>) -> !cir.ptr<!cir.void>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::MemChr { ref result, ref src, ref pattern, ref len, .. }
+                if result == "3" && src == "0" && pattern == "1" && len == "2"
+        ));
+    }
+
+    #[test]
+    fn call_llvm_intrinsic_lowers() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.call_llvm_intrinsic"(%0) <{intrinsic_name = "llvm.foo"}> : (!cir.int<s, 32>) -> !cir.int<s, 32>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::CallLlvmIntrinsic { ref result, ref intrinsic_name, ref args }
+                if result.as_ref().is_some_and(|(r, _)| r == "1")
+                    && intrinsic_name == "llvm.foo"
+                    && args == &["0".to_string()]
+        ));
+    }
+
+    #[test]
+    fn atomic_fetch_lowers() {
+        let instr = lower_single_op(
+            r#"%2 = "cir.atomic.fetch"(%0, %1) <{binop = 0 : i32, mem_order = 5 : i32, sync_scope = 1 : i32, fetch_first}> : (!cir.ptr<!cir.int<s, 32>>, !cir.int<s, 32>) -> !cir.int<s, 32>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::AtomicFetch {
+                ref result,
+                ref ptr,
+                ref val,
+                binop: AtomicFetchKind::Add,
+                mem_order: MemOrder::SequentiallyConsistent,
+                sync_scope: SyncScopeKind::System,
+                is_volatile: false,
+                fetch_first: true,
+                ..
+            } if result == "2" && ptr == "0" && val == "1"
+        ));
+        assert_eq!(
+            instr.to_string(),
+            "%2 = atomic.fetch add seq_cst syncscope(system) %0, %1 : s32 [fetch_first]\n"
+        );
+    }
+
+    #[test]
+    fn atomic_xchg_lowers() {
+        let instr = lower_single_op(
+            r#"%2 = "cir.atomic.xchg"(%0, %1) <{mem_order = 5 : i32, sync_scope = 1 : i32, is_volatile}> : (!cir.ptr<!cir.int<u, 64>>, !cir.int<u, 64>) -> !cir.int<u, 64>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::AtomicXchg {
+                ref result,
+                ref ptr,
+                ref val,
+                mem_order: MemOrder::SequentiallyConsistent,
+                sync_scope: SyncScopeKind::System,
+                is_volatile: true,
+                ..
+            } if result == "2" && ptr == "0" && val == "1"
+        ));
+    }
+
+    #[test]
+    fn cleanup_scope_lowers() {
+        let instr = lower_single_op(
+            r#""cir.cleanup.scope"() <{cleanupKind = #cir.cleanup_kind<all>}> ({
+            }, {
+            }) : () -> ()"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::CleanupScope { kind: CleanupKind::All, .. }
         ));
     }
 }

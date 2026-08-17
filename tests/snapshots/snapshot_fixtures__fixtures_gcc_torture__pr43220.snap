@@ -23,9 +23,33 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             %36 = const 1 : s32i
             %37 = add %35, %36 : s32i [nsw]
             %38 = cast(integral) %37 : u64i
-            <unmodeled: cir.stacksave>
+            %39 = stacksave : u8i*
             store %39, %32, align 8
-            <unmodeled: cir.cleanup.scope>
+            cleanup.scope {
+                %41 = alloca s32i, "x", align 16, dynamic %38
+                %42 = const 1 : s32i
+                %43 = const 0 : s64i
+                %44 = ptr_stride %41, %43 : s32i*
+                store %42, %44, align 16
+                %45 = const 2 : s32i
+                %46 = load %1 : s32i, align 4
+                %47 = const 1000 : s32i
+                %48 = rem %46, %47 : s32i
+                %49 = cast(integral) %48 : s64i
+                %50 = ptr_stride %41, %49 : s32i*
+                store %45, %50, align 4
+                %51 = cast(bitcast) %41 : void*
+                %52 = get_global @p : void**
+                store %51, %52, align 8, volatile
+                %53 = load %1 : s32i, align 4
+                %54 = inc %53 : s32i [nsw]
+                store %54, %1, align 4
+                yield
+            } cleanup normal {
+                %40 = load %32 : u8i*, align 8
+                <unmodeled: cir.stackrestore>
+                yield
+            }
             yield
         }
         scope {
@@ -36,9 +60,33 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             %13 = const 1 : s32i
             %14 = add %12, %13 : s32i [nsw]
             %15 = cast(integral) %14 : u64i
-            <unmodeled: cir.stacksave>
+            %16 = stacksave : u8i*
             store %16, %9, align 8
-            <unmodeled: cir.cleanup.scope>
+            cleanup.scope {
+                %18 = alloca s32i, "x", align 16, dynamic %15
+                %19 = const 1 : s32i
+                %20 = const 0 : s64i
+                %21 = ptr_stride %18, %20 : s32i*
+                store %19, %21, align 16
+                %22 = const 2 : s32i
+                %23 = load %1 : s32i, align 4
+                %24 = const 1000 : s32i
+                %25 = rem %23, %24 : s32i
+                %26 = cast(integral) %25 : s64i
+                %27 = ptr_stride %18, %26 : s32i*
+                store %22, %27, align 4
+                %28 = cast(bitcast) %18 : void*
+                %29 = get_global @p : void**
+                store %28, %29, align 8, volatile
+                %30 = load %1 : s32i, align 4
+                %31 = inc %30 : s32i [nsw]
+                store %31, %1, align 4
+                yield
+            } cleanup normal {
+                %17 = load %9 : u8i*, align 8
+                <unmodeled: cir.stackrestore>
+                yield
+            }
             yield
         }
         scope {
