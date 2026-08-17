@@ -425,6 +425,22 @@ pub enum Instruction {
         rhs: ValueId,
     },
 
+    // -- vtables --
+    /// Address of an object's vptr slot: `cir.vtable.get_vptr`.
+    VtableGetVptr {
+        result: ValueId,
+        ty: Type,
+        src: ValueId,
+    },
+    /// Address of a virtual function pointer within a vtable:
+    /// `cir.vtable.get_virtual_fn_addr`.
+    VtableGetVirtualFnAddr {
+        result: ValueId,
+        ty: Type,
+        vptr: ValueId,
+        index: u64,
+    },
+
     // -- vectors --
     /// Broadcasts a scalar into every lane of a vector: `cir.vec.splat`.
     VecSplat {
@@ -665,6 +681,19 @@ pub enum Instruction {
     StackSave {
         result: ValueId,
         ty: Type,
+    },
+    /// Restores the function stack to a state saved by `cir.stacksave`,
+    /// used when lowering variable-length-array allocas: `cir.stackrestore`.
+    StackRestore {
+        ptr: ValueId,
+    },
+    /// Marks the start of an alloca's lifetime: `cir.lifetime.start`.
+    LifetimeStart {
+        ptr: ValueId,
+    },
+    /// Marks the end of an alloca's lifetime: `cir.lifetime.end`.
+    LifetimeEnd {
+        ptr: ValueId,
     },
     /// libc `memchr`: `cir.libc.memchr`.
     MemChr {
@@ -1164,7 +1193,7 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
         }
         "extract_member" => {
             let (result, ty) = single_result(op)?;
-            let index = op.attr("index_attr")?.as_int()? as u64;
+            let index = op.attr("index")?.as_int()? as u64;
             Some(Instruction::ExtractMember {
                 result: result.clone(),
                 ty: ty.clone(),
@@ -1197,6 +1226,24 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 ty: ty.clone(),
                 lhs: operand(op, 0)?.clone(),
                 rhs: operand(op, 1)?.clone(),
+            })
+        }
+        "vtable.get_vptr" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::VtableGetVptr {
+                result: result.clone(),
+                ty: ty.clone(),
+                src: operand(op, 0)?.clone(),
+            })
+        }
+        "vtable.get_virtual_fn_addr" => {
+            let (result, ty) = single_result(op)?;
+            let index = op.attr("index")?.as_int()? as u64;
+            Some(Instruction::VtableGetVirtualFnAddr {
+                result: result.clone(),
+                ty: ty.clone(),
+                vptr: operand(op, 0)?.clone(),
+                index,
             })
         }
         "vec.splat" => {
@@ -1537,6 +1584,15 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 ty: ty.clone(),
             })
         }
+        "stackrestore" => Some(Instruction::StackRestore {
+            ptr: operand(op, 0)?.clone(),
+        }),
+        "lifetime.start" => Some(Instruction::LifetimeStart {
+            ptr: operand(op, 0)?.clone(),
+        }),
+        "lifetime.end" => Some(Instruction::LifetimeEnd {
+            ptr: operand(op, 0)?.clone(),
+        }),
         "libc.memchr" => {
             let (result, ty) = single_result(op)?;
             Some(Instruction::MemChr {
@@ -2110,6 +2166,22 @@ fn write_instruction(
             write_indent(f, level)?;
             writeln!(f, "%{result} = ptr_diff %{lhs}, %{rhs} : {ty}")
         }
+        VtableGetVptr { result, ty, src } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = vtable.get_vptr %{src} : {ty}")
+        }
+        VtableGetVirtualFnAddr {
+            result,
+            ty,
+            vptr,
+            index,
+        } => {
+            write_indent(f, level)?;
+            writeln!(
+                f,
+                "%{result} = vtable.get_virtual_fn_addr %{vptr}[{index}] : {ty}"
+            )
+        }
         VecSplat { result, ty, value } => {
             write_indent(f, level)?;
             writeln!(f, "%{result} = vec.splat %{value} : {ty}")
@@ -2449,6 +2521,18 @@ fn write_instruction(
         StackSave { result, ty } => {
             write_indent(f, level)?;
             writeln!(f, "%{result} = stacksave : {ty}")
+        }
+        StackRestore { ptr } => {
+            write_indent(f, level)?;
+            writeln!(f, "stackrestore %{ptr}")
+        }
+        LifetimeStart { ptr } => {
+            write_indent(f, level)?;
+            writeln!(f, "lifetime.start %{ptr}")
+        }
+        LifetimeEnd { ptr } => {
+            write_indent(f, level)?;
+            writeln!(f, "lifetime.end %{ptr}")
         }
         MemChr {
             result,
@@ -3039,6 +3123,64 @@ mod tests {
     fn stacksave_lowers() {
         let instr = lower_single_op(r#"%0 = "cir.stacksave"() : () -> !cir.ptr<!cir.int<u, 8>>"#);
         assert!(matches!(instr, Instruction::StackSave { ref result, .. } if result == "0"));
+    }
+
+    #[test]
+    fn stackrestore_lowers() {
+        let instr = lower_single_op(
+            r#""cir.stackrestore"(%0) : (!cir.ptr<!cir.int<u, 8>>) -> ()"#,
+        );
+        assert!(matches!(instr, Instruction::StackRestore { ref ptr } if ptr == "0"));
+        assert_eq!(instr.to_string(), "stackrestore %0\n");
+    }
+
+    #[test]
+    fn lifetime_start_end_lower() {
+        let instr = lower_single_op(
+            r#""cir.lifetime.start"(%0) : (!cir.ptr<!cir.int<s, 32>>) -> ()"#,
+        );
+        assert!(matches!(instr, Instruction::LifetimeStart { ref ptr } if ptr == "0"));
+
+        let instr = lower_single_op(
+            r#""cir.lifetime.end"(%0) : (!cir.ptr<!cir.int<s, 32>>) -> ()"#,
+        );
+        assert!(matches!(instr, Instruction::LifetimeEnd { ref ptr } if ptr == "0"));
+    }
+
+    #[test]
+    fn extract_member_lowers() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.extract_member"(%0) <{index = 1 : i64}> : (!cir.record<"struct.Bar" {!cir.int<s, 32>, !cir.int<s, 8>}>) -> !cir.int<s, 8>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::ExtractMember { ref result, ref value, index: 1, .. }
+                if result == "1" && value == "0"
+        ));
+    }
+
+    #[test]
+    fn vtable_get_vptr_lowers() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.vtable.get_vptr"(%0) : (!cir.ptr<!cir.record<"struct.Base">>) -> !cir.ptr<!cir.vptr>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::VtableGetVptr { ref result, ref src, .. }
+                if result == "1" && src == "0"
+        ));
+    }
+
+    #[test]
+    fn vtable_get_virtual_fn_addr_lowers() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.vtable.get_virtual_fn_addr"(%0) <{index = 2 : i64}> : (!cir.vptr) -> !cir.ptr<!cir.ptr<!cir.func<(!cir.ptr<!cir.record<"struct.Base">>) -> !cir.int<s, 32>>>>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::VtableGetVirtualFnAddr { ref result, ref vptr, index: 2, .. }
+                if result == "1" && vptr == "0"
+        ));
     }
 
     #[test]

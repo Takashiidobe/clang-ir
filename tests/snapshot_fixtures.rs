@@ -1,5 +1,6 @@
-//! Snapshot-tests the parser against every `*.c` file found recursively
-//! under `tests/` (fixtures, stdlib, gcc-torture, c-testsuite, chibicc, ...).
+//! Snapshot-tests the parser against every `*.c`/`*.cpp` file found
+//! recursively under `tests/` (fixtures, stdlib, gcc-torture, chibicc,
+//! fixtures.cxx, ...).
 //!
 //! Compiling ~2500 files with clang is the dominant cost, so that pass runs
 //! in parallel across a worker pool; the actual (cheap, pure-Rust) parse and
@@ -31,7 +32,7 @@ fn collect_c_files(dir: &Path, out: &mut Vec<PathBuf>) {
         let path = entry.path();
         if path.is_dir() {
             collect_c_files(&path, out);
-        } else if path.extension().is_some_and(|e| e == "c") {
+        } else if path.extension().is_some_and(|e| e == "c" || e == "cpp") {
             out.push(path);
         }
     }
@@ -43,11 +44,14 @@ enum Compiled {
 }
 
 fn compile_one(clang: &Path, file: &Path) -> Compiled {
-    let output = Command::new("timeout")
-        .arg("20")
-        .arg(clang)
-        .arg("-emit-cir")
-        .arg("-fclangir")
+    let mut cmd = Command::new("timeout");
+    cmd.arg("20").arg(clang).arg("-emit-cir").arg("-fclangir");
+    // C++ fixtures (`fixtures.cxx`) opt into a language mode via extension;
+    // everything else is plain C.
+    if file.extension().is_some_and(|e| e == "cpp") {
+        cmd.arg("-std=c++17");
+    }
+    let output = cmd
         .arg("-S")
         .arg("-o")
         .arg("-")
@@ -90,10 +94,10 @@ fn parse_all_fixtures() {
     files.sort();
     assert!(
         !files.is_empty(),
-        "expected to find *.c files under {}",
+        "expected to find *.c/*.cpp files under {}",
         tests_dir.display()
     );
-    eprintln!("found {} .c files", files.len());
+    eprintln!("found {} .c/.cpp files", files.len());
 
     let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
     let clang = clang_path();
