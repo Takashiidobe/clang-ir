@@ -67,9 +67,12 @@ pub enum Attribute {
         imag: Box<Attribute>,
         ty: Type,
     },
-    /// `#cir.global_view<@symbol> : ty`
+    /// `#cir.global_view<@symbol[, [idx : ty, ...]]> : ty`. `indices` is the
+    /// optional GEP-like index chain used to take the address of a nested
+    /// member/element within `symbol` rather than `symbol` itself.
     GlobalView {
         symbol: String,
+        indices: Vec<i128>,
         ty: Type,
     },
     /// `#cir.bitfield_info<name = "...", storage_type = ty, size = N, offset
@@ -106,7 +109,10 @@ pub enum Attribute {
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ConstArrayData {
-    Str(String),
+    /// Exact byte contents (not necessarily valid UTF-8: `#cir.const_array`
+    /// string bodies encode arbitrary byte data, e.g. non-printable padding
+    /// or non-ASCII wide-char data).
+    Str(Vec<u8>),
     Elements(Vec<Attribute>),
 }
 
@@ -230,13 +236,28 @@ impl std::fmt::Display for Attribute {
             Attribute::CirFloat { text, .. } => write!(f, "{text}"),
             Attribute::CirBool { value, .. } => write!(f, "{value}"),
             Attribute::ConstArray { data, .. } => match data {
-                ConstArrayData::Str(s) => write!(f, "{s:?}"),
+                ConstArrayData::Str(bytes) => write!(f, "{:?}", String::from_utf8_lossy(bytes)),
                 ConstArrayData::Elements(items) => write_bracketed(f, '[', ']', items),
             },
             Attribute::ConstVector { elements, .. } => write_bracketed(f, '[', ']', elements),
             Attribute::ConstRecord { elements, .. } => write_bracketed(f, '{', '}', elements),
             Attribute::ConstComplex { real, imag, .. } => write!(f, "({real}, {imag})"),
-            Attribute::GlobalView { symbol, .. } => write!(f, "@{symbol}"),
+            Attribute::GlobalView {
+                symbol, indices, ..
+            } => {
+                write!(f, "@{symbol}")?;
+                if !indices.is_empty() {
+                    write!(f, "[")?;
+                    for (i, index) in indices.iter().enumerate() {
+                        if i > 0 {
+                            write!(f, ", ")?;
+                        }
+                        write!(f, "{index}")?;
+                    }
+                    write!(f, "]")?;
+                }
+                Ok(())
+            }
             Attribute::BitfieldInfo {
                 name,
                 storage_type,

@@ -401,6 +401,52 @@ impl<'a> Lexer<'a> {
     }
 }
 
+/// Decodes a quoted string literal's escapes (`\"`, `\\`, `\n`, `\t`,
+/// `\XX` hex byte) to exact bytes, given the raw source text strictly
+/// between the opening and closing `"`. Unlike [`Lexer::read_quoted_string`],
+/// this preserves non-UTF-8 byte sequences instead of lossily replacing them:
+/// CIR const-array string bodies encode arbitrary byte data (not necessarily
+/// text), so callers that need byte-exact contents (e.g. `#cir.const_array<"...">`)
+/// re-decode from the token's source span via this function rather than using
+/// the lexer's own (lossy, `String`-typed) [`Tok::Str`] value.
+pub(crate) fn decode_escaped_bytes(body: &[u8]) -> Vec<u8> {
+    let mut out = Vec::with_capacity(body.len());
+    let mut i = 0;
+    while i < body.len() {
+        let b = body[i];
+        i += 1;
+        if b != b'\\' {
+            out.push(b);
+            continue;
+        }
+        let Some(&esc) = body.get(i) else {
+            out.push(b);
+            break;
+        };
+        i += 1;
+        match esc {
+            b'"' => out.push(b'"'),
+            b'\\' => out.push(b'\\'),
+            b'n' => out.push(b'\n'),
+            b't' => out.push(b'\t'),
+            hex if hex.is_ascii_hexdigit() => {
+                if let Some(&hex2) = body.get(i)
+                    && hex2.is_ascii_hexdigit()
+                {
+                    let hi = (hex as char).to_digit(16).unwrap();
+                    let lo = (hex2 as char).to_digit(16).unwrap();
+                    out.push((hi * 16 + lo) as u8);
+                    i += 1;
+                } else {
+                    out.push(hex);
+                }
+            }
+            other => out.push(other),
+        }
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

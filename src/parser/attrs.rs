@@ -189,11 +189,15 @@ impl<'a> Parser<'a> {
     fn parse_cir_const_array(&mut self) -> Result<Attribute> {
         self.expect(Tok::Less)?;
         let data = match self.tok().clone() {
-            Tok::Str(s) => {
-                self.bump();
+            Tok::Str(_) => {
+                let tok = self.bump();
+                // re-decode from the raw source span (not the lexer's lossy
+                // `String`-typed `Tok::Str`): these bytes are arbitrary data,
+                // not necessarily valid UTF-8.
+                let body = &self.src.as_bytes()[tok.pos + 1..tok.end - 1];
                 self.expect(Tok::Colon)?;
                 let _elem_ty = self.parse_type()?;
-                ConstArrayData::Str(s)
+                ConstArrayData::Str(crate::lexer::decode_escaped_bytes(body))
             }
             Tok::LBracket => {
                 self.bump();
@@ -280,15 +284,31 @@ impl<'a> Parser<'a> {
     fn parse_cir_global_view(&mut self) -> Result<Attribute> {
         self.expect(Tok::Less)?;
         let symbol = self.expect_symbol_ref()?;
-        if !self.at(&Tok::Greater) {
-            let _ = self.capture_raw_body();
-            let ty = self.maybe_colon_type()?.unwrap_or(crate::ast::Type::Void);
-            return Ok(Attribute::GlobalView { symbol, ty });
+        let mut indices = Vec::new();
+        if self.eat(&Tok::Comma) {
+            self.expect(Tok::LBracket)?;
+            if !self.at(&Tok::RBracket) {
+                loop {
+                    let n = self.expect_number()?;
+                    let value: i128 = n
+                        .parse()
+                        .map_err(|_| self.err("invalid global_view index"))?;
+                    indices.push(value);
+                    let _ = self.maybe_colon_type()?;
+                    if !self.eat(&Tok::Comma) {
+                        break;
+                    }
+                }
+            }
+            self.expect(Tok::RBracket)?;
         }
         self.expect(Tok::Greater)?;
-        self.expect(Tok::Colon)?;
-        let ty = self.parse_type()?;
-        Ok(Attribute::GlobalView { symbol, ty })
+        let ty = self.maybe_colon_type()?.unwrap_or(crate::ast::Type::Void);
+        Ok(Attribute::GlobalView {
+            symbol,
+            indices,
+            ty,
+        })
     }
 
     fn parse_cir_bitfield_info(&mut self) -> Result<Attribute> {

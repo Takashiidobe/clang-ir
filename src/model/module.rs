@@ -1,7 +1,7 @@
 use std::fmt;
 
 use crate::ast::attr::ConstArrayData;
-use crate::ast::{Attribute, Block, GenericModule, Operation, Region};
+use crate::ast::{Attribute, Block, Module as GenericModule, Operation, Region};
 use crate::model::enums::SourceLanguage;
 use crate::model::function::Function;
 use crate::model::global::Global;
@@ -29,7 +29,7 @@ pub struct Module {
 /// `value = #true`, ...) throughout `op` and its nested regions, recursively.
 /// The `ast` layer deliberately keeps these unresolved (faithful to the
 /// source text, and `!`-type aliases can be self-referential in ways
-/// attribute aliases aren't - see [`GenericModule::resolve_type`]), but the
+/// attribute aliases aren't - see [`ast::Module::resolve_type`]), but the
 /// `model` layer's [`crate::model::instruction::try_lower`] only ever sees a
 /// bare `Operation` with no access to `generic.attr_aliases`, so aliases must
 /// be inlined before lowering or every alias-referenced attribute silently
@@ -78,7 +78,7 @@ fn resolve_attribute(attr: &Attribute, generic: &GenericModule) -> Attribute {
     if let Attribute::Named(name) = attr {
         // Aliases are defined before use in `cir-opt` output, but chase
         // alias-to-alias chains regardless; the `seen` guard mirrors
-        // `GenericModule::resolve_type`'s cycle break (falls back to the
+        // `ast::Module::resolve_type`'s cycle break (falls back to the
         // unresolved reference rather than looping forever).
         let mut current_name = name.clone();
         let mut seen = std::collections::HashSet::new();

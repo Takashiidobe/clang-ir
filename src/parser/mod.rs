@@ -5,7 +5,7 @@
 mod attrs;
 mod types;
 
-use crate::ast::{Attribute, Block, GenericModule, Operation, Region, Type};
+use crate::ast::{Attribute, Block, Module, Operation, Region, Type};
 use crate::error::{Error, Result};
 use crate::lexer::{Lexer, SpannedTok, Tok};
 
@@ -15,7 +15,7 @@ pub struct Parser<'a> {
     pos: usize,
 }
 
-pub fn parse_generic_module(src: &str) -> Result<GenericModule> {
+pub fn parse_generic_module(src: &str) -> Result<Module> {
     let mut p = Parser::new(src)?;
     p.parse_module()
 }
@@ -168,8 +168,8 @@ impl<'a> Parser<'a> {
 
     // ---- top-level module ----
 
-    fn parse_module(&mut self) -> Result<GenericModule> {
-        let mut m = GenericModule::default();
+    fn parse_module(&mut self) -> Result<Module> {
+        let mut m = Module::default();
         loop {
             match self.tok() {
                 Tok::Bang => {

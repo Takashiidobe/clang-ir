@@ -2,7 +2,7 @@
 ///
 /// `Named` is deliberately not eagerly resolved: CIR record types can be
 /// self- or mutually-recursive (`!rec_node = !cir.struct<"node" {data !cir.ptr<!rec_node>}>`),
-/// so alias resolution has to stay lazy (via [`crate::ast::op::GenericModule::resolve_type`])
+/// so alias resolution has to stay lazy (via [`crate::ast::op::Module::resolve_type`])
 /// rather than inlining bodies at parse time.
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

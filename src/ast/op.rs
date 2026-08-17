@@ -78,7 +78,7 @@ pub struct Block {
 /// type/attribute aliases plus the (usually singular) top-level operation(s).
 #[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct GenericModule {
+pub struct Module {
     pub type_aliases: BTreeMap<String, Type>,
     pub attr_aliases: BTreeMap<String, Attribute>,
     /// `#locN = loc(...)` alias definitions, kept verbatim like `Operation::loc`.
@@ -86,7 +86,7 @@ pub struct GenericModule {
     pub ops: Vec<Operation>,
 }
 
-impl GenericModule {
+impl Module {
     /// Follows a `Type::Named` chain to its underlying definition. Returns
     /// `None` if the alias is undefined (never loops forever: CIR record
     /// aliases may be self-referential through a `Ptr`/`Array` indirection,

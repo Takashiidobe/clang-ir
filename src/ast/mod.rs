@@ -12,5 +12,5 @@ pub mod op;
 pub mod ty;
 
 pub use attr::{Attribute, ConstArrayData};
-pub use op::{Block, GenericModule, Operation, Region, ValueId};
+pub use op::{Block, Module, Operation, Region, ValueId};
 pub use ty::{FloatKind, RecordKind, RecordMemberKind, StructType, Type};
