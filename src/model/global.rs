@@ -3,7 +3,7 @@ use std::fmt;
 use crate::ast::{Attribute, Operation, Type};
 use crate::model::enums::{GlobalLinkageKind, TlsModel, VisibilityKind};
 
-#[derive(Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Global {
     pub name: String,
@@ -121,11 +121,5 @@ impl fmt::Display for Global {
             attrs.push("comdat".to_string());
         }
         writeln!(f, " [{}]", attrs.join(", "))
-    }
-}
-
-impl fmt::Debug for Global {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        fmt::Display::fmt(self, f)
     }
 }

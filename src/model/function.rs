@@ -4,7 +4,7 @@ use crate::ast::{Attribute, Operation, Type, ValueId};
 use crate::model::enums::{CallingConv, GlobalLinkageKind, InlineKind, SideEffect};
 use crate::model::instruction::{Body, lower_region, write_body};
 
-#[derive(Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Function {
     pub name: String,
@@ -173,11 +173,5 @@ impl fmt::Display for Function {
                 writeln!(f, "}}")
             }
         }
-    }
-}
-
-impl fmt::Debug for Function {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        fmt::Display::fmt(self, f)
     }
 }

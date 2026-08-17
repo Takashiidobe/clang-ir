@@ -1,7 +1,7 @@
 //! Hand-written lexer for the generic MLIR textual syntax used by `cir-opt
 //! --mlir-print-op-generic` output (operations, regions, CIR types/attributes).
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Tok {
     Ident(String),
     /// `%name` or `%42` (the text after `%`)
@@ -36,7 +36,7 @@ pub enum Tok {
     Eof,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SpannedTok {
     pub tok: Tok,
     pub pos: usize,

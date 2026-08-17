@@ -15,13 +15,13 @@ use crate::model::enums::{CaseOpKind, CastKind, CmpOpKind, SideEffect};
 /// A lowered region: almost always a single unlabeled block, but CIR can
 /// still produce multiple blocks within a region (e.g. `goto` crossing
 /// scopes lowers to plain block successors via `cir.br`/`cir.brcond`).
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Body {
     pub blocks: Vec<InstBlock>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InstBlock {
     pub label: Option<String>,
@@ -29,7 +29,7 @@ pub struct InstBlock {
     pub body: Vec<Instruction>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum BinaryOp {
     Add,
@@ -87,7 +87,7 @@ impl std::fmt::Display for BinaryOp {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum UnaryOp {
     Inc,
@@ -126,7 +126,7 @@ impl std::fmt::Display for UnaryOp {
 
 /// A single-operand math/bit-count builtin. `result`'s type can differ from
 /// `operand`'s (e.g. `Signbit` takes a float and returns `bool`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum MathUnaryKind {
     Fabs,
@@ -172,7 +172,7 @@ impl std::fmt::Display for MathUnaryKind {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BitfieldInfo {
     pub name: String,
@@ -218,7 +218,7 @@ impl std::fmt::Display for BitfieldInfo {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SwitchCase {
     pub kind: CaseOpKind,
@@ -228,14 +228,14 @@ pub struct SwitchCase {
     pub body: Body,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Callee {
     Direct(String),
     Indirect(ValueId),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Instruction {
     // -- memory --

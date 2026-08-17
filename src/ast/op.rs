@@ -6,7 +6,7 @@ use super::ty::Type;
 /// A single SSA value id, without its `%` sigil.
 pub type ValueId = String;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Operation {
     /// Full dialect-qualified mnemonic, e.g. `"cir.alloca"` or `"builtin.module"`.
@@ -58,13 +58,13 @@ impl Operation {
     }
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Region {
     pub blocks: Vec<Block>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Block {
     /// `None` for an unlabeled entry block (only the first block in a region
@@ -76,7 +76,7 @@ pub struct Block {
 
 /// The result of parsing a whole `.mlir`/generic-CIR text file: top-level
 /// type/attribute aliases plus the (usually singular) top-level operation(s).
-#[derive(Debug, Clone, Default)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Module {
     pub type_aliases: BTreeMap<String, Type>,

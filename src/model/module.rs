@@ -6,7 +6,7 @@ use crate::model::enums::SourceLanguage;
 use crate::model::function::Function;
 use crate::model::global::Global;
 
-#[derive(Clone, Default)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Module {
     /// The module's `sym_name`: clang IR names the module after the source
@@ -244,11 +244,5 @@ impl fmt::Display for Module {
             writeln!(f, "; {} unmodeled top-level op(s)", self.other.len())?;
         }
         Ok(())
-    }
-}
-
-impl fmt::Debug for Module {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        fmt::Display::fmt(self, f)
     }
 }

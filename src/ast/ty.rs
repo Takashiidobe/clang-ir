@@ -4,7 +4,7 @@
 /// self- or mutually-recursive (`!rec_node = !cir.struct<"node" {data !cir.ptr<!rec_node>}>`),
 /// so alias resolution has to stay lazy (via [`crate::ast::op::Module::resolve_type`])
 /// rather than inlining bodies at parse time.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Type {
     /// Reference to a `!name` alias defined at the top of the file.
@@ -59,7 +59,7 @@ pub enum Type {
     },
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum FloatKind {
     F16,
@@ -69,14 +69,14 @@ pub enum FloatKind {
     F128,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum RecordKind {
     Struct,
     Union,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum RecordMemberKind {
     Data,
@@ -84,7 +84,7 @@ pub enum RecordMemberKind {
     Empty,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StructType {
     pub name: Option<String>,

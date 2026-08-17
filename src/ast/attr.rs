@@ -1,7 +1,7 @@
 use super::ty::Type;
 
 /// An attribute as it appears in generic MLIR/CIR text.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Attribute {
     /// Bare dict key with no `=`, e.g. `init` inside `<{alignment = 4, init}>`.
@@ -106,7 +106,7 @@ pub enum Attribute {
     },
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ConstArrayData {
     /// Exact byte contents (not necessarily valid UTF-8: `#cir.const_array`
