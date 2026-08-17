@@ -1,0 +1,58 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "tests/fixtures.cxx/try_catch.cpp" (cxx, x86_64-unknown-linux-gnu)
+global _ZTIi : u8i* [external, default, dso_local, constant]
+
+fn __gxx_personality_v0(...) -> s32i [external, c, dso_local];
+fn _Z5riskyv() -> s32i [external, c];
+fn _Z1fv() -> s32i [external, c, no_inline, dso_local] {
+    %0 = alloca s32i, "__retval", align 4
+    scope {
+        %1 = alloca s32i, "e", align 4
+        try {
+            %8 = call @_Z5riskyv() : s32i [all]
+            store %8, %0
+            %9 = load %0 : s32i
+            return %9
+            ^bb1():
+                yield
+        }
+        catch [@_ZTIi : u8i*] {
+            ^bb0(%arg1: cir.eh_token):
+                %5#0, %5#1 = begin_catch %arg1 : void*
+                cleanup.scope {
+                    init_catch_param scalar %5#1 to %1
+                    %6 = load %1 : s32i, align 4
+                    store %6, %0
+                    %7 = load %0 : s32i
+                    return %7
+                    ^bb1():
+                        yield
+                } cleanup all {
+                    end_catch %5#0
+                    yield
+                }
+                yield
+        }
+        catch [...] {
+            ^bb0(%arg0: cir.eh_token):
+                %2#0, %2#1 = begin_catch %arg0 : void*
+                cleanup.scope {
+                    %3 = const -1 : s32i
+                    store %3, %0
+                    %4 = load %0 : s32i
+                    return %4
+                    ^bb1():
+                        yield
+                } cleanup all {
+                    end_catch %2#0
+                    yield
+                }
+                yield
+        }
+        yield
+    }
+    trap
+}

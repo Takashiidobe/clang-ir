@@ -385,6 +385,18 @@ int_enum! {
     }
 }
 
+int_enum! {
+    /// `cir.init_catch_param`'s `kind` field.
+    InitCatchKind from "CIROps.td:8677-8685" {
+        Reference = 0 => "reference",
+        Pointer = 1 => "pointer",
+        Scalar = 2 => "scalar",
+        Objc = 3 => "objc",
+        TrivialCopy = 4 => "trivial_copy",
+        NonTrivialCopy = 5 => "non_trivial_copy",
+    }
+}
+
 /// `cir.is_fp_class`'s `flags` field: a bitmask of individual FP class bits
 /// (composite groups like `fcNan` are just multiple bits OR'd together, not
 /// separate encodings). Bit positions mirror LLVM's `FPClassTest` layout, per

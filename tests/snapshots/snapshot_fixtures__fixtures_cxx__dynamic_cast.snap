@@ -1,0 +1,60 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "tests/fixtures.cxx/dynamic_cast.cpp" (cxx, x86_64-unknown-linux-gnu)
+global _ZTVN10__cxxabiv117__class_type_infoE : u8i** [external, default, align 8, dso_local]
+global _ZTS4Base : s8i[6] = "4Base" [linkonce_odr, default, align 1, dso_local, comdat]
+global _ZTI4Base : rec_anon_struct = #cir.typeinfo<{#cir.global_view<@_ZTVN10__cxxabiv117__class_type_infoE, [2 : i32]> : !cir.ptr<!u8i>, #cir.global_view<@_ZTS4Base> : !cir.ptr<!u8i>}> [linkonce_odr, default, align 8, dso_local, constant, comdat]
+global _ZTVN10__cxxabiv120__si_class_type_infoE : u8i** [external, default, align 8, dso_local]
+global _ZTS7Derived : s8i[9] = "7Derived" [linkonce_odr, default, align 1, dso_local, comdat]
+global _ZTI7Derived : rec_anon_struct1 = #cir.typeinfo<{#cir.global_view<@_ZTVN10__cxxabiv120__si_class_type_infoE, [2 : i32]> : !cir.ptr<!u8i>, #cir.global_view<@_ZTS7Derived> : !cir.ptr<!u8i>, #cir.global_view<@_ZTI4Base> : !cir.ptr<!u8i>}> [linkonce_odr, default, align 8, dso_local, constant, comdat]
+
+fn __dynamic_cast(%arg0: void*, %arg1: u8i*, %arg2: u8i*, %arg3: s64i) -> void* [external, c, dso_local, nothrow];
+fn __cxa_bad_cast() -> void [external, c, dso_local];
+fn _Z7do_castP4Base(%arg1: rec_Base*) -> rec_Derived* [external, c, no_inline, dso_local] {
+    ^bb0(%arg1: rec_Base*):
+        %12 = alloca rec_Base*, "b", align 8
+        %13 = alloca rec_Derived*, "__retval", align 8
+        store %arg1, %12
+        %14 = load %12 : rec_Base*, align 8
+        %15 = cast(ptr_to_bool) %14 : bool
+        %16 = ternary %15 ? { : rec_Derived*
+            %19 = cast(bitcast) %14 : void*
+            %20 = const @_ZTI4Base : u8i*
+            %21 = const @_ZTI7Derived : u8i*
+            %22 = const 0 : s64i
+            %23 = call @__dynamic_cast(%19, %20, %21, %22) : void* [all]
+            %24 = cast(bitcast) %23 : rec_Derived*
+            yield %24
+        } : {
+            %18 = const #cir.ptr<null> : rec_Derived*
+            yield %18
+        }
+        store %16, %13
+        %17 = load %13 : rec_Derived*
+        return %17
+}
+fn __cxa_bad_typeid() -> void [external, c, dso_local];
+fn _Z9do_typeidP4Base(%arg0: rec_Base*) -> rec_std3A3Atype_info* [external, c, no_inline, dso_local] {
+    ^bb0(%arg0: rec_Base*):
+        %0 = alloca rec_Base*, "b", align 8
+        %1 = alloca rec_std3A3Atype_info*, "__retval", align 8
+        store %arg0, %0
+        %2 = load %0 : rec_Base*, align 8
+        %3 = const #cir.ptr<null> : rec_Base*
+        %4 = cmp eq %2, %3 : bool
+        if %4 {
+            call @__cxa_bad_typeid() [all]
+            unreachable
+        }
+        %5 = vtable.get_vptr %2 : cir.vptr*
+        %6 = load %5 : cir.vptr, align 8
+        %7 = const -1 : s64i
+        %8 = cast(bitcast) %6 : rec_std3A3Atype_info**
+        %9 = ptr_stride %8, %7 : rec_std3A3Atype_info**
+        %10 = load %9 : rec_std3A3Atype_info*, align 8
+        store %10, %1
+        %11 = load %1 : rec_std3A3Atype_info*
+        return %11
+}

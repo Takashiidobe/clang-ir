@@ -1,0 +1,135 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "tests/fixtures.cxx/array_new_delete.cpp" (cxx, x86_64-unknown-linux-gnu)
+fn _Znam(%arg0: u64i) -> void* [external, c];
+fn _ZN6WidgetC1Ev(%arg0: rec_Widget*) -> void [external, c];
+fn _ZN6WidgetD1Ev(%arg0: rec_Widget*) -> void [external, c, nothrow];
+fn _ZdaPvm(%arg0: void*, %arg1: u64i) -> void [external, c, nothrow];
+fn _Z12make_widgetsi(%arg1: s32i) -> rec_Widget* [external, c, no_inline, dso_local] {
+    ^bb0(%arg1: s32i):
+        %22 = alloca s32i, "n", align 4
+        %23 = alloca rec_Widget*, "__retval", align 8
+        %24 = alloca rec_Widget*, "__new_result", align 8
+        store %arg1, %22
+        %25 = load %22 : s32i, align 4
+        %26 = cast(integral) %25 : u64i
+        %27 = const 4 : u64i
+        %28#0, %28#1 = mul.overflow %26, %27 : u64i
+        %29 = const 8 : u64i
+        %30#0, %30#1 = add.overflow %28#0, %29 : u64i
+        %31 = or %28#1, %30#1 : bool
+        %32 = const 18446744073709551615 : u64i
+        %33 = select %31, %32, %30#0 : u64i
+        %34 = call @_Znam(%33) : void* [all]
+        cleanup.scope {
+            %37 = cast(bitcast) %34 : u8i*
+            %38 = cast(bitcast) %37 : u64i*
+            store %26, %38, align 8
+            %39 = const 8 : s32i
+            %40 = ptr_stride %37, %39 : u8i*
+            %41 = cast(bitcast) %40 : void*
+            %42 = cast(bitcast) %41 : rec_Widget*
+            store %42, %24, align 8
+            %43 = cast(bitcast) %42 : rec_Widget[0]*
+            %44 = cast(bitcast) %43 : rec_Widget*
+            %45 = ptr_stride %44, %26 : rec_Widget*
+            %46 = const 0 : u64i
+            %47 = cmp ne %26, %46 : bool
+            if %47 {
+                %48 = alloca rec_Widget*, "__array_idx", align 1
+                store %44, %48
+                cleanup.scope {
+                    do {
+                        %58 = load %48 : rec_Widget*
+                        call @_ZN6WidgetC1Ev(%58) [all]
+                        %59 = const 1 : u64i
+                        %60 = ptr_stride %58, %59 : rec_Widget*
+                        store %60, %48
+                        yield
+                    } while {
+                        %56 = load %48 : rec_Widget*
+                        %57 = cmp ne %56, %45 : bool
+                        condition %57
+                    }
+                    yield
+                } cleanup eh {
+                    %49 = load %48 : rec_Widget*
+                    %50 = cmp ne %49, %44 : bool
+                    if %50 {
+                        do {
+                            %53 = load %48 : rec_Widget*
+                            %54 = const -1 : s64i
+                            %55 = ptr_stride %53, %54 : rec_Widget*
+                            store %55, %48
+                            call @_ZN6WidgetD1Ev(%55) [all]
+                            yield
+                        } while {
+                            %51 = load %48 : rec_Widget*
+                            %52 = cmp ne %51, %44 : bool
+                            condition %52
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        } cleanup eh {
+            call @_ZdaPvm(%34, %33) [all]
+            yield
+        }
+        %35 = load %24 : rec_Widget*, align 8
+        store %35, %23
+        %36 = load %23 : rec_Widget*
+        return %36
+}
+fn _Z12free_widgetsP6Widget(%arg0: rec_Widget*) -> void [external, c, no_inline, dso_local] {
+    ^bb0(%arg0: rec_Widget*):
+        %0 = alloca rec_Widget*, "w", align 8
+        store %arg0, %0
+        %1 = load %0 : rec_Widget*, align 8
+        %2 = const #cir.ptr<null> : rec_Widget*
+        %3 = cmp ne %1, %2 : bool
+        if %3 {
+            %4 = cast(bitcast) %1 : u8i*
+            %5 = const -8 : s64i
+            %6 = ptr_stride %4, %5 : u8i*
+            %7 = cast(bitcast) %6 : void*
+            %8 = cast(bitcast) %6 : u64i*
+            %9 = load %8 : u64i, align 4
+            cleanup.scope {
+                %14 = ptr_stride %1, %9 : rec_Widget*
+                %15 = cmp ne %14, %1 : bool
+                if %15 {
+                    %16 = alloca rec_Widget*, "__array_idx", align 1
+                    store %14, %16
+                    do {
+                        %19 = load %16 : rec_Widget*
+                        %20 = const -1 : s64i
+                        %21 = ptr_stride %19, %20 : rec_Widget*
+                        store %21, %16
+                        call @_ZN6WidgetD1Ev(%21) [all]
+                        yield
+                    } while {
+                        %17 = load %16 : rec_Widget*
+                        %18 = cmp ne %17, %1 : bool
+                        condition %18
+                    }
+                    yield
+                }
+                yield
+            } cleanup normal {
+                %10 = const 4 : u64i
+                %11 = mul %10, %9 : u64i
+                %12 = const 8 : u64i
+                %13 = add %11, %12 : u64i
+                call @_ZdaPvm(%7, %13) [all]
+                yield
+            }
+            yield
+        }
+        return
+}

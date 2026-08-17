@@ -12,7 +12,7 @@
 use crate::ast::{Attribute, Block, Operation, Region, Type, ValueId};
 use crate::model::enums::{
     AsmFlavor, AssumeBundleKind, AtomicFetchKind, CaseOpKind, CastKind, CleanupKind, CmpOpKind,
-    FpClassFlags, MemOrder, SideEffect, SyncScopeKind,
+    FpClassFlags, InitCatchKind, MemOrder, SideEffect, SyncScopeKind,
 };
 
 /// A lowered region: almost always a single unlabeled block, but CIR can
@@ -261,6 +261,20 @@ pub struct SwitchCase {
     pub body: Body,
 }
 
+/// One entry of a `cir.try`'s `handler_types` list, paired 1:1 with its
+/// `handler_regions`.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum TryHandlerKind {
+    /// `#cir.global_view<@type_info> : ty` - a typed `catch (T)`.
+    Catch { type_info: String, ty: Type },
+    /// `#cir.all` - `catch (...)`.
+    CatchAll,
+    /// `#cir.unwind` - the implicit unwind-only handler run when no other
+    /// handler matches and there's no `catch (...)`.
+    Unwind,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Callee {
@@ -439,6 +453,22 @@ pub enum Instruction {
         ty: Type,
         vptr: ValueId,
         index: u64,
+    },
+    /// Non-virtual upcast to a base-class subobject: `cir.base_class_addr`.
+    BaseClassAddr {
+        result: ValueId,
+        ty: Type,
+        derived_addr: ValueId,
+        offset: u64,
+        assume_not_null: bool,
+    },
+    /// Non-virtual downcast from a base-class subobject: `cir.derived_class_addr`.
+    DerivedClassAddr {
+        result: ValueId,
+        ty: Type,
+        base_addr: ValueId,
+        offset: u64,
+        assume_not_null: bool,
     },
 
     // -- vectors --
@@ -647,6 +677,28 @@ pub enum Instruction {
     EhLongjmp {
         env: ValueId,
     },
+    /// First operation in a `cir.try` catch-handler region: `cir.begin_catch`.
+    BeginCatch {
+        catch_token: ValueId,
+        exn_ptr: ValueId,
+        exn_ptr_ty: Type,
+        eh_token: ValueId,
+    },
+    /// Marks the end of a catch handler: `cir.end_catch`.
+    EndCatch {
+        catch_token: ValueId,
+    },
+    /// Materializes the caught exception into the catch parameter's alloca:
+    /// `cir.init_catch_param`.
+    InitCatchParam {
+        exn_ptr: ValueId,
+        param_addr: ValueId,
+        kind: InitCatchKind,
+    },
+    /// Re-raises an in-flight exception that no handler caught: `cir.resume`.
+    Resume {
+        eh_token: ValueId,
+    },
 
     // -- misc runtime builtins --
     FrameAddress {
@@ -852,6 +904,14 @@ pub enum Instruction {
         true_body: Body,
         false_body: Body,
     },
+    /// C++ `try { ... } catch (...) { ... }`: `cir.try`. `handlers` is 1:1
+    /// with the source `handler_types` list, each paired with its region's
+    /// lowered body.
+    Try {
+        cleanup: bool,
+        body: Body,
+        handlers: Vec<(TryHandlerKind, Body)>,
+    },
 
     // -- control transfer --
     Return {
@@ -970,6 +1030,25 @@ fn block_addr_info(attr: &Attribute) -> Option<(String, String)> {
             let label = label.trim().strip_prefix('"')?.strip_suffix('"')?.to_string();
             Some((func, label))
         }
+        _ => None,
+    }
+}
+
+/// Decodes one entry of `cir.try`'s `handler_types` array: either a typed
+/// `#cir.global_view<@type_info> : ty` (`catch (T)`), or the bare
+/// `#cir.all`/`#cir.unwind` markers (`catch (...)`/implicit unwind).
+fn try_handler_kind(attr: &Attribute) -> Option<TryHandlerKind> {
+    match attr {
+        Attribute::GlobalView { symbol, ty, .. } => Some(TryHandlerKind::Catch {
+            type_info: symbol.clone(),
+            ty: ty.clone(),
+        }),
+        Attribute::Dialect {
+            dialect, mnemonic, ..
+        } if dialect == "cir" && mnemonic == "all" => Some(TryHandlerKind::CatchAll),
+        Attribute::Dialect {
+            dialect, mnemonic, ..
+        } if dialect == "cir" && mnemonic == "unwind" => Some(TryHandlerKind::Unwind),
         _ => None,
     }
 }
@@ -1244,6 +1323,26 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 ty: ty.clone(),
                 vptr: operand(op, 0)?.clone(),
                 index,
+            })
+        }
+        "base_class_addr" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::BaseClassAddr {
+                result: result.clone(),
+                ty: ty.clone(),
+                derived_addr: operand(op, 0)?.clone(),
+                offset: op.attr("offset")?.as_int()? as u64,
+                assume_not_null: flag(op, "assume_not_null"),
+            })
+        }
+        "derived_class_addr" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::DerivedClassAddr {
+                result: result.clone(),
+                ty: ty.clone(),
+                base_addr: operand(op, 0)?.clone(),
+                offset: op.attr("offset")?.as_int()? as u64,
+                assume_not_null: flag(op, "assume_not_null"),
             })
         }
         "vec.splat" => {
@@ -1787,6 +1886,45 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
             true_body: lower_region(region(op, 0)?),
             false_body: lower_region(region(op, 1)?),
         }),
+        "try" => {
+            let handler_types = op.attr("handler_types")?.as_array()?;
+            if handler_types.len() != op.regions.len().checked_sub(1)? {
+                return None;
+            }
+            let mut regions = op.regions.iter();
+            let body = lower_region(regions.next()?);
+            let handlers = handler_types
+                .iter()
+                .zip(regions)
+                .map(|(t, r)| Some((try_handler_kind(t)?, lower_region(r))))
+                .collect::<Option<Vec<_>>>()?;
+            Some(Instruction::Try {
+                cleanup: flag(op, "cleanup"),
+                body,
+                handlers,
+            })
+        }
+        "begin_catch" => {
+            let (catch_token, _) = op.results.first()?;
+            let (exn_ptr, exn_ptr_ty) = op.results.get(1)?;
+            Some(Instruction::BeginCatch {
+                catch_token: catch_token.clone(),
+                exn_ptr: exn_ptr.clone(),
+                exn_ptr_ty: exn_ptr_ty.clone(),
+                eh_token: operand(op, 0)?.clone(),
+            })
+        }
+        "end_catch" => Some(Instruction::EndCatch {
+            catch_token: operand(op, 0)?.clone(),
+        }),
+        "init_catch_param" => Some(Instruction::InitCatchParam {
+            exn_ptr: operand(op, 0)?.clone(),
+            param_addr: operand(op, 1)?.clone(),
+            kind: InitCatchKind::try_from(op.attr("kind")?).ok()?,
+        }),
+        "resume" => Some(Instruction::Resume {
+            eh_token: operand(op, 0)?.clone(),
+        }),
         "return" => Some(Instruction::Return {
             value: operand(op, 0).cloned(),
         }),
@@ -2181,6 +2319,30 @@ fn write_instruction(
                 f,
                 "%{result} = vtable.get_virtual_fn_addr %{vptr}[{index}] : {ty}"
             )
+        }
+        BaseClassAddr {
+            result,
+            ty,
+            derived_addr,
+            offset,
+            assume_not_null,
+        } => {
+            write_indent(f, level)?;
+            write!(f, "%{result} = base_class_addr %{derived_addr}")?;
+            write_flags(f, &[("nonnull", *assume_not_null)])?;
+            writeln!(f, "[{offset}] : {ty}")
+        }
+        DerivedClassAddr {
+            result,
+            ty,
+            base_addr,
+            offset,
+            assume_not_null,
+        } => {
+            write_indent(f, level)?;
+            write!(f, "%{result} = derived_class_addr %{base_addr}")?;
+            write_flags(f, &[("nonnull", *assume_not_null)])?;
+            writeln!(f, "[{offset}] : {ty}")
         }
         VecSplat { result, ty, value } => {
             write_indent(f, level)?;
@@ -2843,6 +3005,61 @@ fn write_instruction(
             write_indent(f, level)?;
             writeln!(f, "}}")
         }
+        Try {
+            cleanup,
+            body,
+            handlers,
+        } => {
+            write_indent(f, level)?;
+            write!(f, "try")?;
+            write_flags(f, &[("cleanup", *cleanup)])?;
+            writeln!(f, " {{")?;
+            write_body(body, f, level + 1)?;
+            write_indent(f, level)?;
+            writeln!(f, "}}")?;
+            for (kind, handler_body) in handlers {
+                write_indent(f, level)?;
+                match kind {
+                    TryHandlerKind::Catch { type_info, ty } => {
+                        writeln!(f, "catch [@{type_info} : {ty}] {{")?
+                    }
+                    TryHandlerKind::CatchAll => writeln!(f, "catch [...] {{")?,
+                    TryHandlerKind::Unwind => writeln!(f, "unwind {{")?,
+                }
+                write_body(handler_body, f, level + 1)?;
+                write_indent(f, level)?;
+                writeln!(f, "}}")?;
+            }
+            Ok(())
+        }
+        BeginCatch {
+            catch_token,
+            exn_ptr,
+            exn_ptr_ty,
+            eh_token,
+        } => {
+            write_indent(f, level)?;
+            writeln!(
+                f,
+                "%{catch_token}, %{exn_ptr} = begin_catch %{eh_token} : {exn_ptr_ty}"
+            )
+        }
+        EndCatch { catch_token } => {
+            write_indent(f, level)?;
+            writeln!(f, "end_catch %{catch_token}")
+        }
+        InitCatchParam {
+            exn_ptr,
+            param_addr,
+            kind,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "init_catch_param {kind} %{exn_ptr} to %{param_addr}")
+        }
+        Resume { eh_token } => {
+            write_indent(f, level)?;
+            writeln!(f, "resume %{eh_token}")
+        }
         Return { value } => {
             write_indent(f, level)?;
             write!(f, "return")?;
@@ -3180,6 +3397,118 @@ mod tests {
             instr,
             Instruction::VtableGetVirtualFnAddr { ref result, ref vptr, index: 2, .. }
                 if result == "1" && vptr == "0"
+        ));
+    }
+
+    #[test]
+    fn base_class_addr_lowers() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.base_class_addr"(%0) <{offset = 16 : index, assume_not_null}> : (!cir.ptr<!cir.record<"struct.Derived">>) -> !cir.ptr<!cir.record<"struct.Base">>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::BaseClassAddr { ref result, ref derived_addr, offset: 16, assume_not_null: true, .. }
+                if result == "1" && derived_addr == "0"
+        ));
+    }
+
+    #[test]
+    fn derived_class_addr_lowers() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.derived_class_addr"(%0) <{offset = 0 : index}> : (!cir.ptr<!cir.record<"struct.Base">>) -> !cir.ptr<!cir.record<"struct.Derived">>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::DerivedClassAddr { ref result, ref base_addr, offset: 0, assume_not_null: false, .. }
+                if result == "1" && base_addr == "0"
+        ));
+    }
+
+    #[test]
+    fn begin_catch_end_catch_lower() {
+        let instr = lower_single_op(
+            r#"%1:2 = "cir.begin_catch"(%0) : (!cir.eh_token) -> (!cir.catch_token, !cir.ptr<!cir.void>)"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::BeginCatch { ref catch_token, ref exn_ptr, ref eh_token, .. }
+                if catch_token == "1#0" && exn_ptr == "1#1" && eh_token == "0"
+        ));
+
+        let instr = lower_single_op(r#""cir.end_catch"(%0) : (!cir.catch_token) -> ()"#);
+        assert!(matches!(
+            instr,
+            Instruction::EndCatch { ref catch_token } if catch_token == "0"
+        ));
+    }
+
+    #[test]
+    fn init_catch_param_lowers() {
+        let instr = lower_single_op(
+            r#""cir.init_catch_param"(%0, %1) <{kind = 2 : i32}> : (!cir.ptr<!cir.void>, !cir.ptr<!cir.int<s, 32>>) -> ()"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::InitCatchParam { ref exn_ptr, ref param_addr, kind: InitCatchKind::Scalar }
+                if exn_ptr == "0" && param_addr == "1"
+        ));
+    }
+
+    #[test]
+    fn resume_lowers() {
+        let instr = lower_single_op(r#""cir.resume"(%0) : (!cir.eh_token) -> ()"#);
+        assert!(matches!(instr, Instruction::Resume { ref eh_token } if eh_token == "0"));
+    }
+
+    #[test]
+    fn try_lowers_with_catch_and_catch_all() {
+        let instr = lower_single_op(
+            r#""cir.try"() <{handler_types = [#cir.global_view<@_ZTIi> : !cir.ptr<!cir.int<u, 8>>, #cir.all]}> ({
+    "cir.yield"() : () -> ()
+}, {
+^bb0(%arg1: !cir.eh_token):
+    "cir.yield"() : () -> ()
+}, {
+^bb0(%arg0: !cir.eh_token):
+    "cir.yield"() : () -> ()
+}) : () -> ()"#,
+        );
+        let Instruction::Try {
+            cleanup,
+            body,
+            handlers,
+        } = &instr
+        else {
+            panic!("expected Try, got {instr:?}");
+        };
+        assert!(!cleanup);
+        assert_eq!(body.blocks.len(), 1);
+        assert_eq!(handlers.len(), 2);
+        assert!(matches!(
+            &handlers[0].0,
+            TryHandlerKind::Catch { type_info, .. } if type_info == "_ZTIi"
+        ));
+        assert!(matches!(handlers[1].0, TryHandlerKind::CatchAll));
+    }
+
+    #[test]
+    fn try_lowers_with_implicit_unwind() {
+        let instr = lower_single_op(
+            r#""cir.try"() <{handler_types = [#cir.unwind]}> ({
+    "cir.yield"() : () -> ()
+}, {
+^bb0(%arg0: !cir.eh_token):
+    "cir.resume"(%arg0) : (!cir.eh_token) -> ()
+}) : () -> ()"#,
+        );
+        let Instruction::Try { handlers, .. } = &instr else {
+            panic!("expected Try, got {instr:?}");
+        };
+        assert_eq!(handlers.len(), 1);
+        assert!(matches!(handlers[0].0, TryHandlerKind::Unwind));
+        assert!(matches!(
+            handlers[0].1.blocks[0].body[0],
+            Instruction::Resume { .. }
         ));
     }
 
