@@ -20,6 +20,18 @@ pub struct Operation {
     pub regions: Vec<Region>,
     /// The trailing `{...}` discardable-attribute dict, if present.
     pub attributes: Vec<(String, Attribute)>,
+    /// The operand types from the op's `: (operand-types) -> result-types`
+    /// function-type signature, in operand order. Not derivable from
+    /// `operands` alone: operand `ValueId`s carry no type of their own, only
+    /// the producing op's `results` do, and for cross-block/region operands
+    /// (e.g. a `cir.cast` fed by a block argument) that producer isn't always
+    /// locally available.
+    pub operand_types: Vec<Type>,
+    /// Trailing `loc(...)`, kept verbatim (not structurally parsed: MLIR's
+    /// location grammar - `fused[...]`, `callsite(... at ...)`, `#locN`
+    /// aliases, `unknown` - is a distinct grammar from CIR's `#cir.*`
+    /// attributes). Consumers that need it join on this text themselves.
+    pub loc: Option<String>,
 }
 
 impl Operation {
@@ -69,6 +81,8 @@ pub struct Block {
 pub struct GenericModule {
     pub type_aliases: BTreeMap<String, Type>,
     pub attr_aliases: BTreeMap<String, Attribute>,
+    /// `#locN = loc(...)` alias definitions, kept verbatim like `Operation::loc`.
+    pub loc_aliases: BTreeMap<String, String>,
     pub ops: Vec<Operation>,
 }
 

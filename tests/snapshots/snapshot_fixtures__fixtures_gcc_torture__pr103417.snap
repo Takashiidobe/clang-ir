@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr103417.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/pr103417.c" (c, x86_64-unknown-linux-gnu)
 global c : rec_anon2E0 = {256} [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
@@ -13,17 +13,17 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     scope {
         %4 = get_global @c : rec_anon2E0*
         %5 = get_member %4[0] "b" : u32i*
-        <unmodeled: cir.get_bitfield>
+        %6 = get_bitfield %5, "b": 24 bits @8 in signed u32i : s32i, align 4
         %7 = cast(int_to_bool) %6 : bool
         %8 = ternary %7 ? { : bool
             %10 = get_global @c : rec_anon2E0*
             %11 = get_member %10[0] "b" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %12 = get_bitfield %11, "b": 24 bits @8 in signed u32i : s32i, align 4
             %13 = cast(int_to_bool) %12 : bool
             %14 = not %13 : bool
             yield %14
         } : {
-            %9 = const #false : bool
+            %9 = const false : bool
             yield %9
         }
         if %8 {

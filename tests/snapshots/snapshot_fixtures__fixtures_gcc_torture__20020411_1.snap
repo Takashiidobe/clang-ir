@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20020411-1.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/20020411-1.c" (c, x86_64-unknown-linux-gnu)
 fn foo() -> vector<2 x float> [external, c, no_inline, dso_local, nothrow] {
     %32 = alloca complex<float>, "coerce", align 8
     %33 = alloca complex<float>, "__retval", align 4
@@ -22,10 +22,10 @@ fn foo() -> vector<2 x float> [external, c, no_inline, dso_local, nothrow] {
     %45 = const 0 : s64i
     %46 = get_element %34[%45] : complex<float>*
     %47 = load %46 : complex<float>, align 4
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %48 = complex.real %47 : float
+    %49 = complex.imag %47 : float
     %50 = fneg %49 : float
-    <unmodeled: cir.complex.create>
+    %51 = complex.create %48, %50 : complex<float>
     %52 = const 0 : s64i
     %53 = get_element %34[%52] : complex<float>*
     store %51, %53, align 4
@@ -51,11 +51,11 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     store %4, %0
     %5 = cast(bitcast) %0 : complex<float>*
     %6 = load %5 : complex<float>
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %7 = complex.real %6 : float
+    %8 = complex.imag %6 : float
     %9 = cast(floating) %7 : double
     %10 = cast(floating) %8 : double
-    <unmodeled: cir.complex.create>
+    %11 = complex.create %9, %10 : complex<double>
     %12 = const 0 : s64i
     %13 = get_element %2[%12] : complex<double>*
     store %11, %13, align 16
@@ -63,17 +63,17 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %17 = const 0 : s64i
         %18 = get_element %2[%17] : complex<double>*
         %19 = load %18 : complex<double>, align 16
-        <unmodeled: cir.complex.real>
+        %20 = complex.real %19 : double
         %21 = const 1.000000e+00 : double
         %22 = cmp ne %20, %21 : bool
         %23 = ternary %22 ? { : bool
-            %31 = const #true : bool
+            %31 = const true : bool
             yield %31
         } : {
             %25 = const 0 : s64i
             %26 = get_element %2[%25] : complex<double>*
             %27 = load %26 : complex<double>, align 16
-            <unmodeled: cir.complex.imag>
+            %28 = complex.imag %27 : double
             %29 = const -1.000000e+00 : double
             %30 = cmp ne %28, %29 : bool
             yield %30

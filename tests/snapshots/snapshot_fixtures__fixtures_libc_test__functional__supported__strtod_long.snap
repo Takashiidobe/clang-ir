@@ -2,9 +2,9 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/strtod_long.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.libc-test/functional/supported/strtod_long.c" (c, x86_64-unknown-linux-gnu)
 global t_status : s32i = 0 [external, default, align 4, dso_local]
-global .str : s8i[133] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/strtod_long.c:73: strtod(.11[...]1) got %a want %a\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[130] = "tests/fixtures.libc-test/functional/supported/strtod_long.c:73: strtod(.11[...]1) got %a want %a\n" [cir_private, default, align 1, dso_local, constant]
 
 fn vsnprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec___va_list_tag*) -> s32i [external, c, nothrow];
 fn write(%arg0: s32i, %arg1: void*, %arg2: u64i) -> s64i [external, c];
@@ -20,7 +20,7 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %40 = get_global @t_status : s32i*
         store %39, %40, align 4, volatile
         %41 = cast(array_to_ptrdecay) %36 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %41
         %42 = get_global @vsnprintf : ((s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i)*
         %43 = cast(array_to_ptrdecay) %37 : s8i*
         %44 = const 512 : u64i
@@ -29,7 +29,7 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %47 = call @vsnprintf(%43, %44, %45, %46) : s32i [all]
         store %47, %38, align 4
         %48 = cast(array_to_ptrdecay) %36 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %48
         scope {
             %57 = load %38 : s32i, align 4
             %58 = const 0 : s32i
@@ -130,7 +130,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %27 = load %2 : double, align 8
         %28 = cmp ne %26, %27 : bool
         if %28 {
-            %29 = get_global @.str : s8i[133]*
+            %29 = get_global @.str : s8i[130]*
             %30 = cast(array_to_ptrdecay) %29 : s8i*
             %31 = load %1 : double, align 8
             %32 = load %2 : double, align 8

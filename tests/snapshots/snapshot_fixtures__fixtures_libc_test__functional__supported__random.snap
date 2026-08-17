@@ -2,16 +2,16 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/random.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.libc-test/functional/supported/random.c" (c, x86_64-unknown-linux-gnu)
 global __const.chkmissing.d : s32i[8] = zero [cir_private, default, dso_local, constant]
 global t_status : s32i = 0 [external, default, align 4, dso_local]
-global .str : s8i[138] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/random.c:104: weak seed %d, missing pattern in low bits\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[124] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/random.c:106: weak seed %d, exact repeats\n" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[129] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/random.c:108: weak seed %d, or pattern: 0x%08x\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[135] = "tests/fixtures.libc-test/functional/supported/random.c:104: weak seed %d, missing pattern in low bits\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[121] = "tests/fixtures.libc-test/functional/supported/random.c:106: weak seed %d, exact repeats\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[126] = "tests/fixtures.libc-test/functional/supported/random.c:108: weak seed %d, or pattern: 0x%08x\n" [cir_private, default, align 1, dso_local, constant]
 global orx : u32i = 0 [internal, default, align 4, dso_local]
-global .str.3 : s8i[155] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/random.c:125: initstate(1) is not default: (%d) default: %ld, seed1: %ld\n" [cir_private, default, align 1, dso_local, constant]
-global .str.4 : s8i[139] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/random.c:130: setstate failed (%d) orig: %ld, reset: %ld\n" [cir_private, default, align 1, dso_local, constant]
-global .str.5 : s8i[153] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/random.c:137: srandom(1) is not default: (%d) default: %ld, seed1: %ld\n" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[152] = "tests/fixtures.libc-test/functional/supported/random.c:125: initstate(1) is not default: (%d) default: %ld, seed1: %ld\n" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[136] = "tests/fixtures.libc-test/functional/supported/random.c:130: setstate failed (%d) orig: %ld, reset: %ld\n" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[150] = "tests/fixtures.libc-test/functional/supported/random.c:137: srandom(1) is not default: (%d) default: %ld, seed1: %ld\n" [cir_private, default, align 1, dso_local, constant]
 
 fn vsnprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec___va_list_tag*) -> s32i [external, c, nothrow];
 fn write(%arg0: s32i, %arg1: void*, %arg2: u64i) -> s64i [external, c];
@@ -27,7 +27,7 @@ fn t_printf(%arg5: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %239 = get_global @t_status : s32i*
         store %238, %239, align 4, volatile
         %240 = cast(array_to_ptrdecay) %235 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %240
         %241 = get_global @vsnprintf : ((s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i)*
         %242 = cast(array_to_ptrdecay) %236 : s8i*
         %243 = const 512 : u64i
@@ -36,7 +36,7 @@ fn t_printf(%arg5: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %246 = call @vsnprintf(%242, %243, %244, %245) : s32i [all]
         store %246, %237, align 4
         %247 = cast(array_to_ptrdecay) %235 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %247
         scope {
             %256 = load %237 : s32i, align 4
             %257 = const 0 : s32i
@@ -332,7 +332,7 @@ fn checkseed(%arg0: u32i, %arg1: s64i*) -> void [external, c, no_inline, dso_loc
             %121 = call @chkmissing(%120) : s32i [all]
             %122 = cast(int_to_bool) %121 : bool
             if %122 {
-                %123 = get_global @.str : s8i[138]*
+                %123 = get_global @.str : s8i[135]*
                 %124 = cast(array_to_ptrdecay) %123 : s8i*
                 %125 = load %100 : u32i, align 4
                 %126 = call @t_printf(%124, %125) : s32i [all]
@@ -345,7 +345,7 @@ fn checkseed(%arg0: u32i, %arg1: s64i*) -> void [external, c, no_inline, dso_loc
             %114 = call @chkrepeat(%113) : s32i [all]
             %115 = cast(int_to_bool) %114 : bool
             if %115 {
-                %116 = get_global @.str.1 : s8i[124]*
+                %116 = get_global @.str.1 : s8i[121]*
                 %117 = cast(array_to_ptrdecay) %116 : s8i*
                 %118 = load %100 : u32i, align 4
                 %119 = call @t_printf(%117, %118) : s32i [all]
@@ -358,7 +358,7 @@ fn checkseed(%arg0: u32i, %arg1: s64i*) -> void [external, c, no_inline, dso_loc
             %105 = call @chkones(%104) : s32i [all]
             %106 = cast(int_to_bool) %105 : bool
             if %106 {
-                %107 = get_global @.str.2 : s8i[129]*
+                %107 = get_global @.str.2 : s8i[126]*
                 %108 = cast(array_to_ptrdecay) %107 : s8i*
                 %109 = load %100 : u32i, align 4
                 %110 = get_global @orx : u32i*
@@ -434,7 +434,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
                 store %76, %2, align 8
                 %77 = cmp ne %75, %76 : bool
                 if %77 {
-                    %78 = get_global @.str.3 : s8i[155]*
+                    %78 = get_global @.str.3 : s8i[152]*
                     %79 = cast(array_to_ptrdecay) %78 : s8i*
                     %80 = load %4 : s32i, align 4
                     %81 = load %4 : s32i, align 4
@@ -477,7 +477,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
                     store %58, %2, align 8
                     %59 = cmp ne %57, %58 : bool
                     if %59 {
-                        %60 = get_global @.str.4 : s8i[139]*
+                        %60 = get_global @.str.4 : s8i[136]*
                         %61 = cast(array_to_ptrdecay) %60 : s8i*
                         %62 = load %4 : s32i, align 4
                         %63 = load %3 : s64i, align 8
@@ -521,7 +521,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
                 store %35, %2, align 8
                 %36 = cmp ne %34, %35 : bool
                 if %36 {
-                    %37 = get_global @.str.5 : s8i[153]*
+                    %37 = get_global @.str.5 : s8i[150]*
                     %38 = cast(array_to_ptrdecay) %37 : s8i*
                     %39 = load %4 : s32i, align 4
                     %40 = load %4 : s32i, align 4

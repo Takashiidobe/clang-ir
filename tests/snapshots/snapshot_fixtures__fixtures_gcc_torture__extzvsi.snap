@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/extzvsi.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/extzvsi.c" (c, x86_64-unknown-linux-gnu)
 global x : rec_ieee = zero [external, default, align 4, dso_local]
 
 fn foo() -> u32i [external, c, no_inline, dso_local, nothrow] {
@@ -10,7 +10,7 @@ fn foo() -> u32i [external, c, no_inline, dso_local, nothrow] {
     %13 = alloca u32i, "exponent", align 4
     %14 = get_global @x : rec_ieee*
     %15 = get_member %14[0] "exponent" : u64i*
-    <unmodeled: cir.get_bitfield>
+    %16 = get_bitfield %15, "exponent": 11 bits @1 in u64i : u32i, align 4
     store %16, %13, align 4
     scope {
         %19 = load %13 : u32i, align 4
@@ -51,7 +51,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %2 = const 1 : u32i
     %3 = get_global @x : rec_ieee*
     %4 = get_member %3[0] "exponent" : u64i*
-    <unmodeled: cir.set_bitfield>
+    %5 = set_bitfield %4, %2, "exponent": 11 bits @1 in u64i : u32i, align 4
     scope {
         %8 = call @foo() : u32i [all]
         %9 = const 0 : u32i

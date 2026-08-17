@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr82192.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/pr82192.c" (c, x86_64-unknown-linux-gnu)
 global a : u64i = 10798855141994013410 [external, default, align 8, dso_local]
 global b : rec_S = zero [external, default, align 4, dso_local]
 
@@ -21,7 +21,7 @@ fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
     %26 = shift right %17, %25 : u32i
     %27 = get_global @b : rec_S*
     %28 = get_member %27[0] "m" : u16i*
-    <unmodeled: cir.set_bitfield>
+    %29 = set_bitfield %28, %26, "m": 13 bits @0 in u16i : u32i, align 4
     return
 }
 fn abort() -> void [external, c, nothrow];
@@ -45,7 +45,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     scope {
         %4 = get_global @b : rec_S*
         %5 = get_member %4[0] "m" : u16i*
-        <unmodeled: cir.get_bitfield>
+        %6 = get_bitfield %5, "m": 13 bits @0 in u16i : u32i, align 4
         %7 = cast(integral) %6 : s32i
         %8 = const 0 : s32i
         %9 = cmp ne %7, %8 : bool

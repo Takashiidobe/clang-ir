@@ -2,19 +2,19 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/iconv_open.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.libc-test/functional/supported/iconv_open.c" (c, x86_64-unknown-linux-gnu)
 global t_status : s32i = 0 [external, default, align 4, dso_local]
 global .str : s8i[5] = "test" [cir_private, default, align 1, dso_local, constant]
 global .str.1 : s8i[12] = "bad-codeset" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[133] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/iconv_open.c:76: iconv_open(\"%s\",\"%s\") didn't fail\n" [cir_private, default, align 1, dso_local, constant]
-global .str.3 : s8i[154] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/iconv_open.c:79: iconv_open(\"%s\",\"%s\") did not fail with EINVAL, got %s\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[130] = "tests/fixtures.libc-test/functional/supported/iconv_open.c:76: iconv_open(\"%s\",\"%s\") didn't fail\n" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[151] = "tests/fixtures.libc-test/functional/supported/iconv_open.c:79: iconv_open(\"%s\",\"%s\") did not fail with EINVAL, got %s\n" [cir_private, default, align 1, dso_local, constant]
 global .str.4 : s8i[6] = "UTF-8" [cir_private, default, align 1, dso_local, constant]
-global .str.5 : s8i[128] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/iconv_open.c:84: iconv_open(\"\",\"\") failed: %s\n" [cir_private, default, align 1, dso_local, constant]
-global .str.6 : s8i[141] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/iconv_open.c:90: iconv() did not fail with 0 output length\n" [cir_private, default, align 1, dso_local, constant]
-global .str.7 : s8i[139] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/iconv_open.c:92: iconv() did not fail with E2BIG, got %s\n" [cir_private, default, align 1, dso_local, constant]
-global .str.8 : s8i[161] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/iconv_open.c:99: iconv() did not return 0 when converting utf8 to utf8, got %d\n" [cir_private, default, align 1, dso_local, constant]
-global .str.9 : s8i[119] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/iconv_open.c:101: iconv() failed: %s\n" [cir_private, default, align 1, dso_local, constant]
-global .str.10 : s8i[123] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/iconv_open.c:105: iconv_close failed: %s\n" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[125] = "tests/fixtures.libc-test/functional/supported/iconv_open.c:84: iconv_open(\"\",\"\") failed: %s\n" [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[138] = "tests/fixtures.libc-test/functional/supported/iconv_open.c:90: iconv() did not fail with 0 output length\n" [cir_private, default, align 1, dso_local, constant]
+global .str.7 : s8i[136] = "tests/fixtures.libc-test/functional/supported/iconv_open.c:92: iconv() did not fail with E2BIG, got %s\n" [cir_private, default, align 1, dso_local, constant]
+global .str.8 : s8i[158] = "tests/fixtures.libc-test/functional/supported/iconv_open.c:99: iconv() did not return 0 when converting utf8 to utf8, got %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.9 : s8i[116] = "tests/fixtures.libc-test/functional/supported/iconv_open.c:101: iconv() failed: %s\n" [cir_private, default, align 1, dso_local, constant]
+global .str.10 : s8i[120] = "tests/fixtures.libc-test/functional/supported/iconv_open.c:105: iconv_close failed: %s\n" [cir_private, default, align 1, dso_local, constant]
 
 fn vsnprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec___va_list_tag*) -> s32i [external, c, nothrow];
 fn write(%arg0: s32i, %arg1: void*, %arg2: u64i) -> s64i [external, c];
@@ -30,7 +30,7 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %126 = get_global @t_status : s32i*
         store %125, %126, align 4, volatile
         %127 = cast(array_to_ptrdecay) %122 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %127
         %128 = get_global @vsnprintf : ((s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i)*
         %129 = cast(array_to_ptrdecay) %123 : s8i*
         %130 = const 512 : u64i
@@ -39,7 +39,7 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %133 = call @vsnprintf(%129, %130, %131, %132) : s32i [all]
         store %133, %124, align 4
         %134 = cast(array_to_ptrdecay) %122 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %134
         scope {
             %143 = load %124 : s32i, align 4
             %144 = const 0 : s32i
@@ -144,7 +144,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %113 = cast(int_to_ptr) %112 : void*
         %114 = cmp ne %111, %113 : bool
         if %114 {
-            %115 = get_global @.str.2 : s8i[133]*
+            %115 = get_global @.str.2 : s8i[130]*
             %116 = cast(array_to_ptrdecay) %115 : s8i*
             %117 = load %8 : s8i*, align 8
             %118 = load %8 : s8i*, align 8
@@ -159,7 +159,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %100 = const 22 : s32i
         %101 = cmp ne %99, %100 : bool
         if %101 {
-            %102 = get_global @.str.3 : s8i[154]*
+            %102 = get_global @.str.3 : s8i[151]*
             %103 = cast(array_to_ptrdecay) %102 : s8i*
             %104 = load %8 : s8i*, align 8
             %105 = load %8 : s8i*, align 8
@@ -187,7 +187,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %89 = cast(int_to_ptr) %88 : void*
         %90 = cmp eq %87, %89 : bool
         if %90 {
-            %91 = get_global @.str.5 : s8i[128]*
+            %91 = get_global @.str.5 : s8i[125]*
             %92 = cast(array_to_ptrdecay) %91 : s8i*
             %93 = get_global @strerror : ((s32i) -> s8i*)*
             %94 = call @__errno_location() : s32i* [const]
@@ -211,7 +211,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %82 = const 18446744073709551615 : u64i
         %83 = cmp ne %81, %82 : bool
         if %83 {
-            %84 = get_global @.str.6 : s8i[141]*
+            %84 = get_global @.str.6 : s8i[138]*
             %85 = cast(array_to_ptrdecay) %84 : s8i*
             %86 = call @t_printf(%85) : s32i [all]
             yield
@@ -224,7 +224,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %72 = const 7 : s32i
         %73 = cmp ne %71, %72 : bool
         if %73 {
-            %74 = get_global @.str.7 : s8i[139]*
+            %74 = get_global @.str.7 : s8i[136]*
             %75 = cast(array_to_ptrdecay) %74 : s8i*
             %76 = get_global @strerror : ((s32i) -> s8i*)*
             %77 = call @__errno_location() : s32i* [const]
@@ -247,7 +247,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %64 = load %7 : u64i, align 8
         %65 = cast(int_to_bool) %64 : bool
         if %65 {
-            %66 = get_global @.str.8 : s8i[161]*
+            %66 = get_global @.str.8 : s8i[158]*
             %67 = cast(array_to_ptrdecay) %66 : s8i*
             %68 = load %7 : u64i, align 8
             %69 = call @t_printf(%67, %68) : s32i [all]
@@ -260,7 +260,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %55 = load %54 : s32i, align 4
         %56 = cast(int_to_bool) %55 : bool
         if %56 {
-            %57 = get_global @.str.9 : s8i[119]*
+            %57 = get_global @.str.9 : s8i[116]*
             %58 = cast(array_to_ptrdecay) %57 : s8i*
             %59 = get_global @strerror : ((s32i) -> s8i*)*
             %60 = call @__errno_location() : s32i* [const]
@@ -280,7 +280,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %45 = const 18446744073709551615 : u64i
         %46 = cmp eq %44, %45 : bool
         if %46 {
-            %47 = get_global @.str.10 : s8i[123]*
+            %47 = get_global @.str.10 : s8i[120]*
             %48 = cast(array_to_ptrdecay) %47 : s8i*
             %49 = get_global @strerror : ((s32i) -> s8i*)*
             %50 = call @__errno_location() : s32i* [const]

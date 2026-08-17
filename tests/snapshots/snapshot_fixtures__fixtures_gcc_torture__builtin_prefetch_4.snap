@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/builtin-prefetch-4.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/builtin-prefetch-4.c" (c, x86_64-unknown-linux-gnu)
 global arr : s32i[100] = zero [external, default, align 16, dso_local]
 global ptr : s32i* = @arr [external, default, align 8, dso_local]
 global arrindex : s32i = 4 [external, default, align 4, dso_local]
@@ -18,7 +18,7 @@ fn assign_arg_ptr(%arg19: s32i*) -> s32i [external, c, no_inline, dso_local, not
         %490 = load %487 : s32i*, align 8
         store %490, %489, align 8
         %491 = cast(bitcast) %490 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %491, locality(0)
         %492 = load %489 : s32i*, align 8
         %493 = load %487 : s32i*, align 8
         %494 = cmp eq %492, %493 : bool
@@ -34,7 +34,7 @@ fn assign_glob_ptr() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %479 = load %478 : s32i*, align 8
     store %479, %477, align 8
     %480 = cast(bitcast) %479 : void*
-    <unmodeled: cir.prefetch>
+    prefetch %480, locality(0)
     %481 = load %477 : s32i*, align 8
     %482 = get_global @ptr : s32i**
     %483 = load %482 : s32i*, align 8
@@ -58,7 +58,7 @@ fn assign_arg_idx(%arg17: s32i*, %arg18: s32i) -> s32i [external, c, no_inline, 
         %468 = load %462 : s32i*, align 8
         %469 = ptr_stride %468, %467 : s32i*
         %470 = cast(bitcast) %469 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %470, locality(0)
         %471 = load %465 : s32i, align 4
         %472 = load %463 : s32i, align 4
         %473 = cmp eq %471, %472 : bool
@@ -78,7 +78,7 @@ fn assign_glob_idx() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %453 = load %452 : s32i*, align 8
     %454 = ptr_stride %453, %451 : s32i*
     %455 = cast(bitcast) %454 : void*
-    <unmodeled: cir.prefetch>
+    prefetch %455, locality(0)
     %456 = load %448 : s32i, align 4
     %457 = get_global @arrindex : s32i*
     %458 = load %457 : s32i, align 4
@@ -103,7 +103,7 @@ fn preinc_arg_ptr(%arg16: s32i*) -> s32i [external, c, no_inline, dso_local, not
         %440 = ptr_stride %438, %439 : s32i*
         store %440, %432, align 8
         %441 = cast(bitcast) %440 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %441, locality(0)
         %442 = load %432 : s32i*, align 8
         %443 = load %434 : s32i*, align 8
         %444 = cmp eq %442, %443 : bool
@@ -126,7 +126,7 @@ fn preinc_glob_ptr() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %424 = ptr_stride %422, %423 : s32i*
     store %424, %421, align 8
     %425 = cast(bitcast) %424 : void*
-    <unmodeled: cir.prefetch>
+    prefetch %425, locality(0)
     %426 = get_global @ptr : s32i**
     %427 = load %426 : s32i*, align 8
     %428 = load %416 : s32i*, align 8
@@ -151,7 +151,7 @@ fn postinc_arg_ptr(%arg15: s32i*) -> s32i [external, c, no_inline, dso_local, no
         %408 = ptr_stride %406, %407 : s32i*
         store %408, %400, align 8
         %409 = cast(bitcast) %406 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %409, locality(0)
         %410 = load %400 : s32i*, align 8
         %411 = load %402 : s32i*, align 8
         %412 = cmp eq %410, %411 : bool
@@ -174,7 +174,7 @@ fn postinc_glob_ptr() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %392 = ptr_stride %390, %391 : s32i*
     store %392, %389, align 8
     %393 = cast(bitcast) %390 : void*
-    <unmodeled: cir.prefetch>
+    prefetch %393, locality(0)
     %394 = get_global @ptr : s32i**
     %395 = load %394 : s32i*, align 8
     %396 = load %384 : s32i*, align 8
@@ -199,7 +199,7 @@ fn predec_arg_ptr(%arg14: s32i*) -> s32i [external, c, no_inline, dso_local, not
         %376 = ptr_stride %374, %375 : s32i*
         store %376, %368, align 8
         %377 = cast(bitcast) %376 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %377, locality(0)
         %378 = load %368 : s32i*, align 8
         %379 = load %370 : s32i*, align 8
         %380 = cmp eq %378, %379 : bool
@@ -222,7 +222,7 @@ fn predec_glob_ptr() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %360 = ptr_stride %358, %359 : s32i*
     store %360, %357, align 8
     %361 = cast(bitcast) %360 : void*
-    <unmodeled: cir.prefetch>
+    prefetch %361, locality(0)
     %362 = get_global @ptr : s32i**
     %363 = load %362 : s32i*, align 8
     %364 = load %352 : s32i*, align 8
@@ -247,7 +247,7 @@ fn postdec_arg_ptr(%arg13: s32i*) -> s32i [external, c, no_inline, dso_local, no
         %344 = ptr_stride %342, %343 : s32i*
         store %344, %336, align 8
         %345 = cast(bitcast) %342 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %345, locality(0)
         %346 = load %336 : s32i*, align 8
         %347 = load %338 : s32i*, align 8
         %348 = cmp eq %346, %347 : bool
@@ -270,7 +270,7 @@ fn postdec_glob_ptr() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %328 = ptr_stride %326, %327 : s32i*
     store %328, %325, align 8
     %329 = cast(bitcast) %326 : void*
-    <unmodeled: cir.prefetch>
+    prefetch %329, locality(0)
     %330 = get_global @ptr : s32i**
     %331 = load %330 : s32i*, align 8
     %332 = load %320 : s32i*, align 8
@@ -299,7 +299,7 @@ fn preinc_arg_idx(%arg11: s32i*, %arg12: s32i) -> s32i [external, c, no_inline, 
         %311 = load %301 : s32i*, align 8
         %312 = ptr_stride %311, %310 : s32i*
         %313 = cast(bitcast) %312 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %313, locality(0)
         %314 = load %302 : s32i, align 4
         %315 = load %304 : s32i, align 4
         %316 = cmp eq %314, %315 : bool
@@ -325,7 +325,7 @@ fn preinc_glob_idx() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %292 = load %291 : s32i*, align 8
     %293 = ptr_stride %292, %290 : s32i*
     %294 = cast(bitcast) %293 : void*
-    <unmodeled: cir.prefetch>
+    prefetch %294, locality(0)
     %295 = get_global @arrindex : s32i*
     %296 = load %295 : s32i, align 4
     %297 = load %282 : s32i, align 4
@@ -354,7 +354,7 @@ fn postinc_arg_idx(%arg9: s32i*, %arg10: s32i) -> s32i [external, c, no_inline, 
         %273 = load %263 : s32i*, align 8
         %274 = ptr_stride %273, %272 : s32i*
         %275 = cast(bitcast) %274 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %275, locality(0)
         %276 = load %264 : s32i, align 4
         %277 = load %266 : s32i, align 4
         %278 = cmp eq %276, %277 : bool
@@ -380,7 +380,7 @@ fn postinc_glob_idx() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %254 = load %253 : s32i*, align 8
     %255 = ptr_stride %254, %252 : s32i*
     %256 = cast(bitcast) %255 : void*
-    <unmodeled: cir.prefetch>
+    prefetch %256, locality(0)
     %257 = get_global @arrindex : s32i*
     %258 = load %257 : s32i, align 4
     %259 = load %244 : s32i, align 4
@@ -409,7 +409,7 @@ fn predec_arg_idx(%arg7: s32i*, %arg8: s32i) -> s32i [external, c, no_inline, ds
         %235 = load %225 : s32i*, align 8
         %236 = ptr_stride %235, %234 : s32i*
         %237 = cast(bitcast) %236 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %237, locality(0)
         %238 = load %226 : s32i, align 4
         %239 = load %228 : s32i, align 4
         %240 = cmp eq %238, %239 : bool
@@ -435,7 +435,7 @@ fn predec_glob_idx() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %216 = load %215 : s32i*, align 8
     %217 = ptr_stride %216, %214 : s32i*
     %218 = cast(bitcast) %217 : void*
-    <unmodeled: cir.prefetch>
+    prefetch %218, locality(0)
     %219 = get_global @arrindex : s32i*
     %220 = load %219 : s32i, align 4
     %221 = load %206 : s32i, align 4
@@ -464,7 +464,7 @@ fn postdec_arg_idx(%arg5: s32i*, %arg6: s32i) -> s32i [external, c, no_inline, d
         %197 = load %187 : s32i*, align 8
         %198 = ptr_stride %197, %196 : s32i*
         %199 = cast(bitcast) %198 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %199, locality(0)
         %200 = load %188 : s32i, align 4
         %201 = load %190 : s32i, align 4
         %202 = cmp eq %200, %201 : bool
@@ -490,7 +490,7 @@ fn postdec_glob_idx() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %178 = load %177 : s32i*, align 8
     %179 = ptr_stride %178, %176 : s32i*
     %180 = cast(bitcast) %179 : void*
-    <unmodeled: cir.prefetch>
+    prefetch %180, locality(0)
     %181 = get_global @arrindex : s32i*
     %182 = load %181 : s32i, align 4
     %183 = load %168 : s32i, align 4
@@ -524,7 +524,7 @@ fn funccall_arg_ptr(%arg3: s32i*) -> s32i [external, c, no_inline, dso_local, no
         %149 = load %147 : s32i*, align 8
         %150 = call @getptr(%149) : s32i* [all]
         %151 = cast(bitcast) %150 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %151, locality(0)
         %152 = get_global @getptrcnt : s32i*
         %153 = load %152 : s32i, align 4
         %154 = const 1 : s32i
@@ -563,7 +563,7 @@ fn funccall_arg_idx(%arg0: s32i*, %arg1: s32i) -> s32i [external, c, no_inline, 
         %129 = load %123 : s32i*, align 8
         %130 = ptr_stride %129, %128 : s32i*
         %131 = cast(bitcast) %130 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %131, locality(0)
         %132 = get_global @getintcnt : s32i*
         %133 = load %132 : s32i, align 4
         %134 = const 1 : s32i

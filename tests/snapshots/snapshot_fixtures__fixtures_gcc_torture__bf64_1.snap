@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/bf64-1.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/bf64-1.c" (c, x86_64-unknown-linux-gnu)
 global __const.main.tmp2 : rec_tmp2 = {1315049991948926991} [cir_private, default, dso_local, constant]
 global __const.main.tmp : rec_tmp = {18442241573325435171} [cir_private, default, dso_local, constant]
 
@@ -18,9 +18,9 @@ fn sub(%arg1: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
         store %68, %69
         %71 = const 2381903268435576 : s64i
         %72 = get_member %69[0] "field" : u64i*
-        <unmodeled: cir.get_bitfield>
+        %73 = get_bitfield %72, "field": 52 bits @12 in signed u64i : s64i, align 8
         %74 = or %73, %71 : s64i
-        <unmodeled: cir.set_bitfield>
+        %75 = set_bitfield %72, %74, "field": 52 bits @12 in signed u64i : s64i, align 8
         copy %70, %69
         %76 = load %70 : rec_tmp
         store %76, %65
@@ -40,9 +40,9 @@ fn sub2(%arg0: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
         store %54, %55
         %57 = const 2381903268435576 : s64i
         %58 = get_member %55[0] "field" : u64i*
-        <unmodeled: cir.get_bitfield>
+        %59 = get_bitfield %58, "field": 52 bits @0 in signed u64i : s64i, align 8
         %60 = or %59, %57 : s64i
-        <unmodeled: cir.set_bitfield>
+        %61 = set_bitfield %58, %60, "field": 52 bits @0 in signed u64i : s64i, align 8
         copy %56, %55
         %62 = load %56 : rec_tmp2
         store %62, %51
@@ -86,16 +86,16 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     store %21, %6, align 8
     scope {
         %38 = get_member %5[0] "pad" : u64i*
-        <unmodeled: cir.get_bitfield>
+        %39 = get_bitfield %38, "pad": 12 bits @0 in signed u64i : s64i, align 8
         %40 = cast(integral) %39 : s32i
         %41 = const 291 : s32i
         %42 = cmp ne %40, %41 : bool
         %43 = ternary %42 ? { : bool
-            %50 = const #true : bool
+            %50 = const true : bool
             yield %50
         } : {
             %45 = get_member %5[0] "field" : u64i*
-            <unmodeled: cir.get_bitfield>
+            %46 = get_bitfield %45, "field": 52 bits @12 in signed u64i : s64i, align 8
             %47 = cast(integral) %46 : u64i
             %48 = const 18446743335512004223 : u64i
             %49 = cmp ne %47, %48 : bool
@@ -110,16 +110,16 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     }
     scope {
         %25 = get_member %6[0] "pad" : u64i*
-        <unmodeled: cir.get_bitfield>
+        %26 = get_bitfield %25, "pad": 12 bits @52 in signed u64i : s64i, align 8
         %27 = cast(integral) %26 : s32i
         %28 = const 291 : s32i
         %29 = cmp ne %27, %28 : bool
         %30 = ternary %29 ? { : bool
-            %37 = const #true : bool
+            %37 = const true : bool
             yield %37
         } : {
             %32 = get_member %6[0] "field" : u64i*
-            <unmodeled: cir.get_bitfield>
+            %33 = get_bitfield %32, "field": 52 bits @0 in signed u64i : s64i, align 8
             %34 = cast(integral) %33 : u64i
             %35 = const 18446743335512004223 : u64i
             %36 = cmp ne %34, %35 : bool

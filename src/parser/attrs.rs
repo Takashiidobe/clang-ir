@@ -131,6 +131,7 @@ impl<'a> Parser<'a> {
             "const_record" => self.parse_cir_const_list("record"),
             "const_complex" => self.parse_cir_const_complex(),
             "global_view" => self.parse_cir_global_view(),
+            "bitfield_info" => self.parse_cir_bitfield_info(),
             "zero" => self.parse_cir_typed_marker(|ty| Attribute::Zero { ty }),
             "poison" => self.parse_cir_typed_marker(|ty| Attribute::Poison { ty }),
             _ => {
@@ -288,6 +289,54 @@ impl<'a> Parser<'a> {
         self.expect(Tok::Colon)?;
         let ty = self.parse_type()?;
         Ok(Attribute::GlobalView { symbol, ty })
+    }
+
+    fn parse_cir_bitfield_info(&mut self) -> Result<Attribute> {
+        self.expect(Tok::Less)?;
+        let mut name = None;
+        let mut storage_type = None;
+        let mut size = None;
+        let mut offset = None;
+        let mut is_signed = None;
+        loop {
+            let key = self.expect_ident()?;
+            self.expect(Tok::Equal)?;
+            match key.as_str() {
+                "name" => name = Some(self.expect_str()?),
+                "storage_type" => storage_type = Some(self.parse_type()?),
+                "size" => size = Some(self.parse_attribute()?),
+                "offset" => offset = Some(self.parse_attribute()?),
+                "is_signed" => is_signed = Some(self.parse_attribute()?),
+                other => {
+                    return Err(self.err(format!("unexpected bitfield_info field `{other}`")));
+                }
+            }
+            if !self.eat(&Tok::Comma) {
+                break;
+            }
+        }
+        self.expect(Tok::Greater)?;
+        let name = name.ok_or_else(|| self.err("bitfield_info missing `name`"))?;
+        let storage_type =
+            storage_type.ok_or_else(|| self.err("bitfield_info missing `storage_type`"))?;
+        let size = size
+            .and_then(|a| a.as_int())
+            .ok_or_else(|| self.err("bitfield_info missing/invalid `size`"))?
+            as u32;
+        let offset = offset
+            .and_then(|a| a.as_int())
+            .ok_or_else(|| self.err("bitfield_info missing/invalid `offset`"))?
+            as u32;
+        let is_signed = is_signed
+            .and_then(|a| a.as_bool())
+            .ok_or_else(|| self.err("bitfield_info missing/invalid `is_signed`"))?;
+        Ok(Attribute::BitfieldInfo {
+            name,
+            storage_type,
+            size,
+            offset,
+            is_signed,
+        })
     }
 
     fn parse_cir_typed_marker(

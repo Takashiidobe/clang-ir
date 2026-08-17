@@ -183,8 +183,12 @@ impl<'a> Parser<'a> {
                     self.bump();
                     let name = self.expect_ident()?;
                     self.expect(Tok::Equal)?;
-                    let attr = self.parse_attribute()?;
-                    m.attr_aliases.insert(name, attr);
+                    if let Some(loc) = self.try_parse_loc_suffix() {
+                        m.loc_aliases.insert(name, loc);
+                    } else {
+                        let attr = self.parse_attribute()?;
+                        m.attr_aliases.insert(name, attr);
+                    }
                 }
                 Tok::Eof => break,
                 _ => {
@@ -284,7 +288,7 @@ impl<'a> Parser<'a> {
         };
 
         self.expect(Tok::Colon)?;
-        let (_input_tys, result_tys) = self.parse_function_type()?;
+        let (operand_types, result_tys) = self.parse_function_type()?;
         if result_tys.len() != result_ids.len() {
             return Err(self.err(format!(
                 "operation '{name}' has {} result value(s) but function type lists {}",
@@ -293,6 +297,7 @@ impl<'a> Parser<'a> {
             )));
         }
         let results = result_ids.into_iter().zip(result_tys).collect();
+        let loc = self.try_parse_loc_suffix();
 
         Ok(Operation {
             name,
@@ -302,7 +307,26 @@ impl<'a> Parser<'a> {
             properties,
             regions,
             attributes,
+            operand_types,
+            loc,
         })
+    }
+
+    /// Consumes and returns a trailing `loc(...)` verbatim (including the
+    /// `loc(`/`)` wrapper), or leaves the parser untouched and returns `None`
+    /// if the current token isn't `loc`.
+    fn try_parse_loc_suffix(&mut self) -> Option<String> {
+        if !matches!(self.tok(), Tok::Ident(s) if s == "loc") {
+            return None;
+        }
+        let start = self.cur().pos;
+        self.bump();
+        if !self.eat(&Tok::LParen) {
+            return None;
+        }
+        self.capture_raw_body();
+        let end = self.toks[self.pos.saturating_sub(1)].end;
+        Some(self.src[start..end].to_string())
     }
 
     fn parse_region(&mut self) -> Result<Region> {
@@ -329,6 +353,10 @@ impl<'a> Parser<'a> {
                         let id = self.expect_value()?;
                         self.expect(Tok::Colon)?;
                         let ty = self.parse_type()?;
+                        // Per-argument `loc(...)` (e.g. `%arg0: !s32i
+                        // loc(fused[...])`), discarded like the parser
+                        // already discards other block-arg locations.
+                        self.try_parse_loc_suffix();
                         args.push((id, ty));
                         if !self.eat(&Tok::Comma) {
                             break;

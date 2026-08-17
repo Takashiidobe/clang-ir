@@ -72,6 +72,16 @@ pub enum Attribute {
         symbol: String,
         ty: Type,
     },
+    /// `#cir.bitfield_info<name = "...", storage_type = ty, size = N, offset
+    /// = N, is_signed = bool>` (no trailing `: ty` - unlike most other `#cir.*`
+    /// attrs, the CIR printer doesn't attach one to this one).
+    BitfieldInfo {
+        name: String,
+        storage_type: Type,
+        size: u32,
+        offset: u32,
+        is_signed: bool,
+    },
     /// `#cir.zero : ty`
     Zero {
         ty: Type,
@@ -227,6 +237,16 @@ impl std::fmt::Display for Attribute {
             Attribute::ConstRecord { elements, .. } => write_bracketed(f, '{', '}', elements),
             Attribute::ConstComplex { real, imag, .. } => write!(f, "({real}, {imag})"),
             Attribute::GlobalView { symbol, .. } => write!(f, "@{symbol}"),
+            Attribute::BitfieldInfo {
+                name,
+                storage_type,
+                size,
+                offset,
+                is_signed,
+            } => write!(
+                f,
+                "bitfield_info<{name:?}, {storage_type}, size={size}, offset={offset}, signed={is_signed}>"
+            ),
             Attribute::Zero { .. } => write!(f, "zero"),
             Attribute::Poison { .. } => write!(f, "poison"),
             Attribute::Dialect {

@@ -124,6 +124,100 @@ impl std::fmt::Display for UnaryOp {
     }
 }
 
+/// A single-operand math/bit-count builtin. `result`'s type can differ from
+/// `operand`'s (e.g. `Signbit` takes a float and returns `bool`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum MathUnaryKind {
+    Fabs,
+    Floor,
+    Ffs,
+    Clz,
+    Ctz,
+    Abs,
+    Signbit,
+}
+
+impl std::str::FromStr for MathUnaryKind {
+    type Err = crate::model::enums::ParseEnumError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "fabs" => Ok(MathUnaryKind::Fabs),
+            "floor" => Ok(MathUnaryKind::Floor),
+            "ffs" => Ok(MathUnaryKind::Ffs),
+            "clz" => Ok(MathUnaryKind::Clz),
+            "ctz" => Ok(MathUnaryKind::Ctz),
+            "abs" => Ok(MathUnaryKind::Abs),
+            "signbit" => Ok(MathUnaryKind::Signbit),
+            other => Err(crate::model::enums::ParseEnumError::new(
+                "MathUnaryKind",
+                other,
+            )),
+        }
+    }
+}
+
+impl std::fmt::Display for MathUnaryKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let kw = match self {
+            MathUnaryKind::Fabs => "fabs",
+            MathUnaryKind::Floor => "floor",
+            MathUnaryKind::Ffs => "ffs",
+            MathUnaryKind::Clz => "clz",
+            MathUnaryKind::Ctz => "ctz",
+            MathUnaryKind::Abs => "abs",
+            MathUnaryKind::Signbit => "signbit",
+        };
+        write!(f, "{kw}")
+    }
+}
+
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct BitfieldInfo {
+    pub name: String,
+    pub storage_type: Type,
+    pub size: u32,
+    pub offset: u32,
+    pub is_signed: bool,
+}
+
+impl TryFrom<&Attribute> for BitfieldInfo {
+    type Error = ();
+    fn try_from(attr: &Attribute) -> Result<Self, Self::Error> {
+        match attr {
+            Attribute::BitfieldInfo {
+                name,
+                storage_type,
+                size,
+                offset,
+                is_signed,
+            } => Ok(BitfieldInfo {
+                name: name.clone(),
+                storage_type: storage_type.clone(),
+                size: *size,
+                offset: *offset,
+                is_signed: *is_signed,
+            }),
+            _ => Err(()),
+        }
+    }
+}
+
+impl std::fmt::Display for BitfieldInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{:?}: {} bits @{} in {}{}",
+            self.name,
+            self.size,
+            self.offset,
+            if self.is_signed { "signed " } else { "" },
+            self.storage_type
+        )
+    }
+}
+
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SwitchCase {
@@ -169,6 +263,24 @@ pub enum Instruction {
     Copy {
         dst: ValueId,
         src: ValueId,
+    },
+    GetBitfield {
+        result: ValueId,
+        ty: Type,
+        addr: ValueId,
+        bitfield: BitfieldInfo,
+        alignment: Option<u64>,
+    },
+    /// Result is the stored value viewed back through the field's logical
+    /// type (sign-extended/truncated as CIR's semantics require), not the
+    /// (possibly wider) storage type.
+    SetBitfield {
+        result: ValueId,
+        ty: Type,
+        addr: ValueId,
+        value: ValueId,
+        bitfield: BitfieldInfo,
+        alignment: Option<u64>,
     },
 
     // -- constants / globals --
@@ -280,6 +392,96 @@ pub enum Instruction {
         rhs: ValueId,
     },
 
+    // -- math / bit-count builtins --
+    MathUnary {
+        result: ValueId,
+        ty: Type,
+        kind: MathUnaryKind,
+        operand: ValueId,
+        /// `poison_zero` (clz/ctz) or `min_is_poison` (abs); always `false`
+        /// for kinds that don't carry one.
+        poison_flag: bool,
+    },
+    Copysign {
+        result: ValueId,
+        ty: Type,
+        magnitude: ValueId,
+        sign: ValueId,
+    },
+    Fmuladd {
+        result: ValueId,
+        ty: Type,
+        a: ValueId,
+        b: ValueId,
+        c: ValueId,
+    },
+    MulOverflow {
+        result: ValueId,
+        overflow: ValueId,
+        ty: Type,
+        lhs: ValueId,
+        rhs: ValueId,
+    },
+    AddOverflow {
+        result: ValueId,
+        overflow: ValueId,
+        ty: Type,
+        lhs: ValueId,
+        rhs: ValueId,
+    },
+
+    // -- complex numbers --
+    ComplexCreate {
+        result: ValueId,
+        ty: Type,
+        real: ValueId,
+        imag: ValueId,
+    },
+    ComplexReal {
+        result: ValueId,
+        ty: Type,
+        operand: ValueId,
+    },
+    ComplexImag {
+        result: ValueId,
+        ty: Type,
+        operand: ValueId,
+    },
+
+    // -- varargs --
+    VaStart {
+        addr: ValueId,
+    },
+    VaEnd {
+        addr: ValueId,
+    },
+    VaCopy {
+        dst: ValueId,
+        src: ValueId,
+    },
+    VaArg {
+        result: ValueId,
+        ty: Type,
+        addr: ValueId,
+    },
+
+    // -- misc runtime builtins --
+    FrameAddress {
+        result: ValueId,
+        ty: Type,
+        level: ValueId,
+    },
+    ReturnAddress {
+        result: ValueId,
+        ty: Type,
+        level: ValueId,
+    },
+    Prefetch {
+        addr: ValueId,
+        locality: u32,
+        is_write: bool,
+    },
+
     // -- structured control flow --
     Scope {
         body: Body,
@@ -306,9 +508,11 @@ pub enum Instruction {
         condition: ValueId,
         cases: Vec<SwitchCase>,
     },
+    /// `result` is `None` for a statement-position ternary used only for its
+    /// side effects (e.g. inside an `assert`-style macro) - `cir.ternary`
+    /// carries no result value in that shape.
     Ternary {
-        result: ValueId,
-        ty: Type,
+        result: Option<(ValueId, Type)>,
         condition: ValueId,
         true_body: Body,
         false_body: Body,
@@ -433,6 +637,29 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
             dst: operand(op, 0)?.clone(),
             src: operand(op, 1)?.clone(),
         }),
+        "get_bitfield" => {
+            let (result, ty) = single_result(op)?;
+            let bitfield = BitfieldInfo::try_from(op.attr("bitfield_info")?).ok()?;
+            Some(Instruction::GetBitfield {
+                result: result.clone(),
+                ty: ty.clone(),
+                addr: operand(op, 0)?.clone(),
+                bitfield,
+                alignment: alignment(op),
+            })
+        }
+        "set_bitfield" => {
+            let (result, ty) = single_result(op)?;
+            let bitfield = BitfieldInfo::try_from(op.attr("bitfield_info")?).ok()?;
+            Some(Instruction::SetBitfield {
+                result: result.clone(),
+                ty: ty.clone(),
+                addr: operand(op, 0)?.clone(),
+                value: operand(op, 1)?.clone(),
+                bitfield,
+                alignment: alignment(op),
+            })
+        }
         "const" => {
             let (result, ty) = single_result(op)?;
             Some(Instruction::Const {
@@ -625,6 +852,124 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 rhs: operand(op, 1)?.clone(),
             })
         }
+        "fabs" | "floor" | "ffs" | "clz" | "ctz" | "abs" | "signbit" => {
+            let (result, ty) = single_result(op)?;
+            let kind: MathUnaryKind = op.mnemonic().parse().ok()?;
+            let poison_flag = flag(op, "poison_zero") || flag(op, "min_is_poison");
+            Some(Instruction::MathUnary {
+                result: result.clone(),
+                ty: ty.clone(),
+                kind,
+                operand: operand(op, 0)?.clone(),
+                poison_flag,
+            })
+        }
+        "copysign" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::Copysign {
+                result: result.clone(),
+                ty: ty.clone(),
+                magnitude: operand(op, 0)?.clone(),
+                sign: operand(op, 1)?.clone(),
+            })
+        }
+        "fmuladd" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::Fmuladd {
+                result: result.clone(),
+                ty: ty.clone(),
+                a: operand(op, 0)?.clone(),
+                b: operand(op, 1)?.clone(),
+                c: operand(op, 2)?.clone(),
+            })
+        }
+        "mul.overflow" | "add.overflow" => {
+            let (result, ty) = op.results.first()?;
+            let overflow = op.results.get(1)?.0.clone();
+            let lhs = operand(op, 0)?.clone();
+            let rhs = operand(op, 1)?.clone();
+            Some(if op.mnemonic() == "mul.overflow" {
+                Instruction::MulOverflow {
+                    result: result.clone(),
+                    overflow,
+                    ty: ty.clone(),
+                    lhs,
+                    rhs,
+                }
+            } else {
+                Instruction::AddOverflow {
+                    result: result.clone(),
+                    overflow,
+                    ty: ty.clone(),
+                    lhs,
+                    rhs,
+                }
+            })
+        }
+        "complex.create" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::ComplexCreate {
+                result: result.clone(),
+                ty: ty.clone(),
+                real: operand(op, 0)?.clone(),
+                imag: operand(op, 1)?.clone(),
+            })
+        }
+        "complex.real" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::ComplexReal {
+                result: result.clone(),
+                ty: ty.clone(),
+                operand: operand(op, 0)?.clone(),
+            })
+        }
+        "complex.imag" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::ComplexImag {
+                result: result.clone(),
+                ty: ty.clone(),
+                operand: operand(op, 0)?.clone(),
+            })
+        }
+        "va_start" => Some(Instruction::VaStart {
+            addr: operand(op, 0)?.clone(),
+        }),
+        "va_end" => Some(Instruction::VaEnd {
+            addr: operand(op, 0)?.clone(),
+        }),
+        "va_copy" => Some(Instruction::VaCopy {
+            dst: operand(op, 0)?.clone(),
+            src: operand(op, 1)?.clone(),
+        }),
+        "va_arg" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::VaArg {
+                result: result.clone(),
+                ty: ty.clone(),
+                addr: operand(op, 0)?.clone(),
+            })
+        }
+        "frame_address" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::FrameAddress {
+                result: result.clone(),
+                ty: ty.clone(),
+                level: operand(op, 0)?.clone(),
+            })
+        }
+        "return_address" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::ReturnAddress {
+                result: result.clone(),
+                ty: ty.clone(),
+                level: operand(op, 0)?.clone(),
+            })
+        }
+        "prefetch" => Some(Instruction::Prefetch {
+            addr: operand(op, 0)?.clone(),
+            locality: op.attr("locality").and_then(Attribute::as_int).unwrap_or(0) as u32,
+            is_write: flag(op, "isWrite"),
+        }),
         "scope" => Some(Instruction::Scope {
             body: lower_region(region(op, 0)?),
         }),
@@ -671,16 +1016,12 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 cases,
             })
         }
-        "ternary" => {
-            let (result, ty) = single_result(op)?;
-            Some(Instruction::Ternary {
-                result: result.clone(),
-                ty: ty.clone(),
-                condition: operand(op, 0)?.clone(),
-                true_body: lower_region(region(op, 0)?),
-                false_body: lower_region(region(op, 1)?),
-            })
-        }
+        "ternary" => Some(Instruction::Ternary {
+            result: single_result(op).cloned(),
+            condition: operand(op, 0)?.clone(),
+            true_body: lower_region(region(op, 0)?),
+            false_body: lower_region(region(op, 1)?),
+        }),
         "return" => Some(Instruction::Return {
             value: operand(op, 0).cloned(),
         }),
@@ -847,6 +1188,38 @@ fn write_instruction(
         Copy { dst, src } => {
             write_indent(f, level)?;
             writeln!(f, "copy %{dst}, %{src}")
+        }
+        GetBitfield {
+            result,
+            ty,
+            addr,
+            bitfield,
+            alignment,
+        } => {
+            write_indent(f, level)?;
+            write!(f, "%{result} = get_bitfield %{addr}, {bitfield} : {ty}")?;
+            if let Some(a) = alignment {
+                write!(f, ", align {a}")?;
+            }
+            writeln!(f)
+        }
+        SetBitfield {
+            result,
+            ty,
+            addr,
+            value,
+            bitfield,
+            alignment,
+        } => {
+            write_indent(f, level)?;
+            write!(
+                f,
+                "%{result} = set_bitfield %{addr}, %{value}, {bitfield} : {ty}"
+            )?;
+            if let Some(a) = alignment {
+                write!(f, ", align {a}")?;
+            }
+            writeln!(f)
         }
         Const { result, ty, value } => {
             write_indent(f, level)?;
@@ -1027,6 +1400,130 @@ fn write_instruction(
             write_indent(f, level)?;
             writeln!(f, "%{result} = ptr_diff %{lhs}, %{rhs} : {ty}")
         }
+        MathUnary {
+            result,
+            ty,
+            kind,
+            operand,
+            poison_flag,
+        } => {
+            write_indent(f, level)?;
+            write!(f, "%{result} = {kind} %{operand} : {ty}")?;
+            write_flags(f, &[("poison", *poison_flag)])?;
+            writeln!(f)
+        }
+        Copysign {
+            result,
+            ty,
+            magnitude,
+            sign,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = copysign %{magnitude}, %{sign} : {ty}")
+        }
+        Fmuladd {
+            result,
+            ty,
+            a,
+            b,
+            c,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = fmuladd %{a}, %{b}, %{c} : {ty}")
+        }
+        MulOverflow {
+            result,
+            overflow,
+            ty,
+            lhs,
+            rhs,
+        } => {
+            write_indent(f, level)?;
+            writeln!(
+                f,
+                "%{result}, %{overflow} = mul.overflow %{lhs}, %{rhs} : {ty}"
+            )
+        }
+        AddOverflow {
+            result,
+            overflow,
+            ty,
+            lhs,
+            rhs,
+        } => {
+            write_indent(f, level)?;
+            writeln!(
+                f,
+                "%{result}, %{overflow} = add.overflow %{lhs}, %{rhs} : {ty}"
+            )
+        }
+        ComplexCreate {
+            result,
+            ty,
+            real,
+            imag,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = complex.create %{real}, %{imag} : {ty}")
+        }
+        ComplexReal {
+            result,
+            ty,
+            operand,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = complex.real %{operand} : {ty}")
+        }
+        ComplexImag {
+            result,
+            ty,
+            operand,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = complex.imag %{operand} : {ty}")
+        }
+        VaStart { addr } => {
+            write_indent(f, level)?;
+            writeln!(f, "va_start %{addr}")
+        }
+        VaEnd { addr } => {
+            write_indent(f, level)?;
+            writeln!(f, "va_end %{addr}")
+        }
+        VaCopy { dst, src } => {
+            write_indent(f, level)?;
+            writeln!(f, "va_copy %{dst}, %{src}")
+        }
+        VaArg { result, ty, addr } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = va_arg %{addr} : {ty}")
+        }
+        FrameAddress {
+            result,
+            ty,
+            level: addr_level,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = frame_address(%{addr_level}) : {ty}")
+        }
+        ReturnAddress {
+            result,
+            ty,
+            level: addr_level,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = return_address(%{addr_level}) : {ty}")
+        }
+        Prefetch {
+            addr,
+            locality,
+            is_write,
+        } => {
+            write_indent(f, level)?;
+            write!(f, "prefetch %{addr}, locality({locality})")?;
+            write_flags(f, &[("write", *is_write)])?;
+            writeln!(f)
+        }
         Scope { body } => write_nested(f, level, "scope", body),
         If {
             condition,
@@ -1106,13 +1603,15 @@ fn write_instruction(
         }
         Ternary {
             result,
-            ty,
             condition,
             true_body,
             false_body,
         } => {
             write_indent(f, level)?;
-            writeln!(f, "%{result} = ternary %{condition} ? {{ : {ty}")?;
+            match result {
+                Some((r, ty)) => writeln!(f, "%{r} = ternary %{condition} ? {{ : {ty}")?,
+                None => writeln!(f, "ternary %{condition} ? {{")?,
+            }
             write_body(true_body, f, level + 1)?;
             write_indent(f, level)?;
             writeln!(f, "}} : {{")?;

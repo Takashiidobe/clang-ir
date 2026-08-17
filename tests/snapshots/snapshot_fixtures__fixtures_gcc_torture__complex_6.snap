@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/complex-6.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/complex-6.c" (c, x86_64-unknown-linux-gnu)
 global .str : s8i[19] = "test_float failed\n" [cir_private, default, align 1, dso_local, constant]
 global e : s32i = 0 [external, default, align 4, dso_local]
 global .str.1 : s8i[20] = "test_double failed\n" [cir_private, default, align 1, dso_local, constant]
@@ -22,10 +22,10 @@ fn ctest_float(%arg6: vector<2 x float>) -> vector<2 x float> [external, c, no_i
         %286 = alloca complex<float>, "res", align 4
         store %283, %284
         %287 = load %284 : complex<float>, align 4
-        <unmodeled: cir.complex.real>
-        <unmodeled: cir.complex.imag>
+        %288 = complex.real %287 : float
+        %289 = complex.imag %287 : float
         %290 = fneg %289 : float
-        <unmodeled: cir.complex.create>
+        %291 = complex.create %288, %290 : complex<float>
         store %291, %286, align 4
         %292 = load %286 : complex<float>, align 4
         store %292, %285, align 4
@@ -46,12 +46,12 @@ fn test_float() -> void [external, c, no_inline, dso_local, nothrow] {
     %245 = const 0.000000e+00 : double
     %246 = const 2.000000e+00 : double
     %247 = fadd %244, %245 : double
-    <unmodeled: cir.complex.create>
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %248 = complex.create %247, %246 : complex<double>
+    %249 = complex.real %248 : double
+    %250 = complex.imag %248 : double
     %251 = cast(floating) %249 : float
     %252 = cast(floating) %250 : float
-    <unmodeled: cir.complex.create>
+    %253 = complex.create %251, %252 : complex<float>
     store %253, %242, align 4
     %254 = load %242 : complex<float>, align 4
     store %254, %243, align 4
@@ -66,16 +66,16 @@ fn test_float() -> void [external, c, no_inline, dso_local, nothrow] {
     store %260, %241, align 4
     scope {
         %261 = load %241 : complex<float>, align 4
-        <unmodeled: cir.complex.real>
-        <unmodeled: cir.complex.imag>
+        %262 = complex.real %261 : float
+        %263 = complex.imag %261 : float
         %264 = cast(floating) %262 : double
         %265 = cast(floating) %263 : double
-        <unmodeled: cir.complex.create>
+        %266 = complex.create %264, %265 : complex<double>
         %267 = const 1.000000e+00 : double
         %268 = const 0.000000e+00 : double
         %269 = fsub %267, %268 : double
         %270 = const -2.000000e+00 : double
-        <unmodeled: cir.complex.create>
+        %271 = complex.create %269, %270 : complex<double>
         %272 = cmp ne %266, %271 : bool
         if %272 {
             %273 = get_global @printf : ((s8i*, ...) -> s32i)*
@@ -110,10 +110,10 @@ fn ctest_double(%arg4: double, %arg5: double) -> rec_anon_struct [external, c, n
         %229 = alloca complex<double>, "res", align 8
         store %226, %227
         %230 = load %227 : complex<double>, align 8
-        <unmodeled: cir.complex.real>
-        <unmodeled: cir.complex.imag>
+        %231 = complex.real %230 : double
+        %232 = complex.imag %230 : double
         %233 = fneg %232 : double
-        <unmodeled: cir.complex.create>
+        %234 = complex.create %231, %233 : complex<double>
         store %234, %229, align 8
         %235 = load %229 : complex<double>, align 8
         store %235, %228, align 8
@@ -133,7 +133,7 @@ fn test_double() -> void [external, c, no_inline, dso_local, nothrow] {
     %191 = const 0.000000e+00 : double
     %192 = const 2.000000e+00 : double
     %193 = fadd %190, %191 : double
-    <unmodeled: cir.complex.create>
+    %194 = complex.create %193, %192 : complex<double>
     store %194, %188, align 8
     %195 = load %188 : complex<double>, align 8
     store %195, %189, align 8
@@ -155,7 +155,7 @@ fn test_double() -> void [external, c, no_inline, dso_local, nothrow] {
         %207 = const 0.000000e+00 : double
         %208 = fsub %206, %207 : double
         %209 = const -2.000000e+00 : double
-        <unmodeled: cir.complex.create>
+        %210 = complex.create %208, %209 : complex<double>
         %211 = cmp ne %205, %210 : bool
         if %211 {
             %212 = get_global @printf : ((s8i*, ...) -> s32i)*
@@ -181,10 +181,10 @@ fn ctest_long_double(%arg3: complex<long_double<f80>>*) -> rec_anon_struct1 [ext
         %175 = alloca complex<long_double<f80>>, "res", align 16
         store %172, %173
         %176 = load %173 : complex<long_double<f80>>, align 16
-        <unmodeled: cir.complex.real>
-        <unmodeled: cir.complex.imag>
+        %177 = complex.real %176 : long_double<f80>
+        %178 = complex.imag %176 : long_double<f80>
         %179 = fneg %178 : long_double<f80>
-        <unmodeled: cir.complex.create>
+        %180 = complex.create %177, %179 : complex<long_double<f80>>
         store %180, %175, align 16
         %181 = load %175 : complex<long_double<f80>>, align 16
         store %181, %174, align 16
@@ -203,12 +203,12 @@ fn test_long_double() -> void [external, c, no_inline, dso_local, nothrow] {
     %137 = const 0.000000e+00 : double
     %138 = const 2.000000e+00 : double
     %139 = fadd %136, %137 : double
-    <unmodeled: cir.complex.create>
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %140 = complex.create %139, %138 : complex<double>
+    %141 = complex.real %140 : double
+    %142 = complex.imag %140 : double
     %143 = cast(floating) %141 : long_double<f80>
     %144 = cast(floating) %142 : long_double<f80>
-    <unmodeled: cir.complex.create>
+    %145 = complex.create %143, %144 : complex<long_double<f80>>
     store %145, %134, align 16
     %146 = load %134 : complex<long_double<f80>>, align 16
     store %146, %135, align 16
@@ -226,12 +226,12 @@ fn test_long_double() -> void [external, c, no_inline, dso_local, nothrow] {
         %154 = const 0.000000e+00 : double
         %155 = fsub %153, %154 : double
         %156 = const -2.000000e+00 : double
-        <unmodeled: cir.complex.create>
-        <unmodeled: cir.complex.real>
-        <unmodeled: cir.complex.imag>
+        %157 = complex.create %155, %156 : complex<double>
+        %158 = complex.real %157 : double
+        %159 = complex.imag %157 : double
         %160 = cast(floating) %158 : long_double<f80>
         %161 = cast(floating) %159 : long_double<f80>
-        <unmodeled: cir.complex.create>
+        %162 = complex.create %160, %161 : complex<long_double<f80>>
         %163 = cmp ne %152, %162 : bool
         if %163 {
             %164 = get_global @printf : ((s8i*, ...) -> s32i)*
@@ -260,10 +260,10 @@ fn ctest_int(%arg2: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
         %122 = alloca complex<s32i>, "res", align 4
         store %119, %120
         %123 = load %120 : complex<s32i>, align 4
-        <unmodeled: cir.complex.real>
-        <unmodeled: cir.complex.imag>
+        %124 = complex.real %123 : s32i
+        %125 = complex.imag %123 : s32i
         %126 = minus %125 : s32i
-        <unmodeled: cir.complex.create>
+        %127 = complex.create %124, %126 : complex<s32i>
         store %127, %122, align 4
         %128 = load %122 : complex<s32i>, align 4
         store %128, %121, align 4
@@ -283,12 +283,12 @@ fn test_int() -> void [external, c, no_inline, dso_local, nothrow] {
     %81 = const 0.000000e+00 : double
     %82 = const 2.000000e+00 : double
     %83 = fadd %80, %81 : double
-    <unmodeled: cir.complex.create>
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %84 = complex.create %83, %82 : complex<double>
+    %85 = complex.real %84 : double
+    %86 = complex.imag %84 : double
     %87 = cast(float_to_int) %85 : s32i
     %88 = cast(float_to_int) %86 : s32i
-    <unmodeled: cir.complex.create>
+    %89 = complex.create %87, %88 : complex<s32i>
     store %89, %78, align 4
     %90 = load %78 : complex<s32i>, align 4
     store %90, %79, align 4
@@ -303,16 +303,16 @@ fn test_int() -> void [external, c, no_inline, dso_local, nothrow] {
     store %96, %77, align 4
     scope {
         %97 = load %77 : complex<s32i>, align 4
-        <unmodeled: cir.complex.real>
-        <unmodeled: cir.complex.imag>
+        %98 = complex.real %97 : s32i
+        %99 = complex.imag %97 : s32i
         %100 = cast(int_to_float) %98 : double
         %101 = cast(int_to_float) %99 : double
-        <unmodeled: cir.complex.create>
+        %102 = complex.create %100, %101 : complex<double>
         %103 = const 1.000000e+00 : double
         %104 = const 0.000000e+00 : double
         %105 = fsub %103, %104 : double
         %106 = const -2.000000e+00 : double
-        <unmodeled: cir.complex.create>
+        %107 = complex.create %105, %106 : complex<double>
         %108 = cmp ne %102, %107 : bool
         if %108 {
             %109 = get_global @printf : ((s8i*, ...) -> s32i)*
@@ -347,10 +347,10 @@ fn ctest_long_int(%arg0: u64i, %arg1: u64i) -> rec_anon_struct2 [external, c, no
         %65 = alloca complex<s64i>, "res", align 8
         store %62, %63
         %66 = load %63 : complex<s64i>, align 8
-        <unmodeled: cir.complex.real>
-        <unmodeled: cir.complex.imag>
+        %67 = complex.real %66 : s64i
+        %68 = complex.imag %66 : s64i
         %69 = minus %68 : s64i
-        <unmodeled: cir.complex.create>
+        %70 = complex.create %67, %69 : complex<s64i>
         store %70, %65, align 8
         %71 = load %65 : complex<s64i>, align 8
         store %71, %64, align 8
@@ -370,12 +370,12 @@ fn test_long_int() -> void [external, c, no_inline, dso_local, nothrow] {
     %17 = const 0.000000e+00 : double
     %18 = const 2.000000e+00 : double
     %19 = fadd %16, %17 : double
-    <unmodeled: cir.complex.create>
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %20 = complex.create %19, %18 : complex<double>
+    %21 = complex.real %20 : double
+    %22 = complex.imag %20 : double
     %23 = cast(float_to_int) %21 : s64i
     %24 = cast(float_to_int) %22 : s64i
-    <unmodeled: cir.complex.create>
+    %25 = complex.create %23, %24 : complex<s64i>
     store %25, %14, align 8
     %26 = load %14 : complex<s64i>, align 8
     store %26, %15, align 8
@@ -393,16 +393,16 @@ fn test_long_int() -> void [external, c, no_inline, dso_local, nothrow] {
     store %35, %13, align 8
     scope {
         %36 = load %13 : complex<s64i>, align 8
-        <unmodeled: cir.complex.real>
-        <unmodeled: cir.complex.imag>
+        %37 = complex.real %36 : s64i
+        %38 = complex.imag %36 : s64i
         %39 = cast(int_to_float) %37 : double
         %40 = cast(int_to_float) %38 : double
-        <unmodeled: cir.complex.create>
+        %41 = complex.create %39, %40 : complex<double>
         %42 = const 1.000000e+00 : double
         %43 = const 0.000000e+00 : double
         %44 = fsub %42, %43 : double
         %45 = const -2.000000e+00 : double
-        <unmodeled: cir.complex.create>
+        %46 = complex.create %44, %45 : complex<double>
         %47 = cmp ne %41, %46 : bool
         if %47 {
             %48 = get_global @printf : ((s8i*, ...) -> s32i)*

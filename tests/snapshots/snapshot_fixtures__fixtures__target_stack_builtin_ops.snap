@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/target_stack_builtin_ops.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures/target_stack_builtin_ops.c" (c, x86_64-unknown-linux-gnu)
 global __const.cache_prefetch_probe.bytes : s8i[16] = zero [cir_private, default, dso_local, constant]
 global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
 
@@ -31,7 +31,7 @@ fn cache_prefetch_probe(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local,
         %38 = const 1 : s32i
         %39 = ptr_stride %37, %38 : s8i*
         %40 = cast(bitcast) %39 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %40, locality(3)
         %41 = const 0 : s64i
         %42 = get_element %25[%41] : s8i*
         %43 = load %42 : s8i, align 16
@@ -46,7 +46,7 @@ fn frame_probe() -> s32i [internal, c, no_inline, dso_local, nothrow] {
     %13 = alloca s32i, "__retval", align 4
     %14 = alloca void*, "frame", align 8
     %15 = const 0 : u32i
-    <unmodeled: cir.frame_address>
+    %16 = frame_address(%15) : u8i*
     %17 = cast(bitcast) %16 : void*
     store %17, %14, align 8
     %18 = load %14 : void*, align 8

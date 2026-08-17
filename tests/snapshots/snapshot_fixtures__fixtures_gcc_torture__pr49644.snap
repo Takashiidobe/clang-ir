@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr49644.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/pr49644.c" (c, x86_64-unknown-linux-gnu)
 global __const.main.b : double[12] = [1.000000e+00, 2.000000e+00, 3.000000e+00, 4.000000e+00, 5.000000e+00, 6.000000e+00, 7.000000e+00, 8.000000e+00, 9.000000e+00, 1.000000e+01, 1.100000e+01, 1.200000e+01] [cir_private, default, dso_local, constant]
 
 fn abort() -> void [external, c, nothrow];
@@ -22,7 +22,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %10 = const 0.000000e+00 : double
     %11 = const 1.000000e+00 : double
     %12 = fadd %9, %10 : double
-    <unmodeled: cir.complex.create>
+    %13 = complex.create %12, %11 : complex<double>
     store %13, %3, align 8
     %14 = get_global @__const.main.b : double[12]*
     copy %4, %14
@@ -48,11 +48,11 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             store %36, %5, align 8
             %37 = load %34 : double, align 8
             %38 = load %3 : complex<double>, align 8
-            <unmodeled: cir.complex.real>
-            <unmodeled: cir.complex.imag>
+            %39 = complex.real %38 : double
+            %40 = complex.imag %38 : double
             %41 = fmul %37, %39 : double
             %42 = fmul %37, %40 : double
-            <unmodeled: cir.complex.create>
+            %43 = complex.create %41, %42 : complex<double>
             %44 = load %2 : complex<double>*, align 8
             %45 = const 1 : s32i
             %46 = ptr_stride %44, %45 : complex<double>*
@@ -69,7 +69,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %21 = ptr_stride %19, %20 : complex<double>*
         %22 = cmp ne %18, %21 : bool
         %23 = ternary %22 ? { : bool
-            %30 = const #true : bool
+            %30 = const true : bool
             yield %30
         } : {
             %25 = load %5 : double*, align 8

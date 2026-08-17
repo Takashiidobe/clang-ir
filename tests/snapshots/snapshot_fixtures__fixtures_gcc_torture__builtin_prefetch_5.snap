@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/builtin-prefetch-5.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/builtin-prefetch-5.c" (c, x86_64-unknown-linux-gnu)
 global arr : s8i[100] = zero [external, default, align 16, dso_local]
 global ptr : s8i* = @arr [external, default, align 8, dso_local]
 global idx : s32i = 3 [external, default, align 4, dso_local]
@@ -14,7 +14,7 @@ fn arg_ptr(%arg2: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
         store %arg2, %54
         %55 = load %54 : s8i*, align 8
         %56 = cast(bitcast) %55 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %56, locality(0)
         return
 }
 fn arg_idx(%arg0: s8i*, %arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -28,14 +28,14 @@ fn arg_idx(%arg0: s8i*, %arg1: s32i) -> void [external, c, no_inline, dso_local,
         %51 = load %47 : s8i*, align 8
         %52 = ptr_stride %51, %50 : s8i*
         %53 = cast(bitcast) %52 : void*
-        <unmodeled: cir.prefetch>
+        prefetch %53, locality(0)
         return
 }
 fn glob_ptr() -> void [external, c, no_inline, dso_local, nothrow] {
     %44 = get_global @ptr : s8i**
     %45 = load %44 : s8i*, align 8
     %46 = cast(bitcast) %45 : void*
-    <unmodeled: cir.prefetch>
+    prefetch %46, locality(0)
     return
 }
 fn glob_idx() -> void [external, c, no_inline, dso_local, nothrow] {
@@ -46,7 +46,7 @@ fn glob_idx() -> void [external, c, no_inline, dso_local, nothrow] {
     %41 = load %40 : s8i*, align 8
     %42 = ptr_stride %41, %39 : s8i*
     %43 = cast(bitcast) %42 : void*
-    <unmodeled: cir.prefetch>
+    prefetch %43, locality(0)
     return
 }
 fn exit(%arg0: s32i) -> void [external, c];
@@ -57,13 +57,13 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %2 = get_global @s : rec_S*
     %3 = get_member %2[1] "b" : s16i*
     %4 = cast(bitcast) %3 : void*
-    <unmodeled: cir.prefetch>
+    prefetch %4, locality(0)
     %5 = const 1 : s64i
     %6 = get_global @s : rec_S*
     %7 = get_member %6[2] "c" : s8i[8]*
     %8 = get_element %7[%5] : s8i*
     %9 = cast(bitcast) %8 : void*
-    <unmodeled: cir.prefetch>
+    prefetch %9, locality(0)
     %10 = const 1 : s64i
     %11 = get_global @s : rec_S*
     %12 = get_member %11[2] "c" : s8i[8]*

@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr108498-2.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/pr108498-2.c" (c, x86_64-unknown-linux-gnu)
 global __const.main.t : rec_T = zero [cir_private, default, dso_local, constant]
 global __const.main.s : rec_S = zero [cir_private, default, dso_local, constant]
 global .str : s8i[16] = "abcdefghijklmno" [cir_private, default, align 1, dso_local, constant]
@@ -17,11 +17,11 @@ fn foo(%arg2: rec_S*) -> void [external, c, no_inline, dso_local, nothrow] {
         %502 = const 231 : u32i
         %503 = load %499 : rec_S*, align 8
         %504 = get_member %503[0] "b" : u32i*
-        <unmodeled: cir.set_bitfield>
+        %505 = set_bitfield %504, %502, "b": 8 bits @3 in u32i : u32i, align 4
         %506 = const 42 : u32i
         %507 = load %499 : rec_S*, align 8
         %508 = get_member %507[0] "c" : u32i*
-        <unmodeled: cir.set_bitfield>
+        %509 = set_bitfield %508, %506, "c": 21 bits @11 in u32i : u32i, align 4
         %510 = load %499 : rec_S*, align 8
         %511 = get_member %510[1] "d" : rec_U*
         %512 = get_member %500[0] "c" : s8i[16]*
@@ -49,11 +49,11 @@ fn bar(%arg1: rec_S*) -> void [external, c, no_inline, dso_local, nothrow] {
         %476 = const 231 : u32i
         %477 = load %473 : rec_S*, align 8
         %478 = get_member %477[0] "b" : u32i*
-        <unmodeled: cir.set_bitfield>
+        %479 = set_bitfield %478, %476, "b": 8 bits @3 in u32i : u32i, align 4
         %480 = const 42 : u32i
         %481 = load %473 : rec_S*, align 8
         %482 = get_member %481[0] "c" : u32i*
-        <unmodeled: cir.set_bitfield>
+        %483 = set_bitfield %482, %480, "c": 21 bits @11 in u32i : u32i, align 4
         %484 = load %473 : rec_S*, align 8
         %485 = get_member %484[1] "d" : rec_U*
         %486 = get_member %474[0] "c" : s8i[16]*
@@ -73,7 +73,7 @@ fn bar(%arg1: rec_S*) -> void [external, c, no_inline, dso_local, nothrow] {
         %495 = const 12 : u32i
         %496 = load %473 : rec_S*, align 8
         %497 = get_member %496[4] "g" : u32i*
-        <unmodeled: cir.set_bitfield>
+        %498 = set_bitfield %497, %495, "g": 5 bits @0 in u32i : u32i, align 4
         return
 }
 fn baz(%arg0: rec_T*) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -85,7 +85,7 @@ fn baz(%arg0: rec_T*) -> void [external, c, no_inline, dso_local, nothrow] {
         %454 = const 42 : u32i
         %455 = load %451 : rec_T*, align 8
         %456 = get_member %455[0] "c" : u32i*
-        <unmodeled: cir.set_bitfield>
+        %457 = set_bitfield %456, %454, "c": 8 bits @24 in u32i : u32i, align 4
         %458 = load %451 : rec_T*, align 8
         %459 = get_member %458[1] "d" : rec_U*
         %460 = get_member %452[0] "c" : s8i[16]*
@@ -105,7 +105,7 @@ fn baz(%arg0: rec_T*) -> void [external, c, no_inline, dso_local, nothrow] {
         %469 = const 12 : u32i
         %470 = load %451 : rec_T*, align 8
         %471 = get_member %470[4] "g" : u32i*
-        <unmodeled: cir.set_bitfield>
+        %472 = set_bitfield %471, %469, "g": 5 bits @0 in u32i : u32i, align 4
         return
 }
 fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c, nothrow];
@@ -122,7 +122,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %442 = const 8 : s32i
         %443 = cmp ne %441, %442 : bool
         %444 = ternary %443 ? { : bool
-            %450 = const #true : bool
+            %450 = const true : bool
             yield %450
         } : {
             %447 = const 4 : s32i
@@ -145,34 +145,34 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     call @foo(%1) [all]
     scope {
         %380 = get_member %1[0] "a" : u32i*
-        <unmodeled: cir.get_bitfield>
+        %381 = get_bitfield %380, "a": 3 bits @0 in u32i : u32i, align 4
         %382 = cast(integral) %381 : s32i
         %383 = const 0 : s32i
         %384 = cmp ne %382, %383 : bool
         %385 = ternary %384 ? { : bool
-            %440 = const #true : bool
+            %440 = const true : bool
             yield %440
         } : {
             %435 = get_member %1[0] "b" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %436 = get_bitfield %435, "b": 8 bits @3 in u32i : u32i, align 4
             %437 = cast(integral) %436 : s32i
             %438 = const 231 : s32i
             %439 = cmp ne %437, %438 : bool
             yield %439
         }
         %386 = ternary %385 ? { : bool
-            %434 = const #true : bool
+            %434 = const true : bool
             yield %434
         } : {
             %429 = get_member %1[0] "c" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %430 = get_bitfield %429, "c": 21 bits @11 in u32i : u32i, align 4
             %431 = cast(integral) %430 : s32i
             %432 = const 42 : s32i
             %433 = cmp ne %431, %432 : bool
             yield %433
         }
         %387 = ternary %386 ? { : bool
-            %428 = const #true : bool
+            %428 = const true : bool
             yield %428
         } : {
             %419 = get_member %1[1] "d" : rec_U*
@@ -187,7 +187,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %427
         }
         %388 = ternary %387 ? { : bool
-            %418 = const #true : bool
+            %418 = const true : bool
             yield %418
         } : {
             %414 = get_member %1[2] "e" : u32i*
@@ -197,7 +197,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %417
         }
         %389 = ternary %388 ? { : bool
-            %413 = const #true : bool
+            %413 = const true : bool
             yield %413
         } : {
             %404 = get_member %1[3] "f" : rec_V*
@@ -212,22 +212,22 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %412
         }
         %390 = ternary %389 ? { : bool
-            %403 = const #true : bool
+            %403 = const true : bool
             yield %403
         } : {
             %398 = get_member %1[4] "g" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %399 = get_bitfield %398, "g": 5 bits @0 in u32i : u32i, align 4
             %400 = cast(integral) %399 : s32i
             %401 = const 0 : s32i
             %402 = cmp ne %400, %401 : bool
             yield %402
         }
         %391 = ternary %390 ? { : bool
-            %397 = const #true : bool
+            %397 = const true : bool
             yield %397
         } : {
             %392 = get_member %1[4] "h" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %393 = get_bitfield %392, "h": 27 bits @5 in u32i : u32i, align 4
             %394 = cast(integral) %393 : s32i
             %395 = const 0 : s32i
             %396 = cmp ne %394, %395 : bool
@@ -245,48 +245,48 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %9 = call @memset(%6, %7, %8) : void* [all]
     %10 = const 7 : u32i
     %11 = get_member %1[0] "a" : u32i*
-    <unmodeled: cir.set_bitfield>
+    %12 = set_bitfield %11, %10, "a": 3 bits @0 in u32i : u32i, align 4
     %13 = const 31 : u32i
     %14 = get_member %1[4] "g" : u32i*
-    <unmodeled: cir.set_bitfield>
+    %15 = set_bitfield %14, %13, "g": 5 bits @0 in u32i : u32i, align 4
     %16 = const 1 : u32i
     %17 = const 27 : s32i
     %18 = shift left %16, %17 : u32i
     %19 = const 1 : u32i
     %20 = sub %18, %19 : u32i
     %21 = get_member %1[4] "h" : u32i*
-    <unmodeled: cir.set_bitfield>
+    %22 = set_bitfield %21, %20, "h": 27 bits @5 in u32i : u32i, align 4
     call @foo(%1) [all]
     scope {
         %316 = get_member %1[0] "a" : u32i*
-        <unmodeled: cir.get_bitfield>
+        %317 = get_bitfield %316, "a": 3 bits @0 in u32i : u32i, align 4
         %318 = cast(integral) %317 : s32i
         %319 = const 7 : s32i
         %320 = cmp ne %318, %319 : bool
         %321 = ternary %320 ? { : bool
-            %379 = const #true : bool
+            %379 = const true : bool
             yield %379
         } : {
             %374 = get_member %1[0] "b" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %375 = get_bitfield %374, "b": 8 bits @3 in u32i : u32i, align 4
             %376 = cast(integral) %375 : s32i
             %377 = const 231 : s32i
             %378 = cmp ne %376, %377 : bool
             yield %378
         }
         %322 = ternary %321 ? { : bool
-            %373 = const #true : bool
+            %373 = const true : bool
             yield %373
         } : {
             %368 = get_member %1[0] "c" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %369 = get_bitfield %368, "c": 21 bits @11 in u32i : u32i, align 4
             %370 = cast(integral) %369 : s32i
             %371 = const 42 : s32i
             %372 = cmp ne %370, %371 : bool
             yield %372
         }
         %323 = ternary %322 ? { : bool
-            %367 = const #true : bool
+            %367 = const true : bool
             yield %367
         } : {
             %358 = get_member %1[1] "d" : rec_U*
@@ -301,7 +301,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %366
         }
         %324 = ternary %323 ? { : bool
-            %357 = const #true : bool
+            %357 = const true : bool
             yield %357
         } : {
             %353 = get_member %1[2] "e" : u32i*
@@ -311,7 +311,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %356
         }
         %325 = ternary %324 ? { : bool
-            %352 = const #true : bool
+            %352 = const true : bool
             yield %352
         } : {
             %343 = get_member %1[3] "f" : rec_V*
@@ -326,22 +326,22 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %351
         }
         %326 = ternary %325 ? { : bool
-            %342 = const #true : bool
+            %342 = const true : bool
             yield %342
         } : {
             %337 = get_member %1[4] "g" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %338 = get_bitfield %337, "g": 5 bits @0 in u32i : u32i, align 4
             %339 = cast(integral) %338 : s32i
             %340 = const 31 : s32i
             %341 = cmp ne %339, %340 : bool
             yield %341
         }
         %327 = ternary %326 ? { : bool
-            %336 = const #true : bool
+            %336 = const true : bool
             yield %336
         } : {
             %328 = get_member %1[4] "h" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %329 = get_bitfield %328, "h": 27 bits @5 in u32i : u32i, align 4
             %330 = const 1 : u32i
             %331 = const 27 : s32i
             %332 = shift left %330, %331 : u32i
@@ -363,34 +363,34 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     call @bar(%1) [all]
     scope {
         %255 = get_member %1[0] "a" : u32i*
-        <unmodeled: cir.get_bitfield>
+        %256 = get_bitfield %255, "a": 3 bits @0 in u32i : u32i, align 4
         %257 = cast(integral) %256 : s32i
         %258 = const 0 : s32i
         %259 = cmp ne %257, %258 : bool
         %260 = ternary %259 ? { : bool
-            %315 = const #true : bool
+            %315 = const true : bool
             yield %315
         } : {
             %310 = get_member %1[0] "b" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %311 = get_bitfield %310, "b": 8 bits @3 in u32i : u32i, align 4
             %312 = cast(integral) %311 : s32i
             %313 = const 231 : s32i
             %314 = cmp ne %312, %313 : bool
             yield %314
         }
         %261 = ternary %260 ? { : bool
-            %309 = const #true : bool
+            %309 = const true : bool
             yield %309
         } : {
             %304 = get_member %1[0] "c" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %305 = get_bitfield %304, "c": 21 bits @11 in u32i : u32i, align 4
             %306 = cast(integral) %305 : s32i
             %307 = const 42 : s32i
             %308 = cmp ne %306, %307 : bool
             yield %308
         }
         %262 = ternary %261 ? { : bool
-            %303 = const #true : bool
+            %303 = const true : bool
             yield %303
         } : {
             %294 = get_member %1[1] "d" : rec_U*
@@ -405,7 +405,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %302
         }
         %263 = ternary %262 ? { : bool
-            %293 = const #true : bool
+            %293 = const true : bool
             yield %293
         } : {
             %289 = get_member %1[2] "e" : u32i*
@@ -415,7 +415,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %292
         }
         %264 = ternary %263 ? { : bool
-            %288 = const #true : bool
+            %288 = const true : bool
             yield %288
         } : {
             %279 = get_member %1[3] "f" : rec_V*
@@ -430,22 +430,22 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %287
         }
         %265 = ternary %264 ? { : bool
-            %278 = const #true : bool
+            %278 = const true : bool
             yield %278
         } : {
             %273 = get_member %1[4] "g" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %274 = get_bitfield %273, "g": 5 bits @0 in u32i : u32i, align 4
             %275 = cast(integral) %274 : s32i
             %276 = const 12 : s32i
             %277 = cmp ne %275, %276 : bool
             yield %277
         }
         %266 = ternary %265 ? { : bool
-            %272 = const #true : bool
+            %272 = const true : bool
             yield %272
         } : {
             %267 = get_member %1[4] "h" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %268 = get_bitfield %267, "h": 27 bits @5 in u32i : u32i, align 4
             %269 = cast(integral) %268 : s32i
             %270 = const 0 : s32i
             %271 = cmp ne %269, %270 : bool
@@ -463,48 +463,48 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %30 = call @memset(%27, %28, %29) : void* [all]
     %31 = const 7 : u32i
     %32 = get_member %1[0] "a" : u32i*
-    <unmodeled: cir.set_bitfield>
+    %33 = set_bitfield %32, %31, "a": 3 bits @0 in u32i : u32i, align 4
     %34 = const 31 : u32i
     %35 = get_member %1[4] "g" : u32i*
-    <unmodeled: cir.set_bitfield>
+    %36 = set_bitfield %35, %34, "g": 5 bits @0 in u32i : u32i, align 4
     %37 = const 1 : u32i
     %38 = const 27 : s32i
     %39 = shift left %37, %38 : u32i
     %40 = const 1 : u32i
     %41 = sub %39, %40 : u32i
     %42 = get_member %1[4] "h" : u32i*
-    <unmodeled: cir.set_bitfield>
+    %43 = set_bitfield %42, %41, "h": 27 bits @5 in u32i : u32i, align 4
     call @bar(%1) [all]
     scope {
         %191 = get_member %1[0] "a" : u32i*
-        <unmodeled: cir.get_bitfield>
+        %192 = get_bitfield %191, "a": 3 bits @0 in u32i : u32i, align 4
         %193 = cast(integral) %192 : s32i
         %194 = const 7 : s32i
         %195 = cmp ne %193, %194 : bool
         %196 = ternary %195 ? { : bool
-            %254 = const #true : bool
+            %254 = const true : bool
             yield %254
         } : {
             %249 = get_member %1[0] "b" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %250 = get_bitfield %249, "b": 8 bits @3 in u32i : u32i, align 4
             %251 = cast(integral) %250 : s32i
             %252 = const 231 : s32i
             %253 = cmp ne %251, %252 : bool
             yield %253
         }
         %197 = ternary %196 ? { : bool
-            %248 = const #true : bool
+            %248 = const true : bool
             yield %248
         } : {
             %243 = get_member %1[0] "c" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %244 = get_bitfield %243, "c": 21 bits @11 in u32i : u32i, align 4
             %245 = cast(integral) %244 : s32i
             %246 = const 42 : s32i
             %247 = cmp ne %245, %246 : bool
             yield %247
         }
         %198 = ternary %197 ? { : bool
-            %242 = const #true : bool
+            %242 = const true : bool
             yield %242
         } : {
             %233 = get_member %1[1] "d" : rec_U*
@@ -519,7 +519,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %241
         }
         %199 = ternary %198 ? { : bool
-            %232 = const #true : bool
+            %232 = const true : bool
             yield %232
         } : {
             %228 = get_member %1[2] "e" : u32i*
@@ -529,7 +529,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %231
         }
         %200 = ternary %199 ? { : bool
-            %227 = const #true : bool
+            %227 = const true : bool
             yield %227
         } : {
             %218 = get_member %1[3] "f" : rec_V*
@@ -544,22 +544,22 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %226
         }
         %201 = ternary %200 ? { : bool
-            %217 = const #true : bool
+            %217 = const true : bool
             yield %217
         } : {
             %212 = get_member %1[4] "g" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %213 = get_bitfield %212, "g": 5 bits @0 in u32i : u32i, align 4
             %214 = cast(integral) %213 : s32i
             %215 = const 12 : s32i
             %216 = cmp ne %214, %215 : bool
             yield %216
         }
         %202 = ternary %201 ? { : bool
-            %211 = const #true : bool
+            %211 = const true : bool
             yield %211
         } : {
             %203 = get_member %1[4] "h" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %204 = get_bitfield %203, "h": 27 bits @5 in u32i : u32i, align 4
             %205 = const 1 : u32i
             %206 = const 27 : s32i
             %207 = shift left %205, %206 : u32i
@@ -577,34 +577,34 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     call @baz(%2) [all]
     scope {
         %130 = get_member %2[0] "a" : u32i*
-        <unmodeled: cir.get_bitfield>
+        %131 = get_bitfield %130, "a": 16 bits @0 in u32i : u32i, align 4
         %132 = cast(integral) %131 : s32i
         %133 = const 0 : s32i
         %134 = cmp ne %132, %133 : bool
         %135 = ternary %134 ? { : bool
-            %190 = const #true : bool
+            %190 = const true : bool
             yield %190
         } : {
             %185 = get_member %2[0] "b" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %186 = get_bitfield %185, "b": 8 bits @16 in u32i : u32i, align 4
             %187 = cast(integral) %186 : s32i
             %188 = const 0 : s32i
             %189 = cmp ne %187, %188 : bool
             yield %189
         }
         %136 = ternary %135 ? { : bool
-            %184 = const #true : bool
+            %184 = const true : bool
             yield %184
         } : {
             %179 = get_member %2[0] "c" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %180 = get_bitfield %179, "c": 8 bits @24 in u32i : u32i, align 4
             %181 = cast(integral) %180 : s32i
             %182 = const 42 : s32i
             %183 = cmp ne %181, %182 : bool
             yield %183
         }
         %137 = ternary %136 ? { : bool
-            %178 = const #true : bool
+            %178 = const true : bool
             yield %178
         } : {
             %169 = get_member %2[1] "d" : rec_U*
@@ -619,7 +619,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %177
         }
         %138 = ternary %137 ? { : bool
-            %168 = const #true : bool
+            %168 = const true : bool
             yield %168
         } : {
             %164 = get_member %2[2] "e" : u32i*
@@ -629,7 +629,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %167
         }
         %139 = ternary %138 ? { : bool
-            %163 = const #true : bool
+            %163 = const true : bool
             yield %163
         } : {
             %154 = get_member %2[3] "f" : rec_V*
@@ -644,22 +644,22 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %162
         }
         %140 = ternary %139 ? { : bool
-            %153 = const #true : bool
+            %153 = const true : bool
             yield %153
         } : {
             %148 = get_member %2[4] "g" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %149 = get_bitfield %148, "g": 5 bits @0 in u32i : u32i, align 4
             %150 = cast(integral) %149 : s32i
             %151 = const 12 : s32i
             %152 = cmp ne %150, %151 : bool
             yield %152
         }
         %141 = ternary %140 ? { : bool
-            %147 = const #true : bool
+            %147 = const true : bool
             yield %147
         } : {
             %142 = get_member %2[4] "h" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %143 = get_bitfield %142, "h": 27 bits @5 in u32i : u32i, align 4
             %144 = cast(integral) %143 : s32i
             %145 = const 0 : s32i
             %146 = cmp ne %144, %145 : bool
@@ -677,51 +677,51 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %47 = call @memset(%44, %45, %46) : void* [all]
     %48 = const 7 : u32i
     %49 = get_member %2[0] "a" : u32i*
-    <unmodeled: cir.set_bitfield>
+    %50 = set_bitfield %49, %48, "a": 16 bits @0 in u32i : u32i, align 4
     %51 = const 255 : u32i
     %52 = get_member %2[0] "b" : u32i*
-    <unmodeled: cir.set_bitfield>
+    %53 = set_bitfield %52, %51, "b": 8 bits @16 in u32i : u32i, align 4
     %54 = const 31 : u32i
     %55 = get_member %2[4] "g" : u32i*
-    <unmodeled: cir.set_bitfield>
+    %56 = set_bitfield %55, %54, "g": 5 bits @0 in u32i : u32i, align 4
     %57 = const 1 : u32i
     %58 = const 27 : s32i
     %59 = shift left %57, %58 : u32i
     %60 = const 1 : u32i
     %61 = sub %59, %60 : u32i
     %62 = get_member %2[4] "h" : u32i*
-    <unmodeled: cir.set_bitfield>
+    %63 = set_bitfield %62, %61, "h": 27 bits @5 in u32i : u32i, align 4
     call @baz(%2) [all]
     scope {
         %66 = get_member %2[0] "a" : u32i*
-        <unmodeled: cir.get_bitfield>
+        %67 = get_bitfield %66, "a": 16 bits @0 in u32i : u32i, align 4
         %68 = cast(integral) %67 : s32i
         %69 = const 7 : s32i
         %70 = cmp ne %68, %69 : bool
         %71 = ternary %70 ? { : bool
-            %129 = const #true : bool
+            %129 = const true : bool
             yield %129
         } : {
             %124 = get_member %2[0] "b" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %125 = get_bitfield %124, "b": 8 bits @16 in u32i : u32i, align 4
             %126 = cast(integral) %125 : s32i
             %127 = const 255 : s32i
             %128 = cmp ne %126, %127 : bool
             yield %128
         }
         %72 = ternary %71 ? { : bool
-            %123 = const #true : bool
+            %123 = const true : bool
             yield %123
         } : {
             %118 = get_member %2[0] "c" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %119 = get_bitfield %118, "c": 8 bits @24 in u32i : u32i, align 4
             %120 = cast(integral) %119 : s32i
             %121 = const 42 : s32i
             %122 = cmp ne %120, %121 : bool
             yield %122
         }
         %73 = ternary %72 ? { : bool
-            %117 = const #true : bool
+            %117 = const true : bool
             yield %117
         } : {
             %108 = get_member %2[1] "d" : rec_U*
@@ -736,7 +736,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %116
         }
         %74 = ternary %73 ? { : bool
-            %107 = const #true : bool
+            %107 = const true : bool
             yield %107
         } : {
             %103 = get_member %2[2] "e" : u32i*
@@ -746,7 +746,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %106
         }
         %75 = ternary %74 ? { : bool
-            %102 = const #true : bool
+            %102 = const true : bool
             yield %102
         } : {
             %93 = get_member %2[3] "f" : rec_V*
@@ -761,22 +761,22 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %101
         }
         %76 = ternary %75 ? { : bool
-            %92 = const #true : bool
+            %92 = const true : bool
             yield %92
         } : {
             %87 = get_member %2[4] "g" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %88 = get_bitfield %87, "g": 5 bits @0 in u32i : u32i, align 4
             %89 = cast(integral) %88 : s32i
             %90 = const 12 : s32i
             %91 = cmp ne %89, %90 : bool
             yield %91
         }
         %77 = ternary %76 ? { : bool
-            %86 = const #true : bool
+            %86 = const true : bool
             yield %86
         } : {
             %78 = get_member %2[4] "h" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %79 = get_bitfield %78, "h": 27 bits @5 in u32i : u32i, align 4
             %80 = const 1 : u32i
             %81 = const 27 : s32i
             %82 = shift left %80, %81 : u32i

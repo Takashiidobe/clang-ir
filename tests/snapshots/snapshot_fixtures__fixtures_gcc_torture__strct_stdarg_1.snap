@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/strct-stdarg-1.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/strct-stdarg-1.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn f(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i):
@@ -12,7 +12,7 @@ fn f(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %89 = alloca rec___va_list_tag[1], "ap", align 16
         store %arg0, %86
         %90 = cast(array_to_ptrdecay) %89 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %90
         scope {
             %99 = const 0 : s32i
             store %99, %88, align 4
@@ -30,7 +30,7 @@ fn f(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
                 scope {
                     %102 = alloca rec_tiny, "vaarg.tmp", align 1
                     %103 = cast(array_to_ptrdecay) %89 : rec___va_list_tag*
-                    <unmodeled: cir.va_arg>
+                    %104 = va_arg %103 : rec_tiny
                     store %104, %102, align 1
                     copy %87, %102
                     scope {
@@ -117,7 +117,7 @@ fn f(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         scope {
             %92 = alloca s64i, "x", align 8
             %93 = cast(array_to_ptrdecay) %89 : rec___va_list_tag*
-            <unmodeled: cir.va_arg>
+            %94 = va_arg %93 : s64i
             store %94, %92, align 8
             scope {
                 %95 = load %92 : s64i, align 8
@@ -133,7 +133,7 @@ fn f(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
             yield
         }
         %91 = cast(array_to_ptrdecay) %89 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %91
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];

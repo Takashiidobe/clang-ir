@@ -2,9 +2,9 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/clock_gettime.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.libc-test/functional/supported/clock_gettime.c" (c, x86_64-unknown-linux-gnu)
 global t_status : s32i = 0 [external, default, align 4, dso_local]
-global .str : s8i[167] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/clock_gettime.c:69: clock_gettime(CLOCK_REALTIME, &ts) == 0 && errno == 0 failed: %s\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[164] = "tests/fixtures.libc-test/functional/supported/clock_gettime.c:69: clock_gettime(CLOCK_REALTIME, &ts) == 0 && errno == 0 failed: %s\n" [cir_private, default, align 1, dso_local, constant]
 
 fn vsnprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec___va_list_tag*) -> s32i [external, c, nothrow];
 fn write(%arg0: s32i, %arg1: void*, %arg2: u64i) -> s64i [external, c];
@@ -20,7 +20,7 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %33 = get_global @t_status : s32i*
         store %32, %33, align 4, volatile
         %34 = cast(array_to_ptrdecay) %29 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %34
         %35 = get_global @vsnprintf : ((s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i)*
         %36 = cast(array_to_ptrdecay) %30 : s8i*
         %37 = const 512 : u64i
@@ -29,7 +29,7 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %40 = call @vsnprintf(%36, %37, %38, %39) : s32i [all]
         store %40, %31, align 4
         %41 = cast(array_to_ptrdecay) %29 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %41
         scope {
             %50 = load %31 : s32i, align 4
             %51 = const 0 : s32i
@@ -113,14 +113,14 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %26 = cmp eq %24, %25 : bool
         yield %26
     } : {
-        %22 = const #false : bool
+        %22 = const false : bool
         yield %22
     }
     %8 = ternary %7 ? { : bool
-        %21 = const #true : bool
+        %21 = const true : bool
         yield %21
     } : {
-        %12 = get_global @.str : s8i[167]*
+        %12 = get_global @.str : s8i[164]*
         %13 = cast(array_to_ptrdecay) %12 : s8i*
         %14 = get_global @strerror : ((s32i) -> s8i*)*
         %15 = call @__errno_location() : s32i* [const]

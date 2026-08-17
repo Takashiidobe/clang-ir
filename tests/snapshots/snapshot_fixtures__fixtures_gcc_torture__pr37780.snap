@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr37780.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/pr37780.c" (c, x86_64-unknown-linux-gnu)
 fn fooctz(%arg5: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg5: s32i):
         %134 = alloca s32i, "i", align 4
@@ -19,7 +19,7 @@ fn fooctz(%arg5: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         } : {
             %142 = load %134 : s32i, align 4
             %143 = cast(integral) %142 : u32i
-            <unmodeled: cir.ctz>
+            %144 = ctz %143 : u32i [poison]
             %145 = cast(integral) %144 : s32i
             %146 = cast(integral) %145 : u64i
             yield %146
@@ -40,7 +40,7 @@ fn fooctz2(%arg4: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %123 = ternary %122 ? { : u64i
             %129 = load %118 : s32i, align 4
             %130 = cast(integral) %129 : u32i
-            <unmodeled: cir.ctz>
+            %131 = ctz %130 : u32i [poison]
             %132 = cast(integral) %131 : s32i
             %133 = cast(integral) %132 : u64i
             yield %133
@@ -65,7 +65,7 @@ fn fooctz3(%arg3: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         %107 = cmp gt %105, %106 : bool
         %108 = ternary %107 ? { : u64i
             %114 = load %103 : u32i, align 4
-            <unmodeled: cir.ctz>
+            %115 = ctz %114 : u32i [poison]
             %116 = cast(integral) %115 : s32i
             %117 = cast(integral) %116 : u64i
             yield %117
@@ -96,7 +96,7 @@ fn fooclz(%arg2: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         } : {
             %95 = load %87 : s32i, align 4
             %96 = cast(integral) %95 : u32i
-            <unmodeled: cir.clz>
+            %97 = clz %96 : u32i [poison]
             %98 = cast(integral) %97 : s32i
             %99 = cast(integral) %98 : u64i
             yield %99
@@ -117,7 +117,7 @@ fn fooclz2(%arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %76 = ternary %75 ? { : u64i
             %82 = load %71 : s32i, align 4
             %83 = cast(integral) %82 : u32i
-            <unmodeled: cir.clz>
+            %84 = clz %83 : u32i [poison]
             %85 = cast(integral) %84 : s32i
             %86 = cast(integral) %85 : u64i
             yield %86
@@ -142,7 +142,7 @@ fn fooclz3(%arg0: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         %60 = cmp gt %58, %59 : bool
         %61 = ternary %60 ? { : u64i
             %67 = load %56 : u32i, align 4
-            <unmodeled: cir.clz>
+            %68 = clz %67 : u32i [poison]
             %69 = cast(integral) %68 : s32i
             %70 = cast(integral) %69 : u64i
             yield %70
@@ -171,7 +171,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %9 = mul %7, %8 : u64i
         %10 = cmp ne %6, %9 : bool
         %11 = ternary %10 ? { : bool
-            %55 = const #true : bool
+            %55 = const true : bool
             yield %55
         } : {
             %48 = const 0 : s32i
@@ -184,7 +184,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %54
         }
         %12 = ternary %11 ? { : bool
-            %47 = const #true : bool
+            %47 = const true : bool
             yield %47
         } : {
             %40 = const 0 : u32i
@@ -197,7 +197,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %46
         }
         %13 = ternary %12 ? { : bool
-            %39 = const #true : bool
+            %39 = const true : bool
             yield %39
         } : {
             %32 = const 0 : s32i
@@ -210,7 +210,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %38
         }
         %14 = ternary %13 ? { : bool
-            %31 = const #true : bool
+            %31 = const true : bool
             yield %31
         } : {
             %24 = const 0 : s32i
@@ -223,7 +223,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %30
         }
         %15 = ternary %14 ? { : bool
-            %23 = const #true : bool
+            %23 = const true : bool
             yield %23
         } : {
             %16 = const 0 : u32i

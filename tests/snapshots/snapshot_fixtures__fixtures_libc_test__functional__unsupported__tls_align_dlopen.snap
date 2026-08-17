@@ -2,14 +2,14 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c" (c, x86_64-unknown-linux-gnu)
 global t_status : s32i = 0 [external, default, align 4, dso_local]
 global .str : s8i[32] = "src/functional/tls_align_dso.so" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[121] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:74: dlopen failed\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[118] = "tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:74: dlopen failed\n" [cir_private, default, align 1, dso_local, constant]
 global .str.2 : s8i[2] = "t" [cir_private, default, align 1, dso_local, constant]
-global .str.3 : s8i[120] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:77: dlsym failed\n" [cir_private, default, align 1, dso_local, constant]
-global .str.4 : s8i[133] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:81: name is not set for t[%d]\n" [cir_private, default, align 1, dso_local, constant]
-global .str.5 : s8i[159] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:84: bad alignment: %s, size: %u, align: %u, addr: 0x%lx\n" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[117] = "tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:77: dlsym failed\n" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[130] = "tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:81: name is not set for t[%d]\n" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[156] = "tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:84: bad alignment: %s, size: %u, align: %u, addr: 0x%lx\n" [cir_private, default, align 1, dso_local, constant]
 
 fn vsnprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec___va_list_tag*) -> s32i [external, c, nothrow];
 fn write(%arg0: s32i, %arg1: void*, %arg2: u64i) -> s64i [external, c];
@@ -25,7 +25,7 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %97 = get_global @t_status : s32i*
         store %96, %97, align 4, volatile
         %98 = cast(array_to_ptrdecay) %93 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %98
         %99 = get_global @vsnprintf : ((s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i)*
         %100 = cast(array_to_ptrdecay) %94 : s8i*
         %101 = const 512 : u64i
@@ -34,7 +34,7 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %104 = call @vsnprintf(%100, %101, %102, %103) : s32i [all]
         store %104, %95, align 4
         %105 = cast(array_to_ptrdecay) %93 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %105
         scope {
             %114 = load %95 : s32i, align 4
             %115 = const 0 : s32i
@@ -118,7 +118,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %86 = cast(ptr_to_bool) %85 : bool
         %87 = not %86 : bool
         if %87 {
-            %88 = get_global @.str.1 : s8i[121]*
+            %88 = get_global @.str.1 : s8i[118]*
             %89 = cast(array_to_ptrdecay) %88 : s8i*
             %90 = call @t_printf(%89) : s32i [all]
             yield
@@ -136,7 +136,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %18 = cast(ptr_to_bool) %17 : bool
         %19 = not %18 : bool
         if %19 {
-            %82 = get_global @.str.3 : s8i[120]*
+            %82 = get_global @.str.3 : s8i[117]*
             %83 = cast(array_to_ptrdecay) %82 : s8i*
             %84 = call @t_printf(%83) : s32i [all]
             yield
@@ -166,7 +166,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
                             %73 = cast(ptr_to_bool) %72 : bool
                             %74 = not %73 : bool
                             if %74 {
-                                %75 = get_global @.str.4 : s8i[133]*
+                                %75 = get_global @.str.4 : s8i[130]*
                                 %76 = cast(array_to_ptrdecay) %75 : s8i*
                                 %77 = load %1 : s32i, align 4
                                 %78 = call @t_printf(%76, %77) : s32i [all]
@@ -193,7 +193,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
                             %38 = and %28, %37 : u64i
                             %39 = cast(int_to_bool) %38 : bool
                             if %39 {
-                                %40 = get_global @.str.5 : s8i[159]*
+                                %40 = get_global @.str.5 : s8i[156]*
                                 %41 = cast(array_to_ptrdecay) %40 : s8i*
                                 %42 = load %1 : s32i, align 4
                                 %43 = cast(integral) %42 : s64i

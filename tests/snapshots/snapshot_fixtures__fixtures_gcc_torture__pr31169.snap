@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr31169.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/pr31169.c" (c, x86_64-unknown-linux-gnu)
 fn sign_bit_p(%arg0: rec_tree_type*, %arg1: s64i, %arg2: u64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: rec_tree_type*, %arg1: s64i, %arg2: u64i):
         %14 = alloca rec_tree_type*, "t", align 8
@@ -19,7 +19,7 @@ fn sign_bit_p(%arg0: rec_tree_type*, %arg1: s64i, %arg2: u64i) -> s32i [external
         store %arg2, %16
         %23 = load %14 : rec_tree_type*, align 8
         %24 = get_member %23[0] "precision" : u16i*
-        <unmodeled: cir.get_bitfield>
+        %25 = get_bitfield %24, "precision": 9 bits @0 in u16i : u32i, align 4
         %26 = cast(integral) %25 : s32i
         store %26, %22, align 4
         scope {
@@ -97,7 +97,7 @@ fn sign_bit_p(%arg0: rec_tree_type*, %arg1: s64i, %arg2: u64i) -> s32i [external
                 %42 = cmp eq %40, %41 : bool
                 yield %42
             } : {
-                %37 = const #false : bool
+                %37 = const false : bool
                 yield %37
             }
             if %34 {
@@ -121,7 +121,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     store %2, %0
     %3 = const 1 : u32i
     %4 = get_member %1[0] "precision" : u16i*
-    <unmodeled: cir.set_bitfield>
+    %5 = set_bitfield %4, %3, "precision": 9 bits @0 in u16i : u32i, align 4
     scope {
         %8 = const 0 : s64i
         %9 = const 18446744073709551615 : u64i

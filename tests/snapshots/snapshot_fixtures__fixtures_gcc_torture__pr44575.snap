@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr44575.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/pr44575.c" (c, x86_64-unknown-linux-gnu)
 global fails : s32i = 0 [external, default, align 4, dso_local]
 global a : rec_S[5] = zero [external, default, align 16, dso_local]
 
@@ -21,7 +21,7 @@ fn check(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] 
         %45 = const 0 : s32i
         store %45, %42, align 4
         %46 = cast(array_to_ptrdecay) %40 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %46
         scope {
             %48 = const 2 : s32i
             store %48, %43, align 4
@@ -63,7 +63,7 @@ fn check(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] 
                                 %88 = get_element %87[%86] : rec_S*
                                 store %88, %39, align 8
                                 %89 = cast(array_to_ptrdecay) %40 : rec___va_list_tag*
-                                <unmodeled: cir.va_arg>
+                                %90 = va_arg %89 : rec_S
                                 store %90, %77, align 4
                                 copy %38, %77
                                 break
@@ -94,7 +94,7 @@ fn check(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] 
                             %76 = cmp ne %71, %75 : bool
                             yield %76
                         } : {
-                            %66 = const #false : bool
+                            %66 = const false : bool
                             yield %66
                         }
                         if %62 {
@@ -122,7 +122,7 @@ fn check(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] 
             yield
         }
         %47 = cast(array_to_ptrdecay) %40 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %47
         return
 }
 fn abort() -> void [external, c, nothrow];

@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20050121-1.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/20050121-1.c" (c, x86_64-unknown-linux-gnu)
 fn foo_float(%arg23: s32i) -> vector<2 x float> [external, c, no_inline, pure, dso_local, nothrow] {
     ^bb0(%arg23: s32i):
         %360 = alloca complex<float>, "coerce", align 8
@@ -40,7 +40,7 @@ fn bar_float(%arg22: float*) -> void [external, c, no_inline, dso_local, nothrow
         store %355, %352
         %356 = cast(bitcast) %352 : complex<float>*
         %357 = load %356 : complex<float>
-        <unmodeled: cir.complex.real>
+        %358 = complex.real %357 : float
         %359 = load %353 : float*, align 8
         store %358, %359, align 4
         return
@@ -55,7 +55,7 @@ fn baz_float(%arg21: float*) -> void [external, c, no_inline, dso_local, nothrow
         store %347, %344
         %348 = cast(bitcast) %344 : complex<float>*
         %349 = load %348 : complex<float>
-        <unmodeled: cir.complex.imag>
+        %350 = complex.imag %349 : float
         %351 = load %345 : float*, align 8
         store %350, %351, align 4
         return
@@ -97,7 +97,7 @@ fn bar_double(%arg19: double*) -> void [external, c, no_inline, dso_local, nothr
         store %321, %318
         %322 = cast(bitcast) %318 : complex<double>*
         %323 = load %322 : complex<double>
-        <unmodeled: cir.complex.real>
+        %324 = complex.real %323 : double
         %325 = load %319 : double*, align 8
         store %324, %325, align 8
         return
@@ -112,7 +112,7 @@ fn baz_double(%arg18: double*) -> void [external, c, no_inline, dso_local, nothr
         store %313, %310
         %314 = cast(bitcast) %310 : complex<double>*
         %315 = load %314 : complex<double>
-        <unmodeled: cir.complex.imag>
+        %316 = complex.imag %315 : double
         %317 = load %311 : double*, align 8
         store %316, %317, align 8
         return
@@ -154,7 +154,7 @@ fn bar_ldouble_t(%arg16: long_double<f80>*) -> void [external, c, no_inline, dso
         store %287, %284
         %288 = cast(bitcast) %284 : complex<long_double<f80>>*
         %289 = load %288 : complex<long_double<f80>>
-        <unmodeled: cir.complex.real>
+        %290 = complex.real %289 : long_double<f80>
         %291 = load %285 : long_double<f80>*, align 8
         store %290, %291, align 16
         return
@@ -169,7 +169,7 @@ fn baz_ldouble_t(%arg15: long_double<f80>*) -> void [external, c, no_inline, dso
         store %279, %276
         %280 = cast(bitcast) %276 : complex<long_double<f80>>*
         %281 = load %280 : complex<long_double<f80>>
-        <unmodeled: cir.complex.imag>
+        %282 = complex.imag %281 : long_double<f80>
         %283 = load %277 : long_double<f80>*, align 8
         store %282, %283, align 16
         return
@@ -211,7 +211,7 @@ fn bar_char(%arg13: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
         store %253, %250
         %254 = cast(bitcast) %250 : complex<s8i>*
         %255 = load %254 : complex<s8i>
-        <unmodeled: cir.complex.real>
+        %256 = complex.real %255 : s8i
         %257 = load %251 : s8i*, align 8
         store %256, %257, align 1
         return
@@ -226,7 +226,7 @@ fn baz_char(%arg12: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
         store %245, %242
         %246 = cast(bitcast) %242 : complex<s8i>*
         %247 = load %246 : complex<s8i>
-        <unmodeled: cir.complex.imag>
+        %248 = complex.imag %247 : s8i
         %249 = load %243 : s8i*, align 8
         store %248, %249, align 1
         return
@@ -268,7 +268,7 @@ fn bar_short(%arg10: s16i*) -> void [external, c, no_inline, dso_local, nothrow]
         store %219, %216
         %220 = cast(bitcast) %216 : complex<s16i>*
         %221 = load %220 : complex<s16i>
-        <unmodeled: cir.complex.real>
+        %222 = complex.real %221 : s16i
         %223 = load %217 : s16i*, align 8
         store %222, %223, align 2
         return
@@ -283,7 +283,7 @@ fn baz_short(%arg9: s16i*) -> void [external, c, no_inline, dso_local, nothrow] 
         store %211, %208
         %212 = cast(bitcast) %208 : complex<s16i>*
         %213 = load %212 : complex<s16i>
-        <unmodeled: cir.complex.imag>
+        %214 = complex.imag %213 : s16i
         %215 = load %209 : s16i*, align 8
         store %214, %215, align 2
         return
@@ -323,7 +323,7 @@ fn bar_int(%arg7: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
         store %187, %184
         %188 = cast(bitcast) %184 : complex<s32i>*
         %189 = load %188 : complex<s32i>
-        <unmodeled: cir.complex.real>
+        %190 = complex.real %189 : s32i
         %191 = load %185 : s32i*, align 8
         store %190, %191, align 4
         return
@@ -338,7 +338,7 @@ fn baz_int(%arg6: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
         store %179, %176
         %180 = cast(bitcast) %176 : complex<s32i>*
         %181 = load %180 : complex<s32i>
-        <unmodeled: cir.complex.imag>
+        %182 = complex.imag %181 : s32i
         %183 = load %177 : s32i*, align 8
         store %182, %183, align 4
         return
@@ -380,7 +380,7 @@ fn bar_long(%arg4: s64i*) -> void [external, c, no_inline, dso_local, nothrow] {
         store %153, %150
         %154 = cast(bitcast) %150 : complex<s64i>*
         %155 = load %154 : complex<s64i>
-        <unmodeled: cir.complex.real>
+        %156 = complex.real %155 : s64i
         %157 = load %151 : s64i*, align 8
         store %156, %157, align 8
         return
@@ -395,7 +395,7 @@ fn baz_long(%arg3: s64i*) -> void [external, c, no_inline, dso_local, nothrow] {
         store %145, %142
         %146 = cast(bitcast) %142 : complex<s64i>*
         %147 = load %146 : complex<s64i>
-        <unmodeled: cir.complex.imag>
+        %148 = complex.imag %147 : s64i
         %149 = load %143 : s64i*, align 8
         store %148, %149, align 8
         return
@@ -437,7 +437,7 @@ fn bar_llong(%arg1: s64i*) -> void [external, c, no_inline, dso_local, nothrow] 
         store %119, %116
         %120 = cast(bitcast) %116 : complex<s64i>*
         %121 = load %120 : complex<s64i>
-        <unmodeled: cir.complex.real>
+        %122 = complex.real %121 : s64i
         %123 = load %117 : s64i*, align 8
         store %122, %123, align 8
         return
@@ -452,7 +452,7 @@ fn baz_llong(%arg0: s64i*) -> void [external, c, no_inline, dso_local, nothrow] 
         store %111, %108
         %112 = cast(bitcast) %108 : complex<s64i>*
         %113 = load %112 : complex<s64i>
-        <unmodeled: cir.complex.imag>
+        %114 = complex.imag %113 : s64i
         %115 = load %109 : s64i*, align 8
         store %114, %115, align 8
         return

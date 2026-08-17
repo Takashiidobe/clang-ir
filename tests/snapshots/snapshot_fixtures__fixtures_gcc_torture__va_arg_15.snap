@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/va-arg-15.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/va-arg-15.c" (c, x86_64-unknown-linux-gnu)
 global .str : s8i[1] = zero [cir_private, default, align 1, dso_local, constant]
 
 fn abort() -> void [external, c, nothrow];
@@ -18,7 +18,7 @@ fn vafunction(%arg0: s8i*, ...) -> void [external, c, no_inline, dso_local, noth
         %32 = const 0 : s32i
         store %32, %29, align 4
         %33 = cast(array_to_ptrdecay) %31 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %33
         scope {
             %35 = const 1 : s32i
             store %35, %30, align 4
@@ -44,7 +44,7 @@ fn vafunction(%arg0: s8i*, ...) -> void [external, c, no_inline, dso_local, noth
                         %43 = cast(int_to_bool) %42 : bool
                         if %43 {
                             %50 = cast(array_to_ptrdecay) %31 : rec___va_list_tag*
-                            <unmodeled: cir.va_arg>
+                            %51 = va_arg %50 : double
                             store %51, %27, align 8
                             scope {
                                 %52 = load %27 : double, align 8
@@ -61,7 +61,7 @@ fn vafunction(%arg0: s8i*, ...) -> void [external, c, no_inline, dso_local, noth
                             yield
                         } else {
                             %44 = cast(array_to_ptrdecay) %31 : rec___va_list_tag*
-                            <unmodeled: cir.va_arg>
+                            %45 = va_arg %44 : s32i
                             store %45, %28, align 4
                             scope {
                                 %46 = load %28 : s32i, align 4
@@ -85,7 +85,7 @@ fn vafunction(%arg0: s8i*, ...) -> void [external, c, no_inline, dso_local, noth
             yield
         }
         %34 = cast(array_to_ptrdecay) %31 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %34
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];

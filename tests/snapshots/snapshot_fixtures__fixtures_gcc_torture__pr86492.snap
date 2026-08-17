@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr86492.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/pr86492.c" (c, x86_64-unknown-linux-gnu)
 fn foo(%arg0: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: u32i):
         %42 = alloca u32i, "x", align 4
@@ -15,11 +15,11 @@ fn foo(%arg0: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         %47 = load %42 : u32i, align 4
         %48 = get_member %44[1] "f" : rec_S*
         %49 = get_member %48[0] "c" : u32i*
-        <unmodeled: cir.set_bitfield>
+        %50 = set_bitfield %49, %47, "c": 16 bits @16 in u32i : u32i, align 4
         %51 = const 14 : u32i
         %52 = get_member %44[1] "f" : rec_S*
         %53 = get_member %52[0] "b" : u32i*
-        <unmodeled: cir.set_bitfield>
+        %54 = set_bitfield %53, %51, "b": 4 bits @12 in u32i : u32i, align 4
         %55 = get_member %44[0] "r" : u32i*
         %56 = load %55 : u32i, align 4
         store %56, %43
@@ -39,7 +39,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %33 = const 32 : s32i
         %34 = cmp ne %32, %33 : bool
         %35 = ternary %34 ? { : bool
-            %41 = const #true : bool
+            %41 = const true : bool
             yield %41
         } : {
             %38 = const 4 : u64i
@@ -62,29 +62,29 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     scope {
         %8 = get_member %1[1] "f" : rec_S*
         %9 = get_member %8[0] "a" : u32i*
-        <unmodeled: cir.get_bitfield>
+        %10 = get_bitfield %9, "a": 12 bits @0 in u32i : u32i, align 4
         %11 = cast(integral) %10 : s32i
         %12 = const 0 : s32i
         %13 = cmp ne %11, %12 : bool
         %14 = ternary %13 ? { : bool
-            %29 = const #true : bool
+            %29 = const true : bool
             yield %29
         } : {
             %23 = get_member %1[1] "f" : rec_S*
             %24 = get_member %23[0] "b" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %25 = get_bitfield %24, "b": 4 bits @12 in u32i : u32i, align 4
             %26 = cast(integral) %25 : s32i
             %27 = const 14 : s32i
             %28 = cmp ne %26, %27 : bool
             yield %28
         }
         %15 = ternary %14 ? { : bool
-            %22 = const #true : bool
+            %22 = const true : bool
             yield %22
         } : {
             %16 = get_member %1[1] "f" : rec_S*
             %17 = get_member %16[0] "c" : u32i*
-            <unmodeled: cir.get_bitfield>
+            %18 = get_bitfield %17, "c": 16 bits @16 in u32i : u32i, align 4
             %19 = cast(integral) %18 : s32i
             %20 = const 114 : s32i
             %21 = cmp ne %19, %20 : bool

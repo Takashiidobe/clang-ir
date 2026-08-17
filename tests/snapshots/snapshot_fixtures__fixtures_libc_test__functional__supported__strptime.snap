@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/strptime.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.libc-test/functional/supported/strptime.c" (c, x86_64-unknown-linux-gnu)
 global __const.checkStrptimeTz.tm : rec_tm = zero [cir_private, default, dso_local, constant]
 global __const.checkStrptime.tm : rec_tm = zero [cir_private, default, dso_local, constant]
 global t_status : s32i = 0 [external, default, align 4, dso_local]
@@ -40,12 +40,12 @@ global .str.26 : s8i[3] = "%s" [cir_private, default, align 1, dso_local, consta
 global .str.27 : s8i[6] = "+0200" [cir_private, default, align 1, dso_local, constant]
 global .str.28 : s8i[6] = "-0530" [cir_private, default, align 1, dso_local, constant]
 global .str.29 : s8i[4] = "-06" [cir_private, default, align 1, dso_local, constant]
-global .str.30 : s8i[124] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/strptime.c:82: \"%s\": failed to parse \"%s\"\n" [cir_private, default, align 1, dso_local, constant]
+global .str.30 : s8i[121] = "tests/fixtures.libc-test/functional/supported/strptime.c:82: \"%s\": failed to parse \"%s\"\n" [cir_private, default, align 1, dso_local, constant]
 global .str.31 : s8i[14] = "%FT%H:%M:%S%Z" [cir_private, default, align 1, dso_local, constant]
-global .str.32 : s8i[135] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/strptime.c:94: \"%s\": for \"%s\" expected %s but got %s\n" [cir_private, default, align 1, dso_local, constant]
+global .str.32 : s8i[132] = "tests/fixtures.libc-test/functional/supported/strptime.c:94: \"%s\": for \"%s\" expected %s but got %s\n" [cir_private, default, align 1, dso_local, constant]
 global .str.33 : s8i[3] = "%z" [cir_private, default, align 1, dso_local, constant]
-global .str.34 : s8i[126] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/strptime.c:105: \"%%z\": failed to parse \"%s\"\n" [cir_private, default, align 1, dso_local, constant]
-global .str.35 : s8i[149] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/strptime.c:108: \"%%z\": for \"%s\" expected tm_gmtoff %ld but got %ld\n" [cir_private, default, align 1, dso_local, constant]
+global .str.34 : s8i[123] = "tests/fixtures.libc-test/functional/supported/strptime.c:105: \"%%z\": failed to parse \"%s\"\n" [cir_private, default, align 1, dso_local, constant]
+global .str.35 : s8i[146] = "tests/fixtures.libc-test/functional/supported/strptime.c:108: \"%%z\": for \"%s\" expected tm_gmtoff %ld but got %ld\n" [cir_private, default, align 1, dso_local, constant]
 
 fn vsnprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec___va_list_tag*) -> s32i [external, c, nothrow];
 fn write(%arg0: s32i, %arg1: void*, %arg2: u64i) -> s64i [external, c];
@@ -61,7 +61,7 @@ fn t_printf(%arg6: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %233 = get_global @t_status : s32i*
         store %232, %233, align 4, volatile
         %234 = cast(array_to_ptrdecay) %229 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %234
         %235 = get_global @vsnprintf : ((s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i)*
         %236 = cast(array_to_ptrdecay) %230 : s8i*
         %237 = const 512 : u64i
@@ -70,7 +70,7 @@ fn t_printf(%arg6: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %240 = call @vsnprintf(%236, %237, %238, %239) : s32i [all]
         store %240, %231, align 4
         %241 = cast(array_to_ptrdecay) %229 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %241
         scope {
             %250 = load %231 : s32i, align 4
             %251 = const 0 : s32i
@@ -159,7 +159,7 @@ fn checkStrptime(%arg3: s8i*, %arg4: s8i*, %arg5: rec_tm*) -> void [internal, c,
             %147 = cast(ptr_to_bool) %146 : bool
             %148 = not %147 : bool
             %149 = ternary %148 ? { : bool
-                %226 = const #true : bool
+                %226 = const true : bool
                 yield %226
             } : {
                 %221 = load %141 : s8i*, align 8
@@ -170,7 +170,7 @@ fn checkStrptime(%arg3: s8i*, %arg4: s8i*, %arg5: rec_tm*) -> void [internal, c,
                 yield %225
             }
             if %149 {
-                %216 = get_global @.str.30 : s8i[124]*
+                %216 = get_global @.str.30 : s8i[121]*
                 %217 = cast(array_to_ptrdecay) %216 : s8i*
                 %218 = load %138 : s8i*, align 8
                 %219 = load %137 : s8i*, align 8
@@ -185,7 +185,7 @@ fn checkStrptime(%arg3: s8i*, %arg4: s8i*, %arg5: rec_tm*) -> void [internal, c,
                     %154 = load %153 : s32i, align 8
                     %155 = cmp ne %151, %154 : bool
                     %156 = ternary %155 ? { : bool
-                        %215 = const #true : bool
+                        %215 = const true : bool
                         yield %215
                     } : {
                         %209 = get_member %140[1] "tm_min" : s32i*
@@ -197,7 +197,7 @@ fn checkStrptime(%arg3: s8i*, %arg4: s8i*, %arg5: rec_tm*) -> void [internal, c,
                         yield %214
                     }
                     %157 = ternary %156 ? { : bool
-                        %208 = const #true : bool
+                        %208 = const true : bool
                         yield %208
                     } : {
                         %202 = get_member %140[2] "tm_hour" : s32i*
@@ -209,7 +209,7 @@ fn checkStrptime(%arg3: s8i*, %arg4: s8i*, %arg5: rec_tm*) -> void [internal, c,
                         yield %207
                     }
                     %158 = ternary %157 ? { : bool
-                        %201 = const #true : bool
+                        %201 = const true : bool
                         yield %201
                     } : {
                         %195 = get_member %140[3] "tm_mday" : s32i*
@@ -221,7 +221,7 @@ fn checkStrptime(%arg3: s8i*, %arg4: s8i*, %arg5: rec_tm*) -> void [internal, c,
                         yield %200
                     }
                     %159 = ternary %158 ? { : bool
-                        %194 = const #true : bool
+                        %194 = const true : bool
                         yield %194
                     } : {
                         %188 = get_member %140[4] "tm_mon" : s32i*
@@ -233,7 +233,7 @@ fn checkStrptime(%arg3: s8i*, %arg4: s8i*, %arg5: rec_tm*) -> void [internal, c,
                         yield %193
                     }
                     %160 = ternary %159 ? { : bool
-                        %187 = const #true : bool
+                        %187 = const true : bool
                         yield %187
                     } : {
                         %181 = get_member %140[5] "tm_year" : s32i*
@@ -258,7 +258,7 @@ fn checkStrptime(%arg3: s8i*, %arg4: s8i*, %arg5: rec_tm*) -> void [internal, c,
                         %171 = get_global @.str.31 : s8i[14]*
                         %172 = cast(array_to_ptrdecay) %171 : s8i*
                         %173 = call @strftime(%169, %170, %172, %140) : u64i [all]
-                        %174 = get_global @.str.32 : s8i[135]*
+                        %174 = get_global @.str.32 : s8i[132]*
                         %175 = cast(array_to_ptrdecay) %174 : s8i*
                         %176 = load %138 : s8i*, align 8
                         %177 = load %137 : s8i*, align 8
@@ -307,7 +307,7 @@ fn checkStrptimeTz(%arg0: s8i*, %arg1: s32i, %arg2: s32i) -> void [internal, c, 
             %113 = cast(ptr_to_bool) %112 : bool
             %114 = not %113 : bool
             %115 = ternary %114 ? { : bool
-                %136 = const #true : bool
+                %136 = const true : bool
                 yield %136
             } : {
                 %131 = load %98 : s8i*, align 8
@@ -318,7 +318,7 @@ fn checkStrptimeTz(%arg0: s8i*, %arg1: s32i, %arg2: s32i) -> void [internal, c, 
                 yield %135
             }
             if %115 {
-                %127 = get_global @.str.34 : s8i[126]*
+                %127 = get_global @.str.34 : s8i[123]*
                 %128 = cast(array_to_ptrdecay) %127 : s8i*
                 %129 = load %93 : s8i*, align 8
                 %130 = call @t_printf(%128, %129) : s32i [all]
@@ -330,7 +330,7 @@ fn checkStrptimeTz(%arg0: s8i*, %arg1: s32i, %arg2: s32i) -> void [internal, c, 
                     %118 = load %96 : s64i, align 8
                     %119 = cmp ne %117, %118 : bool
                     if %119 {
-                        %120 = get_global @.str.35 : s8i[149]*
+                        %120 = get_global @.str.35 : s8i[146]*
                         %121 = cast(array_to_ptrdecay) %120 : s8i*
                         %122 = load %93 : s8i*, align 8
                         %123 = get_member %97[9] "tm_gmtoff" : s64i*

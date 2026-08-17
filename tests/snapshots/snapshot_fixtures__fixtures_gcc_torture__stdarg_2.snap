@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/stdarg-2.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/stdarg-2.c" (c, x86_64-unknown-linux-gnu)
 global foo_arg : s32i = 0 [external, default, align 4, dso_local]
 global gap : rec___va_list_tag[1] = zero [external, default, align 16, dso_local]
 global bar_arg : s32i = 0 [external, default, align 4, dso_local]
@@ -21,11 +21,11 @@ fn foo(%arg12: s32i, %arg13: rec___va_list_tag*) -> void [external, c, no_inline
             switch %222 {
                 case equal 5 {
                     %245 = load %221 : rec___va_list_tag*, align 8
-                    <unmodeled: cir.va_arg>
+                    %246 = va_arg %245 : s32i
                     %247 = get_global @foo_arg : s32i*
                     store %246, %247, align 4
                     %248 = load %221 : rec___va_list_tag*, align 8
-                    <unmodeled: cir.va_arg>
+                    %249 = va_arg %248 : double
                     %250 = get_global @foo_arg : s32i*
                     %251 = load %250 : s32i, align 4
                     %252 = cast(int_to_float) %251 : double
@@ -33,7 +33,7 @@ fn foo(%arg12: s32i, %arg13: rec___va_list_tag*) -> void [external, c, no_inline
                     %254 = cast(float_to_int) %253 : s32i
                     store %254, %250, align 4
                     %255 = load %221 : rec___va_list_tag*, align 8
-                    <unmodeled: cir.va_arg>
+                    %256 = va_arg %255 : s64i
                     %257 = get_global @foo_arg : s32i*
                     %258 = load %257 : s32i, align 4
                     %259 = cast(integral) %258 : s64i
@@ -44,12 +44,12 @@ fn foo(%arg12: s32i, %arg13: rec___va_list_tag*) -> void [external, c, no_inline
                 }
                 case equal 8 {
                     %234 = load %221 : rec___va_list_tag*, align 8
-                    <unmodeled: cir.va_arg>
+                    %235 = va_arg %234 : s64i
                     %236 = cast(integral) %235 : s32i
                     %237 = get_global @foo_arg : s32i*
                     store %236, %237, align 4
                     %238 = load %221 : rec___va_list_tag*, align 8
-                    <unmodeled: cir.va_arg>
+                    %239 = va_arg %238 : double
                     %240 = get_global @foo_arg : s32i*
                     %241 = load %240 : s32i, align 4
                     %242 = cast(int_to_float) %241 : double
@@ -60,11 +60,11 @@ fn foo(%arg12: s32i, %arg13: rec___va_list_tag*) -> void [external, c, no_inline
                 }
                 case equal 11 {
                     %224 = load %221 : rec___va_list_tag*, align 8
-                    <unmodeled: cir.va_arg>
+                    %225 = va_arg %224 : s32i
                     %226 = get_global @foo_arg : s32i*
                     store %225, %226, align 4
                     %227 = load %221 : rec___va_list_tag*, align 8
-                    <unmodeled: cir.va_arg>
+                    %228 = va_arg %227 : long_double<f80>
                     %229 = get_global @foo_arg : s32i*
                     %230 = load %229 : s32i, align 4
                     %231 = cast(int_to_float) %230 : long_double<f80>
@@ -95,16 +95,16 @@ fn bar(%arg11: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
                 scope {
                     %207 = get_global @gap : rec___va_list_tag[1]*
                     %208 = cast(array_to_ptrdecay) %207 : rec___va_list_tag*
-                    <unmodeled: cir.va_arg>
+                    %209 = va_arg %208 : s32i
                     %210 = const 13 : s32i
                     %211 = cmp ne %209, %210 : bool
                     %212 = ternary %211 ? { : bool
-                        %219 = const #true : bool
+                        %219 = const true : bool
                         yield %219
                     } : {
                         %214 = get_global @gap : rec___va_list_tag[1]*
                         %215 = cast(array_to_ptrdecay) %214 : rec___va_list_tag*
-                        <unmodeled: cir.va_arg>
+                        %216 = va_arg %215 : double
                         %217 = const -1.400000e+01 : double
                         %218 = cmp ne %216, %217 : bool
                         yield %218
@@ -131,15 +131,15 @@ fn f1(%arg10: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         store %arg10, %192
         %193 = get_global @gap : rec___va_list_tag[1]*
         %194 = cast(array_to_ptrdecay) %193 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %194
         %195 = get_global @gap : rec___va_list_tag[1]*
         %196 = cast(array_to_ptrdecay) %195 : rec___va_list_tag*
-        <unmodeled: cir.va_arg>
+        %197 = va_arg %196 : s64i
         %198 = get_global @x : s64i*
         store %197, %198, align 8
         %199 = get_global @gap : rec___va_list_tag[1]*
         %200 = cast(array_to_ptrdecay) %199 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %200
         return
 }
 fn f2(%arg9: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -148,12 +148,12 @@ fn f2(%arg9: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         store %arg9, %186
         %187 = get_global @gap : rec___va_list_tag[1]*
         %188 = cast(array_to_ptrdecay) %187 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %188
         %189 = load %186 : s32i, align 4
         call @bar(%189) [all]
         %190 = get_global @gap : rec___va_list_tag[1]*
         %191 = cast(array_to_ptrdecay) %190 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %191
         return
 }
 fn f3(%arg8: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -164,17 +164,17 @@ fn f3(%arg8: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %175 = const 4 : s64i
         %176 = get_element %174[%175] : rec___va_list_tag[1]*
         %177 = cast(array_to_ptrdecay) %176 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %177
         %178 = const 4 : s64i
         %179 = get_element %174[%178] : rec___va_list_tag[1]*
         %180 = cast(array_to_ptrdecay) %179 : rec___va_list_tag*
-        <unmodeled: cir.va_arg>
+        %181 = va_arg %180 : s64i
         %182 = get_global @x : s64i*
         store %181, %182, align 8
         %183 = const 4 : s64i
         %184 = get_element %174[%183] : rec___va_list_tag[1]*
         %185 = cast(array_to_ptrdecay) %184 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %185
         return
 }
 fn f4(%arg7: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -185,13 +185,13 @@ fn f4(%arg7: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %166 = const 4 : s64i
         %167 = get_element %165[%166] : rec___va_list_tag[1]*
         %168 = cast(array_to_ptrdecay) %167 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %168
         %169 = load %164 : s32i, align 4
         call @bar(%169) [all]
         %170 = const 4 : s64i
         %171 = get_element %165[%170] : rec___va_list_tag[1]*
         %172 = cast(array_to_ptrdecay) %171 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %172
         return
 }
 fn f5(%arg6: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -202,7 +202,7 @@ fn f5(%arg6: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %154 = const 4 : s64i
         %155 = get_element %153[%154] : rec___va_list_tag[1]*
         %156 = cast(array_to_ptrdecay) %155 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %156
         %157 = load %152 : s32i, align 4
         %158 = const 4 : s64i
         %159 = get_element %153[%158] : rec___va_list_tag[1]*
@@ -211,7 +211,7 @@ fn f5(%arg6: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %161 = const 4 : s64i
         %162 = get_element %153[%161] : rec___va_list_tag[1]*
         %163 = cast(array_to_ptrdecay) %162 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %163
         return
 }
 fn f6(%arg5: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -221,15 +221,15 @@ fn f6(%arg5: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         store %arg5, %142
         %144 = get_member %143[1] "g" : rec___va_list_tag[1]*
         %145 = cast(array_to_ptrdecay) %144 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %145
         %146 = get_member %143[1] "g" : rec___va_list_tag[1]*
         %147 = cast(array_to_ptrdecay) %146 : rec___va_list_tag*
-        <unmodeled: cir.va_arg>
+        %148 = va_arg %147 : s64i
         %149 = get_global @x : s64i*
         store %148, %149, align 8
         %150 = get_member %143[1] "g" : rec___va_list_tag[1]*
         %151 = cast(array_to_ptrdecay) %150 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %151
         return
 }
 fn f7(%arg4: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -239,12 +239,12 @@ fn f7(%arg4: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         store %arg4, %135
         %137 = get_member %136[1] "g" : rec___va_list_tag[1]*
         %138 = cast(array_to_ptrdecay) %137 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %138
         %139 = load %135 : s32i, align 4
         call @bar(%139) [all]
         %140 = get_member %136[1] "g" : rec___va_list_tag[1]*
         %141 = cast(array_to_ptrdecay) %140 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %141
         return
 }
 fn f8(%arg3: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -254,14 +254,14 @@ fn f8(%arg3: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         store %arg3, %126
         %128 = get_member %127[1] "g" : rec___va_list_tag[1]*
         %129 = cast(array_to_ptrdecay) %128 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %129
         %130 = load %126 : s32i, align 4
         %131 = get_member %127[1] "g" : rec___va_list_tag[1]*
         %132 = cast(array_to_ptrdecay) %131 : rec___va_list_tag*
         call @foo(%130, %132) [all]
         %133 = get_member %127[1] "g" : rec___va_list_tag[1]*
         %134 = cast(array_to_ptrdecay) %133 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %134
         return
 }
 fn f10(%arg2: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -273,19 +273,19 @@ fn f10(%arg2: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %113 = get_member %111[2] "h" : rec___va_list_tag[1][2]*
         %114 = get_element %113[%112] : rec___va_list_tag[1]*
         %115 = cast(array_to_ptrdecay) %114 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %115
         %116 = const 1 : s64i
         %117 = get_member %111[2] "h" : rec___va_list_tag[1][2]*
         %118 = get_element %117[%116] : rec___va_list_tag[1]*
         %119 = cast(array_to_ptrdecay) %118 : rec___va_list_tag*
-        <unmodeled: cir.va_arg>
+        %120 = va_arg %119 : s64i
         %121 = get_global @x : s64i*
         store %120, %121, align 8
         %122 = const 1 : s64i
         %123 = get_member %111[2] "h" : rec___va_list_tag[1][2]*
         %124 = get_element %123[%122] : rec___va_list_tag[1]*
         %125 = cast(array_to_ptrdecay) %124 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %125
         return
 }
 fn f11(%arg1: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -297,14 +297,14 @@ fn f11(%arg1: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %102 = get_member %100[2] "h" : rec___va_list_tag[1][2]*
         %103 = get_element %102[%101] : rec___va_list_tag[1]*
         %104 = cast(array_to_ptrdecay) %103 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %104
         %105 = load %99 : s32i, align 4
         call @bar(%105) [all]
         %106 = const 1 : s64i
         %107 = get_member %100[2] "h" : rec___va_list_tag[1][2]*
         %108 = get_element %107[%106] : rec___va_list_tag[1]*
         %109 = cast(array_to_ptrdecay) %108 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %109
         return
 }
 fn f12(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -316,7 +316,7 @@ fn f12(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %87 = get_member %85[2] "h" : rec___va_list_tag[1][2]*
         %88 = get_element %87[%86] : rec___va_list_tag[1]*
         %89 = cast(array_to_ptrdecay) %88 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %89
         %90 = load %84 : s32i, align 4
         %91 = const 1 : s64i
         %92 = get_member %85[2] "h" : rec___va_list_tag[1][2]*
@@ -327,7 +327,7 @@ fn f12(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %96 = get_member %85[2] "h" : rec___va_list_tag[1][2]*
         %97 = get_element %96[%95] : rec___va_list_tag[1]*
         %98 = cast(array_to_ptrdecay) %97 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %98
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {

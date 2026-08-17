@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr65215-4.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/pr65215-4.c" (c, x86_64-unknown-linux-gnu)
 fn foo(%arg1: u32i) -> u32i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: u32i):
         %40 = alloca u32i, "x", align 4
@@ -38,7 +38,7 @@ fn bar(%arg0: rec_S*) -> u32i [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %32
         %34 = load %32 : rec_S*, align 8
         %35 = get_member %34[0] "l1" : u64i*
-        <unmodeled: cir.get_bitfield>
+        %36 = get_bitfield %35, "l1": 48 bits @0 in u64i : u64i, align 8
         %37 = cast(integral) %36 : u32i
         %38 = call @foo(%37) : u32i [all]
         store %38, %33
@@ -56,7 +56,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %18 = const 8 : s32i
         %19 = cmp ne %17, %18 : bool
         %20 = ternary %19 ? { : bool
-            %31 = const #true : bool
+            %31 = const true : bool
             yield %31
         } : {
             %28 = const 4 : u64i
@@ -65,7 +65,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
             yield %30
         }
         %21 = ternary %20 ? { : bool
-            %27 = const #true : bool
+            %27 = const true : bool
             yield %27
         } : {
             %24 = const 8 : u64i
@@ -89,7 +89,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %8 = shift left %6, %7 : u64i
     %9 = or %5, %8 : u64i
     %10 = get_member %1[0] "l1" : u64i*
-    <unmodeled: cir.set_bitfield>
+    %11 = set_bitfield %10, %9, "l1": 48 bits @0 in u64i : u64i, align 8
     scope {
         %14 = call @bar(%1) : u32i [all]
         %15 = const 3735928559 : u32i

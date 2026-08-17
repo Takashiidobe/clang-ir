@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/compndlit-1.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/compndlit-1.c" (c, x86_64-unknown-linux-gnu)
 global x : rec_S = {25} [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
@@ -16,17 +16,17 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %4 = get_global @x : rec_S*
     %5 = get_member %1[0] "a" : u32i*
     %6 = const 0 : s32i
-    <unmodeled: cir.set_bitfield>
+    %7 = set_bitfield %5, %6, "a": 3 bits @0 in signed u32i : s32i, align 4
     %8 = get_member %1[0] "b" : u32i*
     %9 = const 0 : u32i
-    <unmodeled: cir.set_bitfield>
+    %10 = set_bitfield %8, %9, "b": 1 bits @3 in u32i : u32i, align 4
     %11 = get_member %1[0] "c" : u32i*
     scope {
         %25 = alloca rec_S, "o", align 4
         %26 = get_global @x : rec_S*
         copy %25, %26
         %27 = get_member %25[0] "a" : u32i*
-        <unmodeled: cir.get_bitfield>
+        %28 = get_bitfield %27, "a": 3 bits @0 in signed u32i : s32i, align 4
         %29 = const 1 : s32i
         %30 = cmp eq %28, %29 : bool
         %31 = const 10 : s32i
@@ -37,12 +37,12 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     }
     %12 = load %2 : s32i, align 4
     %13 = cast(integral) %12 : u32i
-    <unmodeled: cir.set_bitfield>
+    %14 = set_bitfield %11, %13, "c": 28 bits @4 in u32i : u32i, align 4
     copy %4, %1
     scope {
         %18 = get_global @x : rec_S*
         %19 = get_member %18[0] "c" : u32i*
-        <unmodeled: cir.get_bitfield>
+        %20 = get_bitfield %19, "c": 28 bits @4 in u32i : u32i, align 4
         %21 = cast(integral) %20 : s32i
         %22 = const 10 : s32i
         %23 = cmp ne %21, %22 : bool

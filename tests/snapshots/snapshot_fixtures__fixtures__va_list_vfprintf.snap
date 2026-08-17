@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/va_list_vfprintf.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures/va_list_vfprintf.c" (c, x86_64-unknown-linux-gnu)
 global .str : s8i[7] = "%d %s\n" [cir_private, default, align 1, dso_local, constant]
 global .str.1 : s8i[10] = "forwarded" [cir_private, default, align 1, dso_local, constant]
 global stdout : rec__IO_FILE* [external, default, align 8, dso_local]
@@ -14,7 +14,7 @@ fn print_values(%arg0: s8i*, ...) -> void [internal, c, no_inline, dso_local, no
         %10 = alloca rec___va_list_tag[1], "args", align 16
         store %arg0, %9
         %11 = cast(array_to_ptrdecay) %10 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %11
         %12 = get_global @vfprintf : ((rec__IO_FILE*, s8i*, rec___va_list_tag*) -> s32i)*
         %13 = get_global @stdout : rec__IO_FILE**
         %14 = load %13 : rec__IO_FILE*, align 8
@@ -22,7 +22,7 @@ fn print_values(%arg0: s8i*, ...) -> void [internal, c, no_inline, dso_local, no
         %16 = cast(array_to_ptrdecay) %10 : rec___va_list_tag*
         %17 = call @vfprintf(%14, %15, %16) : s32i [all]
         %18 = cast(array_to_ptrdecay) %10 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %18
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {

@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/stdarg/vararg_sum.c" (c, x86_64-unknown-linux-gnu)
+module "tests/stdlib/stdarg/vararg_sum.c" (c, x86_64-unknown-linux-gnu)
 global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
@@ -14,7 +14,7 @@ fn sum(%arg0: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         %17 = alloca s32i, "total", align 4
         store %arg0, %14
         %18 = cast(array_to_ptrdecay) %16 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %18
         %19 = const 0 : s32i
         store %19, %17, align 4
         scope {
@@ -33,7 +33,7 @@ fn sum(%arg0: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
                 yield
             } do {
                 %27 = cast(array_to_ptrdecay) %16 : rec___va_list_tag*
-                <unmodeled: cir.va_arg>
+                %28 = va_arg %27 : s32i
                 %29 = load %17 : s32i, align 4
                 %30 = add %29, %28 : s32i [nsw]
                 store %30, %17, align 4
@@ -42,7 +42,7 @@ fn sum(%arg0: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
             yield
         }
         %20 = cast(array_to_ptrdecay) %16 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %20
         %21 = load %17 : s32i, align 4
         store %21, %15
         %22 = load %15 : s32i

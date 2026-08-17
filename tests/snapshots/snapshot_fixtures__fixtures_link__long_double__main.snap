@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.link/long_double/main.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.link/long_double/main.c" (c, x86_64-unknown-linux-gnu)
 global __const.test_casts_and_usual_conversions.ui : u64i[6] = [0, 1, 4294967295, 9007199254740991, 9007199254740993, 18446744073709551615] [cir_private, default, dso_local, constant]
 global __const.test_casts_and_usual_conversions.si : s64i[7] = [0, 1, -1, 2147483647, -2147483647, 9007199254740991, -9007199254740991] [cir_private, default, dso_local, constant]
 global failures : s32i = 0 [internal, default, align 4, dso_local]
@@ -240,11 +240,11 @@ fn test_format_and_layout() -> void [internal, c, no_inline, dso_local, nothrow]
                         %4221 = cmp eq %4219, %4220 : bool
                         yield %4221
                     } : {
-                        %4218 = const #false : bool
+                        %4218 = const false : bool
                         yield %4218
                     }
                     %4185 = ternary %4184 ? { : bool
-                        %4217 = const #true : bool
+                        %4217 = const true : bool
                         yield %4217
                     } : {
                         %4209 = const 64 : s32i
@@ -256,13 +256,13 @@ fn test_format_and_layout() -> void [internal, c, no_inline, dso_local, nothrow]
                             %4216 = cmp eq %4214, %4215 : bool
                             yield %4216
                         } : {
-                            %4213 = const #false : bool
+                            %4213 = const false : bool
                             yield %4213
                         }
                         yield %4212
                     }
                     %4186 = ternary %4185 ? { : bool
-                        %4208 = const #true : bool
+                        %4208 = const true : bool
                         yield %4208
                     } : {
                         %4200 = const 64 : s32i
@@ -274,7 +274,7 @@ fn test_format_and_layout() -> void [internal, c, no_inline, dso_local, nothrow]
                             %4207 = cmp eq %4205, %4206 : bool
                             yield %4207
                         } : {
-                            %4204 = const #false : bool
+                            %4204 = const false : bool
                             yield %4204
                         }
                         yield %4203
@@ -1111,7 +1111,7 @@ fn test_literals_and_precision_boundaries() -> void [internal, c, no_inline, dso
                         %3761 = cmp eq %3759, %3760 : bool
                         yield %3761
                     } : {
-                        %3756 = const #false : bool
+                        %3756 = const false : bool
                         yield %3756
                     }
                     %3743 = not %3742 : bool
@@ -1260,7 +1260,7 @@ fn test_literals_and_precision_boundaries() -> void [internal, c, no_inline, dso
                         %3682 = cmp eq %3680, %3681 : bool
                         yield %3682
                     } : {
-                        %3677 = const #false : bool
+                        %3677 = const false : bool
                         yield %3677
                     }
                     %3664 = not %3663 : bool
@@ -1769,7 +1769,7 @@ fn test_arithmetic_and_temporaries() -> void [internal, c, no_inline, dso_local,
     %3157 = fdiv %3155, %3156 : long_double<f80>
     %3158 = const 4.901885986328125E-4 : long_double<f80>
     %3159 = fneg %3157 : long_double<f80>
-    <unmodeled: cir.fmuladd>
+    %3160 = fmuladd %3159, %3158, %3152 : long_double<f80>
     store %3160, %3141, align 16
     %3161 = load %3138 : long_double<f80>, align 16, volatile
     %3162 = load %3139 : long_double<f80>, align 16, volatile
@@ -2982,7 +2982,7 @@ fn test_special_values_and_comparisons() -> void [internal, c, no_inline, dso_lo
                 store %2654, %2652, align 4
                 scope {
                     %2655 = load %2127 : long_double<f80>, align 16
-                    <unmodeled: cir.signbit>
+                    %2656 = signbit %2655 : bool
                     if %2656 {
                         %2657 = get_global @failures : s32i*
                         %2658 = load %2657 : s32i, align 4
@@ -3020,7 +3020,7 @@ fn test_special_values_and_comparisons() -> void [internal, c, no_inline, dso_lo
                 store %2634, %2632, align 4
                 scope {
                     %2635 = load %2128 : long_double<f80>, align 16
-                    <unmodeled: cir.signbit>
+                    %2636 = signbit %2635 : bool
                     %2637 = not %2636 : bool
                     if %2637 {
                         %2638 = get_global @failures : s32i*
@@ -3070,15 +3070,15 @@ fn test_special_values_and_comparisons() -> void [internal, c, no_inline, dso_lo
                     %2609 = cmp eq %2607, %2608 : bool
                     %2610 = ternary %2609 ? { : bool
                         %2623 = load %2599 : long_double<f80>, align 16
-                        <unmodeled: cir.signbit>
+                        %2624 = signbit %2623 : bool
                         %2625 = cast(bool_to_int) %2624 : s32i
                         %2626 = load %2600 : long_double<f80>, align 16
-                        <unmodeled: cir.signbit>
+                        %2627 = signbit %2626 : bool
                         %2628 = cast(bool_to_int) %2627 : s32i
                         %2629 = cmp eq %2625, %2628 : bool
                         yield %2629
                     } : {
-                        %2622 = const #false : bool
+                        %2622 = const false : bool
                         yield %2622
                     }
                     %2611 = not %2610 : bool
@@ -3128,15 +3128,15 @@ fn test_special_values_and_comparisons() -> void [internal, c, no_inline, dso_lo
                     %2576 = cmp eq %2574, %2575 : bool
                     %2577 = ternary %2576 ? { : bool
                         %2590 = load %2566 : long_double<f80>, align 16
-                        <unmodeled: cir.signbit>
+                        %2591 = signbit %2590 : bool
                         %2592 = cast(bool_to_int) %2591 : s32i
                         %2593 = load %2567 : long_double<f80>, align 16
-                        <unmodeled: cir.signbit>
+                        %2594 = signbit %2593 : bool
                         %2595 = cast(bool_to_int) %2594 : s32i
                         %2596 = cmp eq %2592, %2595 : bool
                         yield %2596
                     } : {
-                        %2589 = const #false : bool
+                        %2589 = const false : bool
                         yield %2589
                     }
                     %2578 = not %2577 : bool
@@ -3186,15 +3186,15 @@ fn test_special_values_and_comparisons() -> void [internal, c, no_inline, dso_lo
                     %2543 = cmp eq %2541, %2542 : bool
                     %2544 = ternary %2543 ? { : bool
                         %2557 = load %2533 : long_double<f80>, align 16
-                        <unmodeled: cir.signbit>
+                        %2558 = signbit %2557 : bool
                         %2559 = cast(bool_to_int) %2558 : s32i
                         %2560 = load %2534 : long_double<f80>, align 16
-                        <unmodeled: cir.signbit>
+                        %2561 = signbit %2560 : bool
                         %2562 = cast(bool_to_int) %2561 : s32i
                         %2563 = cmp eq %2559, %2562 : bool
                         yield %2563
                     } : {
-                        %2556 = const #false : bool
+                        %2556 = const false : bool
                         yield %2556
                     }
                     %2545 = not %2544 : bool
@@ -3244,15 +3244,15 @@ fn test_special_values_and_comparisons() -> void [internal, c, no_inline, dso_lo
                     %2510 = cmp eq %2508, %2509 : bool
                     %2511 = ternary %2510 ? { : bool
                         %2524 = load %2500 : long_double<f80>, align 16
-                        <unmodeled: cir.signbit>
+                        %2525 = signbit %2524 : bool
                         %2526 = cast(bool_to_int) %2525 : s32i
                         %2527 = load %2501 : long_double<f80>, align 16
-                        <unmodeled: cir.signbit>
+                        %2528 = signbit %2527 : bool
                         %2529 = cast(bool_to_int) %2528 : s32i
                         %2530 = cmp eq %2526, %2529 : bool
                         yield %2530
                     } : {
-                        %2523 = const #false : bool
+                        %2523 = const false : bool
                         yield %2523
                     }
                     %2512 = not %2511 : bool
@@ -3292,7 +3292,7 @@ fn test_special_values_and_comparisons() -> void [internal, c, no_inline, dso_lo
                 scope {
                     %2471 = load %2129 : long_double<f80>, align 16
                     <unmodeled: cir.is_fp_class>
-                    <unmodeled: cir.signbit>
+                    %2473 = signbit %2471 : bool
                     %2474 = const 0 : s32i
                     %2475 = const 1 : s32i
                     %2476 = const -1 : s32i
@@ -3305,7 +3305,7 @@ fn test_special_values_and_comparisons() -> void [internal, c, no_inline, dso_lo
                         %2497 = cmp gt %2495, %2496 : bool
                         yield %2497
                     } : {
-                        %2494 = const #false : bool
+                        %2494 = const false : bool
                         yield %2494
                     }
                     %2481 = not %2480 : bool
@@ -3347,7 +3347,7 @@ fn test_special_values_and_comparisons() -> void [internal, c, no_inline, dso_lo
                 scope {
                     %2439 = load %2130 : long_double<f80>, align 16
                     <unmodeled: cir.is_fp_class>
-                    <unmodeled: cir.signbit>
+                    %2441 = signbit %2439 : bool
                     %2442 = const 0 : s32i
                     %2443 = const 1 : s32i
                     %2444 = const -1 : s32i
@@ -3360,7 +3360,7 @@ fn test_special_values_and_comparisons() -> void [internal, c, no_inline, dso_lo
                         %2465 = cmp lt %2463, %2464 : bool
                         yield %2465
                     } : {
-                        %2462 = const #false : bool
+                        %2462 = const false : bool
                         yield %2462
                     }
                     %2449 = not %2448 : bool
@@ -3879,8 +3879,8 @@ fn test_special_values_and_comparisons() -> void [internal, c, no_inline, dso_lo
                 scope {
                     %2168 = const 1.000000e+00 : long_double<f80>
                     %2169 = load %2128 : long_double<f80>, align 16
-                    <unmodeled: cir.copysign>
-                    <unmodeled: cir.signbit>
+                    %2170 = copysign %2168, %2169 : long_double<f80>
+                    %2171 = signbit %2170 : bool
                     %2172 = not %2171 : bool
                     if %2172 {
                         %2173 = get_global @failures : s32i*
@@ -3920,8 +3920,8 @@ fn test_special_values_and_comparisons() -> void [internal, c, no_inline, dso_lo
                 scope {
                     %2147 = const 1.000000e+00 : long_double<f80>
                     %2148 = load %2127 : long_double<f80>, align 16
-                    <unmodeled: cir.copysign>
-                    <unmodeled: cir.signbit>
+                    %2149 = copysign %2147, %2148 : long_double<f80>
+                    %2150 = signbit %2149 : bool
                     if %2150 {
                         %2151 = get_global @failures : s32i*
                         %2152 = load %2151 : s32i, align 4
@@ -4180,7 +4180,7 @@ fn test_libc_and_libm_externs() -> void [internal, c, no_inline, dso_local, noth
                         %2036 = cmp lt %2034, %2035 : bool
                         yield %2036
                     } : {
-                        %2032 = const #false : bool
+                        %2032 = const false : bool
                         yield %2032
                     }
                     %2019 = not %2018 : bool
@@ -4284,7 +4284,7 @@ fn test_libc_and_libm_externs() -> void [internal, c, no_inline, dso_local, noth
                         %1978 = cmp eq %1976, %1977 : bool
                         yield %1978
                     } : {
-                        %1973 = const #false : bool
+                        %1973 = const false : bool
                         yield %1973
                     }
                     %1960 = not %1959 : bool
@@ -4837,7 +4837,7 @@ fn test_libc_and_libm_externs() -> void [internal, c, no_inline, dso_local, noth
                 %1623 = alloca long_double<f80>, "check_got_", align 16
                 %1624 = alloca long_double<f80>, "check_expected_", align 16
                 %1625 = const -1.250000e+00 : long_double<f80>
-                <unmodeled: cir.floor>
+                %1626 = floor %1625 : long_double<f80>
                 store %1626, %1623, align 16
                 %1627 = const -2.000000e+00 : long_double<f80>
                 store %1627, %1624, align 16
@@ -5263,7 +5263,7 @@ fn local_cb(%arg2: long_double<f80>, %arg3: long_double<f80>) -> long_double<f80
         %1384 = const 2.000000e+00 : long_double<f80>
         %1385 = fdiv %1383, %1384 : long_double<f80>
         %1386 = fneg %1385 : long_double<f80>
-        <unmodeled: cir.fmuladd>
+        %1387 = fmuladd %1381, %1382, %1386 : long_double<f80>
         %1388 = const 7.62939453125E-6 : long_double<f80>
         %1389 = fadd %1387, %1388 : long_double<f80>
         store %1389, %1376
@@ -6708,7 +6708,7 @@ fn local_vsum(%arg1: s32i, ...) -> long_double<f80> [internal, c, no_inline, dso
         %475 = const 0.000000e+00 : long_double<f80>
         store %475, %473, align 16
         %476 = cast(array_to_ptrdecay) %472 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %476
         scope {
             %480 = const 0 : s32i
             store %480, %474, align 4
@@ -6724,7 +6724,7 @@ fn local_vsum(%arg1: s32i, ...) -> long_double<f80> [internal, c, no_inline, dso
                 yield
             } do {
                 %483 = cast(array_to_ptrdecay) %472 : rec___va_list_tag*
-                <unmodeled: cir.va_arg>
+                %484 = va_arg %483 : long_double<f80>
                 %485 = load %473 : long_double<f80>, align 16
                 %486 = fadd %485, %484 : long_double<f80>
                 store %486, %473, align 16
@@ -6733,7 +6733,7 @@ fn local_vsum(%arg1: s32i, ...) -> long_double<f80> [internal, c, no_inline, dso
             yield
         }
         %477 = cast(array_to_ptrdecay) %472 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %477
         %478 = load %473 : long_double<f80>, align 16
         store %478, %471
         %479 = load %471 : long_double<f80>
@@ -6901,7 +6901,7 @@ fn test_varargs() -> void [internal, c, no_inline, dso_local, nothrow] {
                         %401 = cmp lt %399, %400 : bool
                         yield %401
                     } : {
-                        %397 = const #false : bool
+                        %397 = const false : bool
                         yield %397
                     }
                     %384 = not %383 : bool
@@ -7007,7 +7007,7 @@ fn test_varargs() -> void [internal, c, no_inline, dso_local, nothrow] {
                         %343 = cmp eq %341, %342 : bool
                         yield %343
                     } : {
-                        %338 = const #false : bool
+                        %338 = const false : bool
                         yield %338
                     }
                     %325 = not %324 : bool

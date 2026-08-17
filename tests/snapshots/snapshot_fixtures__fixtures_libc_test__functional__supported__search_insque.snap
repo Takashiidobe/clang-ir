@@ -2,11 +2,11 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/search_insque.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.libc-test/functional/supported/search_insque.c" (c, x86_64-unknown-linux-gnu)
 global t_status : s32i = 0 [external, default, align 4, dso_local]
-global .str : s8i[135] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/search_insque.c:91: walking queue: got %d, wanted %d\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[128] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/search_insque.c:96: remque: got %d, wanted %d\n" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[128] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/search_insque.c:98: remque: got %d, wanted %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[132] = "tests/fixtures.libc-test/functional/supported/search_insque.c:91: walking queue: got %d, wanted %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[125] = "tests/fixtures.libc-test/functional/supported/search_insque.c:96: remque: got %d, wanted %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[125] = "tests/fixtures.libc-test/functional/supported/search_insque.c:98: remque: got %d, wanted %d\n" [cir_private, default, align 1, dso_local, constant]
 
 fn vsnprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec___va_list_tag*) -> s32i [external, c, nothrow];
 fn write(%arg0: s32i, %arg1: void*, %arg2: u64i) -> s64i [external, c];
@@ -22,7 +22,7 @@ fn t_printf(%arg1: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %116 = get_global @t_status : s32i*
         store %115, %116, align 4, volatile
         %117 = cast(array_to_ptrdecay) %112 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %117
         %118 = get_global @vsnprintf : ((s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i)*
         %119 = cast(array_to_ptrdecay) %113 : s8i*
         %120 = const 512 : u64i
@@ -31,7 +31,7 @@ fn t_printf(%arg1: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %123 = call @vsnprintf(%119, %120, %121, %122) : s32i [all]
         store %123, %114, align 4
         %124 = cast(array_to_ptrdecay) %112 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %124
         scope {
             %133 = load %114 : s32i, align 4
             %134 = const 0 : s32i
@@ -182,7 +182,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
                     store %73, %3, align 4
                     %74 = cmp ne %71, %73 : bool
                     if %74 {
-                        %75 = get_global @.str : s8i[135]*
+                        %75 = get_global @.str : s8i[132]*
                         %76 = cast(array_to_ptrdecay) %75 : s8i*
                         %77 = load %1 : rec_q*, align 8
                         %78 = get_member %77[2] "i" : s32i*
@@ -221,7 +221,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %51 = sub %49, %50 : s32i [nsw]
         %52 = cmp ne %46, %51 : bool
         if %52 {
-            %53 = get_global @.str.1 : s8i[128]*
+            %53 = get_global @.str.1 : s8i[125]*
             %54 = cast(array_to_ptrdecay) %53 : s8i*
             %55 = load %2 : rec_q*, align 8
             %56 = get_member %55[1] "p" : rec_q**
@@ -251,7 +251,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %27 = load %26 : s32i, align 8
         %28 = cmp ne %24, %27 : bool
         if %28 {
-            %29 = get_global @.str.2 : s8i[128]*
+            %29 = get_global @.str.2 : s8i[125]*
             %30 = cast(array_to_ptrdecay) %29 : s8i*
             %31 = load %2 : rec_q*, align 8
             %32 = get_member %31[1] "p" : rec_q**

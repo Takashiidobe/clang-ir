@@ -2,18 +2,18 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr78436.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/pr78436.c" (c, x86_64-unknown-linux-gnu)
 global s : rec_S = zero [external, default, align 8, dso_local]
 
 fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
     %11 = const 0 : s8i
     %12 = get_global @s : rec_S*
     %13 = get_member %12[0] "b" : u32i*
-    <unmodeled: cir.set_bitfield>
+    %14 = set_bitfield %13, %11, "b": 8 bits @24 in signed u32i : s8i, align 8
     %15 = const -1193165 : s64i
     %16 = get_global @s : rec_S*
     %17 = get_member %16[0] "a" : u32i*
-    <unmodeled: cir.set_bitfield>
+    %18 = set_bitfield %17, %15, "a": 24 bits @0 in signed u32i : s64i, align 8
     return
 }
 fn abort() -> void [external, c, nothrow];
@@ -26,7 +26,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     scope {
         %5 = get_global @s : rec_S*
         %6 = get_member %5[0] "b" : u32i*
-        <unmodeled: cir.get_bitfield>
+        %7 = get_bitfield %6, "b": 8 bits @24 in signed u32i : s8i, align 8
         %8 = cast(integral) %7 : s32i
         %9 = const 0 : s32i
         %10 = cmp ne %8, %9 : bool

@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/overflow_scalar_ops.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures/overflow_scalar_ops.c" (c, x86_64-unknown-linux-gnu)
 global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
 global .str.1 : s8i[7] = "%d %u\n" [cir_private, default, align 1, dso_local, constant]
 global .str.2 : s8i[9] = "%d %lld\n" [cir_private, default, align 1, dso_local, constant]
@@ -28,7 +28,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     store %12, %3, align 8
     %13 = const 2147483647 : s32i
     %14 = const 1 : s32i
-    <unmodeled: cir.add.overflow>
+    %15#0, %15#1 = add.overflow %13, %14 : s32i
     store %15#0, %1, align 4
     %16 = cast(bool_to_int) %15#1 : s32i
     store %16, %4, align 4
@@ -54,7 +54,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %34 = call @printf(%31, %32, %33) : s32i [all]
     %35 = const 1073741824 : s32i
     %36 = const 2 : s32i
-    <unmodeled: cir.mul.overflow>
+    %37#0, %37#1 = mul.overflow %35, %36 : s32i
     store %37#0, %1, align 4
     %38 = cast(bool_to_int) %37#1 : s32i
     store %38, %6, align 4
@@ -66,7 +66,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %44 = call @printf(%41, %42, %43) : s32i [all]
     %45 = const 4294967295 : u32i
     %46 = const 1 : u32i
-    <unmodeled: cir.add.overflow>
+    %47#0, %47#1 = add.overflow %45, %46 : u32i
     store %47#0, %2, align 4
     %48 = cast(bool_to_int) %47#1 : s32i
     store %48, %7, align 4
@@ -78,7 +78,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %54 = call @printf(%51, %52, %53) : s32i [all]
     %55 = const 3037000500 : s64i
     %56 = const 3037000500 : s64i
-    <unmodeled: cir.mul.overflow>
+    %57#0, %57#1 = mul.overflow %55, %56 : s64i
     store %57#0, %3, align 8
     %58 = cast(bool_to_int) %57#1 : s32i
     store %58, %8, align 4

@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20100316-1.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/20100316-1.c" (c, x86_64-unknown-linux-gnu)
 global f : rec_Foo = zero [external, default, align 4, dso_local]
 
 fn foo(%arg0: rec_Foo*) -> s32i [external, c, no_inline, dso_local, nothrow] {
@@ -15,7 +15,7 @@ fn foo(%arg0: rec_Foo*) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %23, %22, align 8
         %24 = load %22 : rec_Foo*, align 8
         %25 = get_member %24[1] "precision" : u16i*
-        <unmodeled: cir.get_bitfield>
+        %26 = get_bitfield %25, "precision": 10 bits @0 in u16i : u32i, align 4
         %27 = cast(integral) %26 : s32i
         store %27, %21
         %28 = load %21 : s32i
@@ -33,11 +33,11 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %5 = const 0 : u32i
     %6 = get_global @f : rec_Foo*
     %7 = get_member %6[1] "precision" : u16i*
-    <unmodeled: cir.set_bitfield>
+    %8 = set_bitfield %7, %5, "precision": 10 bits @0 in u16i : u32i, align 4
     %9 = const 4294967295 : u32i
     %10 = get_global @f : rec_Foo*
     %11 = get_member %10[1] "blah" : u16i*
-    <unmodeled: cir.set_bitfield>
+    %12 = set_bitfield %11, %9, "blah": 3 bits @10 in u16i : u32i, align 4
     scope {
         %15 = get_global @f : rec_Foo*
         %16 = call @foo(%15) : s32i [all]

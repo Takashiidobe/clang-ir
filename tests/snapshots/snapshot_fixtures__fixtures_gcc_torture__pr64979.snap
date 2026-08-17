@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr64979.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/pr64979.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn bar(%arg1: s32i, %arg2: rec___va_list_tag[1]*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: s32i, %arg2: rec___va_list_tag[1]*):
@@ -33,7 +33,7 @@ fn bar(%arg1: s32i, %arg2: rec___va_list_tag[1]*) -> void [external, c, no_inlin
                             %43 = load %34 : s32i, align 4
                             %44 = load %31 : rec___va_list_tag[1]*, align 8
                             %45 = cast(array_to_ptrdecay) %44 : rec___va_list_tag*
-                            <unmodeled: cir.va_arg>
+                            %46 = va_arg %45 : s32i
                             %47 = cmp ne %43, %46 : bool
                             if %47 {
                                 call @abort() [all]
@@ -48,7 +48,7 @@ fn bar(%arg1: s32i, %arg2: rec___va_list_tag[1]*) -> void [external, c, no_inlin
                 scope {
                     %35 = load %31 : rec___va_list_tag[1]*, align 8
                     %36 = cast(array_to_ptrdecay) %35 : rec___va_list_tag*
-                    <unmodeled: cir.va_arg>
+                    %37 = va_arg %36 : double
                     %38 = const 5.000000e-01 : double
                     %39 = cmp ne %37, %38 : bool
                     if %39 {
@@ -70,9 +70,9 @@ fn foo(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %19 = alloca s32i, "n", align 4
         store %arg0, %17
         %20 = cast(array_to_ptrdecay) %18 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %20
         %21 = cast(array_to_ptrdecay) %18 : rec___va_list_tag*
-        <unmodeled: cir.va_arg>
+        %22 = va_arg %21 : s32i
         store %22, %19, align 4
         %23 = load %17 : s32i, align 4
         %24 = load %19 : s32i, align 4
@@ -86,7 +86,7 @@ fn foo(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         }
         call @bar(%23, %27) [all]
         %28 = cast(array_to_ptrdecay) %18 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %28
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {

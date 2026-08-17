@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00213.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.c-testsuite/case_00213.c" (c, x86_64-unknown-linux-gnu)
 global .str : s8i[6] = "yeah\n" [cir_private, default, align 1, dso_local, constant]
 global .str.1 : s8i[5] = "boo\n" [cir_private, default, align 1, dso_local, constant]
 global .str.2 : s8i[6] = "once\n" [cir_private, default, align 1, dso_local, constant]
@@ -33,7 +33,51 @@ fn kb_wait_1() -> void [internal, c, no_inline, dso_local, nothrow] {
             scope {
                 %159 = const 1 : s32i
                 %160 = cast(int_to_bool) %159 : bool
-                <unmodeled: cir.ternary>
+                ternary %160 ? {
+                    %174 = get_global @printf : ((s8i*, ...) -> s32i)*
+                    %175 = get_global @.str.16 : s8i[13]*
+                    %176 = cast(array_to_ptrdecay) %175 : s8i*
+                    %177 = load %155 : u64i, align 8
+                    %178 = call @printf(%176, %177) : s32i [all]
+                    yield
+                } : {
+                    scope {
+                        %163 = alloca s32i, "i", align 4
+                        %164 = const 1 : s32i
+                        store %164, %163, align 4
+                        scope {
+                            while {
+                                %172 = const 1 : s32i
+                                %173 = cast(int_to_bool) %172 : bool
+                                condition %173
+                            } do {
+                                scope {
+                                    while {
+                                        %169 = load %163 : s32i, align 4
+                                        %170 = dec %169 : s32i [nsw]
+                                        store %170, %163, align 4
+                                        %171 = cast(int_to_bool) %169 : bool
+                                        condition %171
+                                    } do {
+                                        br ^bb1
+                                        ^bb1():
+                                            label some_label:
+                                            %165 = get_global @printf : ((s8i*, ...) -> s32i)*
+                                            %166 = get_global @.str.10 : s8i[7]*
+                                            %167 = cast(array_to_ptrdecay) %166 : s8i*
+                                            %168 = call @printf(%167) : s32i [all]
+                                            yield
+                                    }
+                                    yield
+                                }
+                                yield
+                            }
+                            yield
+                        }
+                        goto some_label
+                    }
+                    yield
+                }
                 %161 = load %155 : u64i, align 8
                 %162 = dec %161 : u64i
                 store %162, %155, align 8

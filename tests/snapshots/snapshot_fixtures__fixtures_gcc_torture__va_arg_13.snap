@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/va-arg-13.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/va-arg-13.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn dummy(%arg1: rec___va_list_tag*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: rec___va_list_tag*):
@@ -10,7 +10,7 @@ fn dummy(%arg1: rec___va_list_tag*) -> void [external, c, no_inline, dso_local, 
         store %arg1, %25
         scope {
             %26 = load %25 : rec___va_list_tag*, align 8
-            <unmodeled: cir.va_arg>
+            %27 = va_arg %26 : s32i
             %28 = const 1234 : s32i
             %29 = cmp ne %27, %28 : bool
             if %29 {
@@ -32,7 +32,7 @@ fn test(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %10 = load %9 : rec_ScanfState*, align 8
         %11 = get_member %10[1] "ap" : rec___va_list_tag[1]*
         %12 = cast(array_to_ptrdecay) %11 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %12
         %13 = load %9 : rec_ScanfState*, align 8
         %14 = get_member %13[1] "ap" : rec___va_list_tag[1]*
         %15 = cast(array_to_ptrdecay) %14 : rec___va_list_tag*
@@ -40,16 +40,16 @@ fn test(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %16 = load %9 : rec_ScanfState*, align 8
         %17 = get_member %16[1] "ap" : rec___va_list_tag[1]*
         %18 = cast(array_to_ptrdecay) %17 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %18
         %19 = get_member %8[1] "ap" : rec___va_list_tag[1]*
         %20 = cast(array_to_ptrdecay) %19 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %20
         %21 = get_member %8[1] "ap" : rec___va_list_tag[1]*
         %22 = cast(array_to_ptrdecay) %21 : rec___va_list_tag*
         call @dummy(%22) [all]
         %23 = get_member %8[1] "ap" : rec___va_list_tag[1]*
         %24 = cast(array_to_ptrdecay) %23 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %24
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];

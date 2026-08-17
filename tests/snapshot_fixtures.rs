@@ -95,6 +95,7 @@ fn parse_all_fixtures() {
     );
     eprintln!("found {} .c files", files.len());
 
+    let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
     let clang = clang_path();
     let worker_count = std::thread::available_parallelism()
         .map(|n| n.get())
@@ -116,6 +117,7 @@ fn parse_all_fixtures() {
     });
 
     let toolchain = clang_ir::Toolchain::from_env();
+    let manifest_prefix = format!("{}/", manifest_dir.display());
     let mut compile_failed = 0usize;
     let mut parse_failed = 0usize;
     let mut parsed_ok = 0usize;
@@ -130,7 +132,13 @@ fn parse_all_fixtures() {
             Compiled::Cir(cir_text) => match clang_ir::parse_with(&toolchain, &cir_text) {
                 Ok(module) => {
                     parsed_ok += 1;
-                    format!("{module}")
+                    // clang always embeds the module's source path as an
+                    // absolute, canonicalized path regardless of how it was
+                    // invoked (confirmed: passing a relative path with a
+                    // matching cwd still resolves to absolute), so strip the
+                    // checkout-specific prefix here to keep snapshots stable
+                    // across clones/renames.
+                    format!("{module}").replace(&manifest_prefix, "")
                 }
                 Err(e) => {
                     parse_failed += 1;

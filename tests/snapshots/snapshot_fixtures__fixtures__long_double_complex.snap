@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/long_double_complex.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures/long_double_complex.c" (c, x86_64-unknown-linux-gnu)
 global .str : s8i[4] = "add" [cir_private, default, align 1, dso_local, constant]
 global .str.1 : s8i[4] = "sub" [cir_private, default, align 1, dso_local, constant]
 global .str.2 : s8i[4] = "mul" [cir_private, default, align 1, dso_local, constant]
@@ -57,9 +57,9 @@ fn print_lc(%arg2: s8i*, %arg3: complex<long_double<f80>>*) -> void [internal, c
         %587 = cast(array_to_ptrdecay) %586 : s8i*
         %588 = load %583 : s8i*, align 8
         %589 = load %584 : complex<long_double<f80>>, align 16
-        <unmodeled: cir.complex.real>
+        %590 = complex.real %589 : long_double<f80>
         %591 = load %584 : complex<long_double<f80>>, align 16
-        <unmodeled: cir.complex.imag>
+        %592 = complex.imag %591 : long_double<f80>
         %593 = call @printf(%587, %588, %590, %592) : s32i [all]
         return
 }
@@ -79,19 +79,19 @@ fn mix_complex(%arg0: complex<long_double<f80>>*, %arg1: complex<long_double<f80
         %564 = load %560 : complex<long_double<f80>>, align 16
         <unmodeled: cir.complex.add>
         %566 = const 2.000000e+00 : long_double<f80>
-        <unmodeled: cir.complex.real>
-        <unmodeled: cir.complex.imag>
+        %567 = complex.real %565 : long_double<f80>
+        %568 = complex.imag %565 : long_double<f80>
         %569 = fdiv %567, %566 : long_double<f80>
         %570 = fdiv %568, %566 : long_double<f80>
-        <unmodeled: cir.complex.create>
+        %571 = complex.create %569, %570 : complex<long_double<f80>>
         store %571, %562, align 16
         %572 = load %562 : complex<long_double<f80>>, align 16
         %573 = const 3.000000e+00 : long_double<f80>
-        <unmodeled: cir.complex.real>
-        <unmodeled: cir.complex.imag>
+        %574 = complex.real %572 : long_double<f80>
+        %575 = complex.imag %572 : long_double<f80>
         %576 = fmul %574, %573 : long_double<f80>
         %577 = fmul %575, %573 : long_double<f80>
-        <unmodeled: cir.complex.create>
+        %578 = complex.create %576, %577 : complex<long_double<f80>>
         store %578, %561, align 16
         %579 = load %561 : complex<long_double<f80>>
         store %579, %556
@@ -146,20 +146,20 @@ fn check_arithmetic() -> void [internal, c, no_inline, dso_local, nothrow] {
     %416 = cast(array_to_ptrdecay) %415 : s8i*
     %417 = load %383 : complex<long_double<f80>>, align 16
     %418 = load %384 : complex<long_double<f80>>, align 16
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %419 = complex.real %417 : long_double<f80>
+    %420 = complex.imag %417 : long_double<f80>
+    %421 = complex.real %418 : long_double<f80>
+    %422 = complex.imag %418 : long_double<f80>
     %423 = fmul %419, %421 : long_double<f80>
     %424 = fmul %420, %422 : long_double<f80>
     %425 = fmul %419, %422 : long_double<f80>
     %426 = fmul %420, %421 : long_double<f80>
     %427 = fsub %423, %424 : long_double<f80>
     %428 = fadd %425, %426 : long_double<f80>
-    <unmodeled: cir.complex.create>
+    %429 = complex.create %427, %428 : complex<long_double<f80>>
     %430 = cmp ne %427, %427 : bool
     %431 = cmp ne %428, %428 : bool
-    %432 = const #false : bool
+    %432 = const false : bool
     %433 = select %430, %431, %432 : bool
     %434 = ternary %433 ? { : complex<long_double<f80>>
         %555 = call @__mulxc3(%419, %420, %421, %422) : complex<long_double<f80>> [all]
@@ -176,10 +176,10 @@ fn check_arithmetic() -> void [internal, c, no_inline, dso_local, nothrow] {
     %438 = cast(array_to_ptrdecay) %437 : s8i*
     %439 = load %383 : complex<long_double<f80>>, align 16
     %440 = load %384 : complex<long_double<f80>>, align 16
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %441 = complex.real %439 : long_double<f80>
+    %442 = complex.imag %439 : long_double<f80>
+    %443 = complex.real %440 : long_double<f80>
+    %444 = complex.imag %440 : long_double<f80>
     %445 = call @__divxc3(%441, %442, %443, %444) : complex<long_double<f80>> [all]
     store %445, %388, align 16
     %446 = load %388 : complex<long_double<f80>>, align 16
@@ -189,11 +189,11 @@ fn check_arithmetic() -> void [internal, c, no_inline, dso_local, nothrow] {
     %448 = get_global @.str.4 : s8i[4]*
     %449 = cast(array_to_ptrdecay) %448 : s8i*
     %450 = load %383 : complex<long_double<f80>>, align 16
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %451 = complex.real %450 : long_double<f80>
+    %452 = complex.imag %450 : long_double<f80>
     %453 = fneg %451 : long_double<f80>
     %454 = fneg %452 : long_double<f80>
-    <unmodeled: cir.complex.create>
+    %455 = complex.create %453, %454 : complex<long_double<f80>>
     store %455, %389, align 16
     %456 = load %389 : complex<long_double<f80>>, align 16
     %457 = alloca complex<long_double<f80>>, "byval", align 16
@@ -227,20 +227,20 @@ fn check_arithmetic() -> void [internal, c, no_inline, dso_local, nothrow] {
     call @print_lc(%471, %474) [all]
     %475 = load %384 : complex<long_double<f80>>, align 16
     %476 = load %390 : complex<long_double<f80>>, align 16
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %477 = complex.real %476 : long_double<f80>
+    %478 = complex.imag %476 : long_double<f80>
+    %479 = complex.real %475 : long_double<f80>
+    %480 = complex.imag %475 : long_double<f80>
     %481 = fmul %477, %479 : long_double<f80>
     %482 = fmul %478, %480 : long_double<f80>
     %483 = fmul %477, %480 : long_double<f80>
     %484 = fmul %478, %479 : long_double<f80>
     %485 = fsub %481, %482 : long_double<f80>
     %486 = fadd %483, %484 : long_double<f80>
-    <unmodeled: cir.complex.create>
+    %487 = complex.create %485, %486 : complex<long_double<f80>>
     %488 = cmp ne %485, %485 : bool
     %489 = cmp ne %486, %486 : bool
-    %490 = const #false : bool
+    %490 = const false : bool
     %491 = select %488, %489, %490 : bool
     %492 = ternary %491 ? { : complex<long_double<f80>>
         %554 = call @__mulxc3(%477, %478, %479, %480) : complex<long_double<f80>> [all]
@@ -259,10 +259,10 @@ fn check_arithmetic() -> void [internal, c, no_inline, dso_local, nothrow] {
     call @print_lc(%494, %497) [all]
     %498 = load %384 : complex<long_double<f80>>, align 16
     %499 = load %390 : complex<long_double<f80>>, align 16
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %500 = complex.real %499 : long_double<f80>
+    %501 = complex.imag %499 : long_double<f80>
+    %502 = complex.real %498 : long_double<f80>
+    %503 = complex.imag %498 : long_double<f80>
     %504 = call @__divxc3(%500, %501, %502, %503) : complex<long_double<f80>> [all]
     store %504, %390, align 16
     %505 = get_global @.str.8 : s8i[11]*
@@ -347,9 +347,9 @@ fn check_arithmetic() -> void [internal, c, no_inline, dso_local, nothrow] {
     %533 = get_global @.str.11 : s8i[31]*
     %534 = cast(array_to_ptrdecay) %533 : s8i*
     %535 = load %383 : complex<long_double<f80>>, align 16
-    <unmodeled: cir.complex.real>
+    %536 = complex.real %535 : long_double<f80>
     %537 = load %383 : complex<long_double<f80>>, align 16
-    <unmodeled: cir.complex.imag>
+    %538 = complex.imag %537 : long_double<f80>
     %539 = call @printf(%534, %536, %538) : s32i [all]
     return
 }
@@ -375,7 +375,7 @@ fn check_casts() -> void [internal, c, no_inline, dso_local, nothrow] {
     store %303, %286, align 16
     %304 = load %286 : long_double<f80>, align 16
     %305 = const 0.000000e+00 : long_double<f80>
-    <unmodeled: cir.complex.create>
+    %306 = complex.create %304, %305 : complex<long_double<f80>>
     store %306, %287, align 16
     %307 = get_global @.str.13 : s8i[16]*
     %308 = cast(array_to_ptrdecay) %307 : s8i*
@@ -386,7 +386,7 @@ fn check_casts() -> void [internal, c, no_inline, dso_local, nothrow] {
     store %310, %311
     call @print_lc(%308, %311) [all]
     %312 = load %287 : complex<long_double<f80>>, align 16
-    <unmodeled: cir.complex.real>
+    %313 = complex.real %312 : long_double<f80>
     store %313, %289, align 16
     scope {
         %378 = load %289 : long_double<f80>, align 16
@@ -402,7 +402,7 @@ fn check_casts() -> void [internal, c, no_inline, dso_local, nothrow] {
     %314 = const (3.000000e+00, 4.000000e+00) : complex<long_double<f80>>
     store %314, %290, align 16
     %315 = load %290 : complex<long_double<f80>>, align 16
-    <unmodeled: cir.complex.real>
+    %316 = complex.real %315 : long_double<f80>
     store %316, %291, align 16
     scope {
         %374 = load %291 : long_double<f80>, align 16
@@ -416,40 +416,40 @@ fn check_casts() -> void [internal, c, no_inline, dso_local, nothrow] {
         yield
     }
     %317 = load %290 : complex<long_double<f80>>, align 16
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %318 = complex.real %317 : long_double<f80>
+    %319 = complex.imag %317 : long_double<f80>
     %320 = cast(floating) %318 : double
     %321 = cast(floating) %319 : double
-    <unmodeled: cir.complex.create>
+    %322 = complex.create %320, %321 : complex<double>
     store %322, %292, align 8
     %323 = get_global @.str.14 : s8i[18]*
     %324 = cast(array_to_ptrdecay) %323 : s8i*
     %325 = load %292 : complex<double>, align 8
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %326 = complex.real %325 : double
+    %327 = complex.imag %325 : double
     %328 = cast(floating) %326 : long_double<f80>
     %329 = cast(floating) %327 : long_double<f80>
-    <unmodeled: cir.complex.create>
+    %330 = complex.create %328, %329 : complex<long_double<f80>>
     store %330, %293, align 16
     %331 = load %293 : complex<long_double<f80>>, align 16
     %332 = alloca complex<long_double<f80>>, "byval", align 16
     store %331, %332
     call @print_lc(%324, %332) [all]
     %333 = load %290 : complex<long_double<f80>>, align 16
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %334 = complex.real %333 : long_double<f80>
+    %335 = complex.imag %333 : long_double<f80>
     %336 = cast(floating) %334 : float
     %337 = cast(floating) %335 : float
-    <unmodeled: cir.complex.create>
+    %338 = complex.create %336, %337 : complex<float>
     store %338, %294, align 4
     %339 = get_global @.str.15 : s8i[17]*
     %340 = cast(array_to_ptrdecay) %339 : s8i*
     %341 = load %294 : complex<float>, align 4
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %342 = complex.real %341 : float
+    %343 = complex.imag %341 : float
     %344 = cast(floating) %342 : long_double<f80>
     %345 = cast(floating) %343 : long_double<f80>
-    <unmodeled: cir.complex.create>
+    %346 = complex.create %344, %345 : complex<long_double<f80>>
     store %346, %295, align 16
     %347 = load %295 : complex<long_double<f80>>, align 16
     %348 = alloca complex<long_double<f80>>, "byval", align 16
@@ -459,14 +459,14 @@ fn check_casts() -> void [internal, c, no_inline, dso_local, nothrow] {
     store %349, %296, align 8
     %350 = load %296 : double, align 8
     %351 = const 0.000000e+00 : double
-    <unmodeled: cir.complex.create>
+    %352 = complex.create %350, %351 : complex<double>
     store %352, %297, align 8
     %353 = load %297 : complex<double>, align 8
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %354 = complex.real %353 : double
+    %355 = complex.imag %353 : double
     %356 = cast(floating) %354 : long_double<f80>
     %357 = cast(floating) %355 : long_double<f80>
-    <unmodeled: cir.complex.create>
+    %358 = complex.create %356, %357 : complex<long_double<f80>>
     store %358, %298, align 16
     %359 = get_global @.str.16 : s8i[20]*
     %360 = cast(array_to_ptrdecay) %359 : s8i*
@@ -481,7 +481,7 @@ fn check_casts() -> void [internal, c, no_inline, dso_local, nothrow] {
     %365 = load %300 : s32i, align 4
     %366 = cast(int_to_float) %365 : long_double<f80>
     %367 = const 0.000000e+00 : long_double<f80>
-    <unmodeled: cir.complex.create>
+    %368 = complex.create %366, %367 : complex<long_double<f80>>
     store %368, %301, align 16
     %369 = get_global @.str.17 : s8i[9]*
     %370 = cast(array_to_ptrdecay) %369 : s8i*
@@ -596,10 +596,10 @@ fn check_stdlib_functions() -> void [internal, c, no_inline, dso_local, nothrow]
     %79 = get_global @.str.20 : s8i[5]*
     %80 = cast(array_to_ptrdecay) %79 : s8i*
     %81 = load %21 : complex<long_double<f80>>, align 16
-    <unmodeled: cir.complex.real>
-    <unmodeled: cir.complex.imag>
+    %82 = complex.real %81 : long_double<f80>
+    %83 = complex.imag %81 : long_double<f80>
     %84 = fneg %83 : long_double<f80>
-    <unmodeled: cir.complex.create>
+    %85 = complex.create %82, %84 : complex<long_double<f80>>
     store %85, %24, align 16
     %86 = load %24 : complex<long_double<f80>>, align 16
     %87 = alloca complex<long_double<f80>>, "byval", align 16
@@ -903,9 +903,9 @@ fn check_stdlib_functions() -> void [internal, c, no_inline, dso_local, nothrow]
     %279 = get_global @.str.38 : s8i[21]*
     %280 = cast(array_to_ptrdecay) %279 : s8i*
     %281 = load %21 : complex<long_double<f80>>, align 16
-    <unmodeled: cir.complex.real>
+    %282 = complex.real %281 : long_double<f80>
     %283 = load %21 : complex<long_double<f80>>, align 16
-    <unmodeled: cir.complex.imag>
+    %284 = complex.imag %283 : long_double<f80>
     %285 = call @printf(%280, %282, %284) : s32i [all]
     return
 }

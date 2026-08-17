@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/920625-1.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/920625-1.c" (c, x86_64-unknown-linux-gnu)
 global pts : rec_point[4] = [{1.000000e+00, 2.000000e+00}, {3.000000e+00, 4.000000e+00}, {5.000000e+00, 6.000000e+00}, {7.000000e+00, 8.000000e+00}] [external, default, align 16, dso_local]
 global ipts : rec_ipoint[4] = [{1, 2}, {3, 4}, {5, 6}, {7, 8}] [external, default, align 16, dso_local]
 
@@ -16,7 +16,7 @@ fn va1(%arg1: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         %119 = alloca rec_point, "pi", align 8
         store %arg1, %115
         %120 = cast(array_to_ptrdecay) %117 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %120
         scope {
             %123 = const 0 : s32i
             store %123, %118, align 4
@@ -34,7 +34,7 @@ fn va1(%arg1: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
                 scope {
                     %126 = alloca rec_point, "vaarg.tmp", align 8
                     %127 = cast(array_to_ptrdecay) %117 : rec___va_list_tag*
-                    <unmodeled: cir.va_arg>
+                    %128 = va_arg %127 : rec_point
                     store %128, %126, align 8
                     copy %119, %126
                     scope {
@@ -48,7 +48,7 @@ fn va1(%arg1: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
                         %136 = load %135 : double, align 8
                         %137 = cmp ne %134, %136 : bool
                         %138 = ternary %137 ? { : bool
-                            %149 = const #true : bool
+                            %149 = const true : bool
                             yield %149
                         } : {
                             %140 = load %118 : s32i, align 4
@@ -76,7 +76,7 @@ fn va1(%arg1: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
             yield
         }
         %121 = cast(array_to_ptrdecay) %117 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %121
         %122 = load %116 : s32i
         return %122
 }
@@ -89,7 +89,7 @@ fn va2(%arg0: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         %81 = alloca rec_ipoint, "pi", align 4
         store %arg0, %77
         %82 = cast(array_to_ptrdecay) %79 : rec___va_list_tag*
-        <unmodeled: cir.va_start>
+        va_start %82
         scope {
             %85 = const 0 : s32i
             store %85, %80, align 4
@@ -107,7 +107,7 @@ fn va2(%arg0: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
                 scope {
                     %88 = alloca rec_ipoint, "vaarg.tmp", align 4
                     %89 = cast(array_to_ptrdecay) %79 : rec___va_list_tag*
-                    <unmodeled: cir.va_arg>
+                    %90 = va_arg %89 : rec_ipoint
                     store %90, %88, align 4
                     copy %81, %88
                     scope {
@@ -121,7 +121,7 @@ fn va2(%arg0: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
                         %98 = load %97 : s32i, align 4
                         %99 = cmp ne %96, %98 : bool
                         %100 = ternary %99 ? { : bool
-                            %111 = const #true : bool
+                            %111 = const true : bool
                             yield %111
                         } : {
                             %102 = load %80 : s32i, align 4
@@ -149,7 +149,7 @@ fn va2(%arg0: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
             yield
         }
         %83 = cast(array_to_ptrdecay) %79 : rec___va_list_tag*
-        <unmodeled: cir.va_end>
+        va_end %83
         %84 = load %78 : s32i
         return %84
 }

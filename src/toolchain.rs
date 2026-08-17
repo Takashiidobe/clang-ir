@@ -40,13 +40,17 @@ impl Toolchain {
         }
     }
 
-    /// Runs `cir-opt --mlir-print-op-generic` on `source`, returning the
-    /// normalized text (dialect-agnostic op syntax; CIR types/attributes
-    /// keep their pretty printed form).
+    /// Runs `cir-opt --mlir-print-op-generic --mlir-print-debuginfo` on
+    /// `source`, returning the normalized text (dialect-agnostic op syntax;
+    /// CIR types/attributes keep their pretty printed form). Without
+    /// `--mlir-print-debuginfo`, `cir-opt` silently drops every `loc(...)` -
+    /// including from input that already carries it - so it's required
+    /// unconditionally, not just when the caller wants locations.
     pub fn normalize_to_generic(&self, source: &str) -> Result<String> {
         let mut child = Command::new(&self.cir_opt)
             .arg("-")
             .arg("--mlir-print-op-generic")
+            .arg("--mlir-print-debuginfo")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())

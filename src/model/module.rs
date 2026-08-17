@@ -1,6 +1,7 @@
 use std::fmt;
 
-use crate::ast::{Attribute, GenericModule, Operation};
+use crate::ast::attr::ConstArrayData;
+use crate::ast::{Attribute, Block, GenericModule, Operation, Region};
 use crate::model::enums::SourceLanguage;
 use crate::model::function::Function;
 use crate::model::global::Global;
@@ -22,6 +23,124 @@ pub struct Module {
     /// attributes like `dlti.dl_spec`, target datalayout, etc). Empty for a
     /// hand-built `Module` rather than one produced by parsing.
     pub generic: GenericModule,
+}
+
+/// Inlines `Attribute::Named` alias references (`bitfield_info = #bfi_a`,
+/// `value = #true`, ...) throughout `op` and its nested regions, recursively.
+/// The `ast` layer deliberately keeps these unresolved (faithful to the
+/// source text, and `!`-type aliases can be self-referential in ways
+/// attribute aliases aren't - see [`GenericModule::resolve_type`]), but the
+/// `model` layer's [`crate::model::instruction::try_lower`] only ever sees a
+/// bare `Operation` with no access to `generic.attr_aliases`, so aliases must
+/// be inlined before lowering or every alias-referenced attribute silently
+/// fails to structurally match and falls back to [`crate::model::Instruction::Other`].
+fn resolve_op(op: &Operation, generic: &GenericModule) -> Operation {
+    Operation {
+        name: op.name.clone(),
+        results: op.results.clone(),
+        operands: op.operands.clone(),
+        successors: op.successors.clone(),
+        properties: op
+            .properties
+            .iter()
+            .map(|(k, v)| (k.clone(), resolve_attribute(v, generic)))
+            .collect(),
+        regions: op
+            .regions
+            .iter()
+            .map(|r| resolve_region(r, generic))
+            .collect(),
+        attributes: op
+            .attributes
+            .iter()
+            .map(|(k, v)| (k.clone(), resolve_attribute(v, generic)))
+            .collect(),
+        operand_types: op.operand_types.clone(),
+        loc: op.loc.clone(),
+    }
+}
+
+fn resolve_region(region: &Region, generic: &GenericModule) -> Region {
+    Region {
+        blocks: region
+            .blocks
+            .iter()
+            .map(|b| Block {
+                label: b.label.clone(),
+                args: b.args.clone(),
+                ops: b.ops.iter().map(|op| resolve_op(op, generic)).collect(),
+            })
+            .collect(),
+    }
+}
+
+fn resolve_attribute(attr: &Attribute, generic: &GenericModule) -> Attribute {
+    if let Attribute::Named(name) = attr {
+        // Aliases are defined before use in `cir-opt` output, but chase
+        // alias-to-alias chains regardless; the `seen` guard mirrors
+        // `GenericModule::resolve_type`'s cycle break (falls back to the
+        // unresolved reference rather than looping forever).
+        let mut current_name = name.clone();
+        let mut seen = std::collections::HashSet::new();
+        loop {
+            if !seen.insert(current_name.clone()) {
+                return attr.clone();
+            }
+            match generic.attr_aliases.get(&current_name) {
+                Some(Attribute::Named(next)) => current_name = next.clone(),
+                Some(resolved) => return resolve_attribute(resolved, generic),
+                None => return attr.clone(),
+            }
+        }
+    }
+    match attr {
+        Attribute::Array(items) => Attribute::Array(
+            items
+                .iter()
+                .map(|a| resolve_attribute(a, generic))
+                .collect(),
+        ),
+        Attribute::Dict(entries) => Attribute::Dict(
+            entries
+                .iter()
+                .map(|(k, v)| (k.clone(), resolve_attribute(v, generic)))
+                .collect(),
+        ),
+        Attribute::ConstArray {
+            data: ConstArrayData::Elements(items),
+            trailing_zeros,
+            ty,
+        } => Attribute::ConstArray {
+            data: ConstArrayData::Elements(
+                items
+                    .iter()
+                    .map(|a| resolve_attribute(a, generic))
+                    .collect(),
+            ),
+            trailing_zeros: *trailing_zeros,
+            ty: ty.clone(),
+        },
+        Attribute::ConstVector { elements, ty } => Attribute::ConstVector {
+            elements: elements
+                .iter()
+                .map(|a| resolve_attribute(a, generic))
+                .collect(),
+            ty: ty.clone(),
+        },
+        Attribute::ConstRecord { elements, ty } => Attribute::ConstRecord {
+            elements: elements
+                .iter()
+                .map(|a| resolve_attribute(a, generic))
+                .collect(),
+            ty: ty.clone(),
+        },
+        Attribute::ConstComplex { real, imag, ty } => Attribute::ConstComplex {
+            real: Box::new(resolve_attribute(real, generic)),
+            imag: Box::new(resolve_attribute(imag, generic)),
+            ty: ty.clone(),
+        },
+        other => other.clone(),
+    }
 }
 
 impl Module {
@@ -60,16 +179,17 @@ impl Module {
             .map(|b| b.ops.as_slice());
 
         for op in body_ops.unwrap_or_default() {
+            let op = resolve_op(op, &generic);
             match op.mnemonic() {
-                "func" => match Function::from_op(op) {
+                "func" => match Function::from_op(&op) {
                     Some(f) => functions.push(f),
-                    None => other.push(op.clone()),
+                    None => other.push(op),
                 },
-                "global" => match Global::from_op(op) {
+                "global" => match Global::from_op(&op) {
                     Some(g) => globals.push(g),
-                    None => other.push(op.clone()),
+                    None => other.push(op),
                 },
-                _ => other.push(op.clone()),
+                _ => other.push(op),
             }
         }
 

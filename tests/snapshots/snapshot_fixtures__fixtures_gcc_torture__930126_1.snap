@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/930126-1.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/930126-1.c" (c, x86_64-unknown-linux-gnu)
 global main.i : rec_s = zero [internal, default, align 8, dso_local]
 
 fn f(%arg0: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
@@ -17,7 +17,7 @@ fn f(%arg0: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
         store %33, %34
         %36 = const 3454997044 : u64i
         %37 = get_member %34[0] "b" : u64i*
-        <unmodeled: cir.set_bitfield>
+        %38 = set_bitfield %37, %36, "b": 32 bits @8 in u64i : u64i, align 8
         copy %35, %34
         %39 = load %35 : rec_s
         store %39, %30
@@ -36,7 +36,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %4 = get_global @main.i : rec_s*
     %5 = const 12 : u64i
     %6 = get_member %4[0] "a" : u64i*
-    <unmodeled: cir.set_bitfield>
+    %7 = set_bitfield %6, %5, "a": 8 bits @0 in u64i : u64i, align 8
     %8 = load %4 : rec_s, align 8
     store %8, %1
     %9 = cast(bitcast) %1 : u64i*
@@ -48,16 +48,16 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     store %13, %4, align 8
     scope {
         %17 = get_member %4[0] "a" : u64i*
-        <unmodeled: cir.get_bitfield>
+        %18 = get_bitfield %17, "a": 8 bits @0 in u64i : u64i, align 8
         %19 = cast(integral) %18 : s32i
         %20 = const 12 : s32i
         %21 = cmp ne %19, %20 : bool
         %22 = ternary %21 ? { : bool
-            %29 = const #true : bool
+            %29 = const true : bool
             yield %29
         } : {
             %24 = get_member %4[0] "b" : u64i*
-            <unmodeled: cir.get_bitfield>
+            %25 = get_bitfield %24, "b": 32 bits @8 in u64i : u64i, align 8
             %26 = cast(integral) %25 : u32i
             %27 = const 3454997044 : u32i
             %28 = cmp ne %26, %27 : bool

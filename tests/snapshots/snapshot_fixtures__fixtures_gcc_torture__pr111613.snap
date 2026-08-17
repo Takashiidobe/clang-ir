@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr111613.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/pr111613.c" (c, x86_64-unknown-linux-gnu)
 fn malloc(%arg0: u64i) -> void* [external, c, nothrow];
 fn set_field1_and_field2(%arg0: rec_bitfield*) -> void [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: rec_bitfield*):
@@ -11,11 +11,11 @@ fn set_field1_and_field2(%arg0: rec_bitfield*) -> void [internal, c, no_inline, 
         %26 = const 1 : u32i
         %27 = load %25 : rec_bitfield*, align 8
         %28 = get_member %27[0] "field1" : u8i*
-        <unmodeled: cir.set_bitfield>
+        %29 = set_bitfield %28, %26, "field1": 1 bits @0 in u8i : u32i, align 4
         %30 = const 1 : u32i
         %31 = load %25 : rec_bitfield*, align 8
         %32 = get_member %31[0] "field2" : u8i*
-        <unmodeled: cir.set_bitfield>
+        %33 = set_bitfield %32, %30, "field2": 1 bits @1 in u8i : u32i, align 4
         return
 }
 fn new_bitfield() -> rec_bitfield* [internal, c, no_inline, dso_local, nothrow] {
@@ -29,7 +29,7 @@ fn new_bitfield() -> rec_bitfield* [internal, c, no_inline, dso_local, nothrow] 
     %18 = const 1 : u32i
     %19 = load %13 : rec_bitfield*, align 8
     %20 = get_member %19[0] "field3" : u8i*
-    <unmodeled: cir.set_bitfield>
+    %21 = set_bitfield %20, %18, "field3": 1 bits @2 in u8i : u32i, align 4
     %22 = load %13 : rec_bitfield*, align 8
     call @set_field1_and_field2(%22) [all]
     %23 = load %13 : rec_bitfield*, align 8
@@ -48,7 +48,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     scope {
         %6 = load %1 : rec_bitfield*, align 8
         %7 = get_member %6[0] "field3" : u8i*
-        <unmodeled: cir.get_bitfield>
+        %8 = get_bitfield %7, "field3": 1 bits @2 in u8i : u32i, align 4
         %9 = cast(integral) %8 : s32i
         %10 = const 1 : s32i
         %11 = cmp ne %9, %10 : bool

@@ -2,7 +2,7 @@
 source: tests/snapshot_fixtures.rs
 expression: snapshot
 ---
-module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr88739.c" (c, x86_64-unknown-linux-gnu)
+module "tests/fixtures.gcc-torture/pr88739.c" (c, x86_64-unknown-linux-gnu)
 global bar.i : s32i = 0 [internal, default, align 4, dso_local]
 global v : rec_U = {{0, 0, 0, 16521}} [external, default, align 4, dso_local]
 
@@ -23,7 +23,7 @@ fn bar(%arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
                         %76 = get_global @v : rec_U*
                         %77 = get_member %76[0] "f" : rec_A*
                         %78 = get_member %77[3] "d" : u32i*
-                        <unmodeled: cir.get_bitfield>
+                        %79 = get_bitfield %78, "d": 30 bits @0 in u32i : u32i, align 4
                         %80 = cast(integral) %79 : s32i
                         %81 = cmp ne %75, %80 : bool
                         if %81 {
@@ -40,7 +40,7 @@ fn bar(%arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
                         %69 = get_global @v : rec_U*
                         %70 = get_member %69[0] "f" : rec_A*
                         %71 = get_member %70[3] "e" : u32i*
-                        <unmodeled: cir.get_bitfield>
+                        %72 = get_bitfield %71, "e": 2 bits @30 in u32i : u32i, align 4
                         %73 = cast(integral) %72 : s32i
                         %74 = cmp ne %68, %73 : bool
                         if %74 {
@@ -124,19 +124,19 @@ fn foo(%arg0: u32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %9 = shift right %7, %8 : u32i
         %10 = get_member %6[0] "f" : rec_A*
         %11 = get_member %10[3] "d" : u32i*
-        <unmodeled: cir.set_bitfield>
+        %12 = set_bitfield %11, %9, "d": 30 bits @0 in u32i : u32i, align 4
         %13 = const 0 : u32i
         %14 = get_member %6[0] "f" : rec_A*
         %15 = get_member %14[3] "e" : u32i*
-        <unmodeled: cir.set_bitfield>
+        %16 = set_bitfield %15, %13, "e": 2 bits @30 in u32i : u32i, align 4
         %17 = get_member %6[0] "f" : rec_A*
         %18 = get_member %17[3] "d" : u32i*
-        <unmodeled: cir.get_bitfield>
+        %19 = get_bitfield %18, "d": 30 bits @0 in u32i : u32i, align 4
         %20 = cast(integral) %19 : s32i
         call @bar(%20) [all]
         %21 = get_member %6[0] "f" : rec_A*
         %22 = get_member %21[3] "e" : u32i*
-        <unmodeled: cir.get_bitfield>
+        %23 = get_bitfield %22, "e": 2 bits @30 in u32i : u32i, align 4
         %24 = cast(integral) %23 : s32i
         call @bar(%24) [all]
         %25 = const 3 : s64i
