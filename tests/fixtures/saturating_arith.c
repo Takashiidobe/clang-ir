@@ -19,15 +19,15 @@ int main(void) {
   unsigned sub_u = __builtin_elementwise_sub_sat(5u, 10u);
   printf("%u\n", sub_u);
 
-  U128 u128a = (U128)0 - 1;
+  U128 u128a    = (U128)0 - 1;
   U128 add_u128 = __builtin_elementwise_add_sat(u128a, (U128)5);
   printf("%d\n", add_u128 == (U128)0 - 1);
 
-  S200 s200a = -1;
+  S200 s200a    = -1;
   S200 add_s200 = __builtin_elementwise_add_sat(s200a, (S200)5);
   printf("%d\n", (int)add_s200);
 
-  U200 u200a = 3;
+  U200 u200a    = 3;
   U200 sub_u200 = __builtin_elementwise_sub_sat(u200a, (U200)10);
   printf("%d\n", sub_u200 == 0);
 
