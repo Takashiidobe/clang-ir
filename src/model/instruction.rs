@@ -139,6 +139,11 @@ pub enum MathUnaryKind {
     Ctz,
     Abs,
     Signbit,
+    Trunc,
+    ByteSwap,
+    Clrsb,
+    Parity,
+    Popcount,
 }
 
 impl std::str::FromStr for MathUnaryKind {
@@ -152,6 +157,11 @@ impl std::str::FromStr for MathUnaryKind {
             "ctz" => Ok(MathUnaryKind::Ctz),
             "abs" => Ok(MathUnaryKind::Abs),
             "signbit" => Ok(MathUnaryKind::Signbit),
+            "trunc" => Ok(MathUnaryKind::Trunc),
+            "byte_swap" => Ok(MathUnaryKind::ByteSwap),
+            "clrsb" => Ok(MathUnaryKind::Clrsb),
+            "parity" => Ok(MathUnaryKind::Parity),
+            "popcount" => Ok(MathUnaryKind::Popcount),
             other => Err(crate::model::enums::ParseEnumError::new(
                 "MathUnaryKind",
                 other,
@@ -170,6 +180,11 @@ impl std::fmt::Display for MathUnaryKind {
             MathUnaryKind::Ctz => "ctz",
             MathUnaryKind::Abs => "abs",
             MathUnaryKind::Signbit => "signbit",
+            MathUnaryKind::Trunc => "trunc",
+            MathUnaryKind::ByteSwap => "byte_swap",
+            MathUnaryKind::Clrsb => "clrsb",
+            MathUnaryKind::Parity => "parity",
+            MathUnaryKind::Popcount => "popcount",
         };
         write!(f, "{kw}")
     }
@@ -421,6 +436,14 @@ pub enum Instruction {
         lhs: ValueId,
         rhs: ValueId,
     },
+    /// Replaces one lane of a vector with a scalar: `cir.vec.insert`.
+    VecInsert {
+        result: ValueId,
+        ty: Type,
+        vec: ValueId,
+        value: ValueId,
+        index: ValueId,
+    },
 
     // -- math / bit-count builtins --
     MathUnary {
@@ -444,6 +467,12 @@ pub enum Instruction {
         ty: Type,
         magnitude: ValueId,
         sign: ValueId,
+    },
+    FMaxNum {
+        result: ValueId,
+        ty: Type,
+        lhs: ValueId,
+        rhs: ValueId,
     },
     Fmuladd {
         result: ValueId,
@@ -497,6 +526,12 @@ pub enum Instruction {
         operand: ValueId,
     },
     ComplexAdd {
+        result: ValueId,
+        ty: Type,
+        lhs: ValueId,
+        rhs: ValueId,
+    },
+    ComplexSub {
         result: ValueId,
         ty: Type,
         lhs: ValueId,
@@ -625,6 +660,14 @@ pub enum Instruction {
         condition: ValueId,
         cases: Vec<SwitchCase>,
     },
+    /// A standalone `cir.case`, encountered when it's nested inside another
+    /// case's body rather than a direct child of `cir.switch` (the "simple
+    /// form" case list already surfaces those via `Switch::cases`).
+    Case {
+        kind: CaseOpKind,
+        values: Vec<Attribute>,
+        body: Body,
+    },
     /// `result` is `None` for a statement-position ternary used only for its
     /// side effects (e.g. inside an `assert`-style macro) - `cir.ternary`
     /// carries no result value in that shape.
@@ -669,6 +712,8 @@ pub enum Instruction {
         addr: ValueId,
     },
     Unreachable,
+    /// Aborts the program: `cir.trap`.
+    Trap,
 
     /// Anything not modeled above: the original operation is preserved
     /// verbatim (including any nested regions, which are *not* recursively
@@ -1024,6 +1069,20 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 rhs: operand(op, 1)?.clone(),
             })
         }
+        "vec.insert" => {
+            let (result, ty) = single_result(op)?;
+            // Argument declaration order is `(vec, value, index)`, which the
+            // generic op printer follows - the *pretty* assembly format
+            // reorders these (`$value, $vec[$index]`), but that's irrelevant
+            // here since this crate only ever parses the generic form.
+            Some(Instruction::VecInsert {
+                result: result.clone(),
+                ty: ty.clone(),
+                vec: operand(op, 0)?.clone(),
+                value: operand(op, 1)?.clone(),
+                index: operand(op, 2)?.clone(),
+            })
+        }
         "is_fp_class" => {
             let (result, ty) = single_result(op)?;
             let flags = FpClassFlags::try_from(op.attr("flags")?).ok()?;
@@ -1034,7 +1093,8 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 flags,
             })
         }
-        "fabs" | "floor" | "ffs" | "clz" | "ctz" | "abs" | "signbit" => {
+        "fabs" | "floor" | "ffs" | "clz" | "ctz" | "abs" | "signbit" | "trunc" | "byte_swap"
+        | "clrsb" | "parity" | "popcount" => {
             let (result, ty) = single_result(op)?;
             let kind: MathUnaryKind = op.mnemonic().parse().ok()?;
             let poison_flag = flag(op, "poison_zero") || flag(op, "min_is_poison");
@@ -1053,6 +1113,15 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 ty: ty.clone(),
                 magnitude: operand(op, 0)?.clone(),
                 sign: operand(op, 1)?.clone(),
+            })
+        }
+        "fmaxnum" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::FMaxNum {
+                result: result.clone(),
+                ty: ty.clone(),
+                lhs: operand(op, 0)?.clone(),
+                rhs: operand(op, 1)?.clone(),
             })
         }
         "fmuladd" => {
@@ -1132,6 +1201,15 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
         "complex.add" => {
             let (result, ty) = single_result(op)?;
             Some(Instruction::ComplexAdd {
+                result: result.clone(),
+                ty: ty.clone(),
+                lhs: operand(op, 0)?.clone(),
+                rhs: operand(op, 1)?.clone(),
+            })
+        }
+        "complex.sub" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::ComplexSub {
                 result: result.clone(),
                 ty: ty.clone(),
                 lhs: operand(op, 0)?.clone(),
@@ -1306,6 +1384,16 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 cases,
             })
         }
+        "case" => {
+            let kind = CaseOpKind::try_from(op.attr("kind")?).ok()?;
+            let values = op
+                .attr("value")
+                .and_then(Attribute::as_array)
+                .unwrap_or(&[])
+                .to_vec();
+            let body = lower_region(region(op, 0)?);
+            Some(Instruction::Case { kind, values, body })
+        }
         "ternary" => Some(Instruction::Ternary {
             result: single_result(op).cloned(),
             condition: operand(op, 0)?.clone(),
@@ -1341,6 +1429,7 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
             addr: operand(op, 0)?.clone(),
         }),
         "unreachable" => Some(Instruction::Unreachable),
+        "trap" => Some(Instruction::Trap),
         _ => None,
     }
 }
@@ -1723,6 +1812,16 @@ fn write_instruction(
             write_indent(f, level)?;
             writeln!(f, "%{result} = vec.cmp {kind} %{lhs}, %{rhs} : {ty}")
         }
+        VecInsert {
+            result,
+            ty,
+            vec,
+            value,
+            index,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = vec.insert %{value}, %{vec}[%{index}] : {ty}")
+        }
         MathUnary {
             result,
             ty,
@@ -1752,6 +1851,15 @@ fn write_instruction(
         } => {
             write_indent(f, level)?;
             writeln!(f, "%{result} = copysign %{magnitude}, %{sign} : {ty}")
+        }
+        FMaxNum {
+            result,
+            ty,
+            lhs,
+            rhs,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = fmaxnum %{lhs}, %{rhs} : {ty}")
         }
         Fmuladd {
             result,
@@ -1838,6 +1946,15 @@ fn write_instruction(
         } => {
             write_indent(f, level)?;
             writeln!(f, "%{result} = complex.add %{lhs}, %{rhs} : {ty}")
+        }
+        ComplexSub {
+            result,
+            ty,
+            lhs,
+            rhs,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = complex.sub %{lhs}, %{rhs} : {ty}")
         }
         VaStart { addr } => {
             write_indent(f, level)?;
@@ -2072,6 +2189,23 @@ fn write_instruction(
             write_indent(f, level)?;
             writeln!(f, "}}")
         }
+        Case { kind, values, body } => {
+            write_indent(f, level)?;
+            write!(f, "case {kind}")?;
+            if !values.is_empty() {
+                write!(f, " ")?;
+                for (i, v) in values.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+                    write!(f, "{v}")?;
+                }
+            }
+            writeln!(f, " {{")?;
+            write_body(body, f, level + 1)?;
+            write_indent(f, level)?;
+            writeln!(f, "}}")
+        }
         Ternary {
             result,
             condition,
@@ -2145,6 +2279,10 @@ fn write_instruction(
         Unreachable => {
             write_indent(f, level)?;
             writeln!(f, "unreachable")
+        }
+        Trap => {
+            write_indent(f, level)?;
+            writeln!(f, "trap")
         }
         // The fallback case: only the mnemonic is shown (not the full raw
         // operation tree) to keep this readable; use `Instruction::Other`'s
@@ -2449,5 +2587,117 @@ mod tests {
             instr,
             Instruction::CleanupScope { kind: CleanupKind::All, .. }
         ));
+    }
+
+    #[test]
+    fn standalone_case_lowers() {
+        // Nested case (fallthrough inside another case's body), rather than a
+        // direct child of `cir.switch` - see `Instruction::Case`'s doc.
+        let instr = lower_single_op(
+            r#""cir.case"() <{kind = 1 : i32, value = [#cir.int<5> : !cir.int<s, 32>]}> ({
+            }) : () -> ()"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::Case { kind: CaseOpKind::Equal, ref values, .. } if values.len() == 1
+        ));
+    }
+
+    #[test]
+    fn byte_swap_lowers() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.byte_swap"(%0) : (!cir.int<u, 32>) -> !cir.int<u, 32>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::MathUnary { kind: MathUnaryKind::ByteSwap, ref operand, .. }
+                if operand == "0"
+        ));
+    }
+
+    #[test]
+    fn vec_insert_lowers() {
+        let instr = lower_single_op(
+            r#"%3 = "cir.vec.insert"(%0, %1, %2) : (!cir.vector<4 x !cir.int<s, 32>>, !cir.int<s, 32>, !cir.int<s, 32>) -> !cir.vector<4 x !cir.int<s, 32>>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::VecInsert { ref result, ref vec, ref value, ref index, .. }
+                if result == "3" && vec == "0" && value == "1" && index == "2"
+        ));
+        assert_eq!(
+            instr.to_string(),
+            "%3 = vec.insert %1, %0[%2] : vector<4 x s32>\n"
+        );
+    }
+
+    #[test]
+    fn popcount_lowers() {
+        let instr =
+            lower_single_op(r#"%1 = "cir.popcount"(%0) : (!cir.int<u, 32>) -> !cir.int<u, 32>"#);
+        assert!(matches!(
+            instr,
+            Instruction::MathUnary { kind: MathUnaryKind::Popcount, .. }
+        ));
+    }
+
+    #[test]
+    fn parity_lowers() {
+        let instr =
+            lower_single_op(r#"%1 = "cir.parity"(%0) : (!cir.int<u, 32>) -> !cir.int<u, 32>"#);
+        assert!(matches!(
+            instr,
+            Instruction::MathUnary { kind: MathUnaryKind::Parity, .. }
+        ));
+    }
+
+    #[test]
+    fn fmaxnum_lowers() {
+        let instr = lower_single_op(
+            r#"%2 = "cir.fmaxnum"(%0, %1) : (!cir.double, !cir.double) -> !cir.double"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::FMaxNum { ref result, ref lhs, ref rhs, .. }
+                if result == "2" && lhs == "0" && rhs == "1"
+        ));
+    }
+
+    #[test]
+    fn complex_sub_lowers() {
+        let instr = lower_single_op(
+            r#"%2 = "cir.complex.sub"(%0, %1) : (!cir.complex<!cir.float>, !cir.complex<!cir.float>) -> !cir.complex<!cir.float>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::ComplexSub { ref result, ref lhs, ref rhs, .. }
+                if result == "2" && lhs == "0" && rhs == "1"
+        ));
+    }
+
+    #[test]
+    fn clrsb_lowers() {
+        let instr =
+            lower_single_op(r#"%1 = "cir.clrsb"(%0) : (!cir.int<s, 32>) -> !cir.int<s, 32>"#);
+        assert!(matches!(
+            instr,
+            Instruction::MathUnary { kind: MathUnaryKind::Clrsb, .. }
+        ));
+    }
+
+    #[test]
+    fn trunc_lowers() {
+        let instr = lower_single_op(r#"%1 = "cir.trunc"(%0) : (!cir.double) -> !cir.double"#);
+        assert!(matches!(
+            instr,
+            Instruction::MathUnary { kind: MathUnaryKind::Trunc, .. }
+        ));
+    }
+
+    #[test]
+    fn trap_lowers() {
+        let instr = lower_single_op(r#""cir.trap"() : () -> ()"#);
+        assert!(matches!(instr, Instruction::Trap));
+        assert_eq!(instr.to_string(), "trap\n");
     }
 }
