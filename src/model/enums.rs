@@ -375,6 +375,16 @@ keyword_enum! {
     }
 }
 
+int_enum! {
+    /// `cir.assume`'s `bundle_kind` field.
+    AssumeBundleKind from "CIROps.td:6925-6931" {
+        None = 0 => "none",
+        Align = 1 => "align",
+        SeparateStorage = 2 => "separate_storage",
+        Dereferenceable = 3 => "dereferenceable",
+    }
+}
+
 /// `cir.is_fp_class`'s `flags` field: a bitmask of individual FP class bits
 /// (composite groups like `fcNan` are just multiple bits OR'd together, not
 /// separate encodings). Bit positions mirror LLVM's `FPClassTest` layout, per

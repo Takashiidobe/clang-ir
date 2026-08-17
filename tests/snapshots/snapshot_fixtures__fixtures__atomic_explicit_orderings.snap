@@ -86,7 +86,7 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     store %51, %22, align 4
     %52 = load %20 : s32i, align 4
     %53 = load %22 : s32i, align 4
-    <unmodeled: cir.atomic.cmpxchg>
+    %54#0, %54#1 = atomic.cmpxchg success(acq_rel) failure(acquire) syncscope(system) %1, %52, %53 : s32i, align 4
     %55 = not %54#1 : bool
     if %55 {
         store %54#0, %20, align 4
@@ -96,8 +96,8 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
     %56 = load %23 : bool, align 1
     %57 = cast(bool_to_int) %56 : s32i
     store %57, %21, align 4
-    <unmodeled: cir.atomic.fence>
-    <unmodeled: cir.atomic.fence>
+    atomic.fence release syncscope(system)
+    atomic.fence acquire syncscope(system)
     %58 = get_global @printf : ((s8i*, ...) -> s32i)*
     %59 = get_global @.str : s8i[28]*
     %60 = cast(array_to_ptrdecay) %59 : s8i*

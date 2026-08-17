@@ -11,8 +11,8 @@
 
 use crate::ast::{Attribute, Block, Operation, Region, Type, ValueId};
 use crate::model::enums::{
-    AsmFlavor, AtomicFetchKind, CaseOpKind, CastKind, CleanupKind, CmpOpKind, FpClassFlags,
-    MemOrder, SideEffect, SyncScopeKind,
+    AsmFlavor, AssumeBundleKind, AtomicFetchKind, CaseOpKind, CastKind, CleanupKind, CmpOpKind,
+    FpClassFlags, MemOrder, SideEffect, SyncScopeKind,
 };
 
 /// A lowered region: almost always a single unlabeled block, but CIR can
@@ -144,6 +144,11 @@ pub enum MathUnaryKind {
     Clrsb,
     Parity,
     Popcount,
+    Ceil,
+    Round,
+    Rint,
+    Nearbyint,
+    BitReverse,
 }
 
 impl std::str::FromStr for MathUnaryKind {
@@ -162,6 +167,11 @@ impl std::str::FromStr for MathUnaryKind {
             "clrsb" => Ok(MathUnaryKind::Clrsb),
             "parity" => Ok(MathUnaryKind::Parity),
             "popcount" => Ok(MathUnaryKind::Popcount),
+            "ceil" => Ok(MathUnaryKind::Ceil),
+            "round" => Ok(MathUnaryKind::Round),
+            "rint" => Ok(MathUnaryKind::Rint),
+            "nearbyint" => Ok(MathUnaryKind::Nearbyint),
+            "bitreverse" => Ok(MathUnaryKind::BitReverse),
             other => Err(crate::model::enums::ParseEnumError::new(
                 "MathUnaryKind",
                 other,
@@ -185,6 +195,11 @@ impl std::fmt::Display for MathUnaryKind {
             MathUnaryKind::Clrsb => "clrsb",
             MathUnaryKind::Parity => "parity",
             MathUnaryKind::Popcount => "popcount",
+            MathUnaryKind::Ceil => "ceil",
+            MathUnaryKind::Round => "round",
+            MathUnaryKind::Rint => "rint",
+            MathUnaryKind::Nearbyint => "nearbyint",
+            MathUnaryKind::BitReverse => "bitreverse",
         };
         write!(f, "{kw}")
     }
@@ -444,6 +459,14 @@ pub enum Instruction {
         value: ValueId,
         index: ValueId,
     },
+    /// `__builtin_shufflevector`-style constant-index shuffle: `cir.vec.shuffle`.
+    VecShuffle {
+        result: ValueId,
+        ty: Type,
+        vec1: ValueId,
+        vec2: ValueId,
+        indices: Vec<i128>,
+    },
 
     // -- math / bit-count builtins --
     MathUnary {
@@ -461,6 +484,21 @@ pub enum Instruction {
         ty: Type,
         operand: ValueId,
         flags: FpClassFlags,
+    },
+    /// `llvm.objectsize`-style buffer bound query: `cir.objsize`.
+    ObjSize {
+        result: ValueId,
+        ty: Type,
+        ptr: ValueId,
+        min: bool,
+        nullunknown: bool,
+        dynamic: bool,
+    },
+    /// `__builtin_constant_p`: `cir.is_constant`.
+    IsConstant {
+        result: ValueId,
+        ty: Type,
+        val: ValueId,
     },
     Copysign {
         result: ValueId,
@@ -491,6 +529,33 @@ pub enum Instruction {
     AddOverflow {
         result: ValueId,
         overflow: ValueId,
+        ty: Type,
+        lhs: ValueId,
+        rhs: ValueId,
+    },
+    SubOverflow {
+        result: ValueId,
+        overflow: ValueId,
+        ty: Type,
+        lhs: ValueId,
+        rhs: ValueId,
+    },
+    /// Splits a float into fractional and integral parts: `cir.modf`.
+    Modf {
+        fractional: ValueId,
+        integral: ValueId,
+        ty: Type,
+        operand: ValueId,
+    },
+    Fma {
+        result: ValueId,
+        ty: Type,
+        a: ValueId,
+        b: ValueId,
+        c: ValueId,
+    },
+    FMinNum {
+        result: ValueId,
         ty: Type,
         lhs: ValueId,
         rhs: ValueId,
@@ -555,6 +620,18 @@ pub enum Instruction {
         addr: ValueId,
     },
 
+    // -- exceptions --
+    /// Saves call-site state for a later `cir.eh.longjmp`: `cir.eh.setjmp`.
+    EhSetjmp {
+        result: ValueId,
+        ty: Type,
+        env: ValueId,
+    },
+    /// Restores state saved by `cir.eh.setjmp`: `cir.eh.longjmp`.
+    EhLongjmp {
+        env: ValueId,
+    },
+
     // -- misc runtime builtins --
     FrameAddress {
         result: ValueId,
@@ -603,6 +680,43 @@ pub enum Instruction {
         intrinsic_name: String,
         args: Vec<ValueId>,
     },
+    /// GCC "labels as values" (`&&label`): `cir.block_address`.
+    BlockAddress {
+        result: ValueId,
+        ty: Type,
+        func: String,
+        label: String,
+    },
+    /// Tells the optimizer a boolean predicate always holds: `cir.assume`.
+    Assume {
+        predicate: ValueId,
+        bundle_kind: AssumeBundleKind,
+        bundle_args: Vec<ValueId>,
+    },
+    /// libc `memcpy`: `cir.libc.memcpy`.
+    MemCpy {
+        dst: ValueId,
+        src: ValueId,
+        len: ValueId,
+    },
+    /// libc `memmove`: `cir.libc.memmove`.
+    MemMove {
+        dst: ValueId,
+        src: ValueId,
+        len: ValueId,
+    },
+    /// libc `memset`: `cir.libc.memset`.
+    MemSet {
+        dst: ValueId,
+        val: ValueId,
+        len: ValueId,
+        alignment: Option<u64>,
+    },
+    /// Flushes the instruction cache for `[begin, end)`: `cir.clear_cache`.
+    ClearCache {
+        begin: ValueId,
+        end: ValueId,
+    },
 
     // -- atomics --
     AtomicFetch {
@@ -625,6 +739,38 @@ pub enum Instruction {
         val: ValueId,
         mem_order: MemOrder,
         sync_scope: SyncScopeKind,
+        is_volatile: bool,
+    },
+    AtomicFence {
+        mem_order: MemOrder,
+        sync_scope: Option<SyncScopeKind>,
+    },
+    AtomicCmpXchg {
+        old: ValueId,
+        success: ValueId,
+        ty: Type,
+        ptr: ValueId,
+        expected: ValueId,
+        desired: ValueId,
+        succ_order: MemOrder,
+        fail_order: MemOrder,
+        sync_scope: SyncScopeKind,
+        alignment: Option<u64>,
+        weak: bool,
+        is_volatile: bool,
+    },
+    AtomicTestAndSet {
+        result: ValueId,
+        ty: Type,
+        ptr: ValueId,
+        mem_order: MemOrder,
+        alignment: Option<u64>,
+        is_volatile: bool,
+    },
+    AtomicClear {
+        ptr: ValueId,
+        mem_order: MemOrder,
+        alignment: Option<u64>,
         is_volatile: bool,
     },
 
@@ -774,6 +920,26 @@ fn dense_i32_array(attr: &Attribute) -> Option<Vec<i64>> {
             list.split(',')
                 .map(|v| v.trim().parse::<i64>().ok())
                 .collect()
+        }
+        _ => None,
+    }
+}
+
+/// Decodes `#cir.block_addr_info<@func, "label">`, which the parser leaves
+/// as unstructured raw text (`@func, "label"`) since it's not one of the
+/// handful of CIR attrs with a dedicated structural parser.
+fn block_addr_info(attr: &Attribute) -> Option<(String, String)> {
+    match attr {
+        Attribute::Dialect {
+            dialect,
+            mnemonic,
+            raw: Some(raw),
+            ..
+        } if dialect == "cir" && mnemonic == "block_addr_info" => {
+            let (func, label) = raw.split_once(',')?;
+            let func = func.trim().strip_prefix('@')?.to_string();
+            let label = label.trim().strip_prefix('"')?.strip_suffix('"')?.to_string();
+            Some((func, label))
         }
         _ => None,
     }
@@ -1083,6 +1249,22 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 index: operand(op, 2)?.clone(),
             })
         }
+        "vec.shuffle" => {
+            let (result, ty) = single_result(op)?;
+            let indices = op
+                .attr("indices")?
+                .as_array()?
+                .iter()
+                .map(Attribute::as_int)
+                .collect::<Option<Vec<i128>>>()?;
+            Some(Instruction::VecShuffle {
+                result: result.clone(),
+                ty: ty.clone(),
+                vec1: operand(op, 0)?.clone(),
+                vec2: operand(op, 1)?.clone(),
+                indices,
+            })
+        }
         "is_fp_class" => {
             let (result, ty) = single_result(op)?;
             let flags = FpClassFlags::try_from(op.attr("flags")?).ok()?;
@@ -1093,8 +1275,28 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 flags,
             })
         }
+        "objsize" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::ObjSize {
+                result: result.clone(),
+                ty: ty.clone(),
+                ptr: operand(op, 0)?.clone(),
+                min: flag(op, "min"),
+                nullunknown: flag(op, "nullunknown"),
+                dynamic: flag(op, "dynamic"),
+            })
+        }
+        "is_constant" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::IsConstant {
+                result: result.clone(),
+                ty: ty.clone(),
+                val: operand(op, 0)?.clone(),
+            })
+        }
         "fabs" | "floor" | "ffs" | "clz" | "ctz" | "abs" | "signbit" | "trunc" | "byte_swap"
-        | "clrsb" | "parity" | "popcount" => {
+        | "clrsb" | "parity" | "popcount" | "ceil" | "round" | "rint" | "nearbyint"
+        | "bitreverse" => {
             let (result, ty) = single_result(op)?;
             let kind: MathUnaryKind = op.mnemonic().parse().ok()?;
             let poison_flag = flag(op, "poison_zero") || flag(op, "min_is_poison");
@@ -1134,27 +1336,62 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 c: operand(op, 2)?.clone(),
             })
         }
-        "mul.overflow" | "add.overflow" => {
+        "fma" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::Fma {
+                result: result.clone(),
+                ty: ty.clone(),
+                a: operand(op, 0)?.clone(),
+                b: operand(op, 1)?.clone(),
+                c: operand(op, 2)?.clone(),
+            })
+        }
+        "fminnum" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::FMinNum {
+                result: result.clone(),
+                ty: ty.clone(),
+                lhs: operand(op, 0)?.clone(),
+                rhs: operand(op, 1)?.clone(),
+            })
+        }
+        "modf" => {
+            let (fractional, ty) = single_result(op)?;
+            let integral = op.results.get(1)?.0.clone();
+            Some(Instruction::Modf {
+                fractional: fractional.clone(),
+                integral,
+                ty: ty.clone(),
+                operand: operand(op, 0)?.clone(),
+            })
+        }
+        "mul.overflow" | "add.overflow" | "sub.overflow" => {
             let (result, ty) = op.results.first()?;
             let overflow = op.results.get(1)?.0.clone();
             let lhs = operand(op, 0)?.clone();
             let rhs = operand(op, 1)?.clone();
-            Some(if op.mnemonic() == "mul.overflow" {
-                Instruction::MulOverflow {
+            Some(match op.mnemonic() {
+                "mul.overflow" => Instruction::MulOverflow {
                     result: result.clone(),
                     overflow,
                     ty: ty.clone(),
                     lhs,
                     rhs,
-                }
-            } else {
-                Instruction::AddOverflow {
+                },
+                "add.overflow" => Instruction::AddOverflow {
                     result: result.clone(),
                     overflow,
                     ty: ty.clone(),
                     lhs,
                     rhs,
-                }
+                },
+                _ => Instruction::SubOverflow {
+                    result: result.clone(),
+                    overflow,
+                    ty: ty.clone(),
+                    lhs,
+                    rhs,
+                },
             })
         }
         "complex.create" => {
@@ -1234,6 +1471,17 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 addr: operand(op, 0)?.clone(),
             })
         }
+        "eh.setjmp" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::EhSetjmp {
+                result: result.clone(),
+                ty: ty.clone(),
+                env: operand(op, 0)?.clone(),
+            })
+        }
+        "eh.longjmp" => Some(Instruction::EhLongjmp {
+            env: operand(op, 0)?.clone(),
+        }),
         "frame_address" => {
             let (result, ty) = single_result(op)?;
             Some(Instruction::FrameAddress {
@@ -1307,6 +1555,48 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 .to_string(),
             args: op.operands.clone(),
         }),
+        "block_address" => {
+            let (result, ty) = single_result(op)?;
+            let (func, label) = block_addr_info(op.attr("block_addr_info")?)?;
+            Some(Instruction::BlockAddress {
+                result: result.clone(),
+                ty: ty.clone(),
+                func,
+                label,
+            })
+        }
+        "assume" => {
+            let predicate = operand(op, 0)?.clone();
+            let bundle_kind = op
+                .attr("bundle_kind")
+                .and_then(|a| AssumeBundleKind::try_from(a).ok())
+                .unwrap_or(AssumeBundleKind::None);
+            Some(Instruction::Assume {
+                predicate,
+                bundle_kind,
+                bundle_args: op.operands.get(1..).unwrap_or(&[]).to_vec(),
+            })
+        }
+        "libc.memcpy" => Some(Instruction::MemCpy {
+            dst: operand(op, 0)?.clone(),
+            src: operand(op, 1)?.clone(),
+            len: operand(op, 2)?.clone(),
+        }),
+        "libc.memmove" => Some(Instruction::MemMove {
+            dst: operand(op, 0)?.clone(),
+            src: operand(op, 1)?.clone(),
+            len: operand(op, 2)?.clone(),
+        }),
+        "libc.memset" => Some(Instruction::MemSet {
+            dst: operand(op, 0)?.clone(),
+            val: operand(op, 1)?.clone(),
+            len: operand(op, 2)?.clone(),
+            alignment: alignment(op),
+        }),
+        "clear_cache" => Some(Instruction::ClearCache {
+            begin: operand(op, 0)?.clone(),
+            end: operand(op, 1)?.clone(),
+        }),
         "atomic.fetch" => {
             let (result, ty) = single_result(op)?;
             Some(Instruction::AtomicFetch {
@@ -1333,6 +1623,47 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 is_volatile: flag(op, "is_volatile"),
             })
         }
+        "atomic.fence" => Some(Instruction::AtomicFence {
+            mem_order: MemOrder::try_from(op.attr("ordering")?).ok()?,
+            sync_scope: op
+                .attr("syncscope")
+                .and_then(|a| SyncScopeKind::try_from(a).ok()),
+        }),
+        "atomic.cmpxchg" => {
+            let (old, ty) = op.results.first()?;
+            let success = op.results.get(1)?.0.clone();
+            Some(Instruction::AtomicCmpXchg {
+                old: old.clone(),
+                success,
+                ty: ty.clone(),
+                ptr: operand(op, 0)?.clone(),
+                expected: operand(op, 1)?.clone(),
+                desired: operand(op, 2)?.clone(),
+                succ_order: MemOrder::try_from(op.attr("succ_order")?).ok()?,
+                fail_order: MemOrder::try_from(op.attr("fail_order")?).ok()?,
+                sync_scope: SyncScopeKind::try_from(op.attr("sync_scope")?).ok()?,
+                alignment: alignment(op),
+                weak: flag(op, "weak"),
+                is_volatile: flag(op, "is_volatile"),
+            })
+        }
+        "atomic.test_and_set" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::AtomicTestAndSet {
+                result: result.clone(),
+                ty: ty.clone(),
+                ptr: operand(op, 0)?.clone(),
+                mem_order: MemOrder::try_from(op.attr("mem_order")?).ok()?,
+                alignment: alignment(op),
+                is_volatile: flag(op, "is_volatile"),
+            })
+        }
+        "atomic.clear" => Some(Instruction::AtomicClear {
+            ptr: operand(op, 0)?.clone(),
+            mem_order: MemOrder::try_from(op.attr("mem_order")?).ok()?,
+            alignment: alignment(op),
+            is_volatile: flag(op, "is_volatile"),
+        }),
         "cleanup.scope" => Some(Instruction::CleanupScope {
             kind: CleanupKind::try_from(op.attr("cleanupKind")?).ok()?,
             body: lower_region(region(op, 0)?),
@@ -1822,6 +2153,23 @@ fn write_instruction(
             write_indent(f, level)?;
             writeln!(f, "%{result} = vec.insert %{value}, %{vec}[%{index}] : {ty}")
         }
+        VecShuffle {
+            result,
+            ty,
+            vec1,
+            vec2,
+            indices,
+        } => {
+            write_indent(f, level)?;
+            write!(f, "%{result} = vec.shuffle(%{vec1}, %{vec2}) [")?;
+            for (i, idx) in indices.iter().enumerate() {
+                if i > 0 {
+                    write!(f, ", ")?;
+                }
+                write!(f, "{idx}")?;
+            }
+            writeln!(f, "] : {ty}")
+        }
         MathUnary {
             result,
             ty,
@@ -1843,6 +2191,30 @@ fn write_instruction(
             write_indent(f, level)?;
             writeln!(f, "%{result} = is_fp_class %{operand}, {flags} : {ty}")
         }
+        ObjSize {
+            result,
+            ty,
+            ptr,
+            min,
+            nullunknown,
+            dynamic,
+        } => {
+            write_indent(f, level)?;
+            write!(f, "%{result} = objsize %{ptr}")?;
+            write_flags(
+                f,
+                &[
+                    ("min", *min),
+                    ("nullunknown", *nullunknown),
+                    ("dynamic", *dynamic),
+                ],
+            )?;
+            writeln!(f, " : {ty}")
+        }
+        IsConstant { result, ty, val } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = is_constant %{val} : {ty}")
+        }
         Copysign {
             result,
             ty,
@@ -1861,6 +2233,15 @@ fn write_instruction(
             write_indent(f, level)?;
             writeln!(f, "%{result} = fmaxnum %{lhs}, %{rhs} : {ty}")
         }
+        FMinNum {
+            result,
+            ty,
+            lhs,
+            rhs,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = fminnum %{lhs}, %{rhs} : {ty}")
+        }
         Fmuladd {
             result,
             ty,
@@ -1870,6 +2251,25 @@ fn write_instruction(
         } => {
             write_indent(f, level)?;
             writeln!(f, "%{result} = fmuladd %{a}, %{b}, %{c} : {ty}")
+        }
+        Fma {
+            result,
+            ty,
+            a,
+            b,
+            c,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = fma %{a}, %{b}, %{c} : {ty}")
+        }
+        Modf {
+            fractional,
+            integral,
+            ty,
+            operand,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{fractional}, %{integral} = modf %{operand} : {ty}")
         }
         MulOverflow {
             result,
@@ -1895,6 +2295,19 @@ fn write_instruction(
             writeln!(
                 f,
                 "%{result}, %{overflow} = add.overflow %{lhs}, %{rhs} : {ty}"
+            )
+        }
+        SubOverflow {
+            result,
+            overflow,
+            ty,
+            lhs,
+            rhs,
+        } => {
+            write_indent(f, level)?;
+            writeln!(
+                f,
+                "%{result}, %{overflow} = sub.overflow %{lhs}, %{rhs} : {ty}"
             )
         }
         ComplexCreate {
@@ -1971,6 +2384,14 @@ fn write_instruction(
         VaArg { result, ty, addr } => {
             write_indent(f, level)?;
             writeln!(f, "%{result} = va_arg %{addr} : {ty}")
+        }
+        EhSetjmp { result, ty, env } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = eh.setjmp %{env} : {ty}")
+        }
+        EhLongjmp { env } => {
+            write_indent(f, level)?;
+            writeln!(f, "eh.longjmp %{env}")
         }
         FrameAddress {
             result,
@@ -2059,6 +2480,54 @@ fn write_instruction(
             }
             writeln!(f)
         }
+        BlockAddress {
+            result,
+            ty,
+            func,
+            label,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = block_address(@{func}, {label:?}) : {ty}")
+        }
+        Assume {
+            predicate,
+            bundle_kind,
+            bundle_args,
+        } => {
+            write_indent(f, level)?;
+            write!(f, "assume %{predicate}")?;
+            if !bundle_args.is_empty() || *bundle_kind != AssumeBundleKind::None {
+                write!(f, " {bundle_kind}(")?;
+                write_value_list(f, bundle_args)?;
+                write!(f, ")")?;
+            }
+            writeln!(f)
+        }
+        MemCpy { dst, src, len } => {
+            write_indent(f, level)?;
+            writeln!(f, "libc.memcpy %{dst}, %{src}, %{len}")
+        }
+        MemMove { dst, src, len } => {
+            write_indent(f, level)?;
+            writeln!(f, "libc.memmove %{dst}, %{src}, %{len}")
+        }
+        MemSet {
+            dst,
+            val,
+            len,
+            alignment,
+        } => {
+            write_indent(f, level)?;
+            write!(f, "libc.memset %{dst}, %{val}, %{len}")?;
+            if let Some(a) = alignment {
+                write!(f, ", align {a}")?;
+            }
+            writeln!(f)
+        }
+        ClearCache { begin, end } => {
+            write_indent(f, level)?;
+            writeln!(f, "clear_cache %{begin}, %{end}")
+        }
         AtomicFetch {
             result,
             ty,
@@ -2095,6 +2564,72 @@ fn write_instruction(
                 f,
                 "%{result} = atomic.xchg {mem_order} syncscope({sync_scope}) %{ptr}, %{val} : {ty}"
             )?;
+            write_flags(f, &[("volatile", *is_volatile)])?;
+            writeln!(f)
+        }
+        AtomicFence {
+            mem_order,
+            sync_scope,
+        } => {
+            write_indent(f, level)?;
+            write!(f, "atomic.fence {mem_order}")?;
+            if let Some(scope) = sync_scope {
+                write!(f, " syncscope({scope})")?;
+            }
+            writeln!(f)
+        }
+        AtomicCmpXchg {
+            old,
+            success,
+            ty,
+            ptr,
+            expected,
+            desired,
+            succ_order,
+            fail_order,
+            sync_scope,
+            alignment,
+            weak,
+            is_volatile,
+        } => {
+            write_indent(f, level)?;
+            write!(
+                f,
+                "%{old}, %{success} = atomic.cmpxchg success({succ_order}) failure({fail_order}) syncscope({sync_scope}) %{ptr}, %{expected}, %{desired} : {ty}"
+            )?;
+            if let Some(a) = alignment {
+                write!(f, ", align {a}")?;
+            }
+            write_flags(f, &[("weak", *weak), ("volatile", *is_volatile)])?;
+            writeln!(f)
+        }
+        AtomicTestAndSet {
+            result,
+            ty,
+            ptr,
+            mem_order,
+            alignment,
+            is_volatile,
+        } => {
+            write_indent(f, level)?;
+            write!(f, "%{result} = atomic.test_and_set {mem_order} %{ptr}")?;
+            if let Some(a) = alignment {
+                write!(f, ", align {a}")?;
+            }
+            write_flags(f, &[("volatile", *is_volatile)])?;
+            writeln!(f, " : {ty}")
+        }
+        AtomicClear {
+            ptr,
+            mem_order,
+            alignment,
+            is_volatile,
+        } => {
+            write_indent(f, level)?;
+            write!(f, "atomic.clear {mem_order} %{ptr}")?;
+            if let Some(a) = alignment {
+                write!(f, ", align {a}")?;
+            }
             write_flags(f, &[("volatile", *is_volatile)])?;
             writeln!(f)
         }
@@ -2699,5 +3234,263 @@ mod tests {
         let instr = lower_single_op(r#""cir.trap"() : () -> ()"#);
         assert!(matches!(instr, Instruction::Trap));
         assert_eq!(instr.to_string(), "trap\n");
+    }
+
+    #[test]
+    fn sub_overflow_lowers() {
+        let instr = lower_single_op(
+            r#"%r, %o = "cir.sub.overflow"(%0, %1) : (!cir.int<u, 32>, !cir.int<u, 32>) -> (!cir.int<u, 32>, !cir.bool)"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::SubOverflow { ref result, ref overflow, ref lhs, ref rhs, .. }
+                if result == "r" && overflow == "o" && lhs == "0" && rhs == "1"
+        ));
+    }
+
+    #[test]
+    fn modf_lowers() {
+        let instr = lower_single_op(
+            r#"%frac, %int = "cir.modf"(%0) : (!cir.float) -> (!cir.float, !cir.float)"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::Modf { ref fractional, ref integral, ref operand, .. }
+                if fractional == "frac" && integral == "int" && operand == "0"
+        ));
+        assert_eq!(instr.to_string(), "%frac, %int = modf %0 : float\n");
+    }
+
+    #[test]
+    fn eh_setjmp_lowers() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.eh.setjmp"(%0) : (!cir.ptr<!cir.void>) -> !cir.int<s, 32>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::EhSetjmp { ref result, ref env, .. } if result == "1" && env == "0"
+        ));
+    }
+
+    #[test]
+    fn eh_longjmp_lowers() {
+        let instr =
+            lower_single_op(r#""cir.eh.longjmp"(%0) : (!cir.ptr<!cir.void>) -> ()"#);
+        assert!(matches!(instr, Instruction::EhLongjmp { ref env } if env == "0"));
+        assert_eq!(instr.to_string(), "eh.longjmp %0\n");
+    }
+
+    #[test]
+    fn ceil_round_rint_nearbyint_bitreverse_lower() {
+        for (mnemonic, kind) in [
+            ("ceil", MathUnaryKind::Ceil),
+            ("round", MathUnaryKind::Round),
+            ("rint", MathUnaryKind::Rint),
+            ("nearbyint", MathUnaryKind::Nearbyint),
+        ] {
+            let instr = lower_single_op(&format!(
+                r#"%1 = "cir.{mnemonic}"(%0) : (!cir.double) -> !cir.double"#
+            ));
+            assert!(matches!(instr, Instruction::MathUnary { kind: k, .. } if k == kind));
+        }
+        let instr =
+            lower_single_op(r#"%1 = "cir.bitreverse"(%0) : (!cir.int<u, 32>) -> !cir.int<u, 32>"#);
+        assert!(matches!(
+            instr,
+            Instruction::MathUnary { kind: MathUnaryKind::BitReverse, .. }
+        ));
+    }
+
+    #[test]
+    fn atomic_fence_lowers() {
+        let instr = lower_single_op(
+            r#""cir.atomic.fence"() <{ordering = 5 : i32, syncscope = 1 : i32}> : () -> ()"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::AtomicFence { mem_order: MemOrder::SequentiallyConsistent, sync_scope: Some(SyncScopeKind::System) }
+        ));
+        assert_eq!(instr.to_string(), "atomic.fence seq_cst syncscope(system)\n");
+    }
+
+    #[test]
+    fn atomic_cmpxchg_lowers() {
+        let instr = lower_single_op(
+            r#"%old, %ok = "cir.atomic.cmpxchg"(%0, %1, %2) <{succ_order = 5 : i32, fail_order = 2 : i32, sync_scope = 1 : i32}> : (!cir.ptr<!cir.int<u, 64>>, !cir.int<u, 64>, !cir.int<u, 64>) -> (!cir.int<u, 64>, !cir.bool)"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::AtomicCmpXchg {
+                ref old,
+                ref success,
+                ref ptr,
+                ref expected,
+                ref desired,
+                succ_order: MemOrder::SequentiallyConsistent,
+                fail_order: MemOrder::Acquire,
+                sync_scope: SyncScopeKind::System,
+                weak: false,
+                is_volatile: false,
+                ..
+            } if old == "old" && success == "ok" && ptr == "0" && expected == "1" && desired == "2"
+        ));
+    }
+
+    #[test]
+    fn atomic_test_and_set_lowers() {
+        let instr = lower_single_op(
+            r#"%res = "cir.atomic.test_and_set"(%0) <{mem_order = 5 : i32}> : (!cir.ptr<!cir.int<s, 8>>) -> !cir.bool"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::AtomicTestAndSet { ref result, ref ptr, mem_order: MemOrder::SequentiallyConsistent, .. }
+                if result == "res" && ptr == "0"
+        ));
+    }
+
+    #[test]
+    fn atomic_clear_lowers() {
+        let instr = lower_single_op(
+            r#""cir.atomic.clear"(%0) <{mem_order = 5 : i32}> : (!cir.ptr<!cir.int<s, 8>>) -> ()"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::AtomicClear { ref ptr, mem_order: MemOrder::SequentiallyConsistent, .. }
+                if ptr == "0"
+        ));
+    }
+
+    #[test]
+    fn objsize_lowers() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.objsize"(%0) <{min}> : (!cir.ptr<!cir.int<s, 32>>) -> !cir.int<u, 64>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::ObjSize { ref result, ref ptr, min: true, nullunknown: false, dynamic: false, .. }
+                if result == "1" && ptr == "0"
+        ));
+    }
+
+    #[test]
+    fn is_constant_lowers() {
+        let instr =
+            lower_single_op(r#"%1 = "cir.is_constant"(%0) : (!cir.int<s, 32>) -> !cir.bool"#);
+        assert!(matches!(
+            instr,
+            Instruction::IsConstant { ref result, ref val, .. } if result == "1" && val == "0"
+        ));
+    }
+
+    #[test]
+    fn fma_lowers() {
+        let instr = lower_single_op(
+            r#"%3 = "cir.fma"(%0, %1, %2) : (!cir.float, !cir.float, !cir.float) -> !cir.float"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::Fma { ref result, ref a, ref b, ref c, .. }
+                if result == "3" && a == "0" && b == "1" && c == "2"
+        ));
+    }
+
+    #[test]
+    fn fminnum_lowers() {
+        let instr = lower_single_op(
+            r#"%2 = "cir.fminnum"(%0, %1) : (!cir.double, !cir.double) -> !cir.double"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::FMinNum { ref result, ref lhs, ref rhs, .. }
+                if result == "2" && lhs == "0" && rhs == "1"
+        ));
+    }
+
+    #[test]
+    fn block_address_lowers() {
+        let instr = lower_single_op(
+            r#"%addr = "cir.block_address"() <{block_addr_info = #cir.block_addr_info<@c, "label1">}> : () -> !cir.ptr<!cir.void>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::BlockAddress { ref result, ref func, ref label, .. }
+                if result == "addr" && func == "c" && label == "label1"
+        ));
+        assert_eq!(
+            instr.to_string(),
+            "%addr = block_address(@c, \"label1\") : void*\n"
+        );
+    }
+
+    #[test]
+    fn assume_lowers_with_no_bundle() {
+        let instr = lower_single_op(r#""cir.assume"(%0) : (!cir.bool) -> ()"#);
+        assert!(matches!(
+            instr,
+            Instruction::Assume { ref predicate, bundle_kind: AssumeBundleKind::None, ref bundle_args }
+                if predicate == "0" && bundle_args.is_empty()
+        ));
+    }
+
+    #[test]
+    fn assume_lowers_with_dereferenceable_bundle() {
+        let instr = lower_single_op(
+            r#""cir.assume"(%0, %1, %2) <{bundle_kind = 3 : i32}> : (!cir.bool, !cir.ptr<!cir.void>, !cir.int<u, 64>) -> ()"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::Assume { ref predicate, bundle_kind: AssumeBundleKind::Dereferenceable, ref bundle_args }
+                if predicate == "0" && bundle_args == &["1".to_string(), "2".to_string()]
+        ));
+    }
+
+    #[test]
+    fn vec_shuffle_lowers() {
+        let instr = lower_single_op(
+            r#"%2 = "cir.vec.shuffle"(%0, %1) <{indices = [#cir.int<3> : !cir.int<s, 64>, #cir.int<1> : !cir.int<s, 64>]}> : (!cir.vector<2 x !cir.int<s, 32>>, !cir.vector<2 x !cir.int<s, 32>>) -> !cir.vector<2 x !cir.int<s, 32>>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::VecShuffle { ref result, ref vec1, ref vec2, ref indices, .. }
+                if result == "2" && vec1 == "0" && vec2 == "1" && indices == &[3, 1]
+        ));
+    }
+
+    #[test]
+    fn memcpy_memmove_memset_lower() {
+        let instr = lower_single_op(
+            r#""cir.libc.memcpy"(%0, %1, %2) : (!cir.ptr<!cir.void>, !cir.ptr<!cir.void>, !cir.int<u, 32>) -> ()"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::MemCpy { ref dst, ref src, ref len } if dst == "0" && src == "1" && len == "2"
+        ));
+
+        let instr = lower_single_op(
+            r#""cir.libc.memmove"(%0, %1, %2) : (!cir.ptr<!cir.void>, !cir.ptr<!cir.void>, !cir.int<u, 32>) -> ()"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::MemMove { ref dst, ref src, ref len } if dst == "0" && src == "1" && len == "2"
+        ));
+
+        let instr = lower_single_op(
+            r#""cir.libc.memset"(%0, %1, %2) : (!cir.ptr<!cir.void>, !cir.int<u, 8>, !cir.int<u, 32>) -> ()"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::MemSet { ref dst, ref val, ref len, alignment: None } if dst == "0" && val == "1" && len == "2"
+        ));
+    }
+
+    #[test]
+    fn clear_cache_lowers() {
+        let instr = lower_single_op(
+            r#""cir.clear_cache"(%0, %1) : (!cir.ptr<!cir.void>, !cir.ptr<!cir.void>) -> ()"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::ClearCache { ref begin, ref end } if begin == "0" && end == "1"
+        ));
     }
 }

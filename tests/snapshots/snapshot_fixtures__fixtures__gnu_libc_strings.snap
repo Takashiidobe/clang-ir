@@ -1,0 +1,436 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "tests/fixtures/gnu_libc_strings.c" (c, x86_64-unknown-linux-gnu)
+global __const.gnu_string_extensions.tokens : s8i[6] = "a::bc" [cir_private, default, dso_local, constant]
+global __const.gnu_string_extensions.obscured : s8i[4] = "gnu" [cir_private, default, dso_local, constant]
+global __const.gnu_string_extensions.repeated : s8i[5] = "abca" [cir_private, default, dso_local, constant]
+global __const.gnu_string_extensions.destination : s8i[16] = zero [cir_private, default, dso_local, constant]
+global .str : s8i[10] = "%d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[6] = "slate" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[2] = ":" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[4] = "abc" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[12] = "GNU Library" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[8] = "library" [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[10] = "release-2" [cir_private, default, align 1, dso_local, constant]
+global .str.7 : s8i[11] = "release-10" [cir_private, default, align 1, dso_local, constant]
+global .str.8 : s8i[4] = "gnu" [cir_private, default, align 1, dso_local, constant]
+global .str.9 : s8i[7] = "EINVAL" [cir_private, default, align 1, dso_local, constant]
+global .str.10 : s8i[14] = "one:two:three" [cir_private, default, align 1, dso_local, constant]
+global .str.11 : s8i[4] = "two" [cir_private, default, align 1, dso_local, constant]
+global .str.12 : s8i[5] = "four" [cir_private, default, align 1, dso_local, constant]
+global .str.13 : s8i[6] = "three" [cir_private, default, align 1, dso_local, constant]
+global .str.14 : s8i[6] = "THREE" [cir_private, default, align 1, dso_local, constant]
+global .str.15 : s8i[19] = "one,two,THREE,four" [cir_private, default, align 1, dso_local, constant]
+global .str.16 : s8i[6] = "ALPHA" [cir_private, default, align 1, dso_local, constant]
+global .str.17 : s8i[4] = "one" [cir_private, default, align 1, dso_local, constant]
+global .str.18 : s8i[5] = "BETA" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn mempcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
+fn strsep(%arg0: s8i**, %arg1: s8i*) -> s8i* [external, c, nothrow];
+fn strlen(%arg0: s8i*) -> u64i [external, c, pure, nothrow];
+fn memfrob(%arg0: void*, %arg1: u64i) -> void* [external, c, nothrow];
+fn strcmp(%arg0: s8i*, %arg1: s8i*) -> s32i [external, c, pure, nothrow];
+fn memrchr(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, pure, nothrow];
+fn rawmemchr(%arg0: void*, %arg1: s32i) -> void* [external, c, pure, nothrow];
+fn strchrnul(%arg0: s8i*, %arg1: s32i) -> s8i* [external, c, pure, nothrow];
+fn strcasestr(%arg0: s8i*, %arg1: s8i*) -> s8i* [external, c, pure, nothrow];
+fn strverscmp(%arg0: s8i*, %arg1: s8i*) -> s32i [external, c, pure, nothrow];
+fn strerrorname_np(%arg0: s32i) -> s8i* [external, c, nothrow];
+fn strerrordesc_np(%arg0: s32i) -> s8i* [external, c, nothrow];
+fn gnu_string_extensions() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %178 = alloca s32i, "__retval", align 4
+    %179 = alloca s8i[16], "destination", align 16
+    %180 = alloca s8i[5], "repeated", align 1
+    %181 = alloca s8i[4], "obscured", align 1
+    %182 = alloca s8i[6], "tokens", align 1
+    %183 = alloca s8i*, "cursor", align 8
+    %184 = alloca s8i*, "token", align 8
+    %185 = alloca s8i*, "end", align 8
+    %186 = alloca s32i, "token_score", align 4
+    %187 = get_global @__const.gnu_string_extensions.destination : s8i[16]*
+    copy %179, %187
+    %188 = get_global @__const.gnu_string_extensions.repeated : s8i[5]*
+    copy %180, %188
+    %189 = get_global @__const.gnu_string_extensions.obscured : s8i[4]*
+    copy %181, %189
+    %190 = get_global @__const.gnu_string_extensions.tokens : s8i[6]*
+    copy %182, %190
+    %191 = cast(array_to_ptrdecay) %182 : s8i*
+    store %191, %183, align 8
+    %192 = get_global @mempcpy : ((void*, void*, u64i) -> void*)*
+    %193 = cast(array_to_ptrdecay) %179 : s8i*
+    %194 = cast(bitcast) %193 : void*
+    %195 = get_global @.str.1 : s8i[6]*
+    %196 = cast(array_to_ptrdecay) %195 : s8i*
+    %197 = cast(bitcast) %196 : void*
+    %198 = const 6 : u64i
+    %199 = call @mempcpy(%194, %197, %198) : void* [all]
+    %200 = cast(bitcast) %199 : s8i*
+    store %200, %185, align 8
+    %201 = const 0 : s32i
+    store %201, %186, align 4
+    scope {
+        while {
+            %312 = get_global @.str.2 : s8i[2]*
+            %313 = cast(array_to_ptrdecay) %312 : s8i*
+            %314 = call @strsep(%183, %313) : s8i* [all]
+            store %314, %184, align 8
+            %315 = const #cir.ptr<null> : void*
+            %316 = cast(bitcast) %315 : s8i*
+            %317 = cmp ne %314, %316 : bool
+            condition %317
+        } do {
+            scope {
+                %304 = load %186 : s32i, align 4
+                %305 = const 10 : s32i
+                %306 = mul %304, %305 : s32i [nsw]
+                %307 = get_global @strlen : ((s8i*) -> u64i)*
+                %308 = load %184 : s8i*, align 8
+                %309 = call @strlen(%308) : u64i [pure]
+                %310 = cast(integral) %309 : s32i
+                %311 = add %306, %310 : s32i [nsw]
+                store %311, %186, align 4
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %202 = cast(array_to_ptrdecay) %181 : s8i*
+    %203 = cast(bitcast) %202 : void*
+    %204 = const 3 : u64i
+    %205 = call @memfrob(%203, %204) : void* [all]
+    %206 = cast(array_to_ptrdecay) %181 : s8i*
+    %207 = cast(bitcast) %206 : void*
+    %208 = const 3 : u64i
+    %209 = call @memfrob(%207, %208) : void* [all]
+    %210 = load %185 : s8i*, align 8
+    %211 = cast(array_to_ptrdecay) %179 : s8i*
+    %212 = ptr_diff %210, %211 : s64i
+    %213 = cast(integral) %212 : s32i
+    %214 = get_global @strcmp : ((s8i*, s8i*) -> s32i)*
+    %215 = cast(array_to_ptrdecay) %179 : s8i*
+    %216 = get_global @.str.1 : s8i[6]*
+    %217 = cast(array_to_ptrdecay) %216 : s8i*
+    %218 = call @strcmp(%215, %217) : s32i [pure]
+    %219 = const 0 : s32i
+    %220 = cmp eq %218, %219 : bool
+    %221 = cast(bool_to_int) %220 : s32i
+    %222 = add %213, %221 : s32i [nsw]
+    %223 = cast(integral) %222 : s64i
+    %224 = cast(array_to_ptrdecay) %180 : s8i*
+    %225 = cast(bitcast) %224 : void*
+    %226 = const 97 : s32i
+    %227 = const 4 : u64i
+    %228 = call @memrchr(%225, %226, %227) : void* [pure]
+    %229 = cast(bitcast) %228 : s8i*
+    %230 = cast(array_to_ptrdecay) %180 : s8i*
+    %231 = ptr_diff %229, %230 : s64i
+    %232 = add %223, %231 : s64i [nsw]
+    %233 = cast(array_to_ptrdecay) %180 : s8i*
+    %234 = cast(bitcast) %233 : void*
+    %235 = const 99 : s32i
+    %236 = call @rawmemchr(%234, %235) : void* [pure]
+    %237 = cast(bitcast) %236 : s8i*
+    %238 = cast(array_to_ptrdecay) %180 : s8i*
+    %239 = ptr_diff %237, %238 : s64i
+    %240 = add %232, %239 : s64i [nsw]
+    %241 = get_global @.str.3 : s8i[4]*
+    %242 = cast(array_to_ptrdecay) %241 : s8i*
+    %243 = const 122 : s32i
+    %244 = call @strchrnul(%242, %243) : s8i* [pure]
+    %245 = get_global @.str.3 : s8i[4]*
+    %246 = cast(array_to_ptrdecay) %245 : s8i*
+    %247 = ptr_diff %244, %246 : s64i
+    %248 = add %240, %247 : s64i [nsw]
+    %249 = get_global @.str.4 : s8i[12]*
+    %250 = cast(array_to_ptrdecay) %249 : s8i*
+    %251 = get_global @.str.5 : s8i[8]*
+    %252 = cast(array_to_ptrdecay) %251 : s8i*
+    %253 = call @strcasestr(%250, %252) : s8i* [pure]
+    %254 = const #cir.ptr<null> : void*
+    %255 = cast(bitcast) %254 : s8i*
+    %256 = cmp ne %253, %255 : bool
+    %257 = cast(bool_to_int) %256 : s32i
+    %258 = cast(integral) %257 : s64i
+    %259 = add %248, %258 : s64i [nsw]
+    %260 = get_global @.str.6 : s8i[10]*
+    %261 = cast(array_to_ptrdecay) %260 : s8i*
+    %262 = get_global @.str.7 : s8i[11]*
+    %263 = cast(array_to_ptrdecay) %262 : s8i*
+    %264 = call @strverscmp(%261, %263) : s32i [pure]
+    %265 = const 0 : s32i
+    %266 = cmp lt %264, %265 : bool
+    %267 = cast(bool_to_int) %266 : s32i
+    %268 = cast(integral) %267 : s64i
+    %269 = add %259, %268 : s64i [nsw]
+    %270 = get_global @strcmp : ((s8i*, s8i*) -> s32i)*
+    %271 = cast(array_to_ptrdecay) %181 : s8i*
+    %272 = get_global @.str.8 : s8i[4]*
+    %273 = cast(array_to_ptrdecay) %272 : s8i*
+    %274 = call @strcmp(%271, %273) : s32i [pure]
+    %275 = const 0 : s32i
+    %276 = cmp eq %274, %275 : bool
+    %277 = cast(bool_to_int) %276 : s32i
+    %278 = cast(integral) %277 : s64i
+    %279 = add %269, %278 : s64i [nsw]
+    %280 = load %186 : s32i, align 4
+    %281 = cast(integral) %280 : s64i
+    %282 = add %279, %281 : s64i [nsw]
+    %283 = get_global @strcmp : ((s8i*, s8i*) -> s32i)*
+    %284 = const 22 : s32i
+    %285 = call @strerrorname_np(%284) : s8i* [all]
+    %286 = get_global @.str.9 : s8i[7]*
+    %287 = cast(array_to_ptrdecay) %286 : s8i*
+    %288 = call @strcmp(%285, %287) : s32i [pure]
+    %289 = const 0 : s32i
+    %290 = cmp eq %288, %289 : bool
+    %291 = cast(bool_to_int) %290 : s32i
+    %292 = cast(integral) %291 : s64i
+    %293 = add %282, %292 : s64i [nsw]
+    %294 = const 22 : s32i
+    %295 = call @strerrordesc_np(%294) : s8i* [all]
+    %296 = const #cir.ptr<null> : void*
+    %297 = cast(bitcast) %296 : s8i*
+    %298 = cmp ne %295, %297 : bool
+    %299 = cast(bool_to_int) %298 : s32i
+    %300 = cast(integral) %299 : s64i
+    %301 = add %293, %300 : s64i [nsw]
+    %302 = cast(integral) %301 : s32i
+    store %302, %178
+    %303 = load %178 : s32i
+    return %303
+}
+fn argz_create_sep(%arg0: s8i*, %arg1: s32i, %arg2: s8i**, %arg3: u64i*) -> s32i [external, c, nothrow];
+fn argz_count(%arg0: s8i*, %arg1: u64i) -> u64i [external, c, pure, nothrow];
+fn argz_extract(%arg0: s8i*, %arg1: u64i, %arg2: s8i**) -> void [external, c, nothrow];
+fn argz_add(%arg0: s8i**, %arg1: u64i*, %arg2: s8i*) -> s32i [external, c, nothrow];
+fn argz_replace(%arg0: s8i**, %arg1: u64i*, %arg2: s8i*, %arg3: s8i*, %arg4: u32i*) -> s32i [external, c];
+fn argz_stringify(%arg0: s8i*, %arg1: u64i, %arg2: s32i) -> void [external, c, nothrow];
+fn free(%arg0: void*) -> void [external, c, nothrow];
+fn gnu_argz_extensions() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %86 = alloca s32i, "__retval", align 4
+    %87 = alloca s8i*, "argz", align 8
+    %88 = alloca u64i, "length", align 8
+    %89 = alloca s8i*[6], "arguments", align 16
+    %90 = alloca u32i, "replacements", align 4
+    %91 = alloca s32i, "total", align 4
+    %92 = const #cir.ptr<null> : s8i*
+    store %92, %87, align 8
+    %93 = const 0 : u64i
+    store %93, %88, align 8
+    %94 = const 0 : u32i
+    store %94, %90, align 4
+    %95 = const 0 : s32i
+    store %95, %91, align 4
+    %96 = get_global @.str.10 : s8i[14]*
+    %97 = cast(array_to_ptrdecay) %96 : s8i*
+    %98 = const 58 : s32i
+    %99 = call @argz_create_sep(%97, %98, %87, %88) : s32i [all]
+    %100 = const 0 : s32i
+    %101 = cmp eq %99, %100 : bool
+    %102 = cast(bool_to_int) %101 : s32i
+    %103 = load %91 : s32i, align 4
+    %104 = add %103, %102 : s32i [nsw]
+    store %104, %91, align 4
+    %105 = load %87 : s8i*, align 8
+    %106 = load %88 : u64i, align 8
+    %107 = call @argz_count(%105, %106) : u64i [pure]
+    %108 = const 3 : u64i
+    %109 = cmp eq %107, %108 : bool
+    %110 = cast(bool_to_int) %109 : s32i
+    %111 = load %91 : s32i, align 4
+    %112 = add %111, %110 : s32i [nsw]
+    store %112, %91, align 4
+    %113 = load %87 : s8i*, align 8
+    %114 = load %88 : u64i, align 8
+    %115 = cast(array_to_ptrdecay) %89 : s8i**
+    call @argz_extract(%113, %114, %115) [all]
+    %116 = get_global @strcmp : ((s8i*, s8i*) -> s32i)*
+    %117 = const 1 : s64i
+    %118 = get_element %89[%117] : s8i**
+    %119 = load %118 : s8i*, align 8
+    %120 = get_global @.str.11 : s8i[4]*
+    %121 = cast(array_to_ptrdecay) %120 : s8i*
+    %122 = call @strcmp(%119, %121) : s32i [pure]
+    %123 = const 0 : s32i
+    %124 = cmp eq %122, %123 : bool
+    %125 = cast(bool_to_int) %124 : s32i
+    %126 = load %91 : s32i, align 4
+    %127 = add %126, %125 : s32i [nsw]
+    store %127, %91, align 4
+    %128 = get_global @.str.12 : s8i[5]*
+    %129 = cast(array_to_ptrdecay) %128 : s8i*
+    %130 = call @argz_add(%87, %88, %129) : s32i [all]
+    %131 = const 0 : s32i
+    %132 = cmp eq %130, %131 : bool
+    %133 = cast(bool_to_int) %132 : s32i
+    %134 = load %91 : s32i, align 4
+    %135 = add %134, %133 : s32i [nsw]
+    store %135, %91, align 4
+    %136 = get_global @.str.13 : s8i[6]*
+    %137 = cast(array_to_ptrdecay) %136 : s8i*
+    %138 = get_global @.str.14 : s8i[6]*
+    %139 = cast(array_to_ptrdecay) %138 : s8i*
+    %140 = call @argz_replace(%87, %88, %137, %139, %90) : s32i [all]
+    %141 = const 0 : s32i
+    %142 = cmp eq %140, %141 : bool
+    %143 = cast(bool_to_int) %142 : s32i
+    %144 = load %91 : s32i, align 4
+    %145 = add %144, %143 : s32i [nsw]
+    store %145, %91, align 4
+    %146 = load %90 : u32i, align 4
+    %147 = const 1 : u32i
+    %148 = cmp eq %146, %147 : bool
+    %149 = cast(bool_to_int) %148 : s32i
+    %150 = load %91 : s32i, align 4
+    %151 = add %150, %149 : s32i [nsw]
+    store %151, %91, align 4
+    %152 = load %87 : s8i*, align 8
+    %153 = load %88 : u64i, align 8
+    %154 = call @argz_count(%152, %153) : u64i [pure]
+    %155 = const 4 : u64i
+    %156 = cmp eq %154, %155 : bool
+    %157 = cast(bool_to_int) %156 : s32i
+    %158 = load %91 : s32i, align 4
+    %159 = add %158, %157 : s32i [nsw]
+    store %159, %91, align 4
+    %160 = load %87 : s8i*, align 8
+    %161 = load %88 : u64i, align 8
+    %162 = const 44 : s32i
+    call @argz_stringify(%160, %161, %162) [all]
+    %163 = get_global @strcmp : ((s8i*, s8i*) -> s32i)*
+    %164 = load %87 : s8i*, align 8
+    %165 = get_global @.str.15 : s8i[19]*
+    %166 = cast(array_to_ptrdecay) %165 : s8i*
+    %167 = call @strcmp(%164, %166) : s32i [pure]
+    %168 = const 0 : s32i
+    %169 = cmp eq %167, %168 : bool
+    %170 = cast(bool_to_int) %169 : s32i
+    %171 = load %91 : s32i, align 4
+    %172 = add %171, %170 : s32i [nsw]
+    store %172, %91, align 4
+    %173 = get_global @free : ((void*) -> void)*
+    %174 = load %87 : s8i*, align 8
+    %175 = cast(bitcast) %174 : void*
+    call @free(%175) [all]
+    %176 = load %91 : s32i, align 4
+    store %176, %86
+    %177 = load %86 : s32i
+    return %177
+}
+fn envz_add(%arg0: s8i**, %arg1: u64i*, %arg2: s8i*, %arg3: s8i*) -> s32i [external, c, nothrow];
+fn envz_get(%arg0: s8i*, %arg1: u64i, %arg2: s8i*) -> s8i* [external, c, pure, nothrow];
+fn envz_entry(%arg0: s8i*, %arg1: u64i, %arg2: s8i*) -> s8i* [external, c, pure, nothrow];
+fn envz_remove(%arg0: s8i**, %arg1: u64i*, %arg2: s8i*) -> void [external, c, nothrow];
+fn envz_strip(%arg0: s8i**, %arg1: u64i*) -> void [external, c, nothrow];
+fn gnu_envz_extensions() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %11 = alloca s32i, "__retval", align 4
+    %12 = alloca s8i*, "envz", align 8
+    %13 = alloca u64i, "length", align 8
+    %14 = alloca s32i, "total", align 4
+    %15 = const #cir.ptr<null> : s8i*
+    store %15, %12, align 8
+    %16 = const 0 : u64i
+    store %16, %13, align 8
+    %17 = const 0 : s32i
+    store %17, %14, align 4
+    %18 = get_global @.str.16 : s8i[6]*
+    %19 = cast(array_to_ptrdecay) %18 : s8i*
+    %20 = get_global @.str.17 : s8i[4]*
+    %21 = cast(array_to_ptrdecay) %20 : s8i*
+    %22 = call @envz_add(%12, %13, %19, %21) : s32i [all]
+    %23 = const 0 : s32i
+    %24 = cmp eq %22, %23 : bool
+    %25 = cast(bool_to_int) %24 : s32i
+    %26 = load %14 : s32i, align 4
+    %27 = add %26, %25 : s32i [nsw]
+    store %27, %14, align 4
+    %28 = get_global @.str.18 : s8i[5]*
+    %29 = cast(array_to_ptrdecay) %28 : s8i*
+    %30 = const #cir.ptr<null> : s8i*
+    %31 = call @envz_add(%12, %13, %29, %30) : s32i [all]
+    %32 = const 0 : s32i
+    %33 = cmp eq %31, %32 : bool
+    %34 = cast(bool_to_int) %33 : s32i
+    %35 = load %14 : s32i, align 4
+    %36 = add %35, %34 : s32i [nsw]
+    store %36, %14, align 4
+    %37 = get_global @strcmp : ((s8i*, s8i*) -> s32i)*
+    %38 = load %12 : s8i*, align 8
+    %39 = load %13 : u64i, align 8
+    %40 = get_global @.str.16 : s8i[6]*
+    %41 = cast(array_to_ptrdecay) %40 : s8i*
+    %42 = call @envz_get(%38, %39, %41) : s8i* [pure]
+    %43 = get_global @.str.17 : s8i[4]*
+    %44 = cast(array_to_ptrdecay) %43 : s8i*
+    %45 = call @strcmp(%42, %44) : s32i [pure]
+    %46 = const 0 : s32i
+    %47 = cmp eq %45, %46 : bool
+    %48 = cast(bool_to_int) %47 : s32i
+    %49 = load %14 : s32i, align 4
+    %50 = add %49, %48 : s32i [nsw]
+    store %50, %14, align 4
+    %51 = load %12 : s8i*, align 8
+    %52 = load %13 : u64i, align 8
+    %53 = get_global @.str.18 : s8i[5]*
+    %54 = cast(array_to_ptrdecay) %53 : s8i*
+    %55 = call @envz_entry(%51, %52, %54) : s8i* [pure]
+    %56 = const #cir.ptr<null> : void*
+    %57 = cast(bitcast) %56 : s8i*
+    %58 = cmp ne %55, %57 : bool
+    %59 = cast(bool_to_int) %58 : s32i
+    %60 = load %14 : s32i, align 4
+    %61 = add %60, %59 : s32i [nsw]
+    store %61, %14, align 4
+    %62 = get_global @.str.16 : s8i[6]*
+    %63 = cast(array_to_ptrdecay) %62 : s8i*
+    call @envz_remove(%12, %13, %63) [all]
+    %64 = load %12 : s8i*, align 8
+    %65 = load %13 : u64i, align 8
+    %66 = get_global @.str.16 : s8i[6]*
+    %67 = cast(array_to_ptrdecay) %66 : s8i*
+    %68 = call @envz_get(%64, %65, %67) : s8i* [pure]
+    %69 = const #cir.ptr<null> : void*
+    %70 = cast(bitcast) %69 : s8i*
+    %71 = cmp eq %68, %70 : bool
+    %72 = cast(bool_to_int) %71 : s32i
+    %73 = load %14 : s32i, align 4
+    %74 = add %73, %72 : s32i [nsw]
+    store %74, %14, align 4
+    call @envz_strip(%12, %13) [all]
+    %75 = load %13 : u64i, align 8
+    %76 = const 0 : u64i
+    %77 = cmp eq %75, %76 : bool
+    %78 = cast(bool_to_int) %77 : s32i
+    %79 = load %14 : s32i, align 4
+    %80 = add %79, %78 : s32i [nsw]
+    store %80, %14, align 4
+    %81 = get_global @free : ((void*) -> void)*
+    %82 = load %12 : s8i*, align 8
+    %83 = cast(bitcast) %82 : void*
+    call @free(%83) [all]
+    %84 = load %14 : s32i, align 4
+    store %84, %11
+    %85 = load %11 : s32i
+    return %85
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[10]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = call @gnu_string_extensions() : s32i [all]
+    %6 = call @gnu_argz_extensions() : s32i [all]
+    %7 = call @gnu_envz_extensions() : s32i [all]
+    %8 = call @printf(%4, %5, %6, %7) : s32i [all]
+    %9 = const 0 : s32i
+    store %9, %0
+    %10 = load %0 : s32i
+    return %10
+}

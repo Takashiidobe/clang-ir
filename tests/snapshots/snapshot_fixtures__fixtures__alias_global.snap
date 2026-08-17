@@ -1,0 +1,18 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "tests/fixtures/alias_global.c" (c, x86_64-unknown-linux-gnu)
+global real_global : s32i = 12 [external, default, align 4, dso_local]
+global alias_global : s32i [external, default, dso_local]
+
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @alias_global : s32i*
+    %3 = load %2 : s32i, align 4
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}
