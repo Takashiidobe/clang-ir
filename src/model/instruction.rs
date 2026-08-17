@@ -10,7 +10,7 @@
 //! "structural-with-fallback" approach used for types/attributes.
 
 use crate::ast::{Attribute, Block, Operation, Region, Type, ValueId};
-use crate::model::enums::{CaseOpKind, CastKind, CmpOpKind, FpClassFlags, SideEffect};
+use crate::model::enums::{AsmFlavor, CaseOpKind, CastKind, CmpOpKind, FpClassFlags, SideEffect};
 
 /// A lowered region: almost always a single unlabeled block, but CIR can
 /// still produce multiple blocks within a region (e.g. `goto` crossing
@@ -405,6 +405,11 @@ pub enum Instruction {
         vec: ValueId,
         index: ValueId,
     },
+    VecCreate {
+        result: ValueId,
+        ty: Type,
+        elements: Vec<ValueId>,
+    },
 
     // -- math / bit-count builtins --
     MathUnary {
@@ -468,6 +473,12 @@ pub enum Instruction {
         ty: Type,
         operand: ValueId,
     },
+    /// Address of a complex value's real component: `cir.complex.real_ptr`.
+    ComplexRealPtr {
+        result: ValueId,
+        ty: Type,
+        operand: ValueId,
+    },
 
     // -- varargs --
     VaStart {
@@ -501,6 +512,18 @@ pub enum Instruction {
         addr: ValueId,
         locality: u32,
         is_write: bool,
+    },
+    /// C/C++ inline asm: `cir.asm`. `result` is `None` when there's no
+    /// (single-)output operand shape a caller reads back.
+    InlineAsm {
+        result: Option<(ValueId, Type)>,
+        outputs: Vec<ValueId>,
+        inputs: Vec<ValueId>,
+        in_outs: Vec<ValueId>,
+        asm_string: String,
+        constraints: String,
+        side_effects: bool,
+        flavor: AsmFlavor,
     },
 
     // -- structured control flow --
@@ -617,6 +640,25 @@ fn alignment(op: &Operation) -> Option<u64> {
 
 fn region(op: &Operation, i: usize) -> Option<&Region> {
     op.regions.get(i)
+}
+
+/// Decodes a builtin `DenseI32ArrayAttr` (`array<i32: 2, 1, 0>`), which the
+/// parser leaves as unstructured raw text since it's not CIR-specific.
+fn dense_i32_array(attr: &Attribute) -> Option<Vec<i64>> {
+    match attr {
+        Attribute::Dialect {
+            dialect,
+            mnemonic,
+            raw: Some(raw),
+            ..
+        } if dialect == "builtin" && mnemonic == "array" => {
+            let (_elem_ty, list) = raw.split_once(':')?;
+            list.split(',')
+                .map(|v| v.trim().parse::<i64>().ok())
+                .collect()
+        }
+        _ => None,
+    }
 }
 
 /// Attempts a structural interpretation of `op`; `None` means "fall back to
@@ -890,6 +932,14 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 index: operand(op, 1)?.clone(),
             })
         }
+        "vec.create" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::VecCreate {
+                result: result.clone(),
+                ty: ty.clone(),
+                elements: op.operands.clone(),
+            })
+        }
         "is_fp_class" => {
             let (result, ty) = single_result(op)?;
             let flags = FpClassFlags::try_from(op.attr("flags")?).ok()?;
@@ -979,6 +1029,14 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 operand: operand(op, 0)?.clone(),
             })
         }
+        "complex.real_ptr" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::ComplexRealPtr {
+                result: result.clone(),
+                ty: ty.clone(),
+                operand: operand(op, 0)?.clone(),
+            })
+        }
         "va_start" => Some(Instruction::VaStart {
             addr: operand(op, 0)?.clone(),
         }),
@@ -1018,6 +1076,33 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
             locality: op.attr("locality").and_then(Attribute::as_int).unwrap_or(0) as u32,
             is_write: flag(op, "isWrite"),
         }),
+        "asm" => {
+            // `asm_operands` is a VariadicOfVariadic (output, input, in_out
+            // groups, in that order) flattened into `op.operands`, split back
+            // up via the `operands_segments` dense-i32-array property.
+            let segments = dense_i32_array(op.attr("operands_segments")?)?;
+            let [out_n, in_n, inout_n] = <[i64; 3]>::try_from(segments).ok()?;
+            let (out_n, in_n, inout_n) = (
+                usize::try_from(out_n).ok()?,
+                usize::try_from(in_n).ok()?,
+                usize::try_from(inout_n).ok()?,
+            );
+            if out_n + in_n + inout_n != op.operands.len() {
+                return None;
+            }
+            let (outputs, rest) = op.operands.split_at(out_n);
+            let (inputs, in_outs) = rest.split_at(in_n);
+            Some(Instruction::InlineAsm {
+                result: single_result(op).cloned(),
+                outputs: outputs.to_vec(),
+                inputs: inputs.to_vec(),
+                in_outs: in_outs.to_vec(),
+                asm_string: op.attr("asm_string").and_then(Attribute::as_str)?.to_string(),
+                constraints: op.attr("constraints").and_then(Attribute::as_str)?.to_string(),
+                side_effects: op.attr("side_effects").is_some(),
+                flavor: AsmFlavor::try_from(op.attr("asm_flavor")?).ok()?,
+            })
+        }
         "scope" => Some(Instruction::Scope {
             body: lower_region(region(op, 0)?),
         }),
@@ -1461,6 +1546,16 @@ fn write_instruction(
             write_indent(f, level)?;
             writeln!(f, "%{result} = vec.extract %{vec}[%{index}] : {ty}")
         }
+        VecCreate {
+            result,
+            ty,
+            elements,
+        } => {
+            write_indent(f, level)?;
+            write!(f, "%{result} = vec.create(")?;
+            write_value_list(f, elements)?;
+            writeln!(f, ") : {ty}")
+        }
         MathUnary {
             result,
             ty,
@@ -1552,6 +1647,14 @@ fn write_instruction(
             write_indent(f, level)?;
             writeln!(f, "%{result} = complex.imag %{operand} : {ty}")
         }
+        ComplexRealPtr {
+            result,
+            ty,
+            operand,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = complex.real_ptr %{operand} : {ty}")
+        }
         VaStart { addr } => {
             write_indent(f, level)?;
             writeln!(f, "va_start %{addr}")
@@ -1592,6 +1695,33 @@ fn write_instruction(
             write_indent(f, level)?;
             write!(f, "prefetch %{addr}, locality({locality})")?;
             write_flags(f, &[("write", *is_write)])?;
+            writeln!(f)
+        }
+        InlineAsm {
+            result,
+            outputs,
+            inputs,
+            in_outs,
+            asm_string,
+            constraints,
+            side_effects,
+            flavor,
+        } => {
+            write_indent(f, level)?;
+            if let Some((r, _)) = result {
+                write!(f, "%{r} = ")?;
+            }
+            write!(f, "asm({flavor}, out = [")?;
+            write_value_list(f, outputs)?;
+            write!(f, "], in = [")?;
+            write_value_list(f, inputs)?;
+            write!(f, "], in_out = [")?;
+            write_value_list(f, in_outs)?;
+            write!(f, "], {asm_string:?}, {constraints:?}")?;
+            write_flags(f, &[("side_effects", *side_effects)])?;
+            if let Some((_, ty)) = result {
+                write!(f, " : {ty}")?;
+            }
             writeln!(f)
         }
         Scope { body } => write_nested(f, level, "scope", body),
@@ -1755,6 +1885,16 @@ fn write_instruction(
     }
 }
 
+fn write_value_list(f: &mut std::fmt::Formatter<'_>, ids: &[ValueId]) -> std::fmt::Result {
+    for (i, id) in ids.iter().enumerate() {
+        if i > 0 {
+            write!(f, ", ")?;
+        }
+        write!(f, "%{id}")?;
+    }
+    Ok(())
+}
+
 fn write_flags(f: &mut std::fmt::Formatter<'_>, flags: &[(&str, bool)]) -> std::fmt::Result {
     let set: Vec<&str> = flags
         .iter()
@@ -1826,5 +1966,88 @@ mod tests {
             r#"%1 = "cir.is_fp_class"(%0) <{flags = 544 : i32}> : (!cir.float) -> !cir.bool"#,
         );
         assert!(matches!(instr, Instruction::IsFpClass { flags, .. } if flags.0 == 544));
+    }
+
+    #[test]
+    fn vec_create_lowers() {
+        let instr = lower_single_op(
+            r#"%2 = "cir.vec.create"(%0, %1) : (!cir.int<s, 32>, !cir.int<s, 32>) -> !cir.vector<2 x !cir.int<s, 32>>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::VecCreate { ref result, ref elements, .. }
+                if result == "2" && elements == &["0".to_string(), "1".to_string()]
+        ));
+        assert_eq!(
+            instr.to_string(),
+            "%2 = vec.create(%0, %1) : vector<2 x s32>\n"
+        );
+    }
+
+    #[test]
+    fn complex_real_ptr_lowers() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.complex.real_ptr"(%0) : (!cir.ptr<!cir.complex<!cir.double>>) -> !cir.ptr<!cir.double>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::ComplexRealPtr { ref result, ref operand, .. }
+                if result == "1" && operand == "0"
+        ));
+        assert_eq!(
+            instr.to_string(),
+            "%1 = complex.real_ptr %0 : double*\n"
+        );
+    }
+
+    #[test]
+    fn asm_lowers_with_no_operands() {
+        let instr = lower_single_op(
+            r#""cir.asm"() <{asm_flavor = 0 : i32, asm_string = "foo", constraints = "~{dirflag},~{fpsr},~{flags}", operand_attrs = [], operands_segments = array<i32: 0, 0, 0>, side_effects}> : () -> ()"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::InlineAsm {
+                ref result,
+                ref outputs,
+                ref inputs,
+                ref in_outs,
+                ref asm_string,
+                ref constraints,
+                side_effects: true,
+                flavor: AsmFlavor::AttSyntax,
+            } if result.is_none()
+                && outputs.is_empty()
+                && inputs.is_empty()
+                && in_outs.is_empty()
+                && asm_string == "foo"
+                && constraints == "~{dirflag},~{fpsr},~{flags}"
+        ));
+        assert_eq!(
+            instr.to_string(),
+            "asm(x86_att, out = [], in = [], in_out = [], \"foo\", \"~{dirflag},~{fpsr},~{flags}\" [side_effects]\n"
+        );
+    }
+
+    #[test]
+    fn asm_lowers_with_in_out_operand_and_result() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.asm"(%0) <{asm_flavor = 0 : i32, asm_string = "bar $$42 $0", constraints = "=r,=&r,1,~{dirflag},~{fpsr},~{flags}", operand_attrs = [], operands_segments = array<i32: 0, 0, 1>}> : (!cir.int<s, 32>) -> !cir.int<s, 32>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::InlineAsm {
+                ref result,
+                ref outputs,
+                ref inputs,
+                ref in_outs,
+                side_effects: false,
+                flavor: AsmFlavor::AttSyntax,
+                ..
+            } if result.as_ref().is_some_and(|(r, _)| r == "1")
+                && outputs.is_empty()
+                && inputs.is_empty()
+                && in_outs == &["0".to_string()]
+        ));
     }
 }

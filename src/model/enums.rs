@@ -264,6 +264,14 @@ int_enum! {
 }
 
 int_enum! {
+    /// `cir.asm`'s `asm_flavor` field.
+    AsmFlavor from "CIROps.td:5362-5364" {
+        AttSyntax = 0 => "x86_att",
+        IntelSyntax = 1 => "x86_intel",
+    }
+}
+
+int_enum! {
     /// `cir.case`'s `kind` field.
     CaseOpKind from "CIROps.td:1515-1520" {
         Default = 0 => "default",
