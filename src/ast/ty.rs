@@ -5,6 +5,7 @@
 /// so alias resolution has to stay lazy (via [`crate::ast::op::GenericModule::resolve_type`])
 /// rather than inlining bodies at parse time.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Type {
     /// Reference to a `!name` alias defined at the top of the file.
     Named(String),
@@ -59,6 +60,7 @@ pub enum Type {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum FloatKind {
     F16,
     F32,
@@ -68,12 +70,14 @@ pub enum FloatKind {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum RecordKind {
     Struct,
     Union,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum RecordMemberKind {
     Data,
     Pad,
@@ -81,6 +85,7 @@ pub enum RecordMemberKind {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StructType {
     pub name: Option<String>,
     pub kind: RecordKind,

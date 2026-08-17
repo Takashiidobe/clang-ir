@@ -7,6 +7,7 @@ use super::ty::Type;
 pub type ValueId = String;
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Operation {
     /// Full dialect-qualified mnemonic, e.g. `"cir.alloca"` or `"builtin.module"`.
     pub name: String,
@@ -46,11 +47,13 @@ impl Operation {
 }
 
 #[derive(Debug, Clone, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Region {
     pub blocks: Vec<Block>,
 }
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Block {
     /// `None` for an unlabeled entry block (only the first block in a region
     /// may omit its label).
@@ -62,6 +65,7 @@ pub struct Block {
 /// The result of parsing a whole `.mlir`/generic-CIR text file: top-level
 /// type/attribute aliases plus the (usually singular) top-level operation(s).
 #[derive(Debug, Clone, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct GenericModule {
     pub type_aliases: BTreeMap<String, Type>,
     pub attr_aliases: BTreeMap<String, Attribute>,

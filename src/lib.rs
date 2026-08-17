@@ -17,7 +17,8 @@ pub use toolchain::Toolchain;
 ///
 /// Internally normalizes the input through `cir-opt --mlir-print-op-generic`
 /// (see [`Toolchain`]) before parsing, so `cir-opt` must be available (set
-/// `CLANG_OPT` to point at it if it's not on `PATH`).
+/// `CIR_OPT` to point at it if it's not on `PATH` or at the conventional
+/// `~/llvm-project/build-cir/bin/cir-opt` dev-tree location).
 pub fn parse_str(source: &str) -> Result<GenericModule> {
     parse_str_with(&Toolchain::from_env(), source)
 }

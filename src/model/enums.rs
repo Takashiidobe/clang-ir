@@ -59,6 +59,7 @@ macro_rules! int_enum {
         $(#[$meta])*
         #[doc = concat!("See `", $td, "` in the ClangIR TableGen sources.")]
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         pub enum $name {
             $($(#[$vmeta])* $variant),+
         }
@@ -125,6 +126,7 @@ macro_rules! keyword_enum {
         $(#[$meta])*
         #[doc = concat!("See `", $td, "` in the ClangIR TableGen sources.")]
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         pub enum $name {
             $($variant),+
         }

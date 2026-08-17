@@ -2,6 +2,7 @@ use super::ty::Type;
 
 /// An attribute as it appears in generic MLIR/CIR text.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Attribute {
     /// Bare dict key with no `=`, e.g. `init` inside `<{alignment = 4, init}>`.
     Unit,
@@ -93,6 +94,7 @@ pub enum Attribute {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ConstArrayData {
     Str(String),
     Elements(Vec<Attribute>),

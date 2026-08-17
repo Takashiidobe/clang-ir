@@ -16,11 +16,13 @@ use crate::model::enums::{CaseOpKind, CastKind, CmpOpKind, SideEffect};
 /// still produce multiple blocks within a region (e.g. `goto` crossing
 /// scopes lowers to plain block successors via `cir.br`/`cir.brcond`).
 #[derive(Debug, Clone, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Body {
     pub blocks: Vec<InstBlock>,
 }
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InstBlock {
     pub label: Option<String>,
     pub args: Vec<(ValueId, Type)>,
@@ -28,6 +30,7 @@ pub struct InstBlock {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum BinaryOp {
     Add,
     Sub,
@@ -85,6 +88,7 @@ impl std::fmt::Display for BinaryOp {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum UnaryOp {
     Inc,
     Dec,
@@ -121,6 +125,7 @@ impl std::fmt::Display for UnaryOp {
 }
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SwitchCase {
     pub kind: CaseOpKind,
     /// Case labels (empty for `default`, one value for `equal`, several for
@@ -130,12 +135,14 @@ pub struct SwitchCase {
 }
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Callee {
     Direct(String),
     Indirect(ValueId),
 }
 
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Instruction {
     // -- memory --
     Alloca {

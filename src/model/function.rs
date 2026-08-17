@@ -5,6 +5,7 @@ use crate::model::enums::{CallingConv, GlobalLinkageKind, InlineKind, SideEffect
 use crate::model::instruction::{Body, lower_region, write_body};
 
 #[derive(Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Function {
     pub name: String,
     pub params: Vec<(ValueId, Type)>,

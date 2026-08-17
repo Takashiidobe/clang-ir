@@ -5,15 +5,16 @@
 //! in parallel across a worker pool; the actual (cheap, pure-Rust) parse and
 //! snapshot assertion happens sequentially afterwards.
 //!
-//! Override the compiler with `CLANG_IR_RS_TEST_CLANG` if it's not at the
+//! Override the compiler with `CLANG_OPT` if it's not at the
 //! default dev-machine path. `cir-opt` is located the normal way (see
-//! [`clang_ir_rs::Toolchain`]), via `CLANG_OPT` or `PATH`.
+//! [`clang_ir_rs::Toolchain`]), via `CIR_OPT`, the default dev-machine path,
+//! or `PATH`.
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
 fn clang_path() -> PathBuf {
-    if let Some(p) = std::env::var_os("CLANG_IR_RS_TEST_CLANG") {
+    if let Some(p) = std::env::var_os("CLANG_OPT") {
         return PathBuf::from(p);
     }
     let home = std::env::var("HOME").expect("HOME not set");
@@ -114,7 +115,7 @@ fn parse_all_fixtures() {
         }
     });
 
-    let toolchain = clang_ir_rs::Toolchain::from_env();
+    let toolchain = clang_ir::Toolchain::from_env();
     let mut compile_failed = 0usize;
     let mut parse_failed = 0usize;
     let mut parsed_ok = 0usize;
@@ -126,7 +127,7 @@ fn parse_all_fixtures() {
                 compile_failed += 1;
                 format!("CLANG_COMPILE_FAILED: {msg}")
             }
-            Compiled::Cir(cir_text) => match clang_ir_rs::parse_with(&toolchain, &cir_text) {
+            Compiled::Cir(cir_text) => match clang_ir::parse_with(&toolchain, &cir_text) {
                 Ok(module) => {
                     parsed_ok += 1;
                     format!("{module}")

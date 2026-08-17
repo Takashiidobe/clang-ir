@@ -18,11 +18,18 @@ impl Default for Toolchain {
 }
 
 impl Toolchain {
-    /// Resolves `cir-opt` from the `CLANG_OPT` environment variable
-    /// if set, otherwise falls back to `cir-opt` on `PATH`.
+    /// Resolves `cir-opt` from the `CIR_OPT` environment variable if set;
+    /// otherwise falls back to `~/llvm-project/build-cir/bin/cir-opt` (the
+    /// conventional dev-tree build location, mirroring how
+    /// `tests/snapshot_fixtures.rs` locates `clang` via `CLANG_OPT`) if
+    /// `HOME` is set, or bare `cir-opt` on `PATH` otherwise.
     pub fn from_env() -> Self {
-        let cir_opt = std::env::var_os("CLANG_OPT")
+        let cir_opt = std::env::var_os("CIR_OPT")
             .map(PathBuf::from)
+            .or_else(|| {
+                std::env::var_os("HOME")
+                    .map(|home| PathBuf::from(home).join("llvm-project/build-cir/bin/cir-opt"))
+            })
             .unwrap_or_else(|| PathBuf::from("cir-opt"));
         Toolchain { cir_opt }
     }

@@ -6,6 +6,7 @@ use crate::model::function::Function;
 use crate::model::global::Global;
 
 #[derive(Clone, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Module {
     /// The module's `sym_name`: clang IR names the module after the source
     /// file path it was compiled from.

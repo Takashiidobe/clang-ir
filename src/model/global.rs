@@ -4,6 +4,7 @@ use crate::ast::{Attribute, Operation, Type};
 use crate::model::enums::{GlobalLinkageKind, TlsModel, VisibilityKind};
 
 #[derive(Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Global {
     pub name: String,
     pub ty: Type,
