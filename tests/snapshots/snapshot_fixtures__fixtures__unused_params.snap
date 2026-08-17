@@ -1,0 +1,96 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/unused_params.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[13] = "%d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn address_taken(%arg7: s32i, %arg8: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg7: s32i, %arg8: s32i):
+        %46 = alloca s32i, "a", align 4
+        %47 = alloca s32i, "unused", align 4
+        %48 = alloca s32i, "__retval", align 4
+        store %arg7, %46
+        store %arg8, %47
+        %49 = load %46 : s32i, align 4
+        %50 = const 4 : s32i
+        %51 = add %49, %50 : s32i [nsw]
+        store %51, %48
+        %52 = load %48 : s32i
+        return %52
+}
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn add(%arg5: s32i, %arg6: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg5: s32i, %arg6: s32i):
+        %39 = alloca s32i, "a", align 4
+        %40 = alloca s32i, "unused", align 4
+        %41 = alloca s32i, "__retval", align 4
+        store %arg5, %39
+        store %arg6, %40
+        %42 = load %39 : s32i, align 4
+        %43 = const 1 : s32i
+        %44 = add %42, %43 : s32i [nsw]
+        store %44, %41
+        %45 = load %41 : s32i
+        return %45
+}
+fn get_used(%arg3: s32i, %arg4: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: s32i, %arg4: s32i):
+        %32 = alloca s32i, "a", align 4
+        %33 = alloca s32i, "b", align 4
+        %34 = alloca s32i, "__retval", align 4
+        store %arg3, %32
+        store %arg4, %33
+        %35 = load %32 : s32i, align 4
+        %36 = load %33 : s32i, align 4
+        %37 = add %35, %36 : s32i [nsw]
+        store %37, %34
+        %38 = load %34 : s32i
+        return %38
+}
+fn remove_two(%arg0: s32i, %arg1: s32i, %arg2: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s32i, %arg2: s32i):
+        %24 = alloca s32i, "a", align 4
+        %25 = alloca s32i, "unused_a", align 4
+        %26 = alloca s32i, "unused_b", align 4
+        %27 = alloca s32i, "__retval", align 4
+        store %arg0, %24
+        store %arg1, %25
+        store %arg2, %26
+        %28 = load %24 : s32i, align 4
+        %29 = const 2 : s32i
+        %30 = add %28, %29 : s32i [nsw]
+        store %30, %27
+        %31 = load %27 : s32i
+        return %31
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca ((s32i, s32i) -> s32i)*, "indirect", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @address_taken : ((s32i, s32i) -> s32i)*
+    store %3, %1, align 8
+    %4 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %5 = get_global @.str : s8i[13]*
+    %6 = cast(array_to_ptrdecay) %5 : s8i*
+    %7 = const 5 : s32i
+    %8 = const 10 : s32i
+    %9 = call @add(%7, %8) : s32i [all]
+    %10 = const 1 : s32i
+    %11 = const 2 : s32i
+    %12 = call @get_used(%10, %11) : s32i [all]
+    %13 = const 3 : s32i
+    %14 = const 4 : s32i
+    %15 = const 5 : s32i
+    %16 = call @remove_two(%13, %14, %15) : s32i [all]
+    %17 = load %1 : ((s32i, s32i) -> s32i)*, align 8
+    %18 = const 8 : s32i
+    %19 = const 9 : s32i
+    %20 = call %17(%18, %19) : s32i [all]
+    %21 = call @printf(%6, %9, %12, %16, %20) : s32i [all]
+    %22 = const 0 : s32i
+    store %22, %0
+    %23 = load %0 : s32i
+    return %23
+}

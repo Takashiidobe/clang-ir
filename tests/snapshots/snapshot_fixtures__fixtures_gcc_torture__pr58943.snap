@@ -1,0 +1,51 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr58943.c" (c, x86_64-unknown-linux-gnu)
+global x : u32i[1] = [2] [external, default, align 4, dso_local]
+
+fn foo() -> u32i [external, c, no_inline, dso_local, nothrow] {
+    %16 = alloca u32i, "__retval", align 4
+    %17 = const 128 : u32i
+    %18 = const 0 : s64i
+    %19 = get_global @x : u32i[1]*
+    %20 = get_element %19[%18] : u32i*
+    %21 = load %20 : u32i, align 4
+    %22 = or %21, %17 : u32i
+    store %22, %20, align 4
+    %23 = const 1 : u32i
+    store %23, %16
+    %24 = load %16 : u32i
+    return %24
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = call @foo() : u32i [all]
+    %3 = const 0 : s64i
+    %4 = get_global @x : u32i[1]*
+    %5 = get_element %4[%3] : u32i*
+    %6 = load %5 : u32i, align 4
+    %7 = or %6, %2 : u32i
+    store %7, %5, align 4
+    scope {
+        %10 = const 0 : s64i
+        %11 = get_global @x : u32i[1]*
+        %12 = get_element %11[%10] : u32i*
+        %13 = load %12 : u32i, align 4
+        %14 = const 131 : u32i
+        %15 = cmp ne %13, %14 : bool
+        if %15 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %8 = const 0 : s32i
+    store %8, %0
+    %9 = load %0 : s32i
+    return %9
+}

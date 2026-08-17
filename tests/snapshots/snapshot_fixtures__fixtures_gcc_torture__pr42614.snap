@@ -1,0 +1,146 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr42614.c" (c, x86_64-unknown-linux-gnu)
+fn malloc(%arg0: u64i) -> void* [external, c];
+fn init() -> rec_STable* [external, c, no_inline, dso_local, nothrow] {
+    %63 = alloca rec_STable*, "__retval", align 8
+    %64 = get_global @malloc : ((u64i) -> void*)*
+    %65 = const 2 : u64i
+    %66 = call @malloc(%65) : void* [all]
+    %67 = cast(bitcast) %66 : rec_STable*
+    store %67, %63
+    %68 = load %63 : rec_STable*
+    return %68
+}
+fn abort() -> void [external, c, nothrow];
+fn expect_func(%arg2: s32i, %arg3: u8i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i, %arg3: u8i*):
+        %47 = alloca s32i, "a", align 4
+        %48 = alloca u8i*, "b", align 8
+        store %arg2, %47
+        store %arg3, %48
+        scope {
+            %56 = load %47 : s32i, align 4
+            %57 = const 0 : s32i
+            %58 = cmp eq %56, %57 : bool
+            %59 = cast(bool_to_int) %58 : s32i
+            <unmodeled: cir.abs>
+            %61 = cast(int_to_bool) %60 : bool
+            if %61 {
+                %62 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %49 = load %48 : u8i*, align 8
+            %50 = const #cir.ptr<null> : u8i*
+            %51 = cmp eq %49, %50 : bool
+            %52 = cast(bool_to_int) %51 : s32i
+            <unmodeled: cir.abs>
+            %54 = cast(int_to_bool) %53 : bool
+            if %54 {
+                %55 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn inlined_wrong(%arg0: rec_SEntry*, %arg1: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_SEntry*, %arg1: s32i):
+        %20 = alloca rec_SEntry*, "entry_p", align 8
+        %21 = alloca s32i, "flag", align 4
+        %22 = alloca u8i, "index", align 1
+        store %arg0, %20
+        store %arg1, %21
+        %23 = const 0 : u8i
+        %24 = load %20 : rec_SEntry*, align 8
+        %25 = get_member %24[0] "num" : u8i*
+        store %23, %25, align 1
+        scope {
+            %43 = load %21 : s32i, align 4
+            %44 = const 0 : s32i
+            %45 = cmp eq %43, %44 : bool
+            if %45 {
+                %46 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %32 = const 0 : u8i
+            store %32, %22, align 1
+            for cond: {
+                %39 = load %22 : u8i, align 1
+                %40 = cast(integral) %39 : s32i
+                %41 = const 1 : s32i
+                %42 = cmp lt %40, %41 : bool
+                condition %42
+            } step: {
+                %33 = load %22 : u8i, align 1
+                %34 = inc %33 : u8i
+                store %34, %22, align 1
+                yield
+            } do {
+                %35 = load %20 : rec_SEntry*, align 8
+                %36 = get_member %35[0] "num" : u8i*
+                %37 = load %36 : u8i, align 1
+                %38 = inc %37 : u8i
+                store %38, %36, align 1
+                yield
+            }
+            yield
+        }
+        scope {
+            %26 = load %20 : rec_SEntry*, align 8
+            %27 = get_member %26[0] "num" : u8i*
+            %28 = load %27 : u8i, align 1
+            %29 = cast(int_to_bool) %28 : bool
+            %30 = not %29 : bool
+            if %30 {
+                %31 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn free(%arg0: void*) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u8i, "index", align 1
+    %2 = alloca rec_STable*, "table_p", align 8
+    %3 = alloca rec_SEntry, "work", align 1
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 0 : u8i
+    store %5, %1, align 1
+    %6 = get_global @init : (() -> rec_STable*)*
+    %7 = call @init() : rec_STable* [all]
+    store %7, %2, align 8
+    %8 = const 1 : s64i
+    %9 = load %2 : rec_STable*, align 8
+    %10 = get_member %9[0] "data" : rec_SEntry[2]*
+    %11 = get_element %10[%8] : rec_SEntry*
+    %12 = const 1 : s32i
+    call @inlined_wrong(%11, %12) [all]
+    %13 = const 1 : s32i
+    call @expect_func(%13, %1) [all]
+    %14 = const 1 : s32i
+    call @inlined_wrong(%3, %14) [all]
+    %15 = get_global @free : ((void*) -> void)*
+    %16 = load %2 : rec_STable*, align 8
+    %17 = cast(bitcast) %16 : void*
+    call @free(%17) [all]
+    %18 = const 0 : s32i
+    store %18, %0
+    %19 = load %0 : s32i
+    return %19
+}

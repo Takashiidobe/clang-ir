@@ -1,0 +1,79 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/printf_scientific.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[20] = "%e %.2e %10.2e %+e\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[9] = "%E %.2E\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[10] = "%-10.2e|\n" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[8] = "%e %+e\n" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[6] = "%.0e\n" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[4] = "%e\n" [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[7] = "%e %E\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca double, "pos", align 8
+    %2 = alloca double, "neg", align 8
+    %3 = alloca double, "zero", align 8
+    %4 = alloca double, "big", align 8
+    %5 = alloca double, "small", align 8
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = const 1234.5678 : double
+    store %7, %1, align 8
+    %8 = const -1234.5678 : double
+    store %8, %2, align 8
+    %9 = const 0.000000e+00 : double
+    store %9, %3, align 8
+    %10 = const 1.000000e+300 : double
+    store %10, %4, align 8
+    %11 = const 1.000000e-300 : double
+    store %11, %5, align 8
+    %12 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %13 = get_global @.str : s8i[20]*
+    %14 = cast(array_to_ptrdecay) %13 : s8i*
+    %15 = load %1 : double, align 8
+    %16 = load %1 : double, align 8
+    %17 = load %1 : double, align 8
+    %18 = load %1 : double, align 8
+    %19 = call @printf(%14, %15, %16, %17, %18) : s32i [all]
+    %20 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %21 = get_global @.str.1 : s8i[9]*
+    %22 = cast(array_to_ptrdecay) %21 : s8i*
+    %23 = load %1 : double, align 8
+    %24 = load %1 : double, align 8
+    %25 = call @printf(%22, %23, %24) : s32i [all]
+    %26 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %27 = get_global @.str.2 : s8i[10]*
+    %28 = cast(array_to_ptrdecay) %27 : s8i*
+    %29 = load %1 : double, align 8
+    %30 = call @printf(%28, %29) : s32i [all]
+    %31 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %32 = get_global @.str.3 : s8i[8]*
+    %33 = cast(array_to_ptrdecay) %32 : s8i*
+    %34 = load %2 : double, align 8
+    %35 = load %2 : double, align 8
+    %36 = call @printf(%33, %34, %35) : s32i [all]
+    %37 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %38 = get_global @.str.4 : s8i[6]*
+    %39 = cast(array_to_ptrdecay) %38 : s8i*
+    %40 = load %1 : double, align 8
+    %41 = call @printf(%39, %40) : s32i [all]
+    %42 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %43 = get_global @.str.5 : s8i[4]*
+    %44 = cast(array_to_ptrdecay) %43 : s8i*
+    %45 = load %3 : double, align 8
+    %46 = call @printf(%44, %45) : s32i [all]
+    %47 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %48 = get_global @.str.6 : s8i[7]*
+    %49 = cast(array_to_ptrdecay) %48 : s8i*
+    %50 = load %4 : double, align 8
+    %51 = load %5 : double, align 8
+    %52 = call @printf(%49, %50, %51) : s32i [all]
+    %53 = const 0 : s32i
+    store %53, %0
+    %54 = load %0 : s32i
+    return %54
+}

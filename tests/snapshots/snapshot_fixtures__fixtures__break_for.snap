@@ -1,0 +1,88 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/break_for.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn first_multiple(%arg0: s32i, %arg1: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s32i):
+        %18 = alloca s32i, "n", align 4
+        %19 = alloca s32i, "m", align 4
+        %20 = alloca s32i, "__retval", align 4
+        store %arg0, %18
+        store %arg1, %19
+        scope {
+            %23 = alloca s32i, "i", align 4
+            %24 = const 1 : s32i
+            store %24, %23, align 4
+            for cond: {
+                %37 = load %23 : s32i, align 4
+                %38 = load %18 : s32i, align 4
+                %39 = cmp le %37, %38 : bool
+                condition %39
+            } step: {
+                %25 = load %23 : s32i, align 4
+                %26 = inc %25 : s32i [nsw]
+                store %26, %23, align 4
+                yield
+            } do {
+                scope {
+                    scope {
+                        %30 = load %23 : s32i, align 4
+                        %31 = load %19 : s32i, align 4
+                        %32 = rem %30, %31 : s32i
+                        %33 = const 0 : s32i
+                        %34 = cmp eq %32, %33 : bool
+                        if %34 {
+                            %35 = load %23 : s32i, align 4
+                            store %35, %20
+                            %36 = load %20 : s32i
+                            return %36
+                        }
+                        yield
+                    }
+                    scope {
+                        %27 = load %23 : s32i, align 4
+                        %28 = const 100 : s32i
+                        %29 = cmp gt %27, %28 : bool
+                        if %29 {
+                            break
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %21 = const -1 : s32i
+        store %21, %20
+        %22 = load %20 : s32i
+        return %22
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[4]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 50 : s32i
+    %6 = const 7 : s32i
+    %7 = call @first_multiple(%5, %6) : s32i [all]
+    %8 = call @printf(%4, %7) : s32i [all]
+    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %10 = get_global @.str : s8i[4]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = const 3 : s32i
+    %13 = const 7 : s32i
+    %14 = call @first_multiple(%12, %13) : s32i [all]
+    %15 = call @printf(%11, %14) : s32i [all]
+    %16 = const 0 : s32i
+    store %16, %0
+    %17 = load %0 : s32i
+    return %17
+}

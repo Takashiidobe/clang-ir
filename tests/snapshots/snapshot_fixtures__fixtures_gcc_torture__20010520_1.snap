@@ -1,0 +1,45 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20010520-1.c" (c, x86_64-unknown-linux-gnu)
+global expr_hash_table_size : u32i = 1 [internal, default, align 4, dso_local]
+
+fn exit(%arg0: s32i) -> void [external, c];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "del", align 4
+    %2 = alloca u32i, "i", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 1 : s32i
+    store %4, %1, align 4
+    %5 = const 0 : u32i
+    store %5, %2, align 4
+    scope {
+        %8 = load %2 : u32i, align 4
+        %9 = get_global @expr_hash_table_size : u32i*
+        %10 = load %9 : u32i, align 4
+        %11 = cmp lt %8, %10 : bool
+        %12 = ternary %11 ? { : bool
+            %16 = load %1 : s32i, align 4
+            %17 = cast(int_to_bool) %16 : bool
+            yield %17
+        } : {
+            %15 = const #false : bool
+            yield %15
+        }
+        if %12 {
+            %13 = get_global @exit : ((s32i) -> void)*
+            %14 = const 0 : s32i
+            call @exit(%14) [all]
+            yield
+        }
+        yield
+    }
+    %6 = get_global @abort : (() -> void)*
+    call @abort() [all]
+    %7 = load %0 : s32i
+    return %7
+}

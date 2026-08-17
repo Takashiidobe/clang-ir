@@ -1,0 +1,42 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/wchar/mbstowcs.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[6] = "hello" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[12] = "%zu %zu %s\n" [cir_private, default, align 1, dso_local, constant]
+
+fn mbstowcs(%arg0: s32i*, %arg1: s8i*, %arg2: u64i) -> u64i [external, c, nothrow];
+fn wcstombs(%arg0: s8i*, %arg1: s32i*, %arg2: u64i) -> u64i [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i[16], "wbuf", align 16
+    %2 = alloca u64i, "n", align 8
+    %3 = alloca s8i[16], "cbuf", align 16
+    %4 = alloca u64i, "m", align 8
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = cast(array_to_ptrdecay) %1 : s32i*
+    %7 = get_global @.str : s8i[6]*
+    %8 = cast(array_to_ptrdecay) %7 : s8i*
+    %9 = const 16 : u64i
+    %10 = call @mbstowcs(%6, %8, %9) : u64i [all]
+    store %10, %2, align 8
+    %11 = cast(array_to_ptrdecay) %3 : s8i*
+    %12 = cast(array_to_ptrdecay) %1 : s32i*
+    %13 = const 16 : u64i
+    %14 = call @wcstombs(%11, %12, %13) : u64i [all]
+    store %14, %4, align 8
+    %15 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %16 = get_global @.str.1 : s8i[12]*
+    %17 = cast(array_to_ptrdecay) %16 : s8i*
+    %18 = load %2 : u64i, align 8
+    %19 = load %4 : u64i, align 8
+    %20 = cast(array_to_ptrdecay) %3 : s8i*
+    %21 = call @printf(%17, %18, %19, %20) : s32i [all]
+    %22 = const 0 : s32i
+    store %22, %0
+    %23 = load %0 : s32i
+    return %23
+}

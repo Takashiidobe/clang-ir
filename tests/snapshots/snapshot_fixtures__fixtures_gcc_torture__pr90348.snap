@@ -1,0 +1,127 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr90348.c" (c, x86_64-unknown-linux-gnu)
+fn set_one(%arg2: u8i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: u8i*):
+        %45 = alloca u8i*, "ptr", align 8
+        store %arg2, %45
+        %46 = const 1 : u8i
+        %47 = load %45 : u8i*, align 8
+        store %46, %47, align 1
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn check_zero(%arg0: u8i*, %arg1: u32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u8i*, %arg1: u32i):
+        %28 = alloca u8i*, "in", align 8
+        %29 = alloca u32i, "len", align 4
+        store %arg0, %28
+        store %arg1, %29
+        scope {
+            %30 = alloca u32i, "i", align 4
+            %31 = const 0 : u32i
+            store %31, %30, align 4
+            for cond: {
+                %42 = load %30 : u32i, align 4
+                %43 = load %29 : u32i, align 4
+                %44 = cmp lt %42, %43 : bool
+                condition %44
+            } step: {
+                %32 = load %30 : u32i, align 4
+                %33 = inc %32 : u32i
+                store %33, %30, align 4
+                yield
+            } do {
+                scope {
+                    %34 = load %30 : u32i, align 4
+                    %35 = cast(integral) %34 : u64i
+                    %36 = load %28 : u8i*, align 8
+                    %37 = ptr_stride %36, %35 : u8i*
+                    %38 = load %37 : u8i, align 1
+                    %39 = cast(integral) %38 : s32i
+                    %40 = const 0 : s32i
+                    %41 = cmp ne %39, %40 : bool
+                    if %41 {
+                        call @abort() [all]
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        return
+}
+fn set_one_on_stack() -> void [internal, c, no_inline, dso_local, nothrow] {
+    %26 = alloca u8i[1], "buf", align 1
+    %27 = cast(array_to_ptrdecay) %26 : u8i*
+    call @set_one(%27) [all]
+    return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = alloca s32i, "i", align 4
+        %5 = const 0 : s32i
+        store %5, %4, align 4
+        for cond: {
+            %23 = load %4 : s32i, align 4
+            %24 = const 4 : s32i
+            %25 = cmp le %23, %24 : bool
+            condition %25
+        } step: {
+            %6 = load %4 : s32i, align 4
+            %7 = inc %6 : s32i [nsw]
+            store %7, %4, align 4
+            yield
+        } do {
+            scope {
+                %8 = alloca u8i[4], "in", align 1
+                scope {
+                    %12 = alloca s32i, "j", align 4
+                    %13 = const 0 : s32i
+                    store %13, %12, align 4
+                    for cond: {
+                        %20 = load %12 : s32i, align 4
+                        %21 = load %4 : s32i, align 4
+                        %22 = cmp lt %20, %21 : bool
+                        condition %22
+                    } step: {
+                        %14 = load %12 : s32i, align 4
+                        %15 = inc %14 : s32i [nsw]
+                        store %15, %12, align 4
+                        yield
+                    } do {
+                        scope {
+                            %16 = const 0 : u8i
+                            %17 = load %12 : s32i, align 4
+                            %18 = cast(integral) %17 : s64i
+                            %19 = get_element %8[%18] : u8i*
+                            store %16, %19, align 1
+                            call @set_one_on_stack() [all]
+                            yield
+                        }
+                        yield
+                    }
+                    yield
+                }
+                %9 = cast(array_to_ptrdecay) %8 : u8i*
+                %10 = load %4 : s32i, align 4
+                %11 = cast(integral) %10 : u32i
+                call @check_zero(%9, %11) [all]
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

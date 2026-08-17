@@ -1,0 +1,130 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr42231.c" (c, x86_64-unknown-linux-gnu)
+global max : s32i = 0 [internal, default, align 4, dso_local]
+
+fn CallFunctionRec(%arg3: ((s32i) -> s32i)*, %arg4: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: ((s32i) -> s32i)*, %arg4: s32i):
+        %41 = alloca ((s32i) -> s32i)*, "fun", align 8
+        %42 = alloca s32i, "depth", align 4
+        %43 = alloca s32i, "__retval", align 4
+        store %arg3, %41
+        store %arg4, %42
+        scope {
+            %54 = load %41 : ((s32i) -> s32i)*, align 8
+            %55 = load %42 : s32i, align 4
+            %56 = call %54(%55) : s32i [all]
+            %57 = cast(int_to_bool) %56 : bool
+            %58 = not %57 : bool
+            if %58 {
+                %59 = const 0 : s32i
+                store %59, %43
+                %60 = load %43 : s32i
+                return %60
+            }
+            yield
+        }
+        scope {
+            %46 = load %42 : s32i, align 4
+            %47 = const 10 : s32i
+            %48 = cmp lt %46, %47 : bool
+            if %48 {
+                %49 = load %41 : ((s32i) -> s32i)*, align 8
+                %50 = load %42 : s32i, align 4
+                %51 = const 1 : s32i
+                %52 = add %50, %51 : s32i [nsw]
+                %53 = call @CallFunctionRec(%49, %52) : s32i [all]
+                yield
+            }
+            yield
+        }
+        %44 = const 1 : s32i
+        store %44, %43
+        %45 = load %43 : s32i
+        return %45
+}
+fn CallFunction(%arg2: ((s32i) -> s32i)*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: ((s32i) -> s32i)*):
+        %26 = alloca ((s32i) -> s32i)*, "fun", align 8
+        %27 = alloca s32i, "__retval", align 4
+        store %arg2, %26
+        %28 = load %26 : ((s32i) -> s32i)*, align 8
+        %29 = const 1 : s32i
+        %30 = call @CallFunctionRec(%28, %29) : s32i [all]
+        %31 = cast(int_to_bool) %30 : bool
+        %32 = ternary %31 ? { : bool
+            %36 = load %26 : ((s32i) -> s32i)*, align 8
+            %37 = const 0 : s32i
+            %38 = call %36(%37) : s32i [all]
+            %39 = cast(int_to_bool) %38 : bool
+            %40 = not %39 : bool
+            yield %40
+        } : {
+            %35 = const #false : bool
+            yield %35
+        }
+        %33 = cast(bool_to_int) %32 : s32i
+        store %33, %27
+        %34 = load %27 : s32i
+        return %34
+}
+fn storemax(%arg1: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i):
+        %19 = alloca s32i, "i", align 4
+        store %arg1, %19
+        scope {
+            %20 = load %19 : s32i, align 4
+            %21 = get_global @max : s32i*
+            %22 = load %21 : s32i, align 4
+            %23 = cmp gt %20, %22 : bool
+            if %23 {
+                %24 = load %19 : s32i, align 4
+                %25 = get_global @max : s32i*
+                store %24, %25, align 4
+                yield
+            }
+            yield
+        }
+        return
+}
+fn callback(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %11 = alloca s32i, "depth", align 4
+        %12 = alloca s32i, "__retval", align 4
+        store %arg0, %11
+        %13 = load %11 : s32i, align 4
+        call @storemax(%13) [all]
+        %14 = load %11 : s32i, align 4
+        %15 = const 0 : s32i
+        %16 = cmp ne %14, %15 : bool
+        %17 = cast(bool_to_int) %16 : s32i
+        store %17, %12
+        %18 = load %12 : s32i
+        return %18
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @callback : ((s32i) -> s32i)*
+    %3 = call @CallFunction(%2) : s32i [all]
+    scope {
+        %6 = get_global @max : s32i*
+        %7 = load %6 : s32i, align 4
+        %8 = const 10 : s32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            %10 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

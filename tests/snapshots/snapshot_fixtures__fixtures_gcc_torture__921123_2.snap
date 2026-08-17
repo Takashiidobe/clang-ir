@@ -1,0 +1,70 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/921123-2.c" (c, x86_64-unknown-linux-gnu)
+global b : s32i = 0 [external, default, align 4, dso_local]
+global a : s32i = 0 [external, default, align 4, dso_local]
+global x : rec_four_quarters = zero [external, default, align 2, dso_local]
+
+fn f(%arg0: u64i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u64i):
+        %21 = alloca u64i, "coerce", align 8
+        store %arg0, %21
+        %22 = cast(bitcast) %21 : rec_four_quarters*
+        %23 = load %22 : rec_four_quarters
+        %24 = alloca rec_four_quarters, "j", align 2
+        store %23, %24
+        %25 = get_member %24[2] "b2" : u16i*
+        %26 = load %25 : u16i, align 2
+        %27 = cast(integral) %26 : s32i
+        %28 = get_global @b : s32i*
+        store %27, %28, align 4
+        %29 = get_member %24[3] "b3" : u16i*
+        %30 = load %29 : u16i, align 2
+        %31 = cast(integral) %30 : s32i
+        %32 = get_global @a : s32i*
+        store %31, %32, align 4
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca rec_four_quarters, "coerce", align 8
+    %1 = alloca s32i, "__retval", align 4
+    %2 = alloca rec_four_quarters, "x", align 2
+    %3 = const 0 : s32i
+    store %3, %1
+    %4 = const 0 : u16i
+    %5 = get_member %2[2] "b2" : u16i*
+    store %4, %5, align 2
+    %6 = get_member %2[1] "b1" : u16i*
+    store %4, %6, align 2
+    %7 = get_member %2[0] "b0" : u16i*
+    store %4, %7, align 2
+    %8 = const 38 : u16i
+    %9 = get_member %2[3] "b3" : u16i*
+    store %8, %9, align 2
+    %10 = load %2 : rec_four_quarters, align 2
+    store %10, %0
+    %11 = cast(bitcast) %0 : u64i*
+    %12 = load %11 : u64i
+    call @f(%12) [all]
+    scope {
+        %16 = get_global @a : s32i*
+        %17 = load %16 : s32i, align 4
+        %18 = const 38 : s32i
+        %19 = cmp ne %17, %18 : bool
+        if %19 {
+            %20 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %13 = get_global @exit : ((s32i) -> void)*
+    %14 = const 0 : s32i
+    call @exit(%14) [all]
+    %15 = load %1 : s32i
+    return %15
+}

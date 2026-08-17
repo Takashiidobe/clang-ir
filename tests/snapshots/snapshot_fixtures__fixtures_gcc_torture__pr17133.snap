@@ -1,0 +1,86 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr17133.c" (c, x86_64-unknown-linux-gnu)
+global foo : s32i = 0 [external, default, align 4, dso_local]
+global bar : void* = #cir.ptr<null> [external, default, align 8, dso_local]
+global baz : u32i = 100 [external, default, align 4, dso_local]
+
+fn pure_alloc() -> void* [external, c, no_inline, dso_local, nothrow] {
+    %11 = alloca void*, "__retval", align 8
+    %12 = alloca void*, "res", align 8
+    scope {
+        while {
+            %38 = const 1 : s32i
+            %39 = cast(int_to_bool) %38 : bool
+            condition %39
+        } do {
+            scope {
+                %14 = get_global @foo : s32i*
+                %15 = load %14 : s32i, align 4
+                %16 = get_global @bar : void**
+                %17 = load %16 : void*, align 8
+                %18 = ptr_stride %17, %15 : void*
+                %19 = cast(ptr_to_int) %18 : u32i
+                %20 = const 4294967294 : u32i
+                %21 = and %19, %20 : u32i
+                %22 = cast(integral) %21 : u64i
+                %23 = cast(int_to_ptr) %22 : void*
+                store %23, %12, align 8
+                %24 = const 2 : s32i
+                %25 = get_global @foo : s32i*
+                %26 = load %25 : s32i, align 4
+                %27 = add %26, %24 : s32i [nsw]
+                store %27, %25, align 4
+                scope {
+                    %30 = get_global @foo : s32i*
+                    %31 = load %30 : s32i, align 4
+                    %32 = cast(integral) %31 : u32i
+                    %33 = get_global @baz : u32i*
+                    %34 = load %33 : u32i, align 4
+                    %35 = cmp lt %32, %34 : bool
+                    if %35 {
+                        %36 = load %12 : void*, align 8
+                        store %36, %11
+                        %37 = load %11 : void*
+                        return %37
+                    }
+                    yield
+                }
+                %28 = const 0 : s32i
+                %29 = get_global @foo : s32i*
+                store %28, %29, align 4
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %13 = load %11 : void*
+    return %13
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @pure_alloc : (() -> void*)*
+    %3 = call @pure_alloc() : void* [all]
+    scope {
+        %6 = get_global @foo : s32i*
+        %7 = load %6 : s32i, align 4
+        %8 = cast(int_to_bool) %7 : bool
+        %9 = not %8 : bool
+        if %9 {
+            %10 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

@@ -1,0 +1,38 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.multi/unsafe_deref_callback_cross_tu/main.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn deref_and_add(%arg0: s32i*) -> s32i [external, c];
+fn call_handler(%arg0: rec_Callback*, %arg1: s32i*) -> s32i [external, c];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "value", align 4
+    %2 = alloca rec_Callback, "cb", align 8
+    %3 = alloca s32i, "direct", align 4
+    %4 = alloca s32i, "via_cb", align 4
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = const 41 : s32i
+    store %6, %1, align 4
+    %7 = get_global @deref_and_add : ((s32i*) -> s32i)*
+    %8 = get_member %2[0] "handler" : ((s32i*) -> s32i)**
+    store %7, %8, align 8
+    %9 = call @deref_and_add(%1) : s32i [all]
+    store %9, %3, align 4
+    %10 = call @call_handler(%2, %1) : s32i [all]
+    store %10, %4, align 4
+    %11 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %12 = get_global @.str : s8i[7]*
+    %13 = cast(array_to_ptrdecay) %12 : s8i*
+    %14 = load %3 : s32i, align 4
+    %15 = load %4 : s32i, align 4
+    %16 = call @printf(%13, %14, %15) : s32i [all]
+    %17 = const 0 : s32i
+    store %17, %0
+    %18 = load %0 : s32i
+    return %18
+}

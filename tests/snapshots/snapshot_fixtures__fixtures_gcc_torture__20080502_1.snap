@@ -1,0 +1,42 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20080502-1.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: long_double<f80>) -> long_double<f80> [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: long_double<f80>):
+        %9 = alloca long_double<f80>, "x", align 16
+        %10 = alloca long_double<f80>, "__retval", align 16
+        store %arg0, %9
+        %11 = load %9 : long_double<f80>, align 16
+        <unmodeled: cir.signbit>
+        %13 = const 3.14159265358979323851 : long_double<f80>
+        %14 = const 0.000000e+00 : double
+        %15 = cast(floating) %14 : long_double<f80>
+        %16 = select %12, %13, %15 : long_double<f80>
+        store %16, %10
+        %17 = load %10 : long_double<f80>
+        return %17
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = const -1.000000e+00 : long_double<f80>
+        %5 = call @foo(%4) : long_double<f80> [all]
+        %6 = const 3.14159265358979323851 : long_double<f80>
+        %7 = cmp ne %5, %6 : bool
+        if %7 {
+            %8 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

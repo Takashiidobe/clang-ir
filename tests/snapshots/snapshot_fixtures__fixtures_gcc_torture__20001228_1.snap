@@ -1,0 +1,58 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20001228-1.c" (c, x86_64-unknown-linux-gnu)
+fn foo1() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %19 = alloca s32i, "__retval", align 4
+    %20 = alloca rec_anon2E0, "u", align 4
+    %21 = const 1 : u32i
+    %22 = get_member %20[1] "b" : u32i*
+    store %21, %22, align 4
+    %23 = const 0 : s64i
+    %24 = get_member %20[0] "a" : s8i[4]*
+    %25 = get_element %24[%23] : s8i*
+    %26 = load %25 : s8i, align 4
+    %27 = cast(integral) %26 : s32i
+    store %27, %19
+    %28 = load %19 : s32i
+    return %28
+}
+fn foo2() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %9 = alloca s32i, "__retval", align 4
+    %10 = alloca rec_anon2E1, "u", align 4
+    %11 = const 1 : u32i
+    %12 = get_member %10[1] "b" : u32i*
+    store %11, %12, align 4, volatile
+    %13 = const 0 : s64i
+    %14 = get_member %10[0] "a" : s8i[4]*
+    %15 = get_element %14[%13] : s8i*
+    %16 = load %15 : s8i, align 4, volatile
+    %17 = cast(integral) %16 : s32i
+    store %17, %9
+    %18 = load %9 : s32i
+    return %18
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %5 = call @foo1() : s32i [all]
+        %6 = call @foo2() : s32i [all]
+        %7 = cmp ne %5, %6 : bool
+        if %7 {
+            %8 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

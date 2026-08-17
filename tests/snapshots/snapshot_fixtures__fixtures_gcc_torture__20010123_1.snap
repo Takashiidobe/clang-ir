@@ -1,0 +1,81 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20010123-1.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[10] = "hey there" [cir_private, default, align 1, dso_local, constant]
+
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "i", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    scope {
+        %6 = const 0 : s32i
+        store %6, %1, align 4
+        for cond: {
+            %31 = load %1 : s32i, align 4
+            %32 = const 4 : s32i
+            %33 = cmp lt %31, %32 : bool
+            condition %33
+        } step: {
+            %7 = load %1 : s32i, align 4
+            %8 = inc %7 : s32i [nsw]
+            store %8, %1, align 4
+            yield
+        } do {
+            scope {
+                %9 = alloca rec_s*, "t", align 8
+                %10 = alloca rec_s, ".compoundliteral", align 8
+                %11 = get_member %10[0] "value" : s32i*
+                %12 = const 3 : s32i
+                store %12, %11, align 8
+                %13 = get_member %10[1] "string" : s8i**
+                %14 = get_global @.str : s8i[10]*
+                %15 = cast(array_to_ptrdecay) %14 : s8i*
+                store %15, %13, align 8
+                store %10, %9, align 8
+                scope {
+                    %25 = load %9 : rec_s*, align 8
+                    %26 = get_member %25[0] "value" : s32i*
+                    %27 = load %26 : s32i, align 8
+                    %28 = const 3 : s32i
+                    %29 = cmp ne %27, %28 : bool
+                    if %29 {
+                        %30 = get_global @abort : (() -> void)*
+                        call @abort() [all]
+                        yield
+                    }
+                    yield
+                }
+                %16 = const 4 : s32i
+                %17 = load %9 : rec_s*, align 8
+                %18 = get_member %17[0] "value" : s32i*
+                store %16, %18, align 8
+                scope {
+                    %19 = load %9 : rec_s*, align 8
+                    %20 = get_member %19[0] "value" : s32i*
+                    %21 = load %20 : s32i, align 8
+                    %22 = const 4 : s32i
+                    %23 = cmp ne %21, %22 : bool
+                    if %23 {
+                        %24 = get_global @abort : (() -> void)*
+                        call @abort() [all]
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %3 = get_global @exit : ((s32i) -> void)*
+    %4 = const 0 : s32i
+    call @exit(%4) [all]
+    %5 = load %0 : s32i
+    return %5
+}

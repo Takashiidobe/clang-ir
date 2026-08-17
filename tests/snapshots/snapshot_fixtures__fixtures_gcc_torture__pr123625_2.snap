@@ -1,0 +1,118 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr123625-2.c" (c, x86_64-unknown-linux-gnu)
+global g0 : vector<16 x s64i> = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] [external, default, align 128, dso_local]
+global g1 : vector<16 x s64i> = [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] [external, default, align 128, dso_local]
+global g2 : vector<16 x s64i> = [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] [external, default, align 128, dso_local]
+global g3 : vector<16 x s64i> = [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] [external, default, align 128, dso_local]
+global p : s32i = 0 [external, default, align 4, dso_local]
+global q : s32i = 0 [external, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca vector<16 x s64i>, "b", align 128
+    %2 = alloca vector<16 x s64i>, "a", align 128
+    %3 = alloca vector<16 x s64i>, "c", align 128
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = get_global @g0 : vector<16 x s64i>*
+    %6 = load %5 : vector<16 x s64i>, align 128
+    store %6, %1, align 128
+    scope {
+        %51 = get_global @p : s32i*
+        %52 = load %51 : s32i, align 4, volatile
+        %53 = cast(int_to_bool) %52 : bool
+        if %53 {
+            %56 = load %1 : vector<16 x s64i>, align 128
+            store %56, %2, align 128
+            yield
+        } else {
+            %54 = get_global @g1 : vector<16 x s64i>*
+            %55 = load %54 : vector<16 x s64i>, align 128
+            store %55, %2, align 128
+            yield
+        }
+        yield
+    }
+    %7 = load %2 : vector<16 x s64i>, align 128
+    %8 = get_global @g1 : vector<16 x s64i>*
+    store %7, %8, align 128
+    %9 = get_global @g2 : vector<16 x s64i>*
+    %10 = load %9 : vector<16 x s64i>, align 128
+    store %10, %1, align 128
+    scope {
+        %45 = get_global @q : s32i*
+        %46 = load %45 : s32i, align 4, volatile
+        %47 = cast(int_to_bool) %46 : bool
+        if %47 {
+            %50 = load %1 : vector<16 x s64i>, align 128
+            store %50, %3, align 128
+            yield
+        } else {
+            %48 = get_global @g3 : vector<16 x s64i>*
+            %49 = load %48 : vector<16 x s64i>, align 128
+            store %49, %3, align 128
+            yield
+        }
+        yield
+    }
+    %11 = load %3 : vector<16 x s64i>, align 128
+    %12 = get_global @g3 : vector<16 x s64i>*
+    store %11, %12, align 128
+    scope {
+        %15 = get_global @g1 : vector<16 x s64i>*
+        %16 = load %15 : vector<16 x s64i>, align 128
+        %17 = const 0 : s32i
+        <unmodeled: cir.vec.extract>
+        %19 = const 5 : s64i
+        %20 = cmp ne %18, %19 : bool
+        %21 = ternary %20 ? { : bool
+            %44 = const #true : bool
+            yield %44
+        } : {
+            %38 = get_global @g1 : vector<16 x s64i>*
+            %39 = load %38 : vector<16 x s64i>, align 128
+            %40 = const 1 : s32i
+            <unmodeled: cir.vec.extract>
+            %42 = const 0 : s64i
+            %43 = cmp ne %41, %42 : bool
+            yield %43
+        }
+        %22 = ternary %21 ? { : bool
+            %37 = const #true : bool
+            yield %37
+        } : {
+            %31 = get_global @g3 : vector<16 x s64i>*
+            %32 = load %31 : vector<16 x s64i>, align 128
+            %33 = const 0 : s32i
+            <unmodeled: cir.vec.extract>
+            %35 = const 7 : s64i
+            %36 = cmp ne %34, %35 : bool
+            yield %36
+        }
+        %23 = ternary %22 ? { : bool
+            %30 = const #true : bool
+            yield %30
+        } : {
+            %24 = get_global @g3 : vector<16 x s64i>*
+            %25 = load %24 : vector<16 x s64i>, align 128
+            %26 = const 1 : s32i
+            <unmodeled: cir.vec.extract>
+            %28 = const 0 : s64i
+            %29 = cmp ne %27, %28 : bool
+            yield %29
+        }
+        if %23 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %13 = const 0 : s32i
+    store %13, %0
+    %14 = load %0 : s32i
+    return %14
+}

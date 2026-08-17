@@ -1,0 +1,78 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20020215-1.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: rec_s*, %arg1: rec_s*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_s*, %arg1: rec_s*):
+        %34 = load %arg1 : rec_s
+        %35 = alloca rec_s, "s", align 8
+        store %34, %35
+        %36 = get_member %35[1] "i2" : s64i*
+        %37 = load %36 : s64i, align 8
+        %38 = inc %37 : s64i [nsw]
+        store %38, %36, align 8
+        copy %arg0, %35
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_s, "s", align 8
+    %2 = alloca rec_s, ".compoundliteral", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_member %2[0] "i1" : s16i*
+    %5 = const 1000 : s16i
+    store %5, %4, align 8
+    %6 = get_member %2[1] "i2" : s64i*
+    %7 = const 2000 : s64i
+    store %7, %6, align 8
+    %8 = get_member %2[2] "i3" : s16i*
+    %9 = const 3000 : s16i
+    store %9, %8, align 8
+    %10 = load %2 : rec_s, align 8
+    %11 = alloca rec_s, "byval", align 8
+    store %10, %11
+    call @foo(%1, %11) [all]
+    scope {
+        %15 = get_member %1[0] "i1" : s16i*
+        %16 = load %15 : s16i, align 8
+        %17 = cast(integral) %16 : s32i
+        %18 = const 1000 : s32i
+        %19 = cmp ne %17, %18 : bool
+        %20 = ternary %19 ? { : bool
+            %33 = const #true : bool
+            yield %33
+        } : {
+            %29 = get_member %1[1] "i2" : s64i*
+            %30 = load %29 : s64i, align 8
+            %31 = const 2001 : s64i
+            %32 = cmp ne %30, %31 : bool
+            yield %32
+        }
+        %21 = ternary %20 ? { : bool
+            %28 = const #true : bool
+            yield %28
+        } : {
+            %23 = get_member %1[2] "i3" : s16i*
+            %24 = load %23 : s16i, align 8
+            %25 = cast(integral) %24 : s32i
+            %26 = const 3000 : s32i
+            %27 = cmp ne %25, %26 : bool
+            yield %27
+        }
+        if %21 {
+            %22 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %12 = get_global @exit : ((s32i) -> void)*
+    %13 = const 0 : s32i
+    call @exit(%13) [all]
+    %14 = load %0 : s32i
+    return %14
+}

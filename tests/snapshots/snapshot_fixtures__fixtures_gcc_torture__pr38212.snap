@@ -1,0 +1,66 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr38212.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: s32i*, %arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i*, %arg1: s32i):
+        %11 = alloca s32i*, "p", align 8
+        %12 = alloca s32i, "i", align 4
+        %13 = alloca s32i, "__retval", align 4
+        %14 = alloca s32i*, "q", align 8
+        %15 = alloca s32i*, "r", align 8
+        %16 = alloca s32i, "v", align 4
+        %17 = alloca s32i, "w", align 4
+        store %arg0, %11
+        store %arg1, %12
+        %18 = load %11 : s32i*, align 8
+        %19 = const 1 : s32i
+        %20 = ptr_stride %18, %19 : s32i*
+        store %20, %14, align 8
+        %21 = load %14 : s32i*, align 8
+        %22 = load %12 : s32i, align 4
+        %23 = minus %22 : s32i
+        %24 = ptr_stride %21, %23 : s32i*
+        store %24, %15, align 8
+        %25 = load %15 : s32i*, align 8
+        %26 = load %25 : s32i, align 4
+        store %26, %16, align 4
+        %27 = const 1 : s32i
+        %28 = load %11 : s32i*, align 8
+        store %27, %28, align 4
+        %29 = load %15 : s32i*, align 8
+        %30 = load %29 : s32i, align 4
+        store %30, %17, align 4
+        %31 = load %16 : s32i, align 4
+        %32 = load %17 : s32i, align 4
+        %33 = add %31, %32 : s32i [nsw]
+        store %33, %13
+        %34 = load %13 : s32i
+        return %34
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "i", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 0 : s32i
+    store %3, %1, align 4
+    scope {
+        %6 = const 1 : s32i
+        %7 = call @foo(%1, %6) : s32i [all]
+        %8 = const 1 : s32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            %10 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

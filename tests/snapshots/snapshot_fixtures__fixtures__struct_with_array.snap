@@ -1,0 +1,90 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/struct_with_array.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.init : rec_Buf = {[1, 2, 3], 3} [cir_private, default, dso_local, constant]
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_Buf, "b", align 4
+    %2 = alloca rec_Buf, "init", align 4
+    %3 = alloca s32i, "sum", align 4
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 10 : s32i
+    %6 = const 0 : s64i
+    %7 = get_member %1[0] "data" : s32i[3]*
+    %8 = get_element %7[%6] : s32i*
+    store %5, %8, align 4
+    %9 = const 20 : s32i
+    %10 = const 1 : s64i
+    %11 = get_member %1[0] "data" : s32i[3]*
+    %12 = get_element %11[%10] : s32i*
+    store %9, %12, align 4
+    %13 = const 30 : s32i
+    %14 = const 2 : s64i
+    %15 = get_member %1[0] "data" : s32i[3]*
+    %16 = get_element %15[%14] : s32i*
+    store %13, %16, align 4
+    %17 = const 3 : s32i
+    %18 = get_member %1[1] "len" : s32i*
+    store %17, %18, align 4
+    %19 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %20 = get_global @.str : s8i[4]*
+    %21 = cast(array_to_ptrdecay) %20 : s8i*
+    %22 = const 1 : s64i
+    %23 = get_member %1[0] "data" : s32i[3]*
+    %24 = get_element %23[%22] : s32i*
+    %25 = load %24 : s32i, align 4
+    %26 = get_member %1[1] "len" : s32i*
+    %27 = load %26 : s32i, align 4
+    %28 = add %25, %27 : s32i [nsw]
+    %29 = call @printf(%21, %28) : s32i [all]
+    %30 = get_global @__const.main.init : rec_Buf*
+    copy %2, %30
+    %31 = const 0 : s32i
+    store %31, %3, align 4
+    scope {
+        %39 = alloca s32i, "i", align 4
+        %40 = const 0 : s32i
+        store %40, %39, align 4
+        for cond: {
+            %50 = load %39 : s32i, align 4
+            %51 = get_member %2[1] "len" : s32i*
+            %52 = load %51 : s32i, align 4
+            %53 = cmp lt %50, %52 : bool
+            condition %53
+        } step: {
+            %41 = load %39 : s32i, align 4
+            %42 = inc %41 : s32i [nsw]
+            store %42, %39, align 4
+            yield
+        } do {
+            scope {
+                %43 = load %39 : s32i, align 4
+                %44 = cast(integral) %43 : s64i
+                %45 = get_member %2[0] "data" : s32i[3]*
+                %46 = get_element %45[%44] : s32i*
+                %47 = load %46 : s32i, align 4
+                %48 = load %3 : s32i, align 4
+                %49 = add %48, %47 : s32i [nsw]
+                store %49, %3, align 4
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %32 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %33 = get_global @.str : s8i[4]*
+    %34 = cast(array_to_ptrdecay) %33 : s8i*
+    %35 = load %3 : s32i, align 4
+    %36 = call @printf(%34, %35) : s32i [all]
+    %37 = const 0 : s32i
+    store %37, %0
+    %38 = load %0 : s32i
+    return %38
+}

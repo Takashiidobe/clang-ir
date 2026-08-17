@@ -1,0 +1,173 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20010409-1.c" (c, x86_64-unknown-linux-gnu)
+global b : s32i = 1 [external, default, align 4, dso_local]
+global c : s32i = 0 [external, default, align 4, dso_local]
+global d : rec_B[1] = zero [external, default, align 16, dso_local]
+global .str : s8i[5] = "test" [cir_private, default, align 1, dso_local, constant]
+global a : rec_A* = #cir.ptr<null> [external, default, align 8, dso_local]
+global .str.1 : s8i[1] = zero [cir_private, default, align 1, dso_local, constant]
+
+fn foo(%arg7: rec_A*, %arg8: s8i*, %arg9: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg7: rec_A*, %arg8: s8i*, %arg9: s32i):
+        %97 = alloca rec_A*, "x", align 8
+        %98 = alloca s8i*, "y", align 8
+        %99 = alloca s32i, "z", align 4
+        store %arg7, %97
+        store %arg8, %98
+        store %arg9, %99
+        %100 = const 4 : s64i
+        %101 = load %98 : s8i*, align 8
+        %102 = ptr_stride %101, %100 : s8i*
+        %103 = load %102 : s8i, align 1
+        %104 = cast(integral) %103 : s32i
+        %105 = load %99 : s32i, align 4
+        %106 = const 25 : s32i
+        %107 = mul %105, %106 : s32i [nsw]
+        %108 = add %104, %107 : s32i [nsw]
+        %109 = get_global @c : s32i*
+        store %108, %109, align 4
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn bar(%arg2: s8i*, %arg3: s32i, %arg4: s32i, %arg5: s8i*, %arg6: s32i) -> rec_A* [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s8i*, %arg3: s32i, %arg4: s32i, %arg5: s8i*, %arg6: s32i):
+        %85 = alloca s8i*, "v", align 8
+        %86 = alloca s32i, "w", align 4
+        %87 = alloca s32i, "x", align 4
+        %88 = alloca s8i*, "y", align 8
+        %89 = alloca s32i, "z", align 4
+        %90 = alloca rec_A*, "__retval", align 8
+        store %arg2, %85
+        store %arg3, %86
+        store %arg4, %87
+        store %arg5, %88
+        store %arg6, %89
+        scope {
+            %94 = load %86 : s32i, align 4
+            %95 = cast(int_to_bool) %94 : bool
+            if %95 {
+                %96 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        %91 = get_global @exit : ((s32i) -> void)*
+        %92 = const 0 : s32i
+        call @exit(%92) [all]
+        %93 = load %90 : rec_A*
+        return %93
+}
+fn strlen(%arg0: s8i*) -> u64i [external, c, nothrow];
+fn test(%arg0: s8i*, %arg1: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i*, %arg1: s32i*):
+        %14 = alloca s8i*, "x", align 8
+        %15 = alloca s32i*, "y", align 8
+        store %arg0, %14
+        store %arg1, %15
+        %16 = get_global @d : rec_B[1]*
+        %17 = cast(array_to_ptrdecay) %16 : rec_B*
+        %18 = get_member %17[1] "b" : s32i*
+        %19 = load %18 : s32i, align 8
+        %20 = cast(integral) %19 : s64i
+        %21 = get_global @d : rec_B[1]*
+        %22 = cast(array_to_ptrdecay) %21 : rec_B*
+        %23 = get_member %22[0] "a" : rec_A***
+        %24 = load %23 : rec_A**, align 16
+        %25 = ptr_stride %24, %20 : rec_A**
+        %26 = load %25 : rec_A*, align 8
+        %27 = get_global @.str : s8i[5]*
+        %28 = cast(array_to_ptrdecay) %27 : s8i*
+        %29 = const 200 : s32i
+        call @foo(%26, %28, %29) [all]
+        %30 = load %14 : s8i*, align 8
+        %31 = get_global @b : s32i*
+        %32 = load %31 : s32i, align 4
+        %33 = cast(int_to_bool) %32 : bool
+        %34 = const 0 : s32i
+        %35 = const 65536 : s32i
+        %36 = select %33, %34, %35 : s32i
+        %37 = get_global @strlen : ((s8i*) -> u64i)*
+        %38 = load %14 : s8i*, align 8
+        %39 = call @strlen(%38) : u64i [all]
+        %40 = cast(integral) %39 : s32i
+        %41 = get_global @.str : s8i[5]*
+        %42 = cast(array_to_ptrdecay) %41 : s8i*
+        %43 = const 201 : s32i
+        %44 = call @bar(%30, %36, %40, %42, %43) : rec_A* [all]
+        %45 = get_global @d : rec_B[1]*
+        %46 = cast(array_to_ptrdecay) %45 : rec_B*
+        %47 = get_member %46[1] "b" : s32i*
+        %48 = load %47 : s32i, align 8
+        %49 = cast(integral) %48 : s64i
+        %50 = get_global @d : rec_B[1]*
+        %51 = cast(array_to_ptrdecay) %50 : rec_B*
+        %52 = get_member %51[0] "a" : rec_A***
+        %53 = load %52 : rec_A**, align 16
+        %54 = ptr_stride %53, %49 : rec_A**
+        store %44, %54, align 8
+        %55 = get_global @d : rec_B[1]*
+        %56 = cast(array_to_ptrdecay) %55 : rec_B*
+        %57 = get_member %56[1] "b" : s32i*
+        %58 = load %57 : s32i, align 8
+        %59 = cast(integral) %58 : s64i
+        %60 = get_global @d : rec_B[1]*
+        %61 = cast(array_to_ptrdecay) %60 : rec_B*
+        %62 = get_member %61[0] "a" : rec_A***
+        %63 = load %62 : rec_A**, align 16
+        %64 = ptr_stride %63, %59 : rec_A**
+        %65 = load %64 : rec_A*, align 8
+        %66 = get_member %65[0] "a" : s32i*
+        %67 = load %66 : s32i, align 4
+        %68 = inc %67 : s32i [nsw]
+        store %68, %66, align 4
+        scope {
+            %69 = load %15 : s32i*, align 8
+            %70 = cast(ptr_to_bool) %69 : bool
+            if %70 {
+                %71 = load %15 : s32i*, align 8
+                %72 = load %71 : s32i, align 4
+                %73 = get_global @d : rec_B[1]*
+                %74 = cast(array_to_ptrdecay) %73 : rec_B*
+                %75 = get_member %74[1] "b" : s32i*
+                %76 = load %75 : s32i, align 8
+                %77 = cast(integral) %76 : s64i
+                %78 = get_global @d : rec_B[1]*
+                %79 = cast(array_to_ptrdecay) %78 : rec_B*
+                %80 = get_member %79[0] "a" : rec_A***
+                %81 = load %80 : rec_A**, align 16
+                %82 = ptr_stride %81, %77 : rec_A**
+                %83 = load %82 : rec_A*, align 8
+                %84 = get_member %83[1] "b" : s32i*
+                store %72, %84, align 4
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 0 : s32i
+    %3 = get_global @d : rec_B[1]*
+    %4 = cast(array_to_ptrdecay) %3 : rec_B*
+    %5 = get_member %4[1] "b" : s32i*
+    store %2, %5, align 8
+    %6 = get_global @a : rec_A**
+    %7 = get_global @d : rec_B[1]*
+    %8 = cast(array_to_ptrdecay) %7 : rec_B*
+    %9 = get_member %8[0] "a" : rec_A***
+    store %6, %9, align 16
+    %10 = get_global @.str.1 : s8i[1]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = const #cir.ptr<null> : s32i*
+    call @test(%11, %12) [all]
+    %13 = load %0 : s32i
+    return %13
+}

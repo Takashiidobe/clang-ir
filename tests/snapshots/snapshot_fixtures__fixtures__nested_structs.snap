@@ -1,0 +1,61 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/nested_structs.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.init : rec_Outer = {{1, 2}, 3} [cir_private, default, dso_local, constant]
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_Outer, "o", align 4
+    %2 = alloca rec_Outer, "init", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 3 : s32i
+    %5 = get_member %1[0] "a" : rec_Inner*
+    %6 = get_member %5[0] "x" : s32i*
+    store %4, %6, align 4
+    %7 = const 4 : s32i
+    %8 = get_member %1[0] "a" : rec_Inner*
+    %9 = get_member %8[1] "y" : s32i*
+    store %7, %9, align 4
+    %10 = const 5 : s32i
+    %11 = get_member %1[1] "z" : s32i*
+    store %10, %11, align 4
+    %12 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %13 = get_global @.str : s8i[4]*
+    %14 = cast(array_to_ptrdecay) %13 : s8i*
+    %15 = get_member %1[0] "a" : rec_Inner*
+    %16 = get_member %15[0] "x" : s32i*
+    %17 = load %16 : s32i, align 4
+    %18 = get_member %1[0] "a" : rec_Inner*
+    %19 = get_member %18[1] "y" : s32i*
+    %20 = load %19 : s32i, align 4
+    %21 = add %17, %20 : s32i [nsw]
+    %22 = get_member %1[1] "z" : s32i*
+    %23 = load %22 : s32i, align 4
+    %24 = add %21, %23 : s32i [nsw]
+    %25 = call @printf(%14, %24) : s32i [all]
+    %26 = get_global @__const.main.init : rec_Outer*
+    copy %2, %26
+    %27 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %28 = get_global @.str : s8i[4]*
+    %29 = cast(array_to_ptrdecay) %28 : s8i*
+    %30 = get_member %2[0] "a" : rec_Inner*
+    %31 = get_member %30[0] "x" : s32i*
+    %32 = load %31 : s32i, align 4
+    %33 = get_member %2[0] "a" : rec_Inner*
+    %34 = get_member %33[1] "y" : s32i*
+    %35 = load %34 : s32i, align 4
+    %36 = add %32, %35 : s32i [nsw]
+    %37 = get_member %2[1] "z" : s32i*
+    %38 = load %37 : s32i, align 4
+    %39 = add %36, %38 : s32i [nsw]
+    %40 = call @printf(%29, %39) : s32i [all]
+    %41 = const 0 : s32i
+    store %41, %0
+    %42 = load %0 : s32i
+    return %42
+}

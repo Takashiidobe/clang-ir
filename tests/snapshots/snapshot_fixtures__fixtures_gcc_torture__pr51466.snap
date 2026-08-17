@@ -1,0 +1,132 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr51466.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg2: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i):
+        %62 = alloca s32i, "i", align 4
+        %63 = alloca s32i, "__retval", align 4
+        %64 = alloca s32i[4], "v", align 16
+        %65 = alloca s32i*, "p", align 8
+        store %arg2, %62
+        %66 = const 6 : s32i
+        %67 = load %62 : s32i, align 4
+        %68 = cast(integral) %67 : s64i
+        %69 = get_element %64[%68] : s32i*
+        store %66, %69, align 4, volatile
+        %70 = load %62 : s32i, align 4
+        %71 = cast(integral) %70 : s64i
+        %72 = get_element %64[%71] : s32i*
+        store %72, %65, align 8
+        %73 = load %65 : s32i*, align 8
+        %74 = load %73 : s32i, align 4
+        store %74, %63
+        %75 = load %63 : s32i
+        return %75
+}
+fn bar(%arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i):
+        %44 = alloca s32i, "i", align 4
+        %45 = alloca s32i, "__retval", align 4
+        %46 = alloca s32i[4], "v", align 16
+        %47 = alloca s32i*, "p", align 8
+        store %arg1, %44
+        %48 = const 6 : s32i
+        %49 = load %44 : s32i, align 4
+        %50 = cast(integral) %49 : s64i
+        %51 = get_element %46[%50] : s32i*
+        store %48, %51, align 4, volatile
+        %52 = load %44 : s32i, align 4
+        %53 = cast(integral) %52 : s64i
+        %54 = get_element %46[%53] : s32i*
+        store %54, %47, align 8
+        %55 = const 8 : s32i
+        %56 = load %47 : s32i*, align 8
+        store %55, %56, align 4
+        %57 = load %44 : s32i, align 4
+        %58 = cast(integral) %57 : s64i
+        %59 = get_element %46[%58] : s32i*
+        %60 = load %59 : s32i, align 4, volatile
+        store %60, %45
+        %61 = load %45 : s32i
+        return %61
+}
+fn baz(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %27 = alloca s32i, "i", align 4
+        %28 = alloca s32i, "__retval", align 4
+        %29 = alloca s32i[4], "v", align 16
+        %30 = alloca s32i*, "p", align 8
+        store %arg0, %27
+        %31 = const 6 : s32i
+        %32 = load %27 : s32i, align 4
+        %33 = cast(integral) %32 : s64i
+        %34 = get_element %29[%33] : s32i*
+        store %31, %34, align 4, volatile
+        %35 = const 0 : s64i
+        %36 = get_element %29[%35] : s32i*
+        store %36, %30, align 8
+        %37 = const 8 : s32i
+        %38 = load %30 : s32i*, align 8
+        store %37, %38, align 4
+        %39 = load %27 : s32i, align 4
+        %40 = cast(integral) %39 : s64i
+        %41 = get_element %29[%40] : s32i*
+        %42 = load %41 : s32i, align 4, volatile
+        store %42, %28
+        %43 = load %28 : s32i
+        return %43
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = const 3 : s32i
+        %5 = call @foo(%4) : s32i [all]
+        %6 = const 6 : s32i
+        %7 = cmp ne %5, %6 : bool
+        %8 = ternary %7 ? { : bool
+            %26 = const #true : bool
+            yield %26
+        } : {
+            %22 = const 2 : s32i
+            %23 = call @bar(%22) : s32i [all]
+            %24 = const 8 : s32i
+            %25 = cmp ne %23, %24 : bool
+            yield %25
+        }
+        %9 = ternary %8 ? { : bool
+            %21 = const #true : bool
+            yield %21
+        } : {
+            %17 = const 0 : s32i
+            %18 = call @baz(%17) : s32i [all]
+            %19 = const 8 : s32i
+            %20 = cmp ne %18, %19 : bool
+            yield %20
+        }
+        %10 = ternary %9 ? { : bool
+            %16 = const #true : bool
+            yield %16
+        } : {
+            %12 = const 1 : s32i
+            %13 = call @baz(%12) : s32i [all]
+            %14 = const 6 : s32i
+            %15 = cmp ne %13, %14 : bool
+            yield %15
+        }
+        if %10 {
+            %11 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

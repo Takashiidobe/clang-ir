@@ -1,0 +1,101 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.link/long_double_callback/main.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[7] = "result" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[3] = "%s" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[5] = "%02x" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[2] = "\n" [cir_private, default, align 1, dso_local, constant]
+
+fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn dump80(%arg2: s8i*, %arg3: long_double<f80>) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s8i*, %arg3: long_double<f80>):
+        %21 = alloca s8i*, "name", align 8
+        %22 = alloca long_double<f80>, "value", align 16
+        %23 = alloca u8i[10], "bytes", align 1
+        store %arg2, %21
+        store %arg3, %22
+        %24 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %25 = cast(array_to_ptrdecay) %23 : u8i*
+        %26 = cast(bitcast) %25 : void*
+        %27 = cast(bitcast) %22 : void*
+        %28 = const 10 : u64i
+        %29 = call @memcpy(%26, %27, %28) : void* [all]
+        %30 = get_global @printf : ((s8i*, ...) -> s32i)*
+        %31 = get_global @.str.1 : s8i[3]*
+        %32 = cast(array_to_ptrdecay) %31 : s8i*
+        %33 = load %21 : s8i*, align 8
+        %34 = call @printf(%32, %33) : s32i [all]
+        scope {
+            %39 = alloca s32i, "i", align 4
+            %40 = const 0 : s32i
+            store %40, %39, align 4
+            for cond: {
+                %52 = load %39 : s32i, align 4
+                %53 = const 10 : s32i
+                %54 = cmp lt %52, %53 : bool
+                condition %54
+            } step: {
+                %41 = load %39 : s32i, align 4
+                %42 = inc %41 : s32i [nsw]
+                store %42, %39, align 4
+                yield
+            } do {
+                %43 = get_global @printf : ((s8i*, ...) -> s32i)*
+                %44 = get_global @.str.2 : s8i[5]*
+                %45 = cast(array_to_ptrdecay) %44 : s8i*
+                %46 = load %39 : s32i, align 4
+                %47 = cast(integral) %46 : s64i
+                %48 = get_element %23[%47] : u8i*
+                %49 = load %48 : u8i, align 1
+                %50 = cast(integral) %49 : s32i
+                %51 = call @printf(%45, %50) : s32i [all]
+                yield
+            }
+            yield
+        }
+        %35 = get_global @printf : ((s8i*, ...) -> s32i)*
+        %36 = get_global @.str.3 : s8i[2]*
+        %37 = cast(array_to_ptrdecay) %36 : s8i*
+        %38 = call @printf(%37) : s32i [all]
+        return
+}
+fn invoke_cb(%arg0: ((long_double<f80>, long_double<f80>) -> long_double<f80>)*, %arg1: long_double<f80>, %arg2: long_double<f80>) -> long_double<f80> [external, c];
+fn local_cb(%arg0: long_double<f80>, %arg1: long_double<f80>) -> long_double<f80> [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: long_double<f80>, %arg1: long_double<f80>):
+        %14 = alloca long_double<f80>, "a", align 16
+        %15 = alloca long_double<f80>, "b", align 16
+        %16 = alloca long_double<f80>, "__retval", align 16
+        store %arg0, %14
+        store %arg1, %15
+        %17 = load %14 : long_double<f80>, align 16
+        %18 = load %15 : long_double<f80>, align 16
+        %19 = fadd %17, %18 : long_double<f80>
+        store %19, %16
+        %20 = load %16 : long_double<f80>
+        return %20
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca long_double<f80>, "a", align 16
+    %2 = alloca long_double<f80>, "b", align 16
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 1.000000e+00 : long_double<f80>
+    store %4, %1, align 16
+    %5 = const 1.00000000000000000011 : long_double<f80>
+    store %5, %2, align 16
+    %6 = get_global @.str : s8i[7]*
+    %7 = cast(array_to_ptrdecay) %6 : s8i*
+    %8 = get_global @local_cb : ((long_double<f80>, long_double<f80>) -> long_double<f80>)*
+    %9 = load %1 : long_double<f80>, align 16
+    %10 = load %2 : long_double<f80>, align 16
+    %11 = call @invoke_cb(%8, %9, %10) : long_double<f80> [all]
+    call @dump80(%7, %11) [all]
+    %12 = const 0 : s32i
+    store %12, %0
+    %13 = load %0 : s32i
+    return %13
+}

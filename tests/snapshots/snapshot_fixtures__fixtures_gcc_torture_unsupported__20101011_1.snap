@@ -1,0 +1,41 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture.unsupported/20101011-1.c" (c, x86_64-unknown-linux-gnu)
+global i : s32i = 0 [internal, default, align 4, dso_local]
+global j : s32i = 0 [internal, default, align 4, dso_local]
+global k : s32i = 0 [external, default, align 4, dso_local]
+global llvm.compiler.used : void*[1] = [@k] [appending, default, dso_local]
+
+fn exit(%arg0: s32i) -> void [external, c];
+fn sigfpe(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %13 = alloca s32i, "signum", align 4
+        store %arg0, %13
+        %14 = get_global @exit : ((s32i) -> void)*
+        %15 = const 0 : s32i
+        call @exit(%15) [all]
+        return
+}
+fn signal(%arg0: s32i, %arg1: ((s32i) -> void)*) -> ((s32i) -> void)* [external, c, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 8 : s32i
+    %3 = get_global @sigfpe : ((s32i) -> void)*
+    %4 = call @signal(%2, %3) : ((s32i) -> void)* [all]
+    %5 = get_global @i : s32i*
+    %6 = load %5 : s32i, align 4
+    %7 = get_global @j : s32i*
+    %8 = load %7 : s32i, align 4
+    %9 = div %6, %8 : s32i
+    %10 = get_global @k : s32i*
+    store %9, %10, align 4
+    %11 = get_global @abort : (() -> void)*
+    call @abort() [all]
+    %12 = load %0 : s32i
+    return %12
+}

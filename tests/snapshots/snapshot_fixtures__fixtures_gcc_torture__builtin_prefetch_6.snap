@@ -1,0 +1,123 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/builtin-prefetch-6.c" (c, x86_64-unknown-linux-gnu)
+global bad_addr : s32i*[65] = zero [external, default, align 16, dso_local]
+global arr_used : s32i = 0 [external, default, align 4, dso_local]
+
+fn init_addrs() -> void [external, c, no_inline, dso_local, nothrow] {
+    %31 = alloca s32i, "i", align 4
+    %32 = alloca s32i, "bits_per_ptr", align 4
+    %33 = const 8 : u64i
+    %34 = const 8 : u64i
+    %35 = mul %33, %34 : u64i
+    %36 = cast(integral) %35 : s32i
+    store %36, %32, align 4
+    scope {
+        %41 = const 0 : s32i
+        store %41, %31, align 4
+        for cond: {
+            %53 = load %31 : s32i, align 4
+            %54 = load %32 : s32i, align 4
+            %55 = cmp lt %53, %54 : bool
+            condition %55
+        } step: {
+            %42 = load %31 : s32i, align 4
+            %43 = inc %42 : s32i [nsw]
+            store %43, %31, align 4
+            yield
+        } do {
+            %44 = const 1 : u64i
+            %45 = load %31 : s32i, align 4
+            %46 = shift left %44, %45 : u64i
+            %47 = cast(int_to_ptr) %46 : void*
+            %48 = cast(bitcast) %47 : s32i*
+            %49 = load %31 : s32i, align 4
+            %50 = cast(integral) %49 : s64i
+            %51 = get_global @bad_addr : s32i*[65]*
+            %52 = get_element %51[%50] : s32i**
+            store %48, %52, align 8
+            yield
+        }
+        yield
+    }
+    %37 = load %32 : s32i, align 4
+    %38 = const 1 : s32i
+    %39 = add %37, %38 : s32i [nsw]
+    %40 = get_global @arr_used : s32i*
+    store %39, %40, align 4
+    return
+}
+fn prefetch_for_read() -> void [external, c, no_inline, dso_local, nothrow] {
+    %18 = alloca s32i, "i", align 4
+    scope {
+        %19 = const 0 : s32i
+        store %19, %18, align 4
+        for cond: {
+            %28 = load %18 : s32i, align 4
+            %29 = const 65 : s32i
+            %30 = cmp lt %28, %29 : bool
+            condition %30
+        } step: {
+            %20 = load %18 : s32i, align 4
+            %21 = inc %20 : s32i [nsw]
+            store %21, %18, align 4
+            yield
+        } do {
+            %22 = load %18 : s32i, align 4
+            %23 = cast(integral) %22 : s64i
+            %24 = get_global @bad_addr : s32i*[65]*
+            %25 = get_element %24[%23] : s32i**
+            %26 = load %25 : s32i*, align 8
+            %27 = cast(bitcast) %26 : void*
+            <unmodeled: cir.prefetch>
+            yield
+        }
+        yield
+    }
+    return
+}
+fn prefetch_for_write() -> void [external, c, no_inline, dso_local, nothrow] {
+    %5 = alloca s32i, "i", align 4
+    scope {
+        %6 = const 0 : s32i
+        store %6, %5, align 4
+        for cond: {
+            %15 = load %5 : s32i, align 4
+            %16 = const 65 : s32i
+            %17 = cmp lt %15, %16 : bool
+            condition %17
+        } step: {
+            %7 = load %5 : s32i, align 4
+            %8 = inc %7 : s32i [nsw]
+            store %8, %5, align 4
+            yield
+        } do {
+            %9 = load %5 : s32i, align 4
+            %10 = cast(integral) %9 : s64i
+            %11 = get_global @bad_addr : s32i*[65]*
+            %12 = get_element %11[%10] : s32i**
+            %13 = load %12 : s32i*, align 8
+            %14 = cast(bitcast) %13 : void*
+            <unmodeled: cir.prefetch>
+            yield
+        }
+        yield
+    }
+    return
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    call @init_addrs() [all]
+    call @prefetch_for_read() [all]
+    call @prefetch_for_write() [all]
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

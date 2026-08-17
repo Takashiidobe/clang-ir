@@ -1,0 +1,85 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr114965.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[2] = "_" [cir_private, default, align 1, dso_local, constant]
+
+fn abort() -> void [external, c, nothrow];
+fn foo(%arg0: s8i*) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i*):
+        %5 = alloca s8i*, "x", align 8
+        %6 = alloca s8i, "a", align 1
+        store %arg0, %5
+        %7 = const 48 : s8i
+        store %7, %6, align 1
+        scope {
+            while {
+                %26 = const 1 : s32i
+                %27 = cast(int_to_bool) %26 : bool
+                condition %27
+            } do {
+                scope {
+                    scope {
+                        %18 = load %5 : s8i*, align 8
+                        %19 = load %18 : s8i, align 1
+                        %20 = cast(integral) %19 : s32i
+                        switch %20 {
+                            case equal 95 {
+                                yield
+                            }
+                            case equal 43 {
+                                %21 = load %5 : s8i*, align 8
+                                %22 = load %21 : s8i, align 1
+                                store %22, %6, align 1
+                                %23 = load %5 : s8i*, align 8
+                                %24 = const 1 : s32i
+                                %25 = ptr_stride %23, %24 : s8i*
+                                store %25, %5, align 8
+                                continue
+                            }
+                            case default {
+                                break
+                            }
+                        }
+                        yield
+                    }
+                    break
+                }
+                yield
+            }
+            yield
+        }
+        scope {
+            %8 = load %6 : s8i, align 1
+            %9 = cast(integral) %8 : s32i
+            %10 = const 48 : s32i
+            %11 = cmp eq %9, %10 : bool
+            %12 = ternary %11 ? { : bool
+                %17 = const #true : bool
+                yield %17
+            } : {
+                %13 = load %6 : s8i, align 1
+                %14 = cast(integral) %13 : s32i
+                %15 = const 43 : s32i
+                %16 = cmp eq %14, %15 : bool
+                yield %16
+            }
+            if %12 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @.str : s8i[2]*
+    %3 = cast(array_to_ptrdecay) %2 : s8i*
+    call @foo(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

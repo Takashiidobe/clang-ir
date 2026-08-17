@@ -1,0 +1,142 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr65418-2.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %38 = alloca s32i, "x", align 4
+        %39 = alloca s32i, "__retval", align 4
+        store %arg0, %38
+        scope {
+            %42 = load %38 : s32i, align 4
+            %43 = const -216 : s32i
+            %44 = cmp eq %42, %43 : bool
+            %45 = ternary %44 ? { : bool
+                %66 = const #true : bool
+                yield %66
+            } : {
+                %63 = load %38 : s32i, align 4
+                %64 = const -211 : s32i
+                %65 = cmp eq %63, %64 : bool
+                yield %65
+            }
+            %46 = ternary %45 ? { : bool
+                %62 = const #true : bool
+                yield %62
+            } : {
+                %59 = load %38 : s32i, align 4
+                %60 = const -218 : s32i
+                %61 = cmp eq %59, %60 : bool
+                yield %61
+            }
+            %47 = ternary %46 ? { : bool
+                %58 = const #true : bool
+                yield %58
+            } : {
+                %55 = load %38 : s32i, align 4
+                %56 = const -205 : s32i
+                %57 = cmp eq %55, %56 : bool
+                yield %57
+            }
+            %48 = ternary %47 ? { : bool
+                %54 = const #true : bool
+                yield %54
+            } : {
+                %51 = load %38 : s32i, align 4
+                %52 = const -223 : s32i
+                %53 = cmp eq %51, %52 : bool
+                yield %53
+            }
+            if %48 {
+                %49 = const 1 : s32i
+                store %49, %39
+                %50 = load %39 : s32i
+                return %50
+            }
+            yield
+        }
+        %40 = const 0 : s32i
+        store %40, %39
+        %41 = load %39 : s32i
+        return %41
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "i", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    scope {
+        %5 = const -230 : s32i
+        store %5, %1, align 4, volatile
+        for cond: {
+            %35 = load %1 : s32i, align 4, volatile
+            %36 = const -200 : s32i
+            %37 = cmp lt %35, %36 : bool
+            condition %37
+        } step: {
+            %6 = load %1 : s32i, align 4, volatile
+            %7 = inc %6 : s32i [nsw]
+            store %7, %1, align 4, volatile
+            yield
+        } do {
+            scope {
+                %8 = load %1 : s32i, align 4, volatile
+                %9 = call @foo(%8) : s32i [all]
+                %10 = load %1 : s32i, align 4, volatile
+                %11 = const -216 : s32i
+                %12 = cmp eq %10, %11 : bool
+                %13 = ternary %12 ? { : bool
+                    %34 = const #true : bool
+                    yield %34
+                } : {
+                    %31 = load %1 : s32i, align 4, volatile
+                    %32 = const -211 : s32i
+                    %33 = cmp eq %31, %32 : bool
+                    yield %33
+                }
+                %14 = ternary %13 ? { : bool
+                    %30 = const #true : bool
+                    yield %30
+                } : {
+                    %27 = load %1 : s32i, align 4, volatile
+                    %28 = const -218 : s32i
+                    %29 = cmp eq %27, %28 : bool
+                    yield %29
+                }
+                %15 = ternary %14 ? { : bool
+                    %26 = const #true : bool
+                    yield %26
+                } : {
+                    %23 = load %1 : s32i, align 4, volatile
+                    %24 = const -205 : s32i
+                    %25 = cmp eq %23, %24 : bool
+                    yield %25
+                }
+                %16 = ternary %15 ? { : bool
+                    %22 = const #true : bool
+                    yield %22
+                } : {
+                    %19 = load %1 : s32i, align 4, volatile
+                    %20 = const -223 : s32i
+                    %21 = cmp eq %19, %20 : bool
+                    yield %21
+                }
+                %17 = cast(bool_to_int) %16 : s32i
+                %18 = cmp ne %9, %17 : bool
+                if %18 {
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

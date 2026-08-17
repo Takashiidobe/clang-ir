@@ -1,0 +1,36 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/math/hyperbolic.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[16] = "%.6f %.6f %.6f\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn sinh(%arg0: double) -> double [external, c, nothrow];
+fn cosh(%arg0: double) -> double [external, c, nothrow];
+fn tanh(%arg0: double) -> double [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca double, "x", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 5.000000e-01 : double
+    store %3, %1, align 8
+    %4 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %5 = get_global @.str : s8i[16]*
+    %6 = cast(array_to_ptrdecay) %5 : s8i*
+    %7 = get_global @sinh : ((double) -> double)*
+    %8 = load %1 : double, align 8
+    %9 = call @sinh(%8) : double [all]
+    %10 = get_global @cosh : ((double) -> double)*
+    %11 = load %1 : double, align 8
+    %12 = call @cosh(%11) : double [all]
+    %13 = get_global @tanh : ((double) -> double)*
+    %14 = load %1 : double, align 8
+    %15 = call @tanh(%14) : double [all]
+    %16 = call @printf(%6, %9, %12, %15) : s32i [all]
+    %17 = const 0 : s32i
+    store %17, %0
+    %18 = load %0 : s32i
+    return %18
+}

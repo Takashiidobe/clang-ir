@@ -1,0 +1,182 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr27285.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.y : rec_S = zero [cir_private, default, dso_local, constant]
+global __const.main.x : rec_S = {0, 25, 0, [170, 187, 204, 221]} [cir_private, default, dso_local, constant]
+
+fn foo(%arg0: rec_S*, %arg1: rec_S*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_S*, %arg1: rec_S*):
+        %61 = alloca rec_S*, "x", align 8
+        %62 = alloca rec_S*, "y", align 8
+        %63 = alloca s32i, "a", align 4
+        %64 = alloca s32i, "b", align 4
+        %65 = alloca u8i, "c", align 1
+        %66 = alloca u8i*, "d", align 8
+        %67 = alloca u8i*, "e", align 8
+        store %arg0, %61
+        store %arg1, %62
+        %68 = load %61 : rec_S*, align 8
+        %69 = get_member %68[1] "b" : u8i*
+        %70 = load %69 : u8i, align 1
+        %71 = cast(integral) %70 : s32i
+        store %71, %64, align 4
+        %72 = load %61 : rec_S*, align 8
+        %73 = get_member %72[3] "d" : u8i[16]*
+        %74 = cast(array_to_ptrdecay) %73 : u8i*
+        store %74, %66, align 8
+        %75 = load %62 : rec_S*, align 8
+        %76 = get_member %75[3] "d" : u8i[16]*
+        %77 = cast(array_to_ptrdecay) %76 : u8i*
+        store %77, %67, align 8
+        %78 = const 0 : s32i
+        store %78, %63, align 4
+        scope {
+            while {
+                %109 = load %64 : s32i, align 4
+                %110 = cast(int_to_bool) %109 : bool
+                condition %110
+            } do {
+                scope {
+                    scope {
+                        %95 = load %64 : s32i, align 4
+                        %96 = const 8 : s32i
+                        %97 = cmp ge %95, %96 : bool
+                        if %97 {
+                            %105 = const 255 : u8i
+                            store %105, %65, align 1
+                            %106 = const 8 : s32i
+                            %107 = load %64 : s32i, align 4
+                            %108 = sub %107, %106 : s32i [nsw]
+                            store %108, %64, align 4
+                            yield
+                        } else {
+                            %98 = const 255 : s32i
+                            %99 = const 8 : s32i
+                            %100 = load %64 : s32i, align 4
+                            %101 = sub %99, %100 : s32i [nsw]
+                            %102 = shift left %98, %101 : s32i
+                            %103 = cast(integral) %102 : u8i
+                            store %103, %65, align 1
+                            %104 = const 0 : s32i
+                            store %104, %64, align 4
+                            yield
+                        }
+                        yield
+                    }
+                    %79 = load %63 : s32i, align 4
+                    %80 = cast(integral) %79 : s64i
+                    %81 = load %66 : u8i*, align 8
+                    %82 = ptr_stride %81, %80 : u8i*
+                    %83 = load %82 : u8i, align 1
+                    %84 = cast(integral) %83 : s32i
+                    %85 = load %65 : u8i, align 1
+                    %86 = cast(integral) %85 : s32i
+                    %87 = and %84, %86 : s32i
+                    %88 = cast(integral) %87 : u8i
+                    %89 = load %63 : s32i, align 4
+                    %90 = cast(integral) %89 : s64i
+                    %91 = load %67 : u8i*, align 8
+                    %92 = ptr_stride %91, %90 : u8i*
+                    store %88, %92, align 1
+                    %93 = load %63 : s32i, align 4
+                    %94 = inc %93 : s32i [nsw]
+                    store %94, %63, align 4
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_S, "x", align 1
+    %2 = alloca rec_S, "y", align 1
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_global @__const.main.x : rec_S*
+    copy %1, %4
+    %5 = get_global @__const.main.y : rec_S*
+    copy %2, %5
+    call @foo(%1, %2) [all]
+    scope {
+        %8 = const 0 : s64i
+        %9 = get_member %1[3] "d" : u8i[16]*
+        %10 = get_element %9[%8] : u8i*
+        %11 = load %10 : u8i, align 1
+        %12 = cast(integral) %11 : s32i
+        %13 = const 0 : s64i
+        %14 = get_member %2[3] "d" : u8i[16]*
+        %15 = get_element %14[%13] : u8i*
+        %16 = load %15 : u8i, align 1
+        %17 = cast(integral) %16 : s32i
+        %18 = cmp ne %12, %17 : bool
+        %19 = ternary %18 ? { : bool
+            %60 = const #true : bool
+            yield %60
+        } : {
+            %49 = const 1 : s64i
+            %50 = get_member %1[3] "d" : u8i[16]*
+            %51 = get_element %50[%49] : u8i*
+            %52 = load %51 : u8i, align 1
+            %53 = cast(integral) %52 : s32i
+            %54 = const 1 : s64i
+            %55 = get_member %2[3] "d" : u8i[16]*
+            %56 = get_element %55[%54] : u8i*
+            %57 = load %56 : u8i, align 1
+            %58 = cast(integral) %57 : s32i
+            %59 = cmp ne %53, %58 : bool
+            yield %59
+        }
+        %20 = ternary %19 ? { : bool
+            %48 = const #true : bool
+            yield %48
+        } : {
+            %37 = const 2 : s64i
+            %38 = get_member %1[3] "d" : u8i[16]*
+            %39 = get_element %38[%37] : u8i*
+            %40 = load %39 : u8i, align 1
+            %41 = cast(integral) %40 : s32i
+            %42 = const 2 : s64i
+            %43 = get_member %2[3] "d" : u8i[16]*
+            %44 = get_element %43[%42] : u8i*
+            %45 = load %44 : u8i, align 1
+            %46 = cast(integral) %45 : s32i
+            %47 = cmp ne %41, %46 : bool
+            yield %47
+        }
+        %21 = ternary %20 ? { : bool
+            %36 = const #true : bool
+            yield %36
+        } : {
+            %23 = const 3 : s64i
+            %24 = get_member %1[3] "d" : u8i[16]*
+            %25 = get_element %24[%23] : u8i*
+            %26 = load %25 : u8i, align 1
+            %27 = cast(integral) %26 : s32i
+            %28 = const 128 : s32i
+            %29 = and %27, %28 : s32i
+            %30 = const 3 : s64i
+            %31 = get_member %2[3] "d" : u8i[16]*
+            %32 = get_element %31[%30] : u8i*
+            %33 = load %32 : u8i, align 1
+            %34 = cast(integral) %33 : s32i
+            %35 = cmp ne %29, %34 : bool
+            yield %35
+        }
+        if %21 {
+            %22 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = load %0 : s32i
+    return %7
+}

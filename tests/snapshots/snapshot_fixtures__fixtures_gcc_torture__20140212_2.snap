@@ -1,0 +1,65 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20140212-2.c" (c, x86_64-unknown-linux-gnu)
+fn f(%arg0: u16i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u16i):
+        %12 = alloca u16i, "usVlanID", align 2
+        %13 = alloca s32i, "__retval", align 4
+        %14 = alloca u32i, "uiVlanID", align 4
+        %15 = alloca s32i, "i", align 4
+        store %arg0, %12
+        %16 = const 4294967295 : u32i
+        store %16, %14, align 4
+        scope {
+            %20 = const 65535 : s32i
+            %21 = load %12 : u16i, align 2
+            %22 = cast(integral) %21 : s32i
+            %23 = cmp ne %20, %22 : bool
+            if %23 {
+                %24 = load %12 : u16i, align 2
+                %25 = cast(integral) %24 : u32i
+                store %25, %14, align 4
+                yield
+            }
+            yield
+        }
+        %17 = load %14 : u32i, align 4
+        %18 = cast(integral) %17 : s32i
+        store %18, %13
+        %19 = load %13 : s32i
+        return %19
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %8 = const 1 : u16i
+        %9 = call @f(%8) : s32i [all]
+        %10 = const 1 : s32i
+        %11 = cmp ne %9, %10 : bool
+        if %11 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %4 = const 65535 : u16i
+        %5 = call @f(%4) : s32i [all]
+        %6 = const -1 : s32i
+        %7 = cmp ne %5, %6 : bool
+        if %7 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

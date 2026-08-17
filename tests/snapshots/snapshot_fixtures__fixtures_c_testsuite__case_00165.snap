@@ -1,0 +1,36 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00165.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[12] = "%d, %d, %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[4]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 12 : s32i
+    %6 = call @printf(%4, %5) : s32i [all]
+    %7 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %8 = get_global @.str.1 : s8i[12]*
+    %9 = cast(array_to_ptrdecay) %8 : s8i*
+    %10 = const 12 : s32i
+    %11 = const 1 : s32i
+    %12 = mul %10, %11 : s32i [nsw]
+    %13 = const 12 : s32i
+    %14 = const 2 : s32i
+    %15 = mul %13, %14 : s32i [nsw]
+    %16 = const 12 : s32i
+    %17 = const 3 : s32i
+    %18 = mul %16, %17 : s32i [nsw]
+    %19 = call @printf(%9, %12, %15, %18) : s32i [all]
+    %20 = const 0 : s32i
+    store %20, %0
+    %21 = load %0 : s32i
+    return %21
+}

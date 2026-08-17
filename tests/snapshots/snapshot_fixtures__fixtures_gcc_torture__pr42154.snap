@@ -1,0 +1,72 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr42154.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn foo(%arg0: s8i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i):
+        %21 = alloca s8i, "coerce", align 1
+        store %arg0, %21
+        %22 = cast(bitcast) %21 : rec_A*
+        %23 = load %22 : rec_A
+        %24 = alloca rec_A, "a", align 1
+        store %23, %24
+        scope {
+            %25 = const 0 : s64i
+            %26 = get_member %24[0] "x" : s8i[1]*
+            %27 = get_element %26[%25] : s8i*
+            %28 = load %27 : s8i, align 1
+            %29 = cast(integral) %28 : s32i
+            %30 = const 97 : s32i
+            %31 = cmp ne %29, %30 : bool
+            if %31 {
+                %32 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca rec_A, "coerce", align 1
+    %1 = alloca s32i, "__retval", align 4
+    %2 = alloca rec_A, "a", align 1
+    %3 = alloca s32i, "i", align 4
+    %4 = const 0 : s32i
+    store %4, %1
+    scope {
+        %10 = const 0 : s32i
+        store %10, %3, align 4
+        for cond: {
+            %18 = load %3 : s32i, align 4
+            %19 = const 1 : s32i
+            %20 = cmp lt %18, %19 : bool
+            condition %20
+        } step: {
+            %11 = load %3 : s32i, align 4
+            %12 = inc %11 : s32i [nsw]
+            store %12, %3, align 4
+            yield
+        } do {
+            %13 = const 97 : s8i
+            %14 = load %3 : s32i, align 4
+            %15 = cast(integral) %14 : s64i
+            %16 = get_member %2[0] "x" : s8i[1]*
+            %17 = get_element %16[%15] : s8i*
+            store %13, %17, align 1
+            yield
+        }
+        yield
+    }
+    %5 = load %2 : rec_A, align 1
+    store %5, %0
+    %6 = cast(bitcast) %0 : s8i*
+    %7 = load %6 : s8i
+    call @foo(%7) [all]
+    %8 = const 0 : s32i
+    store %8, %1
+    %9 = load %1 : s32i
+    return %9
+}

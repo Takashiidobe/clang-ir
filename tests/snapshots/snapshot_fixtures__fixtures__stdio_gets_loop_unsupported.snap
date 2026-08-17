@@ -1,0 +1,129 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/stdio_gets_loop_unsupported.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[38] = "slate_stdio_gets_loop_unsupported.tmp" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[2] = "w" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[10] = "open-fail" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[5] = "one\n" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[5] = "two\n" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[2] = "r" [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[12] = "reopen-fail" [cir_private, default, align 1, dso_local, constant]
+global .str.7 : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn remove(%arg0: s8i*) -> s32i [external, c, nothrow];
+fn fopen(%arg0: s8i*, %arg1: s8i*) -> rec__IO_FILE* [external, c];
+fn puts(%arg0: s8i*) -> s32i [external, c];
+fn fputs(%arg0: s8i*, %arg1: rec__IO_FILE*) -> s32i [external, c];
+fn fclose(%arg0: rec__IO_FILE*) -> s32i [external, c];
+fn fgets(%arg0: s8i*, %arg1: s32i, %arg2: rec__IO_FILE*) -> s8i* [external, c];
+fn strlen(%arg0: s8i*) -> u64i [external, c, pure, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec__IO_FILE*, "f", align 8
+    %2 = alloca rec__IO_FILE*, "g", align 8
+    %3 = alloca s8i[64], "line", align 16
+    %4 = alloca s32i, "count", align 4
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = get_global @.str : s8i[38]*
+    %7 = cast(array_to_ptrdecay) %6 : s8i*
+    %8 = call @remove(%7) : s32i [all]
+    %9 = get_global @fopen : ((s8i*, s8i*) -> rec__IO_FILE*)*
+    %10 = get_global @.str : s8i[38]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = get_global @.str.1 : s8i[2]*
+    %13 = cast(array_to_ptrdecay) %12 : s8i*
+    %14 = call @fopen(%11, %13) : rec__IO_FILE* [all]
+    store %14, %1, align 8
+    scope {
+        %65 = load %1 : rec__IO_FILE*, align 8
+        %66 = cast(ptr_to_bool) %65 : bool
+        %67 = not %66 : bool
+        if %67 {
+            %68 = get_global @.str.2 : s8i[10]*
+            %69 = cast(array_to_ptrdecay) %68 : s8i*
+            %70 = call @puts(%69) : s32i [all]
+            %71 = const 0 : s32i
+            store %71, %0
+            %72 = load %0 : s32i
+            return %72
+        }
+        yield
+    }
+    %15 = get_global @.str.3 : s8i[5]*
+    %16 = cast(array_to_ptrdecay) %15 : s8i*
+    %17 = load %1 : rec__IO_FILE*, align 8
+    %18 = call @fputs(%16, %17) : s32i [all]
+    %19 = get_global @.str.4 : s8i[5]*
+    %20 = cast(array_to_ptrdecay) %19 : s8i*
+    %21 = load %1 : rec__IO_FILE*, align 8
+    %22 = call @fputs(%20, %21) : s32i [all]
+    %23 = load %1 : rec__IO_FILE*, align 8
+    %24 = call @fclose(%23) : s32i [all]
+    %25 = get_global @fopen : ((s8i*, s8i*) -> rec__IO_FILE*)*
+    %26 = get_global @.str : s8i[38]*
+    %27 = cast(array_to_ptrdecay) %26 : s8i*
+    %28 = get_global @.str.5 : s8i[2]*
+    %29 = cast(array_to_ptrdecay) %28 : s8i*
+    %30 = call @fopen(%27, %29) : rec__IO_FILE* [all]
+    store %30, %2, align 8
+    scope {
+        %57 = load %2 : rec__IO_FILE*, align 8
+        %58 = cast(ptr_to_bool) %57 : bool
+        %59 = not %58 : bool
+        if %59 {
+            %60 = get_global @.str.6 : s8i[12]*
+            %61 = cast(array_to_ptrdecay) %60 : s8i*
+            %62 = call @puts(%61) : s32i [all]
+            %63 = const 0 : s32i
+            store %63, %0
+            %64 = load %0 : s32i
+            return %64
+        }
+        yield
+    }
+    %31 = const 0 : s32i
+    store %31, %4, align 4
+    scope {
+        while {
+            %50 = cast(array_to_ptrdecay) %3 : s8i*
+            %51 = const 64 : s32i
+            %52 = load %2 : rec__IO_FILE*, align 8
+            %53 = call @fgets(%50, %51, %52) : s8i* [all]
+            %54 = const #cir.ptr<null> : void*
+            %55 = cast(bitcast) %54 : s8i*
+            %56 = cmp ne %53, %55 : bool
+            condition %56
+        } do {
+            scope {
+                %44 = get_global @strlen : ((s8i*) -> u64i)*
+                %45 = cast(array_to_ptrdecay) %3 : s8i*
+                %46 = call @strlen(%45) : u64i [pure]
+                %47 = cast(integral) %46 : s32i
+                %48 = load %4 : s32i, align 4
+                %49 = add %48, %47 : s32i [nsw]
+                store %49, %4, align 4
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %32 = load %2 : rec__IO_FILE*, align 8
+    %33 = call @fclose(%32) : s32i [all]
+    %34 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %35 = get_global @.str.7 : s8i[4]*
+    %36 = cast(array_to_ptrdecay) %35 : s8i*
+    %37 = load %4 : s32i, align 4
+    %38 = call @printf(%36, %37) : s32i [all]
+    %39 = get_global @.str : s8i[38]*
+    %40 = cast(array_to_ptrdecay) %39 : s8i*
+    %41 = call @remove(%40) : s32i [all]
+    %42 = const 0 : s32i
+    store %42, %0
+    %43 = load %0 : s32i
+    return %43
+}

@@ -1,0 +1,150 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/990127-1.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "a", align 4
+    %2 = alloca s32i, "b", align 4
+    %3 = alloca s32i, "c", align 4
+    %4 = alloca s32i*, "pa", align 8
+    %5 = alloca s32i*, "pb", align 8
+    %6 = alloca s32i*, "pc", align 8
+    %7 = alloca s32i**, "ppa", align 8
+    %8 = alloca s32i**, "ppb", align 8
+    %9 = alloca s32i**, "ppc", align 8
+    %10 = alloca s32i, "i", align 4
+    %11 = alloca s32i, "j", align 4
+    %12 = alloca s32i, "k", align 4
+    %13 = alloca s32i, "x", align 4
+    %14 = alloca s32i, "y", align 4
+    %15 = alloca s32i, "z", align 4
+    %16 = const 0 : s32i
+    store %16, %0
+    %17 = const 10 : s32i
+    store %17, %1, align 4
+    %18 = const 20 : s32i
+    store %18, %2, align 4
+    %19 = const 30 : s32i
+    store %19, %3, align 4
+    store %1, %4, align 8
+    store %2, %5, align 8
+    store %3, %6, align 8
+    store %4, %7, align 8
+    store %5, %8, align 8
+    store %6, %9, align 8
+    %20 = const 0 : s32i
+    store %20, %13, align 4
+    %21 = const 0 : s32i
+    store %21, %14, align 4
+    %22 = const 0 : s32i
+    store %22, %15, align 4
+    scope {
+        %42 = const 0 : s32i
+        store %42, %10, align 4
+        for cond: {
+            %59 = load %10 : s32i, align 4
+            %60 = const 10 : s32i
+            %61 = cmp lt %59, %60 : bool
+            condition %61
+        } step: {
+            %43 = load %10 : s32i, align 4
+            %44 = inc %43 : s32i [nsw]
+            store %44, %10, align 4
+            yield
+        } do {
+            scope {
+                scope {
+                    %57 = load %4 : s32i*, align 8
+                    %58 = cmp eq %57, %1 : bool
+                    if %58 {
+                        store %2, %4, align 8
+                        yield
+                    } else {
+                        store %1, %4, align 8
+                        yield
+                    }
+                    yield
+                }
+                scope {
+                    while {
+                        %53 = load %4 : s32i*, align 8
+                        %54 = load %53 : s32i, align 4
+                        %55 = dec %54 : s32i [nsw]
+                        store %55, %53, align 4
+                        %56 = cast(int_to_bool) %54 : bool
+                        condition %56
+                    } do {
+                        scope {
+                            %47 = load %13 : s32i, align 4
+                            %48 = inc %47 : s32i [nsw]
+                            store %48, %13, align 4
+                            scope {
+                                %49 = load %4 : s32i*, align 8
+                                %50 = load %49 : s32i, align 4
+                                %51 = const 3 : s32i
+                                %52 = cmp lt %50, %51 : bool
+                                if %52 {
+                                    break
+                                } else {
+                                    store %2, %4, align 8
+                                    yield
+                                }
+                                yield
+                            }
+                            yield
+                        }
+                        yield
+                    }
+                    yield
+                }
+                %45 = load %13 : s32i, align 4
+                %46 = inc %45 : s32i [nsw]
+                store %46, %13, align 4
+                store %2, %4, align 8
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    scope {
+        %26 = load %4 : s32i*, align 8
+        %27 = load %26 : s32i, align 4
+        %28 = const -5 : s32i
+        %29 = cmp ne %27, %28 : bool
+        %30 = ternary %29 ? { : bool
+            %41 = const #true : bool
+            yield %41
+        } : {
+            %37 = load %5 : s32i*, align 8
+            %38 = load %37 : s32i, align 4
+            %39 = const -5 : s32i
+            %40 = cmp ne %38, %39 : bool
+            yield %40
+        }
+        %31 = ternary %30 ? { : bool
+            %36 = const #true : bool
+            yield %36
+        } : {
+            %33 = load %13 : s32i, align 4
+            %34 = const 43 : s32i
+            %35 = cmp ne %33, %34 : bool
+            yield %35
+        }
+        if %31 {
+            %32 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %23 = get_global @exit : ((s32i) -> void)*
+    %24 = const 0 : s32i
+    call @exit(%24) [all]
+    %25 = load %0 : s32i
+    return %25
+}

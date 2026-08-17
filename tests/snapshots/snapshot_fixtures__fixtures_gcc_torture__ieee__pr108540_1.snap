@@ -1,0 +1,289 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/ieee__pr108540-1.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[5] = "ZERO" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[1] = zero [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[4] = "Inf" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[4] = "NaN" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[4] = "INF" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[4] = "NAN" [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[6] = "WRONG" [cir_private, default, align 1, dso_local, constant]
+
+fn strcmp(%arg0: s8i*, %arg1: s8i*) -> s32i [external, c, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn bar(%arg3: s8i*, %arg4: u64i, %arg5: s8i, %arg6: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: s8i*, %arg4: u64i, %arg5: s8i, %arg6: s32i):
+        %95 = alloca s8i*, "cp", align 8
+        %96 = alloca u64i, "size", align 8
+        %97 = alloca s8i, "sign", align 1
+        %98 = alloca s32i, "dsgn", align 4
+        store %arg3, %95
+        store %arg4, %96
+        store %arg5, %97
+        store %arg6, %98
+        scope {
+            %99 = load %95 : s8i*, align 8
+            %100 = get_global @.str : s8i[5]*
+            %101 = cast(array_to_ptrdecay) %100 : s8i*
+            %102 = call @strcmp(%99, %101) : s32i [all]
+            %103 = const 0 : s32i
+            %104 = cmp ne %102, %103 : bool
+            %105 = ternary %104 ? { : bool
+                %120 = const #true : bool
+                yield %120
+            } : {
+                %117 = load %96 : u64i, align 8
+                %118 = const 4 : u64i
+                %119 = cmp ne %117, %118 : bool
+                yield %119
+            }
+            %106 = ternary %105 ? { : bool
+                %116 = const #true : bool
+                yield %116
+            } : {
+                %112 = load %97 : s8i, align 1
+                %113 = cast(integral) %112 : s32i
+                %114 = const 45 : s32i
+                %115 = cmp ne %113, %114 : bool
+                yield %115
+            }
+            %107 = ternary %106 ? { : bool
+                %111 = const #true : bool
+                yield %111
+            } : {
+                %108 = load %98 : s32i, align 4
+                %109 = const 1 : s32i
+                %110 = cmp ne %108, %109 : bool
+                yield %110
+            }
+            if %107 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn foo(%arg0: s32i, %arg1: s32i, %arg2: double) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s32i, %arg2: double):
+        %7 = alloca s32i, "x", align 4
+        %8 = alloca s32i, "ch", align 4
+        %9 = alloca double, "d", align 8
+        %10 = alloca s8i*, "cp", align 8
+        %11 = alloca u64i, "size", align 8
+        %12 = alloca s8i, "sign", align 1
+        store %arg0, %7
+        store %arg1, %8
+        store %arg2, %9
+        %13 = get_global @.str.1 : s8i[1]*
+        %14 = cast(array_to_ptrdecay) %13 : s8i*
+        store %14, %10, align 8
+        %15 = const 0 : u64i
+        store %15, %11, align 8
+        %16 = const 0 : s8i
+        store %16, %12, align 1
+        scope {
+            %17 = load %7 : s32i, align 4
+            switch %17 {
+                case equal 42 {
+                    scope {
+                        %85 = load %9 : double, align 8
+                        <unmodeled: cir.is_fp_class>
+                        if %86 {
+                            scope {
+                                %90 = load %9 : double, align 8
+                                %91 = const 0 : s32i
+                                %92 = cast(int_to_float) %91 : double
+                                %93 = cmp lt %90, %92 : bool
+                                if %93 {
+                                    %94 = const 45 : s8i
+                                    store %94, %12, align 1
+                                    yield
+                                }
+                                yield
+                            }
+                            %87 = get_global @.str.2 : s8i[4]*
+                            %88 = cast(array_to_ptrdecay) %87 : s8i*
+                            store %88, %10, align 8
+                            %89 = const 3 : u64i
+                            store %89, %11, align 8
+                            break
+                        }
+                        yield
+                    }
+                    scope {
+                        %80 = load %9 : double, align 8
+                        <unmodeled: cir.is_fp_class>
+                        if %81 {
+                            %82 = get_global @.str.3 : s8i[4]*
+                            %83 = cast(array_to_ptrdecay) %82 : s8i*
+                            store %83, %10, align 8
+                            %84 = const 3 : u64i
+                            store %84, %11, align 8
+                            break
+                        }
+                        yield
+                    }
+                    scope {
+                        %64 = load %9 : double, align 8
+                        %65 = const 0 : s32i
+                        %66 = cast(int_to_float) %65 : double
+                        %67 = cmp lt %64, %66 : bool
+                        if %67 {
+                            %77 = load %9 : double, align 8
+                            %78 = fneg %77 : double
+                            store %78, %9, align 8
+                            %79 = const 45 : s8i
+                            store %79, %12, align 1
+                            yield
+                        } else {
+                            scope {
+                                %68 = load %9 : double, align 8
+                                %69 = const 0.000000e+00 : double
+                                %70 = cmp eq %68, %69 : bool
+                                %71 = ternary %70 ? { : bool
+                                    %75 = load %9 : double, align 8
+                                    <unmodeled: cir.signbit>
+                                    yield %76
+                                } : {
+                                    %74 = const #false : bool
+                                    yield %74
+                                }
+                                if %71 {
+                                    %73 = const 45 : s8i
+                                    store %73, %12, align 1
+                                    yield
+                                } else {
+                                    %72 = const 0 : s8i
+                                    store %72, %12, align 1
+                                    yield
+                                }
+                                yield
+                            }
+                            yield
+                        }
+                        yield
+                    }
+                    scope {
+                        %18 = load %8 : s32i, align 4
+                        %19 = const 97 : s32i
+                        %20 = cmp eq %18, %19 : bool
+                        %21 = ternary %20 ? { : bool
+                            %63 = const #true : bool
+                            yield %63
+                        } : {
+                            %60 = load %8 : s32i, align 4
+                            %61 = const 65 : s32i
+                            %62 = cmp eq %60, %61 : bool
+                            yield %62
+                        }
+                        if %21 {
+                            %22 = alloca rec_U, "u", align 8
+                            %23 = alloca s32i, "dsgn", align 4
+                            %24 = load %9 : double, align 8
+                            %25 = get_member %22[1] "d" : double*
+                            store %24, %25, align 8
+                            scope {
+                                %50 = get_member %22[0] "l" : s64i*
+                                %51 = load %50 : s64i, align 8
+                                %52 = const 0 : s64i
+                                %53 = cmp lt %51, %52 : bool
+                                if %53 {
+                                    %55 = const 1 : s32i
+                                    store %55, %23, align 4
+                                    %56 = const 9223372036854775807 : s64i
+                                    %57 = get_member %22[0] "l" : s64i*
+                                    %58 = load %57 : s64i, align 8
+                                    %59 = and %58, %56 : s64i
+                                    store %59, %57, align 8
+                                    yield
+                                } else {
+                                    %54 = const 0 : s32i
+                                    store %54, %23, align 4
+                                    yield
+                                }
+                                yield
+                            }
+                            scope {
+                                %30 = load %9 : double, align 8
+                                <unmodeled: cir.is_fp_class>
+                                if %31 {
+                                    %47 = get_global @.str.4 : s8i[4]*
+                                    %48 = cast(array_to_ptrdecay) %47 : s8i*
+                                    store %48, %10, align 8
+                                    %49 = const 3 : u64i
+                                    store %49, %11, align 8
+                                    yield
+                                } else {
+                                    scope {
+                                        %32 = load %9 : double, align 8
+                                        <unmodeled: cir.is_fp_class>
+                                        if %33 {
+                                            %44 = get_global @.str.5 : s8i[4]*
+                                            %45 = cast(array_to_ptrdecay) %44 : s8i*
+                                            store %45, %10, align 8
+                                            %46 = const 3 : u64i
+                                            store %46, %11, align 8
+                                            yield
+                                        } else {
+                                            scope {
+                                                %34 = load %9 : double, align 8
+                                                %35 = const 0 : s32i
+                                                %36 = cast(int_to_float) %35 : double
+                                                %37 = cmp eq %34, %36 : bool
+                                                if %37 {
+                                                    %41 = get_global @.str : s8i[5]*
+                                                    %42 = cast(array_to_ptrdecay) %41 : s8i*
+                                                    store %42, %10, align 8
+                                                    %43 = const 4 : u64i
+                                                    store %43, %11, align 8
+                                                    yield
+                                                } else {
+                                                    %38 = get_global @.str.6 : s8i[6]*
+                                                    %39 = cast(array_to_ptrdecay) %38 : s8i*
+                                                    store %39, %10, align 8
+                                                    %40 = const 5 : u64i
+                                                    store %40, %11, align 8
+                                                    yield
+                                                }
+                                                yield
+                                            }
+                                            yield
+                                        }
+                                        yield
+                                    }
+                                    yield
+                                }
+                                yield
+                            }
+                            %26 = load %10 : s8i*, align 8
+                            %27 = load %11 : u64i, align 8
+                            %28 = load %12 : s8i, align 1
+                            %29 = load %23 : s32i, align 4
+                            call @bar(%26, %27, %28, %29) [all]
+                            yield
+                        }
+                        yield
+                    }
+                    yield
+                }
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 42 : s32i
+    %3 = const 97 : s32i
+    %4 = const -0.000000e+00 : double
+    call @foo(%2, %3, %4) [all]
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = load %0 : s32i
+    return %6
+}

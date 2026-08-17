@@ -1,0 +1,53 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20050104-1.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn foo(%arg0: s64i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s64i):
+        %10 = alloca s64i, "j", align 8
+        store %arg0, %10
+        scope {
+            %11 = load %10 : s64i, align 8
+            %12 = const 10 : s64i
+            %13 = cmp gt %11, %12 : bool
+            %14 = ternary %13 ? { : bool
+                %20 = const #true : bool
+                yield %20
+            } : {
+                %16 = load %10 : s64i, align 8
+                %17 = get_global @min : (() -> s64i)*
+                %18 = call %17() : s64i [all]
+                %19 = cmp lt %16, %18 : bool
+                yield %19
+            }
+            if %14 {
+                %15 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %5 = alloca s32i, "__retval", align 4
+    %6 = const 0 : s32i
+    store %6, %5
+    %7 = const 10 : s64i
+    call @foo(%7) [all]
+    %8 = const 0 : s32i
+    store %8, %5
+    %9 = load %5 : s32i
+    return %9
+}
+fn min() -> s64i [internal, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s64i, "__retval", align 8
+    %1 = const -9223372036854775807 : s64i
+    %2 = const 1 : s64i
+    %3 = sub %1, %2 : s64i [nsw]
+    store %3, %0
+    %4 = load %0 : s64i
+    return %4
+}

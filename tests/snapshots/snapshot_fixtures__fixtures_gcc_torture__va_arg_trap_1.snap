@@ -1,0 +1,49 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/va-arg-trap-1.c" (c, x86_64-unknown-linux-gnu)
+global ap : rec___va_list_tag[1] = zero [external, default, align 16, dso_local]
+global f : float = 0.000000e+00 [external, default, align 4, dso_local]
+
+fn exit(%arg0: s32i) -> void [external, c];
+fn foo() -> rec___va_list_tag[1]* [external, c, no_inline, dso_local, nothrow] {
+    %15 = alloca rec___va_list_tag[1]*, "__retval", align 8
+    %16 = get_global @exit : ((s32i) -> void)*
+    %17 = const 0 : s32i
+    call @exit(%17) [all]
+    %18 = get_global @ap : rec___va_list_tag[1]*
+    store %18, %15
+    %19 = load %15 : rec___va_list_tag[1]*
+    return %19
+}
+fn bar(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %6 = alloca s32i, "i", align 4
+        store %arg0, %6
+        %7 = get_global @ap : rec___va_list_tag[1]*
+        %8 = cast(array_to_ptrdecay) %7 : rec___va_list_tag*
+        <unmodeled: cir.va_start>
+        %9 = call @foo() : rec___va_list_tag[1]* [all]
+        %10 = cast(array_to_ptrdecay) %9 : rec___va_list_tag*
+        <unmodeled: cir.va_arg>
+        %12 = get_global @f : float*
+        store %11, %12, align 4
+        %13 = get_global @ap : rec___va_list_tag[1]*
+        %14 = cast(array_to_ptrdecay) %13 : rec___va_list_tag*
+        <unmodeled: cir.va_end>
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 1 : s32i
+    %3 = const 0 : s32i
+    call @bar(%2, %3) [all]
+    %4 = get_global @abort : (() -> void)*
+    call @abort() [all]
+    %5 = load %0 : s32i
+    return %5
+}

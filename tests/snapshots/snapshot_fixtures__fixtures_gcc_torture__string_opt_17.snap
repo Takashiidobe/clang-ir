@@ -1,0 +1,127 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/string-opt-17.c" (c, x86_64-unknown-linux-gnu)
+global check2.r : u64i = 5 [internal, default, align 8, dso_local]
+global .str : s8i[10] = "foobarbaz" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[3] = "az" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[4] = "baz" [cir_private, default, align 1, dso_local, constant]
+
+fn strcpy(%arg0: s8i*, %arg1: s8i*) -> s8i* [external, c, nothrow];
+fn test1(%arg1: s8i*, %arg2: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s8i*, %arg2: u64i):
+        %51 = alloca s8i*, "s", align 8
+        %52 = alloca u64i, "i", align 8
+        %53 = alloca u64i, "__retval", align 8
+        store %arg1, %51
+        store %arg2, %52
+        %54 = get_global @strcpy : ((s8i*, s8i*) -> s8i*)*
+        %55 = load %51 : s8i*, align 8
+        %56 = get_global @.str : s8i[10]*
+        %57 = cast(array_to_ptrdecay) %56 : s8i*
+        %58 = load %52 : u64i, align 8
+        %59 = inc %58 : u64i
+        store %59, %52, align 8
+        %60 = ptr_stride %57, %58 : s8i*
+        %61 = call @strcpy(%55, %60) : s8i* [all]
+        %62 = load %52 : u64i, align 8
+        store %62, %53
+        %63 = load %53 : u64i
+        return %63
+}
+fn abort() -> void [external, c, nothrow];
+fn check2() -> u64i [external, c, no_inline, dso_local, nothrow] {
+    %42 = alloca u64i, "__retval", align 8
+    %43 = get_global @check2.r : u64i*
+    scope {
+        %47 = load %43 : u64i, align 8
+        %48 = const 5 : u64i
+        %49 = cmp ne %47, %48 : bool
+        if %49 {
+            %50 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %44 = load %43 : u64i, align 8
+    %45 = inc %44 : u64i
+    store %45, %43, align 8
+    store %45, %42
+    %46 = load %42 : u64i
+    return %46
+}
+fn test2(%arg0: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i*):
+        %34 = alloca s8i*, "s", align 8
+        store %arg0, %34
+        %35 = get_global @strcpy : ((s8i*, s8i*) -> s8i*)*
+        %36 = load %34 : s8i*, align 8
+        %37 = get_global @.str : s8i[10]*
+        %38 = cast(array_to_ptrdecay) %37 : s8i*
+        %39 = call @check2() : u64i [all]
+        %40 = ptr_stride %38, %39 : s8i*
+        %41 = call @strcpy(%36, %40) : s8i* [all]
+        return
+}
+fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i[10], "buf", align 1
+    %2 = const 0 : s32i
+    store %2, %0
+    scope {
+        %17 = cast(array_to_ptrdecay) %1 : s8i*
+        %18 = const 7 : u64i
+        %19 = call @test1(%17, %18) : u64i [all]
+        %20 = const 8 : u64i
+        %21 = cmp ne %19, %20 : bool
+        %22 = ternary %21 ? { : bool
+            %33 = const #true : bool
+            yield %33
+        } : {
+            %24 = get_global @memcmp : ((void*, void*, u64i) -> s32i)*
+            %25 = cast(array_to_ptrdecay) %1 : s8i*
+            %26 = cast(bitcast) %25 : void*
+            %27 = get_global @.str.1 : s8i[3]*
+            %28 = cast(array_to_ptrdecay) %27 : s8i*
+            %29 = cast(bitcast) %28 : void*
+            %30 = const 3 : u64i
+            %31 = call @memcmp(%26, %29, %30) : s32i [all]
+            %32 = cast(int_to_bool) %31 : bool
+            yield %32
+        }
+        if %22 {
+            %23 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %3 = cast(array_to_ptrdecay) %1 : s8i*
+    call @test2(%3) [all]
+    scope {
+        %7 = get_global @memcmp : ((void*, void*, u64i) -> s32i)*
+        %8 = cast(array_to_ptrdecay) %1 : s8i*
+        %9 = cast(bitcast) %8 : void*
+        %10 = get_global @.str.2 : s8i[4]*
+        %11 = cast(array_to_ptrdecay) %10 : s8i*
+        %12 = cast(bitcast) %11 : void*
+        %13 = const 4 : u64i
+        %14 = call @memcmp(%9, %12, %13) : s32i [all]
+        %15 = cast(int_to_bool) %14 : bool
+        if %15 {
+            %16 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %4 = get_global @exit : ((s32i) -> void)*
+    %5 = const 0 : s32i
+    call @exit(%5) [all]
+    %6 = load %0 : s32i
+    return %6
+}

@@ -1,0 +1,107 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20140622-1.c" (c, x86_64-unknown-linux-gnu)
+global p : u32i = 0 [external, default, align 4, dso_local]
+
+fn test(%arg0: u32i) -> s64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i):
+        %32 = alloca u32i, "a", align 4
+        %33 = alloca s64i, "__retval", align 8
+        store %arg0, %32
+        %34 = get_global @p : u32i*
+        %35 = load %34 : u32i, align 4
+        %36 = load %32 : u32i, align 4
+        %37 = add %35, %36 : u32i
+        %38 = cast(integral) %37 : s64i
+        %39 = get_global @p : u32i*
+        %40 = load %39 : u32i, align 4
+        %41 = cast(integral) %40 : s64i
+        %42 = sub %38, %41 : s64i [nsw]
+        store %42, %33
+        %43 = load %33 : s64i
+        return %43
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 4294967294 : u32i
+    %3 = get_global @p : u32i*
+    store %2, %3, align 4
+    scope {
+        %28 = const 0 : u32i
+        %29 = call @test(%28) : s64i [all]
+        %30 = const 0 : s64i
+        %31 = cmp ne %29, %30 : bool
+        if %31 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %24 = const 1 : u32i
+        %25 = call @test(%24) : s64i [all]
+        %26 = const 1 : s64i
+        %27 = cmp ne %25, %26 : bool
+        if %27 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %20 = const 2 : u32i
+        %21 = call @test(%20) : s64i [all]
+        %22 = const -4294967294 : s64i
+        %23 = cmp ne %21, %22 : bool
+        if %23 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %4 = const 4294967295 : u32i
+    %5 = get_global @p : u32i*
+    store %4, %5, align 4
+    scope {
+        %16 = const 0 : u32i
+        %17 = call @test(%16) : s64i [all]
+        %18 = const 0 : s64i
+        %19 = cmp ne %17, %18 : bool
+        if %19 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %12 = const 1 : u32i
+        %13 = call @test(%12) : s64i [all]
+        %14 = const -4294967295 : s64i
+        %15 = cmp ne %13, %14 : bool
+        if %15 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %8 = const 2 : u32i
+        %9 = call @test(%8) : s64i [all]
+        %10 = const -4294967294 : s64i
+        %11 = cmp ne %9, %10 : bool
+        if %11 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = load %0 : s32i
+    return %7
+}

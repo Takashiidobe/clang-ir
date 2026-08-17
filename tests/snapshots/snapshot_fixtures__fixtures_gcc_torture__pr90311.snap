@@ -1,0 +1,53 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr90311.c" (c, x86_64-unknown-linux-gnu)
+global a : s32i = 0 [external, default, align 4, dso_local]
+global b : s32i = 0 [external, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u64i, "x", align 8
+    %2 = alloca u32i, "c", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_global @a : s32i*
+    %5 = load %4 : s32i, align 4
+    %6 = cast(integral) %5 : u8i
+    %7 = get_global @b : s32i*
+    %8 = load %7 : s32i, align 4
+    %9 = cast(integral) %6 : s33
+    %10 = cast(integral) %8 : s33
+    <unmodeled: cir.add.overflow>
+    store %11#0, %2, align 4
+    %12 = load %2 : u32i, align 4
+    %13 = get_global @a : s32i*
+    %14 = load %13 : s32i, align 4
+    %15 = cast(integral) %14 : u8i
+    %16 = cast(integral) %15 : u32i
+    %17 = cmp lt %12, %16 : bool
+    %18 = cast(bool_to_int) %17 : s32i
+    %19 = get_global @b : s32i*
+    %20 = load %19 : s32i, align 4
+    %21 = sub %20, %18 : s32i [nsw]
+    store %21, %19, align 4
+    %22 = get_global @b : s32i*
+    %23 = load %22 : s32i, align 4
+    %24 = cast(integral) %23 : u64i
+    store %24, %1, align 8
+    scope {
+        %27 = load %1 : u64i, align 8
+        %28 = cast(int_to_bool) %27 : bool
+        if %28 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %25 = const 0 : s32i
+    store %25, %0
+    %26 = load %0 : s32i
+    return %26
+}

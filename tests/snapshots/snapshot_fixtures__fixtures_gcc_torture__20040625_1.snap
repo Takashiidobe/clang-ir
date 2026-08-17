@@ -1,0 +1,56 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20040625-1.c" (c, x86_64-unknown-linux-gnu)
+fn maybe_next(%arg0: rec_s*, %arg1: s32i) -> rec_s* [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_s*, %arg1: s32i):
+        %12 = alloca rec_s*, "s", align 8
+        %13 = alloca s32i, "t", align 4
+        %14 = alloca rec_s*, "__retval", align 8
+        store %arg0, %12
+        store %arg1, %13
+        scope {
+            %17 = load %13 : s32i, align 4
+            %18 = cast(int_to_bool) %17 : bool
+            if %18 {
+                %19 = load %12 : rec_s*, align 8
+                %20 = get_member %19[0] "next" : rec_s**
+                %21 = load %20 : rec_s*, align 1
+                store %21, %12, align 8
+                yield
+            }
+            yield
+        }
+        %15 = load %12 : rec_s*, align 8
+        store %15, %14
+        %16 = load %14 : rec_s*
+        return %16
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_s, "s1", align 1
+    %2 = alloca rec_s, "s2", align 1
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_member %1[0] "next" : rec_s**
+    store %2, %4, align 1
+    scope {
+        %8 = const 1 : s32i
+        %9 = call @maybe_next(%1, %8) : rec_s* [all]
+        %10 = cmp ne %9, %2 : bool
+        if %10 {
+            %11 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %5 = get_global @exit : ((s32i) -> void)*
+    %6 = const 0 : s32i
+    call @exit(%6) [all]
+    %7 = load %0 : s32i
+    return %7
+}

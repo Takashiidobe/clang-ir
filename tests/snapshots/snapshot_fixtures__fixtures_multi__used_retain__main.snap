@@ -1,0 +1,19 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.multi/used_retain/main.c" (c, x86_64-unknown-linux-gnu)
+global used_only : s32i = 11 [internal, default, align 4, dso_local]
+global used_and_retained : s32i = 22 [internal, default, align 4, dso_local]
+global llvm.used : void*[1] = [@used_and_retained] [appending, default, dso_local]
+global llvm.compiler.used : void*[2] = [@used_only, @used_and_retained] [appending, default, dso_local]
+
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

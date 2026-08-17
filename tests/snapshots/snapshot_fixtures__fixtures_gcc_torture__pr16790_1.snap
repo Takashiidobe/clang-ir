@@ -1,0 +1,99 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr16790-1.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn test1(%arg1: u32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: u32i):
+        %31 = alloca u32i, "u1", align 4
+        %32 = alloca u32i, "y_final_1", align 4
+        %33 = alloca s16i, "y_middle", align 2
+        %34 = alloca u32i, "y_final_2", align 4
+        store %arg1, %31
+        %35 = load %31 : u32i, align 4
+        %36 = const 2 : u32i
+        %37 = mul %35, %36 : u32i
+        %38 = cast(integral) %37 : s16i
+        %39 = cast(integral) %38 : s32i
+        %40 = const 3 : s32i
+        %41 = mul %39, %40 : s32i [nsw]
+        %42 = cast(integral) %41 : u32i
+        store %42, %32, align 4
+        %43 = load %31 : u32i, align 4
+        %44 = const 2 : u32i
+        %45 = mul %43, %44 : u32i
+        %46 = cast(integral) %45 : s16i
+        store %46, %33, align 2
+        %47 = load %33 : s16i, align 2
+        %48 = cast(integral) %47 : s32i
+        %49 = const 3 : s32i
+        %50 = mul %48, %49 : s32i [nsw]
+        %51 = cast(integral) %50 : u32i
+        store %51, %34, align 4
+        scope {
+            %52 = load %32 : u32i, align 4
+            %53 = load %34 : u32i, align 4
+            %54 = cmp ne %52, %53 : bool
+            if %54 {
+                %55 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn test2(%arg0: u32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i):
+        %6 = alloca u32i, "u1", align 4
+        %7 = alloca u32i, "y_final_1", align 4
+        %8 = alloca s16i, "y_middle", align 2
+        %9 = alloca u32i, "y_final_2", align 4
+        store %arg0, %6
+        %10 = load %6 : u32i, align 4
+        %11 = const 1 : s32i
+        %12 = shift left %10, %11 : u32i
+        %13 = cast(integral) %12 : s16i
+        %14 = cast(integral) %13 : s32i
+        %15 = const 3 : s32i
+        %16 = mul %14, %15 : s32i [nsw]
+        %17 = cast(integral) %16 : u32i
+        store %17, %7, align 4
+        %18 = load %6 : u32i, align 4
+        %19 = const 1 : s32i
+        %20 = shift left %18, %19 : u32i
+        %21 = cast(integral) %20 : s16i
+        store %21, %8, align 2
+        %22 = load %8 : s16i, align 2
+        %23 = cast(integral) %22 : s32i
+        %24 = const 3 : s32i
+        %25 = mul %23, %24 : s32i [nsw]
+        %26 = cast(integral) %25 : u32i
+        store %26, %9, align 4
+        scope {
+            %27 = load %7 : u32i, align 4
+            %28 = load %9 : u32i, align 4
+            %29 = cmp ne %27, %28 : bool
+            if %29 {
+                %30 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 16384 : u32i
+    call @test1(%2) [all]
+    %3 = const 16384 : u32i
+    call @test2(%3) [all]
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

@@ -1,0 +1,91 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr123978.c" (c, x86_64-unknown-linux-gnu)
+fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
+fn foo(%arg0: rec_A*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_A*):
+        %30 = alloca rec_A*, "a", align 8
+        %31 = alloca s32i, "__retval", align 4
+        store %arg0, %30
+        %32 = load %30 : rec_A*, align 8
+        %33 = get_member %32[2] "d" : u32i**
+        %34 = load %33 : u32i*, align 8
+        %35 = cast(bitcast) %34 : void*
+        %36 = const 0 : s32i
+        %37 = const 4 : s64i
+        %38 = load %30 : rec_A*, align 8
+        %39 = get_member %38[0] "b" : u32i*
+        %40 = load %39 : u32i, align 8
+        %41 = cast(integral) %40 : s64i
+        %42 = mul %37, %41 : s64i [nsw]
+        %43 = load %30 : rec_A*, align 8
+        %44 = get_member %43[1] "c" : u32i*
+        %45 = load %44 : u32i, align 4
+        %46 = cast(integral) %45 : s64i
+        %47 = mul %42, %46 : s64i [nsw]
+        %48 = cast(integral) %47 : u64i
+        %49 = call @memset(%35, %36, %48) : void* [all]
+        %50 = const 0 : s32i
+        store %50, %31
+        %51 = load %31 : s32i
+        return %51
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_A, "a", align 8
+    %2 = alloca u32i[256], "b", align 16
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = cast(array_to_ptrdecay) %2 : u32i*
+    %5 = cast(bitcast) %4 : void*
+    %6 = const 85 : s32i
+    %7 = const 1024 : u64i
+    %8 = call @memset(%5, %6, %7) : void* [all]
+    %9 = const 15 : u32i
+    %10 = get_member %1[0] "b" : u32i*
+    store %9, %10, align 8
+    %11 = const 15 : u32i
+    %12 = get_member %1[1] "c" : u32i*
+    store %11, %12, align 4
+    %13 = cast(array_to_ptrdecay) %2 : u32i*
+    %14 = get_member %1[2] "d" : u32i**
+    store %13, %14, align 8
+    %15 = call @foo(%1) : s32i [all]
+    scope {
+        %17 = alloca s32i, "i", align 4
+        %18 = const 0 : s32i
+        store %18, %17, align 4
+        for cond: {
+            %27 = load %17 : s32i, align 4
+            %28 = const 225 : s32i
+            %29 = cmp lt %27, %28 : bool
+            condition %29
+        } step: {
+            %19 = load %17 : s32i, align 4
+            %20 = inc %19 : s32i [nsw]
+            store %20, %17, align 4
+            yield
+        } do {
+            scope {
+                %21 = load %17 : s32i, align 4
+                %22 = cast(integral) %21 : s64i
+                %23 = get_element %2[%22] : u32i*
+                %24 = load %23 : u32i, align 4
+                %25 = const 0 : u32i
+                %26 = cmp ne %24, %25 : bool
+                if %26 {
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %16 = load %0 : s32i
+    return %16
+}

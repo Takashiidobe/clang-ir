@@ -1,0 +1,93 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/divcmp-5.c" (c, x86_64-unknown-linux-gnu)
+fn always_one_1(%arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i):
+        %26 = alloca s32i, "a", align 4
+        %27 = alloca s32i, "__retval", align 4
+        store %arg1, %26
+        scope {
+            %29 = load %26 : s32i, align 4
+            %30 = const 100 : s32i
+            %31 = div %29, %30 : s32i
+            %32 = const -999999999 : s32i
+            %33 = cmp ge %31, %32 : bool
+            if %33 {
+                %36 = const 1 : s32i
+                store %36, %27
+                %37 = load %27 : s32i
+                return %37
+            } else {
+                %34 = const 0 : s32i
+                store %34, %27
+                %35 = load %27 : s32i
+                return %35
+            }
+            yield
+        }
+        %28 = load %27 : s32i
+        return %28
+}
+fn always_one_2(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %14 = alloca s32i, "a", align 4
+        %15 = alloca s32i, "__retval", align 4
+        store %arg0, %14
+        scope {
+            %17 = load %14 : s32i, align 4
+            %18 = const 100 : s32i
+            %19 = div %17, %18 : s32i
+            %20 = const -999999999 : s32i
+            %21 = cmp lt %19, %20 : bool
+            if %21 {
+                %24 = const 0 : s32i
+                store %24, %15
+                %25 = load %15 : s32i
+                return %25
+            } else {
+                %22 = const 1 : s32i
+                store %22, %15
+                %23 = load %15 : s32i
+                return %23
+            }
+            yield
+        }
+        %16 = load %15 : s32i
+        return %16
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %9 = const 0 : s32i
+        %10 = call @always_one_1(%9) : s32i [all]
+        %11 = const 1 : s32i
+        %12 = cmp ne %10, %11 : bool
+        if %12 {
+            %13 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %4 = const 0 : s32i
+        %5 = call @always_one_2(%4) : s32i [all]
+        %6 = const 1 : s32i
+        %7 = cmp ne %5, %6 : bool
+        if %7 {
+            %8 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

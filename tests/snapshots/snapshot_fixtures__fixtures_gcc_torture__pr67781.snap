@@ -1,0 +1,62 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr67781.c" (c, x86_64-unknown-linux-gnu)
+global s : rec_anon2E0 = {1193046, 120} [external, default, align 4, dso_local]
+
+fn pr67781() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %15 = alloca s32i, "__retval", align 4
+    %16 = alloca u32i, "c", align 4
+    %17 = get_global @s : rec_anon2E0*
+    %18 = get_member %17[0] "a" : u32i*
+    %19 = load %18 : u32i, align 4
+    %20 = const 8 : s32i
+    %21 = shift left %19, %20 : u32i
+    %22 = get_global @s : rec_anon2E0*
+    %23 = get_member %22[1] "b" : u8i*
+    %24 = load %23 : u8i, align 4
+    %25 = cast(integral) %24 : u32i
+    %26 = or %21, %25 : u32i
+    store %26, %16, align 4
+    %27 = load %16 : u32i, align 4
+    %28 = cast(integral) %27 : s32i
+    store %28, %15
+    %29 = load %15 : s32i
+    return %29
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %8 = const 4 : u64i
+        %9 = const 8 : u64i
+        %10 = mul %8, %9 : u64i
+        %11 = const 32 : u64i
+        %12 = cmp ne %10, %11 : bool
+        if %12 {
+            %13 = const 0 : s32i
+            store %13, %0
+            %14 = load %0 : s32i
+            return %14
+        }
+        yield
+    }
+    scope {
+        %4 = get_global @pr67781 : (() -> s32i)*
+        %5 = call @pr67781() : s32i [all]
+        %6 = const 305419896 : s32i
+        %7 = cmp ne %5, %6 : bool
+        if %7 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

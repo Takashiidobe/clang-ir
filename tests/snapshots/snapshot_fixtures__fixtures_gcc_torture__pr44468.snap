@@ -1,0 +1,198 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr44468.c" (c, x86_64-unknown-linux-gnu)
+global s : rec_Q = zero [external, default, align 4, dso_local]
+
+fn test1(%arg2: void*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: void*):
+        %97 = alloca void*, "q", align 8
+        %98 = alloca s32i, "__retval", align 4
+        %99 = alloca rec_S*, "b", align 8
+        store %arg2, %97
+        %100 = load %97 : void*, align 8
+        %101 = cast(bitcast) %100 : s8i*
+        %102 = const 4 : u64i
+        %103 = ptr_stride %101, %102 : s8i*
+        %104 = cast(bitcast) %103 : rec_S*
+        store %104, %99, align 8
+        %105 = const 0 : s32i
+        %106 = get_global @s : rec_Q*
+        %107 = get_member %106[1] "a" : rec_S*
+        %108 = get_member %107[0] "i" : s32i*
+        store %105, %108, align 4
+        %109 = const 3 : s32i
+        %110 = load %99 : rec_S*, align 8
+        %111 = get_member %110[0] "i" : s32i*
+        store %109, %111, align 4
+        %112 = get_global @s : rec_Q*
+        %113 = get_member %112[1] "a" : rec_S*
+        %114 = get_member %113[0] "i" : s32i*
+        %115 = load %114 : s32i, align 4
+        store %115, %98
+        %116 = load %98 : s32i
+        return %116
+}
+fn test2(%arg1: void*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: void*):
+        %79 = alloca void*, "q", align 8
+        %80 = alloca s32i, "__retval", align 4
+        %81 = alloca rec_S*, "b", align 8
+        store %arg1, %79
+        %82 = load %79 : void*, align 8
+        %83 = cast(bitcast) %82 : rec_R*
+        %84 = get_member %83[1] "a" : rec_S*
+        store %84, %81, align 8
+        %85 = const 0 : s32i
+        %86 = get_global @s : rec_Q*
+        %87 = get_member %86[1] "a" : rec_S*
+        %88 = get_member %87[0] "i" : s32i*
+        store %85, %88, align 4
+        %89 = const 3 : s32i
+        %90 = load %81 : rec_S*, align 8
+        %91 = get_member %90[0] "i" : s32i*
+        store %89, %91, align 4
+        %92 = get_global @s : rec_Q*
+        %93 = get_member %92[1] "a" : rec_S*
+        %94 = get_member %93[0] "i" : s32i*
+        %95 = load %94 : s32i, align 4
+        store %95, %80
+        %96 = load %80 : s32i
+        return %96
+}
+fn test3(%arg0: void*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: void*):
+        %61 = alloca void*, "q", align 8
+        %62 = alloca s32i, "__retval", align 4
+        store %arg0, %61
+        %63 = const 0 : s32i
+        %64 = get_global @s : rec_Q*
+        %65 = get_member %64[1] "a" : rec_S*
+        %66 = get_member %65[0] "i" : s32i*
+        store %63, %66, align 4
+        %67 = const 3 : s32i
+        %68 = load %61 : void*, align 8
+        %69 = cast(bitcast) %68 : s8i*
+        %70 = const 4 : u64i
+        %71 = ptr_stride %69, %70 : s8i*
+        %72 = cast(bitcast) %71 : rec_S*
+        %73 = get_member %72[0] "i" : s32i*
+        store %67, %73, align 4
+        %74 = get_global @s : rec_Q*
+        %75 = get_member %74[1] "a" : rec_S*
+        %76 = get_member %75[0] "i" : s32i*
+        %77 = load %76 : s32i, align 4
+        store %77, %62
+        %78 = load %62 : s32i
+        return %78
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %46 = const 4 : u64i
+        %47 = const 4 : u64i
+        %48 = cmp ne %46, %47 : bool
+        %49 = ternary %48 ? { : bool
+            %60 = const #true : bool
+            yield %60
+        } : {
+            %57 = const 4 : u64i
+            %58 = const 4 : u64i
+            %59 = cmp ne %57, %58 : bool
+            yield %59
+        }
+        %50 = ternary %49 ? { : bool
+            %56 = const #true : bool
+            yield %56
+        } : {
+            %53 = const 4 : u64i
+            %54 = const 4 : u64i
+            %55 = cmp ne %53, %54 : bool
+            yield %55
+        }
+        if %50 {
+            %51 = const 0 : s32i
+            store %51, %0
+            %52 = load %0 : s32i
+            return %52
+        }
+        yield
+    }
+    %2 = const 1 : s32i
+    %3 = get_global @s : rec_Q*
+    %4 = get_member %3[1] "a" : rec_S*
+    %5 = get_member %4[0] "i" : s32i*
+    store %2, %5, align 4
+    %6 = const 2 : s32i
+    %7 = get_global @s : rec_Q*
+    %8 = get_member %7[1] "a" : rec_S*
+    %9 = get_member %8[1] "j" : s32i*
+    store %6, %9, align 4
+    scope {
+        %40 = get_global @s : rec_Q*
+        %41 = cast(bitcast) %40 : void*
+        %42 = call @test1(%41) : s32i [all]
+        %43 = const 3 : s32i
+        %44 = cmp ne %42, %43 : bool
+        if %44 {
+            %45 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %10 = const 1 : s32i
+    %11 = get_global @s : rec_Q*
+    %12 = get_member %11[1] "a" : rec_S*
+    %13 = get_member %12[0] "i" : s32i*
+    store %10, %13, align 4
+    %14 = const 2 : s32i
+    %15 = get_global @s : rec_Q*
+    %16 = get_member %15[1] "a" : rec_S*
+    %17 = get_member %16[1] "j" : s32i*
+    store %14, %17, align 4
+    scope {
+        %34 = get_global @s : rec_Q*
+        %35 = cast(bitcast) %34 : void*
+        %36 = call @test2(%35) : s32i [all]
+        %37 = const 3 : s32i
+        %38 = cmp ne %36, %37 : bool
+        if %38 {
+            %39 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %18 = const 1 : s32i
+    %19 = get_global @s : rec_Q*
+    %20 = get_member %19[1] "a" : rec_S*
+    %21 = get_member %20[0] "i" : s32i*
+    store %18, %21, align 4
+    %22 = const 2 : s32i
+    %23 = get_global @s : rec_Q*
+    %24 = get_member %23[1] "a" : rec_S*
+    %25 = get_member %24[1] "j" : s32i*
+    store %22, %25, align 4
+    scope {
+        %28 = get_global @s : rec_Q*
+        %29 = cast(bitcast) %28 : void*
+        %30 = call @test3(%29) : s32i [all]
+        %31 = const 3 : s32i
+        %32 = cmp ne %30, %31 : bool
+        if %32 {
+            %33 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %26 = const 0 : s32i
+    store %26, %0
+    %27 = load %0 : s32i
+    return %27
+}

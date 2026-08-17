@@ -1,0 +1,40 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr48973-2.c" (c, x86_64-unknown-linux-gnu)
+global v : s32i = -1 [external, default, align 4, dso_local]
+global s : rec_S = zero [external, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @v : s32i*
+    %3 = load %2 : s32i, align 4
+    %4 = const 0 : s32i
+    %5 = cmp lt %3, %4 : bool
+    %6 = cast(bool_to_int) %5 : s32i
+    %7 = get_global @s : rec_S*
+    %8 = get_member %7[0] "f" : u8i*
+    <unmodeled: cir.set_bitfield>
+    scope {
+        %12 = get_global @s : rec_S*
+        %13 = get_member %12[0] "f" : u8i*
+        <unmodeled: cir.get_bitfield>
+        %15 = cast(integral) %14 : u32i
+        %16 = const 4294967295 : u32i
+        %17 = cmp ne %15, %16 : bool
+        if %17 {
+            %18 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %10 = const 0 : s32i
+    store %10, %0
+    %11 = load %0 : s32i
+    return %11
+}

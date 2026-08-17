@@ -1,0 +1,50 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr48973-1.c" (c, x86_64-unknown-linux-gnu)
+global v : s32i = -1 [external, default, align 4, dso_local]
+global s : rec_S = zero [external, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn foo(%arg0: u32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i):
+        %18 = alloca u32i, "x", align 4
+        store %arg0, %18
+        scope {
+            %19 = load %18 : u32i, align 4
+            %20 = const 4294967295 : u32i
+            %21 = cmp ne %19, %20 : bool
+            if %21 {
+                %22 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @v : s32i*
+    %3 = load %2 : s32i, align 4
+    %4 = const 1 : s32i
+    %5 = and %3, %4 : s32i
+    %6 = const 0 : s32i
+    %7 = cmp gt %5, %6 : bool
+    %8 = cast(bool_to_int) %7 : s32i
+    %9 = get_global @s : rec_S*
+    %10 = get_member %9[0] "f" : u8i*
+    <unmodeled: cir.set_bitfield>
+    %12 = get_global @s : rec_S*
+    %13 = get_member %12[0] "f" : u8i*
+    <unmodeled: cir.get_bitfield>
+    %15 = cast(integral) %14 : u32i
+    call @foo(%15) [all]
+    %16 = const 0 : s32i
+    store %16, %0
+    %17 = load %0 : s32i
+    return %17
+}

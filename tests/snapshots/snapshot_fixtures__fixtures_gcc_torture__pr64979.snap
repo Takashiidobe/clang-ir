@@ -1,0 +1,114 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr64979.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn bar(%arg1: s32i, %arg2: rec___va_list_tag[1]*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i, %arg2: rec___va_list_tag[1]*):
+        %30 = alloca s32i, "x", align 4
+        %31 = alloca rec___va_list_tag[1]*, "ap", align 8
+        store %arg1, %30
+        store %arg2, %31
+        scope {
+            %32 = load %31 : rec___va_list_tag[1]*, align 8
+            %33 = cast(ptr_to_bool) %32 : bool
+            if %33 {
+                %34 = alloca s32i, "i", align 4
+                scope {
+                    %40 = const 0 : s32i
+                    store %40, %34, align 4
+                    for cond: {
+                        %48 = load %34 : s32i, align 4
+                        %49 = const 10 : s32i
+                        %50 = cmp lt %48, %49 : bool
+                        condition %50
+                    } step: {
+                        %41 = load %34 : s32i, align 4
+                        %42 = inc %41 : s32i [nsw]
+                        store %42, %34, align 4
+                        yield
+                    } do {
+                        scope {
+                            %43 = load %34 : s32i, align 4
+                            %44 = load %31 : rec___va_list_tag[1]*, align 8
+                            %45 = cast(array_to_ptrdecay) %44 : rec___va_list_tag*
+                            <unmodeled: cir.va_arg>
+                            %47 = cmp ne %43, %46 : bool
+                            if %47 {
+                                call @abort() [all]
+                                yield
+                            }
+                            yield
+                        }
+                        yield
+                    }
+                    yield
+                }
+                scope {
+                    %35 = load %31 : rec___va_list_tag[1]*, align 8
+                    %36 = cast(array_to_ptrdecay) %35 : rec___va_list_tag*
+                    <unmodeled: cir.va_arg>
+                    %38 = const 5.000000e-01 : double
+                    %39 = cmp ne %37, %38 : bool
+                    if %39 {
+                        call @abort() [all]
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        return
+}
+fn foo(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %17 = alloca s32i, "x", align 4
+        %18 = alloca rec___va_list_tag[1], "ap", align 16
+        %19 = alloca s32i, "n", align 4
+        store %arg0, %17
+        %20 = cast(array_to_ptrdecay) %18 : rec___va_list_tag*
+        <unmodeled: cir.va_start>
+        %21 = cast(array_to_ptrdecay) %18 : rec___va_list_tag*
+        <unmodeled: cir.va_arg>
+        store %22, %19, align 4
+        %23 = load %17 : s32i, align 4
+        %24 = load %19 : s32i, align 4
+        %25 = const 0 : s32i
+        %26 = cmp eq %24, %25 : bool
+        %27 = ternary %26 ? { : rec___va_list_tag[1]*
+            %29 = const #cir.ptr<null> : rec___va_list_tag[1]*
+            yield %29
+        } : {
+            yield %18
+        }
+        call @bar(%23, %27) [all]
+        %28 = cast(array_to_ptrdecay) %18 : rec___va_list_tag*
+        <unmodeled: cir.va_end>
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 100 : s32i
+    %3 = const 1 : s32i
+    %4 = const 0 : s32i
+    %5 = const 1 : s32i
+    %6 = const 2 : s32i
+    %7 = const 3 : s32i
+    %8 = const 4 : s32i
+    %9 = const 5 : s32i
+    %10 = const 6 : s32i
+    %11 = const 7 : s32i
+    %12 = const 8 : s32i
+    %13 = const 9 : s32i
+    %14 = const 5.000000e-01 : double
+    call @foo(%2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14) [all]
+    %15 = const 0 : s32i
+    store %15, %0
+    %16 = load %0 : s32i
+    return %16
+}

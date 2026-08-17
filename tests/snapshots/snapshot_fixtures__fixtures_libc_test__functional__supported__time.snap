@@ -1,0 +1,707 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/time.c" (c, x86_64-unknown-linux-gnu)
+global tm_str.b : s8i[64][4] = zero [internal, default, align 16, dso_local]
+global tm_str.i : s32i = 0 [internal, default, align 4, dso_local]
+global t_status : s32i = 0 [external, default, align 4, dso_local]
+global .str : s8i[75] = "s=%02d m=%02d h=%02d mday=%02d mon=%02d year=%04d wday=%d yday=%d isdst=%d" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[7] = "TZ=GMT" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[10] = "gmtime(0)" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[8] = "2038-1s" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[5] = "2038" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[6] = "EPOCH" [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[10] = "EPOCH+eps" [cir_private, default, align 1, dso_local, constant]
+global .str.7 : s8i[138] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/time.c:130: %s: mktime(%s) expected -1, got (time_t)%ld\n" [cir_private, default, align 1, dso_local, constant]
+global .str.8 : s8i[143] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/time.c:133: %s: mktime(%s) expected EOVERFLOW (%s), got (%s)\n" [cir_private, default, align 1, dso_local, constant]
+global .str.9 : s8i[142] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/time.c:136: %s: mktime(%s) expected success, got (time_t)-1\n" [cir_private, default, align 1, dso_local, constant]
+global .str.10 : s8i[137] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/time.c:139: %s: mktime(%s) expected no error, got (%s)\n" [cir_private, default, align 1, dso_local, constant]
+global .str.11 : s8i[142] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/time.c:143: %s: gmtime(mktime(%s)) roundtrip failed: got %s\n" [cir_private, default, align 1, dso_local, constant]
+global .str.12 : s8i[148] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/time.c:109: %s: gmtime((time_t)%lld) should not set errno, got %s\n" [cir_private, default, align 1, dso_local, constant]
+global .str.13 : s8i[138] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/time.c:114: %s: mktime(%s) should not set errno, got %s\n" [cir_private, default, align 1, dso_local, constant]
+global .str.14 : s8i[161] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/time.c:118: %s: mktime(gmtime(%lld)) roundtrip failed: got %lld (gmtime is %s)\n" [cir_private, default, align 1, dso_local, constant]
+
+fn vsnprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec___va_list_tag*) -> s32i [external, c, nothrow];
+fn write(%arg0: s32i, %arg1: void*, %arg2: u64i) -> s64i [external, c];
+fn t_printf(%arg8: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg8: s8i*):
+        %383 = alloca s8i*, "s", align 8
+        %384 = alloca s32i, "__retval", align 4
+        %385 = alloca rec___va_list_tag[1], "ap", align 16
+        %386 = alloca s8i[512], "buf", align 16
+        %387 = alloca s32i, "n", align 4
+        store %arg8, %383
+        %388 = const 1 : s32i
+        %389 = get_global @t_status : s32i*
+        store %388, %389, align 4, volatile
+        %390 = cast(array_to_ptrdecay) %385 : rec___va_list_tag*
+        <unmodeled: cir.va_start>
+        %391 = get_global @vsnprintf : ((s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i)*
+        %392 = cast(array_to_ptrdecay) %386 : s8i*
+        %393 = const 512 : u64i
+        %394 = load %383 : s8i*, align 8
+        %395 = cast(array_to_ptrdecay) %385 : rec___va_list_tag*
+        %396 = call @vsnprintf(%392, %393, %394, %395) : s32i [all]
+        store %396, %387, align 4
+        %397 = cast(array_to_ptrdecay) %385 : rec___va_list_tag*
+        <unmodeled: cir.va_end>
+        scope {
+            %406 = load %387 : s32i, align 4
+            %407 = const 0 : s32i
+            %408 = cmp lt %406, %407 : bool
+            if %408 {
+                %438 = const 0 : s32i
+                store %438, %387, align 4
+                yield
+            } else {
+                scope {
+                    %409 = load %387 : s32i, align 4
+                    %410 = cast(integral) %409 : u64i
+                    %411 = const 512 : u64i
+                    %412 = cmp ge %410, %411 : bool
+                    if %412 {
+                        %413 = const 512 : s32i
+                        store %413, %387, align 4
+                        %414 = const 10 : s8i
+                        %415 = load %387 : s32i, align 4
+                        %416 = const 1 : s32i
+                        %417 = sub %415, %416 : s32i [nsw]
+                        %418 = cast(integral) %417 : s64i
+                        %419 = get_element %386[%418] : s8i*
+                        store %414, %419, align 1
+                        %420 = const 46 : s8i
+                        %421 = load %387 : s32i, align 4
+                        %422 = const 2 : s32i
+                        %423 = sub %421, %422 : s32i [nsw]
+                        %424 = cast(integral) %423 : s64i
+                        %425 = get_element %386[%424] : s8i*
+                        store %420, %425, align 1
+                        %426 = const 46 : s8i
+                        %427 = load %387 : s32i, align 4
+                        %428 = const 3 : s32i
+                        %429 = sub %427, %428 : s32i [nsw]
+                        %430 = cast(integral) %429 : s64i
+                        %431 = get_element %386[%430] : s8i*
+                        store %426, %431, align 1
+                        %432 = const 46 : s8i
+                        %433 = load %387 : s32i, align 4
+                        %434 = const 4 : s32i
+                        %435 = sub %433, %434 : s32i [nsw]
+                        %436 = cast(integral) %435 : s64i
+                        %437 = get_element %386[%436] : s8i*
+                        store %432, %437, align 1
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %398 = const 1 : s32i
+        %399 = cast(array_to_ptrdecay) %386 : s8i*
+        %400 = cast(bitcast) %399 : void*
+        %401 = load %387 : s32i, align 4
+        %402 = cast(integral) %401 : u64i
+        %403 = call @write(%398, %400, %402) : s64i [all]
+        %404 = cast(integral) %403 : s32i
+        store %404, %384
+        %405 = load %384 : s32i
+        return %405
+}
+fn tm_cmp(%arg6: rec_tm*, %arg7: rec_tm*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg6: rec_tm*, %arg7: rec_tm*):
+        %315 = load %arg7 : rec_tm
+        %316 = load %arg6 : rec_tm
+        %317 = alloca rec_tm, "tm1", align 8
+        %318 = alloca rec_tm, "tm2", align 8
+        %319 = alloca s32i, "__retval", align 4
+        store %316, %317
+        store %315, %318
+        %320 = get_member %317[0] "tm_sec" : s32i*
+        %321 = load %320 : s32i, align 8
+        %322 = get_member %318[0] "tm_sec" : s32i*
+        %323 = load %322 : s32i, align 8
+        %324 = cmp ne %321, %323 : bool
+        %325 = ternary %324 ? { : bool
+            %382 = const #true : bool
+            yield %382
+        } : {
+            %377 = get_member %317[1] "tm_min" : s32i*
+            %378 = load %377 : s32i, align 4
+            %379 = get_member %318[1] "tm_min" : s32i*
+            %380 = load %379 : s32i, align 4
+            %381 = cmp ne %378, %380 : bool
+            yield %381
+        }
+        %326 = ternary %325 ? { : bool
+            %376 = const #true : bool
+            yield %376
+        } : {
+            %371 = get_member %317[2] "tm_hour" : s32i*
+            %372 = load %371 : s32i, align 8
+            %373 = get_member %318[2] "tm_hour" : s32i*
+            %374 = load %373 : s32i, align 8
+            %375 = cmp ne %372, %374 : bool
+            yield %375
+        }
+        %327 = ternary %326 ? { : bool
+            %370 = const #true : bool
+            yield %370
+        } : {
+            %365 = get_member %317[3] "tm_mday" : s32i*
+            %366 = load %365 : s32i, align 4
+            %367 = get_member %318[3] "tm_mday" : s32i*
+            %368 = load %367 : s32i, align 4
+            %369 = cmp ne %366, %368 : bool
+            yield %369
+        }
+        %328 = ternary %327 ? { : bool
+            %364 = const #true : bool
+            yield %364
+        } : {
+            %359 = get_member %317[4] "tm_mon" : s32i*
+            %360 = load %359 : s32i, align 8
+            %361 = get_member %318[4] "tm_mon" : s32i*
+            %362 = load %361 : s32i, align 8
+            %363 = cmp ne %360, %362 : bool
+            yield %363
+        }
+        %329 = ternary %328 ? { : bool
+            %358 = const #true : bool
+            yield %358
+        } : {
+            %353 = get_member %317[5] "tm_year" : s32i*
+            %354 = load %353 : s32i, align 4
+            %355 = get_member %318[5] "tm_year" : s32i*
+            %356 = load %355 : s32i, align 4
+            %357 = cmp ne %354, %356 : bool
+            yield %357
+        }
+        %330 = ternary %329 ? { : bool
+            %352 = const #true : bool
+            yield %352
+        } : {
+            %347 = get_member %317[6] "tm_wday" : s32i*
+            %348 = load %347 : s32i, align 8
+            %349 = get_member %318[6] "tm_wday" : s32i*
+            %350 = load %349 : s32i, align 8
+            %351 = cmp ne %348, %350 : bool
+            yield %351
+        }
+        %331 = ternary %330 ? { : bool
+            %346 = const #true : bool
+            yield %346
+        } : {
+            %341 = get_member %317[7] "tm_yday" : s32i*
+            %342 = load %341 : s32i, align 4
+            %343 = get_member %318[7] "tm_yday" : s32i*
+            %344 = load %343 : s32i, align 4
+            %345 = cmp ne %342, %344 : bool
+            yield %345
+        }
+        %332 = ternary %331 ? { : bool
+            %340 = const #true : bool
+            yield %340
+        } : {
+            %335 = get_member %317[8] "tm_isdst" : s32i*
+            %336 = load %335 : s32i, align 8
+            %337 = get_member %318[8] "tm_isdst" : s32i*
+            %338 = load %337 : s32i, align 8
+            %339 = cmp ne %336, %338 : bool
+            yield %339
+        }
+        %333 = cast(bool_to_int) %332 : s32i
+        store %333, %319
+        %334 = load %319 : s32i
+        return %334
+}
+fn snprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, ...) -> s32i [external, c, nothrow];
+fn tm_str(%arg5: rec_tm*) -> s8i* [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg5: rec_tm*):
+        %273 = load %arg5 : rec_tm
+        %274 = alloca rec_tm, "tm", align 8
+        %275 = alloca s8i*, "__retval", align 8
+        store %273, %274
+        %276 = get_global @tm_str.i : s32i*
+        %277 = get_global @tm_str.b : s8i[64][4]*
+        %278 = load %276 : s32i, align 4
+        %279 = const 1 : s32i
+        %280 = add %278, %279 : s32i [nsw]
+        %281 = const 4 : s32i
+        %282 = rem %280, %281 : s32i
+        store %282, %276, align 4
+        %283 = get_global @snprintf : ((s8i*, u64i, s8i*, ...) -> s32i)*
+        %284 = load %276 : s32i, align 4
+        %285 = cast(integral) %284 : s64i
+        %286 = get_element %277[%285] : s8i[64]*
+        %287 = cast(array_to_ptrdecay) %286 : s8i*
+        %288 = const 64 : u64i
+        %289 = get_global @.str : s8i[75]*
+        %290 = cast(array_to_ptrdecay) %289 : s8i*
+        %291 = get_member %274[0] "tm_sec" : s32i*
+        %292 = load %291 : s32i, align 8
+        %293 = get_member %274[1] "tm_min" : s32i*
+        %294 = load %293 : s32i, align 4
+        %295 = get_member %274[2] "tm_hour" : s32i*
+        %296 = load %295 : s32i, align 8
+        %297 = get_member %274[3] "tm_mday" : s32i*
+        %298 = load %297 : s32i, align 4
+        %299 = get_member %274[4] "tm_mon" : s32i*
+        %300 = load %299 : s32i, align 8
+        %301 = get_member %274[5] "tm_year" : s32i*
+        %302 = load %301 : s32i, align 4
+        %303 = get_member %274[6] "tm_wday" : s32i*
+        %304 = load %303 : s32i, align 8
+        %305 = get_member %274[7] "tm_yday" : s32i*
+        %306 = load %305 : s32i, align 4
+        %307 = get_member %274[8] "tm_isdst" : s32i*
+        %308 = load %307 : s32i, align 8
+        %309 = call @snprintf(%287, %288, %290, %292, %294, %296, %298, %300, %302, %304, %306, %308) : s32i [all]
+        %310 = load %276 : s32i, align 4
+        %311 = cast(integral) %310 : s64i
+        %312 = get_element %277[%311] : s8i[64]*
+        %313 = cast(array_to_ptrdecay) %312 : s8i*
+        store %313, %275
+        %314 = load %275 : s8i*
+        return %314
+}
+fn putenv(%arg0: s8i*) -> s32i [external, c, nothrow];
+fn tzset() -> void [external, c, nothrow];
+fn __errno_location() -> s32i* [external, c, const, nothrow];
+fn mktime(%arg0: rec_tm*) -> s64i [external, c, nothrow];
+fn strerror(%arg0: s32i) -> s8i* [external, c, nothrow];
+fn gmtime(%arg0: s64i*) -> rec_tm* [external, c, nothrow];
+fn tm2sec(%arg2: rec_tm*, %arg3: s32i, %arg4: s8i*) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: rec_tm*, %arg3: s32i, %arg4: s8i*):
+        %154 = alloca rec_tm*, "tm", align 8
+        %155 = alloca s32i, "big", align 4
+        %156 = alloca s8i*, "m", align 8
+        %157 = alloca rec_tm*, "r", align 8
+        %158 = alloca s64i, "t", align 8
+        %159 = alloca s32i, "overflow", align 4
+        store %arg2, %154
+        store %arg3, %155
+        store %arg4, %156
+        %160 = load %155 : s32i, align 4
+        %161 = cast(int_to_bool) %160 : bool
+        %162 = ternary %161 ? { : bool
+            %270 = const 9223372036854775807 : s64i
+            %271 = const 9223372036854775807 : s64i
+            %272 = cmp ne %270, %271 : bool
+            yield %272
+        } : {
+            %269 = const #false : bool
+            yield %269
+        }
+        %163 = cast(bool_to_int) %162 : s32i
+        store %163, %159, align 4
+        %164 = const 0 : s32i
+        %165 = call @__errno_location() : s32i* [const]
+        store %164, %165, align 4
+        %166 = load %154 : rec_tm*, align 8
+        %167 = call @mktime(%166) : s64i [all]
+        store %167, %158, align 8
+        scope {
+            %253 = load %159 : s32i, align 4
+            %254 = cast(int_to_bool) %253 : bool
+            %255 = ternary %254 ? { : bool
+                %266 = load %158 : s64i, align 8
+                %267 = const -1 : s64i
+                %268 = cmp ne %266, %267 : bool
+                yield %268
+            } : {
+                %265 = const #false : bool
+                yield %265
+            }
+            if %255 {
+                %256 = get_global @.str.7 : s8i[138]*
+                %257 = cast(array_to_ptrdecay) %256 : s8i*
+                %258 = load %156 : s8i*, align 8
+                %259 = load %154 : rec_tm*, align 8
+                %260 = load %259 : rec_tm, align 8
+                %261 = alloca rec_tm, "byval", align 8
+                store %260, %261
+                %262 = call @tm_str(%261) : s8i* [all]
+                %263 = load %158 : s64i, align 8
+                %264 = call @t_printf(%257, %258, %262, %263) : s32i [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %230 = load %159 : s32i, align 4
+            %231 = cast(int_to_bool) %230 : bool
+            %232 = ternary %231 ? { : bool
+                %249 = call @__errno_location() : s32i* [const]
+                %250 = load %249 : s32i, align 4
+                %251 = const 75 : s32i
+                %252 = cmp ne %250, %251 : bool
+                yield %252
+            } : {
+                %248 = const #false : bool
+                yield %248
+            }
+            if %232 {
+                %233 = get_global @.str.8 : s8i[143]*
+                %234 = cast(array_to_ptrdecay) %233 : s8i*
+                %235 = load %156 : s8i*, align 8
+                %236 = load %154 : rec_tm*, align 8
+                %237 = load %236 : rec_tm, align 8
+                %238 = alloca rec_tm, "byval", align 8
+                store %237, %238
+                %239 = call @tm_str(%238) : s8i* [all]
+                %240 = get_global @strerror : ((s32i) -> s8i*)*
+                %241 = const 75 : s32i
+                %242 = call @strerror(%241) : s8i* [all]
+                %243 = get_global @strerror : ((s32i) -> s8i*)*
+                %244 = call @__errno_location() : s32i* [const]
+                %245 = load %244 : s32i, align 4
+                %246 = call @strerror(%245) : s8i* [all]
+                %247 = call @t_printf(%234, %235, %239, %242, %246) : s32i [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %214 = load %159 : s32i, align 4
+            %215 = cast(int_to_bool) %214 : bool
+            %216 = not %215 : bool
+            %217 = ternary %216 ? { : bool
+                %227 = load %158 : s64i, align 8
+                %228 = const -1 : s64i
+                %229 = cmp eq %227, %228 : bool
+                yield %229
+            } : {
+                %226 = const #false : bool
+                yield %226
+            }
+            if %217 {
+                %218 = get_global @.str.9 : s8i[142]*
+                %219 = cast(array_to_ptrdecay) %218 : s8i*
+                %220 = load %156 : s8i*, align 8
+                %221 = load %154 : rec_tm*, align 8
+                %222 = load %221 : rec_tm, align 8
+                %223 = alloca rec_tm, "byval", align 8
+                store %222, %223
+                %224 = call @tm_str(%223) : s8i* [all]
+                %225 = call @t_printf(%219, %220, %224) : s32i [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %194 = load %159 : s32i, align 4
+            %195 = cast(int_to_bool) %194 : bool
+            %196 = not %195 : bool
+            %197 = ternary %196 ? { : bool
+                %211 = call @__errno_location() : s32i* [const]
+                %212 = load %211 : s32i, align 4
+                %213 = cast(int_to_bool) %212 : bool
+                yield %213
+            } : {
+                %210 = const #false : bool
+                yield %210
+            }
+            if %197 {
+                %198 = get_global @.str.10 : s8i[137]*
+                %199 = cast(array_to_ptrdecay) %198 : s8i*
+                %200 = load %156 : s8i*, align 8
+                %201 = load %154 : rec_tm*, align 8
+                %202 = load %201 : rec_tm, align 8
+                %203 = alloca rec_tm, "byval", align 8
+                store %202, %203
+                %204 = call @tm_str(%203) : s8i* [all]
+                %205 = get_global @strerror : ((s32i) -> s8i*)*
+                %206 = call @__errno_location() : s32i* [const]
+                %207 = load %206 : s32i, align 4
+                %208 = call @strerror(%207) : s8i* [all]
+                %209 = call @t_printf(%199, %200, %204, %208) : s32i [all]
+                yield
+            }
+            yield
+        }
+        %168 = call @gmtime(%158) : rec_tm* [all]
+        store %168, %157, align 8
+        scope {
+            %169 = load %159 : s32i, align 4
+            %170 = cast(int_to_bool) %169 : bool
+            %171 = not %170 : bool
+            %172 = ternary %171 ? { : bool
+                %186 = load %157 : rec_tm*, align 8
+                %187 = load %154 : rec_tm*, align 8
+                %188 = load %186 : rec_tm, align 8
+                %189 = load %187 : rec_tm, align 8
+                %190 = alloca rec_tm, "byval", align 8
+                store %188, %190
+                %191 = alloca rec_tm, "byval", align 8
+                store %189, %191
+                %192 = call @tm_cmp(%190, %191) : s32i [all]
+                %193 = cast(int_to_bool) %192 : bool
+                yield %193
+            } : {
+                %185 = const #false : bool
+                yield %185
+            }
+            if %172 {
+                %173 = get_global @.str.11 : s8i[142]*
+                %174 = cast(array_to_ptrdecay) %173 : s8i*
+                %175 = load %156 : s8i*, align 8
+                %176 = load %154 : rec_tm*, align 8
+                %177 = load %176 : rec_tm, align 8
+                %178 = alloca rec_tm, "byval", align 8
+                store %177, %178
+                %179 = call @tm_str(%178) : s8i* [all]
+                %180 = load %157 : rec_tm*, align 8
+                %181 = load %180 : rec_tm, align 8
+                %182 = alloca rec_tm, "byval", align 8
+                store %181, %182
+                %183 = call @tm_str(%182) : s8i* [all]
+                %184 = call @t_printf(%174, %175, %179, %183) : s32i [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn sec2tm(%arg0: s64i, %arg1: s8i*) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s64i, %arg1: s8i*):
+        %101 = alloca s64i, "t", align 8
+        %102 = alloca s8i*, "m", align 8
+        %103 = alloca rec_tm*, "tm", align 8
+        %104 = alloca s64i, "r", align 8
+        store %arg0, %101
+        store %arg1, %102
+        %105 = const 0 : s32i
+        %106 = call @__errno_location() : s32i* [const]
+        store %105, %106, align 4
+        %107 = call @gmtime(%101) : rec_tm* [all]
+        store %107, %103, align 8
+        scope {
+            %141 = call @__errno_location() : s32i* [const]
+            %142 = load %141 : s32i, align 4
+            %143 = const 0 : s32i
+            %144 = cmp ne %142, %143 : bool
+            if %144 {
+                %145 = get_global @.str.12 : s8i[148]*
+                %146 = cast(array_to_ptrdecay) %145 : s8i*
+                %147 = load %102 : s8i*, align 8
+                %148 = load %101 : s64i, align 8
+                %149 = get_global @strerror : ((s32i) -> s8i*)*
+                %150 = call @__errno_location() : s32i* [const]
+                %151 = load %150 : s32i, align 4
+                %152 = call @strerror(%151) : s8i* [all]
+                %153 = call @t_printf(%146, %147, %148, %152) : s32i [all]
+                yield
+            }
+            yield
+        }
+        %108 = const 0 : s32i
+        %109 = call @__errno_location() : s32i* [const]
+        store %108, %109, align 4
+        %110 = load %103 : rec_tm*, align 8
+        %111 = call @mktime(%110) : s64i [all]
+        store %111, %104, align 8
+        scope {
+            %125 = call @__errno_location() : s32i* [const]
+            %126 = load %125 : s32i, align 4
+            %127 = const 0 : s32i
+            %128 = cmp ne %126, %127 : bool
+            if %128 {
+                %129 = get_global @.str.13 : s8i[138]*
+                %130 = cast(array_to_ptrdecay) %129 : s8i*
+                %131 = load %102 : s8i*, align 8
+                %132 = load %103 : rec_tm*, align 8
+                %133 = load %132 : rec_tm, align 8
+                %134 = alloca rec_tm, "byval", align 8
+                store %133, %134
+                %135 = call @tm_str(%134) : s8i* [all]
+                %136 = get_global @strerror : ((s32i) -> s8i*)*
+                %137 = call @__errno_location() : s32i* [const]
+                %138 = load %137 : s32i, align 4
+                %139 = call @strerror(%138) : s8i* [all]
+                %140 = call @t_printf(%130, %131, %135, %139) : s32i [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %112 = load %101 : s64i, align 8
+            %113 = load %104 : s64i, align 8
+            %114 = cmp ne %112, %113 : bool
+            if %114 {
+                %115 = get_global @.str.14 : s8i[161]*
+                %116 = cast(array_to_ptrdecay) %115 : s8i*
+                %117 = load %102 : s8i*, align 8
+                %118 = load %101 : s64i, align 8
+                %119 = load %104 : s64i, align 8
+                %120 = load %103 : rec_tm*, align 8
+                %121 = load %120 : rec_tm, align 8
+                %122 = alloca rec_tm, "byval", align 8
+                store %121, %122
+                %123 = call @tm_str(%122) : s8i* [all]
+                %124 = call @t_printf(%116, %117, %118, %119, %123) : s32i [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s64i, "t", align 8
+    %2 = alloca rec_tm, ".compoundliteral", align 8
+    %3 = alloca rec_tm, ".compoundliteral", align 8
+    %4 = alloca rec_tm, ".compoundliteral", align 8
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = get_global @.str.1 : s8i[7]*
+    %7 = cast(array_to_ptrdecay) %6 : s8i*
+    %8 = call @putenv(%7) : s32i [all]
+    call @tzset() [all]
+    %9 = get_member %2[0] "tm_sec" : s32i*
+    %10 = const 0 : s32i
+    store %10, %9, align 8
+    %11 = get_member %2[1] "tm_min" : s32i*
+    %12 = const 0 : s32i
+    store %12, %11, align 4
+    %13 = get_member %2[2] "tm_hour" : s32i*
+    %14 = const 0 : s32i
+    store %14, %13, align 8
+    %15 = get_member %2[3] "tm_mday" : s32i*
+    %16 = const 1 : s32i
+    store %16, %15, align 4
+    %17 = get_member %2[4] "tm_mon" : s32i*
+    %18 = const 0 : s32i
+    store %18, %17, align 8
+    %19 = get_member %2[5] "tm_year" : s32i*
+    %20 = const 70 : s32i
+    store %20, %19, align 4
+    %21 = get_member %2[6] "tm_wday" : s32i*
+    %22 = const 4 : s32i
+    store %22, %21, align 8
+    %23 = get_member %2[7] "tm_yday" : s32i*
+    %24 = const 0 : s32i
+    store %24, %23, align 4
+    %25 = get_member %2[8] "tm_isdst" : s32i*
+    %26 = const 0 : s32i
+    store %26, %25, align 8
+    %27 = get_member %2[9] "tm_gmtoff" : s64i*
+    %28 = const 0 : s64i
+    store %28, %27, align 8
+    %29 = get_member %2[10] "tm_zone" : s8i**
+    %30 = const #cir.ptr<null> : s8i*
+    store %30, %29, align 8
+    %31 = const 0 : s32i
+    %32 = get_global @.str.2 : s8i[10]*
+    %33 = cast(array_to_ptrdecay) %32 : s8i*
+    call @tm2sec(%2, %31, %33) [all]
+    %34 = get_member %3[0] "tm_sec" : s32i*
+    %35 = const 7 : s32i
+    store %35, %34, align 8
+    %36 = get_member %3[1] "tm_min" : s32i*
+    %37 = const 14 : s32i
+    store %37, %36, align 4
+    %38 = get_member %3[2] "tm_hour" : s32i*
+    %39 = const 3 : s32i
+    store %39, %38, align 8
+    %40 = get_member %3[3] "tm_mday" : s32i*
+    %41 = const 19 : s32i
+    store %41, %40, align 4
+    %42 = get_member %3[4] "tm_mon" : s32i*
+    %43 = const 0 : s32i
+    store %43, %42, align 8
+    %44 = get_member %3[5] "tm_year" : s32i*
+    %45 = const 138 : s32i
+    store %45, %44, align 4
+    %46 = get_member %3[6] "tm_wday" : s32i*
+    %47 = const 2 : s32i
+    store %47, %46, align 8
+    %48 = get_member %3[7] "tm_yday" : s32i*
+    %49 = const 18 : s32i
+    store %49, %48, align 4
+    %50 = get_member %3[8] "tm_isdst" : s32i*
+    %51 = const 0 : s32i
+    store %51, %50, align 8
+    %52 = get_member %3[9] "tm_gmtoff" : s64i*
+    %53 = const 0 : s64i
+    store %53, %52, align 8
+    %54 = get_member %3[10] "tm_zone" : s8i**
+    %55 = const #cir.ptr<null> : s8i*
+    store %55, %54, align 8
+    %56 = const 0 : s32i
+    %57 = get_global @.str.3 : s8i[8]*
+    %58 = cast(array_to_ptrdecay) %57 : s8i*
+    call @tm2sec(%3, %56, %58) [all]
+    %59 = get_member %4[0] "tm_sec" : s32i*
+    %60 = const 8 : s32i
+    store %60, %59, align 8
+    %61 = get_member %4[1] "tm_min" : s32i*
+    %62 = const 14 : s32i
+    store %62, %61, align 4
+    %63 = get_member %4[2] "tm_hour" : s32i*
+    %64 = const 3 : s32i
+    store %64, %63, align 8
+    %65 = get_member %4[3] "tm_mday" : s32i*
+    %66 = const 19 : s32i
+    store %66, %65, align 4
+    %67 = get_member %4[4] "tm_mon" : s32i*
+    %68 = const 0 : s32i
+    store %68, %67, align 8
+    %69 = get_member %4[5] "tm_year" : s32i*
+    %70 = const 138 : s32i
+    store %70, %69, align 4
+    %71 = get_member %4[6] "tm_wday" : s32i*
+    %72 = const 2 : s32i
+    store %72, %71, align 8
+    %73 = get_member %4[7] "tm_yday" : s32i*
+    %74 = const 18 : s32i
+    store %74, %73, align 4
+    %75 = get_member %4[8] "tm_isdst" : s32i*
+    %76 = const 0 : s32i
+    store %76, %75, align 8
+    %77 = get_member %4[9] "tm_gmtoff" : s64i*
+    %78 = const 0 : s64i
+    store %78, %77, align 8
+    %79 = get_member %4[10] "tm_zone" : s8i**
+    %80 = const #cir.ptr<null> : s8i*
+    store %80, %79, align 8
+    %81 = const 1 : s32i
+    %82 = get_global @.str.4 : s8i[5]*
+    %83 = cast(array_to_ptrdecay) %82 : s8i*
+    call @tm2sec(%4, %81, %83) [all]
+    %84 = const 0 : s64i
+    %85 = get_global @.str.5 : s8i[6]*
+    %86 = cast(array_to_ptrdecay) %85 : s8i*
+    call @sec2tm(%84, %86) [all]
+    scope {
+        %90 = const 1 : s64i
+        store %90, %1, align 8
+        for cond: {
+            %98 = load %1 : s64i, align 8
+            %99 = const 1000 : s64i
+            %100 = cmp lt %98, %99 : bool
+            condition %100
+        } step: {
+            %91 = load %1 : s64i, align 8
+            %92 = inc %91 : s64i [nsw]
+            store %92, %1, align 8
+            yield
+        } do {
+            %93 = load %1 : s64i, align 8
+            %94 = const 100003 : s64i
+            %95 = mul %93, %94 : s64i [nsw]
+            %96 = get_global @.str.6 : s8i[10]*
+            %97 = cast(array_to_ptrdecay) %96 : s8i*
+            call @sec2tm(%95, %97) [all]
+            yield
+        }
+        yield
+    }
+    %87 = get_global @t_status : s32i*
+    %88 = load %87 : s32i, align 4, volatile
+    store %88, %0
+    %89 = load %0 : s32i
+    return %89
+}

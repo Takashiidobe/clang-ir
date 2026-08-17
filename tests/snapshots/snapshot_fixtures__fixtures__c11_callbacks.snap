@@ -1,0 +1,132 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/c11_callbacks.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.control : rec___once_flag = zero [cir_private, default, dso_local, constant]
+global .str : s8i[19] = "%d %d %d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global once_total : s32i = 0 [internal, default, align 4, dso_local]
+
+fn thrd_create(%arg0: u64i*, %arg1: ((void*) -> s32i)*, %arg2: void*) -> s32i [external, c];
+fn thread_worker(%arg1: void*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: void*):
+        %63 = alloca void*, "argument", align 8
+        %64 = alloca s32i, "__retval", align 4
+        store %arg1, %63
+        %65 = load %63 : void*, align 8
+        %66 = cast(bitcast) %65 : s32i*
+        %67 = load %66 : s32i, align 4
+        %68 = const 1 : s32i
+        %69 = add %67, %68 : s32i [nsw]
+        store %69, %64
+        %70 = load %64 : s32i
+        return %70
+}
+fn thrd_join(%arg0: u64i, %arg1: s32i*) -> s32i [external, c];
+fn call_once(%arg0: rec___once_flag*, %arg1: (() -> void)*) -> void [external, c];
+fn once_handler() -> void [internal, c, no_inline, dso_local, nothrow] {
+    %59 = const 1 : s32i
+    %60 = get_global @once_total : s32i*
+    %61 = load %60 : s32i, align 4
+    %62 = add %61, %59 : s32i [nsw]
+    store %62, %60, align 4
+    return
+}
+fn tss_create(%arg0: u32i*, %arg1: ((void*) -> void)*) -> s32i [external, c];
+fn tss_destructor(%arg0: void*) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: void*):
+        %51 = alloca void*, "value", align 8
+        store %arg0, %51
+        %52 = load %51 : void*, align 8
+        %53 = const #cir.ptr<null> : void*
+        %54 = cmp ne %52, %53 : bool
+        %55 = cast(bool_to_int) %54 : s32i
+        %56 = get_global @once_total : s32i*
+        %57 = load %56 : s32i, align 4
+        %58 = add %57, %55 : s32i [nsw]
+        store %58, %56, align 4
+        return
+}
+fn tss_delete(%arg0: u32i) -> void [external, c];
+fn at_quick_exit(%arg0: (() -> void)*) -> s32i [external, c, nothrow];
+fn quick_handler() -> void [internal, c, no_inline, dso_local, nothrow] {
+    %47 = const 100 : s32i
+    %48 = get_global @once_total : s32i*
+    %49 = load %48 : s32i, align 4
+    %50 = add %49, %47 : s32i [nsw]
+    store %50, %48, align 4
+    return
+}
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u64i, "thread", align 8
+    %2 = alloca u32i, "key", align 4
+    %3 = alloca s32i, "argument", align 4
+    %4 = alloca s32i, "thread_result", align 4
+    %5 = alloca s32i, "thread_created", align 4
+    %6 = alloca s32i, "thread_joined", align 4
+    %7 = alloca rec___once_flag, "control", align 4
+    %8 = alloca s32i, "key_created", align 4
+    %9 = alloca s32i, "quick_registered", align 4
+    %10 = const 0 : s32i
+    store %10, %0
+    %11 = const 40 : s32i
+    store %11, %3, align 4
+    %12 = const 0 : s32i
+    store %12, %4, align 4
+    %13 = get_global @thread_worker : ((void*) -> s32i)*
+    %14 = cast(bitcast) %3 : void*
+    %15 = call @thrd_create(%1, %13, %14) : s32i [all]
+    store %15, %5, align 4
+    %16 = load %5 : s32i, align 4
+    %17 = const 0 : s32i
+    %18 = cmp eq %16, %17 : bool
+    %19 = ternary %18 ? { : s32i
+        %45 = load %1 : u64i, align 8
+        %46 = call @thrd_join(%45, %4) : s32i [all]
+        yield %46
+    } : {
+        %44 = const -1 : s32i
+        yield %44
+    }
+    store %19, %6, align 4
+    %20 = get_global @__const.main.control : rec___once_flag*
+    copy %7, %20
+    %21 = get_global @once_handler : (() -> void)*
+    call @call_once(%7, %21) [all]
+    %22 = get_global @once_handler : (() -> void)*
+    call @call_once(%7, %22) [all]
+    %23 = get_global @tss_destructor : ((void*) -> void)*
+    %24 = call @tss_create(%2, %23) : s32i [all]
+    store %24, %8, align 4
+    scope {
+        %40 = load %8 : s32i, align 4
+        %41 = const 0 : s32i
+        %42 = cmp eq %40, %41 : bool
+        if %42 {
+            %43 = load %2 : u32i, align 4
+            call @tss_delete(%43) [all]
+            yield
+        }
+        yield
+    }
+    %25 = get_global @quick_handler : (() -> void)*
+    %26 = call @at_quick_exit(%25) : s32i [all]
+    store %26, %9, align 4
+    %27 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %28 = get_global @.str : s8i[19]*
+    %29 = cast(array_to_ptrdecay) %28 : s8i*
+    %30 = load %5 : s32i, align 4
+    %31 = load %6 : s32i, align 4
+    %32 = load %4 : s32i, align 4
+    %33 = get_global @once_total : s32i*
+    %34 = load %33 : s32i, align 4
+    %35 = load %8 : s32i, align 4
+    %36 = load %9 : s32i, align 4
+    %37 = call @printf(%29, %30, %31, %32, %34, %35, %36) : s32i [all]
+    %38 = const 0 : s32i
+    store %38, %0
+    %39 = load %0 : s32i
+    return %39
+}

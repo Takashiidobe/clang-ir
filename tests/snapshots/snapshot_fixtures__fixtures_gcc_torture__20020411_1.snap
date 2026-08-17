@@ -1,0 +1,93 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20020411-1.c" (c, x86_64-unknown-linux-gnu)
+fn foo() -> vector<2 x float> [external, c, no_inline, dso_local, nothrow] {
+    %32 = alloca complex<float>, "coerce", align 8
+    %33 = alloca complex<float>, "__retval", align 4
+    %34 = alloca complex<float>[1], "f", align 4
+    %35 = const 1.000000e+00 : double
+    %36 = cast(floating) %35 : float
+    %37 = const 0 : s64i
+    %38 = get_element %34[%37] : complex<float>*
+    <unmodeled: cir.complex.real_ptr>
+    store %36, %39, align 4
+    %40 = const 1.000000e+00 : double
+    %41 = cast(floating) %40 : float
+    %42 = const 0 : s64i
+    %43 = get_element %34[%42] : complex<float>*
+    <unmodeled: cir.complex.imag_ptr>
+    store %41, %44, align 4
+    %45 = const 0 : s64i
+    %46 = get_element %34[%45] : complex<float>*
+    %47 = load %46 : complex<float>, align 4
+    <unmodeled: cir.complex.real>
+    <unmodeled: cir.complex.imag>
+    %50 = fneg %49 : float
+    <unmodeled: cir.complex.create>
+    %52 = const 0 : s64i
+    %53 = get_element %34[%52] : complex<float>*
+    store %51, %53, align 4
+    %54 = const 0 : s64i
+    %55 = get_element %34[%54] : complex<float>*
+    %56 = load %55 : complex<float>, align 4
+    store %56, %33, align 4
+    %57 = load %33 : complex<float>
+    store %57, %32
+    %58 = cast(bitcast) %32 : vector<2 x float>*
+    %59 = load %58 : vector<2 x float>
+    return %59
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca vector<2 x float>, "coerce", align 8
+    %1 = alloca s32i, "__retval", align 4
+    %2 = alloca complex<double>[1], "d", align 16
+    %3 = const 0 : s32i
+    store %3, %1
+    %4 = call @foo() : vector<2 x float> [all]
+    store %4, %0
+    %5 = cast(bitcast) %0 : complex<float>*
+    %6 = load %5 : complex<float>
+    <unmodeled: cir.complex.real>
+    <unmodeled: cir.complex.imag>
+    %9 = cast(floating) %7 : double
+    %10 = cast(floating) %8 : double
+    <unmodeled: cir.complex.create>
+    %12 = const 0 : s64i
+    %13 = get_element %2[%12] : complex<double>*
+    store %11, %13, align 16
+    scope {
+        %17 = const 0 : s64i
+        %18 = get_element %2[%17] : complex<double>*
+        %19 = load %18 : complex<double>, align 16
+        <unmodeled: cir.complex.real>
+        %21 = const 1.000000e+00 : double
+        %22 = cmp ne %20, %21 : bool
+        %23 = ternary %22 ? { : bool
+            %31 = const #true : bool
+            yield %31
+        } : {
+            %25 = const 0 : s64i
+            %26 = get_element %2[%25] : complex<double>*
+            %27 = load %26 : complex<double>, align 16
+            <unmodeled: cir.complex.imag>
+            %29 = const -1.000000e+00 : double
+            %30 = cmp ne %28, %29 : bool
+            yield %30
+        }
+        if %23 {
+            %24 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %14 = get_global @exit : ((s32i) -> void)*
+    %15 = const 0 : s32i
+    call @exit(%15) [all]
+    %16 = load %1 : s32i
+    return %16
+}

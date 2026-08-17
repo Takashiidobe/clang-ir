@@ -1,0 +1,87 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20021118-1.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.s : rec_s = {[1, 2, 3, 4]} [cir_private, default, dso_local, constant]
+
+fn foo(%arg0: u64i, %arg1: u64i, %arg2: s32i, %arg3: s32i, %arg4: s32i, %arg5: s32i, %arg6: s32i, %arg7: s32i, %arg8: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u64i, %arg1: u64i, %arg2: s32i, %arg3: s32i, %arg4: s32i, %arg5: s32i, %arg6: s32i, %arg7: s32i, %arg8: s32i):
+        %25 = alloca rec_anon_struct, "coerce", align 8
+        %26 = alloca rec_anon_struct, "coerce", align 8
+        %27 = get_member %26[0] "" : u64i*
+        store %arg0, %27
+        %28 = get_member %26[1] "" : u64i*
+        store %arg1, %28
+        %29 = load %26 : rec_anon_struct
+        store %29, %25
+        %30 = cast(bitcast) %25 : rec_s*
+        %31 = load %30 : rec_s
+        %32 = alloca rec_s, "s", align 4
+        %33 = alloca s32i, "x1", align 4
+        %34 = alloca s32i, "x2", align 4
+        %35 = alloca s32i, "x3", align 4
+        %36 = alloca s32i, "x4", align 4
+        %37 = alloca s32i, "x5", align 4
+        %38 = alloca s32i, "x6", align 4
+        %39 = alloca s32i, "x7", align 4
+        %40 = alloca s32i, "__retval", align 4
+        store %31, %32
+        store %arg2, %33
+        store %arg3, %34
+        store %arg4, %35
+        store %arg5, %36
+        store %arg6, %37
+        store %arg7, %38
+        store %arg8, %39
+        %41 = const 3 : s64i
+        %42 = get_member %32[0] "f" : s32i[4]*
+        %43 = get_element %42[%41] : s32i*
+        %44 = load %43 : s32i, align 4
+        %45 = load %39 : s32i, align 4
+        %46 = add %44, %45 : s32i [nsw]
+        store %46, %40
+        %47 = load %40 : s32i
+        return %47
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca rec_s, "coerce", align 8
+    %1 = alloca s32i, "__retval", align 4
+    %2 = alloca rec_s, "s", align 4
+    %3 = const 0 : s32i
+    store %3, %1
+    %4 = get_global @__const.main.s : rec_s*
+    copy %2, %4
+    scope {
+        %8 = const 100 : s32i
+        %9 = const 200 : s32i
+        %10 = const 300 : s32i
+        %11 = const 400 : s32i
+        %12 = const 500 : s32i
+        %13 = const 600 : s32i
+        %14 = const 700 : s32i
+        %15 = load %2 : rec_s, align 4
+        store %15, %0
+        %16 = cast(bitcast) %0 : rec_anon_struct*
+        %17 = get_member %16[0] "" : u64i*
+        %18 = load %17 : u64i
+        %19 = get_member %16[1] "" : u64i*
+        %20 = load %19 : u64i
+        %21 = call @foo(%18, %20, %8, %9, %10, %11, %12, %13, %14) : s32i [all]
+        %22 = const 704 : s32i
+        %23 = cmp ne %21, %22 : bool
+        if %23 {
+            %24 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %5 = get_global @exit : ((s32i) -> void)*
+    %6 = const 0 : s32i
+    call @exit(%6) [all]
+    %7 = load %1 : s32i
+    return %7
+}

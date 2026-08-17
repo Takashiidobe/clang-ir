@@ -1,0 +1,103 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr33992.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn bar(%arg2: u64i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: u64i):
+        %32 = alloca u64i, "i", align 8
+        store %arg2, %32
+        scope {
+            %33 = load %32 : u64i, align 8
+            %34 = cast(int_to_bool) %33 : bool
+            if %34 {
+                %35 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn foo(%arg1: u64i*) -> void [internal, c, always_inline, dso_local, nothrow] {
+    ^bb0(%arg1: u64i*):
+        %15 = alloca u64i*, "r", align 8
+        %16 = alloca s32i, "i", align 4
+        store %arg1, %15
+        scope {
+            %19 = const 0 : s32i
+            store %19, %16, align 4
+            for cond: {
+                %31 = const #true : bool
+                condition %31
+            } step: {
+                %20 = load %16 : s32i, align 4
+                %21 = inc %20 : s32i [nsw]
+                store %21, %16, align 4
+                yield
+            } do {
+                scope {
+                    %22 = load %15 : u64i*, align 8
+                    %23 = load %22 : u64i, align 8
+                    %24 = const 1 : u64i
+                    %25 = const 63 : s32i
+                    %26 = load %16 : s32i, align 4
+                    %27 = sub %25, %26 : s32i [nsw]
+                    %28 = shift left %24, %27 : u64i
+                    %29 = and %23, %28 : u64i
+                    %30 = cast(int_to_bool) %29 : bool
+                    if %30 {
+                        break
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %17 = load %16 : s32i, align 4
+        %18 = cast(integral) %17 : u64i
+        call @bar(%18) [all]
+        return
+}
+fn do_test(%arg0: u64i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u64i*):
+        %6 = alloca u64i*, "r", align 8
+        %7 = alloca s32i, "i", align 4
+        store %arg0, %6
+        scope {
+            %8 = const 0 : s32i
+            store %8, %7, align 4
+            for cond: {
+                %12 = load %7 : s32i, align 4
+                %13 = const 2 : s32i
+                %14 = cmp lt %12, %13 : bool
+                condition %14
+            } step: {
+                %9 = load %7 : s32i, align 4
+                %10 = inc %9 : s32i [nsw]
+                store %10, %7, align 4
+                yield
+            } do {
+                %11 = load %6 : u64i*, align 8
+                call @foo(%11) [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u64i, "r", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 9223372036854775809 : u64i
+    store %3, %1, align 8
+    call @do_test(%1) [all]
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

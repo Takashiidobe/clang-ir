@@ -1,0 +1,105 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/math_builtin_ops.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[30] = "%.3f %.3f %.3f %.3f %ld %lld\n" [cir_private, default, align 1, dso_local, constant]
+
+fn sin(%arg0: double) -> double [external, c, nothrow];
+fn cos(%arg0: double) -> double [external, c, nothrow];
+fn tan(%arg0: double) -> double [external, c, nothrow];
+fn log(%arg0: double) -> double [external, c, nothrow];
+fn log10(%arg0: double) -> double [external, c, nothrow];
+fn log2(%arg0: double) -> double [external, c, nothrow];
+fn pow(%arg0: double, %arg1: double) -> double [external, c, nothrow];
+fn sqrt(%arg0: double) -> double [external, c, nothrow];
+fn exp(%arg0: double) -> double [external, c, nothrow];
+fn exp2(%arg0: double) -> double [external, c, nothrow];
+fn fmod(%arg0: double, %arg1: double) -> double [external, c, nothrow];
+fn lround(%arg0: double) -> s64i [external, c, nothrow];
+fn llround(%arg0: double) -> s64i [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca double, "a", align 8
+    %2 = alloca double, "b", align 8
+    %3 = alloca double, "c", align 8
+    %4 = alloca double, "d", align 8
+    %5 = alloca double, "e", align 8
+    %6 = alloca double, "f", align 8
+    %7 = alloca double, "trig", align 8
+    %8 = alloca double, "logs", align 8
+    %9 = alloca double, "powers", align 8
+    %10 = alloca double, "rem", align 8
+    %11 = alloca s64i, "rounded", align 8
+    %12 = alloca s64i, "rounded_ll", align 8
+    %13 = const 0 : s32i
+    store %13, %0
+    %14 = const 5.000000e-01 : double
+    store %14, %1, align 8, volatile
+    %15 = const 2.000000e+00 : double
+    store %15, %2, align 8, volatile
+    %16 = const 8.000000e+00 : double
+    store %16, %3, align 8, volatile
+    %17 = const 5.750000e+00 : double
+    store %17, %4, align 8, volatile
+    %18 = const 2.000000e+00 : double
+    store %18, %5, align 8, volatile
+    %19 = const 2.500000e+00 : double
+    store %19, %6, align 8, volatile
+    %20 = load %1 : double, align 8, volatile
+    %21 = call @sin(%20) : double [all]
+    %22 = load %1 : double, align 8, volatile
+    %23 = call @cos(%22) : double [all]
+    %24 = fadd %21, %23 : double
+    %25 = load %1 : double, align 8, volatile
+    %26 = call @tan(%25) : double [all]
+    %27 = fadd %24, %26 : double
+    store %27, %7, align 8
+    %28 = load %3 : double, align 8, volatile
+    %29 = call @log(%28) : double [all]
+    %30 = const 1.000000e+02 : double
+    %31 = call @log10(%30) : double [all]
+    %32 = fadd %29, %31 : double
+    %33 = load %3 : double, align 8, volatile
+    %34 = call @log2(%33) : double [all]
+    %35 = fadd %32, %34 : double
+    store %35, %8, align 8
+    %36 = load %2 : double, align 8, volatile
+    %37 = const 3.000000e+00 : double
+    %38 = call @pow(%36, %37) : double [all]
+    %39 = load %3 : double, align 8, volatile
+    %40 = call @sqrt(%39) : double [all]
+    %41 = fadd %38, %40 : double
+    %42 = const 1.000000e+00 : double
+    %43 = call @exp(%42) : double [all]
+    %44 = fadd %41, %43 : double
+    %45 = const 3.000000e+00 : double
+    %46 = call @exp2(%45) : double [all]
+    %47 = fadd %44, %46 : double
+    store %47, %9, align 8
+    %48 = load %4 : double, align 8, volatile
+    %49 = load %5 : double, align 8, volatile
+    %50 = call @fmod(%48, %49) : double [all]
+    store %50, %10, align 8
+    %51 = load %6 : double, align 8, volatile
+    %52 = call @lround(%51) : s64i [all]
+    store %52, %11, align 8
+    %53 = load %6 : double, align 8, volatile
+    %54 = call @llround(%53) : s64i [all]
+    store %54, %12, align 8
+    %55 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %56 = get_global @.str : s8i[30]*
+    %57 = cast(array_to_ptrdecay) %56 : s8i*
+    %58 = load %7 : double, align 8
+    %59 = load %8 : double, align 8
+    %60 = load %9 : double, align 8
+    %61 = load %10 : double, align 8
+    %62 = load %11 : s64i, align 8
+    %63 = load %12 : s64i, align 8
+    %64 = call @printf(%57, %58, %59, %60, %61, %62, %63) : s32i [all]
+    %65 = const 0 : s32i
+    store %65, %0
+    %66 = load %0 : s32i
+    return %66
+}

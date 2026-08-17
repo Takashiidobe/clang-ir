@@ -1,0 +1,113 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20050929-1.c" (c, x86_64-unknown-linux-gnu)
+global .compoundliteral : rec_A = {1, 2} [internal, default, align 4, dso_local]
+global .compoundliteral.1 : rec_A = {3, 4} [internal, default, align 4, dso_local]
+global .compoundliteral.2 : rec_B = {@.compoundliteral, @.compoundliteral.1} [internal, default, align 8, dso_local]
+global .compoundliteral.3 : rec_A = {5, 6} [internal, default, align 4, dso_local]
+global e : rec_C = {@.compoundliteral.2, @.compoundliteral.3} [external, default, align 8, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %42 = get_global @e : rec_C*
+        %43 = get_member %42[0] "c" : rec_B**
+        %44 = load %43 : rec_B*, align 8
+        %45 = get_member %44[0] "a" : rec_A**
+        %46 = load %45 : rec_A*, align 8
+        %47 = get_member %46[0] "i" : s32i*
+        %48 = load %47 : s32i, align 4
+        %49 = const 1 : s32i
+        %50 = cmp ne %48, %49 : bool
+        %51 = ternary %50 ? { : bool
+            %62 = const #true : bool
+            yield %62
+        } : {
+            %53 = get_global @e : rec_C*
+            %54 = get_member %53[0] "c" : rec_B**
+            %55 = load %54 : rec_B*, align 8
+            %56 = get_member %55[0] "a" : rec_A**
+            %57 = load %56 : rec_A*, align 8
+            %58 = get_member %57[1] "j" : s32i*
+            %59 = load %58 : s32i, align 4
+            %60 = const 2 : s32i
+            %61 = cmp ne %59, %60 : bool
+            yield %61
+        }
+        if %51 {
+            %52 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %21 = get_global @e : rec_C*
+        %22 = get_member %21[0] "c" : rec_B**
+        %23 = load %22 : rec_B*, align 8
+        %24 = get_member %23[1] "b" : rec_A**
+        %25 = load %24 : rec_A*, align 8
+        %26 = get_member %25[0] "i" : s32i*
+        %27 = load %26 : s32i, align 4
+        %28 = const 3 : s32i
+        %29 = cmp ne %27, %28 : bool
+        %30 = ternary %29 ? { : bool
+            %41 = const #true : bool
+            yield %41
+        } : {
+            %32 = get_global @e : rec_C*
+            %33 = get_member %32[0] "c" : rec_B**
+            %34 = load %33 : rec_B*, align 8
+            %35 = get_member %34[1] "b" : rec_A**
+            %36 = load %35 : rec_A*, align 8
+            %37 = get_member %36[1] "j" : s32i*
+            %38 = load %37 : s32i, align 4
+            %39 = const 4 : s32i
+            %40 = cmp ne %38, %39 : bool
+            yield %40
+        }
+        if %30 {
+            %31 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %4 = get_global @e : rec_C*
+        %5 = get_member %4[1] "d" : rec_A**
+        %6 = load %5 : rec_A*, align 8
+        %7 = get_member %6[0] "i" : s32i*
+        %8 = load %7 : s32i, align 4
+        %9 = const 5 : s32i
+        %10 = cmp ne %8, %9 : bool
+        %11 = ternary %10 ? { : bool
+            %20 = const #true : bool
+            yield %20
+        } : {
+            %13 = get_global @e : rec_C*
+            %14 = get_member %13[1] "d" : rec_A**
+            %15 = load %14 : rec_A*, align 8
+            %16 = get_member %15[1] "j" : s32i*
+            %17 = load %16 : s32i, align 4
+            %18 = const 6 : s32i
+            %19 = cmp ne %17, %18 : bool
+            yield %19
+        }
+        if %11 {
+            %12 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

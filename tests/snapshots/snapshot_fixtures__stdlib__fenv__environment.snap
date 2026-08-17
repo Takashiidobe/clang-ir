@@ -1,0 +1,176 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/fenv/environment.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[12] = "fenv_t %zu\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[22] = "fegetenv original %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[26] = "feclearexcept initial %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[19] = "fegetenv saved %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[32] = "feraiseexcept before setenv %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[19] = "fesetenv saved %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[19] = "fesetenv flags %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.7 : s8i[30] = "feraiseexcept before hold %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.8 : s8i[17] = "feholdexcept %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.9 : s8i[23] = "feholdexcept flags %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.10 : s8i[23] = "feraiseexcept held %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.11 : s8i[16] = "feupdateenv %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.12 : s8i[22] = "feupdateenv flags %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.13 : s8i[21] = "fesetenv default %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.14 : s8i[27] = "default environment %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.15 : s8i[22] = "fesetenv original %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn fegetenv(%arg0: rec_fenv_t*) -> s32i [external, c, nothrow];
+fn feclearexcept(%arg0: s32i) -> s32i [external, c, nothrow];
+fn feraiseexcept(%arg0: s32i) -> s32i [external, c, nothrow];
+fn fesetenv(%arg0: rec_fenv_t*) -> s32i [external, c, nothrow];
+fn fetestexcept(%arg0: s32i) -> s32i [external, c, nothrow];
+fn feholdexcept(%arg0: rec_fenv_t*) -> s32i [external, c, nothrow];
+fn feupdateenv(%arg0: rec_fenv_t*) -> s32i [external, c, nothrow];
+fn fegetround() -> s32i [external, c, pure, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_fenv_t, "original_environment", align 4
+    %2 = alloca rec_fenv_t, "saved_environment", align 4
+    %3 = alloca rec_fenv_t, "held_environment", align 4
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %6 = get_global @.str : s8i[12]*
+    %7 = cast(array_to_ptrdecay) %6 : s8i*
+    %8 = const 32 : u64i
+    %9 = call @printf(%7, %8) : s32i [all]
+    %10 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %11 = get_global @.str.1 : s8i[22]*
+    %12 = cast(array_to_ptrdecay) %11 : s8i*
+    %13 = call @fegetenv(%1) : s32i [all]
+    %14 = call @printf(%12, %13) : s32i [all]
+    %15 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %16 = get_global @.str.2 : s8i[26]*
+    %17 = cast(array_to_ptrdecay) %16 : s8i*
+    %18 = const 32 : s32i
+    %19 = const 4 : s32i
+    %20 = or %18, %19 : s32i
+    %21 = const 16 : s32i
+    %22 = or %20, %21 : s32i
+    %23 = const 8 : s32i
+    %24 = or %22, %23 : s32i
+    %25 = const 1 : s32i
+    %26 = or %24, %25 : s32i
+    %27 = call @feclearexcept(%26) : s32i [all]
+    %28 = call @printf(%17, %27) : s32i [all]
+    %29 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %30 = get_global @.str.3 : s8i[19]*
+    %31 = cast(array_to_ptrdecay) %30 : s8i*
+    %32 = call @fegetenv(%2) : s32i [all]
+    %33 = call @printf(%31, %32) : s32i [all]
+    %34 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %35 = get_global @.str.4 : s8i[32]*
+    %36 = cast(array_to_ptrdecay) %35 : s8i*
+    %37 = const 1 : s32i
+    %38 = call @feraiseexcept(%37) : s32i [all]
+    %39 = call @printf(%36, %38) : s32i [all]
+    %40 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %41 = get_global @.str.5 : s8i[19]*
+    %42 = cast(array_to_ptrdecay) %41 : s8i*
+    %43 = call @fesetenv(%2) : s32i [all]
+    %44 = call @printf(%42, %43) : s32i [all]
+    %45 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %46 = get_global @.str.6 : s8i[19]*
+    %47 = cast(array_to_ptrdecay) %46 : s8i*
+    %48 = const 32 : s32i
+    %49 = const 4 : s32i
+    %50 = or %48, %49 : s32i
+    %51 = const 16 : s32i
+    %52 = or %50, %51 : s32i
+    %53 = const 8 : s32i
+    %54 = or %52, %53 : s32i
+    %55 = const 1 : s32i
+    %56 = or %54, %55 : s32i
+    %57 = call @fetestexcept(%56) : s32i [all]
+    %58 = call @printf(%47, %57) : s32i [all]
+    %59 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %60 = get_global @.str.7 : s8i[30]*
+    %61 = cast(array_to_ptrdecay) %60 : s8i*
+    %62 = const 4 : s32i
+    %63 = call @feraiseexcept(%62) : s32i [all]
+    %64 = call @printf(%61, %63) : s32i [all]
+    %65 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %66 = get_global @.str.8 : s8i[17]*
+    %67 = cast(array_to_ptrdecay) %66 : s8i*
+    %68 = call @feholdexcept(%3) : s32i [all]
+    %69 = call @printf(%67, %68) : s32i [all]
+    %70 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %71 = get_global @.str.9 : s8i[23]*
+    %72 = cast(array_to_ptrdecay) %71 : s8i*
+    %73 = const 32 : s32i
+    %74 = const 4 : s32i
+    %75 = or %73, %74 : s32i
+    %76 = const 16 : s32i
+    %77 = or %75, %76 : s32i
+    %78 = const 8 : s32i
+    %79 = or %77, %78 : s32i
+    %80 = const 1 : s32i
+    %81 = or %79, %80 : s32i
+    %82 = call @fetestexcept(%81) : s32i [all]
+    %83 = call @printf(%72, %82) : s32i [all]
+    %84 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %85 = get_global @.str.10 : s8i[23]*
+    %86 = cast(array_to_ptrdecay) %85 : s8i*
+    %87 = const 8 : s32i
+    %88 = call @feraiseexcept(%87) : s32i [all]
+    %89 = call @printf(%86, %88) : s32i [all]
+    %90 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %91 = get_global @.str.11 : s8i[16]*
+    %92 = cast(array_to_ptrdecay) %91 : s8i*
+    %93 = call @feupdateenv(%3) : s32i [all]
+    %94 = call @printf(%92, %93) : s32i [all]
+    %95 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %96 = get_global @.str.12 : s8i[22]*
+    %97 = cast(array_to_ptrdecay) %96 : s8i*
+    %98 = const 4 : s32i
+    %99 = const 8 : s32i
+    %100 = or %98, %99 : s32i
+    %101 = call @fetestexcept(%100) : s32i [all]
+    %102 = const 4 : s32i
+    %103 = const 8 : s32i
+    %104 = or %102, %103 : s32i
+    %105 = cmp eq %101, %104 : bool
+    %106 = cast(bool_to_int) %105 : s32i
+    %107 = call @printf(%97, %106) : s32i [all]
+    %108 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %109 = get_global @.str.13 : s8i[21]*
+    %110 = cast(array_to_ptrdecay) %109 : s8i*
+    %111 = const 18446744073709551615 : u64i
+    %112 = cast(int_to_ptr) %111 : rec_fenv_t*
+    %113 = call @fesetenv(%112) : s32i [all]
+    %114 = call @printf(%110, %113) : s32i [all]
+    %115 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %116 = get_global @.str.14 : s8i[27]*
+    %117 = cast(array_to_ptrdecay) %116 : s8i*
+    %118 = call @fegetround() : s32i [pure]
+    %119 = const 0 : s32i
+    %120 = cmp eq %118, %119 : bool
+    %121 = cast(bool_to_int) %120 : s32i
+    %122 = const 32 : s32i
+    %123 = const 4 : s32i
+    %124 = or %122, %123 : s32i
+    %125 = const 16 : s32i
+    %126 = or %124, %125 : s32i
+    %127 = const 8 : s32i
+    %128 = or %126, %127 : s32i
+    %129 = const 1 : s32i
+    %130 = or %128, %129 : s32i
+    %131 = call @fetestexcept(%130) : s32i [all]
+    %132 = call @printf(%117, %121, %131) : s32i [all]
+    %133 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %134 = get_global @.str.15 : s8i[22]*
+    %135 = cast(array_to_ptrdecay) %134 : s8i*
+    %136 = call @fesetenv(%1) : s32i [all]
+    %137 = call @printf(%135, %136) : s32i [all]
+    %138 = const 0 : s32i
+    store %138, %0
+    %139 = load %0 : s32i
+    return %139
+}

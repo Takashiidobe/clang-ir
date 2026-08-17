@@ -1,0 +1,33 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.multi/static_linkage/other.c" (c, x86_64-unknown-linux-gnu)
+global base : s32i = 100 [internal, default, align 4, dso_local]
+
+fn local(%arg1: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i):
+        %7 = alloca s32i, "x", align 4
+        %8 = alloca s32i, "__retval", align 4
+        store %arg1, %7
+        %9 = load %7 : s32i, align 4
+        %10 = get_global @base : s32i*
+        %11 = load %10 : s32i, align 4
+        %12 = mul %9, %11 : s32i [nsw]
+        store %12, %8
+        %13 = load %8 : s32i
+        return %13
+}
+fn compute(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %0 = alloca s32i, "x", align 4
+        %1 = alloca s32i, "__retval", align 4
+        store %arg0, %0
+        %2 = load %0 : s32i, align 4
+        %3 = call @local(%2) : s32i [all]
+        %4 = const 1 : s32i
+        %5 = add %3, %4 : s32i [nsw]
+        store %5, %1
+        %6 = load %1 : s32i
+        return %6
+}

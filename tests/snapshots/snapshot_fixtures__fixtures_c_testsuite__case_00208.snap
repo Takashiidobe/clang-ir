@@ -1,0 +1,89 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00208.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.s : s8i[9] = "nonono" [cir_private, default, dso_local, constant]
+global __const.f1int.q : rec_wint = {@.str, zero} [cir_private, default, dso_local, constant]
+global __const.f1int.s : s8i[9] = "nonono" [cir_private, default, dso_local, constant]
+global __const.f1char.q : rec_wchar = {@.str, zero} [cir_private, default, dso_local, constant]
+global __const.f1char.s : s8i[9] = "nonono" [cir_private, default, dso_local, constant]
+global main.q : rec_wchar = {@.str, [99]} [internal, default, align 8, dso_local]
+global .str : s8i[5] = "bugs" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[5] = "bla\n" [cir_private, default, align 1, dso_local, constant]
+
+fn f1char() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %34 = alloca s32i, "__retval", align 4
+    %35 = alloca s8i[9], "s", align 1
+    %36 = alloca rec_wchar, "q", align 8
+    %37 = get_global @__const.f1char.s : s8i[9]*
+    copy %35, %37
+    %38 = get_global @__const.f1char.q : rec_wchar*
+    copy %36, %38
+    %39 = const 0 : s64i
+    %40 = get_element %35[%39] : s8i*
+    %41 = load %40 : s8i, align 1
+    %42 = cast(int_to_bool) %41 : bool
+    %43 = not %42 : bool
+    %44 = cast(bool_to_int) %43 : s32i
+    store %44, %34
+    %45 = load %34 : s32i
+    return %45
+}
+fn f1int() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %22 = alloca s32i, "__retval", align 4
+    %23 = alloca s8i[9], "s", align 1
+    %24 = alloca rec_wint, "q", align 8
+    %25 = get_global @__const.f1int.s : s8i[9]*
+    copy %23, %25
+    %26 = get_global @__const.f1int.q : rec_wint*
+    copy %24, %26
+    %27 = const 0 : s64i
+    %28 = get_element %23[%27] : s8i*
+    %29 = load %28 : s8i, align 1
+    %30 = cast(int_to_bool) %29 : bool
+    %31 = not %30 : bool
+    %32 = cast(bool_to_int) %31 : s32i
+    store %32, %22
+    %33 = load %22 : s32i
+    return %33
+}
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i[9], "s", align 1
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @__const.main.s : s8i[9]*
+    copy %1, %3
+    %4 = get_global @main.q : rec_wchar*
+    scope {
+        %12 = call @f1char() : s32i [all]
+        %13 = cast(int_to_bool) %12 : bool
+        %14 = ternary %13 ? { : bool
+            %21 = const #true : bool
+            yield %21
+        } : {
+            %19 = call @f1int() : s32i [all]
+            %20 = cast(int_to_bool) %19 : bool
+            yield %20
+        }
+        if %14 {
+            %15 = get_global @printf : ((s8i*, ...) -> s32i)*
+            %16 = get_global @.str.1 : s8i[5]*
+            %17 = cast(array_to_ptrdecay) %16 : s8i*
+            %18 = call @printf(%17) : s32i [all]
+            yield
+        }
+        yield
+    }
+    %5 = const 0 : s64i
+    %6 = get_element %1[%5] : s8i*
+    %7 = load %6 : s8i, align 1
+    %8 = cast(int_to_bool) %7 : bool
+    %9 = not %8 : bool
+    %10 = cast(bool_to_int) %9 : s32i
+    store %10, %0
+    %11 = load %0 : s32i
+    return %11
+}

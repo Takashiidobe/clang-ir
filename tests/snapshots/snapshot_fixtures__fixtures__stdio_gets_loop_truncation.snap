@@ -1,0 +1,116 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/stdio_gets_loop_truncation.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[37] = "slate_stdio_gets_loop_truncation.tmp" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[2] = "w" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[10] = "open-fail" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[18] = "0123456789abcdef\n" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[7] = "short\n" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[2] = "r" [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[12] = "reopen-fail" [cir_private, default, align 1, dso_local, constant]
+global stdout : rec__IO_FILE* [external, default, align 8, dso_local]
+
+fn remove(%arg0: s8i*) -> s32i [external, c, nothrow];
+fn fopen(%arg0: s8i*, %arg1: s8i*) -> rec__IO_FILE* [external, c];
+fn puts(%arg0: s8i*) -> s32i [external, c];
+fn fputs(%arg0: s8i*, %arg1: rec__IO_FILE*) -> s32i [external, c];
+fn fclose(%arg0: rec__IO_FILE*) -> s32i [external, c];
+fn fgets(%arg0: s8i*, %arg1: s32i, %arg2: rec__IO_FILE*) -> s8i* [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec__IO_FILE*, "f", align 8
+    %2 = alloca rec__IO_FILE*, "g", align 8
+    %3 = alloca s8i[8], "line", align 1
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = get_global @.str : s8i[37]*
+    %6 = cast(array_to_ptrdecay) %5 : s8i*
+    %7 = call @remove(%6) : s32i [all]
+    %8 = get_global @fopen : ((s8i*, s8i*) -> rec__IO_FILE*)*
+    %9 = get_global @.str : s8i[37]*
+    %10 = cast(array_to_ptrdecay) %9 : s8i*
+    %11 = get_global @.str.1 : s8i[2]*
+    %12 = cast(array_to_ptrdecay) %11 : s8i*
+    %13 = call @fopen(%10, %12) : rec__IO_FILE* [all]
+    store %13, %1, align 8
+    scope {
+        %56 = load %1 : rec__IO_FILE*, align 8
+        %57 = cast(ptr_to_bool) %56 : bool
+        %58 = not %57 : bool
+        if %58 {
+            %59 = get_global @.str.2 : s8i[10]*
+            %60 = cast(array_to_ptrdecay) %59 : s8i*
+            %61 = call @puts(%60) : s32i [all]
+            %62 = const 0 : s32i
+            store %62, %0
+            %63 = load %0 : s32i
+            return %63
+        }
+        yield
+    }
+    %14 = get_global @.str.3 : s8i[18]*
+    %15 = cast(array_to_ptrdecay) %14 : s8i*
+    %16 = load %1 : rec__IO_FILE*, align 8
+    %17 = call @fputs(%15, %16) : s32i [all]
+    %18 = get_global @.str.4 : s8i[7]*
+    %19 = cast(array_to_ptrdecay) %18 : s8i*
+    %20 = load %1 : rec__IO_FILE*, align 8
+    %21 = call @fputs(%19, %20) : s32i [all]
+    %22 = load %1 : rec__IO_FILE*, align 8
+    %23 = call @fclose(%22) : s32i [all]
+    %24 = get_global @fopen : ((s8i*, s8i*) -> rec__IO_FILE*)*
+    %25 = get_global @.str : s8i[37]*
+    %26 = cast(array_to_ptrdecay) %25 : s8i*
+    %27 = get_global @.str.5 : s8i[2]*
+    %28 = cast(array_to_ptrdecay) %27 : s8i*
+    %29 = call @fopen(%26, %28) : rec__IO_FILE* [all]
+    store %29, %2, align 8
+    scope {
+        %48 = load %2 : rec__IO_FILE*, align 8
+        %49 = cast(ptr_to_bool) %48 : bool
+        %50 = not %49 : bool
+        if %50 {
+            %51 = get_global @.str.6 : s8i[12]*
+            %52 = cast(array_to_ptrdecay) %51 : s8i*
+            %53 = call @puts(%52) : s32i [all]
+            %54 = const 0 : s32i
+            store %54, %0
+            %55 = load %0 : s32i
+            return %55
+        }
+        yield
+    }
+    scope {
+        while {
+            %41 = cast(array_to_ptrdecay) %3 : s8i*
+            %42 = const 8 : s32i
+            %43 = load %2 : rec__IO_FILE*, align 8
+            %44 = call @fgets(%41, %42, %43) : s8i* [all]
+            %45 = const #cir.ptr<null> : void*
+            %46 = cast(bitcast) %45 : s8i*
+            %47 = cmp ne %44, %46 : bool
+            condition %47
+        } do {
+            scope {
+                %37 = cast(array_to_ptrdecay) %3 : s8i*
+                %38 = get_global @stdout : rec__IO_FILE**
+                %39 = load %38 : rec__IO_FILE*, align 8
+                %40 = call @fputs(%37, %39) : s32i [all]
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %30 = load %2 : rec__IO_FILE*, align 8
+    %31 = call @fclose(%30) : s32i [all]
+    %32 = get_global @.str : s8i[37]*
+    %33 = cast(array_to_ptrdecay) %32 : s8i*
+    %34 = call @remove(%33) : s32i [all]
+    %35 = const 0 : s32i
+    store %35, %0
+    %36 = load %0 : s32i
+    return %36
+}

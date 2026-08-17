@@ -1,0 +1,132 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr42691.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.infinit : rec__D_rep = {[0, 0, 0, 32752]} [cir_private, default, dso_local, constant]
+global __const.add._D_inf2 : rec__D_rep = {[0, 0, 0, 32752]} [cir_private, default, dso_local, constant]
+global __const.add._D_inf : rec__D_rep = {[0, 0, 0, 32752]} [cir_private, default, dso_local, constant]
+
+fn abort() -> void [external, c, nothrow];
+fn add(%arg0: double*, %arg1: double*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: double*, %arg1: double*):
+        %20 = alloca double*, "key", align 8
+        %21 = alloca double*, "table", align 8
+        %22 = alloca s32i, "__retval", align 4
+        %23 = alloca u32i, "i", align 4
+        %24 = alloca double*, "deletedEntry", align 8
+        store %arg0, %20
+        store %arg1, %21
+        %25 = const 0 : u32i
+        store %25, %23, align 4
+        %26 = const #cir.ptr<null> : double*
+        store %26, %24, align 8
+        scope {
+            while {
+                %59 = const 1 : s32i
+                %60 = cast(int_to_bool) %59 : bool
+                condition %60
+            } do {
+                scope {
+                    %33 = alloca double*, "entry", align 8
+                    %34 = alloca rec__D_rep, "_D_inf", align 8
+                    %35 = alloca rec__D_rep, "_D_inf2", align 8
+                    %36 = load %21 : double*, align 8
+                    %37 = load %23 : u32i, align 4
+                    %38 = ptr_stride %36, %37 : double*
+                    store %38, %33, align 8
+                    scope {
+                        %54 = load %33 : double*, align 8
+                        %55 = load %54 : double, align 8
+                        %56 = load %20 : double*, align 8
+                        %57 = load %56 : double, align 8
+                        %58 = cmp eq %55, %57 : bool
+                        if %58 {
+                            break
+                        }
+                        yield
+                    }
+                    %39 = get_global @__const.add._D_inf : rec__D_rep*
+                    copy %34, %39
+                    scope {
+                        %48 = load %33 : double*, align 8
+                        %49 = load %48 : double, align 8
+                        %50 = get_member %34[1] "val" : double*
+                        %51 = load %50 : double, align 8
+                        %52 = cmp ne %49, %51 : bool
+                        if %52 {
+                            %53 = get_global @abort : (() -> void)*
+                            call @abort() [all]
+                            yield
+                        }
+                        yield
+                    }
+                    %40 = get_global @__const.add._D_inf2 : rec__D_rep*
+                    copy %35, %40
+                    scope {
+                        %43 = get_member %35[1] "val" : double*
+                        %44 = load %43 : double, align 8
+                        %45 = cast(float_to_bool) %44 : bool
+                        %46 = not %45 : bool
+                        if %46 {
+                            %47 = load %33 : double*, align 8
+                            store %47, %24, align 8
+                            yield
+                        }
+                        yield
+                    }
+                    %41 = load %23 : u32i, align 4
+                    %42 = inc %41 : u32i
+                    store %42, %23, align 4
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        scope {
+            %29 = load %24 : double*, align 8
+            %30 = cast(ptr_to_bool) %29 : bool
+            if %30 {
+                %31 = const 0.000000e+00 : double
+                %32 = load %24 : double*, align 8
+                store %31, %32, align 8
+                yield
+            }
+            yield
+        }
+        %27 = const 0 : s32i
+        store %27, %22
+        %28 = load %22 : s32i
+        return %28
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec__D_rep, "infinit", align 8
+    %2 = alloca double[2], "table", align 16
+    %3 = alloca double, "key", align 8
+    %4 = alloca s32i, "ret", align 4
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = get_global @__const.main.infinit : rec__D_rep*
+    copy %1, %6
+    %7 = cast(array_to_ptrdecay) %2 : double*
+    %8 = get_member %1[1] "val" : double*
+    %9 = load %8 : double, align 8
+    store %9, %7, align 8
+    %10 = const 1 : s64i
+    %11 = ptr_stride %7, %10 : double*
+    %12 = const 23 : s32i
+    %13 = cast(int_to_float) %12 : double
+    store %13, %11, align 8
+    %14 = const 23 : s32i
+    %15 = cast(int_to_float) %14 : double
+    store %15, %3, align 8
+    %16 = cast(array_to_ptrdecay) %2 : double*
+    %17 = call @add(%3, %16) : s32i [all]
+    store %17, %4, align 4
+    %18 = load %4 : s32i, align 4
+    store %18, %0
+    %19 = load %0 : s32i
+    return %19
+}

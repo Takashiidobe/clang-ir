@@ -1,0 +1,67 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/980506-2.c" (c, x86_64-unknown-linux-gnu)
+fn self(%arg0: void*) -> void* [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: void*):
+        %28 = alloca void*, "p", align 8
+        %29 = alloca void*, "__retval", align 8
+        store %arg0, %28
+        %30 = load %28 : void*, align 8
+        store %30, %29
+        %31 = load %29 : void*
+        return %31
+}
+fn f() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %10 = alloca s32i, "__retval", align 4
+    %11 = alloca rec_anon2E0, "s", align 4
+    %12 = alloca rec_anon2E0*, "sp", align 8
+    %13 = alloca s32i*, "ip", align 8
+    %14 = get_member %11[0] "i" : s32i*
+    store %14, %13, align 8
+    %15 = const 1 : s32i
+    %16 = get_member %11[0] "i" : s32i*
+    store %15, %16, align 4
+    %17 = cast(bitcast) %11 : void*
+    %18 = call @self(%17) : void* [all]
+    %19 = cast(bitcast) %18 : rec_anon2E0*
+    store %19, %12, align 8
+    %20 = const 0 : s32i
+    %21 = load %13 : s32i*, align 8
+    store %20, %21, align 4
+    %22 = load %12 : rec_anon2E0*, align 8
+    %23 = get_member %22[0] "i" : s32i*
+    %24 = load %23 : s32i, align 4
+    %25 = const 1 : s32i
+    %26 = add %24, %25 : s32i [nsw]
+    store %26, %10
+    %27 = load %10 : s32i
+    return %27
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %3 = get_global @f : (() -> s32i)*
+        %4 = call @f() : s32i [all]
+        %5 = const 1 : s32i
+        %6 = cmp ne %4, %5 : bool
+        if %6 {
+            %9 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        } else {
+            %7 = get_global @exit : ((s32i) -> void)*
+            %8 = const 0 : s32i
+            call @exit(%8) [all]
+            yield
+        }
+        yield
+    }
+    %2 = load %0 : s32i
+    return %2
+}

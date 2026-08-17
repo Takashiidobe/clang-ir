@@ -1,0 +1,79 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/loop-14.c" (c, x86_64-unknown-linux-gnu)
+global a3 : s32i[3] = zero [external, default, align 4, dso_local]
+
+fn f(%arg0: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i*):
+        %22 = alloca s32i*, "a", align 8
+        %23 = alloca s32i, "i", align 4
+        store %arg0, %22
+        scope {
+            %24 = const 3 : s32i
+            store %24, %23, align 4
+            for cond: {
+                %32 = load %23 : s32i, align 4
+                %33 = dec %32 : s32i [nsw]
+                store %33, %23, align 4
+                %34 = cast(int_to_bool) %33 : bool
+                condition %34
+            } step: {
+                yield
+            } do {
+                %25 = const 42 : s32i
+                %26 = load %23 : s32i, align 4
+                %27 = div %25, %26 : s32i
+                %28 = load %23 : s32i, align 4
+                %29 = cast(integral) %28 : s64i
+                %30 = load %22 : s32i*, align 8
+                %31 = ptr_stride %30, %29 : s32i*
+                store %27, %31, align 4
+                yield
+            }
+            yield
+        }
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @a3 : s32i[3]*
+    %3 = cast(array_to_ptrdecay) %2 : s32i*
+    call @f(%3) [all]
+    scope {
+        %7 = const 1 : s64i
+        %8 = get_global @a3 : s32i[3]*
+        %9 = get_element %8[%7] : s32i*
+        %10 = load %9 : s32i, align 4
+        %11 = const 42 : s32i
+        %12 = cmp ne %10, %11 : bool
+        %13 = ternary %12 ? { : bool
+            %21 = const #true : bool
+            yield %21
+        } : {
+            %15 = const 2 : s64i
+            %16 = get_global @a3 : s32i[3]*
+            %17 = get_element %16[%15] : s32i*
+            %18 = load %17 : s32i, align 4
+            %19 = const 21 : s32i
+            %20 = cmp ne %18, %19 : bool
+            yield %20
+        }
+        if %13 {
+            %14 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %4 = get_global @exit : ((s32i) -> void)*
+    %5 = const 0 : s32i
+    call @exit(%5) [all]
+    %6 = load %0 : s32i
+    return %6
+}

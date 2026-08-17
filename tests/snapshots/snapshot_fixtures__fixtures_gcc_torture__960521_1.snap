@@ -1,0 +1,124 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/960521-1.c" (c, x86_64-unknown-linux-gnu)
+global n : s32i = 0 [external, default, align 4, dso_local]
+global a : s32i* = #cir.ptr<null> [external, default, align 8, dso_local]
+global b : s32i* = #cir.ptr<null> [external, default, align 8, dso_local]
+
+fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
+    %37 = alloca s32i, "i", align 4
+    scope {
+        %52 = const 0 : s32i
+        store %52, %37, align 4
+        for cond: {
+            %61 = load %37 : s32i, align 4
+            %62 = get_global @n : s32i*
+            %63 = load %62 : s32i, align 4
+            %64 = cmp lt %61, %63 : bool
+            condition %64
+        } step: {
+            %53 = load %37 : s32i, align 4
+            %54 = inc %53 : s32i [nsw]
+            store %54, %37, align 4
+            yield
+        } do {
+            %55 = const -1 : s32i
+            %56 = load %37 : s32i, align 4
+            %57 = cast(integral) %56 : s64i
+            %58 = get_global @a : s32i**
+            %59 = load %58 : s32i*, align 8
+            %60 = ptr_stride %59, %57 : s32i*
+            store %55, %60, align 4
+            yield
+        }
+        yield
+    }
+    scope {
+        %38 = const 0 : s32i
+        store %38, %37, align 4
+        for cond: {
+            %47 = load %37 : s32i, align 4
+            %48 = const 32768 : s32i
+            %49 = const 1 : s32i
+            %50 = sub %48, %49 : s32i [nsw]
+            %51 = cmp lt %47, %50 : bool
+            condition %51
+        } step: {
+            %39 = load %37 : s32i, align 4
+            %40 = inc %39 : s32i [nsw]
+            store %40, %37, align 4
+            yield
+        } do {
+            %41 = const -1 : s32i
+            %42 = load %37 : s32i, align 4
+            %43 = cast(integral) %42 : s64i
+            %44 = get_global @b : s32i**
+            %45 = load %44 : s32i*, align 8
+            %46 = ptr_stride %45, %43 : s32i*
+            store %41, %46, align 4
+            yield
+        }
+        yield
+    }
+    return
+}
+fn malloc(%arg0: u64i) -> void* [external, c, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 32768 : s32i
+    %3 = get_global @n : s32i*
+    store %2, %3, align 4
+    %4 = get_global @malloc : ((u64i) -> void*)*
+    %5 = get_global @n : s32i*
+    %6 = load %5 : s32i, align 4
+    %7 = cast(integral) %6 : u64i
+    %8 = const 4 : u64i
+    %9 = mul %7, %8 : u64i
+    %10 = call @malloc(%9) : void* [all]
+    %11 = cast(bitcast) %10 : s32i*
+    %12 = get_global @a : s32i**
+    store %11, %12, align 8
+    %13 = get_global @malloc : ((u64i) -> void*)*
+    %14 = get_global @n : s32i*
+    %15 = load %14 : s32i, align 4
+    %16 = cast(integral) %15 : u64i
+    %17 = const 4 : u64i
+    %18 = mul %16, %17 : u64i
+    %19 = call @malloc(%18) : void* [all]
+    %20 = cast(bitcast) %19 : s32i*
+    %21 = get_global @b : s32i**
+    store %20, %21, align 8
+    %22 = const 0 : s32i
+    %23 = get_global @b : s32i**
+    %24 = load %23 : s32i*, align 8
+    %25 = const 1 : s32i
+    %26 = ptr_stride %24, %25 : s32i*
+    store %26, %23, align 8
+    store %22, %24, align 4
+    call @foo() [all]
+    scope {
+        %30 = const -1 : s64i
+        %31 = get_global @b : s32i**
+        %32 = load %31 : s32i*, align 8
+        %33 = ptr_stride %32, %30 : s32i*
+        %34 = load %33 : s32i, align 4
+        %35 = cast(int_to_bool) %34 : bool
+        if %35 {
+            %36 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %27 = get_global @exit : ((s32i) -> void)*
+    %28 = const 0 : s32i
+    call @exit(%28) [all]
+    %29 = load %0 : s32i
+    return %29
+}

@@ -1,0 +1,49 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20120105-1.c" (c, x86_64-unknown-linux-gnu)
+global i : s32i = 0 [external, default, align 4, dso_local]
+
+fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
+fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
+fn extract(%arg0: s8i*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i*):
+        %17 = alloca s8i*, "p", align 8
+        %18 = alloca s32i, "__retval", align 4
+        %19 = alloca rec_S, "s", align 1
+        store %arg0, %17
+        %20 = cast(bitcast) %19 : void*
+        %21 = load %17 : s8i*, align 8
+        %22 = cast(bitcast) %21 : void*
+        %23 = const 12 : u64i
+        %24 = call @memcpy(%20, %22, %23) : void* [all]
+        %25 = get_member %19[0] "a" : s32i*
+        %26 = load %25 : s32i, align 1
+        store %26, %18
+        %27 = load %18 : s32i
+        return %27
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i[13], "p", align 1
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = cast(array_to_ptrdecay) %1 : s8i*
+    %4 = cast(bitcast) %3 : void*
+    %5 = const 0 : s32i
+    %6 = const 12 : u64i
+    %7 = const 1 : u64i
+    %8 = add %6, %7 : u64i
+    %9 = call @memset(%4, %5, %8) : void* [all]
+    %10 = cast(array_to_ptrdecay) %1 : s8i*
+    %11 = const 1 : s32i
+    %12 = ptr_stride %10, %11 : s8i*
+    %13 = call @extract(%12) : s32i [all]
+    %14 = get_global @i : s32i*
+    store %13, %14, align 4, volatile
+    %15 = const 0 : s32i
+    store %15, %0
+    %16 = load %0 : s32i
+    return %16
+}

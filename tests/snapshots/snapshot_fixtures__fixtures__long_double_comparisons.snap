@@ -1,0 +1,66 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/long_double_comparisons.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[13] = "%d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca long_double<f80>, "zero", align 16
+    %2 = alloca long_double<f80>, "tiny", align 16
+    %3 = alloca long_double<f80>, "one", align 16
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 0.000000e+00 : long_double<f80>
+    store %5, %1, align 16
+    %6 = const 3.645200e-4951 : long_double<f80>
+    store %6, %2, align 16
+    %7 = const 1.000000e+00 : long_double<f80>
+    store %7, %3, align 16
+    %8 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %9 = get_global @.str : s8i[13]*
+    %10 = cast(array_to_ptrdecay) %9 : s8i*
+    %11 = load %2 : long_double<f80>, align 16
+    %12 = load %1 : long_double<f80>, align 16
+    %13 = cmp gt %11, %12 : bool
+    %14 = cast(bool_to_int) %13 : s32i
+    %15 = load %1 : long_double<f80>, align 16
+    %16 = load %2 : long_double<f80>, align 16
+    %17 = cmp lt %15, %16 : bool
+    %18 = cast(bool_to_int) %17 : s32i
+    %19 = load %3 : long_double<f80>, align 16
+    %20 = load %2 : long_double<f80>, align 16
+    %21 = cmp ge %19, %20 : bool
+    %22 = cast(bool_to_int) %21 : s32i
+    %23 = load %2 : long_double<f80>, align 16
+    %24 = load %3 : long_double<f80>, align 16
+    %25 = cmp le %23, %24 : bool
+    %26 = cast(bool_to_int) %25 : s32i
+    %27 = call @printf(%10, %14, %18, %22, %26) : s32i [all]
+    %28 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %29 = get_global @.str : s8i[13]*
+    %30 = cast(array_to_ptrdecay) %29 : s8i*
+    %31 = load %2 : long_double<f80>, align 16
+    %32 = load %1 : long_double<f80>, align 16
+    %33 = cmp lt %31, %32 : bool
+    %34 = cast(bool_to_int) %33 : s32i
+    %35 = load %1 : long_double<f80>, align 16
+    %36 = load %2 : long_double<f80>, align 16
+    %37 = cmp gt %35, %36 : bool
+    %38 = cast(bool_to_int) %37 : s32i
+    %39 = load %3 : long_double<f80>, align 16
+    %40 = load %2 : long_double<f80>, align 16
+    %41 = cmp le %39, %40 : bool
+    %42 = cast(bool_to_int) %41 : s32i
+    %43 = load %2 : long_double<f80>, align 16
+    %44 = load %3 : long_double<f80>, align 16
+    %45 = cmp ge %43, %44 : bool
+    %46 = cast(bool_to_int) %45 : s32i
+    %47 = call @printf(%30, %34, %38, %42, %46) : s32i [all]
+    %48 = const 0 : s32i
+    store %48, %0
+    %49 = load %0 : s32i
+    return %49
+}

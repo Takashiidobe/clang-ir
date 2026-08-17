@@ -1,0 +1,68 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20100708-1.c" (c, x86_64-unknown-linux-gnu)
+fn f(%arg0: rec_S*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_S*):
+        %5 = alloca rec_S*, "s", align 8
+        %6 = alloca u32i, "i", align 4
+        store %arg0, %5
+        scope {
+            %7 = const 0 : u32i
+            store %7, %6, align 4
+            for cond: {
+                %31 = load %6 : u32i, align 4
+                %32 = const 16 : u32i
+                %33 = cmp lt %31, %32 : bool
+                condition %33
+            } step: {
+                %8 = load %6 : u32i, align 4
+                %9 = inc %8 : u32i
+                store %9, %6, align 4
+                yield
+            } do {
+                scope {
+                    %10 = const 0 : s32i
+                    %11 = load %6 : u32i, align 4
+                    %12 = cast(integral) %11 : u64i
+                    %13 = load %5 : rec_S*, align 8
+                    %14 = get_member %13[1] "a" : rec_anon2E0[16]*
+                    %15 = get_element %14[%12] : rec_anon2E0*
+                    %16 = get_member %15[0] "x" : s32i*
+                    store %10, %16, align 4
+                    %17 = const 0 : s32i
+                    %18 = load %6 : u32i, align 4
+                    %19 = cast(integral) %18 : u64i
+                    %20 = load %5 : rec_S*, align 8
+                    %21 = get_member %20[1] "a" : rec_anon2E0[16]*
+                    %22 = get_element %21[%19] : rec_anon2E0*
+                    %23 = get_member %22[1] "y" : s32i*
+                    store %17, %23, align 4
+                    %24 = const 0 : s32i
+                    %25 = load %6 : u32i, align 4
+                    %26 = cast(integral) %25 : u64i
+                    %27 = load %5 : rec_S*, align 8
+                    %28 = get_member %27[1] "a" : rec_anon2E0[16]*
+                    %29 = get_element %28[%26] : rec_anon2E0*
+                    %30 = get_member %29[2] "z" : s32i*
+                    store %24, %30, align 4
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_S, "s", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    call @f(%1) [all]
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

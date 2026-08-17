@@ -1,0 +1,93 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/function_pointer_presence.c" (c, x86_64-unknown-linux-gnu)
+fn maybe_apply(%arg1: ((s32i) -> s32i)*, %arg2: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: ((s32i) -> s32i)*, %arg2: s32i):
+        %35 = alloca ((s32i) -> s32i)*, "op", align 8
+        %36 = alloca s32i, "value", align 4
+        %37 = alloca s32i, "__retval", align 4
+        store %arg1, %35
+        store %arg2, %36
+        scope {
+            %40 = load %35 : ((s32i) -> s32i)*, align 8
+            %41 = cast(ptr_to_bool) %40 : bool
+            if %41 {
+                %42 = load %35 : ((s32i) -> s32i)*, align 8
+                %43 = load %36 : s32i, align 4
+                %44 = call %42(%43) : s32i [all]
+                store %44, %37
+                %45 = load %37 : s32i
+                return %45
+            }
+            yield
+        }
+        %38 = load %36 : s32i, align 4
+        store %38, %37
+        %39 = load %37 : s32i
+        return %39
+}
+fn bump(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %29 = alloca s32i, "value", align 4
+        %30 = alloca s32i, "__retval", align 4
+        store %arg0, %29
+        %31 = load %29 : s32i, align 4
+        %32 = const 1 : s32i
+        %33 = add %31, %32 : s32i [nsw]
+        store %33, %30
+        %34 = load %30 : s32i
+        return %34
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca ((s32i) -> s32i)*, "op", align 8
+    %2 = alloca s32i, "total", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const #cir.ptr<null> : ((s32i) -> s32i)*
+    store %4, %1, align 8
+    %5 = load %1 : ((s32i) -> s32i)*, align 8
+    %6 = const 4 : s32i
+    %7 = call @maybe_apply(%5, %6) : s32i [all]
+    store %7, %2, align 4
+    %8 = get_global @bump : ((s32i) -> s32i)*
+    store %8, %1, align 8
+    scope {
+        %21 = load %1 : ((s32i) -> s32i)*, align 8
+        %22 = const #cir.ptr<null> : ((s32i) -> s32i)*
+        %23 = cmp ne %21, %22 : bool
+        if %23 {
+            %24 = load %2 : s32i, align 4
+            %25 = load %1 : ((s32i) -> s32i)*, align 8
+            %26 = const 5 : s32i
+            %27 = call @maybe_apply(%25, %26) : s32i [all]
+            %28 = add %24, %27 : s32i [nsw]
+            store %28, %2, align 4
+            yield
+        }
+        yield
+    }
+    scope {
+        %16 = load %1 : ((s32i) -> s32i)*, align 8
+        %17 = const #cir.ptr<null> : ((s32i) -> s32i)*
+        %18 = cmp eq %16, %17 : bool
+        if %18 {
+            %19 = const 2 : s32i
+            store %19, %0
+            %20 = load %0 : s32i
+            return %20
+        }
+        yield
+    }
+    %9 = load %2 : s32i, align 4
+    %10 = const 10 : s32i
+    %11 = cmp eq %9, %10 : bool
+    %12 = const 0 : s32i
+    %13 = const 1 : s32i
+    %14 = select %11, %12, %13 : s32i
+    store %14, %0
+    %15 = load %0 : s32i
+    return %15
+}

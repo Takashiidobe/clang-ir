@@ -1,0 +1,56 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20210505-1.c" (c, x86_64-unknown-linux-gnu)
+global stop : bool = #false [internal, default, align 1, dso_local]
+global buf : rec___jmp_buf_tag[1] = zero [internal, default, align 16, dso_local]
+
+fn call_func(%arg0: (() -> void)*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: (() -> void)*):
+        %19 = alloca (() -> void)*, "func", align 8
+        store %arg0, %19
+        %20 = load %19 : (() -> void)*, align 8
+        call %20() [all]
+        return
+}
+fn longjmp(%arg0: rec___jmp_buf_tag*, %arg1: s32i) -> void [external, c, nothrow];
+fn func() -> void [external, c, no_inline, dso_local, nothrow] {
+    %12 = const 1 : s32i
+    %13 = cast(int_to_bool) %12 : bool
+    %14 = get_global @stop : bool*
+    store %13, %14, align 1
+    %15 = get_global @longjmp : ((rec___jmp_buf_tag*, s32i) -> void)*
+    %16 = get_global @buf : rec___jmp_buf_tag[1]*
+    %17 = cast(array_to_ptrdecay) %16 : rec___jmp_buf_tag*
+    %18 = const 1 : s32i
+    call @longjmp(%17, %18) [all]
+    return
+}
+fn _setjmp(%arg0: rec___jmp_buf_tag*) -> s32i [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @_setjmp : ((rec___jmp_buf_tag*) -> s32i)*
+    %3 = get_global @buf : rec___jmp_buf_tag[1]*
+    %4 = cast(array_to_ptrdecay) %3 : rec___jmp_buf_tag*
+    %5 = call @_setjmp(%4) : s32i [all]
+    scope {
+        while {
+            %9 = get_global @stop : bool*
+            %10 = load %9 : bool, align 1
+            %11 = not %10 : bool
+            condition %11
+        } do {
+            %8 = get_global @func : (() -> void)*
+            call @call_func(%8) [all]
+            yield
+        }
+        yield
+    }
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = load %0 : s32i
+    return %7
+}

@@ -1,0 +1,116 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/gnu_case_ranges.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[37] = "%d %d %d %d %d %d %d %d %d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn classify(%arg1: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i):
+        %40 = alloca s32i, "value", align 4
+        %41 = alloca s32i, "__retval", align 4
+        %42 = alloca s32i, "result", align 4
+        store %arg1, %40
+        %43 = const 0 : s32i
+        store %43, %42, align 4
+        scope {
+            %46 = load %40 : s32i, align 4
+            switch %46 {
+                case range 1, 4 {
+                    %54 = const 10 : s32i
+                    %55 = load %42 : s32i, align 4
+                    %56 = add %55, %54 : s32i [nsw]
+                    store %56, %42, align 4
+                    yield
+                }
+                case range 5, 8 {
+                    %51 = const 20 : s32i
+                    %52 = load %42 : s32i, align 4
+                    %53 = add %52, %51 : s32i [nsw]
+                    store %53, %42, align 4
+                    break
+                }
+                case range 10, 12 {
+                    %48 = const 40 : s32i
+                    %49 = load %42 : s32i, align 4
+                    %50 = add %49, %48 : s32i [nsw]
+                    store %50, %42, align 4
+                    break
+                }
+                case default {
+                    %47 = const 90 : s32i
+                    store %47, %42, align 4
+                    yield
+                }
+            }
+            yield
+        }
+        %44 = load %42 : s32i, align 4
+        store %44, %41
+        %45 = load %41 : s32i
+        return %45
+}
+fn classify_direct(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %32 = alloca s32i, "value", align 4
+        %33 = alloca s32i, "__retval", align 4
+        store %arg0, %32
+        scope {
+            %35 = load %32 : s32i, align 4
+            switch %35 {
+                case range -2, 2 {
+                    %38 = const 7 : s32i
+                    store %38, %33
+                    %39 = load %33 : s32i
+                    return %39
+                }
+                case default {
+                    %36 = const 9 : s32i
+                    store %36, %33
+                    %37 = load %33 : s32i
+                    return %37
+                }
+            }
+            yield
+        }
+        %34 = load %33 : s32i
+        return %34
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[37]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 1 : s32i
+    %6 = call @classify(%5) : s32i [all]
+    %7 = const 2 : s32i
+    %8 = call @classify(%7) : s32i [all]
+    %9 = const 4 : s32i
+    %10 = call @classify(%9) : s32i [all]
+    %11 = const 5 : s32i
+    %12 = call @classify(%11) : s32i [all]
+    %13 = const 7 : s32i
+    %14 = call @classify(%13) : s32i [all]
+    %15 = const 8 : s32i
+    %16 = call @classify(%15) : s32i [all]
+    %17 = const 9 : s32i
+    %18 = call @classify(%17) : s32i [all]
+    %19 = const 10 : s32i
+    %20 = call @classify(%19) : s32i [all]
+    %21 = const 11 : s32i
+    %22 = call @classify(%21) : s32i [all]
+    %23 = const 12 : s32i
+    %24 = call @classify(%23) : s32i [all]
+    %25 = const -1 : s32i
+    %26 = call @classify_direct(%25) : s32i [all]
+    %27 = const 3 : s32i
+    %28 = call @classify_direct(%27) : s32i [all]
+    %29 = call @printf(%4, %6, %8, %10, %12, %14, %16, %18, %20, %22, %24, %26, %28) : s32i [all]
+    %30 = const 0 : s32i
+    store %30, %0
+    %31 = load %0 : s32i
+    return %31
+}

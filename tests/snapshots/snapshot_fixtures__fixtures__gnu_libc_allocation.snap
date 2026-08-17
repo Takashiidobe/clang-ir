@@ -1,0 +1,641 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/gnu_libc_allocation.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[4] = "gnu" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[5] = "libc" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn reallocarray(%arg0: void*, %arg1: u64i, %arg2: u64i) -> void* [external, c, nothrow];
+fn memalign(%arg0: u64i, %arg1: u64i) -> void* [external, c, nothrow];
+fn valloc(%arg0: u64i) -> void* [external, c, nothrow];
+fn pvalloc(%arg0: u64i) -> void* [external, c, nothrow];
+fn sysconf(%arg0: s32i) -> s64i [external, c, nothrow];
+fn malloc_usable_size(%arg0: void*) -> u64i [external, c, nothrow];
+fn mallopt(%arg0: s32i, %arg1: s32i) -> s32i [external, c, nothrow];
+fn free(%arg0: void*) -> void [external, c, nothrow];
+fn gnu_allocation_extensions() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %307 = alloca s32i, "__retval", align 4
+    %308 = alloca s32i*, "values", align 8
+    %309 = alloca void*, "aligned", align 8
+    %310 = alloca void*, "page", align 8
+    %311 = alloca void*, "rounded", align 8
+    %312 = alloca s64i, "page_size", align 8
+    %313 = alloca s32i, "total", align 4
+    %314 = const #cir.ptr<null> : void*
+    %315 = const 4 : u64i
+    %316 = const 4 : u64i
+    %317 = call @reallocarray(%314, %315, %316) : void* [all]
+    %318 = cast(bitcast) %317 : s32i*
+    store %318, %308, align 8
+    %319 = get_global @memalign : ((u64i, u64i) -> void*)*
+    %320 = const 64 : u64i
+    %321 = const 80 : u64i
+    %322 = call @memalign(%320, %321) : void* [all]
+    store %322, %309, align 8
+    %323 = const 1 : u64i
+    %324 = call @valloc(%323) : void* [all]
+    store %324, %310, align 8
+    %325 = const 1 : u64i
+    %326 = call @pvalloc(%325) : void* [all]
+    store %326, %311, align 8
+    %327 = const 30 : s32i
+    %328 = call @sysconf(%327) : s64i [all]
+    store %328, %312, align 8
+    %329 = const 0 : s32i
+    store %329, %313, align 4
+    scope {
+        %432 = alloca s32i, "index", align 4
+        %433 = const 0 : s32i
+        store %433, %432, align 4
+        for cond: {
+            %443 = load %432 : s32i, align 4
+            %444 = const 4 : s32i
+            %445 = cmp lt %443, %444 : bool
+            condition %445
+        } step: {
+            %434 = load %432 : s32i, align 4
+            %435 = inc %434 : s32i [nsw]
+            store %435, %432, align 4
+            yield
+        } do {
+            scope {
+                %436 = load %432 : s32i, align 4
+                %437 = const 1 : s32i
+                %438 = add %436, %437 : s32i [nsw]
+                %439 = load %432 : s32i, align 4
+                %440 = cast(integral) %439 : s64i
+                %441 = load %308 : s32i*, align 8
+                %442 = ptr_stride %441, %440 : s32i*
+                store %438, %442, align 4
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %330 = const 0 : s64i
+    %331 = load %308 : s32i*, align 8
+    %332 = ptr_stride %331, %330 : s32i*
+    %333 = load %332 : s32i, align 4
+    %334 = const 1 : s64i
+    %335 = load %308 : s32i*, align 8
+    %336 = ptr_stride %335, %334 : s32i*
+    %337 = load %336 : s32i, align 4
+    %338 = add %333, %337 : s32i [nsw]
+    %339 = const 2 : s64i
+    %340 = load %308 : s32i*, align 8
+    %341 = ptr_stride %340, %339 : s32i*
+    %342 = load %341 : s32i, align 4
+    %343 = add %338, %342 : s32i [nsw]
+    %344 = const 3 : s64i
+    %345 = load %308 : s32i*, align 8
+    %346 = ptr_stride %345, %344 : s32i*
+    %347 = load %346 : s32i, align 4
+    %348 = add %343, %347 : s32i [nsw]
+    %349 = load %313 : s32i, align 4
+    %350 = add %349, %348 : s32i [nsw]
+    store %350, %313, align 4
+    %351 = load %308 : s32i*, align 8
+    %352 = cast(bitcast) %351 : void*
+    %353 = call @malloc_usable_size(%352) : u64i [all]
+    %354 = const 4 : u64i
+    %355 = const 4 : u64i
+    %356 = mul %354, %355 : u64i
+    %357 = cmp ge %353, %356 : bool
+    %358 = cast(bool_to_int) %357 : s32i
+    %359 = load %313 : s32i, align 4
+    %360 = add %359, %358 : s32i [nsw]
+    store %360, %313, align 4
+    %361 = load %309 : void*, align 8
+    %362 = const #cir.ptr<null> : void*
+    %363 = cmp ne %361, %362 : bool
+    %364 = ternary %363 ? { : bool
+        %426 = load %309 : void*, align 8
+        %427 = cast(ptr_to_int) %426 : u64i
+        %428 = const 64 : u64i
+        %429 = rem %427, %428 : u64i
+        %430 = const 0 : u64i
+        %431 = cmp eq %429, %430 : bool
+        yield %431
+    } : {
+        %425 = const #false : bool
+        yield %425
+    }
+    %365 = cast(bool_to_int) %364 : s32i
+    %366 = load %313 : s32i, align 4
+    %367 = add %366, %365 : s32i [nsw]
+    store %367, %313, align 4
+    %368 = load %310 : void*, align 8
+    %369 = const #cir.ptr<null> : void*
+    %370 = cmp ne %368, %369 : bool
+    %371 = ternary %370 ? { : bool
+        %418 = load %310 : void*, align 8
+        %419 = cast(ptr_to_int) %418 : u64i
+        %420 = load %312 : s64i, align 8
+        %421 = cast(integral) %420 : u64i
+        %422 = rem %419, %421 : u64i
+        %423 = const 0 : u64i
+        %424 = cmp eq %422, %423 : bool
+        yield %424
+    } : {
+        %417 = const #false : bool
+        yield %417
+    }
+    %372 = cast(bool_to_int) %371 : s32i
+    %373 = load %313 : s32i, align 4
+    %374 = add %373, %372 : s32i [nsw]
+    store %374, %313, align 4
+    %375 = load %311 : void*, align 8
+    %376 = const #cir.ptr<null> : void*
+    %377 = cmp ne %375, %376 : bool
+    %378 = ternary %377 ? { : bool
+        %410 = load %311 : void*, align 8
+        %411 = cast(ptr_to_int) %410 : u64i
+        %412 = load %312 : s64i, align 8
+        %413 = cast(integral) %412 : u64i
+        %414 = rem %411, %413 : u64i
+        %415 = const 0 : u64i
+        %416 = cmp eq %414, %415 : bool
+        yield %416
+    } : {
+        %409 = const #false : bool
+        yield %409
+    }
+    %379 = cast(bool_to_int) %378 : s32i
+    %380 = load %313 : s32i, align 4
+    %381 = add %380, %379 : s32i [nsw]
+    store %381, %313, align 4
+    %382 = load %311 : void*, align 8
+    %383 = call @malloc_usable_size(%382) : u64i [all]
+    %384 = load %312 : s64i, align 8
+    %385 = cast(integral) %384 : u64i
+    %386 = cmp ge %383, %385 : bool
+    %387 = cast(bool_to_int) %386 : s32i
+    %388 = load %313 : s32i, align 4
+    %389 = add %388, %387 : s32i [nsw]
+    store %389, %313, align 4
+    %390 = const -5 : s32i
+    %391 = const 1 : s32i
+    %392 = call @mallopt(%390, %391) : s32i [all]
+    %393 = const 0 : s32i
+    %394 = cmp ne %392, %393 : bool
+    %395 = cast(bool_to_int) %394 : s32i
+    %396 = load %313 : s32i, align 4
+    %397 = add %396, %395 : s32i [nsw]
+    store %397, %313, align 4
+    %398 = get_global @free : ((void*) -> void)*
+    %399 = load %308 : s32i*, align 8
+    %400 = cast(bitcast) %399 : void*
+    call @free(%400) [all]
+    %401 = get_global @free : ((void*) -> void)*
+    %402 = load %309 : void*, align 8
+    call @free(%402) [all]
+    %403 = get_global @free : ((void*) -> void)*
+    %404 = load %310 : void*, align 8
+    call @free(%404) [all]
+    %405 = get_global @free : ((void*) -> void)*
+    %406 = load %311 : void*, align 8
+    call @free(%406) [all]
+    %407 = load %313 : s32i, align 4
+    store %407, %307
+    %408 = load %307 : s32i
+    return %408
+}
+fn _obstack_begin(%arg0: rec_obstack*, %arg1: s32i, %arg2: s32i, %arg3: ((s64i) -> void*)*, %arg4: ((void*) -> void)*) -> s32i [external, c];
+fn malloc(%arg0: u64i) -> void* [external, c, nothrow];
+fn _obstack_newchunk(%arg0: rec_obstack*, %arg1: s32i) -> void [external, c];
+fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
+fn strcmp(%arg0: s8i*, %arg1: s8i*) -> s32i [external, c, pure, nothrow];
+fn obstack_free(%arg0: rec_obstack*, %arg1: void*) -> void [external, c];
+fn gnu_obstack_extensions() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %10 = alloca s32i, "__retval", align 4
+    %11 = alloca rec_obstack, "storage", align 8
+    %12 = alloca s8i*, "first", align 8
+    %13 = alloca s8i*, "second", align 8
+    %14 = alloca s32i, "total", align 4
+    %15 = alloca void*, "tmp", align 8
+    %16 = alloca void*, "tmp", align 8
+    %17 = alloca u32i, "tmp", align 4
+    %18 = const 0 : s32i
+    store %18, %14, align 4
+    %19 = const 0 : s32i
+    %20 = const 0 : s32i
+    %21 = get_global @malloc : ((u64i) -> void*)*
+    %22 = cast(bitcast) %21 : ((s64i) -> void*)*
+    %23 = get_global @free : ((void*) -> void)*
+    %24 = call @_obstack_begin(%11, %19, %20, %22, %23) : s32i [all]
+    scope {
+        %199 = alloca rec_obstack*, "__h", align 8
+        %200 = alloca void*, "tmp", align 8
+        store %11, %199, align 8
+        scope {
+            %266 = alloca rec_obstack*, "__o", align 8
+            %267 = alloca s32i, "__len", align 4
+            %268 = load %199 : rec_obstack*, align 8
+            store %268, %266, align 8
+            %269 = const 3 : s32i
+            store %269, %267, align 4
+            scope {
+                %292 = load %266 : rec_obstack*, align 8
+                %293 = get_member %292[3] "next_free" : s8i**
+                %294 = load %293 : s8i*, align 8
+                %295 = load %267 : s32i, align 4
+                %296 = ptr_stride %294, %295 : s8i*
+                %297 = const 1 : s32i
+                %298 = ptr_stride %296, %297 : s8i*
+                %299 = load %266 : rec_obstack*, align 8
+                %300 = get_member %299[4] "chunk_limit" : s8i**
+                %301 = load %300 : s8i*, align 8
+                %302 = cmp gt %298, %301 : bool
+                if %302 {
+                    %303 = load %266 : rec_obstack*, align 8
+                    %304 = load %267 : s32i, align 4
+                    %305 = const 1 : s32i
+                    %306 = add %304, %305 : s32i [nsw]
+                    call @_obstack_newchunk(%303, %306) [all]
+                    yield
+                }
+                yield
+            }
+            %270 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+            %271 = load %266 : rec_obstack*, align 8
+            %272 = get_member %271[3] "next_free" : s8i**
+            %273 = load %272 : s8i*, align 8
+            %274 = cast(bitcast) %273 : void*
+            %275 = get_global @.str.1 : s8i[4]*
+            %276 = cast(array_to_ptrdecay) %275 : s8i*
+            %277 = cast(bitcast) %276 : void*
+            %278 = load %267 : s32i, align 4
+            %279 = cast(integral) %278 : u64i
+            %280 = call @memcpy(%274, %277, %279) : void* [all]
+            %281 = load %267 : s32i, align 4
+            %282 = load %266 : rec_obstack*, align 8
+            %283 = get_member %282[3] "next_free" : s8i**
+            %284 = load %283 : s8i*, align 8
+            %285 = ptr_stride %284, %281 : s8i*
+            store %285, %283, align 8
+            %286 = const 0 : s8i
+            %287 = load %266 : rec_obstack*, align 8
+            %288 = get_member %287[3] "next_free" : s8i**
+            %289 = load %288 : s8i*, align 8
+            %290 = const 1 : s32i
+            %291 = ptr_stride %289, %290 : s8i*
+            store %291, %288, align 8
+            store %286, %289, align 1
+            yield
+        }
+        scope {
+            %202 = alloca rec_obstack*, "__o1", align 8
+            %203 = alloca void*, "__value", align 8
+            %204 = load %199 : rec_obstack*, align 8
+            store %204, %202, align 8
+            %205 = load %202 : rec_obstack*, align 8
+            %206 = get_member %205[2] "object_base" : s8i**
+            %207 = load %206 : s8i*, align 8
+            %208 = cast(bitcast) %207 : void*
+            store %208, %203, align 8
+            scope {
+                %256 = load %202 : rec_obstack*, align 8
+                %257 = get_member %256[3] "next_free" : s8i**
+                %258 = load %257 : s8i*, align 8
+                %259 = load %203 : void*, align 8
+                %260 = cast(bitcast) %259 : s8i*
+                %261 = cmp eq %258, %260 : bool
+                if %261 {
+                    %262 = const 1 : u32i
+                    %263 = load %202 : rec_obstack*, align 8
+                    %264 = get_member %263[10] "maybe_empty_object" : u8i*
+                    <unmodeled: cir.set_bitfield>
+                    yield
+                }
+                yield
+            }
+            %209 = load %202 : rec_obstack*, align 8
+            %210 = get_member %209[3] "next_free" : s8i**
+            %211 = load %210 : s8i*, align 8
+            %212 = const #cir.ptr<null> : s8i*
+            %213 = ptr_diff %211, %212 : s64i
+            %214 = load %202 : rec_obstack*, align 8
+            %215 = get_member %214[6] "alignment_mask" : s32i*
+            %216 = load %215 : s32i, align 8
+            %217 = cast(integral) %216 : s64i
+            %218 = add %213, %217 : s64i [nsw]
+            %219 = load %202 : rec_obstack*, align 8
+            %220 = get_member %219[6] "alignment_mask" : s32i*
+            %221 = load %220 : s32i, align 8
+            %222 = not %221 : s32i
+            %223 = cast(integral) %222 : s64i
+            %224 = and %218, %223 : s64i
+            %225 = cast(int_to_ptr) %224 : s8i*
+            %226 = load %202 : rec_obstack*, align 8
+            %227 = get_member %226[3] "next_free" : s8i**
+            store %225, %227, align 8
+            scope {
+                %234 = load %202 : rec_obstack*, align 8
+                %235 = get_member %234[3] "next_free" : s8i**
+                %236 = load %235 : s8i*, align 8
+                %237 = load %202 : rec_obstack*, align 8
+                %238 = get_member %237[1] "chunk" : rec__obstack_chunk**
+                %239 = load %238 : rec__obstack_chunk*, align 8
+                %240 = cast(bitcast) %239 : s8i*
+                %241 = ptr_diff %236, %240 : s64i
+                %242 = load %202 : rec_obstack*, align 8
+                %243 = get_member %242[4] "chunk_limit" : s8i**
+                %244 = load %243 : s8i*, align 8
+                %245 = load %202 : rec_obstack*, align 8
+                %246 = get_member %245[1] "chunk" : rec__obstack_chunk**
+                %247 = load %246 : rec__obstack_chunk*, align 8
+                %248 = cast(bitcast) %247 : s8i*
+                %249 = ptr_diff %244, %248 : s64i
+                %250 = cmp gt %241, %249 : bool
+                if %250 {
+                    %251 = load %202 : rec_obstack*, align 8
+                    %252 = get_member %251[4] "chunk_limit" : s8i**
+                    %253 = load %252 : s8i*, align 8
+                    %254 = load %202 : rec_obstack*, align 8
+                    %255 = get_member %254[3] "next_free" : s8i**
+                    store %253, %255, align 8
+                    yield
+                }
+                yield
+            }
+            %228 = load %202 : rec_obstack*, align 8
+            %229 = get_member %228[3] "next_free" : s8i**
+            %230 = load %229 : s8i*, align 8
+            %231 = load %202 : rec_obstack*, align 8
+            %232 = get_member %231[2] "object_base" : s8i**
+            store %230, %232, align 8
+            %233 = load %203 : void*, align 8
+            store %233, %200, align 8
+            yield
+        }
+        %201 = load %200 : void*, align 8
+        store %201, %15, align 8
+        yield
+    }
+    %25 = load %15 : void*, align 8
+    %26 = cast(bitcast) %25 : s8i*
+    store %26, %12, align 8
+    scope {
+        %91 = alloca rec_obstack*, "__h", align 8
+        %92 = alloca void*, "tmp", align 8
+        store %11, %91, align 8
+        scope {
+            %158 = alloca rec_obstack*, "__o", align 8
+            %159 = alloca s32i, "__len", align 4
+            %160 = load %91 : rec_obstack*, align 8
+            store %160, %158, align 8
+            %161 = const 4 : s32i
+            store %161, %159, align 4
+            scope {
+                %184 = load %158 : rec_obstack*, align 8
+                %185 = get_member %184[3] "next_free" : s8i**
+                %186 = load %185 : s8i*, align 8
+                %187 = load %159 : s32i, align 4
+                %188 = ptr_stride %186, %187 : s8i*
+                %189 = const 1 : s32i
+                %190 = ptr_stride %188, %189 : s8i*
+                %191 = load %158 : rec_obstack*, align 8
+                %192 = get_member %191[4] "chunk_limit" : s8i**
+                %193 = load %192 : s8i*, align 8
+                %194 = cmp gt %190, %193 : bool
+                if %194 {
+                    %195 = load %158 : rec_obstack*, align 8
+                    %196 = load %159 : s32i, align 4
+                    %197 = const 1 : s32i
+                    %198 = add %196, %197 : s32i [nsw]
+                    call @_obstack_newchunk(%195, %198) [all]
+                    yield
+                }
+                yield
+            }
+            %162 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+            %163 = load %158 : rec_obstack*, align 8
+            %164 = get_member %163[3] "next_free" : s8i**
+            %165 = load %164 : s8i*, align 8
+            %166 = cast(bitcast) %165 : void*
+            %167 = get_global @.str.2 : s8i[5]*
+            %168 = cast(array_to_ptrdecay) %167 : s8i*
+            %169 = cast(bitcast) %168 : void*
+            %170 = load %159 : s32i, align 4
+            %171 = cast(integral) %170 : u64i
+            %172 = call @memcpy(%166, %169, %171) : void* [all]
+            %173 = load %159 : s32i, align 4
+            %174 = load %158 : rec_obstack*, align 8
+            %175 = get_member %174[3] "next_free" : s8i**
+            %176 = load %175 : s8i*, align 8
+            %177 = ptr_stride %176, %173 : s8i*
+            store %177, %175, align 8
+            %178 = const 0 : s8i
+            %179 = load %158 : rec_obstack*, align 8
+            %180 = get_member %179[3] "next_free" : s8i**
+            %181 = load %180 : s8i*, align 8
+            %182 = const 1 : s32i
+            %183 = ptr_stride %181, %182 : s8i*
+            store %183, %180, align 8
+            store %178, %181, align 1
+            yield
+        }
+        scope {
+            %94 = alloca rec_obstack*, "__o1", align 8
+            %95 = alloca void*, "__value", align 8
+            %96 = load %91 : rec_obstack*, align 8
+            store %96, %94, align 8
+            %97 = load %94 : rec_obstack*, align 8
+            %98 = get_member %97[2] "object_base" : s8i**
+            %99 = load %98 : s8i*, align 8
+            %100 = cast(bitcast) %99 : void*
+            store %100, %95, align 8
+            scope {
+                %148 = load %94 : rec_obstack*, align 8
+                %149 = get_member %148[3] "next_free" : s8i**
+                %150 = load %149 : s8i*, align 8
+                %151 = load %95 : void*, align 8
+                %152 = cast(bitcast) %151 : s8i*
+                %153 = cmp eq %150, %152 : bool
+                if %153 {
+                    %154 = const 1 : u32i
+                    %155 = load %94 : rec_obstack*, align 8
+                    %156 = get_member %155[10] "maybe_empty_object" : u8i*
+                    <unmodeled: cir.set_bitfield>
+                    yield
+                }
+                yield
+            }
+            %101 = load %94 : rec_obstack*, align 8
+            %102 = get_member %101[3] "next_free" : s8i**
+            %103 = load %102 : s8i*, align 8
+            %104 = const #cir.ptr<null> : s8i*
+            %105 = ptr_diff %103, %104 : s64i
+            %106 = load %94 : rec_obstack*, align 8
+            %107 = get_member %106[6] "alignment_mask" : s32i*
+            %108 = load %107 : s32i, align 8
+            %109 = cast(integral) %108 : s64i
+            %110 = add %105, %109 : s64i [nsw]
+            %111 = load %94 : rec_obstack*, align 8
+            %112 = get_member %111[6] "alignment_mask" : s32i*
+            %113 = load %112 : s32i, align 8
+            %114 = not %113 : s32i
+            %115 = cast(integral) %114 : s64i
+            %116 = and %110, %115 : s64i
+            %117 = cast(int_to_ptr) %116 : s8i*
+            %118 = load %94 : rec_obstack*, align 8
+            %119 = get_member %118[3] "next_free" : s8i**
+            store %117, %119, align 8
+            scope {
+                %126 = load %94 : rec_obstack*, align 8
+                %127 = get_member %126[3] "next_free" : s8i**
+                %128 = load %127 : s8i*, align 8
+                %129 = load %94 : rec_obstack*, align 8
+                %130 = get_member %129[1] "chunk" : rec__obstack_chunk**
+                %131 = load %130 : rec__obstack_chunk*, align 8
+                %132 = cast(bitcast) %131 : s8i*
+                %133 = ptr_diff %128, %132 : s64i
+                %134 = load %94 : rec_obstack*, align 8
+                %135 = get_member %134[4] "chunk_limit" : s8i**
+                %136 = load %135 : s8i*, align 8
+                %137 = load %94 : rec_obstack*, align 8
+                %138 = get_member %137[1] "chunk" : rec__obstack_chunk**
+                %139 = load %138 : rec__obstack_chunk*, align 8
+                %140 = cast(bitcast) %139 : s8i*
+                %141 = ptr_diff %136, %140 : s64i
+                %142 = cmp gt %133, %141 : bool
+                if %142 {
+                    %143 = load %94 : rec_obstack*, align 8
+                    %144 = get_member %143[4] "chunk_limit" : s8i**
+                    %145 = load %144 : s8i*, align 8
+                    %146 = load %94 : rec_obstack*, align 8
+                    %147 = get_member %146[3] "next_free" : s8i**
+                    store %145, %147, align 8
+                    yield
+                }
+                yield
+            }
+            %120 = load %94 : rec_obstack*, align 8
+            %121 = get_member %120[3] "next_free" : s8i**
+            %122 = load %121 : s8i*, align 8
+            %123 = load %94 : rec_obstack*, align 8
+            %124 = get_member %123[2] "object_base" : s8i**
+            store %122, %124, align 8
+            %125 = load %95 : void*, align 8
+            store %125, %92, align 8
+            yield
+        }
+        %93 = load %92 : void*, align 8
+        store %93, %16, align 8
+        yield
+    }
+    %27 = load %16 : void*, align 8
+    %28 = cast(bitcast) %27 : s8i*
+    store %28, %13, align 8
+    %29 = get_global @strcmp : ((s8i*, s8i*) -> s32i)*
+    %30 = load %12 : s8i*, align 8
+    %31 = get_global @.str.1 : s8i[4]*
+    %32 = cast(array_to_ptrdecay) %31 : s8i*
+    %33 = call @strcmp(%30, %32) : s32i [pure]
+    %34 = const 0 : s32i
+    %35 = cmp eq %33, %34 : bool
+    %36 = cast(bool_to_int) %35 : s32i
+    %37 = load %14 : s32i, align 4
+    %38 = add %37, %36 : s32i [nsw]
+    store %38, %14, align 4
+    %39 = get_global @strcmp : ((s8i*, s8i*) -> s32i)*
+    %40 = load %13 : s8i*, align 8
+    %41 = get_global @.str.2 : s8i[5]*
+    %42 = cast(array_to_ptrdecay) %41 : s8i*
+    %43 = call @strcmp(%40, %42) : s32i [pure]
+    %44 = const 0 : s32i
+    %45 = cmp eq %43, %44 : bool
+    %46 = cast(bool_to_int) %45 : s32i
+    %47 = load %14 : s32i, align 4
+    %48 = add %47, %46 : s32i [nsw]
+    store %48, %14, align 4
+    scope {
+        %82 = alloca rec_obstack*, "__o", align 8
+        store %11, %82, align 8
+        %83 = load %82 : rec_obstack*, align 8
+        %84 = get_member %83[3] "next_free" : s8i**
+        %85 = load %84 : s8i*, align 8
+        %86 = load %82 : rec_obstack*, align 8
+        %87 = get_member %86[2] "object_base" : s8i**
+        %88 = load %87 : s8i*, align 8
+        %89 = ptr_diff %85, %88 : s64i
+        %90 = cast(integral) %89 : u32i
+        store %90, %17, align 4
+        yield
+    }
+    %49 = load %17 : u32i, align 4
+    %50 = const 0 : u32i
+    %51 = cmp eq %49, %50 : bool
+    %52 = cast(bool_to_int) %51 : s32i
+    %53 = load %14 : s32i, align 4
+    %54 = add %53, %52 : s32i [nsw]
+    store %54, %14, align 4
+    scope {
+        %57 = alloca rec_obstack*, "__o", align 8
+        %58 = alloca void*, "__obj", align 8
+        store %11, %57, align 8
+        %59 = const #cir.ptr<null> : void*
+        store %59, %58, align 8
+        scope {
+            %60 = load %58 : void*, align 8
+            %61 = load %57 : rec_obstack*, align 8
+            %62 = get_member %61[1] "chunk" : rec__obstack_chunk**
+            %63 = load %62 : rec__obstack_chunk*, align 8
+            %64 = cast(bitcast) %63 : void*
+            %65 = cmp gt %60, %64 : bool
+            %66 = ternary %65 ? { : bool
+                %76 = load %58 : void*, align 8
+                %77 = load %57 : rec_obstack*, align 8
+                %78 = get_member %77[4] "chunk_limit" : s8i**
+                %79 = load %78 : s8i*, align 8
+                %80 = cast(bitcast) %79 : void*
+                %81 = cmp lt %76, %80 : bool
+                yield %81
+            } : {
+                %75 = const #false : bool
+                yield %75
+            }
+            if %66 {
+                %69 = load %58 : void*, align 8
+                %70 = cast(bitcast) %69 : s8i*
+                %71 = load %57 : rec_obstack*, align 8
+                %72 = get_member %71[2] "object_base" : s8i**
+                store %70, %72, align 8
+                %73 = load %57 : rec_obstack*, align 8
+                %74 = get_member %73[3] "next_free" : s8i**
+                store %70, %74, align 8
+                yield
+            } else {
+                %67 = load %57 : rec_obstack*, align 8
+                %68 = load %58 : void*, align 8
+                call @obstack_free(%67, %68) [all]
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %55 = load %14 : s32i, align 4
+    store %55, %10
+    %56 = load %10 : s32i
+    return %56
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[7]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = call @gnu_allocation_extensions() : s32i [all]
+    %6 = call @gnu_obstack_extensions() : s32i [all]
+    %7 = call @printf(%4, %5, %6) : s32i [all]
+    %8 = const 0 : s32i
+    store %8, %0
+    %9 = load %0 : s32i
+    return %9
+}

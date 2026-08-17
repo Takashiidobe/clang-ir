@@ -1,0 +1,160 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/shiftopt-1.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn link_error() -> void [external, c, no_inline, dso_local, nothrow] {
+    %60 = get_global @abort : (() -> void)*
+    call @abort() [all]
+    return
+}
+fn utest(%arg1: u32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: u32i):
+        %29 = alloca u32i, "x", align 4
+        store %arg1, %29
+        scope {
+            %55 = load %29 : u32i, align 4
+            %56 = const 0 : s32i
+            %57 = shift right %55, %56 : u32i
+            %58 = load %29 : u32i, align 4
+            %59 = cmp ne %57, %58 : bool
+            if %59 {
+                call @link_error() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %50 = load %29 : u32i, align 4
+            %51 = const 0 : s32i
+            %52 = shift left %50, %51 : u32i
+            %53 = load %29 : u32i, align 4
+            %54 = cmp ne %52, %53 : bool
+            if %54 {
+                call @link_error() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %45 = const 0 : s32i
+            %46 = load %29 : u32i, align 4
+            %47 = shift left %45, %46 : s32i
+            %48 = const 0 : s32i
+            %49 = cmp ne %47, %48 : bool
+            if %49 {
+                call @link_error() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %40 = const 0 : s32i
+            %41 = load %29 : u32i, align 4
+            %42 = shift right %40, %41 : s32i
+            %43 = const 0 : s32i
+            %44 = cmp ne %42, %43 : bool
+            if %44 {
+                call @link_error() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %35 = const -1 : s32i
+            %36 = load %29 : u32i, align 4
+            %37 = shift right %35, %36 : s32i
+            %38 = const -1 : s32i
+            %39 = cmp ne %37, %38 : bool
+            if %39 {
+                call @link_error() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %30 = const -1 : s32i
+            %31 = load %29 : u32i, align 4
+            %32 = shift right %30, %31 : s32i
+            %33 = const -1 : s32i
+            %34 = cmp ne %32, %33 : bool
+            if %34 {
+                call @link_error() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn stest(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %8 = alloca s32i, "x", align 4
+        store %arg0, %8
+        scope {
+            %24 = load %8 : s32i, align 4
+            %25 = const 0 : s32i
+            %26 = shift right %24, %25 : s32i
+            %27 = load %8 : s32i, align 4
+            %28 = cmp ne %26, %27 : bool
+            if %28 {
+                call @link_error() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %19 = load %8 : s32i, align 4
+            %20 = const 0 : s32i
+            %21 = shift left %19, %20 : s32i
+            %22 = load %8 : s32i, align 4
+            %23 = cmp ne %21, %22 : bool
+            if %23 {
+                call @link_error() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %14 = const 0 : s32i
+            %15 = load %8 : s32i, align 4
+            %16 = shift left %14, %15 : s32i
+            %17 = const 0 : s32i
+            %18 = cmp ne %16, %17 : bool
+            if %18 {
+                call @link_error() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %9 = const 0 : s32i
+            %10 = load %8 : s32i, align 4
+            %11 = shift right %9, %10 : s32i
+            %12 = const 0 : s32i
+            %13 = cmp ne %11, %12 : bool
+            if %13 {
+                call @link_error() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 9 : u32i
+    call @utest(%2) [all]
+    %3 = const 0 : u32i
+    call @utest(%3) [all]
+    %4 = const 9 : s32i
+    call @stest(%4) [all]
+    %5 = const 0 : s32i
+    call @stest(%5) [all]
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = load %0 : s32i
+    return %7
+}

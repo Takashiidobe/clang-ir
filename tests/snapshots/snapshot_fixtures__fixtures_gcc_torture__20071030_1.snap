@@ -1,0 +1,145 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20071030-1.c" (c, x86_64-unknown-linux-gnu)
+fn CalcPing(%arg0: rec_client_s*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_client_s*):
+        %19 = alloca rec_client_s*, "cl", align 8
+        %20 = alloca s32i, "__retval", align 4
+        %21 = alloca float, "ping", align 4
+        %22 = alloca s32i, "count", align 4
+        %23 = alloca s32i, "i", align 4
+        %24 = alloca rec_client_frame_t*, "frame", align 8
+        store %arg0, %19
+        scope {
+            %68 = load %19 : rec_client_s*, align 8
+            %69 = get_member %68[0] "state" : u32i*
+            %70 = load %69 : u32i, align 8
+            %71 = const 1 : u32i
+            %72 = cmp eq %70, %71 : bool
+            if %72 {
+                %73 = load %19 : rec_client_s*, align 8
+                %74 = get_member %73[1] "ping" : s32i*
+                %75 = load %74 : s32i, align 4
+                store %75, %20
+                %76 = load %20 : s32i
+                return %76
+            }
+            yield
+        }
+        %25 = const 0 : s32i
+        %26 = cast(int_to_float) %25 : float
+        store %26, %21, align 4
+        %27 = const 0 : s32i
+        store %27, %22, align 4
+        scope {
+            %43 = load %19 : rec_client_s*, align 8
+            %44 = get_member %43[2] "frames" : rec_client_frame_t[64]*
+            %45 = cast(array_to_ptrdecay) %44 : rec_client_frame_t*
+            store %45, %24, align 8
+            %46 = const 0 : s32i
+            store %46, %23, align 4
+            for cond: {
+                %65 = load %23 : s32i, align 4
+                %66 = const 64 : s32i
+                %67 = cmp lt %65, %66 : bool
+                condition %67
+            } step: {
+                %47 = load %23 : s32i, align 4
+                %48 = inc %47 : s32i [nsw]
+                store %48, %23, align 4
+                %49 = load %24 : rec_client_frame_t*, align 8
+                %50 = const 1 : s32i
+                %51 = ptr_stride %49, %50 : rec_client_frame_t*
+                store %51, %24, align 8
+                yield
+            } do {
+                scope {
+                    scope {
+                        %52 = load %24 : rec_client_frame_t*, align 8
+                        %53 = get_member %52[1] "ping_time" : float*
+                        %54 = load %53 : float, align 8
+                        %55 = const 0 : s32i
+                        %56 = cast(int_to_float) %55 : float
+                        %57 = cmp gt %54, %56 : bool
+                        if %57 {
+                            %58 = load %24 : rec_client_frame_t*, align 8
+                            %59 = get_member %58[1] "ping_time" : float*
+                            %60 = load %59 : float, align 8
+                            %61 = load %21 : float, align 4
+                            %62 = fadd %61, %60 : float
+                            store %62, %21, align 4
+                            %63 = load %22 : s32i, align 4
+                            %64 = inc %63 : s32i [nsw]
+                            store %64, %22, align 4
+                            yield
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        scope {
+            %38 = load %22 : s32i, align 4
+            %39 = cast(int_to_bool) %38 : bool
+            %40 = not %39 : bool
+            if %40 {
+                %41 = const 9999 : s32i
+                store %41, %20
+                %42 = load %20 : s32i
+                return %42
+            }
+            yield
+        }
+        %28 = load %22 : s32i, align 4
+        %29 = cast(int_to_float) %28 : float
+        %30 = load %21 : float, align 4
+        %31 = fdiv %30, %29 : float
+        store %31, %21, align 4
+        %32 = load %21 : float, align 4
+        %33 = const 1000 : s32i
+        %34 = cast(int_to_float) %33 : float
+        %35 = fmul %32, %34 : float
+        %36 = cast(float_to_int) %35 : s32i
+        store %36, %20
+        %37 = load %20 : s32i
+        return %37
+}
+fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_client_s, "cl", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+    %4 = cast(bitcast) %1 : void*
+    %5 = const 0 : s32i
+    %6 = const 2056 : u64i
+    %7 = call @memset(%4, %5, %6) : void* [all]
+    %8 = const 1.000000e+00 : float
+    %9 = const 0 : s64i
+    %10 = get_member %1[2] "frames" : rec_client_frame_t[64]*
+    %11 = get_element %10[%9] : rec_client_frame_t*
+    %12 = get_member %11[1] "ping_time" : float*
+    store %8, %12, align 8
+    scope {
+        %15 = call @CalcPing(%1) : s32i [all]
+        %16 = const 1000 : s32i
+        %17 = cmp ne %15, %16 : bool
+        if %17 {
+            %18 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %13 = const 0 : s32i
+    store %13, %0
+    %14 = load %0 : s32i
+    return %14
+}

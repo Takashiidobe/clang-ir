@@ -1,0 +1,156 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.chibicc/unsupported/alloca/alloca.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[8] = "p1 - p2" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[8] = "p2 - p3" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[8] = "p3 - p4" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[17] = "0123456789abcdef" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[17] = "ghijklmnopqrstuv" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[4] = "wxy" [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[35] = "memcmp(p1, \"0123456789abcdef\", 16)" [cir_private, default, align 1, dso_local, constant]
+global .str.7 : s8i[35] = "memcmp(p2, \"ghijklmnopqrstuv\", 16)" [cir_private, default, align 1, dso_local, constant]
+global .str.8 : s8i[21] = "memcmp(p3, \"wxy\", 3)" [cir_private, default, align 1, dso_local, constant]
+global .str.9 : s8i[4] = "OK\n" [cir_private, default, align 1, dso_local, constant]
+
+fn fn(%arg0: s32i, %arg1: void*, %arg2: s32i) -> void* [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: void*, %arg2: s32i):
+        %105 = alloca s32i, "x", align 4
+        %106 = alloca void*, "p", align 8
+        %107 = alloca s32i, "y", align 4
+        %108 = alloca void*, "__retval", align 8
+        store %arg0, %105
+        store %arg1, %106
+        store %arg2, %107
+        %109 = load %106 : void*, align 8
+        store %109, %108
+        %110 = load %108 : void*
+        return %110
+}
+fn assert(%arg0: s32i, %arg1: s32i, %arg2: s8i*) -> void [external, c];
+fn memcpy(%arg0: void*, %arg1: void*, %arg2: s64i) -> void* [external, c];
+fn memcmp(%arg0: s8i*, %arg1: s8i*, %arg2: s64i) -> s32i [external, c];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "i", align 4
+    %2 = alloca s8i*, "p1", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 0 : s32i
+    store %4, %1, align 4
+    %5 = const 16 : u64i
+    %6 = alloca u8i, "bi_alloca", align 16, dynamic %5
+    %7 = alloca s8i*, "p2", align 8
+    %8 = cast(bitcast) %6 : void*
+    %9 = cast(bitcast) %8 : s8i*
+    store %9, %2, align 8
+    %10 = const 16 : u64i
+    %11 = alloca u8i, "bi_alloca", align 16, dynamic %10
+    %12 = alloca s8i*, "p3", align 8
+    %13 = cast(bitcast) %11 : void*
+    %14 = cast(bitcast) %13 : s8i*
+    store %14, %7, align 8
+    %15 = const 1 : s32i
+    %16 = const 3 : u64i
+    %17 = alloca u8i, "bi_alloca", align 16, dynamic %16
+    %18 = alloca s8i*, "p4", align 8
+    %19 = cast(bitcast) %17 : void*
+    %20 = cast(bitcast) %19 : s8i*
+    %21 = ptr_stride %20, %15 : s8i*
+    %22 = const 1 : s32i
+    %23 = ptr_stride %21, %22 : s8i*
+    store %23, %12, align 8
+    %24 = load %12 : s8i*, align 8
+    %25 = const -2 : s32i
+    %26 = ptr_stride %24, %25 : s8i*
+    store %26, %12, align 8
+    %27 = const 1 : s32i
+    %28 = const 16 : u64i
+    %29 = alloca u8i, "bi_alloca", align 16, dynamic %28
+    %30 = cast(bitcast) %29 : void*
+    %31 = const 3 : s32i
+    %32 = call @fn(%27, %30, %31) : void* [all]
+    %33 = cast(bitcast) %32 : s8i*
+    store %33, %18, align 8
+    %34 = const 16 : s32i
+    %35 = load %2 : s8i*, align 8
+    %36 = load %7 : s8i*, align 8
+    %37 = ptr_diff %35, %36 : s64i
+    %38 = cast(integral) %37 : s32i
+    %39 = get_global @.str : s8i[8]*
+    %40 = cast(array_to_ptrdecay) %39 : s8i*
+    call @assert(%34, %38, %40) [all]
+    %41 = const 16 : s32i
+    %42 = load %7 : s8i*, align 8
+    %43 = load %12 : s8i*, align 8
+    %44 = ptr_diff %42, %43 : s64i
+    %45 = cast(integral) %44 : s32i
+    %46 = get_global @.str.1 : s8i[8]*
+    %47 = cast(array_to_ptrdecay) %46 : s8i*
+    call @assert(%41, %45, %47) [all]
+    %48 = const 16 : s32i
+    %49 = load %12 : s8i*, align 8
+    %50 = load %18 : s8i*, align 8
+    %51 = ptr_diff %49, %50 : s64i
+    %52 = cast(integral) %51 : s32i
+    %53 = get_global @.str.2 : s8i[8]*
+    %54 = cast(array_to_ptrdecay) %53 : s8i*
+    call @assert(%48, %52, %54) [all]
+    %55 = load %2 : s8i*, align 8
+    %56 = cast(bitcast) %55 : void*
+    %57 = get_global @.str.3 : s8i[17]*
+    %58 = cast(array_to_ptrdecay) %57 : s8i*
+    %59 = cast(bitcast) %58 : void*
+    %60 = const 16 : s64i
+    %61 = call @memcpy(%56, %59, %60) : void* [all]
+    %62 = load %7 : s8i*, align 8
+    %63 = cast(bitcast) %62 : void*
+    %64 = get_global @.str.4 : s8i[17]*
+    %65 = cast(array_to_ptrdecay) %64 : s8i*
+    %66 = cast(bitcast) %65 : void*
+    %67 = const 16 : s64i
+    %68 = call @memcpy(%63, %66, %67) : void* [all]
+    %69 = load %12 : s8i*, align 8
+    %70 = cast(bitcast) %69 : void*
+    %71 = get_global @.str.5 : s8i[4]*
+    %72 = cast(array_to_ptrdecay) %71 : s8i*
+    %73 = cast(bitcast) %72 : void*
+    %74 = const 3 : s64i
+    %75 = call @memcpy(%70, %73, %74) : void* [all]
+    %76 = const 0 : s32i
+    %77 = load %2 : s8i*, align 8
+    %78 = get_global @.str.3 : s8i[17]*
+    %79 = cast(array_to_ptrdecay) %78 : s8i*
+    %80 = const 16 : s64i
+    %81 = call @memcmp(%77, %79, %80) : s32i [all]
+    %82 = get_global @.str.6 : s8i[35]*
+    %83 = cast(array_to_ptrdecay) %82 : s8i*
+    call @assert(%76, %81, %83) [all]
+    %84 = const 0 : s32i
+    %85 = load %7 : s8i*, align 8
+    %86 = get_global @.str.4 : s8i[17]*
+    %87 = cast(array_to_ptrdecay) %86 : s8i*
+    %88 = const 16 : s64i
+    %89 = call @memcmp(%85, %87, %88) : s32i [all]
+    %90 = get_global @.str.7 : s8i[35]*
+    %91 = cast(array_to_ptrdecay) %90 : s8i*
+    call @assert(%84, %89, %91) [all]
+    %92 = const 0 : s32i
+    %93 = load %12 : s8i*, align 8
+    %94 = get_global @.str.5 : s8i[4]*
+    %95 = cast(array_to_ptrdecay) %94 : s8i*
+    %96 = const 3 : s64i
+    %97 = call @memcmp(%93, %95, %96) : s32i [all]
+    %98 = get_global @.str.8 : s8i[21]*
+    %99 = cast(array_to_ptrdecay) %98 : s8i*
+    call @assert(%92, %97, %99) [all]
+    %100 = get_global @.str.9 : s8i[4]*
+    %101 = cast(array_to_ptrdecay) %100 : s8i*
+    %102 = call @printf(%101) : s32i [all]
+    %103 = const 0 : s32i
+    store %103, %0
+    %104 = load %0 : s32i
+    return %104
+}

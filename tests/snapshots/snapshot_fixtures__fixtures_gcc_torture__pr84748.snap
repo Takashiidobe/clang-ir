@@ -1,0 +1,95 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr84748.c" (c, x86_64-unknown-linux-gnu)
+global g0 : u64i = 0 [external, default, align 8, dso_local]
+global g1 : u64i = 0 [external, default, align 8, dso_local]
+global a : s32i = 0 [external, default, align 4, dso_local]
+global b : u128i = 0 [external, default, align 16, dso_local]
+global d : s32i = 0 [external, default, align 4, dso_local]
+global c : s32i = 0 [external, default, align 4, dso_local]
+
+fn store(%arg0: u64i, %arg1: u64i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u64i, %arg1: u64i):
+        %43 = alloca u64i, "a0", align 8
+        %44 = alloca u64i, "a1", align 8
+        store %arg0, %43
+        store %arg1, %44
+        %45 = load %43 : u64i, align 8
+        %46 = get_global @g0 : u64i*
+        store %45, %46, align 8
+        %47 = load %44 : u64i, align 8
+        %48 = get_global @g1 : u64i*
+        store %47, %48, align 8
+        return
+}
+fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
+    %14 = alloca u128i, "x", align 16
+    %15 = get_global @a : s32i*
+    %16 = load %15 : s32i, align 4
+    %17 = cast(integral) %16 : u128i
+    %18 = get_global @b : u128i*
+    %19 = load %18 : u128i, align 16
+    %20 = add %19, %17 : u128i
+    store %20, %18, align 16
+    %21 = get_global @d : s32i*
+    %22 = load %21 : s32i, align 4
+    %23 = const 84347 : s32i
+    %24 = cmp ne %22, %23 : bool
+    %25 = cast(bool_to_int) %24 : s32i
+    %26 = get_global @c : s32i*
+    store %25, %26, align 4
+    %27 = get_global @c : s32i*
+    %28 = load %27 : s32i, align 4
+    %29 = cast(integral) %28 : u128i
+    %30 = get_global @b : u128i*
+    %31 = load %30 : u128i, align 16
+    %32 = div %31, %29 : u128i
+    store %32, %30, align 16
+    %33 = get_global @b : u128i*
+    %34 = load %33 : u128i, align 16
+    store %34, %14, align 16
+    %35 = load %14 : u128i, align 16
+    %36 = const 0 : s32i
+    %37 = shift right %35, %36 : u128i
+    %38 = cast(integral) %37 : u64i
+    %39 = load %14 : u128i, align 16
+    %40 = const 64 : s32i
+    %41 = shift right %39, %40 : u128i
+    %42 = cast(integral) %41 : u64i
+    call @store(%38, %42) [all]
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    call @foo() [all]
+    scope {
+        %4 = get_global @g0 : u64i*
+        %5 = load %4 : u64i, align 8
+        %6 = const 0 : u64i
+        %7 = cmp ne %5, %6 : bool
+        %8 = ternary %7 ? { : bool
+            %13 = const #true : bool
+            yield %13
+        } : {
+            %9 = get_global @g1 : u64i*
+            %10 = load %9 : u64i, align 8
+            %11 = const 0 : u64i
+            %12 = cmp ne %10, %11 : bool
+            yield %12
+        }
+        if %8 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

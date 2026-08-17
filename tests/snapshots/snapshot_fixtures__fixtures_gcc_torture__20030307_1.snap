@@ -1,0 +1,75 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20030307-1.c" (c, x86_64-unknown-linux-gnu)
+fn fcntl_lock(%arg6: s32i, %arg7: s32i, %arg8: s64i, %arg9: s64i, %arg10: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg6: s32i, %arg7: s32i, %arg8: s64i, %arg9: s64i, %arg10: s32i):
+        %28 = alloca s32i, "fd", align 4
+        %29 = alloca s32i, "op", align 4
+        %30 = alloca s64i, "offset", align 8
+        %31 = alloca s64i, "count", align 8
+        %32 = alloca s32i, "type", align 4
+        %33 = alloca s32i, "__retval", align 4
+        store %arg6, %28
+        store %arg7, %29
+        store %arg8, %30
+        store %arg9, %31
+        store %arg10, %32
+        %34 = load %32 : s32i, align 4
+        store %34, %33
+        %35 = load %33 : s32i
+        return %35
+}
+fn vfswrap_lock(%arg0: s8i*, %arg1: s32i, %arg2: s32i, %arg3: s64i, %arg4: s64i, %arg5: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i*, %arg1: s32i, %arg2: s32i, %arg3: s64i, %arg4: s64i, %arg5: s32i):
+        %14 = alloca s8i*, "fsp", align 8
+        %15 = alloca s32i, "fd", align 4
+        %16 = alloca s32i, "op", align 4
+        %17 = alloca s64i, "offset", align 8
+        %18 = alloca s64i, "count", align 8
+        %19 = alloca s32i, "type", align 4
+        %20 = alloca s32i, "__retval", align 4
+        store %arg0, %14
+        store %arg1, %15
+        store %arg2, %16
+        store %arg3, %17
+        store %arg4, %18
+        store %arg5, %19
+        %21 = load %15 : s32i, align 4
+        %22 = load %16 : s32i, align 4
+        %23 = load %17 : s64i, align 8
+        %24 = load %18 : s64i, align 8
+        %25 = load %19 : s32i, align 4
+        %26 = call @fcntl_lock(%21, %22, %23, %24, %25) : s32i [all]
+        store %26, %20
+        %27 = load %20 : s32i
+        return %27
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = const #cir.ptr<null> : s8i*
+        %5 = const 1 : s32i
+        %6 = const 2 : s32i
+        %7 = const 3 : s64i
+        %8 = const 4 : s64i
+        %9 = const 5 : s32i
+        %10 = call @vfswrap_lock(%4, %5, %6, %7, %8, %9) : s32i [all]
+        %11 = const 5 : s32i
+        %12 = cmp ne %10, %11 : bool
+        if %12 {
+            %13 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

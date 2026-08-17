@@ -1,0 +1,95 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr64957.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i):
+        %37 = alloca s32i, "b", align 4
+        %38 = alloca s32i, "__retval", align 4
+        store %arg1, %37
+        %39 = load %37 : s32i, align 4
+        %40 = const 5 : s32i
+        %41 = xor %39, %40 : s32i
+        %42 = const 1 : s32i
+        %43 = or %41, %42 : s32i
+        %44 = const 5 : s32i
+        %45 = xor %43, %44 : s32i
+        %46 = const 1 : s32i
+        %47 = or %45, %46 : s32i
+        store %47, %38
+        %48 = load %38 : s32i
+        return %48
+}
+fn bar(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %25 = alloca s32i, "b", align 4
+        %26 = alloca s32i, "__retval", align 4
+        store %arg0, %25
+        %27 = load %25 : s32i, align 4
+        %28 = const -6 : s32i
+        %29 = xor %27, %28 : s32i
+        %30 = const -2 : s32i
+        %31 = and %29, %30 : s32i
+        %32 = const -6 : s32i
+        %33 = xor %31, %32 : s32i
+        %34 = const -2 : s32i
+        %35 = and %33, %34 : s32i
+        store %35, %26
+        %36 = load %26 : s32i
+        return %36
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "i", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    scope {
+        %5 = const 0 : s32i
+        store %5, %1, align 4
+        for cond: {
+            %22 = load %1 : s32i, align 4
+            %23 = const 16 : s32i
+            %24 = cmp lt %22, %23 : bool
+            condition %24
+        } step: {
+            %6 = load %1 : s32i, align 4
+            %7 = inc %6 : s32i [nsw]
+            store %7, %1, align 4
+            yield
+        } do {
+            scope {
+                %8 = load %1 : s32i, align 4
+                %9 = call @foo(%8) : s32i [all]
+                %10 = load %1 : s32i, align 4
+                %11 = const 1 : s32i
+                %12 = or %10, %11 : s32i
+                %13 = cmp ne %9, %12 : bool
+                %14 = ternary %13 ? { : bool
+                    %21 = const #true : bool
+                    yield %21
+                } : {
+                    %15 = load %1 : s32i, align 4
+                    %16 = call @bar(%15) : s32i [all]
+                    %17 = load %1 : s32i, align 4
+                    %18 = const -2 : s32i
+                    %19 = and %17, %18 : s32i
+                    %20 = cmp ne %16, %19 : bool
+                    yield %20
+                }
+                if %14 {
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

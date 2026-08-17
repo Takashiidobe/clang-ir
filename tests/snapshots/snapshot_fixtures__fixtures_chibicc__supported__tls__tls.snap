@@ -1,0 +1,179 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.chibicc/supported/tls/tls.c" (c, x86_64-unknown-linux-gnu)
+global v2 : s32i = 5 [external, default, tls_dyn, align 4, dso_local]
+global v3 : s32i = 7 [external, default, align 4, dso_local]
+global v1 : s32i = 0 [external, default, tls_dyn, align 4, dso_local]
+global .str : s8i[3] = "v1" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[3] = "v2" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[3] = "v3" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[49] = "pthread_create(&thr, NULL, thread_main, &values)" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[24] = "pthread_join(thr, NULL)" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[18] = "values.initial_v1" [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[18] = "values.initial_v2" [cir_private, default, align 1, dso_local, constant]
+global .str.7 : s8i[18] = "values.initial_v3" [cir_private, default, align 1, dso_local, constant]
+global .str.8 : s8i[18] = "values.updated_v1" [cir_private, default, align 1, dso_local, constant]
+global .str.9 : s8i[18] = "values.updated_v2" [cir_private, default, align 1, dso_local, constant]
+global .str.10 : s8i[18] = "values.updated_v3" [cir_private, default, align 1, dso_local, constant]
+global .str.11 : s8i[4] = "OK\n" [cir_private, default, align 1, dso_local, constant]
+
+fn thread_main(%arg0: void*) -> void* [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: void*):
+        %82 = alloca void*, "unused", align 8
+        %83 = alloca void*, "__retval", align 8
+        %84 = alloca rec_tls_values*, "values", align 8
+        store %arg0, %82
+        %85 = load %82 : void*, align 8
+        %86 = cast(bitcast) %85 : rec_tls_values*
+        store %86, %84, align 8
+        %87 = get_global @v1 : s32i*
+        %88 = load %87 : s32i, align 4
+        %89 = load %84 : rec_tls_values*, align 8
+        %90 = get_member %89[0] "initial_v1" : s32i*
+        store %88, %90, align 4
+        %91 = get_global @v2 : s32i*
+        %92 = load %91 : s32i, align 4
+        %93 = load %84 : rec_tls_values*, align 8
+        %94 = get_member %93[1] "initial_v2" : s32i*
+        store %92, %94, align 4
+        %95 = get_global @v3 : s32i*
+        %96 = load %95 : s32i, align 4
+        %97 = load %84 : rec_tls_values*, align 8
+        %98 = get_member %97[2] "initial_v3" : s32i*
+        store %96, %98, align 4
+        %99 = const 1 : s32i
+        %100 = get_global @v1 : s32i*
+        store %99, %100, align 4
+        %101 = const 2 : s32i
+        %102 = get_global @v2 : s32i*
+        store %101, %102, align 4
+        %103 = const 3 : s32i
+        %104 = get_global @v3 : s32i*
+        store %103, %104, align 4
+        %105 = get_global @v1 : s32i*
+        %106 = load %105 : s32i, align 4
+        %107 = load %84 : rec_tls_values*, align 8
+        %108 = get_member %107[3] "updated_v1" : s32i*
+        store %106, %108, align 4
+        %109 = get_global @v2 : s32i*
+        %110 = load %109 : s32i, align 4
+        %111 = load %84 : rec_tls_values*, align 8
+        %112 = get_member %111[4] "updated_v2" : s32i*
+        store %110, %112, align 4
+        %113 = get_global @v3 : s32i*
+        %114 = load %113 : s32i, align 4
+        %115 = load %84 : rec_tls_values*, align 8
+        %116 = get_member %115[5] "updated_v3" : s32i*
+        store %114, %116, align 4
+        %117 = const #cir.ptr<null> : void*
+        store %117, %83
+        %118 = load %83 : void*
+        return %118
+}
+fn assert(%arg0: s32i, %arg1: s32i, %arg2: s8i*) -> void [external, c];
+fn pthread_create(%arg0: u64i*, %arg1: rec_pthread_attr_t*, %arg2: ((void*) -> void*)*, %arg3: void*) -> s32i [external, c, nothrow];
+fn pthread_join(%arg0: u64i, %arg1: void**) -> s32i [external, c];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u64i, "thr", align 8
+    %2 = alloca rec_tls_values, "values", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 0 : s32i
+    %5 = get_global @v1 : s32i*
+    %6 = load %5 : s32i, align 4
+    %7 = get_global @.str : s8i[3]*
+    %8 = cast(array_to_ptrdecay) %7 : s8i*
+    call @assert(%4, %6, %8) [all]
+    %9 = const 5 : s32i
+    %10 = get_global @v2 : s32i*
+    %11 = load %10 : s32i, align 4
+    %12 = get_global @.str.1 : s8i[3]*
+    %13 = cast(array_to_ptrdecay) %12 : s8i*
+    call @assert(%9, %11, %13) [all]
+    %14 = const 7 : s32i
+    %15 = get_global @v3 : s32i*
+    %16 = load %15 : s32i, align 4
+    %17 = get_global @.str.2 : s8i[3]*
+    %18 = cast(array_to_ptrdecay) %17 : s8i*
+    call @assert(%14, %16, %18) [all]
+    %19 = const 0 : s32i
+    %20 = const #cir.ptr<null> : rec_pthread_attr_t*
+    %21 = get_global @thread_main : ((void*) -> void*)*
+    %22 = cast(bitcast) %2 : void*
+    %23 = call @pthread_create(%1, %20, %21, %22) : s32i [all]
+    %24 = get_global @.str.3 : s8i[49]*
+    %25 = cast(array_to_ptrdecay) %24 : s8i*
+    call @assert(%19, %23, %25) [all]
+    %26 = const 0 : s32i
+    %27 = load %1 : u64i, align 8
+    %28 = const #cir.ptr<null> : void**
+    %29 = call @pthread_join(%27, %28) : s32i [all]
+    %30 = get_global @.str.4 : s8i[24]*
+    %31 = cast(array_to_ptrdecay) %30 : s8i*
+    call @assert(%26, %29, %31) [all]
+    %32 = const 0 : s32i
+    %33 = get_member %2[0] "initial_v1" : s32i*
+    %34 = load %33 : s32i, align 4
+    %35 = get_global @.str.5 : s8i[18]*
+    %36 = cast(array_to_ptrdecay) %35 : s8i*
+    call @assert(%32, %34, %36) [all]
+    %37 = const 5 : s32i
+    %38 = get_member %2[1] "initial_v2" : s32i*
+    %39 = load %38 : s32i, align 4
+    %40 = get_global @.str.6 : s8i[18]*
+    %41 = cast(array_to_ptrdecay) %40 : s8i*
+    call @assert(%37, %39, %41) [all]
+    %42 = const 7 : s32i
+    %43 = get_member %2[2] "initial_v3" : s32i*
+    %44 = load %43 : s32i, align 4
+    %45 = get_global @.str.7 : s8i[18]*
+    %46 = cast(array_to_ptrdecay) %45 : s8i*
+    call @assert(%42, %44, %46) [all]
+    %47 = const 1 : s32i
+    %48 = get_member %2[3] "updated_v1" : s32i*
+    %49 = load %48 : s32i, align 4
+    %50 = get_global @.str.8 : s8i[18]*
+    %51 = cast(array_to_ptrdecay) %50 : s8i*
+    call @assert(%47, %49, %51) [all]
+    %52 = const 2 : s32i
+    %53 = get_member %2[4] "updated_v2" : s32i*
+    %54 = load %53 : s32i, align 4
+    %55 = get_global @.str.9 : s8i[18]*
+    %56 = cast(array_to_ptrdecay) %55 : s8i*
+    call @assert(%52, %54, %56) [all]
+    %57 = const 3 : s32i
+    %58 = get_member %2[5] "updated_v3" : s32i*
+    %59 = load %58 : s32i, align 4
+    %60 = get_global @.str.10 : s8i[18]*
+    %61 = cast(array_to_ptrdecay) %60 : s8i*
+    call @assert(%57, %59, %61) [all]
+    %62 = const 0 : s32i
+    %63 = get_global @v1 : s32i*
+    %64 = load %63 : s32i, align 4
+    %65 = get_global @.str : s8i[3]*
+    %66 = cast(array_to_ptrdecay) %65 : s8i*
+    call @assert(%62, %64, %66) [all]
+    %67 = const 5 : s32i
+    %68 = get_global @v2 : s32i*
+    %69 = load %68 : s32i, align 4
+    %70 = get_global @.str.1 : s8i[3]*
+    %71 = cast(array_to_ptrdecay) %70 : s8i*
+    call @assert(%67, %69, %71) [all]
+    %72 = const 3 : s32i
+    %73 = get_global @v3 : s32i*
+    %74 = load %73 : s32i, align 4
+    %75 = get_global @.str.2 : s8i[3]*
+    %76 = cast(array_to_ptrdecay) %75 : s8i*
+    call @assert(%72, %74, %76) [all]
+    %77 = get_global @.str.11 : s8i[4]*
+    %78 = cast(array_to_ptrdecay) %77 : s8i*
+    %79 = call @printf(%78) : s32i [all]
+    %80 = const 0 : s32i
+    store %80, %0
+    %81 = load %0 : s32i
+    return %81
+}

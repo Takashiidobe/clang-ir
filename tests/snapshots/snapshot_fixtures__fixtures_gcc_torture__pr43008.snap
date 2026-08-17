@@ -1,0 +1,64 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr43008.c" (c, x86_64-unknown-linux-gnu)
+global i : s32i = 0 [external, default, align 4, dso_local]
+
+fn malloc(%arg0: u64i) -> void* [external, c, nothrow];
+fn my_alloc() -> rec_X* [external, c, no_inline, dso_local, nothrow] {
+    %23 = alloca rec_X*, "__retval", align 8
+    %24 = alloca rec_X*, "p", align 8
+    %25 = const 8 : u64i
+    %26 = call @malloc(%25) : void* [all]
+    %27 = cast(bitcast) %26 : rec_X*
+    store %27, %24, align 8
+    %28 = get_global @i : s32i*
+    %29 = load %24 : rec_X*, align 8
+    %30 = get_member %29[0] "p" : s32i**
+    store %28, %30, align 8
+    %31 = load %24 : rec_X*, align 8
+    store %31, %23
+    %32 = load %23 : rec_X*
+    return %32
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_X*, "p", align 8
+    %2 = alloca rec_X*, "q", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = call @my_alloc() : rec_X* [all]
+    store %4, %1, align 8
+    %5 = call @my_alloc() : rec_X* [all]
+    store %5, %2, align 8
+    %6 = const 1 : s32i
+    %7 = load %1 : rec_X*, align 8
+    %8 = get_member %7[0] "p" : s32i**
+    %9 = load %8 : s32i*, align 8
+    store %6, %9, align 4
+    %10 = const 0 : s32i
+    %11 = load %2 : rec_X*, align 8
+    %12 = get_member %11[0] "p" : s32i**
+    %13 = load %12 : s32i*, align 8
+    store %10, %13, align 4
+    scope {
+        %16 = load %1 : rec_X*, align 8
+        %17 = get_member %16[0] "p" : s32i**
+        %18 = load %17 : s32i*, align 8
+        %19 = load %18 : s32i, align 4
+        %20 = const 0 : s32i
+        %21 = cmp ne %19, %20 : bool
+        if %21 {
+            %22 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %14 = const 0 : s32i
+    store %14, %0
+    %15 = load %0 : s32i
+    return %15
+}

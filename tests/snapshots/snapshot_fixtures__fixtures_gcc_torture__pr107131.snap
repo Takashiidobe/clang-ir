@@ -1,0 +1,64 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr107131.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: u8i) -> u64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u8i):
+        %8 = alloca u8i, "o", align 1
+        %9 = alloca u64i, "__retval", align 8
+        %10 = alloca u64i, "t1", align 8
+        %11 = alloca u64i, "t2", align 8
+        %12 = alloca u64i, "t3", align 8
+        store %arg0, %8
+        %13 = load %8 : u8i, align 1
+        %14 = cast(integral) %13 : s32i
+        %15 = const 0 : s32i
+        %16 = cmp eq %14, %15 : bool
+        %17 = cast(bool_to_int) %16 : s32i
+        %18 = cast(integral) %17 : s64i
+        %19 = minus %18 : s64i [nsw]
+        %20 = cast(integral) %19 : u64i
+        store %20, %10, align 8
+        %21 = load %10 : u64i, align 8
+        %22 = const 10439075533421201520 : u64i
+        %23 = cmp gt %21, %22 : bool
+        %24 = cast(bool_to_int) %23 : s32i
+        %25 = cast(integral) %24 : s64i
+        %26 = minus %25 : s64i [nsw]
+        %27 = cast(integral) %26 : u64i
+        store %27, %11, align 8
+        %28 = load %10 : u64i, align 8
+        %29 = load %11 : u64i, align 8
+        %30 = cmp le %28, %29 : bool
+        %31 = cast(bool_to_int) %30 : s32i
+        %32 = cast(integral) %31 : s64i
+        %33 = minus %32 : s64i [nsw]
+        %34 = cast(integral) %33 : u64i
+        store %34, %12, align 8
+        %35 = load %12 : u64i, align 8
+        store %35, %9
+        %36 = load %9 : u64i
+        return %36
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = const 0 : u8i
+        %5 = call @foo(%4) : u64i [all]
+        %6 = const 18446744073709551615 : u64i
+        %7 = cmp ne %5, %6 : bool
+        if %7 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

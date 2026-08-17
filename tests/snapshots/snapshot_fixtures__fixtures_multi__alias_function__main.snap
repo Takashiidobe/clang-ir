@@ -1,0 +1,40 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.multi/alias_function/main.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn real_impl(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %12 = alloca s32i, "x", align 4
+        %13 = alloca s32i, "__retval", align 4
+        store %arg0, %12
+        %14 = load %12 : s32i, align 4
+        %15 = const 3 : s32i
+        %16 = mul %14, %15 : s32i [nsw]
+        %17 = const 1 : s32i
+        %18 = add %16, %17 : s32i [nsw]
+        store %18, %13
+        %19 = load %13 : s32i
+        return %19
+}
+fn alias_impl(%arg0: s32i) -> s32i [external, c, dso_local];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[7]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 5 : s32i
+    %6 = call @alias_impl(%5) : s32i [all]
+    %7 = const 2 : s32i
+    %8 = call @real_impl(%7) : s32i [all]
+    %9 = call @printf(%4, %6, %8) : s32i [all]
+    %10 = const 0 : s32i
+    store %10, %0
+    %11 = load %0 : s32i
+    return %11
+}

@@ -1,0 +1,356 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/popen.c" (c, x86_64-unknown-linux-gnu)
+global t_status : s32i = 0 [external, default, align 4, dso_local]
+global .str : s8i[11] = "echo hello" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[2] = "r" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[117] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/popen.c:85: %s failed (errno = %d)\n" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[29] = "f = popen(\"echo hello\", \"r\")" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[117] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/popen.c:87: %s failed (errno = %d)\n" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[26] = "fgets(foo, sizeof foo, f)" [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[6] = "hello" [cir_private, default, align 1, dso_local, constant]
+global .str.7 : s8i[112] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/popen.c:88: [%s] != [%s] (%s)\n" [cir_private, default, align 1, dso_local, constant]
+global .str.8 : s8i[32] = "child process did not say hello" [cir_private, default, align 1, dso_local, constant]
+global .str.9 : s8i[131] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/popen.c:89: %s failed (exit status %04x != %04x)\n" [cir_private, default, align 1, dso_local, constant]
+global .str.10 : s8i[10] = "pclose(f)" [cir_private, default, align 1, dso_local, constant]
+global .str.11 : s8i[46] = "read a ; test \"x$a\" = xhello && kill -USR1 %d" [cir_private, default, align 1, dso_local, constant]
+global .str.12 : s8i[2] = "w" [cir_private, default, align 1, dso_local, constant]
+global .str.13 : s8i[117] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/popen.c:95: %s failed (errno = %d)\n" [cir_private, default, align 1, dso_local, constant]
+global .str.14 : s8i[20] = "f = popen(cmd, \"w\")" [cir_private, default, align 1, dso_local, constant]
+global .str.15 : s8i[117] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/popen.c:97: %s failed (errno = %d)\n" [cir_private, default, align 1, dso_local, constant]
+global .str.16 : s8i[23] = "fputs(\"hello\", f) >= 0" [cir_private, default, align 1, dso_local, constant]
+global .str.17 : s8i[131] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/popen.c:98: %s failed (exit status %04x != %04x)\n" [cir_private, default, align 1, dso_local, constant]
+global got_sig : s32i = 0 [internal, default, align 4, dso_local]
+global .str.18 : s8i[140] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/popen.c:99: %s failed (child process did not send signal)\n" [cir_private, default, align 1, dso_local, constant]
+global .str.19 : s8i[8] = "got_sig" [cir_private, default, align 1, dso_local, constant]
+
+fn vsnprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec___va_list_tag*) -> s32i [external, c, nothrow];
+fn write(%arg0: s32i, %arg1: void*, %arg2: u64i) -> s64i [external, c];
+fn t_printf(%arg1: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s8i*):
+        %167 = alloca s8i*, "s", align 8
+        %168 = alloca s32i, "__retval", align 4
+        %169 = alloca rec___va_list_tag[1], "ap", align 16
+        %170 = alloca s8i[512], "buf", align 16
+        %171 = alloca s32i, "n", align 4
+        store %arg1, %167
+        %172 = const 1 : s32i
+        %173 = get_global @t_status : s32i*
+        store %172, %173, align 4, volatile
+        %174 = cast(array_to_ptrdecay) %169 : rec___va_list_tag*
+        <unmodeled: cir.va_start>
+        %175 = get_global @vsnprintf : ((s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i)*
+        %176 = cast(array_to_ptrdecay) %170 : s8i*
+        %177 = const 512 : u64i
+        %178 = load %167 : s8i*, align 8
+        %179 = cast(array_to_ptrdecay) %169 : rec___va_list_tag*
+        %180 = call @vsnprintf(%176, %177, %178, %179) : s32i [all]
+        store %180, %171, align 4
+        %181 = cast(array_to_ptrdecay) %169 : rec___va_list_tag*
+        <unmodeled: cir.va_end>
+        scope {
+            %190 = load %171 : s32i, align 4
+            %191 = const 0 : s32i
+            %192 = cmp lt %190, %191 : bool
+            if %192 {
+                %222 = const 0 : s32i
+                store %222, %171, align 4
+                yield
+            } else {
+                scope {
+                    %193 = load %171 : s32i, align 4
+                    %194 = cast(integral) %193 : u64i
+                    %195 = const 512 : u64i
+                    %196 = cmp ge %194, %195 : bool
+                    if %196 {
+                        %197 = const 512 : s32i
+                        store %197, %171, align 4
+                        %198 = const 10 : s8i
+                        %199 = load %171 : s32i, align 4
+                        %200 = const 1 : s32i
+                        %201 = sub %199, %200 : s32i [nsw]
+                        %202 = cast(integral) %201 : s64i
+                        %203 = get_element %170[%202] : s8i*
+                        store %198, %203, align 1
+                        %204 = const 46 : s8i
+                        %205 = load %171 : s32i, align 4
+                        %206 = const 2 : s32i
+                        %207 = sub %205, %206 : s32i [nsw]
+                        %208 = cast(integral) %207 : s64i
+                        %209 = get_element %170[%208] : s8i*
+                        store %204, %209, align 1
+                        %210 = const 46 : s8i
+                        %211 = load %171 : s32i, align 4
+                        %212 = const 3 : s32i
+                        %213 = sub %211, %212 : s32i [nsw]
+                        %214 = cast(integral) %213 : s64i
+                        %215 = get_element %170[%214] : s8i*
+                        store %210, %215, align 1
+                        %216 = const 46 : s8i
+                        %217 = load %171 : s32i, align 4
+                        %218 = const 4 : s32i
+                        %219 = sub %217, %218 : s32i [nsw]
+                        %220 = cast(integral) %219 : s64i
+                        %221 = get_element %170[%220] : s8i*
+                        store %216, %221, align 1
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %182 = const 1 : s32i
+        %183 = cast(array_to_ptrdecay) %170 : s8i*
+        %184 = cast(bitcast) %183 : void*
+        %185 = load %171 : s32i, align 4
+        %186 = cast(integral) %185 : u64i
+        %187 = call @write(%182, %184, %186) : s64i [all]
+        %188 = cast(integral) %187 : s32i
+        store %188, %168
+        %189 = load %168 : s32i
+        return %189
+}
+fn __errno_location() -> s32i* [external, c, const, nothrow];
+fn popen(%arg0: s8i*, %arg1: s8i*) -> rec__IO_FILE* [external, c];
+fn fgets(%arg0: s8i*, %arg1: s32i, %arg2: rec__IO_FILE*) -> s8i* [external, c];
+fn strcmp(%arg0: s8i*, %arg1: s8i*) -> s32i [external, c, pure, nothrow];
+fn pclose(%arg0: rec__IO_FILE*) -> s32i [external, c];
+fn signal(%arg0: s32i, %arg1: ((s32i) -> void)*) -> ((s32i) -> void)* [external, c, nothrow];
+fn handler(%arg0: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %164 = alloca s32i, "sig", align 4
+        store %arg0, %164
+        %165 = const 1 : s32i
+        %166 = get_global @got_sig : s32i*
+        store %165, %166, align 4
+        return
+}
+fn snprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, ...) -> s32i [external, c, nothrow];
+fn getpid() -> s32i [external, c, nothrow];
+fn fputs(%arg0: s8i*, %arg1: rec__IO_FILE*) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "i", align 4
+    %2 = alloca s8i[6], "foo", align 1
+    %3 = alloca s8i[64], "cmd", align 16
+    %4 = alloca rec__IO_FILE*, "f", align 8
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = const 0 : s32i
+    %7 = call @__errno_location() : s32i* [const]
+    store %6, %7, align 4
+    %8 = get_global @.str : s8i[11]*
+    %9 = cast(array_to_ptrdecay) %8 : s8i*
+    %10 = get_global @.str.1 : s8i[2]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = call @popen(%9, %11) : rec__IO_FILE* [all]
+    store %12, %4, align 8
+    %13 = cast(ptr_to_bool) %12 : bool
+    %14 = ternary %13 ? { : bool
+        %163 = const #true : bool
+        yield %163
+    } : {
+        %154 = get_global @.str.2 : s8i[117]*
+        %155 = cast(array_to_ptrdecay) %154 : s8i*
+        %156 = get_global @.str.3 : s8i[29]*
+        %157 = cast(array_to_ptrdecay) %156 : s8i*
+        %158 = call @__errno_location() : s32i* [const]
+        %159 = load %158 : s32i, align 4
+        %160 = call @t_printf(%155, %157, %159) : s32i [all]
+        %161 = const 0 : s32i
+        %162 = cast(int_to_bool) %161 : bool
+        yield %162
+    }
+    scope {
+        %100 = load %4 : rec__IO_FILE*, align 8
+        %101 = cast(ptr_to_bool) %100 : bool
+        if %101 {
+            %102 = const 0 : s32i
+            %103 = call @__errno_location() : s32i* [const]
+            store %102, %103, align 4
+            %104 = cast(array_to_ptrdecay) %2 : s8i*
+            %105 = const 6 : s32i
+            %106 = load %4 : rec__IO_FILE*, align 8
+            %107 = call @fgets(%104, %105, %106) : s8i* [all]
+            %108 = cast(ptr_to_bool) %107 : bool
+            %109 = ternary %108 ? { : bool
+                %153 = const #true : bool
+                yield %153
+            } : {
+                %144 = get_global @.str.4 : s8i[117]*
+                %145 = cast(array_to_ptrdecay) %144 : s8i*
+                %146 = get_global @.str.5 : s8i[26]*
+                %147 = cast(array_to_ptrdecay) %146 : s8i*
+                %148 = call @__errno_location() : s32i* [const]
+                %149 = load %148 : s32i, align 4
+                %150 = call @t_printf(%145, %147, %149) : s32i [all]
+                %151 = const 0 : s32i
+                %152 = cast(int_to_bool) %151 : bool
+                yield %152
+            }
+            %110 = get_global @strcmp : ((s8i*, s8i*) -> s32i)*
+            %111 = cast(array_to_ptrdecay) %2 : s8i*
+            %112 = get_global @.str.6 : s8i[6]*
+            %113 = cast(array_to_ptrdecay) %112 : s8i*
+            %114 = call @strcmp(%111, %113) : s32i [pure]
+            %115 = cast(int_to_bool) %114 : bool
+            %116 = not %115 : bool
+            %117 = ternary %116 ? { : bool
+                %143 = const #true : bool
+                yield %143
+            } : {
+                %133 = get_global @.str.7 : s8i[112]*
+                %134 = cast(array_to_ptrdecay) %133 : s8i*
+                %135 = cast(array_to_ptrdecay) %2 : s8i*
+                %136 = get_global @.str.6 : s8i[6]*
+                %137 = cast(array_to_ptrdecay) %136 : s8i*
+                %138 = get_global @.str.8 : s8i[32]*
+                %139 = cast(array_to_ptrdecay) %138 : s8i*
+                %140 = call @t_printf(%134, %135, %137, %139) : s32i [all]
+                %141 = const 0 : s32i
+                %142 = cast(int_to_bool) %141 : bool
+                yield %142
+            }
+            %118 = load %4 : rec__IO_FILE*, align 8
+            %119 = call @pclose(%118) : s32i [all]
+            store %119, %1, align 4
+            %120 = const 0 : s32i
+            %121 = cmp eq %119, %120 : bool
+            %122 = ternary %121 ? { : bool
+                %132 = const #true : bool
+                yield %132
+            } : {
+                %123 = get_global @.str.9 : s8i[131]*
+                %124 = cast(array_to_ptrdecay) %123 : s8i*
+                %125 = get_global @.str.10 : s8i[10]*
+                %126 = cast(array_to_ptrdecay) %125 : s8i*
+                %127 = load %1 : s32i, align 4
+                %128 = const 0 : s32i
+                %129 = call @t_printf(%124, %126, %127, %128) : s32i [all]
+                %130 = const 0 : s32i
+                %131 = cast(int_to_bool) %130 : bool
+                yield %131
+            }
+            yield
+        }
+        yield
+    }
+    %15 = const 10 : s32i
+    %16 = get_global @handler : ((s32i) -> void)*
+    %17 = call @signal(%15, %16) : ((s32i) -> void)* [all]
+    %18 = get_global @snprintf : ((s8i*, u64i, s8i*, ...) -> s32i)*
+    %19 = cast(array_to_ptrdecay) %3 : s8i*
+    %20 = const 64 : u64i
+    %21 = get_global @.str.11 : s8i[46]*
+    %22 = cast(array_to_ptrdecay) %21 : s8i*
+    %23 = call @getpid() : s32i [all]
+    %24 = call @snprintf(%19, %20, %22, %23) : s32i [all]
+    %25 = const 0 : s32i
+    %26 = call @__errno_location() : s32i* [const]
+    store %25, %26, align 4
+    %27 = cast(array_to_ptrdecay) %3 : s8i*
+    %28 = get_global @.str.12 : s8i[2]*
+    %29 = cast(array_to_ptrdecay) %28 : s8i*
+    %30 = call @popen(%27, %29) : rec__IO_FILE* [all]
+    store %30, %4, align 8
+    %31 = cast(ptr_to_bool) %30 : bool
+    %32 = ternary %31 ? { : bool
+        %99 = const #true : bool
+        yield %99
+    } : {
+        %90 = get_global @.str.13 : s8i[117]*
+        %91 = cast(array_to_ptrdecay) %90 : s8i*
+        %92 = get_global @.str.14 : s8i[20]*
+        %93 = cast(array_to_ptrdecay) %92 : s8i*
+        %94 = call @__errno_location() : s32i* [const]
+        %95 = load %94 : s32i, align 4
+        %96 = call @t_printf(%91, %93, %95) : s32i [all]
+        %97 = const 0 : s32i
+        %98 = cast(int_to_bool) %97 : bool
+        yield %98
+    }
+    scope {
+        %39 = load %4 : rec__IO_FILE*, align 8
+        %40 = cast(ptr_to_bool) %39 : bool
+        if %40 {
+            %41 = const 0 : s32i
+            %42 = call @__errno_location() : s32i* [const]
+            store %41, %42, align 4
+            %43 = get_global @.str.6 : s8i[6]*
+            %44 = cast(array_to_ptrdecay) %43 : s8i*
+            %45 = load %4 : rec__IO_FILE*, align 8
+            %46 = call @fputs(%44, %45) : s32i [all]
+            %47 = const 0 : s32i
+            %48 = cmp ge %46, %47 : bool
+            %49 = ternary %48 ? { : bool
+                %89 = const #true : bool
+                yield %89
+            } : {
+                %80 = get_global @.str.15 : s8i[117]*
+                %81 = cast(array_to_ptrdecay) %80 : s8i*
+                %82 = get_global @.str.16 : s8i[23]*
+                %83 = cast(array_to_ptrdecay) %82 : s8i*
+                %84 = call @__errno_location() : s32i* [const]
+                %85 = load %84 : s32i, align 4
+                %86 = call @t_printf(%81, %83, %85) : s32i [all]
+                %87 = const 0 : s32i
+                %88 = cast(int_to_bool) %87 : bool
+                yield %88
+            }
+            %50 = load %4 : rec__IO_FILE*, align 8
+            %51 = call @pclose(%50) : s32i [all]
+            store %51, %1, align 4
+            %52 = const 0 : s32i
+            %53 = cmp eq %51, %52 : bool
+            %54 = ternary %53 ? { : bool
+                %79 = const #true : bool
+                yield %79
+            } : {
+                %70 = get_global @.str.17 : s8i[131]*
+                %71 = cast(array_to_ptrdecay) %70 : s8i*
+                %72 = get_global @.str.10 : s8i[10]*
+                %73 = cast(array_to_ptrdecay) %72 : s8i*
+                %74 = load %1 : s32i, align 4
+                %75 = const 0 : s32i
+                %76 = call @t_printf(%71, %73, %74, %75) : s32i [all]
+                %77 = const 0 : s32i
+                %78 = cast(int_to_bool) %77 : bool
+                yield %78
+            }
+            %55 = get_global @got_sig : s32i*
+            %56 = load %55 : s32i, align 4
+            store %56, %1, align 4
+            %57 = const 1 : s32i
+            %58 = cmp eq %56, %57 : bool
+            %59 = ternary %58 ? { : bool
+                %69 = const #true : bool
+                yield %69
+            } : {
+                %60 = get_global @.str.18 : s8i[140]*
+                %61 = cast(array_to_ptrdecay) %60 : s8i*
+                %62 = get_global @.str.19 : s8i[8]*
+                %63 = cast(array_to_ptrdecay) %62 : s8i*
+                %64 = load %1 : s32i, align 4
+                %65 = const 1 : s32i
+                %66 = call @t_printf(%61, %63, %64, %65) : s32i [all]
+                %67 = const 0 : s32i
+                %68 = cast(int_to_bool) %67 : bool
+                yield %68
+            }
+            yield
+        }
+        yield
+    }
+    %33 = const 10 : s32i
+    %34 = const #cir.ptr<null> : ((s32i) -> void)*
+    %35 = call @signal(%33, %34) : ((s32i) -> void)* [all]
+    %36 = get_global @t_status : s32i*
+    %37 = load %36 : s32i, align 4, volatile
+    store %37, %0
+    %38 = load %0 : s32i
+    return %38
+}

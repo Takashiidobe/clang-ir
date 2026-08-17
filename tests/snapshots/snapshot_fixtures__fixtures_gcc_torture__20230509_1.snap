@@ -1,0 +1,135 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20230509-1.c" (c, x86_64-unknown-linux-gnu)
+fn f(%arg0: u32i, %arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i, %arg1: s32i):
+        %28 = alloca u32i, "a", align 4
+        %29 = alloca s32i, "b", align 4
+        %30 = alloca s32i, "__retval", align 4
+        %31 = alloca s32i, "t", align 4
+        store %arg0, %28
+        store %arg1, %29
+        scope {
+            %48 = load %28 : u32i, align 4
+            %49 = const 0 : u32i
+            %50 = cmp lt %48, %49 : bool
+            if %50 {
+                unreachable
+            }
+            yield
+        }
+        scope {
+            %45 = load %28 : u32i, align 4
+            %46 = const 30 : u32i
+            %47 = cmp gt %45, %46 : bool
+            if %47 {
+                unreachable
+            }
+            yield
+        }
+        %32 = load %28 : u32i, align 4
+        %33 = cast(integral) %32 : s32i
+        store %33, %31, align 4
+        scope {
+            %36 = load %29 : s32i, align 4
+            %37 = cast(int_to_bool) %36 : bool
+            if %37 {
+                %44 = const 100 : s32i
+                store %44, %31, align 4
+                yield
+            } else {
+                scope {
+                    %38 = load %28 : u32i, align 4
+                    %39 = const 0 : u32i
+                    %40 = cmp ne %38, %39 : bool
+                    if %40 {
+                        %42 = load %28 : u32i, align 4
+                        %43 = cast(integral) %42 : s32i
+                        store %43, %31, align 4
+                        yield
+                    } else {
+                        %41 = const 1 : s32i
+                        store %41, %31, align 4
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %34 = load %31 : s32i, align 4
+        store %34, %30
+        %35 = load %30 : s32i
+        return %35
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %23 = const 0 : u32i
+        %24 = const 0 : s32i
+        %25 = call @f(%23, %24) : s32i [all]
+        %26 = const 1 : s32i
+        %27 = cmp ne %25, %26 : bool
+        if %27 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %18 = const 1 : u32i
+        %19 = const 0 : s32i
+        %20 = call @f(%18, %19) : s32i [all]
+        %21 = const 1 : s32i
+        %22 = cmp ne %20, %21 : bool
+        if %22 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %13 = const 0 : u32i
+        %14 = const 1 : s32i
+        %15 = call @f(%13, %14) : s32i [all]
+        %16 = const 100 : s32i
+        %17 = cmp ne %15, %16 : bool
+        if %17 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %8 = const 1 : u32i
+        %9 = const 0 : s32i
+        %10 = call @f(%8, %9) : s32i [all]
+        %11 = const 1 : s32i
+        %12 = cmp ne %10, %11 : bool
+        if %12 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %3 = const 30 : u32i
+        %4 = const 0 : s32i
+        %5 = call @f(%3, %4) : s32i [all]
+        %6 = const 30 : s32i
+        %7 = cmp ne %5, %6 : bool
+        if %7 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = load %0 : s32i
+    return %2
+}

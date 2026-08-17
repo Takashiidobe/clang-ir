@@ -1,0 +1,49 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20071211-1.c" (c, x86_64-unknown-linux-gnu)
+global sv : rec_s = zero [external, default, align 8, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "f2", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 1 : s32i
+    %4 = const 24 : s32i
+    %5 = shift left %3, %4 : s32i
+    %6 = const 1 : s32i
+    %7 = sub %5, %6 : s32i [nsw]
+    %8 = cast(integral) %7 : u32i
+    %9 = get_global @sv : rec_s*
+    %10 = get_member %9[0] "f2" : u64i*
+    <unmodeled: cir.set_bitfield>
+    <unmodeled: cir.asm>
+    %12 = get_global @sv : rec_s*
+    %13 = get_member %12[0] "f2" : u64i*
+    <unmodeled: cir.get_bitfield>
+    %15 = inc %14 : u32i
+    <unmodeled: cir.set_bitfield>
+    %17 = get_global @sv : rec_s*
+    %18 = get_member %17[0] "f2" : u64i*
+    <unmodeled: cir.get_bitfield>
+    %20 = cast(integral) %19 : s32i
+    store %20, %1, align 4
+    scope {
+        %23 = load %1 : s32i, align 4
+        %24 = const 0 : s32i
+        %25 = cmp ne %23, %24 : bool
+        if %25 {
+            %26 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %21 = const 0 : s32i
+    store %21, %0
+    %22 = load %0 : s32i
+    return %22
+}

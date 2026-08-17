@@ -1,0 +1,53 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/string/memset.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[10] = "%s %d %c\n" [cir_private, default, align 1, dso_local, constant]
+
+fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i[6], "b", align 1
+    %2 = alloca void*, "r", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+    %5 = cast(array_to_ptrdecay) %1 : s8i*
+    %6 = cast(bitcast) %5 : void*
+    %7 = const 120 : s32i
+    %8 = const 5 : u64i
+    %9 = call @memset(%6, %7, %8) : void* [all]
+    store %9, %2, align 8
+    %10 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+    %11 = cast(array_to_ptrdecay) %1 : s8i*
+    %12 = const 1 : s32i
+    %13 = ptr_stride %11, %12 : s8i*
+    %14 = cast(bitcast) %13 : void*
+    %15 = const 122 : s32i
+    %16 = const 0 : u64i
+    %17 = call @memset(%14, %15, %16) : void* [all]
+    %18 = const 0 : s8i
+    %19 = const 5 : s64i
+    %20 = get_element %1[%19] : s8i*
+    store %18, %20, align 1
+    %21 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %22 = get_global @.str : s8i[10]*
+    %23 = cast(array_to_ptrdecay) %22 : s8i*
+    %24 = cast(array_to_ptrdecay) %1 : s8i*
+    %25 = load %2 : void*, align 8
+    %26 = cast(array_to_ptrdecay) %1 : s8i*
+    %27 = cast(bitcast) %26 : void*
+    %28 = cmp eq %25, %27 : bool
+    %29 = cast(bool_to_int) %28 : s32i
+    %30 = const 1 : s64i
+    %31 = get_element %1[%30] : s8i*
+    %32 = load %31 : s8i, align 1
+    %33 = cast(integral) %32 : s32i
+    %34 = call @printf(%23, %24, %29, %33) : s32i [all]
+    %35 = const 0 : s32i
+    store %35, %0
+    %36 = load %0 : s32i
+    return %36
+}

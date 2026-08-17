@@ -1,0 +1,156 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20041214-1.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[3] = "%s" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[5] = "asdf" [cir_private, default, align 1, dso_local, constant]
+global g.step0_jumps : void*[3] = [#cir.block_addr_info<@g, "do_precision">, #cir.block_addr_info<@g, "do_form_integer">, #cir.block_addr_info<@g, "do_form_string">] [internal, default, align 16, dso_local]
+
+fn strcpy(%arg0: s8i*, %arg1: s8i*) -> s8i* [external, c, nothrow];
+fn g(%arg2: s8i*, %arg3: s8i*, %arg4: rec___va_list_tag*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s8i*, %arg3: s8i*, %arg4: rec___va_list_tag*):
+        %27 = alloca s8i*, "s", align 8
+        %28 = alloca s8i*, "format", align 8
+        %29 = alloca rec___va_list_tag*, "ap", align 8
+        %30 = alloca s32i, "__retval", align 4
+        %31 = alloca s8i*, "f", align 8
+        %32 = alloca s8i*, "string", align 8
+        %33 = alloca s8i, "spec", align 1
+        store %arg2, %27
+        store %arg3, %28
+        store %arg4, %29
+        %34 = get_global @g.step0_jumps : void*[3]*
+        %35 = load %28 : s8i*, align 8
+        store %35, %31, align 8
+        scope {
+            %71 = load %31 : s8i*, align 8
+            %72 = load %71 : s8i, align 1
+            %73 = cast(integral) %72 : s32i
+            %74 = const 0 : s32i
+            %75 = cmp eq %73, %74 : bool
+            if %75 {
+                goto all_done
+            }
+            yield
+        }
+        scope {
+            do {
+                scope {
+                    %43 = load %31 : s8i*, align 8
+                    %44 = const 1 : s32i
+                    %45 = ptr_stride %43, %44 : s8i*
+                    store %45, %31, align 8
+                    %46 = load %45 : s8i, align 1
+                    store %46, %33, align 1
+                    %47 = const 2 : s64i
+                    %48 = get_element %34[%47] : void**
+                    %49 = load %48 : void*, align 16
+                    indirect_goto %49
+                    ^bb1():
+                        label do_precision:
+                        %50 = load %31 : s8i*, align 8
+                        %51 = const 1 : s32i
+                        %52 = ptr_stride %50, %51 : s8i*
+                        store %52, %31, align 8
+                        %53 = load %29 : rec___va_list_tag*, align 8
+                        <unmodeled: cir.va_arg>
+                        %55 = load %31 : s8i*, align 8
+                        %56 = load %55 : s8i, align 1
+                        store %56, %33, align 1
+                        %57 = const 2 : s64i
+                        %58 = get_element %34[%57] : void**
+                        %59 = load %58 : void*, align 16
+                        indirect_goto %59
+                    ^bb2():
+                        label do_form_integer:
+                        %60 = load %29 : rec___va_list_tag*, align 8
+                        <unmodeled: cir.va_arg>
+                        goto end
+                    ^bb3():
+                        label do_form_string:
+                        %62 = load %29 : rec___va_list_tag*, align 8
+                        <unmodeled: cir.va_arg>
+                        store %63, %32, align 8
+                        %64 = get_global @strcpy : ((s8i*, s8i*) -> s8i*)*
+                        %65 = load %27 : s8i*, align 8
+                        %66 = load %32 : s8i*, align 8
+                        %67 = call @strcpy(%65, %66) : s8i* [all]
+                        br ^bb4
+                    ^bb4():
+                        label end:
+                        %68 = load %31 : s8i*, align 8
+                        %69 = const 1 : s32i
+                        %70 = ptr_stride %68, %69 : s8i*
+                        store %70, %31, align 8
+                        yield
+                }
+                yield
+            } while {
+                %38 = load %31 : s8i*, align 8
+                %39 = load %38 : s8i, align 1
+                %40 = cast(integral) %39 : s32i
+                %41 = const 0 : s32i
+                %42 = cmp ne %40, %41 : bool
+                condition %42
+            }
+            yield
+        }
+        br ^bb1
+    ^bb1():
+        label all_done:
+        %36 = const 0 : s32i
+        store %36, %30
+        %37 = load %30 : s32i
+        return %37
+}
+fn f(%arg0: s8i*, %arg1: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i*, %arg1: s8i*):
+        %18 = alloca s8i*, "s", align 8
+        %19 = alloca s8i*, "f", align 8
+        %20 = alloca rec___va_list_tag[1], "ap", align 16
+        store %arg0, %18
+        store %arg1, %19
+        %21 = cast(array_to_ptrdecay) %20 : rec___va_list_tag*
+        <unmodeled: cir.va_start>
+        %22 = load %18 : s8i*, align 8
+        %23 = load %19 : s8i*, align 8
+        %24 = cast(array_to_ptrdecay) %20 : rec___va_list_tag*
+        %25 = call @g(%22, %23, %24) : s32i [all]
+        %26 = cast(array_to_ptrdecay) %20 : rec___va_list_tag*
+        <unmodeled: cir.va_end>
+        return
+}
+fn strcmp(%arg0: s8i*, %arg1: s8i*) -> s32i [external, c, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i[10], "buf", align 1
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = cast(array_to_ptrdecay) %1 : s8i*
+    %4 = get_global @.str : s8i[3]*
+    %5 = cast(array_to_ptrdecay) %4 : s8i*
+    %6 = get_global @.str.1 : s8i[5]*
+    %7 = cast(array_to_ptrdecay) %6 : s8i*
+    %8 = const 0 : s32i
+    call @f(%3, %5, %7, %8) [all]
+    scope {
+        %11 = get_global @strcmp : ((s8i*, s8i*) -> s32i)*
+        %12 = cast(array_to_ptrdecay) %1 : s8i*
+        %13 = get_global @.str.1 : s8i[5]*
+        %14 = cast(array_to_ptrdecay) %13 : s8i*
+        %15 = call @strcmp(%12, %14) : s32i [all]
+        %16 = cast(int_to_bool) %15 : bool
+        if %16 {
+            %17 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %9 = const 0 : s32i
+    store %9, %0
+    %10 = load %0 : s32i
+    return %10
+}

@@ -1,0 +1,73 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20030120-2.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %9 = alloca s32i, "status", align 4
+        %10 = alloca s32i, "__retval", align 4
+        %11 = alloca s32i, "s", align 4
+        store %arg0, %9
+        %12 = const 0 : s32i
+        store %12, %11, align 4
+        scope {
+            %23 = load %9 : s32i, align 4
+            %24 = const 1 : s32i
+            %25 = cmp eq %23, %24 : bool
+            if %25 {
+                %26 = const 1 : s32i
+                store %26, %11, align 4
+                yield
+            }
+            yield
+        }
+        scope {
+            %19 = load %9 : s32i, align 4
+            %20 = const 3 : s32i
+            %21 = cmp eq %19, %20 : bool
+            if %21 {
+                %22 = const 3 : s32i
+                store %22, %11, align 4
+                yield
+            }
+            yield
+        }
+        scope {
+            %15 = load %9 : s32i, align 4
+            %16 = const 4 : s32i
+            %17 = cmp eq %15, %16 : bool
+            if %17 {
+                %18 = const 4 : s32i
+                store %18, %11, align 4
+                yield
+            }
+            yield
+        }
+        %13 = load %11 : s32i, align 4
+        store %13, %10
+        %14 = load %10 : s32i
+        return %14
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = const 3 : s32i
+        %5 = call @foo(%4) : s32i [all]
+        %6 = const 3 : s32i
+        %7 = cmp ne %5, %6 : bool
+        if %7 {
+            %8 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

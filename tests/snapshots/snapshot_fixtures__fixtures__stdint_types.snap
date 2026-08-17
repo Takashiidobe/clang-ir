@@ -1,0 +1,136 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/stdint_types.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[5] = "%lu\n" [cir_private, default, align 1, dso_local, constant]
+global global_size : u64i = 7 [internal, default, align 8, dso_local]
+global global_u32 : u32i = 4000000000 [internal, default, align 4, dso_local]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn add_i32(%arg1: s32i, %arg2: s16i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i, %arg2: s16i):
+        %82 = alloca s32i, "a", align 4
+        %83 = alloca s16i, "b", align 2
+        %84 = alloca s32i, "__retval", align 4
+        %85 = alloca s32i, "sum", align 4
+        store %arg1, %82
+        store %arg2, %83
+        %86 = load %82 : s32i, align 4
+        %87 = load %83 : s16i, align 2
+        %88 = cast(integral) %87 : s32i
+        %89 = add %86, %88 : s32i [nsw]
+        store %89, %85, align 4
+        %90 = load %85 : s32i, align 4
+        store %90, %84
+        %91 = load %84 : s32i
+        return %91
+}
+fn widen_u32(%arg0: u32i) -> u64i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i):
+        %72 = alloca u32i, "value", align 4
+        %73 = alloca u64i, "__retval", align 8
+        %74 = alloca u64i, "wide", align 8
+        store %arg0, %72
+        %75 = load %72 : u32i, align 4
+        %76 = cast(integral) %75 : u64i
+        %77 = get_global @global_size : u64i*
+        %78 = load %77 : u64i, align 8
+        %79 = add %76, %78 : u64i
+        store %79, %74, align 8
+        %80 = load %74 : u64i, align 8
+        store %80, %73
+        %81 = load %73 : u64i
+        return %81
+}
+fn use_fixed_types() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %22 = alloca s32i, "__retval", align 4
+    %23 = alloca s8i, "small", align 1
+    %24 = alloca u8i, "byte", align 1
+    %25 = alloca s16i, "short_value", align 2
+    %26 = alloca u16i, "ushort_value", align 2
+    %27 = alloca s32i, "signed_value", align 4
+    %28 = alloca u64i, "wide", align 8
+    %29 = alloca rec_FixedPair, "pair", align 8
+    %30 = const -5 : s8i
+    store %30, %23, align 1
+    %31 = const 250 : u8i
+    store %31, %24, align 1
+    %32 = const 1200 : s16i
+    store %32, %25, align 2
+    %33 = const 65000 : u16i
+    store %33, %26, align 2
+    %34 = const 100000 : s32i
+    %35 = load %25 : s16i, align 2
+    %36 = call @add_i32(%34, %35) : s32i [all]
+    store %36, %27, align 4
+    %37 = get_global @global_u32 : u32i*
+    %38 = load %37 : u32i, align 4
+    %39 = call @widen_u32(%38) : u64i [all]
+    store %39, %28, align 8
+    %40 = load %25 : s16i, align 2
+    %41 = get_member %29[0] "left" : s16i*
+    store %40, %41, align 8
+    %42 = get_global @global_u32 : u32i*
+    %43 = load %42 : u32i, align 4
+    %44 = get_member %29[1] "right" : u32i*
+    store %43, %44, align 4
+    %45 = get_global @global_size : u64i*
+    %46 = load %45 : u64i, align 8
+    %47 = const 3 : u64i
+    %48 = add %46, %47 : u64i
+    %49 = get_member %29[2] "count" : u64i*
+    store %48, %49, align 8
+    %50 = load %23 : s8i, align 1
+    %51 = cast(integral) %50 : s32i
+    %52 = load %24 : u8i, align 1
+    %53 = cast(integral) %52 : s32i
+    %54 = add %51, %53 : s32i [nsw]
+    %55 = get_member %29[0] "left" : s16i*
+    %56 = load %55 : s16i, align 8
+    %57 = cast(integral) %56 : s32i
+    %58 = add %54, %57 : s32i [nsw]
+    %59 = load %27 : s32i, align 4
+    %60 = add %58, %59 : s32i [nsw]
+    %61 = load %26 : u16i, align 2
+    %62 = cast(integral) %61 : s32i
+    %63 = add %60, %62 : s32i [nsw]
+    %64 = cast(integral) %63 : u64i
+    %65 = get_member %29[2] "count" : u64i*
+    %66 = load %65 : u64i, align 8
+    %67 = add %64, %66 : u64i
+    %68 = load %28 : u64i, align 8
+    %69 = add %67, %68 : u64i
+    %70 = cast(integral) %69 : s32i
+    store %70, %22
+    %71 = load %22 : s32i
+    return %71
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[4]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 10 : s32i
+    %6 = const 20 : s16i
+    %7 = call @add_i32(%5, %6) : s32i [all]
+    %8 = call @printf(%4, %7) : s32i [all]
+    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %10 = get_global @.str.1 : s8i[5]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = const 5 : u32i
+    %13 = call @widen_u32(%12) : u64i [all]
+    %14 = call @printf(%11, %13) : s32i [all]
+    %15 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %16 = get_global @.str : s8i[4]*
+    %17 = cast(array_to_ptrdecay) %16 : s8i*
+    %18 = call @use_fixed_types() : s32i [all]
+    %19 = call @printf(%17, %18) : s32i [all]
+    %20 = const 0 : s32i
+    store %20, %0
+    %21 = load %0 : s32i
+    return %21
+}

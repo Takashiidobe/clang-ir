@@ -1,0 +1,105 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20010518-2.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_a_struct*, "a", align 8
+    %2 = alloca rec_a_struct, "b", align 1
+    %3 = alloca rec_a_struct, ".compoundliteral", align 1
+    %4 = const 0 : s32i
+    store %4, %0
+    store %2, %1, align 8
+    %5 = load %1 : rec_a_struct*, align 8
+    %6 = get_member %3[0] "a" : s16i*
+    %7 = const 1 : s16i
+    store %7, %6, align 1
+    %8 = get_member %3[1] "b" : s64i*
+    %9 = const 2 : s64i
+    store %9, %8, align 1
+    %10 = get_member %3[2] "c" : s16i*
+    %11 = const 3 : s16i
+    store %11, %10, align 1
+    %12 = get_member %3[3] "d" : s16i*
+    %13 = const 4 : s16i
+    store %13, %12, align 1
+    %14 = get_member %3[4] "e" : rec_b_struct*
+    %15 = const zero : rec_b_struct
+    store %15, %14, align 1
+    copy %5, %3
+    %16 = const 99 : s8i
+    %17 = load %1 : rec_a_struct*, align 8
+    %18 = get_member %17[4] "e" : rec_b_struct*
+    %19 = get_member %18[4] "b4" : s8i*
+    store %16, %19, align 1, volatile
+    scope {
+        %23 = load %1 : rec_a_struct*, align 8
+        %24 = get_member %23[0] "a" : s16i*
+        %25 = load %24 : s16i, align 1, volatile
+        %26 = cast(integral) %25 : s32i
+        %27 = const 1 : s32i
+        %28 = cmp ne %26, %27 : bool
+        %29 = ternary %28 ? { : bool
+            %61 = const #true : bool
+            yield %61
+        } : {
+            %56 = load %1 : rec_a_struct*, align 8
+            %57 = get_member %56[1] "b" : s64i*
+            %58 = load %57 : s64i, align 1, volatile
+            %59 = const 2 : s64i
+            %60 = cmp ne %58, %59 : bool
+            yield %60
+        }
+        %30 = ternary %29 ? { : bool
+            %55 = const #true : bool
+            yield %55
+        } : {
+            %49 = load %1 : rec_a_struct*, align 8
+            %50 = get_member %49[2] "c" : s16i*
+            %51 = load %50 : s16i, align 1, volatile
+            %52 = cast(integral) %51 : s32i
+            %53 = const 3 : s32i
+            %54 = cmp ne %52, %53 : bool
+            yield %54
+        }
+        %31 = ternary %30 ? { : bool
+            %48 = const #true : bool
+            yield %48
+        } : {
+            %42 = load %1 : rec_a_struct*, align 8
+            %43 = get_member %42[3] "d" : s16i*
+            %44 = load %43 : s16i, align 1, volatile
+            %45 = cast(integral) %44 : s32i
+            %46 = const 4 : s32i
+            %47 = cmp ne %45, %46 : bool
+            yield %47
+        }
+        %32 = ternary %31 ? { : bool
+            %41 = const #true : bool
+            yield %41
+        } : {
+            %34 = load %1 : rec_a_struct*, align 8
+            %35 = get_member %34[4] "e" : rec_b_struct*
+            %36 = get_member %35[4] "b4" : s8i*
+            %37 = load %36 : s8i, align 1, volatile
+            %38 = cast(integral) %37 : s32i
+            %39 = const 99 : s32i
+            %40 = cmp ne %38, %39 : bool
+            yield %40
+        }
+        if %32 {
+            %33 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %20 = get_global @exit : ((s32i) -> void)*
+    %21 = const 0 : s32i
+    call @exit(%21) [all]
+    %22 = load %0 : s32i
+    return %22
+}

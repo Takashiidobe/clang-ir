@@ -1,0 +1,140 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/msvc/core_types.c" (c, x86_64-unknown-linux-gnu)
+global last_signal : s32i = 0 [internal, default, align 4, dso_local]
+
+fn div(%arg0: s32i, %arg1: s32i) -> u64i [external, c, const, nothrow];
+fn classify_div(%arg6: s32i, %arg7: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg6: s32i, %arg7: s32i):
+        %59 = alloca u64i, "coerce", align 8
+        %60 = alloca s32i, "numerator", align 4
+        %61 = alloca s32i, "denominator", align 4
+        %62 = alloca s32i, "__retval", align 4
+        %63 = alloca rec_div_t, "result", align 4
+        store %arg6, %60
+        store %arg7, %61
+        %64 = load %60 : s32i, align 4
+        %65 = load %61 : s32i, align 4
+        %66 = call @div(%64, %65) : u64i [all]
+        store %66, %59
+        %67 = cast(bitcast) %59 : rec_div_t*
+        %68 = load %67 : rec_div_t
+        store %68, %63, align 4
+        %69 = get_member %63[0] "quot" : s32i*
+        %70 = load %69 : s32i, align 4
+        %71 = get_member %63[1] "rem" : s32i*
+        %72 = load %71 : s32i, align 4
+        %73 = add %70, %72 : s32i [nsw]
+        store %73, %62
+        %74 = load %62 : s32i
+        return %74
+}
+fn ldiv(%arg0: s64i, %arg1: s64i) -> rec_anon_struct [external, c, const, nothrow];
+fn classify_ldiv(%arg4: s64i, %arg5: s64i) -> s64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: s64i, %arg5: s64i):
+        %43 = alloca rec_anon_struct, "coerce", align 8
+        %44 = alloca s64i, "numerator", align 8
+        %45 = alloca s64i, "denominator", align 8
+        %46 = alloca s64i, "__retval", align 8
+        %47 = alloca rec_ldiv_t, "result", align 8
+        store %arg4, %44
+        store %arg5, %45
+        %48 = load %44 : s64i, align 8
+        %49 = load %45 : s64i, align 8
+        %50 = call @ldiv(%48, %49) : rec_anon_struct [all]
+        store %50, %43
+        %51 = cast(bitcast) %43 : rec_ldiv_t*
+        %52 = load %51 : rec_ldiv_t
+        store %52, %47, align 8
+        %53 = get_member %47[0] "quot" : s64i*
+        %54 = load %53 : s64i, align 8
+        %55 = get_member %47[1] "rem" : s64i*
+        %56 = load %55 : s64i, align 8
+        %57 = add %54, %56 : s64i [nsw]
+        store %57, %46
+        %58 = load %46 : s64i
+        return %58
+}
+fn lldiv(%arg0: s64i, %arg1: s64i) -> rec_anon_struct [external, c, const, nothrow];
+fn classify_lldiv(%arg2: s64i, %arg3: s64i) -> s64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s64i, %arg3: s64i):
+        %27 = alloca rec_anon_struct, "coerce", align 8
+        %28 = alloca s64i, "numerator", align 8
+        %29 = alloca s64i, "denominator", align 8
+        %30 = alloca s64i, "__retval", align 8
+        %31 = alloca rec_lldiv_t, "result", align 8
+        store %arg2, %28
+        store %arg3, %29
+        %32 = load %28 : s64i, align 8
+        %33 = load %29 : s64i, align 8
+        %34 = call @lldiv(%32, %33) : rec_anon_struct [all]
+        store %34, %27
+        %35 = cast(bitcast) %27 : rec_lldiv_t*
+        %36 = load %35 : rec_lldiv_t
+        store %36, %31, align 8
+        %37 = get_member %31[0] "quot" : s64i*
+        %38 = load %37 : s64i, align 8
+        %39 = get_member %31[1] "rem" : s64i*
+        %40 = load %39 : s64i, align 8
+        %41 = add %38, %40 : s64i [nsw]
+        store %41, %30
+        %42 = load %30 : s64i
+        return %42
+}
+fn __errno_location() -> s32i* [external, c, const, nothrow];
+fn last_error_is_invalid() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %20 = alloca s32i, "__retval", align 4
+    %21 = call @__errno_location() : s32i* [const]
+    %22 = load %21 : s32i, align 4
+    %23 = const 22 : s32i
+    %24 = cmp eq %22, %23 : bool
+    %25 = cast(bool_to_int) %24 : s32i
+    store %25, %20
+    %26 = load %20 : s32i
+    return %26
+}
+fn localtime(%arg0: s64i*) -> rec_tm* [external, c, nothrow];
+fn year_from_time(%arg1: s64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s64i):
+        %10 = alloca s64i, "when", align 8
+        %11 = alloca s32i, "__retval", align 4
+        %12 = alloca rec_tm*, "parts", align 8
+        store %arg1, %10
+        %13 = call @localtime(%10) : rec_tm* [all]
+        store %13, %12, align 8
+        %14 = load %12 : rec_tm*, align 8
+        %15 = get_member %14[5] "tm_year" : s32i*
+        %16 = load %15 : s32i, align 4
+        %17 = const 1900 : s32i
+        %18 = add %16, %17 : s32i [nsw]
+        store %18, %11
+        %19 = load %11 : s32i
+        return %19
+}
+fn record_signal(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %7 = alloca s32i, "sig", align 4
+        store %arg0, %7
+        %8 = load %7 : s32i, align 4
+        %9 = get_global @last_signal : s32i*
+        store %8, %9, align 4, volatile
+        return
+}
+fn signal(%arg0: s32i, %arg1: ((s32i) -> void)*) -> ((s32i) -> void)* [external, c, nothrow];
+fn install_handler() -> void [external, c, no_inline, dso_local, nothrow] {
+    %4 = const 6 : s32i
+    %5 = get_global @record_signal : ((s32i) -> void)*
+    %6 = call @signal(%4, %5) : ((s32i) -> void)* [all]
+    return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

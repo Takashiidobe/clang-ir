@@ -1,0 +1,100 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/stdio_file_write.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.buf : s8i[16] = zero [cir_private, default, dso_local, constant]
+global .str : s8i[27] = "slate_stdio_file_write.tmp" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[2] = "w" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[10] = "open-fail" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[7] = "owned\n" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[2] = "r" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[12] = "reopen-fail" [cir_private, default, align 1, dso_local, constant]
+global stdout : rec__IO_FILE* [external, default, align 8, dso_local]
+
+fn remove(%arg0: s8i*) -> s32i [external, c, nothrow];
+fn fopen(%arg0: s8i*, %arg1: s8i*) -> rec__IO_FILE* [external, c];
+fn puts(%arg0: s8i*) -> s32i [external, c];
+fn fputs(%arg0: s8i*, %arg1: rec__IO_FILE*) -> s32i [external, c];
+fn fclose(%arg0: rec__IO_FILE*) -> s32i [external, c];
+fn fgets(%arg0: s8i*, %arg1: s32i, %arg2: rec__IO_FILE*) -> s8i* [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec__IO_FILE*, "f", align 8
+    %2 = alloca rec__IO_FILE*, "g", align 8
+    %3 = alloca s8i[16], "buf", align 16
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = get_global @.str : s8i[27]*
+    %6 = cast(array_to_ptrdecay) %5 : s8i*
+    %7 = call @remove(%6) : s32i [all]
+    %8 = get_global @fopen : ((s8i*, s8i*) -> rec__IO_FILE*)*
+    %9 = get_global @.str : s8i[27]*
+    %10 = cast(array_to_ptrdecay) %9 : s8i*
+    %11 = get_global @.str.1 : s8i[2]*
+    %12 = cast(array_to_ptrdecay) %11 : s8i*
+    %13 = call @fopen(%10, %12) : rec__IO_FILE* [all]
+    store %13, %1, align 8
+    scope {
+        %50 = load %1 : rec__IO_FILE*, align 8
+        %51 = cast(ptr_to_bool) %50 : bool
+        %52 = not %51 : bool
+        if %52 {
+            %53 = get_global @.str.2 : s8i[10]*
+            %54 = cast(array_to_ptrdecay) %53 : s8i*
+            %55 = call @puts(%54) : s32i [all]
+            %56 = const 0 : s32i
+            store %56, %0
+            %57 = load %0 : s32i
+            return %57
+        }
+        yield
+    }
+    %14 = get_global @.str.3 : s8i[7]*
+    %15 = cast(array_to_ptrdecay) %14 : s8i*
+    %16 = load %1 : rec__IO_FILE*, align 8
+    %17 = call @fputs(%15, %16) : s32i [all]
+    %18 = load %1 : rec__IO_FILE*, align 8
+    %19 = call @fclose(%18) : s32i [all]
+    %20 = get_global @fopen : ((s8i*, s8i*) -> rec__IO_FILE*)*
+    %21 = get_global @.str : s8i[27]*
+    %22 = cast(array_to_ptrdecay) %21 : s8i*
+    %23 = get_global @.str.4 : s8i[2]*
+    %24 = cast(array_to_ptrdecay) %23 : s8i*
+    %25 = call @fopen(%22, %24) : rec__IO_FILE* [all]
+    store %25, %2, align 8
+    scope {
+        %42 = load %2 : rec__IO_FILE*, align 8
+        %43 = cast(ptr_to_bool) %42 : bool
+        %44 = not %43 : bool
+        if %44 {
+            %45 = get_global @.str.5 : s8i[12]*
+            %46 = cast(array_to_ptrdecay) %45 : s8i*
+            %47 = call @puts(%46) : s32i [all]
+            %48 = const 0 : s32i
+            store %48, %0
+            %49 = load %0 : s32i
+            return %49
+        }
+        yield
+    }
+    %26 = get_global @__const.main.buf : s8i[16]*
+    copy %3, %26
+    %27 = cast(array_to_ptrdecay) %3 : s8i*
+    %28 = const 16 : s32i
+    %29 = load %2 : rec__IO_FILE*, align 8
+    %30 = call @fgets(%27, %28, %29) : s8i* [all]
+    %31 = load %2 : rec__IO_FILE*, align 8
+    %32 = call @fclose(%31) : s32i [all]
+    %33 = cast(array_to_ptrdecay) %3 : s8i*
+    %34 = get_global @stdout : rec__IO_FILE**
+    %35 = load %34 : rec__IO_FILE*, align 8
+    %36 = call @fputs(%33, %35) : s32i [all]
+    %37 = get_global @.str : s8i[27]*
+    %38 = cast(array_to_ptrdecay) %37 : s8i*
+    %39 = call @remove(%38) : s32i [all]
+    %40 = const 0 : s32i
+    store %40, %0
+    %41 = load %0 : s32i
+    return %41
+}

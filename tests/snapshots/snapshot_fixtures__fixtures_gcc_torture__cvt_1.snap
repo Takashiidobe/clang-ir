@@ -1,0 +1,97 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/cvt-1.c" (c, x86_64-unknown-linux-gnu)
+fn g2(%arg2: double) -> s64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: double):
+        %41 = alloca double, "f", align 8
+        %42 = alloca s64i, "__retval", align 8
+        store %arg2, %41
+        %43 = load %41 : double, align 8
+        %44 = cast(float_to_int) %43 : s64i
+        store %44, %42
+        %45 = load %42 : s64i
+        return %45
+}
+fn g1(%arg1: double) -> s64i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: double):
+        %34 = alloca double, "x", align 8
+        %35 = alloca s64i, "__retval", align 8
+        store %arg1, %34
+        %36 = load %34 : double, align 8
+        %37 = cast(float_to_int) %36 : s64i
+        %38 = cast(int_to_float) %37 : double
+        %39 = cast(float_to_int) %38 : s64i
+        store %39, %35
+        %40 = load %35 : s64i
+        return %40
+}
+fn abort() -> void [external, c, nothrow];
+fn f(%arg0: s64i) -> double [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s64i):
+        %19 = alloca s64i, "i", align 8
+        %20 = alloca double, "__retval", align 8
+        store %arg0, %19
+        scope {
+            %26 = load %19 : s64i, align 8
+            %27 = cast(int_to_float) %26 : double
+            %28 = call @g1(%27) : s64i [all]
+            %29 = load %19 : s64i, align 8
+            %30 = cast(int_to_float) %29 : double
+            %31 = call @g2(%30) : s64i [all]
+            %32 = cmp ne %28, %31 : bool
+            if %32 {
+                %33 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        %21 = load %19 : s64i, align 8
+        %22 = cast(int_to_float) %21 : double
+        %23 = call @g2(%22) : s64i [all]
+        %24 = cast(int_to_float) %23 : double
+        store %24, %20
+        %25 = load %20 : double
+        return %25
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %13 = const 123456789 : s64i
+        %14 = call @f(%13) : double [all]
+        %15 = const 123456789 : s64i
+        %16 = cast(int_to_float) %15 : double
+        %17 = cmp ne %14, %16 : bool
+        if %17 {
+            %18 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %5 = const 123456789 : s64i
+        %6 = call @f(%5) : double [all]
+        %7 = const 123456789 : s64i
+        %8 = cast(int_to_float) %7 : double
+        %9 = call @g2(%8) : s64i [all]
+        %10 = cast(int_to_float) %9 : double
+        %11 = cmp ne %6, %10 : bool
+        if %11 {
+            %12 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

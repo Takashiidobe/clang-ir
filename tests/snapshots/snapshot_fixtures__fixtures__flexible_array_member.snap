@@ -1,0 +1,132 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/flexible_array_member.c" (c, x86_64-unknown-linux-gnu)
+fn malloc(%arg0: u64i) -> void* [external, c, nothrow];
+fn free(%arg0: void*) -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_FlexibleArray*, "flexible", align 8
+    %2 = alloca s32i, "total", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    scope {
+        %65 = const 8 : u64i
+        %66 = const 8 : u64i
+        %67 = cmp ne %65, %66 : bool
+        if %67 {
+            %68 = const 1 : s32i
+            store %68, %0
+            %69 = load %0 : s32i
+            return %69
+        }
+        yield
+    }
+    %4 = get_global @malloc : ((u64i) -> void*)*
+    %5 = const 8 : u64i
+    %6 = const 3 : u64i
+    %7 = const 4 : u64i
+    %8 = mul %6, %7 : u64i
+    %9 = add %5, %8 : u64i
+    %10 = call @malloc(%9) : void* [all]
+    %11 = cast(bitcast) %10 : rec_FlexibleArray*
+    store %11, %1, align 8
+    scope {
+        %59 = load %1 : rec_FlexibleArray*, align 8
+        %60 = const #cir.ptr<null> : void*
+        %61 = cast(bitcast) %60 : rec_FlexibleArray*
+        %62 = cmp eq %59, %61 : bool
+        if %62 {
+            %63 = const 2 : s32i
+            store %63, %0
+            %64 = load %0 : s32i
+            return %64
+        }
+        yield
+    }
+    %12 = const 3 : u64i
+    %13 = load %1 : rec_FlexibleArray*, align 8
+    %14 = get_member %13[0] "count" : u64i*
+    store %12, %14, align 8
+    scope {
+        %42 = alloca u64i, "index", align 8
+        %43 = const 0 : u64i
+        store %43, %42, align 8
+        for cond: {
+            %54 = load %42 : u64i, align 8
+            %55 = load %1 : rec_FlexibleArray*, align 8
+            %56 = get_member %55[0] "count" : u64i*
+            %57 = load %56 : u64i, align 8
+            %58 = cmp lt %54, %57 : bool
+            condition %58
+        } step: {
+            %44 = load %42 : u64i, align 8
+            %45 = inc %44 : u64i
+            store %45, %42, align 8
+            yield
+        } do {
+            scope {
+                %46 = load %42 : u64i, align 8
+                %47 = cast(integral) %46 : s32i
+                %48 = const 1 : s32i
+                %49 = add %47, %48 : s32i [nsw]
+                %50 = load %42 : u64i, align 8
+                %51 = load %1 : rec_FlexibleArray*, align 8
+                %52 = get_member %51[1] "values" : s32i[0]*
+                %53 = get_element %52[%50] : s32i*
+                store %49, %53, align 4
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %15 = const 0 : s32i
+    store %15, %2, align 4
+    scope {
+        %26 = alloca u64i, "index", align 8
+        %27 = const 0 : u64i
+        store %27, %26, align 8
+        for cond: {
+            %37 = load %26 : u64i, align 8
+            %38 = load %1 : rec_FlexibleArray*, align 8
+            %39 = get_member %38[0] "count" : u64i*
+            %40 = load %39 : u64i, align 8
+            %41 = cmp lt %37, %40 : bool
+            condition %41
+        } step: {
+            %28 = load %26 : u64i, align 8
+            %29 = inc %28 : u64i
+            store %29, %26, align 8
+            yield
+        } do {
+            scope {
+                %30 = load %26 : u64i, align 8
+                %31 = load %1 : rec_FlexibleArray*, align 8
+                %32 = get_member %31[1] "values" : s32i[0]*
+                %33 = get_element %32[%30] : s32i*
+                %34 = load %33 : s32i, align 4
+                %35 = load %2 : s32i, align 4
+                %36 = add %35, %34 : s32i [nsw]
+                store %36, %2, align 4
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %16 = get_global @free : ((void*) -> void)*
+    %17 = load %1 : rec_FlexibleArray*, align 8
+    %18 = cast(bitcast) %17 : void*
+    call @free(%18) [all]
+    %19 = load %2 : s32i, align 4
+    %20 = const 6 : s32i
+    %21 = cmp eq %19, %20 : bool
+    %22 = const 0 : s32i
+    %23 = const 3 : s32i
+    %24 = select %21, %22, %23 : s32i
+    store %24, %0
+    %25 = load %0 : s32i
+    return %25
+}

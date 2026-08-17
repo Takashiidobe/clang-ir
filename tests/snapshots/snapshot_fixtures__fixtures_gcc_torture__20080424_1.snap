@@ -1,0 +1,108 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20080424-1.c" (c, x86_64-unknown-linux-gnu)
+global g : s32i[3][3][48] = zero [external, default, align 16, dso_local]
+global bar.i : s32i = 0 [internal, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn bar(%arg1: s32i[3]*, %arg2: s32i[3]*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i[3]*, %arg2: s32i[3]*):
+        %30 = alloca s32i[3]*, "x", align 8
+        %31 = alloca s32i[3]*, "y", align 8
+        store %arg1, %30
+        store %arg2, %31
+        %32 = get_global @bar.i : s32i*
+        scope {
+            %33 = load %30 : s32i[3]*, align 8
+            %34 = load %32 : s32i, align 4
+            %35 = const 8 : s32i
+            %36 = add %34, %35 : s32i [nsw]
+            %37 = cast(integral) %36 : s64i
+            %38 = get_global @g : s32i[3][3][48]*
+            %39 = get_element %38[%37] : s32i[3][3]*
+            %40 = cast(array_to_ptrdecay) %39 : s32i[3]*
+            %41 = cmp ne %33, %40 : bool
+            %42 = ternary %41 ? { : bool
+                %52 = const #true : bool
+                yield %52
+            } : {
+                %44 = load %31 : s32i[3]*, align 8
+                %45 = load %32 : s32i, align 4
+                %46 = inc %45 : s32i [nsw]
+                store %46, %32, align 4
+                %47 = cast(integral) %45 : s64i
+                %48 = get_global @g : s32i[3][3][48]*
+                %49 = get_element %48[%47] : s32i[3][3]*
+                %50 = cast(array_to_ptrdecay) %49 : s32i[3]*
+                %51 = cmp ne %44, %50 : bool
+                yield %51
+            }
+            if %42 {
+                %43 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn foo(%arg0: s32i[3][3]*) -> void [internal, c, always_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i[3][3]*):
+        %6 = alloca s32i[3][3]*, "x", align 8
+        %7 = alloca s32i, "i", align 4
+        store %arg0, %6
+        scope {
+            %8 = const 0 : s32i
+            store %8, %7, align 4
+            for cond: {
+                %27 = load %7 : s32i, align 4
+                %28 = const 8 : s32i
+                %29 = cmp lt %27, %28 : bool
+                condition %29
+            } step: {
+                %9 = load %7 : s32i, align 4
+                %10 = inc %9 : s32i [nsw]
+                store %10, %7, align 4
+                yield
+            } do {
+                scope {
+                    %11 = alloca s32i, "k", align 4
+                    %12 = load %7 : s32i, align 4
+                    %13 = const 8 : s32i
+                    %14 = add %12, %13 : s32i [nsw]
+                    store %14, %11, align 4
+                    %15 = load %11 : s32i, align 4
+                    %16 = cast(integral) %15 : s64i
+                    %17 = load %6 : s32i[3][3]*, align 8
+                    %18 = ptr_stride %17, %16 : s32i[3][3]*
+                    %19 = cast(array_to_ptrdecay) %18 : s32i[3]*
+                    %20 = load %11 : s32i, align 4
+                    %21 = const 8 : s32i
+                    %22 = sub %20, %21 : s32i [nsw]
+                    %23 = cast(integral) %22 : s64i
+                    %24 = load %6 : s32i[3][3]*, align 8
+                    %25 = ptr_stride %24, %23 : s32i[3][3]*
+                    %26 = cast(array_to_ptrdecay) %25 : s32i[3]*
+                    call @bar(%19, %26) [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @g : s32i[3][3][48]*
+    %3 = cast(array_to_ptrdecay) %2 : s32i[3][3]*
+    call @foo(%3) [all]
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

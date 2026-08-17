@@ -1,0 +1,61 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00218.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[33] = "unsigned enum bit-fields broken\n" [cir_private, default, align 1, dso_local, constant]
+
+fn blah() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %24 = alloca s32i, "__retval", align 4
+    %25 = const 0 : s32i
+    store %25, %24
+    %26 = load %24 : s32i
+    return %26
+}
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn convert_like_real(%arg0: rec_tree_node*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_tree_node*):
+        %10 = alloca rec_tree_node*, "convs", align 8
+        %11 = alloca s32i, "__retval", align 4
+        store %arg0, %10
+        scope {
+            %17 = load %10 : rec_tree_node*, align 8
+            %18 = get_member %17[0] "common" : rec_tree_common*
+            %19 = get_member %18[2] "code" : u16i*
+            <unmodeled: cir.get_bitfield>
+            switch %20 {
+                case equal 152 {
+                    %21 = get_global @blah : (() -> s32i)*
+                    %22 = call @blah() : s32i [all]
+                    store %22, %11
+                    %23 = load %11 : s32i
+                    return %23
+                }
+                case default {
+                    break
+                }
+            }
+            yield
+        }
+        %12 = get_global @printf : ((s8i*, ...) -> s32i)*
+        %13 = get_global @.str : s8i[33]*
+        %14 = cast(array_to_ptrdecay) %13 : s8i*
+        %15 = call @printf(%14) : s32i [all]
+        %16 = load %11 : s32i
+        return %16
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_tree_node, "convs", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 152 : u32i
+    %4 = get_member %1[0] "common" : rec_tree_common*
+    %5 = get_member %4[2] "code" : u16i*
+    <unmodeled: cir.set_bitfield>
+    %7 = call @convert_like_real(%1) : s32i [all]
+    %8 = const 0 : s32i
+    store %8, %0
+    %9 = load %0 : s32i
+    return %9
+}

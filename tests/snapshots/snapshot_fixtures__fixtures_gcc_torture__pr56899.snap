@@ -1,0 +1,115 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr56899.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn f1(%arg3: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: s32i):
+        %38 = alloca s32i, "v", align 4
+        %39 = alloca s32i, "x", align 4
+        store %arg3, %38
+        %40 = const -214748365 : s32i
+        %41 = load %38 : s32i, align 4
+        %42 = const 1 : s32i
+        %43 = sub %41, %42 : s32i [nsw]
+        %44 = mul %40, %43 : s32i [nsw]
+        store %44, %39, align 4
+        scope {
+            %45 = load %39 : s32i, align 4
+            %46 = const -1932735285 : s32i
+            %47 = cmp ne %45, %46 : bool
+            if %47 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn f2(%arg2: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i):
+        %28 = alloca s32i, "v", align 4
+        %29 = alloca s32i, "x", align 4
+        store %arg2, %28
+        %30 = const 214748365 : s32i
+        %31 = load %28 : s32i, align 4
+        %32 = const 1 : s32i
+        %33 = add %31, %32 : s32i [nsw]
+        %34 = mul %30, %33 : s32i [nsw]
+        store %34, %29, align 4
+        scope {
+            %35 = load %29 : s32i, align 4
+            %36 = const -1932735285 : s32i
+            %37 = cmp ne %35, %36 : bool
+            if %37 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn f3(%arg1: u32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: u32i):
+        %18 = alloca u32i, "v", align 4
+        %19 = alloca u32i, "x", align 4
+        store %arg1, %18
+        %20 = const 4080218931 : u32i
+        %21 = load %18 : u32i, align 4
+        %22 = const 1 : u32i
+        %23 = sub %21, %22 : u32i
+        %24 = mul %20, %23 : u32i
+        store %24, %19, align 4
+        scope {
+            %25 = load %19 : u32i, align 4
+            %26 = const 2362232011 : u32i
+            %27 = cmp ne %25, %26 : bool
+            if %27 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn f4(%arg0: u32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i):
+        %8 = alloca u32i, "v", align 4
+        %9 = alloca u32i, "x", align 4
+        store %arg0, %8
+        %10 = const 214748365 : u32i
+        %11 = load %8 : u32i, align 4
+        %12 = const 1 : u32i
+        %13 = add %11, %12 : u32i
+        %14 = mul %10, %13 : u32i
+        store %14, %9, align 4
+        scope {
+            %15 = load %9 : u32i, align 4
+            %16 = const 2362232011 : u32i
+            %17 = cmp ne %15, %16 : bool
+            if %17 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 10 : s32i
+    call @f1(%2) [all]
+    %3 = const -10 : s32i
+    call @f2(%3) [all]
+    %4 = const 10 : u32i
+    call @f3(%4) [all]
+    %5 = const 4294967286 : u32i
+    call @f4(%5) [all]
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = load %0 : s32i
+    return %7
+}

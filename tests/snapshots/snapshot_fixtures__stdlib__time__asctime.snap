@@ -1,0 +1,31 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/time/asctime.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[3] = "%s" [cir_private, default, align 1, dso_local, constant]
+
+fn gmtime(%arg0: s64i*) -> rec_tm* [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn asctime(%arg0: rec_tm*) -> s8i* [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s64i, "t", align 8
+    %2 = alloca rec_tm*, "g", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 1000000000 : s64i
+    store %4, %1, align 8
+    %5 = call @gmtime(%1) : rec_tm* [all]
+    store %5, %2, align 8
+    %6 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %7 = get_global @.str : s8i[3]*
+    %8 = cast(array_to_ptrdecay) %7 : s8i*
+    %9 = load %2 : rec_tm*, align 8
+    %10 = call @asctime(%9) : s8i* [all]
+    %11 = call @printf(%8, %10) : s32i [all]
+    %12 = const 0 : s32i
+    store %12, %0
+    %13 = load %0 : s32i
+    return %13
+}

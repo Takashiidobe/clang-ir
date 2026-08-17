@@ -1,0 +1,40 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20080408-1.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s16i, "ssi", align 2
+    %2 = alloca u16i, "usi", align 2
+    %3 = alloca s32i, "fail", align 4
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 126 : s16i
+    store %5, %1, align 2
+    %6 = const 65280 : u16i
+    store %6, %2, align 2
+    %7 = load %1 : s16i, align 2
+    %8 = cast(integral) %7 : s32i
+    %9 = load %2 : u16i, align 2
+    %10 = cast(integral) %9 : s32i
+    %11 = cmp lt %8, %10 : bool
+    %12 = not %11 : bool
+    %13 = cast(bool_to_int) %12 : s32i
+    store %13, %3, align 4
+    scope {
+        %16 = load %3 : s32i, align 4
+        %17 = cast(int_to_bool) %16 : bool
+        if %17 {
+            %18 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %14 = const 0 : s32i
+    store %14, %0
+    %15 = load %0 : s32i
+    return %15
+}

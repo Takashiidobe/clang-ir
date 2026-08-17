@@ -1,0 +1,108 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr58726.c" (c, x86_64-unknown-linux-gnu)
+global a : s32i = 0 [external, default, align 4, dso_local]
+global b : rec_anon2E0 = zero [external, default, align 4, dso_local]
+global c : s32i = 0 [external, default, align 4, dso_local]
+
+fn foo(%arg0: s16i) -> s16i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s16i):
+        %44 = alloca s16i, "p", align 2
+        %45 = alloca s16i, "__retval", align 2
+        store %arg0, %44
+        %46 = load %44 : s16i, align 2
+        %47 = cast(integral) %46 : s32i
+        %48 = const 0 : s32i
+        %49 = cmp lt %47, %48 : bool
+        %50 = ternary %49 ? { : s32i
+            %55 = load %44 : s16i, align 2
+            %56 = cast(integral) %55 : s32i
+            yield %56
+        } : {
+            %53 = get_global @a : s32i*
+            %54 = load %53 : s32i, align 4
+            yield %54
+        }
+        %51 = cast(integral) %50 : s16i
+        store %51, %45
+        %52 = load %45 : s16i
+        return %52
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u16i, "d", align 2
+    %2 = alloca s32i, "e", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    scope {
+        %30 = const 2 : u64i
+        %31 = const 8 : u64i
+        %32 = mul %30, %31 : u64i
+        %33 = const 16 : u64i
+        %34 = cmp ne %32, %33 : bool
+        %35 = ternary %34 ? { : bool
+            %43 = const #true : bool
+            yield %43
+        } : {
+            %38 = const 4 : u64i
+            %39 = const 8 : u64i
+            %40 = mul %38, %39 : u64i
+            %41 = const 32 : u64i
+            %42 = cmp ne %40, %41 : bool
+            yield %42
+        }
+        if %35 {
+            %36 = const 0 : s32i
+            store %36, %0
+            %37 = load %0 : s32i
+            return %37
+        }
+        yield
+    }
+    %4 = const 56374 : s32i
+    %5 = get_global @b : rec_anon2E0*
+    %6 = get_member %5[0] "f1" : s32i*
+    store %4, %6, align 4
+    %7 = get_global @b : rec_anon2E0*
+    %8 = get_member %7[1] "f2" : u8i*
+    <unmodeled: cir.get_bitfield>
+    store %9, %2, align 4
+    %10 = load %2 : s32i, align 4
+    %11 = const 0 : s32i
+    %12 = cmp eq %10, %11 : bool
+    %13 = ternary %12 ? { : s32i
+        %27 = get_global @b : rec_anon2E0*
+        %28 = get_member %27[0] "f1" : s32i*
+        %29 = load %28 : s32i, align 4
+        yield %29
+    } : {
+        %26 = const 0 : s32i
+        yield %26
+    }
+    %14 = cast(integral) %13 : u16i
+    store %14, %1, align 2
+    %15 = load %1 : u16i, align 2
+    %16 = cast(integral) %15 : s16i
+    %17 = call @foo(%16) : s16i [all]
+    %18 = cast(integral) %17 : s32i
+    %19 = get_global @c : s32i*
+    store %18, %19, align 4
+    scope {
+        %22 = get_global @c : s32i*
+        %23 = load %22 : s32i, align 4
+        %24 = const -9162 : s32i
+        %25 = cmp ne %23, %24 : bool
+        if %25 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %20 = const 0 : s32i
+    store %20, %0
+    %21 = load %0 : s32i
+    return %21
+}

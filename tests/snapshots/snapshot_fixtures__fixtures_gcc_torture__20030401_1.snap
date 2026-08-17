@@ -1,0 +1,68 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20030401-1.c" (c, x86_64-unknown-linux-gnu)
+fn bar() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %25 = alloca s32i, "__retval", align 4
+    %26 = const 1 : s32i
+    store %26, %25
+    %27 = load %25 : s32i
+    return %27
+}
+fn abort() -> void [external, c, nothrow];
+fn foo(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %5 = alloca s32i, "x", align 4
+        %6 = alloca u8i, "error", align 1
+        store %arg0, %5
+        %7 = const 0 : u8i
+        store %7, %6, align 1
+        scope {
+            %12 = load %5 : s32i, align 4
+            %13 = const 0 : s32i
+            %14 = cmp eq %12, %13 : bool
+            %15 = ternary %14 ? { : bool
+                %24 = const #true : bool
+                yield %24
+            } : {
+                %21 = get_global @bar : (() -> s32i)*
+                %22 = call @bar() : s32i [all]
+                %23 = cast(int_to_bool) %22 : bool
+                yield %23
+            }
+            %16 = cast(bool_to_int) %15 : s32i
+            %17 = cast(integral) %16 : u8i
+            store %17, %6, align 1
+            %18 = not %15 : bool
+            if %18 {
+                %19 = get_global @bar : (() -> s32i)*
+                %20 = call @bar() : s32i [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %8 = load %6 : u8i, align 1
+            %9 = cast(int_to_bool) %8 : bool
+            %10 = not %9 : bool
+            if %10 {
+                %11 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 1 : s32i
+    call @foo(%2) [all]
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

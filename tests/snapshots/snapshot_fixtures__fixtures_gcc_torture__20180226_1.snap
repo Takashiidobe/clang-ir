@@ -1,0 +1,106 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20180226-1.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.i : rec_mp_int = {2, 0, -1, #cir.ptr<null>} [cir_private, default, dso_local, constant]
+
+fn mytest(%arg0: rec_mp_int*, %arg1: u64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_mp_int*, %arg1: u64i):
+        %11 = alloca rec_mp_int*, "a", align 8
+        %12 = alloca u64i, "b", align 8
+        %13 = alloca s32i, "__retval", align 4
+        store %arg0, %11
+        store %arg1, %12
+        scope {
+            %43 = load %11 : rec_mp_int*, align 8
+            %44 = get_member %43[2] "sign" : s32i*
+            %45 = load %44 : s32i, align 8
+            %46 = const 1 : s32i
+            %47 = cmp eq %45, %46 : bool
+            if %47 {
+                %48 = const -1 : s32i
+                store %48, %13
+                %49 = load %13 : s32i
+                return %49
+            }
+            yield
+        }
+        scope {
+            %36 = load %11 : rec_mp_int*, align 8
+            %37 = get_member %36[0] "used" : s32i*
+            %38 = load %37 : s32i, align 8
+            %39 = const 1 : s32i
+            %40 = cmp gt %38, %39 : bool
+            if %40 {
+                %41 = const 1 : s32i
+                store %41, %13
+                %42 = load %13 : s32i
+                return %42
+            }
+            yield
+        }
+        scope {
+            %26 = const 0 : s64i
+            %27 = load %11 : rec_mp_int*, align 8
+            %28 = get_member %27[3] "dp" : u64i**
+            %29 = load %28 : u64i*, align 8
+            %30 = ptr_stride %29, %26 : u64i*
+            %31 = load %30 : u64i, align 8
+            %32 = load %12 : u64i, align 8
+            %33 = cmp gt %31, %32 : bool
+            if %33 {
+                %34 = const 1 : s32i
+                store %34, %13
+                %35 = load %13 : s32i
+                return %35
+            }
+            yield
+        }
+        scope {
+            %16 = const 0 : s64i
+            %17 = load %11 : rec_mp_int*, align 8
+            %18 = get_member %17[3] "dp" : u64i**
+            %19 = load %18 : u64i*, align 8
+            %20 = ptr_stride %19, %16 : u64i*
+            %21 = load %20 : u64i, align 8
+            %22 = load %12 : u64i, align 8
+            %23 = cmp lt %21, %22 : bool
+            if %23 {
+                %24 = const -1 : s32i
+                store %24, %13
+                %25 = load %13 : s32i
+                return %25
+            }
+            yield
+        }
+        %14 = const 0 : s32i
+        store %14, %13
+        %15 = load %13 : s32i
+        return %15
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_mp_int, "i", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @__const.main.i : rec_mp_int*
+    copy %1, %3
+    scope {
+        %6 = const 0 : u64i
+        %7 = call @mytest(%1, %6) : s32i [all]
+        %8 = const 1 : s32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            %10 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

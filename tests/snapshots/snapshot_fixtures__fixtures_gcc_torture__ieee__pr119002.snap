@@ -1,0 +1,68 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/ieee__pr119002.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: void*, %arg1: float, %arg2: float) -> u32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: void*, %arg1: float, %arg2: float):
+        %8 = alloca void*, "x", align 8
+        %9 = alloca float, "y", align 4
+        %10 = alloca float, "z", align 4
+        %11 = alloca u32i, "__retval", align 4
+        %12 = alloca u32i, "a", align 4
+        %13 = alloca u32i, "b", align 4
+        %14 = alloca float, "c", align 4
+        %15 = alloca float, "d", align 4
+        %16 = alloca float, "e", align 4
+        store %arg0, %8
+        store %arg1, %9
+        store %arg2, %10
+        %17 = load %9 : float, align 4
+        store %17, %14, align 4
+        %18 = load %10 : float, align 4
+        store %18, %15, align 4
+        %19 = load %14 : float, align 4
+        %20 = load %15 : float, align 4
+        %21 = cmp lt %19, %20 : bool
+        %22 = cast(bool_to_int) %21 : s32i
+        %23 = cast(integral) %22 : u32i
+        store %23, %12, align 4
+        %24 = load %9 : float, align 4
+        store %24, %15, align 4
+        %25 = load %10 : float, align 4
+        store %25, %16, align 4
+        %26 = load %15 : float, align 4
+        %27 = load %16 : float, align 4
+        %28 = cmp ge %26, %27 : bool
+        %29 = cast(bool_to_int) %28 : s32i
+        %30 = cast(integral) %29 : u32i
+        store %30, %13, align 4
+        %31 = load %13 : u32i, align 4
+        %32 = load %12 : u32i, align 4
+        %33 = or %32, %31 : u32i
+        store %33, %12, align 4
+        %34 = load %12 : u32i, align 4
+        store %34, %11
+        %35 = load %11 : u32i
+        return %35
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %3 = const #cir.ptr<null> : void*
+        %4 = const 0.000000e+00 : float
+        %5 = const 0x7FC00000 : float
+        %6 = call @foo(%3, %4, %5) : u32i [all]
+        %7 = cast(int_to_bool) %6 : bool
+        if %7 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = load %0 : s32i
+    return %2
+}

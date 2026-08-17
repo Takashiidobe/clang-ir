@@ -1,0 +1,35 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/stdlib/div.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn div(%arg0: s32i, %arg1: s32i) -> u64i [external, c, const, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca u64i, "coerce", align 8
+    %1 = alloca s32i, "__retval", align 4
+    %2 = alloca rec_div_t, "d", align 4
+    %3 = const 0 : s32i
+    store %3, %1
+    %4 = const 17 : s32i
+    %5 = const 5 : s32i
+    %6 = call @div(%4, %5) : u64i [all]
+    store %6, %0
+    %7 = cast(bitcast) %0 : rec_div_t*
+    %8 = load %7 : rec_div_t
+    store %8, %2, align 4
+    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %10 = get_global @.str : s8i[7]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = get_member %2[0] "quot" : s32i*
+    %13 = load %12 : s32i, align 4
+    %14 = get_member %2[1] "rem" : s32i*
+    %15 = load %14 : s32i, align 4
+    %16 = call @printf(%11, %13, %15) : s32i [all]
+    %17 = const 0 : s32i
+    store %17, %1
+    %18 = load %1 : s32i
+    return %18
+}

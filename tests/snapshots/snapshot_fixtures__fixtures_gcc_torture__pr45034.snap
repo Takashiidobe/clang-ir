@@ -1,0 +1,211 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr45034.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn foo(%arg3: s32i, %arg4: s32i, %arg5: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: s32i, %arg4: s32i, %arg5: s32i):
+        %94 = alloca s32i, "x", align 4
+        %95 = alloca s32i, "y", align 4
+        %96 = alloca s32i, "v", align 4
+        store %arg3, %94
+        store %arg4, %95
+        store %arg5, %96
+        scope {
+            %97 = load %95 : s32i, align 4
+            %98 = const -128 : s32i
+            %99 = cmp lt %97, %98 : bool
+            %100 = ternary %99 ? { : bool
+                %105 = const #true : bool
+                yield %105
+            } : {
+                %102 = load %95 : s32i, align 4
+                %103 = const 127 : s32i
+                %104 = cmp gt %102, %103 : bool
+                yield %104
+            }
+            if %100 {
+                %101 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn fixnum_neg(%arg0: s8i, %arg1: s8i*, %arg2: s32i*) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i, %arg1: s8i*, %arg2: s32i*):
+        %56 = alloca s8i, "x", align 1
+        %57 = alloca s8i*, "py", align 8
+        %58 = alloca s32i*, "pv", align 8
+        %59 = alloca u8i, "ux", align 1
+        %60 = alloca u8i, "uy", align 1
+        store %arg0, %56
+        store %arg1, %57
+        store %arg2, %58
+        %61 = load %56 : s8i, align 1
+        %62 = cast(integral) %61 : u8i
+        store %62, %59, align 1
+        %63 = load %59 : u8i, align 1
+        %64 = cast(integral) %63 : s32i
+        %65 = minus %64 : s32i [nsw]
+        %66 = cast(integral) %65 : u8i
+        store %66, %60, align 1
+        %67 = load %60 : u8i, align 1
+        %68 = cast(integral) %67 : s32i
+        %69 = const 127 : s32i
+        %70 = cmp le %68, %69 : bool
+        %71 = ternary %70 ? { : s32i
+            %91 = load %60 : u8i, align 1
+            %92 = cast(integral) %91 : s8i
+            %93 = cast(integral) %92 : s32i
+            yield %93
+        } : {
+            %82 = const 255 : s32i
+            %83 = load %60 : u8i, align 1
+            %84 = cast(integral) %83 : s32i
+            %85 = sub %82, %84 : s32i [nsw]
+            %86 = cast(integral) %85 : s8i
+            %87 = cast(integral) %86 : s32i
+            %88 = minus %87 : s32i [nsw]
+            %89 = const 1 : s32i
+            %90 = sub %88, %89 : s32i [nsw]
+            yield %90
+        }
+        %72 = cast(integral) %71 : s8i
+        %73 = load %57 : s8i*, align 8
+        store %72, %73, align 1
+        %74 = load %56 : s8i, align 1
+        %75 = cast(integral) %74 : s32i
+        %76 = const -128 : s32i
+        %77 = cmp eq %75, %76 : bool
+        %78 = const 1 : s32i
+        %79 = const 0 : s32i
+        %80 = select %77, %78, %79 : s32i
+        %81 = load %58 : s32i*, align 8
+        store %80, %81, align 4
+        return
+}
+fn test_neg() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %13 = alloca s32i, "__retval", align 4
+    %14 = alloca s8i, "x", align 1
+    %15 = alloca s8i, "y", align 1
+    %16 = alloca s32i, "v", align 4
+    %17 = alloca s32i, "err", align 4
+    %18 = const 0 : s32i
+    store %18, %17, align 4
+    %19 = const -128 : s8i
+    store %19, %14, align 1
+    scope {
+        for cond: {
+            %55 = const #true : bool
+            condition %55
+        } step: {
+            yield
+        } do {
+            scope {
+                %22 = load %14 : s8i, align 1
+                call @fixnum_neg(%22, %15, %16) [all]
+                %23 = load %14 : s8i, align 1
+                %24 = cast(integral) %23 : s32i
+                %25 = load %15 : s8i, align 1
+                %26 = cast(integral) %25 : s32i
+                %27 = load %16 : s32i, align 4
+                call @foo(%24, %26, %27) [all]
+                scope {
+                    %34 = load %16 : s32i, align 4
+                    %35 = cast(int_to_bool) %34 : bool
+                    %36 = ternary %35 ? { : bool
+                        %51 = load %14 : s8i, align 1
+                        %52 = cast(integral) %51 : s32i
+                        %53 = const -128 : s32i
+                        %54 = cmp ne %52, %53 : bool
+                        yield %54
+                    } : {
+                        %50 = const #false : bool
+                        yield %50
+                    }
+                    %37 = ternary %36 ? { : bool
+                        %49 = const #true : bool
+                        yield %49
+                    } : {
+                        %40 = load %16 : s32i, align 4
+                        %41 = cast(int_to_bool) %40 : bool
+                        %42 = not %41 : bool
+                        %43 = ternary %42 ? { : bool
+                            %45 = load %14 : s8i, align 1
+                            %46 = cast(integral) %45 : s32i
+                            %47 = const -128 : s32i
+                            %48 = cmp eq %46, %47 : bool
+                            yield %48
+                        } : {
+                            %44 = const #false : bool
+                            yield %44
+                        }
+                        yield %43
+                    }
+                    if %37 {
+                        %38 = load %17 : s32i, align 4
+                        %39 = inc %38 : s32i [nsw]
+                        store %39, %17, align 4
+                        yield
+                    }
+                    yield
+                }
+                scope {
+                    %30 = load %14 : s8i, align 1
+                    %31 = cast(integral) %30 : s32i
+                    %32 = const 127 : s32i
+                    %33 = cmp eq %31, %32 : bool
+                    if %33 {
+                        break
+                    }
+                    yield
+                }
+                %28 = load %14 : s8i, align 1
+                %29 = inc %28 : s8i
+                store %29, %14, align 1
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %20 = load %17 : s32i, align 4
+    store %20, %13
+    %21 = load %13 : s32i
+    return %21
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %8 = const 1 : u64i
+        %9 = const 1 : u64i
+        %10 = cmp ne %8, %9 : bool
+        if %10 {
+            %11 = const 0 : s32i
+            store %11, %0
+            %12 = load %0 : s32i
+            return %12
+        }
+        yield
+    }
+    scope {
+        %4 = call @test_neg() : s32i [all]
+        %5 = const 0 : s32i
+        %6 = cmp ne %4, %5 : bool
+        if %6 {
+            %7 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

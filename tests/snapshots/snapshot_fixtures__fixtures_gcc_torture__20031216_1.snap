@@ -1,0 +1,48 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20031216-1.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn DisplayNumber(%arg0: u64i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u64i):
+        %14 = alloca u64i, "v", align 8
+        store %arg0, %14
+        scope {
+            %15 = load %14 : u64i, align 8
+            %16 = const 154 : u64i
+            %17 = cmp ne %15, %16 : bool
+            if %17 {
+                %18 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn ReadNumber() -> u64i [external, c, no_inline, dso_local, nothrow] {
+    %11 = alloca u64i, "__retval", align 8
+    %12 = const 10092544 : u64i
+    store %12, %11
+    %13 = load %11 : u64i
+    return %13
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u64i, "tmp", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = call @ReadNumber() : u64i [all]
+    %4 = const 16711680 : u64i
+    %5 = and %3, %4 : u64i
+    %6 = const 16 : s32i
+    %7 = shift right %5, %6 : u64i
+    store %7, %1, align 8
+    %8 = load %1 : u64i, align 8
+    call @DisplayNumber(%8) [all]
+    %9 = const 0 : s32i
+    store %9, %0
+    %10 = load %0 : s32i
+    return %10
+}

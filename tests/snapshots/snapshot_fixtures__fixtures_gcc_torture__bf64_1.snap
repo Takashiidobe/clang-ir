@@ -1,0 +1,140 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/bf64-1.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.tmp2 : rec_tmp2 = {1315049991948926991} [cir_private, default, dso_local, constant]
+global __const.main.tmp : rec_tmp = {18442241573325435171} [cir_private, default, dso_local, constant]
+
+fn sub(%arg1: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: u64i):
+        %65 = alloca rec_tmp, "coerce", align 8
+        %66 = alloca u64i, "coerce", align 8
+        store %arg1, %66
+        %67 = cast(bitcast) %66 : rec_tmp*
+        %68 = load %67 : rec_tmp
+        %69 = alloca rec_tmp, "tmp", align 8
+        %70 = alloca rec_tmp, "__retval", align 8
+        store %68, %69
+        %71 = const 2381903268435576 : s64i
+        %72 = get_member %69[0] "field" : u64i*
+        <unmodeled: cir.get_bitfield>
+        %74 = or %73, %71 : s64i
+        <unmodeled: cir.set_bitfield>
+        copy %70, %69
+        %76 = load %70 : rec_tmp
+        store %76, %65
+        %77 = cast(bitcast) %65 : u64i*
+        %78 = load %77 : u64i
+        return %78
+}
+fn sub2(%arg0: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u64i):
+        %51 = alloca rec_tmp2, "coerce", align 8
+        %52 = alloca u64i, "coerce", align 8
+        store %arg0, %52
+        %53 = cast(bitcast) %52 : rec_tmp2*
+        %54 = load %53 : rec_tmp2
+        %55 = alloca rec_tmp2, "tmp2", align 8
+        %56 = alloca rec_tmp2, "__retval", align 8
+        store %54, %55
+        %57 = const 2381903268435576 : s64i
+        %58 = get_member %55[0] "field" : u64i*
+        <unmodeled: cir.get_bitfield>
+        %60 = or %59, %57 : s64i
+        <unmodeled: cir.set_bitfield>
+        copy %56, %55
+        %62 = load %56 : rec_tmp2
+        store %62, %51
+        %63 = cast(bitcast) %51 : u64i*
+        %64 = load %63 : u64i
+        return %64
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca u64i, "coerce", align 8
+    %1 = alloca rec_tmp2, "coerce", align 8
+    %2 = alloca u64i, "coerce", align 8
+    %3 = alloca rec_tmp, "coerce", align 8
+    %4 = alloca s32i, "__retval", align 4
+    %5 = alloca rec_tmp, "tmp", align 8
+    %6 = alloca rec_tmp2, "tmp2", align 8
+    %7 = const 0 : s32i
+    store %7, %4
+    %8 = get_global @__const.main.tmp : rec_tmp*
+    copy %5, %8
+    %9 = get_global @__const.main.tmp2 : rec_tmp2*
+    copy %6, %9
+    %10 = load %5 : rec_tmp, align 8
+    store %10, %3
+    %11 = cast(bitcast) %3 : u64i*
+    %12 = load %11 : u64i
+    %13 = call @sub(%12) : u64i [all]
+    store %13, %2
+    %14 = cast(bitcast) %2 : rec_tmp*
+    %15 = load %14 : rec_tmp
+    store %15, %5, align 8
+    %16 = load %6 : rec_tmp2, align 8
+    store %16, %1
+    %17 = cast(bitcast) %1 : u64i*
+    %18 = load %17 : u64i
+    %19 = call @sub2(%18) : u64i [all]
+    store %19, %0
+    %20 = cast(bitcast) %0 : rec_tmp2*
+    %21 = load %20 : rec_tmp2
+    store %21, %6, align 8
+    scope {
+        %38 = get_member %5[0] "pad" : u64i*
+        <unmodeled: cir.get_bitfield>
+        %40 = cast(integral) %39 : s32i
+        %41 = const 291 : s32i
+        %42 = cmp ne %40, %41 : bool
+        %43 = ternary %42 ? { : bool
+            %50 = const #true : bool
+            yield %50
+        } : {
+            %45 = get_member %5[0] "field" : u64i*
+            <unmodeled: cir.get_bitfield>
+            %47 = cast(integral) %46 : u64i
+            %48 = const 18446743335512004223 : u64i
+            %49 = cmp ne %47, %48 : bool
+            yield %49
+        }
+        if %43 {
+            %44 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %25 = get_member %6[0] "pad" : u64i*
+        <unmodeled: cir.get_bitfield>
+        %27 = cast(integral) %26 : s32i
+        %28 = const 291 : s32i
+        %29 = cmp ne %27, %28 : bool
+        %30 = ternary %29 ? { : bool
+            %37 = const #true : bool
+            yield %37
+        } : {
+            %32 = get_member %6[0] "field" : u64i*
+            <unmodeled: cir.get_bitfield>
+            %34 = cast(integral) %33 : u64i
+            %35 = const 18446743335512004223 : u64i
+            %36 = cmp ne %34, %35 : bool
+            yield %36
+        }
+        if %30 {
+            %31 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %22 = get_global @exit : ((s32i) -> void)*
+    %23 = const 0 : s32i
+    call @exit(%23) [all]
+    %24 = load %4 : s32i
+    return %24
+}

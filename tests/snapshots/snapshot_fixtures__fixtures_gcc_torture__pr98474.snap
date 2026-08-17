@@ -1,0 +1,84 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr98474.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: u128i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u128i*):
+        %34 = alloca u128i*, "x", align 8
+        store %arg0, %34
+        %35 = const 1 : u128i
+        %36 = const 16 : s32i
+        %37 = const 8 : s32i
+        %38 = mul %36, %37 : s32i [nsw]
+        %39 = const 2 : s32i
+        %40 = div %38, %39 : s32i
+        %41 = const 1 : s32i
+        %42 = add %40, %41 : s32i [nsw]
+        %43 = shift left %35, %42 : u128i
+        %44 = load %34 : u128i*, align 8
+        %45 = load %44 : u128i, align 16
+        %46 = add %45, %43 : u128i
+        store %46, %44, align 16
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u128i, "a", align 16
+    %2 = alloca u128i, "b", align 16
+    %3 = alloca u128i, "n", align 16
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 1 : u128i
+    %6 = const 16 : s32i
+    %7 = const 8 : s32i
+    %8 = mul %6, %7 : s32i [nsw]
+    %9 = const 2 : s32i
+    %10 = div %8, %9 : s32i
+    %11 = const 1 : s32i
+    %12 = add %10, %11 : s32i [nsw]
+    %13 = shift left %5, %12 : u128i
+    store %13, %1, align 16
+    %14 = load %1 : u128i, align 16
+    store %14, %2, align 16
+    call @foo(%2) [all]
+    %15 = load %2 : u128i, align 16
+    store %15, %3, align 16
+    scope {
+        while {
+            %31 = load %3 : u128i, align 16
+            %32 = load %1 : u128i, align 16
+            %33 = cmp ge %31, %32 : bool
+            condition %33
+        } do {
+            %28 = load %1 : u128i, align 16
+            %29 = load %3 : u128i, align 16
+            %30 = sub %29, %28 : u128i
+            store %30, %3, align 16
+            yield
+        }
+        yield
+    }
+    scope {
+        %18 = load %3 : u128i, align 16
+        %19 = const 16 : s32i
+        %20 = const 8 : s32i
+        %21 = mul %19, %20 : s32i [nsw]
+        %22 = const 2 : s32i
+        %23 = div %21, %22 : s32i
+        %24 = shift right %18, %23 : u128i
+        %25 = cast(integral) %24 : s32i
+        %26 = const 0 : s32i
+        %27 = cmp ne %25, %26 : bool
+        if %27 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %16 = const 0 : s32i
+    store %16, %0
+    %17 = load %0 : s32i
+    return %17
+}

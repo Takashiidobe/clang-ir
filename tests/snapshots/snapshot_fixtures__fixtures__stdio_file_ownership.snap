@@ -1,0 +1,99 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/stdio_file_ownership.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.buf : s8i[16] = zero [cir_private, default, dso_local, constant]
+global __const.main.name : s8i[31] = "slate_stdio_file_ownership.tmp" [cir_private, default, dso_local, constant]
+global .str : s8i[2] = "w" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[10] = "open-fail" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[7] = "owned\n" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[2] = "r" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[12] = "reopen-fail" [cir_private, default, align 1, dso_local, constant]
+global stdout : rec__IO_FILE* [external, default, align 8, dso_local]
+
+fn remove(%arg0: s8i*) -> s32i [external, c, nothrow];
+fn fopen(%arg0: s8i*, %arg1: s8i*) -> rec__IO_FILE* [external, c];
+fn puts(%arg0: s8i*) -> s32i [external, c];
+fn fputs(%arg0: s8i*, %arg1: rec__IO_FILE*) -> s32i [external, c];
+fn fclose(%arg0: rec__IO_FILE*) -> s32i [external, c];
+fn fgets(%arg0: s8i*, %arg1: s32i, %arg2: rec__IO_FILE*) -> s8i* [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i[31], "name", align 16
+    %2 = alloca rec__IO_FILE*, "f", align 8
+    %3 = alloca rec__IO_FILE*, "g", align 8
+    %4 = alloca s8i[16], "buf", align 16
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = get_global @__const.main.name : s8i[31]*
+    copy %1, %6
+    %7 = cast(array_to_ptrdecay) %1 : s8i*
+    %8 = call @remove(%7) : s32i [all]
+    %9 = get_global @fopen : ((s8i*, s8i*) -> rec__IO_FILE*)*
+    %10 = cast(array_to_ptrdecay) %1 : s8i*
+    %11 = get_global @.str : s8i[2]*
+    %12 = cast(array_to_ptrdecay) %11 : s8i*
+    %13 = call @fopen(%10, %12) : rec__IO_FILE* [all]
+    store %13, %2, align 8
+    scope {
+        %48 = load %2 : rec__IO_FILE*, align 8
+        %49 = cast(ptr_to_bool) %48 : bool
+        %50 = not %49 : bool
+        if %50 {
+            %51 = get_global @.str.1 : s8i[10]*
+            %52 = cast(array_to_ptrdecay) %51 : s8i*
+            %53 = call @puts(%52) : s32i [all]
+            %54 = const 0 : s32i
+            store %54, %0
+            %55 = load %0 : s32i
+            return %55
+        }
+        yield
+    }
+    %14 = get_global @.str.2 : s8i[7]*
+    %15 = cast(array_to_ptrdecay) %14 : s8i*
+    %16 = load %2 : rec__IO_FILE*, align 8
+    %17 = call @fputs(%15, %16) : s32i [all]
+    %18 = load %2 : rec__IO_FILE*, align 8
+    %19 = call @fclose(%18) : s32i [all]
+    %20 = get_global @fopen : ((s8i*, s8i*) -> rec__IO_FILE*)*
+    %21 = cast(array_to_ptrdecay) %1 : s8i*
+    %22 = get_global @.str.3 : s8i[2]*
+    %23 = cast(array_to_ptrdecay) %22 : s8i*
+    %24 = call @fopen(%21, %23) : rec__IO_FILE* [all]
+    store %24, %3, align 8
+    scope {
+        %40 = load %3 : rec__IO_FILE*, align 8
+        %41 = cast(ptr_to_bool) %40 : bool
+        %42 = not %41 : bool
+        if %42 {
+            %43 = get_global @.str.4 : s8i[12]*
+            %44 = cast(array_to_ptrdecay) %43 : s8i*
+            %45 = call @puts(%44) : s32i [all]
+            %46 = const 0 : s32i
+            store %46, %0
+            %47 = load %0 : s32i
+            return %47
+        }
+        yield
+    }
+    %25 = get_global @__const.main.buf : s8i[16]*
+    copy %4, %25
+    %26 = cast(array_to_ptrdecay) %4 : s8i*
+    %27 = const 16 : s32i
+    %28 = load %3 : rec__IO_FILE*, align 8
+    %29 = call @fgets(%26, %27, %28) : s8i* [all]
+    %30 = load %3 : rec__IO_FILE*, align 8
+    %31 = call @fclose(%30) : s32i [all]
+    %32 = cast(array_to_ptrdecay) %4 : s8i*
+    %33 = get_global @stdout : rec__IO_FILE**
+    %34 = load %33 : rec__IO_FILE*, align 8
+    %35 = call @fputs(%32, %34) : s32i [all]
+    %36 = cast(array_to_ptrdecay) %1 : s8i*
+    %37 = call @remove(%36) : s32i [all]
+    %38 = const 0 : s32i
+    store %38, %0
+    %39 = load %0 : s32i
+    return %39
+}

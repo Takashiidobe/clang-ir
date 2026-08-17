@@ -1,0 +1,37 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/970217-1.c" (c, x86_64-unknown-linux-gnu)
+fn sub(%arg0: s32i, %arg1: s32i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s32i*):
+        %11 = alloca s32i, "i", align 4
+        %12 = alloca s32i*, "array", align 8
+        %13 = alloca s32i, "__retval", align 4
+        store %arg0, %11
+        store %arg1, %12
+        %14 = load %11 : s32i, align 4
+        %15 = inc %14 : s32i [nsw]
+        store %15, %11, align 4
+        %16 = load %11 : s32i, align 4
+        store %16, %13
+        %17 = load %13 : s32i
+        return %17
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i[10], "array", align 16
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @exit : ((s32i) -> void)*
+    %4 = const 10 : s32i
+    %5 = cast(array_to_ptrdecay) %1 : s32i*
+    %6 = call @sub(%4, %5) : s32i [all]
+    %7 = const 11 : s32i
+    %8 = cmp ne %6, %7 : bool
+    %9 = cast(bool_to_int) %8 : s32i
+    call @exit(%9) [all]
+    %10 = load %0 : s32i
+    return %10
+}

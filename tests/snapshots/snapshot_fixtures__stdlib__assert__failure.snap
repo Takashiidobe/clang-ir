@@ -1,0 +1,104 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/assert/failure.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[22] = "assert_failure.stderr" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[2] = "w" [cir_private, default, align 1, dso_local, constant]
+global stderr : rec__IO_FILE* [external, default, align 8, dso_local]
+global .str.2 : s8i[7] = "before" [cir_private, default, align 1, dso_local, constant]
+global stdout : rec__IO_FILE* [external, default, align 8, dso_local]
+global .str.3 : s8i[2] = "0" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[65] = "/home/takashi/Projects/clang-ir-rs/tests/stdlib/assert/failure.c" [cir_private, default, align 1, dso_local, constant]
+global __PRETTY_FUNCTION__.main : s8i[15] = "int main(void)" [cir_private, default, align 1, dso_local, constant]
+
+fn freopen(%arg0: s8i*, %arg1: s8i*, %arg2: rec__IO_FILE*) -> rec__IO_FILE* [external, c];
+fn signal(%arg0: s32i, %arg1: ((s32i) -> void)*) -> ((s32i) -> void)* [external, c, nothrow];
+fn _Exit(%arg0: s32i) -> void [external, c, nothrow];
+fn handle_abort(%arg0: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %39 = alloca s32i, "signal_number", align 4
+        store %arg0, %39
+        %40 = get_global @_Exit : ((s32i) -> void)*
+        %41 = load %39 : s32i, align 4
+        %42 = const 6 : s32i
+        %43 = cmp eq %41, %42 : bool
+        %44 = const 0 : s32i
+        %45 = const 1 : s32i
+        %46 = select %43, %44, %45 : s32i
+        call @_Exit(%46) [all]
+        return
+}
+fn puts(%arg0: s8i*) -> s32i [external, c];
+fn fflush(%arg0: rec__IO_FILE*) -> s32i [external, c];
+fn __assert_fail(%arg0: s8i*, %arg1: s8i*, %arg2: u32i, %arg3: s8i*) -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %27 = get_global @.str : s8i[22]*
+        %28 = cast(array_to_ptrdecay) %27 : s8i*
+        %29 = get_global @.str.1 : s8i[2]*
+        %30 = cast(array_to_ptrdecay) %29 : s8i*
+        %31 = get_global @stderr : rec__IO_FILE**
+        %32 = load %31 : rec__IO_FILE*, align 8
+        %33 = call @freopen(%28, %30, %32) : rec__IO_FILE* [all]
+        %34 = const #cir.ptr<null> : void*
+        %35 = cast(bitcast) %34 : rec__IO_FILE*
+        %36 = cmp eq %33, %35 : bool
+        if %36 {
+            %37 = const 2 : s32i
+            store %37, %0
+            %38 = load %0 : s32i
+            return %38
+        }
+        yield
+    }
+    scope {
+        %19 = const 6 : s32i
+        %20 = get_global @handle_abort : ((s32i) -> void)*
+        %21 = call @signal(%19, %20) : ((s32i) -> void)* [all]
+        %22 = const 18446744073709551615 : u64i
+        %23 = cast(int_to_ptr) %22 : ((s32i) -> void)*
+        %24 = cmp eq %21, %23 : bool
+        if %24 {
+            %25 = const 3 : s32i
+            store %25, %0
+            %26 = load %0 : s32i
+            return %26
+        }
+        yield
+    }
+    %2 = get_global @.str.2 : s8i[7]*
+    %3 = cast(array_to_ptrdecay) %2 : s8i*
+    %4 = call @puts(%3) : s32i [all]
+    %5 = get_global @stdout : rec__IO_FILE**
+    %6 = load %5 : rec__IO_FILE*, align 8
+    %7 = call @fflush(%6) : s32i [all]
+    scope {
+        scope {
+            %10 = const 0 : s32i
+            %11 = cast(int_to_bool) %10 : bool
+            if %11 {
+                yield
+            } else {
+                %12 = get_global @.str.3 : s8i[2]*
+                %13 = cast(array_to_ptrdecay) %12 : s8i*
+                %14 = get_global @.str.4 : s8i[65]*
+                %15 = cast(array_to_ptrdecay) %14 : s8i*
+                %16 = const 18 : u32i
+                %17 = get_global @__PRETTY_FUNCTION__.main : s8i[15]*
+                %18 = cast(array_to_ptrdecay) %17 : s8i*
+                call @__assert_fail(%13, %15, %16, %18) [all]
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %8 = const 4 : s32i
+    store %8, %0
+    %9 = load %0 : s32i
+    return %9
+}

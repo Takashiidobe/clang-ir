@@ -1,0 +1,42 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr83269.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u8i, "a", align 1
+    %2 = alloca s64i, "b", align 8
+    %3 = alloca s32i, "c", align 4
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 1 : u8i
+    store %5, %1, align 1, volatile
+    %6 = const 2147483648 : s64i
+    store %6, %2, align 8
+    %7 = load %2 : s64i, align 8
+    %8 = minus %7 : s64i [nsw]
+    %9 = cast(integral) %8 : s32i
+    %10 = const -2147483647 : s32i
+    %11 = load %1 : u8i, align 1, volatile
+    %12 = cast(integral) %11 : s32i
+    %13 = mul %10, %12 : s32i [nsw]
+    %14 = sub %9, %13 : s32i [nsw]
+    %15 = minus %14 : s32i [nsw]
+    store %15, %3, align 4
+    scope {
+        %18 = load %3 : s32i, align 4
+        %19 = const 1 : s32i
+        %20 = cmp ne %18, %19 : bool
+        if %20 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %16 = const 0 : s32i
+    store %16, %0
+    %17 = load %0 : s32i
+    return %17
+}

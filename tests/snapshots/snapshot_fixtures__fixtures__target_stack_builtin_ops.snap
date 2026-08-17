@@ -1,0 +1,78 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/target_stack_builtin_ops.c" (c, x86_64-unknown-linux-gnu)
+global __const.cache_prefetch_probe.bytes : s8i[16] = zero [cir_private, default, dso_local, constant]
+global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn cache_prefetch_probe(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %23 = alloca s32i, "x", align 4
+        %24 = alloca s32i, "__retval", align 4
+        %25 = alloca s8i[16], "bytes", align 16
+        store %arg0, %23
+        %26 = get_global @__const.cache_prefetch_probe.bytes : s8i[16]*
+        copy %25, %26
+        %27 = load %23 : s32i, align 4
+        %28 = cast(integral) %27 : s8i
+        %29 = const 0 : s64i
+        %30 = get_element %25[%29] : s8i*
+        store %28, %30, align 16
+        %31 = cast(array_to_ptrdecay) %25 : s8i*
+        %32 = cast(bitcast) %31 : void*
+        %33 = cast(array_to_ptrdecay) %25 : s8i*
+        %34 = const 16 : u64i
+        %35 = ptr_stride %33, %34 : s8i*
+        %36 = cast(bitcast) %35 : void*
+        <unmodeled: cir.clear_cache>
+        %37 = cast(array_to_ptrdecay) %25 : s8i*
+        %38 = const 1 : s32i
+        %39 = ptr_stride %37, %38 : s8i*
+        %40 = cast(bitcast) %39 : void*
+        <unmodeled: cir.prefetch>
+        %41 = const 0 : s64i
+        %42 = get_element %25[%41] : s8i*
+        %43 = load %42 : s8i, align 16
+        %44 = cast(integral) %43 : s32i
+        %45 = const 1 : s32i
+        %46 = add %44, %45 : s32i [nsw]
+        store %46, %24
+        %47 = load %24 : s32i
+        return %47
+}
+fn frame_probe() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %13 = alloca s32i, "__retval", align 4
+    %14 = alloca void*, "frame", align 8
+    %15 = const 0 : u32i
+    <unmodeled: cir.frame_address>
+    %17 = cast(bitcast) %16 : void*
+    store %17, %14, align 8
+    %18 = load %14 : void*, align 8
+    %19 = const #cir.ptr<null> : void*
+    %20 = cmp ne %18, %19 : bool
+    %21 = cast(bool_to_int) %20 : s32i
+    store %21, %13
+    %22 = load %13 : s32i
+    return %22
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "input", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 7 : s32i
+    store %3, %1, align 4, volatile
+    %4 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %5 = get_global @.str : s8i[7]*
+    %6 = cast(array_to_ptrdecay) %5 : s8i*
+    %7 = load %1 : s32i, align 4, volatile
+    %8 = call @cache_prefetch_probe(%7) : s32i [all]
+    %9 = call @frame_probe() : s32i [all]
+    %10 = call @printf(%6, %8, %9) : s32i [all]
+    %11 = const 0 : s32i
+    store %11, %0
+    %12 = load %0 : s32i
+    return %12
+}

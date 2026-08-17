@@ -1,0 +1,37 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/float/constants.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[10] = "%d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[10]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 2 : s32i
+    %6 = const 53 : s32i
+    %7 = const 24 : s32i
+    %8 = call @printf(%4, %5, %6, %7) : s32i [all]
+    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %10 = get_global @.str.1 : s8i[7]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = const 15 : s32i
+    %13 = const 6 : s32i
+    %14 = call @printf(%11, %12, %13) : s32i [all]
+    %15 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %16 = get_global @.str.1 : s8i[7]*
+    %17 = cast(array_to_ptrdecay) %16 : s8i*
+    %18 = const 1024 : s32i
+    %19 = const -1021 : s32i
+    %20 = call @printf(%17, %18, %19) : s32i [all]
+    %21 = const 0 : s32i
+    store %21, %0
+    %22 = load %0 : s32i
+    return %22
+}

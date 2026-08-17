@@ -1,0 +1,195 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20071120-1.c" (c, x86_64-unknown-linux-gnu)
+global deferred_access_no_check : u32i = 0 [internal, default, align 4, dso_local]
+global gt_pch_rs_gt_cp_semantics_h : rec_ggc_root_tab[1] = [{@deferred_access_no_check}] [external, default, align 8, dso_local, constant]
+global deferred_access_stack : rec_VEC_deferred_access_gc* = #cir.ptr<null> [internal, default, align 8, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn vec_assert_fail() -> void [external, c, no_inline, dso_local, nothrow] {
+    %104 = get_global @abort : (() -> void)*
+    call @abort() [all]
+    return
+}
+fn perform_access_checks(%arg2: rec_deferred_access_check*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: rec_deferred_access_check*):
+        %102 = alloca rec_deferred_access_check*, "p", align 8
+        store %arg2, %102
+        %103 = get_global @abort : (() -> void)*
+        call @abort() [all]
+        return
+}
+fn VEC_deferred_access_base_last(%arg1: rec_VEC_deferred_access_base*) -> rec_deferred_access* [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: rec_VEC_deferred_access_base*):
+        %79 = alloca rec_VEC_deferred_access_base*, "vec_", align 8
+        %80 = alloca rec_deferred_access*, "__retval", align 8
+        store %arg1, %79
+        %81 = load %79 : rec_VEC_deferred_access_base*, align 8
+        %82 = cast(ptr_to_bool) %81 : bool
+        %83 = ternary %82 ? { : bool
+            %98 = load %79 : rec_VEC_deferred_access_base*, align 8
+            %99 = get_member %98[0] "num" : u32i*
+            %100 = load %99 : u32i, align 8
+            %101 = cast(int_to_bool) %100 : bool
+            yield %101
+        } : {
+            %97 = const #false : bool
+            yield %97
+        }
+        %84 = ternary %83 ? { : s32i
+            %96 = const 0 : s32i
+            yield %96
+        } : {
+            call @vec_assert_fail() [all]
+            %95 = const 0 : s32i
+            yield %95
+        }
+        %85 = load %79 : rec_VEC_deferred_access_base*, align 8
+        %86 = get_member %85[0] "num" : u32i*
+        %87 = load %86 : u32i, align 8
+        %88 = const 1 : u32i
+        %89 = sub %87, %88 : u32i
+        %90 = cast(integral) %89 : u64i
+        %91 = load %79 : rec_VEC_deferred_access_base*, align 8
+        %92 = get_member %91[1] "vec" : rec_deferred_access[1]*
+        %93 = get_element %92[%90] : rec_deferred_access*
+        store %93, %80
+        %94 = load %80 : rec_deferred_access*
+        return %94
+}
+fn VEC_deferred_access_base_pop(%arg0: rec_VEC_deferred_access_base*) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_VEC_deferred_access_base*):
+        %67 = alloca rec_VEC_deferred_access_base*, "vec_", align 8
+        store %arg0, %67
+        %68 = load %67 : rec_VEC_deferred_access_base*, align 8
+        %69 = get_member %68[0] "num" : u32i*
+        %70 = load %69 : u32i, align 8
+        %71 = cast(int_to_bool) %70 : bool
+        %72 = ternary %71 ? { : s32i
+            %78 = const 0 : s32i
+            yield %78
+        } : {
+            call @vec_assert_fail() [all]
+            %77 = const 0 : s32i
+            yield %77
+        }
+        %73 = load %67 : rec_VEC_deferred_access_base*, align 8
+        %74 = get_member %73[0] "num" : u32i*
+        %75 = load %74 : u32i, align 8
+        %76 = dec %75 : u32i
+        store %76, %74, align 8
+        return
+}
+fn pop_to_parent_deferring_access_checks() -> void [external, c, no_inline, dso_local, nothrow] {
+    scope {
+        %25 = get_global @deferred_access_no_check : u32i*
+        %26 = load %25 : u32i, align 4
+        %27 = cast(int_to_bool) %26 : bool
+        if %27 {
+            %64 = get_global @deferred_access_no_check : u32i*
+            %65 = load %64 : u32i, align 4
+            %66 = dec %65 : u32i
+            store %66, %64, align 4
+            yield
+        } else {
+            %28 = alloca rec_deferred_access_check*, "checks", align 8
+            %29 = alloca rec_deferred_access*, "ptr", align 8
+            %30 = get_global @deferred_access_stack : rec_VEC_deferred_access_gc**
+            %31 = load %30 : rec_VEC_deferred_access_gc*, align 8
+            %32 = cast(ptr_to_bool) %31 : bool
+            %33 = ternary %32 ? { : rec_VEC_deferred_access_base*
+                %61 = get_global @deferred_access_stack : rec_VEC_deferred_access_gc**
+                %62 = load %61 : rec_VEC_deferred_access_gc*, align 8
+                %63 = get_member %62[0] "base" : rec_VEC_deferred_access_base*
+                yield %63
+            } : {
+                %60 = const #cir.ptr<null> : rec_VEC_deferred_access_base*
+                yield %60
+            }
+            %34 = call @VEC_deferred_access_base_last(%33) : rec_deferred_access* [all]
+            %35 = get_member %34[0] "deferred_access_checks" : rec_deferred_access_check**
+            %36 = load %35 : rec_deferred_access_check*, align 8
+            store %36, %28, align 8
+            %37 = get_global @deferred_access_stack : rec_VEC_deferred_access_gc**
+            %38 = load %37 : rec_VEC_deferred_access_gc*, align 8
+            %39 = cast(ptr_to_bool) %38 : bool
+            %40 = ternary %39 ? { : rec_VEC_deferred_access_base*
+                %57 = get_global @deferred_access_stack : rec_VEC_deferred_access_gc**
+                %58 = load %57 : rec_VEC_deferred_access_gc*, align 8
+                %59 = get_member %58[0] "base" : rec_VEC_deferred_access_base*
+                yield %59
+            } : {
+                %56 = const #cir.ptr<null> : rec_VEC_deferred_access_base*
+                yield %56
+            }
+            call @VEC_deferred_access_base_pop(%40) [all]
+            %41 = get_global @deferred_access_stack : rec_VEC_deferred_access_gc**
+            %42 = load %41 : rec_VEC_deferred_access_gc*, align 8
+            %43 = cast(ptr_to_bool) %42 : bool
+            %44 = ternary %43 ? { : rec_VEC_deferred_access_base*
+                %53 = get_global @deferred_access_stack : rec_VEC_deferred_access_gc**
+                %54 = load %53 : rec_VEC_deferred_access_gc*, align 8
+                %55 = get_member %54[0] "base" : rec_VEC_deferred_access_base*
+                yield %55
+            } : {
+                %52 = const #cir.ptr<null> : rec_VEC_deferred_access_base*
+                yield %52
+            }
+            %45 = call @VEC_deferred_access_base_last(%44) : rec_deferred_access* [all]
+            store %45, %29, align 8
+            scope {
+                %46 = load %29 : rec_deferred_access*, align 8
+                %47 = get_member %46[1] "deferring_access_checks_kind" : s32i*
+                %48 = load %47 : s32i, align 8
+                %49 = const 0 : s32i
+                %50 = cmp eq %48, %49 : bool
+                if %50 {
+                    %51 = load %28 : rec_deferred_access_check*, align 8
+                    call @perform_access_checks(%51) [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    return
+}
+fn malloc(%arg0: u64i) -> void* [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 24 : u64i
+    %3 = const 16 : u64i
+    %4 = const 8 : u64i
+    %5 = mul %3, %4 : u64i
+    %6 = add %2, %5 : u64i
+    %7 = call @malloc(%6) : void* [all]
+    %8 = cast(bitcast) %7 : rec_VEC_deferred_access_gc*
+    %9 = get_global @deferred_access_stack : rec_VEC_deferred_access_gc**
+    store %8, %9, align 8
+    %10 = const 2 : u32i
+    %11 = get_global @deferred_access_stack : rec_VEC_deferred_access_gc**
+    %12 = load %11 : rec_VEC_deferred_access_gc*, align 8
+    %13 = get_member %12[0] "base" : rec_VEC_deferred_access_base*
+    %14 = get_member %13[0] "num" : u32i*
+    store %10, %14, align 8
+    %15 = const 1 : s32i
+    %16 = const 0 : s64i
+    %17 = get_global @deferred_access_stack : rec_VEC_deferred_access_gc**
+    %18 = load %17 : rec_VEC_deferred_access_gc*, align 8
+    %19 = get_member %18[0] "base" : rec_VEC_deferred_access_base*
+    %20 = get_member %19[1] "vec" : rec_deferred_access[1]*
+    %21 = get_element %20[%16] : rec_deferred_access*
+    %22 = get_member %21[1] "deferring_access_checks_kind" : s32i*
+    store %15, %22, align 8
+    call @pop_to_parent_deferring_access_checks() [all]
+    %23 = const 0 : s32i
+    store %23, %0
+    %24 = load %0 : s32i
+    return %24
+}

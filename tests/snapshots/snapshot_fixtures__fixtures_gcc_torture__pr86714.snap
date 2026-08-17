@@ -1,0 +1,133 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr86714.c" (c, x86_64-unknown-linux-gnu)
+global a : s8i[3][2] = [[49, 50, 51], [120, 121, 122]] [external, default, align 1, dso_local, constant]
+global b : s8i[6] = zero [external, default, align 1, dso_local]
+global pb : void* = @b [external, default, align 8, dso_local]
+global .str : s8i[7] = "123xaa" [cir_private, default, align 1, dso_local, constant]
+
+fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
+fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @b : s8i[6]*
+    %3 = cast(array_to_ptrdecay) %2 : s8i*
+    %4 = cast(bitcast) %3 : void*
+    %5 = get_global @a : s8i[3][2]*
+    %6 = cast(array_to_ptrdecay) %5 : s8i[3]*
+    %7 = cast(bitcast) %6 : void*
+    %8 = const 4 : u64i
+    %9 = call @memcpy(%4, %7, %8) : void* [all]
+    %10 = get_global @b : s8i[6]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = const 4 : s32i
+    %13 = ptr_stride %11, %12 : s8i*
+    %14 = cast(bitcast) %13 : void*
+    %15 = const 97 : s32i
+    %16 = const 2 : u64i
+    %17 = call @memset(%14, %15, %16) : void* [all]
+    scope {
+        %28 = const 0 : s64i
+        %29 = get_global @b : s8i[6]*
+        %30 = get_element %29[%28] : s8i*
+        %31 = load %30 : s8i, align 1
+        %32 = cast(integral) %31 : s32i
+        %33 = const 49 : s32i
+        %34 = cmp ne %32, %33 : bool
+        %35 = ternary %34 ? { : bool
+            %79 = const #true : bool
+            yield %79
+        } : {
+            %72 = const 1 : s64i
+            %73 = get_global @b : s8i[6]*
+            %74 = get_element %73[%72] : s8i*
+            %75 = load %74 : s8i, align 1
+            %76 = cast(integral) %75 : s32i
+            %77 = const 50 : s32i
+            %78 = cmp ne %76, %77 : bool
+            yield %78
+        }
+        %36 = ternary %35 ? { : bool
+            %71 = const #true : bool
+            yield %71
+        } : {
+            %64 = const 2 : s64i
+            %65 = get_global @b : s8i[6]*
+            %66 = get_element %65[%64] : s8i*
+            %67 = load %66 : s8i, align 1
+            %68 = cast(integral) %67 : s32i
+            %69 = const 51 : s32i
+            %70 = cmp ne %68, %69 : bool
+            yield %70
+        }
+        %37 = ternary %36 ? { : bool
+            %63 = const #true : bool
+            yield %63
+        } : {
+            %56 = const 3 : s64i
+            %57 = get_global @b : s8i[6]*
+            %58 = get_element %57[%56] : s8i*
+            %59 = load %58 : s8i, align 1
+            %60 = cast(integral) %59 : s32i
+            %61 = const 120 : s32i
+            %62 = cmp ne %60, %61 : bool
+            yield %62
+        }
+        %38 = ternary %37 ? { : bool
+            %55 = const #true : bool
+            yield %55
+        } : {
+            %48 = const 4 : s64i
+            %49 = get_global @b : s8i[6]*
+            %50 = get_element %49[%48] : s8i*
+            %51 = load %50 : s8i, align 1
+            %52 = cast(integral) %51 : s32i
+            %53 = const 97 : s32i
+            %54 = cmp ne %52, %53 : bool
+            yield %54
+        }
+        %39 = ternary %38 ? { : bool
+            %47 = const #true : bool
+            yield %47
+        } : {
+            %40 = const 5 : s64i
+            %41 = get_global @b : s8i[6]*
+            %42 = get_element %41[%40] : s8i*
+            %43 = load %42 : s8i, align 1
+            %44 = cast(integral) %43 : s32i
+            %45 = const 97 : s32i
+            %46 = cmp ne %44, %45 : bool
+            yield %46
+        }
+        if %39 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %20 = get_global @pb : void**
+        %21 = load %20 : void*, align 8
+        %22 = get_global @.str : s8i[7]*
+        %23 = cast(array_to_ptrdecay) %22 : s8i*
+        %24 = cast(bitcast) %23 : void*
+        %25 = const 6 : u64i
+        %26 = call @memcmp(%21, %24, %25) : s32i [all]
+        %27 = cast(int_to_bool) %26 : bool
+        if %27 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %18 = const 0 : s32i
+    store %18, %0
+    %19 = load %0 : s32i
+    return %19
+}

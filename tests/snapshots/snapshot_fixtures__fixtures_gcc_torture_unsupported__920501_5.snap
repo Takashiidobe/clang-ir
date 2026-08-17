@@ -1,0 +1,83 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture.unsupported/920501-5.c" (c, x86_64-unknown-linux-gnu)
+global __const.x.j : void*[3] = [#cir.block_addr_info<@x, "x">, #cir.block_addr_info<@x, "y">, #cir.block_addr_info<@x, "z">] [cir_private, default, dso_local, constant]
+
+fn x(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %22 = alloca s32i, "i", align 4
+        %23 = alloca s32i, "__retval", align 4
+        %24 = alloca void*[3], "j", align 16
+        store %arg0, %22
+        %25 = get_global @__const.x.j : void*[3]*
+        copy %24, %25
+        %26 = load %22 : s32i, align 4
+        %27 = cast(integral) %26 : s64i
+        %28 = get_element %24[%27] : void**
+        %29 = load %28 : void*, align 8
+        indirect_goto %29
+    ^bb1():
+        label x:
+        %30 = const 2 : s32i
+        store %30, %23
+        %31 = load %23 : s32i
+        return %31
+    ^bb2():
+        label y:
+        %32 = const 3 : s32i
+        store %32, %23
+        %33 = load %23 : s32i
+        return %33
+    ^bb3():
+        label z:
+        %34 = const 5 : s32i
+        store %34, %23
+        %35 = load %23 : s32i
+        return %35
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %5 = const 0 : s32i
+        %6 = call @x(%5) : s32i [all]
+        %7 = const 2 : s32i
+        %8 = cmp ne %6, %7 : bool
+        %9 = ternary %8 ? { : bool
+            %21 = const #true : bool
+            yield %21
+        } : {
+            %17 = const 1 : s32i
+            %18 = call @x(%17) : s32i [all]
+            %19 = const 3 : s32i
+            %20 = cmp ne %18, %19 : bool
+            yield %20
+        }
+        %10 = ternary %9 ? { : bool
+            %16 = const #true : bool
+            yield %16
+        } : {
+            %12 = const 2 : s32i
+            %13 = call @x(%12) : s32i [all]
+            %14 = const 5 : s32i
+            %15 = cmp ne %13, %14 : bool
+            yield %15
+        }
+        if %10 {
+            %11 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

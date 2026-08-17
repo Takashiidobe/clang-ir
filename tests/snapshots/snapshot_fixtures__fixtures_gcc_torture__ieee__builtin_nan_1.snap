@@ -1,0 +1,35 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/ieee__builtin-nan-1.c" (c, x86_64-unknown-linux-gnu)
+global n1 : double = 0x7FF8000000000001 [external, default, align 8, dso_local]
+global n2 : double = 0x7FF8000000000001 [external, default, align 8, dso_local]
+
+fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = get_global @memcmp : ((void*, void*, u64i) -> s32i)*
+        %5 = get_global @n1 : double*
+        %6 = cast(bitcast) %5 : void*
+        %7 = get_global @n2 : double*
+        %8 = cast(bitcast) %7 : void*
+        %9 = const 8 : u64i
+        %10 = call @memcmp(%6, %8, %9) : s32i [all]
+        %11 = cast(int_to_bool) %10 : bool
+        if %11 {
+            %12 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

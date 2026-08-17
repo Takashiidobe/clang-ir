@@ -1,0 +1,65 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/unions.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn pick_left(%arg2: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i):
+        %28 = alloca s32i, "value", align 4
+        %29 = alloca s32i, "__retval", align 4
+        %30 = alloca rec_Pair, "p", align 4
+        store %arg2, %28
+        %31 = load %28 : s32i, align 4
+        %32 = get_member %30[0] "left" : s32i*
+        store %31, %32, align 4
+        %33 = get_member %30[0] "left" : s32i*
+        %34 = load %33 : s32i, align 4
+        store %34, %29
+        %35 = load %29 : s32i
+        return %35
+}
+fn overwrite(%arg0: s32i, %arg1: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s32i):
+        %17 = alloca s32i, "a", align 4
+        %18 = alloca s32i, "b", align 4
+        %19 = alloca s32i, "__retval", align 4
+        %20 = alloca rec_Pair, "p", align 4
+        store %arg0, %17
+        store %arg1, %18
+        %21 = load %17 : s32i, align 4
+        %22 = get_member %20[0] "left" : s32i*
+        store %21, %22, align 4
+        %23 = load %18 : s32i, align 4
+        %24 = get_member %20[1] "right" : s32i*
+        store %23, %24, align 4
+        %25 = get_member %20[0] "left" : s32i*
+        %26 = load %25 : s32i, align 4
+        store %26, %19
+        %27 = load %19 : s32i
+        return %27
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[4]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 7 : s32i
+    %6 = call @pick_left(%5) : s32i [all]
+    %7 = call @printf(%4, %6) : s32i [all]
+    %8 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %9 = get_global @.str : s8i[4]*
+    %10 = cast(array_to_ptrdecay) %9 : s8i*
+    %11 = const 3 : s32i
+    %12 = const 9 : s32i
+    %13 = call @overwrite(%11, %12) : s32i [all]
+    %14 = call @printf(%10, %13) : s32i [all]
+    %15 = const 0 : s32i
+    store %15, %0
+    %16 = load %0 : s32i
+    return %16
+}

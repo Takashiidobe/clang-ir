@@ -1,0 +1,46 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/pointer_compare_address.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.local : rec_tm = zero [cir_private, default, dso_local, constant]
+global __const.main.utc : rec_tm = zero [cir_private, default, dso_local, constant]
+global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn gmtime_r(%arg0: s64i*, %arg1: rec_tm*) -> rec_tm* [external, c, nothrow];
+fn localtime_r(%arg0: s64i*, %arg1: rec_tm*) -> rec_tm* [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s64i, "timestamp", align 8
+    %2 = alloca rec_tm, "utc", align 8
+    %3 = alloca rec_tm, "local", align 8
+    %4 = alloca s32i, "utc_result", align 4
+    %5 = alloca s32i, "local_result", align 4
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = const 0 : s64i
+    store %7, %1, align 8
+    %8 = get_global @__const.main.utc : rec_tm*
+    copy %2, %8
+    %9 = get_global @__const.main.local : rec_tm*
+    copy %3, %9
+    %10 = call @gmtime_r(%1, %2) : rec_tm* [all]
+    %11 = cmp eq %10, %2 : bool
+    %12 = cast(bool_to_int) %11 : s32i
+    store %12, %4, align 4
+    %13 = call @localtime_r(%1, %3) : rec_tm* [all]
+    %14 = cmp eq %13, %3 : bool
+    %15 = cast(bool_to_int) %14 : s32i
+    store %15, %5, align 4
+    %16 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %17 = get_global @.str : s8i[7]*
+    %18 = cast(array_to_ptrdecay) %17 : s8i*
+    %19 = load %4 : s32i, align 4
+    %20 = load %5 : s32i, align 4
+    %21 = call @printf(%18, %19, %20) : s32i [all]
+    %22 = const 0 : s32i
+    store %22, %0
+    %23 = load %0 : s32i
+    return %23
+}

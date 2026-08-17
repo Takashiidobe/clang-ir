@@ -1,0 +1,79 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20001108-1.c" (c, x86_64-unknown-linux-gnu)
+fn signed_poly(%arg2: s64i, %arg3: s64i) -> s64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s64i, %arg3: s64i):
+        %27 = alloca s64i, "sum", align 8
+        %28 = alloca s64i, "x", align 8
+        %29 = alloca s64i, "__retval", align 8
+        store %arg2, %27
+        store %arg3, %28
+        %30 = load %27 : s64i, align 8
+        %31 = load %28 : s64i, align 8
+        %32 = mul %30, %31 : s64i [nsw]
+        %33 = load %27 : s64i, align 8
+        %34 = add %33, %32 : s64i [nsw]
+        store %34, %27, align 8
+        %35 = load %27 : s64i, align 8
+        store %35, %29
+        %36 = load %29 : s64i
+        return %36
+}
+fn unsigned_poly(%arg0: u64i, %arg1: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u64i, %arg1: u64i):
+        %17 = alloca u64i, "sum", align 8
+        %18 = alloca u64i, "x", align 8
+        %19 = alloca u64i, "__retval", align 8
+        store %arg0, %17
+        store %arg1, %18
+        %20 = load %17 : u64i, align 8
+        %21 = load %18 : u64i, align 8
+        %22 = mul %20, %21 : u64i
+        %23 = load %17 : u64i, align 8
+        %24 = add %23, %22 : u64i
+        store %24, %17, align 8
+        %25 = load %17 : u64i, align 8
+        store %25, %19
+        %26 = load %19 : u64i
+        return %26
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %11 = const 2 : s64i
+        %12 = const -3 : s64i
+        %13 = call @signed_poly(%11, %12) : s64i [all]
+        %14 = const -4 : s64i
+        %15 = cmp ne %13, %14 : bool
+        if %15 {
+            %16 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %5 = const 2 : u64i
+        %6 = const 3 : u64i
+        %7 = call @unsigned_poly(%5, %6) : u64i [all]
+        %8 = const 8 : u64i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            %10 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

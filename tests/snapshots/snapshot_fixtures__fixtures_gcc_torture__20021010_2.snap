@@ -1,0 +1,95 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20021010-2.c" (c, x86_64-unknown-linux-gnu)
+global expectedwidth : s32i = 50 [external, default, align 4, dso_local]
+global global_vramPtr : u32i* = #cir.ptr<40960 : i64> [external, default, align 8, dso_local]
+global global_bounds : rec_IOGBounds = {100, 150, 100, 150} [external, default, align 2, dso_local]
+global global_saveRect : rec_IOGBounds = {75, 175, 75, 175} [external, default, align 2, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u32i*, "vramPtr", align 8
+    %2 = alloca s32i, "width", align 4
+    %3 = alloca rec_IOGBounds, "saveRect", align 2
+    %4 = alloca rec_IOGBounds, "bounds", align 2
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = get_global @global_saveRect : rec_IOGBounds*
+    copy %3, %6
+    %7 = get_global @global_bounds : rec_IOGBounds*
+    copy %4, %7
+    scope {
+        %43 = get_member %3[0] "minx" : s16i*
+        %44 = load %43 : s16i, align 2
+        %45 = cast(integral) %44 : s32i
+        %46 = get_member %4[0] "minx" : s16i*
+        %47 = load %46 : s16i, align 2
+        %48 = cast(integral) %47 : s32i
+        %49 = cmp lt %45, %48 : bool
+        if %49 {
+            %50 = get_member %4[0] "minx" : s16i*
+            %51 = load %50 : s16i, align 2
+            %52 = get_member %3[0] "minx" : s16i*
+            store %51, %52, align 2
+            yield
+        }
+        yield
+    }
+    scope {
+        %33 = get_member %3[1] "maxx" : s16i*
+        %34 = load %33 : s16i, align 2
+        %35 = cast(integral) %34 : s32i
+        %36 = get_member %4[1] "maxx" : s16i*
+        %37 = load %36 : s16i, align 2
+        %38 = cast(integral) %37 : s32i
+        %39 = cmp gt %35, %38 : bool
+        if %39 {
+            %40 = get_member %4[1] "maxx" : s16i*
+            %41 = load %40 : s16i, align 2
+            %42 = get_member %3[1] "maxx" : s16i*
+            store %41, %42, align 2
+            yield
+        }
+        yield
+    }
+    %8 = get_global @global_vramPtr : u32i**
+    %9 = load %8 : u32i*, align 8
+    %10 = get_member %3[2] "miny" : s16i*
+    %11 = load %10 : s16i, align 2
+    %12 = cast(integral) %11 : s32i
+    %13 = get_member %4[2] "miny" : s16i*
+    %14 = load %13 : s16i, align 2
+    %15 = cast(integral) %14 : s32i
+    %16 = sub %12, %15 : s32i [nsw]
+    %17 = ptr_stride %9, %16 : u32i*
+    store %17, %1, align 8
+    %18 = get_member %3[1] "maxx" : s16i*
+    %19 = load %18 : s16i, align 2
+    %20 = cast(integral) %19 : s32i
+    %21 = get_member %3[0] "minx" : s16i*
+    %22 = load %21 : s16i, align 2
+    %23 = cast(integral) %22 : s32i
+    %24 = sub %20, %23 : s32i [nsw]
+    store %24, %2, align 4
+    scope {
+        %28 = load %2 : s32i, align 4
+        %29 = get_global @expectedwidth : s32i*
+        %30 = load %29 : s32i, align 4
+        %31 = cmp ne %28, %30 : bool
+        if %31 {
+            %32 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %25 = get_global @exit : ((s32i) -> void)*
+    %26 = const 0 : s32i
+    call @exit(%26) [all]
+    %27 = load %0 : s32i
+    return %27
+}

@@ -1,0 +1,46 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr97888-2.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn foo(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %6 = alloca s32i, "i", align 4
+        store %arg0, %6
+        scope {
+            %7 = load %6 : s32i, align 4
+            %8 = const 7 : s32i
+            %9 = rem %7, %8 : s32i
+            %10 = const 0 : s32i
+            %11 = cmp ge %9, %10 : bool
+            if %11 {
+                scope {
+                    %12 = load %6 : s32i, align 4
+                    %13 = const 0 : s32i
+                    %14 = cmp ge %12, %13 : bool
+                    if %14 {
+                        call @abort() [all]
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const -7 : s32i
+    call @foo(%2) [all]
+    %3 = const -21 : s32i
+    call @foo(%3) [all]
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

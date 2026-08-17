@@ -1,0 +1,95 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20000801-2.c" (c, x86_64-unknown-linux-gnu)
+fn bar() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %34 = alloca s32i, "__retval", align 4
+    %35 = const 0 : s32i
+    store %35, %34
+    %36 = load %34 : s32i
+    return %36
+}
+fn baz() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %31 = alloca s32i, "__retval", align 4
+    %32 = const 0 : s32i
+    store %32, %31
+    %33 = load %31 : s32i
+    return %33
+}
+fn test(%arg0: rec_foo*) -> rec_foo* [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_foo*):
+        %15 = alloca rec_foo*, "node", align 8
+        %16 = alloca rec_foo*, "__retval", align 8
+        store %arg0, %15
+        scope {
+            while {
+                %29 = load %15 : rec_foo*, align 8
+                %30 = cast(ptr_to_bool) %29 : bool
+                condition %30
+            } do {
+                scope {
+                    scope {
+                        %22 = call @bar() : s32i [all]
+                        %23 = cast(int_to_bool) %22 : bool
+                        %24 = ternary %23 ? { : bool
+                            %26 = call @baz() : s32i [all]
+                            %27 = cast(int_to_bool) %26 : bool
+                            %28 = not %27 : bool
+                            yield %28
+                        } : {
+                            %25 = const #false : bool
+                            yield %25
+                        }
+                        if %24 {
+                            break
+                        }
+                        yield
+                    }
+                    %19 = load %15 : rec_foo*, align 8
+                    %20 = get_member %19[0] "next" : rec_foo**
+                    %21 = load %20 : rec_foo*, align 8
+                    store %21, %15, align 8
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %17 = load %15 : rec_foo*, align 8
+        store %17, %16
+        %18 = load %16 : rec_foo*
+        return %18
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_foo, "a", align 8
+    %2 = alloca rec_foo, "b", align 8
+    %3 = alloca rec_foo*, "c", align 8
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = get_member %1[0] "next" : rec_foo**
+    store %2, %5, align 8
+    %6 = const #cir.ptr<null> : rec_foo*
+    %7 = get_member %2[0] "next" : rec_foo**
+    store %6, %7, align 8
+    %8 = call @test(%1) : rec_foo* [all]
+    store %8, %3, align 8
+    scope {
+        %12 = load %3 : rec_foo*, align 8
+        %13 = cast(ptr_to_bool) %12 : bool
+        if %13 {
+            %14 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %9 = get_global @exit : ((s32i) -> void)*
+    %10 = const 0 : s32i
+    call @exit(%10) [all]
+    %11 = load %0 : s32i
+    return %11
+}

@@ -1,0 +1,48 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/math/trig_inverse.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[26] = "%.6f %.6f %.6f %.6f %.6f\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn tan(%arg0: double) -> double [external, c, nothrow];
+fn atan(%arg0: double) -> double [external, c, nothrow];
+fn atan2(%arg0: double, %arg1: double) -> double [external, c, nothrow];
+fn asin(%arg0: double) -> double [external, c, nothrow];
+fn acos(%arg0: double) -> double [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca double, "x", align 8
+    %2 = alloca double, "y", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 5.000000e-01 : double
+    store %4, %1, align 8
+    %5 = const 1.000000e+00 : double
+    store %5, %2, align 8
+    %6 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %7 = get_global @.str : s8i[26]*
+    %8 = cast(array_to_ptrdecay) %7 : s8i*
+    %9 = get_global @tan : ((double) -> double)*
+    %10 = load %1 : double, align 8
+    %11 = call @tan(%10) : double [all]
+    %12 = get_global @atan : ((double) -> double)*
+    %13 = load %1 : double, align 8
+    %14 = call @atan(%13) : double [all]
+    %15 = get_global @atan2 : ((double, double) -> double)*
+    %16 = load %2 : double, align 8
+    %17 = load %1 : double, align 8
+    %18 = call @atan2(%16, %17) : double [all]
+    %19 = get_global @asin : ((double) -> double)*
+    %20 = load %1 : double, align 8
+    %21 = call @asin(%20) : double [all]
+    %22 = get_global @acos : ((double) -> double)*
+    %23 = load %1 : double, align 8
+    %24 = call @acos(%23) : double [all]
+    %25 = call @printf(%8, %11, %14, %18, %21, %24) : s32i [all]
+    %26 = const 0 : s32i
+    store %26, %0
+    %27 = load %0 : s32i
+    return %27
+}

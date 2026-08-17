@@ -1,0 +1,19 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.multi/shared_function_pointer/read.c" (c, x86_64-unknown-linux-gnu)
+fn call_handler(%arg0: rec_Callback*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_Callback*):
+        %0 = alloca rec_Callback*, "callback", align 8
+        %1 = alloca s32i, "__retval", align 4
+        store %arg0, %0
+        %2 = load %0 : rec_Callback*, align 8
+        %3 = get_member %2[0] "handler" : ((s32i) -> s32i)**
+        %4 = load %3 : ((s32i) -> s32i)*, align 8
+        %5 = const 41 : s32i
+        %6 = call %4(%5) : s32i [all]
+        store %6, %1
+        %7 = load %1 : s32i
+        return %7
+}

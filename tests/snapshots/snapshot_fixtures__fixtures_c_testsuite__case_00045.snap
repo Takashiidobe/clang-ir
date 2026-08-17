@@ -1,0 +1,58 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00045.c" (c, x86_64-unknown-linux-gnu)
+global x : s32i = 5 [external, default, align 4, dso_local]
+global y : s64i = 6 [external, default, align 8, dso_local]
+global p : s32i* = @x [external, default, align 8, dso_local]
+
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %17 = get_global @x : s32i*
+        %18 = load %17 : s32i, align 4
+        %19 = const 5 : s32i
+        %20 = cmp ne %18, %19 : bool
+        if %20 {
+            %21 = const 1 : s32i
+            store %21, %0
+            %22 = load %0 : s32i
+            return %22
+        }
+        yield
+    }
+    scope {
+        %11 = get_global @y : s64i*
+        %12 = load %11 : s64i, align 8
+        %13 = const 6 : s64i
+        %14 = cmp ne %12, %13 : bool
+        if %14 {
+            %15 = const 2 : s32i
+            store %15, %0
+            %16 = load %0 : s32i
+            return %16
+        }
+        yield
+    }
+    scope {
+        %4 = get_global @p : s32i**
+        %5 = load %4 : s32i*, align 8
+        %6 = load %5 : s32i, align 4
+        %7 = const 5 : s32i
+        %8 = cmp ne %6, %7 : bool
+        if %8 {
+            %9 = const 3 : s32i
+            store %9, %0
+            %10 = load %0 : s32i
+            return %10
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

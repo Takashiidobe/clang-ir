@@ -1,0 +1,99 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr64255.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn bar(%arg1: s64i, %arg2: u64i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s64i, %arg2: u64i):
+        %32 = alloca s64i, "i", align 8
+        %33 = alloca u64i, "j", align 8
+        store %arg1, %32
+        store %arg2, %33
+        scope {
+            %34 = load %32 : s64i, align 8
+            %35 = const 1 : s64i
+            %36 = cmp ne %34, %35 : bool
+            %37 = ternary %36 ? { : bool
+                %41 = const #true : bool
+                yield %41
+            } : {
+                %38 = load %33 : u64i, align 8
+                %39 = const 1 : u64i
+                %40 = cmp ne %38, %39 : bool
+                yield %40
+            }
+            if %37 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn foo(%arg0: s64i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s64i):
+        %5 = alloca s64i, "i", align 8
+        %6 = alloca u64i, "j", align 8
+        store %arg0, %5
+        scope {
+            %29 = load %5 : s64i, align 8
+            %30 = cast(int_to_bool) %29 : bool
+            %31 = not %30 : bool
+            if %31 {
+                return
+            }
+            yield
+        }
+        %7 = load %5 : s64i, align 8
+        %8 = const 0 : s64i
+        %9 = cmp ge %7, %8 : bool
+        %10 = ternary %9 ? { : u64i
+            %27 = load %5 : s64i, align 8
+            %28 = cast(integral) %27 : u64i
+            yield %28
+        } : {
+            %24 = load %5 : s64i, align 8
+            %25 = cast(integral) %24 : u64i
+            %26 = minus %25 : u64i
+            yield %26
+        }
+        store %10, %6, align 8
+        scope {
+            %13 = load %5 : s64i, align 8
+            %14 = const 0 : s64i
+            %15 = cmp ge %13, %14 : bool
+            %16 = ternary %15 ? { : u64i
+                %22 = load %5 : s64i, align 8
+                %23 = cast(integral) %22 : u64i
+                yield %23
+            } : {
+                %19 = load %5 : s64i, align 8
+                %20 = cast(integral) %19 : u64i
+                %21 = minus %20 : u64i
+                yield %21
+            }
+            %17 = load %6 : u64i, align 8
+            %18 = cmp ne %16, %17 : bool
+            if %18 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        %11 = load %5 : s64i, align 8
+        %12 = load %6 : u64i, align 8
+        call @bar(%11, %12) [all]
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 1 : s64i
+    call @foo(%2) [all]
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

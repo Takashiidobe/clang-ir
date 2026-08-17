@@ -1,0 +1,46 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/heap_box_delayed_store.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn malloc(%arg0: u64i) -> void* [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn free(%arg0: void*) -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i*, "p", align 8
+    %2 = alloca s32i, "marker", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_global @malloc : ((u64i) -> void*)*
+    %5 = const 4 : u64i
+    %6 = call @malloc(%5) : void* [all]
+    %7 = cast(bitcast) %6 : s32i*
+    store %7, %1, align 8
+    %8 = const 7 : s32i
+    store %8, %2, align 4
+    %9 = load %2 : s32i, align 4
+    %10 = const 1 : s32i
+    %11 = add %9, %10 : s32i [nsw]
+    store %11, %2, align 4
+    %12 = const 41 : s32i
+    %13 = load %1 : s32i*, align 8
+    store %12, %13, align 4
+    %14 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %15 = get_global @.str : s8i[7]*
+    %16 = cast(array_to_ptrdecay) %15 : s8i*
+    %17 = load %1 : s32i*, align 8
+    %18 = load %17 : s32i, align 4
+    %19 = load %2 : s32i, align 4
+    %20 = call @printf(%16, %18, %19) : s32i [all]
+    %21 = get_global @free : ((void*) -> void)*
+    %22 = load %1 : s32i*, align 8
+    %23 = cast(bitcast) %22 : void*
+    call @free(%23) [all]
+    %24 = const 0 : s32i
+    store %24, %0
+    %25 = load %0 : s32i
+    return %25
+}

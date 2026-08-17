@@ -1,0 +1,39 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20010114-1.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.array2 : s32i[1][2] = [[1]] [cir_private, default, dso_local, constant]
+global __const.main.array1 : s32i[1] = [1] [cir_private, default, dso_local, constant]
+
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i[1], "array1", align 4
+    %2 = alloca s32i[1][2], "array2", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_global @__const.main.array1 : s32i[1]*
+    copy %1, %4
+    %5 = get_global @__const.main.array2 : s32i[1][2]*
+    copy %2, %5
+    scope {
+        %9 = const 0 : s64i
+        %10 = get_element %1[%9] : s32i*
+        %11 = load %10 : s32i, align 4
+        %12 = const 1 : s32i
+        %13 = cmp ne %11, %12 : bool
+        if %13 {
+            %14 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = get_global @exit : ((s32i) -> void)*
+    %7 = const 0 : s32i
+    call @exit(%7) [all]
+    %8 = load %0 : s32i
+    return %8
+}

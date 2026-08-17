@@ -1,0 +1,57 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr43220.c" (c, x86_64-unknown-linux-gnu)
+global p : void* = #cir.ptr<null> [external, default, align 8, dso_local]
+
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "n", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 0 : s32i
+    store %3, %1, align 4
+    br ^bb1
+    ^bb1():
+        label lab:
+        scope {
+            %32 = alloca u8i*, "saved_stack", align 8
+            %33 = load %1 : s32i, align 4
+            %34 = const 1000 : s32i
+            %35 = rem %33, %34 : s32i
+            %36 = const 1 : s32i
+            %37 = add %35, %36 : s32i [nsw]
+            %38 = cast(integral) %37 : u64i
+            <unmodeled: cir.stacksave>
+            store %39, %32, align 8
+            <unmodeled: cir.cleanup.scope>
+            yield
+        }
+        scope {
+            %9 = alloca u8i*, "saved_stack", align 8
+            %10 = load %1 : s32i, align 4
+            %11 = const 1000 : s32i
+            %12 = rem %10, %11 : s32i
+            %13 = const 1 : s32i
+            %14 = add %12, %13 : s32i [nsw]
+            %15 = cast(integral) %14 : u64i
+            <unmodeled: cir.stacksave>
+            store %16, %9, align 8
+            <unmodeled: cir.cleanup.scope>
+            yield
+        }
+        scope {
+            %6 = load %1 : s32i, align 4
+            %7 = const 1000000 : s32i
+            %8 = cmp lt %6, %7 : bool
+            if %8 {
+                goto lab
+            }
+            yield
+        }
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
+}

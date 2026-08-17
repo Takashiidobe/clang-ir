@@ -1,0 +1,58 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20000801-4.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.s : s8i[2] = "x" [cir_private, default, dso_local, constant]
+global __const.foo.s : s8i[2] = zero [cir_private, default, dso_local, constant]
+global t : s8i* = #cir.ptr<null> [external, default, align 8, dso_local]
+
+fn foo() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %12 = alloca s32i, "__retval", align 4
+    %13 = alloca s8i[2], "s", align 1
+    %14 = get_global @__const.foo.s : s8i[2]*
+    copy %13, %14
+    %15 = const 0 : s32i
+    %16 = const 1 : s64i
+    %17 = get_element %13[%16] : s8i*
+    %18 = load %17 : s8i, align 1
+    %19 = cast(integral) %18 : s32i
+    %20 = cmp eq %15, %19 : bool
+    %21 = cast(bool_to_int) %20 : s32i
+    store %21, %12
+    %22 = load %12 : s32i
+    return %22
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %8 = alloca s8i[2], "s", align 1
+        %9 = get_global @__const.main.s : s8i[2]*
+        copy %8, %9
+        %10 = cast(array_to_ptrdecay) %8 : s8i*
+        %11 = get_global @t : s8i**
+        store %10, %11, align 8
+        yield
+    }
+    scope {
+        %3 = call @foo() : s32i [all]
+        %4 = cast(int_to_bool) %3 : bool
+        if %4 {
+            %6 = get_global @exit : ((s32i) -> void)*
+            %7 = const 0 : s32i
+            call @exit(%7) [all]
+            yield
+        } else {
+            %5 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = load %0 : s32i
+    return %2
+}

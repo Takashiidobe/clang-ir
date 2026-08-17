@@ -1,0 +1,83 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/ieee__980619-1.c" (c, x86_64-unknown-linux-gnu)
+fn exit(%arg0: s32i) -> void [external, c];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca float, "reale", align 4
+    %2 = alloca float, "oneplus", align 4
+    %3 = alloca s32i, "i", align 4
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 1.000000e+00 : float
+    store %5, %1, align 4
+    scope {
+        %26 = const 4 : u64i
+        %27 = const 4 : u64i
+        %28 = cmp ne %26, %27 : bool
+        if %28 {
+            %29 = get_global @exit : ((s32i) -> void)*
+            %30 = const 0 : s32i
+            call @exit(%30) [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %13 = const 0 : s32i
+        store %13, %3, align 4
+        for cond: {
+            %25 = const #true : bool
+            condition %25
+        } step: {
+            %14 = load %3 : s32i, align 4
+            %15 = inc %14 : s32i [nsw]
+            store %15, %3, align 4
+            yield
+        } do {
+            scope {
+                %16 = const 1.000000e+00 : float
+                %17 = load %1 : float, align 4
+                %18 = fadd %16, %17 : float
+                store %18, %2, align 4
+                scope {
+                    %22 = load %2 : float, align 4
+                    %23 = const 1.000000e+00 : float
+                    %24 = cmp eq %22, %23 : bool
+                    if %24 {
+                        break
+                    }
+                    yield
+                }
+                %19 = load %1 : float, align 4
+                %20 = const 2.000000e+00 : float
+                %21 = fdiv %19, %20 : float
+                store %21, %1, align 4
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    scope {
+        %7 = load %3 : s32i, align 4
+        %8 = const 24 : s32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            %12 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        } else {
+            %10 = get_global @exit : ((s32i) -> void)*
+            %11 = const 0 : s32i
+            call @exit(%11) [all]
+            yield
+        }
+        yield
+    }
+    %6 = load %0 : s32i
+    return %6
+}

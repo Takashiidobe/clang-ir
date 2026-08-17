@@ -1,0 +1,72 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr70127.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.e : rec_S = {1, 1} [cir_private, default, dso_local, constant]
+global c : rec_S = {5, 1} [external, default, align 4, dso_local]
+global b : s16i = 0 [external, default, align 2, dso_local]
+global d : rec_S = zero [external, default, align 4, dso_local]
+global a : rec_S[1] = zero [external, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn foo(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %22 = alloca s32i, "x", align 4
+        store %arg0, %22
+        scope {
+            %23 = load %22 : s32i, align 4
+            %24 = const 1 : s32i
+            %25 = cmp ne %23, %24 : bool
+            if %25 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        while {
+            %16 = get_global @b : s16i*
+            %17 = load %16 : s16i, align 2
+            %18 = inc %17 : s16i
+            store %18, %16, align 2
+            %19 = cast(integral) %17 : s32i
+            %20 = const 0 : s32i
+            %21 = cmp le %19, %20 : bool
+            condition %21
+        } do {
+            scope {
+                %9 = alloca rec_S, "e", align 4
+                %10 = get_global @__const.main.e : rec_S*
+                copy %9, %10
+                %11 = get_global @d : rec_S*
+                %12 = const 0 : s64i
+                %13 = get_global @a : rec_S[1]*
+                %14 = get_element %13[%12] : rec_S*
+                %15 = get_global @c : rec_S*
+                copy %14, %15
+                copy %9, %14
+                copy %11, %9
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s64i
+    %3 = get_global @a : rec_S[1]*
+    %4 = get_element %3[%2] : rec_S*
+    %5 = get_member %4[1] "g" : u8i*
+    <unmodeled: cir.get_bitfield>
+    call @foo(%6) [all]
+    %7 = const 0 : s32i
+    store %7, %0
+    %8 = load %0 : s32i
+    return %8
+}

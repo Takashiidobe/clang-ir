@@ -1,0 +1,52 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr110252-3.c" (c, x86_64-unknown-linux-gnu)
+global a : u32i = 1387579096 [external, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn sinkandcheck(%arg0: u32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i):
+        %16 = alloca u32i, "b", align 4
+        store %arg0, %16
+        scope {
+            %17 = get_global @a : u32i*
+            %18 = load %17 : u32i, align 4
+            %19 = load %16 : u32i, align 4
+            %20 = cmp ne %18, %19 : bool
+            if %20 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 1 : u32i
+    %3 = get_global @a : u32i*
+    %4 = load %3 : u32i, align 4
+    %5 = not %4 : u32i
+    %6 = cmp lt %2, %5 : bool
+    %7 = ternary %6 ? { : u32i
+        %15 = const 1 : u32i
+        yield %15
+    } : {
+        %12 = get_global @a : u32i*
+        %13 = load %12 : u32i, align 4
+        %14 = not %13 : u32i
+        yield %14
+    }
+    %8 = get_global @a : u32i*
+    store %7, %8, align 4
+    %9 = const 1 : u32i
+    call @sinkandcheck(%9) [all]
+    %10 = const 0 : s32i
+    store %10, %0
+    %11 = load %0 : s32i
+    return %11
+}

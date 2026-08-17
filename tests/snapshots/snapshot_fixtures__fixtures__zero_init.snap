@@ -1,0 +1,40 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/zero_init.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[10] = "%d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn getchar() -> s32i [external, c];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "x", align 4
+    %2 = alloca s32i, "y", align 4
+    %3 = alloca s32i, "z", align 4
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 0 : s32i
+    store %5, %1, align 4
+    %6 = const 42 : s32i
+    store %6, %1, align 4
+    %7 = const 0 : s32i
+    store %7, %2, align 4
+    %8 = call @getchar() : s32i [all]
+    store %8, %3, align 4
+    %9 = load %3 : s32i, align 4
+    %10 = const 1 : s32i
+    %11 = add %9, %10 : s32i [nsw]
+    store %11, %2, align 4
+    %12 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %13 = get_global @.str : s8i[10]*
+    %14 = cast(array_to_ptrdecay) %13 : s8i*
+    %15 = load %1 : s32i, align 4
+    %16 = load %2 : s32i, align 4
+    %17 = load %3 : s32i, align 4
+    %18 = call @printf(%14, %15, %16, %17) : s32i [all]
+    %19 = const 0 : s32i
+    store %19, %0
+    %20 = load %0 : s32i
+    return %20
+}

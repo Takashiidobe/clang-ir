@@ -1,0 +1,109 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/varargs.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn sum(%arg1: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i):
+        %41 = alloca s32i, "n", align 4
+        %42 = alloca s32i, "__retval", align 4
+        %43 = alloca rec___va_list_tag[1], "ap", align 16
+        %44 = alloca s32i, "total", align 4
+        store %arg1, %41
+        %45 = cast(array_to_ptrdecay) %43 : rec___va_list_tag*
+        <unmodeled: cir.va_start>
+        %46 = const 0 : s32i
+        store %46, %44, align 4
+        scope {
+            %50 = alloca s32i, "i", align 4
+            %51 = const 0 : s32i
+            store %51, %50, align 4
+            for cond: {
+                %58 = load %50 : s32i, align 4
+                %59 = load %41 : s32i, align 4
+                %60 = cmp lt %58, %59 : bool
+                condition %60
+            } step: {
+                %52 = load %50 : s32i, align 4
+                %53 = inc %52 : s32i [nsw]
+                store %53, %50, align 4
+                yield
+            } do {
+                scope {
+                    %54 = cast(array_to_ptrdecay) %43 : rec___va_list_tag*
+                    <unmodeled: cir.va_arg>
+                    %56 = load %44 : s32i, align 4
+                    %57 = add %56, %55 : s32i [nsw]
+                    store %57, %44, align 4
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %47 = cast(array_to_ptrdecay) %43 : rec___va_list_tag*
+        <unmodeled: cir.va_end>
+        %48 = load %44 : s32i, align 4
+        store %48, %42
+        %49 = load %42 : s32i
+        return %49
+}
+fn pick_second(%arg0: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %22 = alloca s32i, "marker", align 4
+        %23 = alloca s32i, "__retval", align 4
+        %24 = alloca rec___va_list_tag[1], "ap", align 16
+        %25 = alloca s32i, "first", align 4
+        %26 = alloca s32i, "second", align 4
+        store %arg0, %22
+        %27 = cast(array_to_ptrdecay) %24 : rec___va_list_tag*
+        <unmodeled: cir.va_start>
+        %28 = cast(array_to_ptrdecay) %24 : rec___va_list_tag*
+        <unmodeled: cir.va_arg>
+        store %29, %25, align 4
+        %30 = cast(array_to_ptrdecay) %24 : rec___va_list_tag*
+        <unmodeled: cir.va_arg>
+        store %31, %26, align 4
+        %32 = cast(array_to_ptrdecay) %24 : rec___va_list_tag*
+        <unmodeled: cir.va_end>
+        %33 = load %22 : s32i, align 4
+        %34 = load %25 : s32i, align 4
+        %35 = const 10 : s32i
+        %36 = mul %34, %35 : s32i [nsw]
+        %37 = add %33, %36 : s32i [nsw]
+        %38 = load %26 : s32i, align 4
+        %39 = add %37, %38 : s32i [nsw]
+        store %39, %23
+        %40 = load %23 : s32i
+        return %40
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[4]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 4 : s32i
+    %6 = const 10 : s32i
+    %7 = const 20 : s32i
+    %8 = const 30 : s32i
+    %9 = const 40 : s32i
+    %10 = call @sum(%5, %6, %7, %8, %9) : s32i [all]
+    %11 = call @printf(%4, %10) : s32i [all]
+    %12 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %13 = get_global @.str : s8i[4]*
+    %14 = cast(array_to_ptrdecay) %13 : s8i*
+    %15 = const 5 : s32i
+    %16 = const 7 : s32i
+    %17 = const 9 : s32i
+    %18 = call @pick_second(%15, %16, %17) : s32i [all]
+    %19 = call @printf(%14, %18) : s32i [all]
+    %20 = const 0 : s32i
+    store %20, %0
+    %21 = load %0 : s32i
+    return %21
+}

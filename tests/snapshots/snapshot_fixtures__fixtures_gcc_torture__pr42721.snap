@@ -1,0 +1,67 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr42721.c" (c, x86_64-unknown-linux-gnu)
+global a : s32i = 0 [internal, default, align 4, dso_local]
+global b : s32i = 0 [internal, default, align 4, dso_local]
+
+fn foo(%arg0: u64i, %arg1: u64i) -> u64i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u64i, %arg1: u64i):
+        %26 = alloca u64i, "x", align 8
+        %27 = alloca u64i, "y", align 8
+        %28 = alloca u64i, "__retval", align 8
+        store %arg0, %26
+        store %arg1, %27
+        %29 = load %26 : u64i, align 8
+        %30 = load %27 : u64i, align 8
+        %31 = div %29, %30 : u64i
+        store %31, %28
+        %32 = load %28 : u64i
+        return %32
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u64i, "c", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 1 : u64i
+    store %3, %1, align 8
+    %4 = load %1 : u64i, align 8
+    %5 = cast(int_to_bool) %4 : bool
+    %6 = ternary %5 ? { : bool
+        %19 = get_global @a : s32i*
+        %20 = load %19 : s32i, align 4
+        %21 = cast(integral) %20 : u64i
+        %22 = const 18446744073709551615 : u64i
+        %23 = call @foo(%21, %22) : u64i [all]
+        %24 = const 1 : u64i
+        %25 = cmp ne %23, %24 : bool
+        yield %25
+    } : {
+        %18 = const #false : bool
+        yield %18
+    }
+    %7 = cast(bool_to_int) %6 : s32i
+    %8 = get_global @b : s32i*
+    %9 = load %8 : s32i, align 4
+    %10 = xor %9, %7 : s32i
+    store %10, %8, align 4
+    scope {
+        %13 = get_global @b : s32i*
+        %14 = load %13 : s32i, align 4
+        %15 = const 1 : s32i
+        %16 = cmp ne %14, %15 : bool
+        if %16 {
+            %17 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %11 = const 0 : s32i
+    store %11, %0
+    %12 = load %0 : s32i
+    return %12
+}

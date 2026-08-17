@@ -1,0 +1,126 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr42006.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn my_shift(%arg3: u32i, %arg4: u32i) -> u32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: u32i, %arg4: u32i):
+        %44 = alloca u32i, "left", align 4
+        %45 = alloca u32i, "right", align 4
+        %46 = alloca u32i, "__retval", align 4
+        store %arg3, %44
+        store %arg4, %45
+        %47 = load %45 : u32i, align 4
+        %48 = const 100 : u32i
+        %49 = cmp gt %47, %48 : bool
+        %50 = ternary %49 ? { : u32i
+            %55 = load %44 : u32i, align 4
+            yield %55
+        } : {
+            %52 = load %44 : u32i, align 4
+            %53 = load %45 : u32i, align 4
+            %54 = shift right %52, %53 : u32i
+            yield %54
+        }
+        store %50, %46
+        %51 = load %46 : u32i
+        return %51
+}
+fn my_add(%arg1: u32i, %arg2: u32i) -> u32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: u32i, %arg2: u32i):
+        %30 = alloca u32i, "si1", align 4
+        %31 = alloca u32i, "si2", align 4
+        %32 = alloca u32i, "__retval", align 4
+        store %arg1, %30
+        store %arg2, %31
+        %33 = load %30 : u32i, align 4
+        %34 = const 50 : u32i
+        %35 = load %31 : u32i, align 4
+        %36 = sub %34, %35 : u32i
+        %37 = cmp gt %33, %36 : bool
+        %38 = ternary %37 ? { : u32i
+            %43 = load %30 : u32i, align 4
+            yield %43
+        } : {
+            %40 = load %30 : u32i, align 4
+            %41 = load %31 : u32i, align 4
+            %42 = add %40, %41 : u32i
+            yield %42
+        }
+        store %38, %32
+        %39 = load %32 : u32i
+        return %39
+}
+fn func_4(%arg0: u32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i):
+        %6 = alloca u32i, "p_6", align 4
+        %7 = alloca s32i, "__retval", align 4
+        %8 = alloca s32i, "count", align 4
+        store %arg0, %6
+        %9 = const 0 : s32i
+        store %9, %8, align 4
+        scope {
+            %12 = const 1 : u32i
+            store %12, %6, align 4
+            for cond: {
+                %27 = load %6 : u32i, align 4
+                %28 = const 3 : u32i
+                %29 = cmp lt %27, %28 : bool
+                condition %29
+            } step: {
+                %13 = load %6 : u32i, align 4
+                %14 = const 1 : u32i
+                %15 = call @my_add(%13, %14) : u32i [all]
+                store %15, %6, align 4
+                yield
+            } do {
+                scope {
+                    scope {
+                        %22 = load %8 : s32i, align 4
+                        %23 = inc %22 : s32i [nsw]
+                        store %23, %8, align 4
+                        %24 = const 1 : s32i
+                        %25 = cmp gt %22, %24 : bool
+                        if %25 {
+                            %26 = get_global @abort : (() -> void)*
+                            call @abort() [all]
+                            yield
+                        }
+                        yield
+                    }
+                    scope {
+                        %16 = load %6 : u32i, align 4
+                        %17 = load %6 : u32i, align 4
+                        %18 = call @my_shift(%16, %17) : u32i [all]
+                        %19 = cast(int_to_bool) %18 : bool
+                        if %19 {
+                            %20 = const 0 : s32i
+                            store %20, %7
+                            %21 = load %7 : s32i
+                            return %21
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %10 = const 0 : s32i
+        store %10, %7
+        %11 = load %7 : s32i
+        return %11
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 0 : u32i
+    %3 = call @func_4(%2) : s32i [all]
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

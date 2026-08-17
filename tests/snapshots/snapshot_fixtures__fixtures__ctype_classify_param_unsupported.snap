@@ -1,0 +1,57 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/ctype_classify_param_unsupported.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[5] = "yes\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[4] = "no\n" [cir_private, default, align 1, dso_local, constant]
+
+fn __ctype_b_loc() -> u16i** [external, c, const, nothrow];
+fn classify(%arg0: s8i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i):
+        %15 = alloca s8i, "c", align 1
+        %16 = alloca s32i, "__retval", align 4
+        store %arg0, %15
+        %17 = load %15 : s8i, align 1
+        %18 = cast(integral) %17 : s32i
+        %19 = cast(integral) %18 : s64i
+        %20 = call @__ctype_b_loc() : u16i** [const]
+        %21 = load %20 : u16i*, align 8
+        %22 = ptr_stride %21, %19 : u16i*
+        %23 = load %22 : u16i, align 2
+        %24 = cast(integral) %23 : s32i
+        %25 = const 1024 : s32i
+        %26 = and %24, %25 : s32i
+        store %26, %16
+        %27 = load %16 : s32i
+        return %27
+}
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = const 65 : s8i
+        %5 = call @classify(%4) : s32i [all]
+        %6 = cast(int_to_bool) %5 : bool
+        if %6 {
+            %11 = get_global @printf : ((s8i*, ...) -> s32i)*
+            %12 = get_global @.str : s8i[5]*
+            %13 = cast(array_to_ptrdecay) %12 : s8i*
+            %14 = call @printf(%13) : s32i [all]
+            yield
+        } else {
+            %7 = get_global @printf : ((s8i*, ...) -> s32i)*
+            %8 = get_global @.str.1 : s8i[4]*
+            %9 = cast(array_to_ptrdecay) %8 : s8i*
+            %10 = call @printf(%9) : s32i [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

@@ -1,0 +1,78 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/991019-1.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: double) -> double [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: double):
+        %25 = alloca rec_material_type, "coerce", align 8
+        %26 = alloca double, "x", align 8
+        %27 = alloca rec_material_type, "__retval", align 8
+        store %arg0, %26
+        %28 = const 1.000000e+00 : double
+        %29 = load %26 : double, align 8
+        %30 = fadd %28, %29 : double
+        %31 = get_member %27[0] "epsilon" : double*
+        store %30, %31, align 8
+        %32 = load %27 : rec_material_type
+        store %32, %25
+        %33 = cast(bitcast) %25 : double*
+        %34 = load %33 : double
+        return %34
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca double, "coerce", align 8
+    %1 = alloca s32i, "__retval", align 4
+    %2 = alloca s32i, "i", align 4
+    %3 = alloca rec_material_type, "x", align 8
+    %4 = const 0 : s32i
+    store %4, %1
+    scope {
+        %8 = const 0 : s32i
+        store %8, %2, align 4
+        for cond: {
+            %22 = load %2 : s32i, align 4
+            %23 = const 10 : s32i
+            %24 = cmp lt %22, %23 : bool
+            condition %24
+        } step: {
+            %9 = load %2 : s32i, align 4
+            %10 = inc %9 : s32i [nsw]
+            store %10, %2, align 4
+            yield
+        } do {
+            scope {
+                %11 = const 1.000000e+00 : double
+                %12 = call @foo(%11) : double [all]
+                store %12, %0
+                %13 = cast(bitcast) %0 : rec_material_type*
+                %14 = load %13 : rec_material_type
+                store %14, %3, align 8
+                scope {
+                    %15 = get_member %3[0] "epsilon" : double*
+                    %16 = load %15 : double, align 8
+                    %17 = const 1.000000e+00 : double
+                    %18 = const 1.000000e+00 : double
+                    %19 = fadd %17, %18 : double
+                    %20 = cmp ne %16, %19 : bool
+                    if %20 {
+                        %21 = get_global @abort : (() -> void)*
+                        call @abort() [all]
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %5 = get_global @exit : ((s32i) -> void)*
+    %6 = const 0 : s32i
+    call @exit(%6) [all]
+    %7 = load %1 : s32i
+    return %7
+}

@@ -1,0 +1,25 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/stdio/fprintf.c" (c, x86_64-unknown-linux-gnu)
+global stdout : rec__IO_FILE* [external, default, align 8, dso_local]
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn fprintf(%arg0: rec__IO_FILE*, %arg1: s8i*, ...) -> s32i [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @fprintf : ((rec__IO_FILE*, s8i*, ...) -> s32i)*
+    %3 = get_global @stdout : rec__IO_FILE**
+    %4 = load %3 : rec__IO_FILE*, align 8
+    %5 = get_global @.str : s8i[4]*
+    %6 = cast(array_to_ptrdecay) %5 : s8i*
+    %7 = const 99 : s32i
+    %8 = call @fprintf(%4, %6, %7) : s32i [all]
+    %9 = const 0 : s32i
+    store %9, %0
+    %10 = load %0 : s32i
+    return %10
+}

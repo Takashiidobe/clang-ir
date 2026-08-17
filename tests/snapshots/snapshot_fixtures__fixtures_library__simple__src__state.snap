@@ -1,0 +1,21 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.library/simple/src/state.c" (c, x86_64-unknown-linux-gnu)
+global counter : s32i = 0 [external, default, align 4, dso_local]
+
+fn bump() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = get_global @counter : s32i*
+    %2 = load %1 : s32i, align 4
+    %3 = const 1 : s32i
+    %4 = add %2, %3 : s32i [nsw]
+    %5 = get_global @counter : s32i*
+    store %4, %5, align 4
+    %6 = get_global @counter : s32i*
+    %7 = load %6 : s32i, align 4
+    store %7, %0
+    %8 = load %0 : s32i
+    return %8
+}

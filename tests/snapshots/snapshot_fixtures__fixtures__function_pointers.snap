@@ -1,0 +1,83 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/function_pointers.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn add_pair(%arg5: s32i, %arg6: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg5: s32i, %arg6: s32i):
+        %39 = alloca s32i, "lhs", align 4
+        %40 = alloca s32i, "rhs", align 4
+        %41 = alloca s32i, "__retval", align 4
+        store %arg5, %39
+        store %arg6, %40
+        %42 = load %39 : s32i, align 4
+        %43 = load %40 : s32i, align 4
+        %44 = add %42, %43 : s32i [nsw]
+        store %44, %41
+        %45 = load %41 : s32i
+        return %45
+}
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn apply_binary(%arg2: ((s32i, s32i) -> s32i)*, %arg3: s32i, %arg4: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: ((s32i, s32i) -> s32i)*, %arg3: s32i, %arg4: s32i):
+        %30 = alloca ((s32i, s32i) -> s32i)*, "op", align 8
+        %31 = alloca s32i, "lhs", align 4
+        %32 = alloca s32i, "rhs", align 4
+        %33 = alloca s32i, "__retval", align 4
+        store %arg2, %30
+        store %arg3, %31
+        store %arg4, %32
+        %34 = load %30 : ((s32i, s32i) -> s32i)*, align 8
+        %35 = load %31 : s32i, align 4
+        %36 = load %32 : s32i, align 4
+        %37 = call %34(%35, %36) : s32i [all]
+        store %37, %33
+        %38 = load %33 : s32i
+        return %38
+}
+fn mul_pair(%arg0: s32i, %arg1: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s32i):
+        %23 = alloca s32i, "lhs", align 4
+        %24 = alloca s32i, "rhs", align 4
+        %25 = alloca s32i, "__retval", align 4
+        store %arg0, %23
+        store %arg1, %24
+        %26 = load %23 : s32i, align 4
+        %27 = load %24 : s32i, align 4
+        %28 = mul %26, %27 : s32i [nsw]
+        store %28, %25
+        %29 = load %25 : s32i
+        return %29
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca ((s32i, s32i) -> s32i)*, "chosen", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @add_pair : ((s32i, s32i) -> s32i)*
+    store %3, %1, align 8
+    %4 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %5 = get_global @.str : s8i[4]*
+    %6 = cast(array_to_ptrdecay) %5 : s8i*
+    %7 = load %1 : ((s32i, s32i) -> s32i)*, align 8
+    %8 = const 4 : s32i
+    %9 = const 5 : s32i
+    %10 = call @apply_binary(%7, %8, %9) : s32i [all]
+    %11 = call @printf(%6, %10) : s32i [all]
+    %12 = get_global @mul_pair : ((s32i, s32i) -> s32i)*
+    store %12, %1, align 8
+    %13 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %14 = get_global @.str : s8i[4]*
+    %15 = cast(array_to_ptrdecay) %14 : s8i*
+    %16 = load %1 : ((s32i, s32i) -> s32i)*, align 8
+    %17 = const 3 : s32i
+    %18 = const 6 : s32i
+    %19 = call %16(%17, %18) : s32i [all]
+    %20 = call @printf(%15, %19) : s32i [all]
+    %21 = const 0 : s32i
+    store %21, %0
+    %22 = load %0 : s32i
+    return %22
+}

@@ -1,0 +1,70 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr43438.c" (c, x86_64-unknown-linux-gnu)
+global g_2 : u8i = 1 [internal, default, align 1, dso_local]
+global l_8 : s32i* = @g_9 [internal, default, align 8, dso_local]
+global g_9 : s32i = 0 [internal, default, align 4, dso_local]
+
+fn func_12(%arg0: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %27 = alloca s32i, "p_13", align 4
+        %28 = alloca s32i*, "l_17", align 8
+        store %arg0, %27
+        %29 = get_global @g_9 : s32i*
+        store %29, %28, align 8
+        %30 = const 0 : s32i
+        %31 = load %27 : s32i, align 4
+        %32 = cmp lt %30, %31 : bool
+        %33 = cast(bool_to_int) %32 : s32i
+        %34 = load %28 : s32i*, align 8
+        %35 = load %34 : s32i, align 4
+        %36 = and %35, %33 : s32i
+        store %36, %34, align 4
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u8i, "l_11", align 1
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 254 : u8i
+    store %3, %1, align 1
+    %4 = get_global @g_2 : u8i*
+    %5 = load %4 : u8i, align 1
+    %6 = cast(integral) %5 : s32i
+    %7 = get_global @l_8 : s32i**
+    %8 = load %7 : s32i*, align 8
+    %9 = load %8 : s32i, align 4
+    %10 = or %9, %6 : s32i
+    store %10, %8, align 4
+    %11 = get_global @l_8 : s32i**
+    %12 = load %11 : s32i*, align 8
+    %13 = load %12 : s32i, align 4
+    %14 = load %1 : u8i, align 1
+    %15 = cast(integral) %14 : s32i
+    %16 = or %15, %13 : s32i
+    %17 = cast(integral) %16 : u8i
+    store %17, %1, align 1
+    %18 = load %1 : u8i, align 1
+    %19 = cast(integral) %18 : s32i
+    call @func_12(%19) [all]
+    scope {
+        %22 = get_global @g_9 : s32i*
+        %23 = load %22 : s32i, align 4
+        %24 = const 1 : s32i
+        %25 = cmp ne %23, %24 : bool
+        if %25 {
+            %26 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %20 = const 0 : s32i
+    store %20, %0
+    %21 = load %0 : s32i
+    return %21
+}

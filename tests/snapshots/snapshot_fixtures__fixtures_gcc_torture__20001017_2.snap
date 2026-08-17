@@ -1,0 +1,75 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20001017-2.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn fn_4parms(%arg0: u8i, %arg1: s64i*, %arg2: s64i*, %arg3: u32i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u8i, %arg1: s64i*, %arg2: s64i*, %arg3: u32i*):
+        %15 = alloca u8i, "a", align 1
+        %16 = alloca s64i*, "b", align 8
+        %17 = alloca s64i*, "c", align 8
+        %18 = alloca u32i*, "d", align 8
+        store %arg0, %15
+        store %arg1, %16
+        store %arg2, %17
+        store %arg3, %18
+        scope {
+            %19 = load %16 : s64i*, align 8
+            %20 = load %19 : s64i, align 8
+            %21 = const 1 : s64i
+            %22 = cmp ne %20, %21 : bool
+            %23 = ternary %22 ? { : bool
+                %35 = const #true : bool
+                yield %35
+            } : {
+                %31 = load %17 : s64i*, align 8
+                %32 = load %31 : s64i, align 8
+                %33 = const 2 : s64i
+                %34 = cmp ne %32, %33 : bool
+                yield %34
+            }
+            %24 = ternary %23 ? { : bool
+                %30 = const #true : bool
+                yield %30
+            } : {
+                %26 = load %18 : u32i*, align 8
+                %27 = load %26 : u32i, align 4
+                %28 = const 3 : u32i
+                %29 = cmp ne %27, %28 : bool
+                yield %29
+            }
+            if %24 {
+                %25 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u8i, "a", align 1
+    %2 = alloca u64i, "b", align 8
+    %3 = alloca u64i, "c", align 8
+    %4 = alloca u32i, "d", align 4
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = const 0 : u8i
+    store %6, %1, align 1
+    %7 = const 1 : u64i
+    store %7, %2, align 8
+    %8 = const 2 : u64i
+    store %8, %3, align 8
+    %9 = const 3 : u32i
+    store %9, %4, align 4
+    %10 = load %1 : u8i, align 1
+    %11 = cast(bitcast) %2 : s64i*
+    %12 = cast(bitcast) %3 : s64i*
+    call @fn_4parms(%10, %11, %12, %4) [all]
+    %13 = const 0 : s32i
+    store %13, %0
+    %14 = load %0 : s32i
+    return %14
+}

@@ -1,0 +1,135 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr91597.c" (c, x86_64-unknown-linux-gnu)
+global s : rec_S = {2} [external, default, align 4, dso_local]
+
+fn foo(%arg4: rec_S*) -> u32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: rec_S*):
+        %40 = alloca rec_S*, "o", align 8
+        %41 = alloca u32i, "__retval", align 4
+        store %arg4, %40
+        scope {
+            %43 = load %40 : rec_S*, align 8
+            %44 = cast(ptr_to_int) %43 : u64i
+            %45 = const 1 : u64i
+            %46 = and %44, %45 : u64i
+            %47 = const 0 : u64i
+            %48 = cmp eq %46, %47 : bool
+            if %48 {
+                %51 = load %40 : rec_S*, align 8
+                %52 = get_member %51[0] "e" : u32i*
+                %53 = load %52 : u32i, align 4
+                store %53, %41
+                %54 = load %41 : u32i
+                return %54
+            } else {
+                %49 = const 0 : u32i
+                store %49, %41
+                %50 = load %41 : u32i
+                return %50
+            }
+            yield
+        }
+        %42 = load %41 : u32i
+        return %42
+}
+fn bar(%arg3: rec_S*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: rec_S*):
+        %26 = alloca rec_S*, "o", align 8
+        %27 = alloca s32i, "__retval", align 4
+        store %arg3, %26
+        %28 = load %26 : rec_S*, align 8
+        %29 = call @foo(%28) : u32i [all]
+        %30 = const 1 : u32i
+        %31 = cmp eq %29, %30 : bool
+        %32 = ternary %31 ? { : bool
+            %39 = const #true : bool
+            yield %39
+        } : {
+            %35 = load %26 : rec_S*, align 8
+            %36 = call @foo(%35) : u32i [all]
+            %37 = const 2 : u32i
+            %38 = cmp eq %36, %37 : bool
+            yield %38
+        }
+        %33 = cast(bool_to_int) %32 : s32i
+        store %33, %27
+        %34 = load %27 : s32i
+        return %34
+}
+fn abort() -> void [external, c, nothrow];
+fn baz(%arg1: rec_S*, %arg2: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: rec_S*, %arg2: s32i):
+        %13 = alloca rec_S*, "o", align 8
+        %14 = alloca s32i, "d", align 4
+        store %arg1, %13
+        store %arg2, %14
+        scope {
+            %22 = load %13 : rec_S*, align 8
+            %23 = call @bar(%22) : s32i [all]
+            %24 = cast(int_to_bool) %23 : bool
+            %25 = not %24 : bool
+            if %25 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %19 = load %14 : s32i, align 4
+            %20 = const 2 : s32i
+            %21 = cmp gt %19, %20 : bool
+            if %21 {
+                return
+            }
+            yield
+        }
+        %15 = load %13 : rec_S*, align 8
+        %16 = load %14 : s32i, align 4
+        %17 = const 1 : s32i
+        %18 = add %16, %17 : s32i [nsw]
+        call @baz(%15, %18) [all]
+        return
+}
+fn qux(%arg0: rec_S*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_S*):
+        %5 = alloca rec_S*, "o", align 8
+        store %arg0, %5
+        scope {
+            %6 = load %5 : rec_S*, align 8
+            %7 = get_member %6[0] "e" : u32i*
+            %8 = load %7 : u32i, align 4
+            switch %8 {
+                case equal 0 {
+                    return
+                }
+                case equal 1 {
+                    %11 = load %5 : rec_S*, align 8
+                    %12 = const 0 : s32i
+                    call @baz(%11, %12) [all]
+                    break
+                }
+                case equal 2 {
+                    %9 = load %5 : rec_S*, align 8
+                    %10 = const 0 : s32i
+                    call @baz(%9, %10) [all]
+                    break
+                }
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @s : rec_S*
+    call @qux(%2) [all]
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

@@ -1,0 +1,74 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20071018-1.c" (c, x86_64-unknown-linux-gnu)
+fn malloc(%arg0: u64i) -> void* [external, c, nothrow];
+fn bar(%arg1: rec_foo**) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: rec_foo**):
+        %33 = alloca rec_foo**, "f", align 8
+        store %arg1, %33
+        %34 = const 16 : u64i
+        %35 = call @malloc(%34) : void* [all]
+        %36 = cast(bitcast) %35 : rec_foo*
+        %37 = load %33 : rec_foo**, align 8
+        store %36, %37, align 8
+        return
+}
+fn foo(%arg0: s32i) -> rec_foo* [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %9 = alloca s32i, "rank", align 4
+        %10 = alloca rec_foo*, "__retval", align 8
+        %11 = alloca void*, "x", align 8
+        %12 = alloca rec_mem*, "as", align 8
+        %13 = alloca rec_foo**, "upper", align 8
+        store %arg0, %9
+        %14 = const 32 : u64i
+        %15 = call @malloc(%14) : void* [all]
+        store %15, %11, align 8
+        %16 = load %11 : void*, align 8
+        %17 = cast(bitcast) %16 : rec_mem*
+        store %17, %12, align 8
+        %18 = load %9 : s32i, align 4
+        %19 = const 8 : s32i
+        %20 = mul %18, %19 : s32i [nsw]
+        %21 = const 5 : s32i
+        %22 = sub %20, %21 : s32i [nsw]
+        %23 = cast(integral) %22 : s64i
+        %24 = load %12 : rec_mem*, align 8
+        %25 = get_member %24[0] "x" : rec_foo*[4]*
+        %26 = get_element %25[%23] : rec_foo**
+        store %26, %13, align 8
+        %27 = const #cir.ptr<null> : rec_foo*
+        %28 = load %13 : rec_foo**, align 8
+        store %27, %28, align 8
+        %29 = load %13 : rec_foo**, align 8
+        call @bar(%29) [all]
+        %30 = load %13 : rec_foo**, align 8
+        %31 = load %30 : rec_foo*, align 8
+        store %31, %10
+        %32 = load %10 : rec_foo*
+        return %32
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = const 1 : s32i
+        %5 = call @foo(%4) : rec_foo* [all]
+        %6 = const #cir.ptr<null> : rec_foo*
+        %7 = cmp eq %5, %6 : bool
+        if %7 {
+            %8 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

@@ -1,0 +1,82 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/arrays.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn sum_array() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %32 = alloca s32i, "__retval", align 4
+    %33 = alloca s32i[3], "values", align 4
+    %34 = const 4 : s32i
+    %35 = const 0 : s64i
+    %36 = get_element %33[%35] : s32i*
+    store %34, %36, align 4
+    %37 = const 5 : s32i
+    %38 = const 1 : s64i
+    %39 = get_element %33[%38] : s32i*
+    store %37, %39, align 4
+    %40 = const 0 : s64i
+    %41 = get_element %33[%40] : s32i*
+    %42 = load %41 : s32i, align 4
+    %43 = const 1 : s64i
+    %44 = get_element %33[%43] : s32i*
+    %45 = load %44 : s32i, align 4
+    %46 = add %42, %45 : s32i [nsw]
+    %47 = const 2 : s64i
+    %48 = get_element %33[%47] : s32i*
+    store %46, %48, align 4
+    %49 = const 2 : s64i
+    %50 = get_element %33[%49] : s32i*
+    %51 = load %50 : s32i, align 4
+    store %51, %32
+    %52 = load %32 : s32i
+    return %52
+}
+fn pick_index(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %15 = alloca s32i, "index", align 4
+        %16 = alloca s32i, "__retval", align 4
+        %17 = alloca s32i[3], "values", align 4
+        store %arg0, %15
+        %18 = const 10 : s32i
+        %19 = const 0 : s64i
+        %20 = get_element %17[%19] : s32i*
+        store %18, %20, align 4
+        %21 = const 20 : s32i
+        %22 = const 1 : s64i
+        %23 = get_element %17[%22] : s32i*
+        store %21, %23, align 4
+        %24 = const 30 : s32i
+        %25 = const 2 : s64i
+        %26 = get_element %17[%25] : s32i*
+        store %24, %26, align 4
+        %27 = load %15 : s32i, align 4
+        %28 = cast(integral) %27 : s64i
+        %29 = get_element %17[%28] : s32i*
+        %30 = load %29 : s32i, align 4
+        store %30, %16
+        %31 = load %16 : s32i
+        return %31
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[4]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = call @sum_array() : s32i [all]
+    %6 = call @printf(%4, %5) : s32i [all]
+    %7 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %8 = get_global @.str : s8i[4]*
+    %9 = cast(array_to_ptrdecay) %8 : s8i*
+    %10 = const 1 : s32i
+    %11 = call @pick_index(%10) : s32i [all]
+    %12 = call @printf(%9, %11) : s32i [all]
+    %13 = const 0 : s32i
+    store %13, %0
+    %14 = load %0 : s32i
+    return %14
+}

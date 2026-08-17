@@ -1,0 +1,29 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/stdio/stdin_fgets.c" (c, x86_64-unknown-linux-gnu)
+global stdin : rec__IO_FILE* [external, default, align 8, dso_local]
+global stdout : rec__IO_FILE* [external, default, align 8, dso_local]
+
+fn fgets(%arg0: s8i*, %arg1: s32i, %arg2: rec__IO_FILE*) -> s8i* [external, c];
+fn fputs(%arg0: s8i*, %arg1: rec__IO_FILE*) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i[16], "b", align 16
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = cast(array_to_ptrdecay) %1 : s8i*
+    %4 = const 16 : s32i
+    %5 = get_global @stdin : rec__IO_FILE**
+    %6 = load %5 : rec__IO_FILE*, align 8
+    %7 = call @fgets(%3, %4, %6) : s8i* [all]
+    %8 = cast(array_to_ptrdecay) %1 : s8i*
+    %9 = get_global @stdout : rec__IO_FILE**
+    %10 = load %9 : rec__IO_FILE*, align 8
+    %11 = call @fputs(%8, %10) : s32i [all]
+    %12 = const 0 : s32i
+    store %12, %0
+    %13 = load %0 : s32i
+    return %13
+}

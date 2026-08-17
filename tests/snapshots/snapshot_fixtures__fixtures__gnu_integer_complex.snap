@@ -1,0 +1,57 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/gnu_integer_complex.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[25] = "%d %d %d %d %d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global global_value : complex<s32i> = (17, 19) [internal, default, align 4, dso_local]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca complex<s32i>, "first", align 4
+    %2 = alloca complex<s32i>, "second", align 4
+    %3 = alloca complex<s32i>, "imaginary", align 4
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 5 : s32i
+    %6 = const 0 : s32i
+    <unmodeled: cir.complex.create>
+    %8 = const (0, 7) : complex<s32i>
+    <unmodeled: cir.complex.add>
+    store %9, %1, align 4
+    %10 = const -3 : s32i
+    %11 = const 0 : s32i
+    <unmodeled: cir.complex.create>
+    %13 = const (0, 11) : complex<s32i>
+    <unmodeled: cir.complex.add>
+    store %14, %2, align 4
+    %15 = const (0, 13) : complex<s32i>
+    store %15, %3, align 4
+    %16 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %17 = get_global @.str : s8i[25]*
+    %18 = cast(array_to_ptrdecay) %17 : s8i*
+    %19 = load %1 : complex<s32i>, align 4
+    <unmodeled: cir.complex.real>
+    %21 = load %1 : complex<s32i>, align 4
+    <unmodeled: cir.complex.imag>
+    %23 = load %2 : complex<s32i>, align 4
+    <unmodeled: cir.complex.real>
+    %25 = load %2 : complex<s32i>, align 4
+    <unmodeled: cir.complex.imag>
+    %27 = load %3 : complex<s32i>, align 4
+    <unmodeled: cir.complex.real>
+    %29 = load %3 : complex<s32i>, align 4
+    <unmodeled: cir.complex.imag>
+    %31 = get_global @global_value : complex<s32i>*
+    %32 = load %31 : complex<s32i>, align 4
+    <unmodeled: cir.complex.real>
+    %34 = get_global @global_value : complex<s32i>*
+    %35 = load %34 : complex<s32i>, align 4
+    <unmodeled: cir.complex.imag>
+    %37 = call @printf(%18, %20, %22, %24, %26, %28, %30, %33, %36) : s32i [all]
+    %38 = const 0 : s32i
+    store %38, %0
+    %39 = load %0 : s32i
+    return %39
+}

@@ -1,0 +1,604 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/printf-chk-1.c" (c, x86_64-unknown-linux-gnu)
+global should_optimize : s32i = 0 [external, default, align 4, dso_local]
+global .str : s8i[6] = "hello" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[7] = "hello\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[2] = "a" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[1] = zero [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[3] = "%s" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[3] = "%c" [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[4] = "%s\n" [cir_private, default, align 1, dso_local, constant]
+global .str.7 : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn vprintf(%arg0: s8i*, %arg1: rec___va_list_tag*) -> s32i [external, c, nothrow];
+fn __printf_chk(%arg0: s32i, %arg1: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s8i*):
+        %303 = alloca s32i, "flag", align 4
+        %304 = alloca s8i*, "fmt", align 8
+        %305 = alloca s32i, "__retval", align 4
+        %306 = alloca rec___va_list_tag[1], "ap", align 16
+        %307 = alloca s32i, "ret", align 4
+        store %arg0, %303
+        store %arg1, %304
+        %308 = const 1 : s32i
+        %309 = get_global @should_optimize : s32i*
+        store %308, %309, align 4, volatile
+        %310 = cast(array_to_ptrdecay) %306 : rec___va_list_tag*
+        <unmodeled: cir.va_start>
+        %311 = get_global @vprintf : ((s8i*, rec___va_list_tag*) -> s32i)*
+        %312 = load %304 : s8i*, align 8
+        %313 = cast(array_to_ptrdecay) %306 : rec___va_list_tag*
+        %314 = call @vprintf(%312, %313) : s32i [all]
+        store %314, %307, align 4
+        %315 = cast(array_to_ptrdecay) %306 : rec___va_list_tag*
+        <unmodeled: cir.va_end>
+        %316 = load %307 : s32i, align 4
+        store %316, %305
+        %317 = load %305 : s32i
+        return %317
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 0 : s32i
+    %3 = get_global @should_optimize : s32i*
+    store %2, %3, align 4, volatile
+    %4 = const 1 : s32i
+    %5 = get_global @.str : s8i[6]*
+    %6 = cast(array_to_ptrdecay) %5 : s8i*
+    %7 = call @__printf_chk(%4, %6) : s32i [all]
+    scope {
+        %298 = get_global @should_optimize : s32i*
+        %299 = load %298 : s32i, align 4, volatile
+        %300 = cast(int_to_bool) %299 : bool
+        %301 = not %300 : bool
+        if %301 {
+            %302 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %8 = const 0 : s32i
+    %9 = get_global @should_optimize : s32i*
+    store %8, %9, align 4, volatile
+    scope {
+        %291 = const 1 : s32i
+        %292 = get_global @.str : s8i[6]*
+        %293 = cast(array_to_ptrdecay) %292 : s8i*
+        %294 = call @__printf_chk(%291, %293) : s32i [all]
+        %295 = const 5 : s32i
+        %296 = cmp ne %294, %295 : bool
+        if %296 {
+            %297 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %286 = get_global @should_optimize : s32i*
+        %287 = load %286 : s32i, align 4, volatile
+        %288 = cast(int_to_bool) %287 : bool
+        %289 = not %288 : bool
+        if %289 {
+            %290 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %10 = const 1 : s32i
+    %11 = get_global @should_optimize : s32i*
+    store %10, %11, align 4, volatile
+    %12 = const 1 : s32i
+    %13 = get_global @.str.1 : s8i[7]*
+    %14 = cast(array_to_ptrdecay) %13 : s8i*
+    %15 = call @__printf_chk(%12, %14) : s32i [all]
+    scope {
+        %281 = get_global @should_optimize : s32i*
+        %282 = load %281 : s32i, align 4, volatile
+        %283 = cast(int_to_bool) %282 : bool
+        %284 = not %283 : bool
+        if %284 {
+            %285 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %16 = const 0 : s32i
+    %17 = get_global @should_optimize : s32i*
+    store %16, %17, align 4, volatile
+    scope {
+        %274 = const 1 : s32i
+        %275 = get_global @.str.1 : s8i[7]*
+        %276 = cast(array_to_ptrdecay) %275 : s8i*
+        %277 = call @__printf_chk(%274, %276) : s32i [all]
+        %278 = const 6 : s32i
+        %279 = cmp ne %277, %278 : bool
+        if %279 {
+            %280 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %269 = get_global @should_optimize : s32i*
+        %270 = load %269 : s32i, align 4, volatile
+        %271 = cast(int_to_bool) %270 : bool
+        %272 = not %271 : bool
+        if %272 {
+            %273 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %18 = const 1 : s32i
+    %19 = get_global @should_optimize : s32i*
+    store %18, %19, align 4, volatile
+    %20 = const 1 : s32i
+    %21 = get_global @.str.2 : s8i[2]*
+    %22 = cast(array_to_ptrdecay) %21 : s8i*
+    %23 = call @__printf_chk(%20, %22) : s32i [all]
+    scope {
+        %264 = get_global @should_optimize : s32i*
+        %265 = load %264 : s32i, align 4, volatile
+        %266 = cast(int_to_bool) %265 : bool
+        %267 = not %266 : bool
+        if %267 {
+            %268 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %24 = const 0 : s32i
+    %25 = get_global @should_optimize : s32i*
+    store %24, %25, align 4, volatile
+    scope {
+        %257 = const 1 : s32i
+        %258 = get_global @.str.2 : s8i[2]*
+        %259 = cast(array_to_ptrdecay) %258 : s8i*
+        %260 = call @__printf_chk(%257, %259) : s32i [all]
+        %261 = const 1 : s32i
+        %262 = cmp ne %260, %261 : bool
+        if %262 {
+            %263 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %252 = get_global @should_optimize : s32i*
+        %253 = load %252 : s32i, align 4, volatile
+        %254 = cast(int_to_bool) %253 : bool
+        %255 = not %254 : bool
+        if %255 {
+            %256 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %26 = const 1 : s32i
+    %27 = get_global @should_optimize : s32i*
+    store %26, %27, align 4, volatile
+    %28 = const 1 : s32i
+    %29 = get_global @.str.3 : s8i[1]*
+    %30 = cast(array_to_ptrdecay) %29 : s8i*
+    %31 = call @__printf_chk(%28, %30) : s32i [all]
+    scope {
+        %247 = get_global @should_optimize : s32i*
+        %248 = load %247 : s32i, align 4, volatile
+        %249 = cast(int_to_bool) %248 : bool
+        %250 = not %249 : bool
+        if %250 {
+            %251 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %32 = const 0 : s32i
+    %33 = get_global @should_optimize : s32i*
+    store %32, %33, align 4, volatile
+    scope {
+        %240 = const 1 : s32i
+        %241 = get_global @.str.3 : s8i[1]*
+        %242 = cast(array_to_ptrdecay) %241 : s8i*
+        %243 = call @__printf_chk(%240, %242) : s32i [all]
+        %244 = const 0 : s32i
+        %245 = cmp ne %243, %244 : bool
+        if %245 {
+            %246 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %235 = get_global @should_optimize : s32i*
+        %236 = load %235 : s32i, align 4, volatile
+        %237 = cast(int_to_bool) %236 : bool
+        %238 = not %237 : bool
+        if %238 {
+            %239 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %34 = const 0 : s32i
+    %35 = get_global @should_optimize : s32i*
+    store %34, %35, align 4, volatile
+    %36 = const 1 : s32i
+    %37 = get_global @.str.4 : s8i[3]*
+    %38 = cast(array_to_ptrdecay) %37 : s8i*
+    %39 = get_global @.str : s8i[6]*
+    %40 = cast(array_to_ptrdecay) %39 : s8i*
+    %41 = call @__printf_chk(%36, %38, %40) : s32i [all]
+    scope {
+        %230 = get_global @should_optimize : s32i*
+        %231 = load %230 : s32i, align 4, volatile
+        %232 = cast(int_to_bool) %231 : bool
+        %233 = not %232 : bool
+        if %233 {
+            %234 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %42 = const 0 : s32i
+    %43 = get_global @should_optimize : s32i*
+    store %42, %43, align 4, volatile
+    scope {
+        %221 = const 1 : s32i
+        %222 = get_global @.str.4 : s8i[3]*
+        %223 = cast(array_to_ptrdecay) %222 : s8i*
+        %224 = get_global @.str : s8i[6]*
+        %225 = cast(array_to_ptrdecay) %224 : s8i*
+        %226 = call @__printf_chk(%221, %223, %225) : s32i [all]
+        %227 = const 5 : s32i
+        %228 = cmp ne %226, %227 : bool
+        if %228 {
+            %229 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %216 = get_global @should_optimize : s32i*
+        %217 = load %216 : s32i, align 4, volatile
+        %218 = cast(int_to_bool) %217 : bool
+        %219 = not %218 : bool
+        if %219 {
+            %220 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %44 = const 1 : s32i
+    %45 = get_global @should_optimize : s32i*
+    store %44, %45, align 4, volatile
+    %46 = const 1 : s32i
+    %47 = get_global @.str.4 : s8i[3]*
+    %48 = cast(array_to_ptrdecay) %47 : s8i*
+    %49 = get_global @.str.1 : s8i[7]*
+    %50 = cast(array_to_ptrdecay) %49 : s8i*
+    %51 = call @__printf_chk(%46, %48, %50) : s32i [all]
+    scope {
+        %211 = get_global @should_optimize : s32i*
+        %212 = load %211 : s32i, align 4, volatile
+        %213 = cast(int_to_bool) %212 : bool
+        %214 = not %213 : bool
+        if %214 {
+            %215 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %52 = const 0 : s32i
+    %53 = get_global @should_optimize : s32i*
+    store %52, %53, align 4, volatile
+    scope {
+        %202 = const 1 : s32i
+        %203 = get_global @.str.4 : s8i[3]*
+        %204 = cast(array_to_ptrdecay) %203 : s8i*
+        %205 = get_global @.str.1 : s8i[7]*
+        %206 = cast(array_to_ptrdecay) %205 : s8i*
+        %207 = call @__printf_chk(%202, %204, %206) : s32i [all]
+        %208 = const 6 : s32i
+        %209 = cmp ne %207, %208 : bool
+        if %209 {
+            %210 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %197 = get_global @should_optimize : s32i*
+        %198 = load %197 : s32i, align 4, volatile
+        %199 = cast(int_to_bool) %198 : bool
+        %200 = not %199 : bool
+        if %200 {
+            %201 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %54 = const 1 : s32i
+    %55 = get_global @should_optimize : s32i*
+    store %54, %55, align 4, volatile
+    %56 = const 1 : s32i
+    %57 = get_global @.str.4 : s8i[3]*
+    %58 = cast(array_to_ptrdecay) %57 : s8i*
+    %59 = get_global @.str.2 : s8i[2]*
+    %60 = cast(array_to_ptrdecay) %59 : s8i*
+    %61 = call @__printf_chk(%56, %58, %60) : s32i [all]
+    scope {
+        %192 = get_global @should_optimize : s32i*
+        %193 = load %192 : s32i, align 4, volatile
+        %194 = cast(int_to_bool) %193 : bool
+        %195 = not %194 : bool
+        if %195 {
+            %196 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %62 = const 0 : s32i
+    %63 = get_global @should_optimize : s32i*
+    store %62, %63, align 4, volatile
+    scope {
+        %183 = const 1 : s32i
+        %184 = get_global @.str.4 : s8i[3]*
+        %185 = cast(array_to_ptrdecay) %184 : s8i*
+        %186 = get_global @.str.2 : s8i[2]*
+        %187 = cast(array_to_ptrdecay) %186 : s8i*
+        %188 = call @__printf_chk(%183, %185, %187) : s32i [all]
+        %189 = const 1 : s32i
+        %190 = cmp ne %188, %189 : bool
+        if %190 {
+            %191 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %178 = get_global @should_optimize : s32i*
+        %179 = load %178 : s32i, align 4, volatile
+        %180 = cast(int_to_bool) %179 : bool
+        %181 = not %180 : bool
+        if %181 {
+            %182 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %64 = const 1 : s32i
+    %65 = get_global @should_optimize : s32i*
+    store %64, %65, align 4, volatile
+    %66 = const 1 : s32i
+    %67 = get_global @.str.4 : s8i[3]*
+    %68 = cast(array_to_ptrdecay) %67 : s8i*
+    %69 = get_global @.str.3 : s8i[1]*
+    %70 = cast(array_to_ptrdecay) %69 : s8i*
+    %71 = call @__printf_chk(%66, %68, %70) : s32i [all]
+    scope {
+        %173 = get_global @should_optimize : s32i*
+        %174 = load %173 : s32i, align 4, volatile
+        %175 = cast(int_to_bool) %174 : bool
+        %176 = not %175 : bool
+        if %176 {
+            %177 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %72 = const 0 : s32i
+    %73 = get_global @should_optimize : s32i*
+    store %72, %73, align 4, volatile
+    scope {
+        %164 = const 1 : s32i
+        %165 = get_global @.str.4 : s8i[3]*
+        %166 = cast(array_to_ptrdecay) %165 : s8i*
+        %167 = get_global @.str.3 : s8i[1]*
+        %168 = cast(array_to_ptrdecay) %167 : s8i*
+        %169 = call @__printf_chk(%164, %166, %168) : s32i [all]
+        %170 = const 0 : s32i
+        %171 = cmp ne %169, %170 : bool
+        if %171 {
+            %172 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %159 = get_global @should_optimize : s32i*
+        %160 = load %159 : s32i, align 4, volatile
+        %161 = cast(int_to_bool) %160 : bool
+        %162 = not %161 : bool
+        if %162 {
+            %163 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %74 = const 1 : s32i
+    %75 = get_global @should_optimize : s32i*
+    store %74, %75, align 4, volatile
+    %76 = const 1 : s32i
+    %77 = get_global @.str.5 : s8i[3]*
+    %78 = cast(array_to_ptrdecay) %77 : s8i*
+    %79 = const 120 : s32i
+    %80 = call @__printf_chk(%76, %78, %79) : s32i [all]
+    scope {
+        %154 = get_global @should_optimize : s32i*
+        %155 = load %154 : s32i, align 4, volatile
+        %156 = cast(int_to_bool) %155 : bool
+        %157 = not %156 : bool
+        if %157 {
+            %158 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %81 = const 0 : s32i
+    %82 = get_global @should_optimize : s32i*
+    store %81, %82, align 4, volatile
+    scope {
+        %146 = const 1 : s32i
+        %147 = get_global @.str.5 : s8i[3]*
+        %148 = cast(array_to_ptrdecay) %147 : s8i*
+        %149 = const 120 : s32i
+        %150 = call @__printf_chk(%146, %148, %149) : s32i [all]
+        %151 = const 1 : s32i
+        %152 = cmp ne %150, %151 : bool
+        if %152 {
+            %153 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %141 = get_global @should_optimize : s32i*
+        %142 = load %141 : s32i, align 4, volatile
+        %143 = cast(int_to_bool) %142 : bool
+        %144 = not %143 : bool
+        if %144 {
+            %145 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %83 = const 1 : s32i
+    %84 = get_global @should_optimize : s32i*
+    store %83, %84, align 4, volatile
+    %85 = const 1 : s32i
+    %86 = get_global @.str.6 : s8i[4]*
+    %87 = cast(array_to_ptrdecay) %86 : s8i*
+    %88 = get_global @.str.1 : s8i[7]*
+    %89 = cast(array_to_ptrdecay) %88 : s8i*
+    %90 = call @__printf_chk(%85, %87, %89) : s32i [all]
+    scope {
+        %136 = get_global @should_optimize : s32i*
+        %137 = load %136 : s32i, align 4, volatile
+        %138 = cast(int_to_bool) %137 : bool
+        %139 = not %138 : bool
+        if %139 {
+            %140 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %91 = const 0 : s32i
+    %92 = get_global @should_optimize : s32i*
+    store %91, %92, align 4, volatile
+    scope {
+        %127 = const 1 : s32i
+        %128 = get_global @.str.6 : s8i[4]*
+        %129 = cast(array_to_ptrdecay) %128 : s8i*
+        %130 = get_global @.str.1 : s8i[7]*
+        %131 = cast(array_to_ptrdecay) %130 : s8i*
+        %132 = call @__printf_chk(%127, %129, %131) : s32i [all]
+        %133 = const 7 : s32i
+        %134 = cmp ne %132, %133 : bool
+        if %134 {
+            %135 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %122 = get_global @should_optimize : s32i*
+        %123 = load %122 : s32i, align 4, volatile
+        %124 = cast(int_to_bool) %123 : bool
+        %125 = not %124 : bool
+        if %125 {
+            %126 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %93 = const 0 : s32i
+    %94 = get_global @should_optimize : s32i*
+    store %93, %94, align 4, volatile
+    %95 = const 1 : s32i
+    %96 = get_global @.str.7 : s8i[4]*
+    %97 = cast(array_to_ptrdecay) %96 : s8i*
+    %98 = const 0 : s32i
+    %99 = call @__printf_chk(%95, %97, %98) : s32i [all]
+    scope {
+        %117 = get_global @should_optimize : s32i*
+        %118 = load %117 : s32i, align 4, volatile
+        %119 = cast(int_to_bool) %118 : bool
+        %120 = not %119 : bool
+        if %120 {
+            %121 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %100 = const 0 : s32i
+    %101 = get_global @should_optimize : s32i*
+    store %100, %101, align 4, volatile
+    scope {
+        %109 = const 1 : s32i
+        %110 = get_global @.str.7 : s8i[4]*
+        %111 = cast(array_to_ptrdecay) %110 : s8i*
+        %112 = const 0 : s32i
+        %113 = call @__printf_chk(%109, %111, %112) : s32i [all]
+        %114 = const 2 : s32i
+        %115 = cmp ne %113, %114 : bool
+        if %115 {
+            %116 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %104 = get_global @should_optimize : s32i*
+        %105 = load %104 : s32i, align 4, volatile
+        %106 = cast(int_to_bool) %105 : bool
+        %107 = not %106 : bool
+        if %107 {
+            %108 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %102 = const 0 : s32i
+    store %102, %0
+    %103 = load %0 : s32i
+    return %103
+}

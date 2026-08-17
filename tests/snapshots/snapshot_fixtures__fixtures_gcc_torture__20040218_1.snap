@@ -1,0 +1,127 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20040218-1.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.yw : s16i[2] = [-1, 16000] [cir_private, default, dso_local, constant]
+global __const.main.y : s64i[2] = [-1, 16000] [cir_private, default, dso_local, constant]
+
+fn xb(%arg2: s64i*) -> s64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s64i*):
+        %60 = alloca s64i*, "y", align 8
+        %61 = alloca s64i, "__retval", align 8
+        %62 = alloca s64i, "xx", align 8
+        store %arg2, %60
+        %63 = load %60 : s64i*, align 8
+        %64 = load %63 : s64i, align 8
+        %65 = const 255 : s64i
+        %66 = and %64, %65 : s64i
+        store %66, %62, align 8
+        %67 = load %62 : s64i, align 8
+        %68 = const 1 : s64i
+        %69 = load %60 : s64i*, align 8
+        %70 = ptr_stride %69, %68 : s64i*
+        %71 = load %70 : s64i, align 8
+        %72 = add %67, %71 : s64i [nsw]
+        store %72, %61
+        %73 = load %61 : s64i
+        return %73
+}
+fn xw(%arg1: s64i*) -> s64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s64i*):
+        %46 = alloca s64i*, "y", align 8
+        %47 = alloca s64i, "__retval", align 8
+        %48 = alloca s64i, "xx", align 8
+        store %arg1, %46
+        %49 = load %46 : s64i*, align 8
+        %50 = load %49 : s64i, align 8
+        %51 = const 65535 : s64i
+        %52 = and %50, %51 : s64i
+        store %52, %48, align 8
+        %53 = load %48 : s64i, align 8
+        %54 = const 1 : s64i
+        %55 = load %46 : s64i*, align 8
+        %56 = ptr_stride %55, %54 : s64i*
+        %57 = load %56 : s64i, align 8
+        %58 = add %53, %57 : s64i [nsw]
+        store %58, %47
+        %59 = load %47 : s64i
+        return %59
+}
+fn yb(%arg0: s16i*) -> s16i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s16i*):
+        %27 = alloca s16i*, "y", align 8
+        %28 = alloca s16i, "__retval", align 2
+        %29 = alloca s16i, "xx", align 2
+        store %arg0, %27
+        %30 = load %27 : s16i*, align 8
+        %31 = load %30 : s16i, align 2
+        %32 = cast(integral) %31 : s32i
+        %33 = const 255 : s32i
+        %34 = and %32, %33 : s32i
+        %35 = cast(integral) %34 : s16i
+        store %35, %29, align 2
+        %36 = load %29 : s16i, align 2
+        %37 = cast(integral) %36 : s32i
+        %38 = const 1 : s64i
+        %39 = load %27 : s16i*, align 8
+        %40 = ptr_stride %39, %38 : s16i*
+        %41 = load %40 : s16i, align 2
+        %42 = cast(integral) %41 : s32i
+        %43 = add %37, %42 : s32i [nsw]
+        %44 = cast(integral) %43 : s16i
+        store %44, %28
+        %45 = load %28 : s16i
+        return %45
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s64i[2], "y", align 16
+    %2 = alloca s16i[2], "yw", align 2
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_global @__const.main.y : s64i[2]*
+    copy %1, %4
+    %5 = get_global @__const.main.yw : s16i[2]*
+    copy %2, %5
+    scope {
+        %9 = cast(array_to_ptrdecay) %1 : s64i*
+        %10 = call @xb(%9) : s64i [all]
+        %11 = const 16255 : s64i
+        %12 = cmp ne %10, %11 : bool
+        %13 = ternary %12 ? { : bool
+            %26 = const #true : bool
+            yield %26
+        } : {
+            %22 = cast(array_to_ptrdecay) %1 : s64i*
+            %23 = call @xw(%22) : s64i [all]
+            %24 = const 81535 : s64i
+            %25 = cmp ne %23, %24 : bool
+            yield %25
+        }
+        %14 = ternary %13 ? { : bool
+            %21 = const #true : bool
+            yield %21
+        } : {
+            %16 = cast(array_to_ptrdecay) %2 : s16i*
+            %17 = call @yb(%16) : s16i [all]
+            %18 = cast(integral) %17 : s32i
+            %19 = const 16255 : s32i
+            %20 = cmp ne %18, %19 : bool
+            yield %20
+        }
+        if %14 {
+            %15 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = get_global @exit : ((s32i) -> void)*
+    %7 = const 0 : s32i
+    call @exit(%7) [all]
+    %8 = load %0 : s32i
+    return %8
+}

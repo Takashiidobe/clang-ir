@@ -1,0 +1,178 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/loop-2g.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[10] = "/dev/zero" [cir_private, default, align 1, dso_local, constant]
+
+fn f(%arg0: s32i, %arg1: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s8i*):
+        %75 = alloca s32i, "s", align 4
+        %76 = alloca s8i*, "p", align 8
+        %77 = alloca s32i, "i", align 4
+        store %arg0, %75
+        store %arg1, %76
+        scope {
+            %78 = load %75 : s32i, align 4
+            store %78, %77, align 4
+            for cond: {
+                %86 = load %77 : s32i, align 4
+                %87 = cast(integral) %86 : s64i
+                %88 = load %76 : s8i*, align 8
+                %89 = ptr_stride %88, %87 : s8i*
+                %90 = const 40 : s64i
+                %91 = load %76 : s8i*, align 8
+                %92 = ptr_stride %91, %90 : s8i*
+                %93 = cmp lt %89, %92 : bool
+                %94 = ternary %93 ? { : bool
+                    %96 = load %77 : s32i, align 4
+                    %97 = const 0 : s32i
+                    %98 = cmp ge %96, %97 : bool
+                    yield %98
+                } : {
+                    %95 = const #false : bool
+                    yield %95
+                }
+                condition %94
+            } step: {
+                %79 = load %77 : s32i, align 4
+                %80 = inc %79 : s32i [nsw]
+                store %80, %77, align 4
+                yield
+            } do {
+                scope {
+                    %81 = const -2 : s8i
+                    %82 = load %77 : s32i, align 4
+                    %83 = cast(integral) %82 : s64i
+                    %84 = load %76 : s8i*, align 8
+                    %85 = ptr_stride %84, %83 : s8i*
+                    store %81, %85, align 1
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        return
+}
+fn open(%arg0: s8i*, %arg1: s32i, ...) -> s32i [external, c];
+fn mmap(%arg0: void*, %arg1: u64i, %arg2: s32i, %arg3: s32i, %arg4: s32i, %arg5: s64i) -> void* [external, c, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i*, "p", align 8
+    %2 = alloca s32i, "dev_zero", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_global @.str : s8i[10]*
+    %5 = cast(array_to_ptrdecay) %4 : s8i*
+    %6 = const 0 : s32i
+    %7 = call @open(%5, %6) : s32i [all]
+    store %7, %2, align 4
+    scope {
+        %65 = const 2147483647 : s64i
+        %66 = const 2147483647 : s64i
+        %67 = cmp ne %65, %66 : bool
+        %68 = ternary %67 ? { : bool
+            %74 = const #true : bool
+            yield %74
+        } : {
+            %71 = const 8 : u64i
+            %72 = const 4 : u64i
+            %73 = cmp ne %71, %72 : bool
+            yield %73
+        }
+        if %68 {
+            %69 = const 0 : s32i
+            store %69, %0
+            %70 = load %0 : s32i
+            return %70
+        }
+        yield
+    }
+    %8 = const 2147450880 : u64i
+    %9 = cast(int_to_ptr) %8 : void*
+    %10 = const 65536 : u64i
+    %11 = const 1 : s32i
+    %12 = const 2 : s32i
+    %13 = or %11, %12 : s32i
+    %14 = const 32 : s32i
+    %15 = const 16 : s32i
+    %16 = or %14, %15 : s32i
+    %17 = const 2 : s32i
+    %18 = or %16, %17 : s32i
+    %19 = load %2 : s32i, align 4
+    %20 = const 0 : s64i
+    %21 = call @mmap(%9, %10, %13, %18, %19, %20) : void* [all]
+    %22 = cast(bitcast) %21 : s8i*
+    store %22, %1, align 8
+    scope {
+        %25 = load %1 : s8i*, align 8
+        %26 = const 18446744073709551615 : u64i
+        %27 = cast(int_to_ptr) %26 : s8i*
+        %28 = cmp ne %25, %27 : bool
+        if %28 {
+            %29 = const 65536 : s32i
+            %30 = const 2 : s32i
+            %31 = div %29, %30 : s32i
+            %32 = cast(integral) %31 : u64i
+            %33 = const 2 : u64i
+            %34 = const 1 : u64i
+            %35 = mul %33, %34 : u64i
+            %36 = sub %32, %35 : u64i
+            %37 = load %1 : s8i*, align 8
+            %38 = ptr_stride %37, %36 : s8i*
+            store %38, %1, align 8
+            %39 = const 0 : s8i
+            %40 = const 39 : s64i
+            %41 = load %1 : s8i*, align 8
+            %42 = ptr_stride %41, %40 : s8i*
+            store %39, %42, align 1
+            %43 = const 0 : s32i
+            %44 = load %1 : s8i*, align 8
+            call @f(%43, %44) [all]
+            scope {
+                %58 = const 39 : s64i
+                %59 = load %1 : s8i*, align 8
+                %60 = ptr_stride %59, %58 : s8i*
+                %61 = load %60 : s8i, align 1
+                %62 = cast(integral) %61 : s32i
+                %63 = const -2 : s32i
+                %64 = cmp ne %62, %63 : bool
+                if %64 {
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            %45 = const 0 : s8i
+            %46 = const 39 : s64i
+            %47 = load %1 : s8i*, align 8
+            %48 = ptr_stride %47, %46 : s8i*
+            store %45, %48, align 1
+            %49 = const -1 : s32i
+            %50 = load %1 : s8i*, align 8
+            call @f(%49, %50) [all]
+            scope {
+                %51 = const 39 : s64i
+                %52 = load %1 : s8i*, align 8
+                %53 = ptr_stride %52, %51 : s8i*
+                %54 = load %53 : s8i, align 1
+                %55 = cast(integral) %54 : s32i
+                %56 = const 0 : s32i
+                %57 = cmp ne %55, %56 : bool
+                if %57 {
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %23 = const 0 : s32i
+    store %23, %0
+    %24 = load %0 : s32i
+    return %24
+}

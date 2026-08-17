@@ -1,0 +1,109 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr46909-2.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %30 = alloca s32i, "x", align 4
+        %31 = alloca s32i, "__retval", align 4
+        store %arg0, %30
+        scope {
+            %34 = load %30 : s32i, align 4
+            %35 = const 0 : s32i
+            %36 = cmp ne %34, %35 : bool
+            %37 = ternary %36 ? { : bool
+                %51 = load %30 : s32i, align 4
+                %52 = const 13 : s32i
+                %53 = cmp ne %51, %52 : bool
+                yield %53
+            } : {
+                %50 = const #false : bool
+                yield %50
+            }
+            %38 = ternary %37 ? { : bool
+                %49 = const #true : bool
+                yield %49
+            } : {
+                %46 = load %30 : s32i, align 4
+                %47 = const 5 : s32i
+                %48 = cmp eq %46, %47 : bool
+                yield %48
+            }
+            %39 = ternary %38 ? { : bool
+                %45 = const #true : bool
+                yield %45
+            } : {
+                %42 = load %30 : s32i, align 4
+                %43 = const 20 : s32i
+                %44 = cmp eq %42, %43 : bool
+                yield %44
+            }
+            if %39 {
+                %40 = const 1 : s32i
+                store %40, %31
+                %41 = load %31 : s32i
+                return %41
+            }
+            yield
+        }
+        %32 = const -1 : s32i
+        store %32, %31
+        %33 = load %31 : s32i
+        return %33
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "i", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    scope {
+        %5 = const -10 : s32i
+        store %5, %1, align 4
+        for cond: {
+            %27 = load %1 : s32i, align 4
+            %28 = const 30 : s32i
+            %29 = cmp lt %27, %28 : bool
+            condition %29
+        } step: {
+            %6 = load %1 : s32i, align 4
+            %7 = inc %6 : s32i [nsw]
+            store %7, %1, align 4
+            yield
+        } do {
+            scope {
+                %8 = load %1 : s32i, align 4
+                %9 = call @foo(%8) : s32i [all]
+                %10 = const 1 : s32i
+                %11 = const 2 : s32i
+                %12 = load %1 : s32i, align 4
+                %13 = const 0 : s32i
+                %14 = cmp eq %12, %13 : bool
+                %15 = cast(bool_to_int) %14 : s32i
+                %16 = mul %11, %15 : s32i [nsw]
+                %17 = sub %10, %16 : s32i [nsw]
+                %18 = const 2 : s32i
+                %19 = load %1 : s32i, align 4
+                %20 = const 13 : s32i
+                %21 = cmp eq %19, %20 : bool
+                %22 = cast(bool_to_int) %21 : s32i
+                %23 = mul %18, %22 : s32i [nsw]
+                %24 = sub %17, %23 : s32i [nsw]
+                %25 = cmp ne %9, %24 : bool
+                if %25 {
+                    %26 = get_global @abort : (() -> void)*
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

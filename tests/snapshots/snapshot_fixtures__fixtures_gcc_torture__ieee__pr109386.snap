@@ -1,0 +1,77 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/ieee__pr109386.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: float, %arg1: float) -> float [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: float, %arg1: float):
+        %8 = alloca float, "x", align 4
+        %9 = alloca float, "y", align 4
+        %10 = alloca float, "__retval", align 4
+        %11 = alloca float, "u", align 4
+        %12 = alloca float, "v", align 4
+        store %arg0, %8
+        store %arg1, %9
+        %13 = load %8 : float, align 4
+        <unmodeled: cir.fabs>
+        store %14, %11, align 4
+        %15 = load %9 : float, align 4
+        <unmodeled: cir.fabs>
+        store %16, %12, align 4
+        scope {
+            %19 = load %11 : float, align 4
+            %20 = load %12 : float, align 4
+            %21 = cmp ge %19, %20 : bool
+            %22 = not %21 : bool
+            if %22 {
+                scope {
+                    %27 = load %12 : float, align 4
+                    <unmodeled: cir.is_fp_class>
+                    if %28 {
+                        %29 = load %12 : float, align 4
+                        store %29, %10
+                        %30 = load %10 : float
+                        return %30
+                    }
+                    yield
+                }
+                scope {
+                    %23 = load %11 : float, align 4
+                    <unmodeled: cir.is_fp_class>
+                    if %24 {
+                        %25 = load %11 : float, align 4
+                        store %25, %10
+                        %26 = load %10 : float
+                        return %26
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %17 = const 4.200000e+01 : float
+        store %17, %10
+        %18 = load %10 : float
+        return %18
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %3 = const 0x7F800000 : float
+        %4 = const 0x7FC00000 : float
+        %5 = call @foo(%3, %4) : float [all]
+        <unmodeled: cir.is_fp_class>
+        %7 = not %6 : bool
+        if %7 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = load %0 : s32i
+    return %2
+}

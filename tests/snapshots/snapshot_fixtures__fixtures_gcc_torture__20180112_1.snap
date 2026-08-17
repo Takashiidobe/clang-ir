@@ -1,0 +1,77 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20180112-1.c" (c, x86_64-unknown-linux-gnu)
+fn bug(%arg0: u32i*) -> u32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i*):
+        %11 = alloca u32i*, "result", align 8
+        %12 = alloca u32i, "__retval", align 4
+        %13 = alloca u32i, "ss", align 4
+        %14 = alloca u32i, "d", align 4
+        %15 = alloca u32i, "tt", align 4
+        %16 = alloca u32i, "r", align 4
+        %17 = alloca u32i, "u", align 4
+        %18 = alloca u32i, "off", align 4
+        store %arg0, %11
+        %19 = const 4294967295 : u32i
+        store %19, %13, align 4, volatile
+        %20 = const 4008636142 : u32i
+        store %20, %14, align 4, volatile
+        %21 = load %14 : u32i, align 4, volatile
+        %22 = const 8388608 : u32i
+        %23 = and %21, %22 : u32i
+        store %23, %15, align 4
+        %24 = load %15 : u32i, align 4
+        %25 = const 8 : s32i
+        %26 = shift left %24, %25 : u32i
+        store %26, %16, align 4
+        %27 = load %16 : u32i, align 4
+        %28 = const 31 : s32i
+        %29 = shift right %27, %28 : u32i
+        %30 = load %16 : u32i, align 4
+        %31 = const 1 : s32i
+        %32 = shift left %30, %31 : u32i
+        %33 = or %29, %32 : u32i
+        store %33, %16, align 4
+        %34 = load %16 : u32i, align 4
+        %35 = load %13 : u32i, align 4, volatile
+        %36 = xor %34, %35 : u32i
+        store %36, %17, align 4
+        %37 = load %17 : u32i, align 4
+        %38 = const 1 : s32i
+        %39 = shift right %37, %38 : u32i
+        store %39, %18, align 4
+        %40 = load %15 : u32i, align 4
+        %41 = load %11 : u32i*, align 8
+        store %40, %41, align 4
+        %42 = load %18 : u32i, align 4
+        store %42, %12
+        %43 = load %12 : u32i
+        return %43
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u32i, "l", align 4
+    %2 = alloca u32i, "off", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = call @bug(%1) : u32i [all]
+    store %4, %2, align 4
+    scope {
+        %7 = load %2 : u32i, align 4
+        %8 = const 2147483647 : u32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            %10 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = load %0 : s32i
+    return %6
+}

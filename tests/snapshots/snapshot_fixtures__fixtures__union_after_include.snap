@@ -1,0 +1,156 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/union_after_include.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn helper(%arg4: s32i, %arg5: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: s32i, %arg5: s32i):
+        %85 = alloca s32i, "a", align 4
+        %86 = alloca s32i, "b", align 4
+        %87 = alloca s32i, "__retval", align 4
+        %88 = alloca s32i, "c", align 4
+        store %arg4, %85
+        store %arg5, %86
+        %89 = load %85 : s32i, align 4
+        %90 = load %86 : s32i, align 4
+        %91 = add %89, %90 : s32i [nsw]
+        store %91, %88, align 4
+        %92 = load %88 : s32i, align 4
+        store %92, %87
+        %93 = load %87 : s32i
+        return %93
+}
+fn loop_sum(%arg3: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: s32i):
+        %69 = alloca s32i, "n", align 4
+        %70 = alloca s32i, "__retval", align 4
+        %71 = alloca s32i, "total", align 4
+        store %arg3, %69
+        %72 = const 0 : s32i
+        store %72, %71, align 4
+        scope {
+            %75 = alloca s32i, "i", align 4
+            %76 = const 1 : s32i
+            store %76, %75, align 4
+            for cond: {
+                %82 = load %75 : s32i, align 4
+                %83 = load %69 : s32i, align 4
+                %84 = cmp le %82, %83 : bool
+                condition %84
+            } step: {
+                %77 = load %75 : s32i, align 4
+                %78 = inc %77 : s32i [nsw]
+                store %78, %75, align 4
+                yield
+            } do {
+                scope {
+                    %79 = load %75 : s32i, align 4
+                    %80 = load %71 : s32i, align 4
+                    %81 = add %80, %79 : s32i [nsw]
+                    store %81, %71, align 4
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %73 = load %71 : s32i, align 4
+        store %73, %70
+        %74 = load %70 : s32i
+        return %74
+}
+fn array_pick(%arg2: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i):
+        %46 = alloca s32i, "index", align 4
+        %47 = alloca s32i, "__retval", align 4
+        %48 = alloca s32i[3], "values", align 4
+        store %arg2, %46
+        %49 = const 6 : s32i
+        %50 = const 0 : s64i
+        %51 = get_element %48[%50] : s32i*
+        store %49, %51, align 4
+        %52 = const 1 : s32i
+        %53 = const 1 : s64i
+        %54 = get_element %48[%53] : s32i*
+        store %52, %54, align 4
+        %55 = const 0 : s64i
+        %56 = get_element %48[%55] : s32i*
+        %57 = load %56 : s32i, align 4
+        %58 = const 1 : s64i
+        %59 = get_element %48[%58] : s32i*
+        %60 = load %59 : s32i, align 4
+        %61 = add %57, %60 : s32i [nsw]
+        %62 = const 2 : s64i
+        %63 = get_element %48[%62] : s32i*
+        store %61, %63, align 4
+        %64 = load %46 : s32i, align 4
+        %65 = cast(integral) %64 : s64i
+        %66 = get_element %48[%65] : s32i*
+        %67 = load %66 : s32i, align 4
+        store %67, %47
+        %68 = load %47 : s32i
+        return %68
+}
+fn union_pick(%arg0: s32i, %arg1: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s32i):
+        %35 = alloca s32i, "a", align 4
+        %36 = alloca s32i, "b", align 4
+        %37 = alloca s32i, "__retval", align 4
+        %38 = alloca rec_FuzzPair, "p", align 4
+        store %arg0, %35
+        store %arg1, %36
+        %39 = load %35 : s32i, align 4
+        %40 = get_member %38[0] "left" : s32i*
+        store %39, %40, align 4
+        %41 = load %36 : s32i, align 4
+        %42 = get_member %38[1] "right" : s32i*
+        store %41, %42, align 4
+        %43 = get_member %38[0] "left" : s32i*
+        %44 = load %43 : s32i, align 4
+        store %44, %37
+        %45 = load %37 : s32i
+        return %45
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[4]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 7 : s32i
+    %6 = const 2 : s32i
+    %7 = call @helper(%5, %6) : s32i [all]
+    %8 = call @printf(%4, %7) : s32i [all]
+    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %10 = get_global @.str : s8i[4]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = const 2 : s32i
+    %13 = call @loop_sum(%12) : s32i [all]
+    %14 = call @printf(%11, %13) : s32i [all]
+    %15 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %16 = get_global @.str : s8i[4]*
+    %17 = cast(array_to_ptrdecay) %16 : s8i*
+    %18 = const 1 : s32i
+    %19 = call @array_pick(%18) : s32i [all]
+    %20 = call @printf(%17, %19) : s32i [all]
+    %21 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %22 = get_global @.str : s8i[4]*
+    %23 = cast(array_to_ptrdecay) %22 : s8i*
+    %24 = const 8 : s32i
+    %25 = const 9 : s32i
+    %26 = call @union_pick(%24, %25) : s32i [all]
+    %27 = call @printf(%23, %26) : s32i [all]
+    %28 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %29 = get_global @.str : s8i[4]*
+    %30 = cast(array_to_ptrdecay) %29 : s8i*
+    %31 = const 6 : s32i
+    %32 = call @printf(%30, %31) : s32i [all]
+    %33 = const 0 : s32i
+    store %33, %0
+    %34 = load %0 : s32i
+    return %34
+}

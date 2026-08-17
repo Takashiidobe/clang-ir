@@ -1,0 +1,53 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00161.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "a", align 4
+    %2 = alloca s32i, "p", align 4
+    %3 = alloca s32i, "t", align 4
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 1 : s32i
+    store %5, %1, align 4
+    %6 = const 0 : s32i
+    store %6, %2, align 4
+    %7 = const 0 : s32i
+    store %7, %3, align 4
+    scope {
+        do {
+            scope {
+                %13 = get_global @printf : ((s8i*, ...) -> s32i)*
+                %14 = get_global @.str : s8i[4]*
+                %15 = cast(array_to_ptrdecay) %14 : s8i*
+                %16 = load %1 : s32i, align 4
+                %17 = call @printf(%15, %16) : s32i [all]
+                %18 = load %1 : s32i, align 4
+                store %18, %3, align 4
+                %19 = load %3 : s32i, align 4
+                %20 = load %2 : s32i, align 4
+                %21 = add %19, %20 : s32i [nsw]
+                store %21, %1, align 4
+                %22 = load %3 : s32i, align 4
+                store %22, %2, align 4
+                yield
+            }
+            yield
+        } while {
+            %10 = load %1 : s32i, align 4
+            %11 = const 100 : s32i
+            %12 = cmp lt %10, %11 : bool
+            condition %12
+        }
+        yield
+    }
+    %8 = const 0 : s32i
+    store %8, %0
+    %9 = load %0 : s32i
+    return %9
+}

@@ -1,0 +1,76 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20140828-1.c" (c, x86_64-unknown-linux-gnu)
+fn f(%arg0: s16i*, %arg1: s32i, %arg2: s32i*) -> s16i* [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s16i*, %arg1: s32i, %arg2: s32i*):
+        %18 = alloca s16i*, "a", align 8
+        %19 = alloca s32i, "b", align 4
+        %20 = alloca s32i*, "d", align 8
+        %21 = alloca s16i*, "__retval", align 8
+        %22 = alloca s16i, "c", align 2
+        store %arg0, %18
+        store %arg1, %19
+        store %arg2, %20
+        %23 = load %18 : s16i*, align 8
+        %24 = load %23 : s16i, align 2
+        store %24, %22, align 2
+        %25 = load %18 : s16i*, align 8
+        %26 = const 1 : s32i
+        %27 = ptr_stride %25, %26 : s16i*
+        store %27, %18, align 8
+        %28 = load %19 : s32i, align 4
+        %29 = load %22 : s16i, align 2
+        %30 = cast(integral) %29 : s32i
+        %31 = shift left %28, %30 : s32i
+        %32 = cast(integral) %31 : s16i
+        store %32, %22, align 2
+        %33 = load %22 : s16i, align 2
+        %34 = cast(integral) %33 : s32i
+        %35 = load %20 : s32i*, align 8
+        store %34, %35, align 4
+        %36 = load %18 : s16i*, align 8
+        store %36, %21
+        %37 = load %21 : s16i*
+        return %37
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "d", align 4
+    %2 = alloca s16i[2], "a", align 2
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 0 : s16i
+    %5 = const 0 : s64i
+    %6 = get_element %2[%5] : s16i*
+    store %4, %6, align 2
+    scope {
+        %12 = cast(array_to_ptrdecay) %2 : s16i*
+        %13 = const 1 : s32i
+        %14 = call @f(%12, %13, %1) : s16i* [all]
+        %15 = const 1 : s64i
+        %16 = get_element %2[%15] : s16i*
+        %17 = cmp ne %14, %16 : bool
+        if %17 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %9 = load %1 : s32i, align 4
+        %10 = const 1 : s32i
+        %11 = cmp ne %9, %10 : bool
+        if %11 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %7 = const 0 : s32i
+    store %7, %0
+    %8 = load %0 : s32i
+    return %8
+}

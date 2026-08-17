@@ -1,0 +1,53 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20190901-1.c" (c, x86_64-unknown-linux-gnu)
+fn tests_infinity_d() -> double [external, c, no_inline, dso_local, nothrow] {
+    %9 = alloca double, "__retval", align 8
+    %10 = alloca rec_ieee_double_extract, "x", align 8
+    %11 = const 2047 : u32i
+    %12 = get_member %10[0] "s" : rec_anon2E0*
+    %13 = get_member %12[0] "exp" : u64i*
+    <unmodeled: cir.set_bitfield>
+    %15 = const 0 : u32i
+    %16 = get_member %10[0] "s" : rec_anon2E0*
+    %17 = get_member %16[0] "manl" : u64i*
+    <unmodeled: cir.set_bitfield>
+    %19 = const 0 : u32i
+    %20 = get_member %10[0] "s" : rec_anon2E0*
+    %21 = get_member %20[0] "manh" : u64i*
+    <unmodeled: cir.set_bitfield>
+    %23 = const 0 : u32i
+    %24 = get_member %10[0] "s" : rec_anon2E0*
+    %25 = get_member %24[0] "sig" : u64i*
+    <unmodeled: cir.set_bitfield>
+    %27 = get_member %10[1] "d" : double*
+    %28 = load %27 : double, align 8
+    store %28, %9
+    %29 = load %9 : double
+    return %29
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca double, "x", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = call @tests_infinity_d() : double [all]
+    store %3, %1, align 8
+    scope {
+        %6 = load %1 : double, align 8
+        %7 = const 0.000000e+00 : double
+        %8 = cmp eq %6, %7 : bool
+        if %8 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

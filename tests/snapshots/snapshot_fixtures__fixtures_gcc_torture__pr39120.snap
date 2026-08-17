@@ -1,0 +1,63 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr39120.c" (c, x86_64-unknown-linux-gnu)
+global x : rec_X = zero [external, default, align 8, dso_local]
+
+fn foo(%arg0: s32i*) -> void* [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i*):
+        %20 = alloca rec_X, "coerce", align 8
+        %21 = alloca s32i*, "p", align 8
+        %22 = alloca rec_X, "__retval", align 8
+        store %arg0, %21
+        %23 = load %21 : s32i*, align 8
+        %24 = get_member %22[0] "p" : s32i**
+        store %23, %24, align 8
+        %25 = load %22 : rec_X
+        store %25, %20
+        %26 = cast(bitcast) %20 : void**
+        %27 = load %26 : void*
+        return %27
+}
+fn bar() -> void [external, c, no_inline, dso_local, nothrow] {
+    %16 = const 1 : s32i
+    %17 = get_global @x : rec_X*
+    %18 = get_member %17[0] "p" : s32i**
+    %19 = load %18 : s32i*, align 8
+    store %16, %19, align 4
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca void*, "coerce", align 8
+    %1 = alloca s32i, "__retval", align 4
+    %2 = alloca s32i, "i", align 4
+    %3 = const 0 : s32i
+    store %3, %1
+    %4 = const 0 : s32i
+    store %4, %2, align 4
+    %5 = get_global @x : rec_X*
+    %6 = call @foo(%2) : void* [all]
+    store %6, %0
+    %7 = cast(bitcast) %0 : rec_X*
+    %8 = load %7 : rec_X
+    store %8, %5, align 8
+    %9 = get_global @bar : (() -> void)*
+    call @bar() [all]
+    scope {
+        %12 = load %2 : s32i, align 4
+        %13 = const 1 : s32i
+        %14 = cmp ne %12, %13 : bool
+        if %14 {
+            %15 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %10 = const 0 : s32i
+    store %10, %1
+    %11 = load %1 : s32i
+    return %11
+}

@@ -1,0 +1,70 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/va-arg-26.c" (c, x86_64-unknown-linux-gnu)
+fn f(%arg0: float, %arg1: float, %arg2: float, %arg3: float, %arg4: float, %arg5: float, ...) -> double [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: float, %arg1: float, %arg2: float, %arg3: float, %arg4: float, %arg5: float):
+        %22 = alloca float, "f1", align 4
+        %23 = alloca float, "f2", align 4
+        %24 = alloca float, "f3", align 4
+        %25 = alloca float, "f4", align 4
+        %26 = alloca float, "f5", align 4
+        %27 = alloca float, "f6", align 4
+        %28 = alloca double, "__retval", align 8
+        %29 = alloca rec___va_list_tag[1], "ap", align 16
+        %30 = alloca double, "d", align 8
+        store %arg0, %22
+        store %arg1, %23
+        store %arg2, %24
+        store %arg3, %25
+        store %arg4, %26
+        store %arg5, %27
+        %31 = cast(array_to_ptrdecay) %29 : rec___va_list_tag*
+        <unmodeled: cir.va_start>
+        %32 = cast(array_to_ptrdecay) %29 : rec___va_list_tag*
+        <unmodeled: cir.va_arg>
+        store %33, %30, align 8
+        %34 = cast(array_to_ptrdecay) %29 : rec___va_list_tag*
+        <unmodeled: cir.va_end>
+        %35 = load %30 : double, align 8
+        store %35, %28
+        %36 = load %28 : double
+        return %36
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %5 = const 1 : s32i
+        %6 = cast(int_to_float) %5 : float
+        %7 = const 2 : s32i
+        %8 = cast(int_to_float) %7 : float
+        %9 = const 3 : s32i
+        %10 = cast(int_to_float) %9 : float
+        %11 = const 4 : s32i
+        %12 = cast(int_to_float) %11 : float
+        %13 = const 5 : s32i
+        %14 = cast(int_to_float) %13 : float
+        %15 = const 6 : s32i
+        %16 = cast(int_to_float) %15 : float
+        %17 = const 7.000000e+00 : double
+        %18 = call @f(%6, %8, %10, %12, %14, %16, %17) : double [all]
+        %19 = const 7.000000e+00 : double
+        %20 = cmp ne %18, %19 : bool
+        if %20 {
+            %21 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

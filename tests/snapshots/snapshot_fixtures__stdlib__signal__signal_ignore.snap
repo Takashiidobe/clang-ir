@@ -1,0 +1,42 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/signal/signal_ignore.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn signal(%arg0: s32i, %arg1: ((s32i) -> void)*) -> ((s32i) -> void)* [external, c, nothrow];
+fn raise(%arg0: s32i) -> s32i [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca ((s32i) -> void)*, "prev", align 8
+    %2 = alloca s32i, "r", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 10 : s32i
+    %5 = const 1 : u64i
+    %6 = cast(int_to_ptr) %5 : ((s32i) -> void)*
+    %7 = call @signal(%4, %6) : ((s32i) -> void)* [all]
+    store %7, %1, align 8
+    %8 = const 10 : s32i
+    %9 = call @raise(%8) : s32i [all]
+    store %9, %2, align 4
+    %10 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %11 = get_global @.str : s8i[7]*
+    %12 = cast(array_to_ptrdecay) %11 : s8i*
+    %13 = load %1 : ((s32i) -> void)*, align 8
+    %14 = const 18446744073709551615 : u64i
+    %15 = cast(int_to_ptr) %14 : ((s32i) -> void)*
+    %16 = cmp ne %13, %15 : bool
+    %17 = cast(bool_to_int) %16 : s32i
+    %18 = load %2 : s32i, align 4
+    %19 = const 0 : s32i
+    %20 = cmp eq %18, %19 : bool
+    %21 = cast(bool_to_int) %20 : s32i
+    %22 = call @printf(%12, %17, %21) : s32i [all]
+    %23 = const 0 : s32i
+    store %23, %0
+    %24 = load %0 : s32i
+    return %24
+}

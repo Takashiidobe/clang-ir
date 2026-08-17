@@ -1,0 +1,278 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr85095.c" (c, x86_64-unknown-linux-gnu)
+fn f1(%arg6: u64i, %arg7: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg6: u64i, %arg7: u64i):
+        %152 = alloca u64i, "a", align 8
+        %153 = alloca u64i, "b", align 8
+        %154 = alloca u64i, "__retval", align 8
+        %155 = alloca u64i, "i", align 8
+        store %arg6, %152
+        store %arg7, %153
+        %156 = load %152 : u64i, align 8
+        %157 = load %153 : u64i, align 8
+        <unmodeled: cir.add.overflow>
+        store %158#0, %152, align 8
+        %159 = cast(bool_to_int) %158#1 : u64i
+        store %159, %155, align 8
+        %160 = load %152 : u64i, align 8
+        %161 = load %155 : u64i, align 8
+        %162 = add %160, %161 : u64i
+        store %162, %154
+        %163 = load %154 : u64i
+        return %163
+}
+fn f2(%arg4: u64i, %arg5: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: u64i, %arg5: u64i):
+        %140 = alloca u64i, "a", align 8
+        %141 = alloca u64i, "b", align 8
+        %142 = alloca u64i, "__retval", align 8
+        %143 = alloca u64i, "i", align 8
+        store %arg4, %140
+        store %arg5, %141
+        %144 = load %140 : u64i, align 8
+        %145 = load %141 : u64i, align 8
+        <unmodeled: cir.add.overflow>
+        store %146#0, %140, align 8
+        %147 = cast(bool_to_int) %146#1 : u64i
+        store %147, %143, align 8
+        %148 = load %140 : u64i, align 8
+        %149 = load %143 : u64i, align 8
+        %150 = sub %148, %149 : u64i
+        store %150, %142
+        %151 = load %142 : u64i
+        return %151
+}
+fn f3(%arg2: u32i, %arg3: u32i) -> u64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: u32i, %arg3: u32i):
+        %127 = alloca u32i, "a", align 4
+        %128 = alloca u32i, "b", align 4
+        %129 = alloca u64i, "__retval", align 8
+        %130 = alloca u32i, "i", align 4
+        store %arg2, %127
+        store %arg3, %128
+        %131 = load %127 : u32i, align 4
+        %132 = load %128 : u32i, align 4
+        <unmodeled: cir.add.overflow>
+        store %133#0, %127, align 4
+        %134 = cast(bool_to_int) %133#1 : u32i
+        store %134, %130, align 4
+        %135 = load %127 : u32i, align 4
+        %136 = load %130 : u32i, align 4
+        %137 = add %135, %136 : u32i
+        %138 = cast(integral) %137 : u64i
+        store %138, %129
+        %139 = load %129 : u64i
+        return %139
+}
+fn f4(%arg0: u32i, %arg1: u32i) -> u64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i, %arg1: u32i):
+        %114 = alloca u32i, "a", align 4
+        %115 = alloca u32i, "b", align 4
+        %116 = alloca u64i, "__retval", align 8
+        %117 = alloca u32i, "i", align 4
+        store %arg0, %114
+        store %arg1, %115
+        %118 = load %114 : u32i, align 4
+        %119 = load %115 : u32i, align 4
+        <unmodeled: cir.add.overflow>
+        store %120#0, %114, align 4
+        %121 = cast(bool_to_int) %120#1 : u32i
+        store %121, %117, align 4
+        %122 = load %114 : u32i, align 4
+        %123 = load %117 : u32i, align 4
+        %124 = sub %122, %123 : u32i
+        %125 = cast(integral) %124 : u64i
+        store %125, %116
+        %126 = load %116 : u64i
+        return %126
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = const 16 : u64i
+        %5 = const 18446744073709551598 : u64i
+        %6 = call @f1(%4, %5) : u64i [all]
+        %7 = const 18446744073709551614 : u64i
+        %8 = cmp ne %6, %7 : bool
+        %9 = ternary %8 ? { : bool
+            %113 = const #true : bool
+            yield %113
+        } : {
+            %108 = const 16 : u64i
+            %109 = const 18446744073709551599 : u64i
+            %110 = call @f1(%108, %109) : u64i [all]
+            %111 = const 18446744073709551615 : u64i
+            %112 = cmp ne %110, %111 : bool
+            yield %112
+        }
+        %10 = ternary %9 ? { : bool
+            %107 = const #true : bool
+            yield %107
+        } : {
+            %102 = const 16 : u64i
+            %103 = const 18446744073709551600 : u64i
+            %104 = call @f1(%102, %103) : u64i [all]
+            %105 = const 1 : u64i
+            %106 = cmp ne %104, %105 : bool
+            yield %106
+        }
+        %11 = ternary %10 ? { : bool
+            %101 = const #true : bool
+            yield %101
+        } : {
+            %96 = const 16 : u64i
+            %97 = const 18446744073709551601 : u64i
+            %98 = call @f1(%96, %97) : u64i [all]
+            %99 = const 2 : u64i
+            %100 = cmp ne %98, %99 : bool
+            yield %100
+        }
+        %12 = ternary %11 ? { : bool
+            %95 = const #true : bool
+            yield %95
+        } : {
+            %90 = const 24 : u64i
+            %91 = const 18446744073709551590 : u64i
+            %92 = call @f2(%90, %91) : u64i [all]
+            %93 = const 18446744073709551614 : u64i
+            %94 = cmp ne %92, %93 : bool
+            yield %94
+        }
+        %13 = ternary %12 ? { : bool
+            %89 = const #true : bool
+            yield %89
+        } : {
+            %84 = const 24 : u64i
+            %85 = const 18446744073709551591 : u64i
+            %86 = call @f2(%84, %85) : u64i [all]
+            %87 = const 18446744073709551615 : u64i
+            %88 = cmp ne %86, %87 : bool
+            yield %88
+        }
+        %14 = ternary %13 ? { : bool
+            %83 = const #true : bool
+            yield %83
+        } : {
+            %78 = const 24 : u64i
+            %79 = const 18446744073709551592 : u64i
+            %80 = call @f2(%78, %79) : u64i [all]
+            %81 = const 18446744073709551615 : u64i
+            %82 = cmp ne %80, %81 : bool
+            yield %82
+        }
+        %15 = ternary %14 ? { : bool
+            %77 = const #true : bool
+            yield %77
+        } : {
+            %72 = const 24 : u64i
+            %73 = const 18446744073709551593 : u64i
+            %74 = call @f2(%72, %73) : u64i [all]
+            %75 = const 0 : u64i
+            %76 = cmp ne %74, %75 : bool
+            yield %76
+        }
+        %16 = ternary %15 ? { : bool
+            %71 = const #true : bool
+            yield %71
+        } : {
+            %66 = const 32 : u32i
+            %67 = const 4294967262 : u32i
+            %68 = call @f3(%66, %67) : u64i [all]
+            %69 = const 4294967294 : u64i
+            %70 = cmp ne %68, %69 : bool
+            yield %70
+        }
+        %17 = ternary %16 ? { : bool
+            %65 = const #true : bool
+            yield %65
+        } : {
+            %60 = const 32 : u32i
+            %61 = const 4294967263 : u32i
+            %62 = call @f3(%60, %61) : u64i [all]
+            %63 = const 4294967295 : u64i
+            %64 = cmp ne %62, %63 : bool
+            yield %64
+        }
+        %18 = ternary %17 ? { : bool
+            %59 = const #true : bool
+            yield %59
+        } : {
+            %54 = const 32 : u32i
+            %55 = const 4294967264 : u32i
+            %56 = call @f3(%54, %55) : u64i [all]
+            %57 = const 1 : u64i
+            %58 = cmp ne %56, %57 : bool
+            yield %58
+        }
+        %19 = ternary %18 ? { : bool
+            %53 = const #true : bool
+            yield %53
+        } : {
+            %48 = const 32 : u32i
+            %49 = const 4294967265 : u32i
+            %50 = call @f3(%48, %49) : u64i [all]
+            %51 = const 2 : u64i
+            %52 = cmp ne %50, %51 : bool
+            yield %52
+        }
+        %20 = ternary %19 ? { : bool
+            %47 = const #true : bool
+            yield %47
+        } : {
+            %42 = const 35 : u32i
+            %43 = const 4294967259 : u32i
+            %44 = call @f4(%42, %43) : u64i [all]
+            %45 = const 4294967294 : u64i
+            %46 = cmp ne %44, %45 : bool
+            yield %46
+        }
+        %21 = ternary %20 ? { : bool
+            %41 = const #true : bool
+            yield %41
+        } : {
+            %36 = const 35 : u32i
+            %37 = const 4294967260 : u32i
+            %38 = call @f4(%36, %37) : u64i [all]
+            %39 = const 4294967295 : u64i
+            %40 = cmp ne %38, %39 : bool
+            yield %40
+        }
+        %22 = ternary %21 ? { : bool
+            %35 = const #true : bool
+            yield %35
+        } : {
+            %30 = const 35 : u32i
+            %31 = const 4294967261 : u32i
+            %32 = call @f4(%30, %31) : u64i [all]
+            %33 = const 4294967295 : u64i
+            %34 = cmp ne %32, %33 : bool
+            yield %34
+        }
+        %23 = ternary %22 ? { : bool
+            %29 = const #true : bool
+            yield %29
+        } : {
+            %24 = const 35 : u32i
+            %25 = const 4294967262 : u32i
+            %26 = call @f4(%24, %25) : u64i [all]
+            %27 = const 0 : u64i
+            %28 = cmp ne %26, %27 : bool
+            yield %28
+        }
+        if %23 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

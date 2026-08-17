@@ -1,0 +1,49 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/unused_items.c" (c, x86_64-unknown-linux-gnu)
+global hidden_static : s32i = 5 [internal, default, align 4, dso_local]
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global live_static : s32i = 7 [internal, default, align 4, dso_local]
+
+fn compute() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %22 = alloca s32i, "__retval", align 4
+    %23 = alloca s32i, "x", align 4
+    %24 = get_global @hidden_static : s32i*
+    %25 = load %24 : s32i, align 4
+    store %25, %23, align 4
+    %26 = const 42 : s32i
+    store %26, %22
+    %27 = load %22 : s32i
+    return %27
+}
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u32i, "c", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 1 : u32i
+    store %3, %1, align 4
+    %4 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %5 = get_global @.str : s8i[4]*
+    %6 = cast(array_to_ptrdecay) %5 : s8i*
+    %7 = load %1 : u32i, align 4
+    %8 = call @printf(%6, %7) : s32i [all]
+    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %10 = get_global @.str : s8i[4]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = get_global @live_static : s32i*
+    %13 = load %12 : s32i, align 4
+    %14 = call @printf(%11, %13) : s32i [all]
+    %15 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %16 = get_global @.str : s8i[4]*
+    %17 = cast(array_to_ptrdecay) %16 : s8i*
+    %18 = call @compute() : s32i [all]
+    %19 = call @printf(%17, %18) : s32i [all]
+    %20 = const 0 : s32i
+    store %20, %0
+    %21 = load %0 : s32i
+    return %21
+}

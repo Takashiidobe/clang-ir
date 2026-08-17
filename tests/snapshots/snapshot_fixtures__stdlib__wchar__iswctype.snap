@@ -1,0 +1,63 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/wchar/iswctype.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[12] = "%d%d%d%d%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[6] = "%c%c\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn iswalpha(%arg0: u32i) -> s32i [external, c, nothrow];
+fn iswdigit(%arg0: u32i) -> s32i [external, c, nothrow];
+fn iswspace(%arg0: u32i) -> s32i [external, c, nothrow];
+fn iswupper(%arg0: u32i) -> s32i [external, c, nothrow];
+fn towupper(%arg0: u32i) -> u32i [external, c, nothrow];
+fn towlower(%arg0: u32i) -> u32i [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[12]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 97 : u32i
+    %6 = call @iswalpha(%5) : s32i [all]
+    %7 = const 0 : s32i
+    %8 = cmp ne %6, %7 : bool
+    %9 = cast(bool_to_int) %8 : s32i
+    %10 = const 55 : u32i
+    %11 = call @iswdigit(%10) : s32i [all]
+    %12 = const 0 : s32i
+    %13 = cmp ne %11, %12 : bool
+    %14 = cast(bool_to_int) %13 : s32i
+    %15 = const 32 : u32i
+    %16 = call @iswspace(%15) : s32i [all]
+    %17 = const 0 : s32i
+    %18 = cmp ne %16, %17 : bool
+    %19 = cast(bool_to_int) %18 : s32i
+    %20 = const 90 : u32i
+    %21 = call @iswupper(%20) : s32i [all]
+    %22 = const 0 : s32i
+    %23 = cmp ne %21, %22 : bool
+    %24 = cast(bool_to_int) %23 : s32i
+    %25 = const 53 : u32i
+    %26 = call @iswalpha(%25) : s32i [all]
+    %27 = const 0 : s32i
+    %28 = cmp ne %26, %27 : bool
+    %29 = cast(bool_to_int) %28 : s32i
+    %30 = call @printf(%4, %9, %14, %19, %24, %29) : s32i [all]
+    %31 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %32 = get_global @.str.1 : s8i[6]*
+    %33 = cast(array_to_ptrdecay) %32 : s8i*
+    %34 = const 97 : u32i
+    %35 = call @towupper(%34) : u32i [all]
+    %36 = cast(integral) %35 : s32i
+    %37 = const 65 : u32i
+    %38 = call @towlower(%37) : u32i [all]
+    %39 = cast(integral) %38 : s32i
+    %40 = call @printf(%33, %36, %39) : s32i [all]
+    %41 = const 0 : s32i
+    store %41, %0
+    %42 = load %0 : s32i
+    return %42
+}

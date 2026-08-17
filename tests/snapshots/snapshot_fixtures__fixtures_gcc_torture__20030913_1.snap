@@ -1,0 +1,50 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20030913-1.c" (c, x86_64-unknown-linux-gnu)
+global g : s32i = 0 [external, default, align 4, dso_local]
+
+fn fn2(%arg0: s32i**) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i**):
+        %14 = alloca s32i**, "q", align 8
+        store %arg0, %14
+        %15 = get_global @g : s32i*
+        %16 = load %14 : s32i**, align 8
+        store %15, %16, align 8
+        return
+}
+fn test() -> void [external, c, no_inline, dso_local, nothrow] {
+    %11 = alloca s32i*, "p", align 8
+    call @fn2(%11) [all]
+    %12 = const 42 : s32i
+    %13 = load %11 : s32i*, align 8
+    store %12, %13, align 4
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @test : (() -> void)*
+    call @test() [all]
+    scope {
+        %6 = get_global @g : s32i*
+        %7 = load %6 : s32i, align 4
+        %8 = const 42 : s32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            %10 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %3 = get_global @exit : ((s32i) -> void)*
+    %4 = const 0 : s32i
+    call @exit(%4) [all]
+    %5 = load %0 : s32i
+    return %5
+}

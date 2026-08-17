@@ -1,0 +1,31 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00184.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i, "a", align 1
+    %2 = alloca s16i, "b", align 2
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %5 = get_global @.str : s8i[7]*
+    %6 = cast(array_to_ptrdecay) %5 : s8i*
+    %7 = const 1 : u64i
+    %8 = const 1 : u64i
+    %9 = call @printf(%6, %7, %8) : s32i [all]
+    %10 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %11 = get_global @.str : s8i[7]*
+    %12 = cast(array_to_ptrdecay) %11 : s8i*
+    %13 = const 2 : u64i
+    %14 = const 2 : u64i
+    %15 = call @printf(%12, %13, %14) : s32i [all]
+    %16 = const 0 : s32i
+    store %16, %0
+    %17 = load %0 : s32i
+    return %17
+}

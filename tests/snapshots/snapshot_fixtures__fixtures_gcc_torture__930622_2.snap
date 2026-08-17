@@ -1,0 +1,66 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/930622-2.c" (c, x86_64-unknown-linux-gnu)
+fn ll_to_ld(%arg1: s64i) -> long_double<f80> [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s64i):
+        %23 = alloca s64i, "n", align 8
+        %24 = alloca long_double<f80>, "__retval", align 16
+        store %arg1, %23
+        %25 = load %23 : s64i, align 8
+        %26 = cast(int_to_float) %25 : long_double<f80>
+        store %26, %24
+        %27 = load %24 : long_double<f80>
+        return %27
+}
+fn ld_to_ll(%arg0: long_double<f80>) -> s64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: long_double<f80>):
+        %18 = alloca long_double<f80>, "n", align 16
+        %19 = alloca s64i, "__retval", align 8
+        store %arg0, %18
+        %20 = load %18 : long_double<f80>, align 16
+        %21 = cast(float_to_int) %20 : s64i
+        store %21, %19
+        %22 = load %19 : s64i
+        return %22
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s64i, "n", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    scope {
+        %12 = const 10 : s64i
+        %13 = call @ll_to_ld(%12) : long_double<f80> [all]
+        %14 = const 1.000000e+01 : double
+        %15 = cast(floating) %14 : long_double<f80>
+        %16 = cmp ne %13, %15 : bool
+        if %16 {
+            %17 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %6 = const 1.000000e+01 : double
+        %7 = cast(floating) %6 : long_double<f80>
+        %8 = call @ld_to_ll(%7) : s64i [all]
+        %9 = const 10 : s64i
+        %10 = cmp ne %8, %9 : bool
+        if %10 {
+            %11 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %3 = get_global @exit : ((s32i) -> void)*
+    %4 = const 0 : s32i
+    call @exit(%4) [all]
+    %5 = load %0 : s32i
+    return %5
+}

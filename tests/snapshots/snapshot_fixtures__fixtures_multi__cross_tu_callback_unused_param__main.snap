@@ -1,0 +1,30 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.multi/cross_tu_callback_unused_param/main.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn add_ignore_b(%arg0: s32i, %arg1: s32i) -> s32i [external, c];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn call_handler(%arg0: rec_Callback*, %arg1: s32i, %arg2: s32i) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_Callback, "cb", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @add_ignore_b : ((s32i, s32i) -> s32i)*
+    %4 = get_member %1[0] "handler" : ((s32i, s32i) -> s32i)**
+    store %3, %4, align 8
+    %5 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %6 = get_global @.str : s8i[4]*
+    %7 = cast(array_to_ptrdecay) %6 : s8i*
+    %8 = const 5 : s32i
+    %9 = const 99 : s32i
+    %10 = call @call_handler(%1, %8, %9) : s32i [all]
+    %11 = call @printf(%7, %10) : s32i [all]
+    %12 = const 0 : s32i
+    store %12, %0
+    %13 = load %0 : s32i
+    return %13
+}

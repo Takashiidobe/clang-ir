@@ -1,0 +1,44 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00129.c" (c, x86_64-unknown-linux-gnu)
+global s2 : rec_s = zero [external, default, align 4, dso_local]
+
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_s, "s", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    goto s
+    ^bb1():
+        scope {
+            %16 = alloca s32i, "s", align 4
+            %17 = load %16 : s32i, align 4
+            store %17, %0
+            %18 = load %0 : s32i
+            return %18
+        }
+        %3 = get_member %1[0] "s" : rec_s1*
+        %4 = get_member %3[0] "s" : s32i*
+        %5 = load %4 : s32i, align 4
+        %6 = get_member %1[0] "s" : rec_s1*
+        %7 = get_member %6[1] "s1" : rec_s2*
+        %8 = get_member %7[0] "s" : s32i*
+        %9 = load %8 : s32i, align 4
+        %10 = add %5, %9 : s32i [nsw]
+        store %10, %0
+        %11 = load %0 : s32i
+        return %11
+    ^bb2():
+        label s:
+        %12 = const 0 : s32i
+        store %12, %0
+        %13 = load %0 : s32i
+        return %13
+    ^bb3():
+        %14 = const 1 : s32i
+        store %14, %0
+        %15 = load %0 : s32i
+        return %15
+}

@@ -1,0 +1,59 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/pointer_select_field_address.c" (c, x86_64-unknown-linux-gnu)
+global acc : rec_Accounting = zero [external, default, align 8, dso_local]
+global .str : s8i[11] = "%llu %llu\n" [cir_private, default, align 1, dso_local, constant]
+
+fn add(%arg0: s32i, %arg1: u64i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: u64i):
+        %20 = alloca s32i, "isDirect", align 4
+        %21 = alloca u64i, "amount", align 8
+        %22 = alloca u64i*, "target", align 8
+        store %arg0, %20
+        store %arg1, %21
+        %23 = load %20 : s32i, align 4
+        %24 = cast(int_to_bool) %23 : bool
+        %25 = get_global @acc : rec_Accounting*
+        %26 = get_member %25[0] "direct" : u64i*
+        %27 = get_global @acc : rec_Accounting*
+        %28 = get_member %27[1] "indirect" : u64i*
+        %29 = select %24, %26, %28 : u64i*
+        store %29, %22, align 8
+        %30 = load %21 : u64i, align 8
+        %31 = load %22 : u64i*, align 8
+        %32 = load %31 : u64i, align 8
+        %33 = add %32, %30 : u64i
+        store %33, %31, align 8
+        return
+}
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 1 : s32i
+    %3 = const 3 : u64i
+    call @add(%2, %3) [all]
+    %4 = const 0 : s32i
+    %5 = const 5 : u64i
+    call @add(%4, %5) [all]
+    %6 = const 1 : s32i
+    %7 = const 7 : u64i
+    call @add(%6, %7) [all]
+    %8 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %9 = get_global @.str : s8i[11]*
+    %10 = cast(array_to_ptrdecay) %9 : s8i*
+    %11 = get_global @acc : rec_Accounting*
+    %12 = get_member %11[0] "direct" : u64i*
+    %13 = load %12 : u64i, align 8
+    %14 = get_global @acc : rec_Accounting*
+    %15 = get_member %14[1] "indirect" : u64i*
+    %16 = load %15 : u64i, align 8
+    %17 = call @printf(%10, %13, %16) : s32i [all]
+    %18 = const 0 : s32i
+    store %18, %0
+    %19 = load %0 : s32i
+    return %19
+}

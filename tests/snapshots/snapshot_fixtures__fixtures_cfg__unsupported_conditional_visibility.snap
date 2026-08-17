@@ -1,0 +1,26 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.cfg/unsupported_conditional_visibility.c" (c, x86_64-unknown-linux-gnu)
+fn visibility_after_endif() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %9 = alloca s32i, "__retval", align 4
+    %10 = const 37 : s32i
+    store %10, %9
+    %11 = load %9 : s32i
+    return %11
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = call @visibility_after_endif() : s32i [all]
+    %3 = const 37 : s32i
+    %4 = cmp eq %2, %3 : bool
+    %5 = const 0 : s32i
+    %6 = const 1 : s32i
+    %7 = select %4, %5, %6 : s32i
+    store %7, %0
+    %8 = load %0 : s32i
+    return %8
+}

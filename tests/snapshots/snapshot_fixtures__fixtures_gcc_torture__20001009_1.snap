@@ -1,0 +1,58 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20001009-1.c" (c, x86_64-unknown-linux-gnu)
+global a : s32i = 0 [external, default, align 4, dso_local]
+global b : s32i = 0 [external, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "c", align 4
+    %2 = alloca s32i, "d", align 4
+    %3 = alloca s32i, "e", align 4
+    %4 = alloca s32i, "f", align 4
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = const -2 : s32i
+    store %6, %1, align 4
+    %7 = const 254 : s32i
+    store %7, %2, align 4
+    %8 = get_global @a : s32i*
+    %9 = load %8 : s32i, align 4
+    %10 = const 1 : s32i
+    %11 = and %9, %10 : s32i
+    store %11, %3, align 4
+    %12 = get_global @b : s32i*
+    %13 = load %12 : s32i, align 4
+    %14 = const 2 : s32i
+    %15 = and %13, %14 : s32i
+    store %15, %4, align 4
+    scope {
+        %17 = load %1 : s32i, align 4
+        %18 = load %3 : s32i, align 4
+        %19 = load %4 : s32i, align 4
+        %20 = and %18, %19 : s32i
+        %21 = or %17, %20 : s32i
+        %22 = cast(integral) %21 : s8i
+        %23 = cast(integral) %22 : s32i
+        %24 = load %2 : s32i, align 4
+        %25 = cast(integral) %24 : s8i
+        %26 = cast(integral) %25 : s32i
+        %27 = cmp eq %23, %26 : bool
+        if %27 {
+            %29 = const 0 : s32i
+            store %29, %0
+            %30 = load %0 : s32i
+            return %30
+        } else {
+            %28 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %16 = load %0 : s32i
+    return %16
+}

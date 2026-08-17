@@ -1,0 +1,53 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/longs.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[5] = "%ld\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[5] = "%lu\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn ladd(%arg0: s64i, %arg1: s64i) -> s64i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s64i, %arg1: s64i):
+        %20 = alloca s64i, "a", align 8
+        %21 = alloca s64i, "b", align 8
+        %22 = alloca s64i, "__retval", align 8
+        %23 = alloca s64i, "c", align 8
+        store %arg0, %20
+        store %arg1, %21
+        %24 = load %20 : s64i, align 8
+        %25 = load %21 : s64i, align 8
+        %26 = add %24, %25 : s64i [nsw]
+        store %26, %23, align 8
+        %27 = load %23 : s64i, align 8
+        store %27, %22
+        %28 = load %22 : s64i
+        return %28
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s64i, "a", align 8
+    %2 = alloca u64i, "ua", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 5000000000 : s64i
+    store %4, %1, align 8
+    %5 = const 9000000000 : u64i
+    store %5, %2, align 8
+    %6 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %7 = get_global @.str : s8i[5]*
+    %8 = cast(array_to_ptrdecay) %7 : s8i*
+    %9 = load %1 : s64i, align 8
+    %10 = const 1 : s64i
+    %11 = call @ladd(%9, %10) : s64i [all]
+    %12 = call @printf(%8, %11) : s32i [all]
+    %13 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %14 = get_global @.str.1 : s8i[5]*
+    %15 = cast(array_to_ptrdecay) %14 : s8i*
+    %16 = load %2 : u64i, align 8
+    %17 = call @printf(%15, %16) : s32i [all]
+    %18 = const 0 : s32i
+    store %18, %0
+    %19 = load %0 : s32i
+    return %19
+}

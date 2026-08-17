@@ -1,0 +1,41 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/time/strftime.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[18] = "%Y-%m-%d %H:%M:%S" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[8] = "%zu %s\n" [cir_private, default, align 1, dso_local, constant]
+
+fn gmtime(%arg0: s64i*) -> rec_tm* [external, c, nothrow];
+fn strftime(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec_tm*) -> u64i [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s64i, "t", align 8
+    %2 = alloca rec_tm*, "g", align 8
+    %3 = alloca s8i[64], "buf", align 16
+    %4 = alloca u64i, "n", align 8
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = const 1000000000 : s64i
+    store %6, %1, align 8
+    %7 = call @gmtime(%1) : rec_tm* [all]
+    store %7, %2, align 8
+    %8 = cast(array_to_ptrdecay) %3 : s8i*
+    %9 = const 64 : u64i
+    %10 = get_global @.str : s8i[18]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = load %2 : rec_tm*, align 8
+    %13 = call @strftime(%8, %9, %11, %12) : u64i [all]
+    store %13, %4, align 8
+    %14 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %15 = get_global @.str.1 : s8i[8]*
+    %16 = cast(array_to_ptrdecay) %15 : s8i*
+    %17 = load %4 : u64i, align 8
+    %18 = cast(array_to_ptrdecay) %3 : s8i*
+    %19 = call @printf(%16, %17, %18) : s32i [all]
+    %20 = const 0 : s32i
+    store %20, %0
+    %21 = load %0 : s32i
+    return %21
+}

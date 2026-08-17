@@ -1,0 +1,32 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/math/pow.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%f\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn pow(%arg0: double, %arg1: double) -> double [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca double, "x", align 8
+    %2 = alloca double, "y", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 2.000000e+00 : double
+    store %4, %1, align 8, volatile
+    %5 = const 1.000000e+01 : double
+    store %5, %2, align 8, volatile
+    %6 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %7 = get_global @.str : s8i[4]*
+    %8 = cast(array_to_ptrdecay) %7 : s8i*
+    %9 = get_global @pow : ((double, double) -> double)*
+    %10 = load %1 : double, align 8, volatile
+    %11 = load %2 : double, align 8, volatile
+    %12 = call @pow(%10, %11) : double [all]
+    %13 = call @printf(%8, %12) : s32i [all]
+    %14 = const 0 : s32i
+    store %14, %0
+    %15 = load %0 : s32i
+    return %15
+}

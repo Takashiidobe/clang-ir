@@ -1,0 +1,65 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/range_loop_local_array.c" (c, x86_64-unknown-linux-gnu)
+global __const.sum_fixed.a : s32i[5] = [1, 2, 3, 4, 5] [cir_private, default, dso_local, constant]
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn sum_fixed() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %9 = alloca s32i, "__retval", align 4
+    %10 = alloca s32i[5], "a", align 16
+    %11 = alloca s32i, "total", align 4
+    %12 = get_global @__const.sum_fixed.a : s32i[5]*
+    copy %10, %12
+    %13 = const 0 : s32i
+    store %13, %11, align 4
+    scope {
+        %16 = alloca s32i, "i", align 4
+        %17 = const 0 : s32i
+        store %17, %16, align 4
+        for cond: {
+            %26 = load %16 : s32i, align 4
+            %27 = const 5 : s32i
+            %28 = cmp lt %26, %27 : bool
+            condition %28
+        } step: {
+            %18 = load %16 : s32i, align 4
+            %19 = inc %18 : s32i [nsw]
+            store %19, %16, align 4
+            yield
+        } do {
+            scope {
+                %20 = load %16 : s32i, align 4
+                %21 = cast(integral) %20 : s64i
+                %22 = get_element %10[%21] : s32i*
+                %23 = load %22 : s32i, align 4
+                %24 = load %11 : s32i, align 4
+                %25 = add %24, %23 : s32i [nsw]
+                store %25, %11, align 4
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %14 = load %11 : s32i, align 4
+    store %14, %9
+    %15 = load %9 : s32i
+    return %15
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[4]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = call @sum_fixed() : s32i [all]
+    %6 = call @printf(%4, %5) : s32i [all]
+    %7 = const 0 : s32i
+    store %7, %0
+    %8 = load %0 : s32i
+    return %8
+}

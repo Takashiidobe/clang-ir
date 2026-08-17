@@ -1,0 +1,49 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/mul-sext.c" (c, x86_64-unknown-linux-gnu)
+fn f(%arg0: s64i, %arg1: s64i) -> s64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s64i, %arg1: s64i):
+        %12 = alloca s64i, "a", align 8
+        %13 = alloca s64i, "b", align 8
+        %14 = alloca s64i, "__retval", align 8
+        store %arg0, %12
+        store %arg1, %13
+        %15 = load %12 : s64i, align 8
+        %16 = cast(integral) %15 : s32i
+        %17 = cast(integral) %16 : s64i
+        %18 = load %13 : s64i, align 8
+        %19 = cast(integral) %18 : s32i
+        %20 = cast(integral) %19 : s64i
+        %21 = mul %17, %20 : s64i [nsw]
+        store %21, %14
+        %22 = load %14 : s64i
+        return %22
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s64i, "a", align 8
+    %2 = alloca s64i, "b", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 1244422862270365697 : s64i
+    store %4, %1, align 8
+    %5 = const 1808618562365947905 : s64i
+    store %5, %2, align 8
+    scope {
+        %7 = load %1 : s64i, align 8
+        %8 = load %2 : s64i, align 8
+        %9 = call @f(%7, %8) : s64i [all]
+        %10 = const 1 : s64i
+        %11 = cmp ne %9, %10 : bool
+        if %11 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = load %0 : s32i
+    return %6
+}

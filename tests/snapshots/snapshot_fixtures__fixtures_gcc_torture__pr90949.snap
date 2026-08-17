@@ -1,0 +1,95 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr90949.c" (c, x86_64-unknown-linux-gnu)
+global space : rec_Node[2] = zero [external, default, align 16, dso_local]
+global .str : s8i[11] = "No cleanup" [cir_private, default, align 1, dso_local, constant]
+
+fn my_puts(%arg4: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: s8i*):
+        %36 = alloca s8i*, "str", align 8
+        store %arg4, %36
+        return
+}
+fn my_free(%arg3: void*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: void*):
+        %35 = alloca void*, "p", align 8
+        store %arg3, %35
+        return
+}
+fn my_malloc(%arg2: s32i) -> rec_Node* [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i):
+        %29 = alloca s32i, "bytes", align 4
+        %30 = alloca rec_Node*, "__retval", align 8
+        store %arg2, %29
+        %31 = const 0 : s64i
+        %32 = get_global @space : rec_Node[2]*
+        %33 = get_element %32[%31] : rec_Node*
+        store %33, %30
+        %34 = load %30 : rec_Node*
+        return %34
+}
+fn walk(%arg0: rec_Node*, %arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_Node*, %arg1: s32i):
+        %11 = alloca rec_Node*, "module", align 8
+        %12 = alloca s32i, "cleanup", align 4
+        store %arg0, %11
+        store %arg1, %12
+        scope {
+            %26 = load %11 : rec_Node*, align 8
+            %27 = const #cir.ptr<null> : rec_Node*
+            %28 = cmp eq %26, %27 : bool
+            if %28 {
+                return
+            }
+            yield
+        }
+        scope {
+            %21 = load %12 : s32i, align 4
+            %22 = cast(int_to_bool) %21 : bool
+            %23 = not %22 : bool
+            if %23 {
+                %24 = get_global @.str : s8i[11]*
+                %25 = cast(array_to_ptrdecay) %24 : s8i*
+                call @my_puts(%25) [all]
+                yield
+            }
+            yield
+        }
+        %13 = load %11 : rec_Node*, align 8
+        %14 = get_member %13[0] "child" : rec_Node**
+        %15 = load %14 : rec_Node*, align 8
+        %16 = load %12 : s32i, align 4
+        call @walk(%15, %16) [all]
+        scope {
+            %17 = load %12 : s32i, align 4
+            %18 = cast(int_to_bool) %17 : bool
+            if %18 {
+                %19 = load %11 : rec_Node*, align 8
+                %20 = cast(bitcast) %19 : void*
+                call @my_free(%20) [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_Node*, "node", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 8 : s32i
+    %4 = call @my_malloc(%3) : rec_Node* [all]
+    store %4, %1, align 8
+    %5 = const #cir.ptr<null> : rec_Node*
+    %6 = load %1 : rec_Node*, align 8
+    %7 = get_member %6[0] "child" : rec_Node**
+    store %5, %7, align 8
+    %8 = load %1 : rec_Node*, align 8
+    %9 = const 1 : s32i
+    call @walk(%8, %9) [all]
+    %10 = load %0 : s32i
+    return %10
+}

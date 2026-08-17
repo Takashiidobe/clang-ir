@@ -1,0 +1,152 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/do_while.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn sum_do_while(%arg1: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i):
+        %58 = alloca s32i, "n", align 4
+        %59 = alloca s32i, "__retval", align 4
+        %60 = alloca s32i, "total", align 4
+        %61 = alloca s32i, "i", align 4
+        store %arg1, %58
+        %62 = const 0 : s32i
+        store %62, %60, align 4
+        %63 = const 1 : s32i
+        store %63, %61, align 4
+        scope {
+            do {
+                scope {
+                    %69 = load %61 : s32i, align 4
+                    %70 = load %60 : s32i, align 4
+                    %71 = add %70, %69 : s32i [nsw]
+                    store %71, %60, align 4
+                    %72 = load %61 : s32i, align 4
+                    %73 = inc %72 : s32i [nsw]
+                    store %73, %61, align 4
+                    yield
+                }
+                yield
+            } while {
+                %66 = load %61 : s32i, align 4
+                %67 = load %58 : s32i, align 4
+                %68 = cmp le %66, %67 : bool
+                condition %68
+            }
+            yield
+        }
+        %64 = load %60 : s32i, align 4
+        store %64, %59
+        %65 = load %59 : s32i
+        return %65
+}
+fn runs_once_when_false() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %48 = alloca s32i, "__retval", align 4
+    %49 = alloca s32i, "total", align 4
+    %50 = const 0 : s32i
+    store %50, %49, align 4
+    scope {
+        do {
+            scope {
+                %55 = const 7 : s32i
+                %56 = load %49 : s32i, align 4
+                %57 = add %56, %55 : s32i [nsw]
+                store %57, %49, align 4
+                yield
+            }
+            yield
+        } while {
+            %53 = const 0 : s32i
+            %54 = cast(int_to_bool) %53 : bool
+            condition %54
+        }
+        yield
+    }
+    %51 = load %49 : s32i, align 4
+    store %51, %48
+    %52 = load %48 : s32i
+    return %52
+}
+fn continue_checks_condition(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %27 = alloca s32i, "n", align 4
+        %28 = alloca s32i, "__retval", align 4
+        %29 = alloca s32i, "total", align 4
+        %30 = alloca s32i, "i", align 4
+        store %arg0, %27
+        %31 = const 0 : s32i
+        store %31, %29, align 4
+        %32 = const 0 : s32i
+        store %32, %30, align 4
+        scope {
+            do {
+                scope {
+                    %38 = load %30 : s32i, align 4
+                    %39 = inc %38 : s32i [nsw]
+                    store %39, %30, align 4
+                    scope {
+                        %43 = load %30 : s32i, align 4
+                        %44 = const 2 : s32i
+                        %45 = rem %43, %44 : s32i
+                        %46 = const 0 : s32i
+                        %47 = cmp eq %45, %46 : bool
+                        if %47 {
+                            continue
+                        }
+                        yield
+                    }
+                    %40 = load %30 : s32i, align 4
+                    %41 = load %29 : s32i, align 4
+                    %42 = add %41, %40 : s32i [nsw]
+                    store %42, %29, align 4
+                    yield
+                }
+                yield
+            } while {
+                %35 = load %30 : s32i, align 4
+                %36 = load %27 : s32i, align 4
+                %37 = cmp lt %35, %36 : bool
+                condition %37
+            }
+            yield
+        }
+        %33 = load %29 : s32i, align 4
+        store %33, %28
+        %34 = load %28 : s32i
+        return %34
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[4]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 5 : s32i
+    %6 = call @sum_do_while(%5) : s32i [all]
+    %7 = call @printf(%4, %6) : s32i [all]
+    %8 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %9 = get_global @.str : s8i[4]*
+    %10 = cast(array_to_ptrdecay) %9 : s8i*
+    %11 = const 0 : s32i
+    %12 = call @sum_do_while(%11) : s32i [all]
+    %13 = call @printf(%10, %12) : s32i [all]
+    %14 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %15 = get_global @.str : s8i[4]*
+    %16 = cast(array_to_ptrdecay) %15 : s8i*
+    %17 = call @runs_once_when_false() : s32i [all]
+    %18 = call @printf(%16, %17) : s32i [all]
+    %19 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %20 = get_global @.str : s8i[4]*
+    %21 = cast(array_to_ptrdecay) %20 : s8i*
+    %22 = const 6 : s32i
+    %23 = call @continue_checks_condition(%22) : s32i [all]
+    %24 = call @printf(%21, %23) : s32i [all]
+    %25 = const 0 : s32i
+    store %25, %0
+    %26 = load %0 : s32i
+    return %26
+}

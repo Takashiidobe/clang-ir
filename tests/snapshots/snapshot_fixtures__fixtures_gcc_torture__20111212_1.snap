@@ -1,0 +1,57 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20111212-1.c" (c, x86_64-unknown-linux-gnu)
+fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
+fn frob_entry(%arg0: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i*):
+        %12 = alloca s8i*, "buf", align 8
+        %13 = alloca rec_event, "event", align 1
+        store %arg0, %12
+        %14 = cast(bitcast) %13 : void*
+        %15 = load %12 : s8i*, align 8
+        %16 = cast(bitcast) %15 : void*
+        %17 = const 4 : u64i
+        %18 = call @memcpy(%14, %16, %17) : void* [all]
+        scope {
+            %19 = get_member %13[0] "sent" : rec_anon2E0*
+            %20 = get_member %19[0] "sec" : u32i*
+            %21 = load %20 : u32i, align 1
+            %22 = const 64 : u32i
+            %23 = cmp lt %21, %22 : bool
+            if %23 {
+                %24 = const 4294967295 : u32i
+                %25 = get_member %13[0] "sent" : rec_anon2E0*
+                %26 = get_member %25[0] "sec" : u32i*
+                store %24, %26, align 1
+                %27 = load %12 : s8i*, align 8
+                %28 = cast(bitcast) %27 : void*
+                %29 = cast(bitcast) %13 : void*
+                %30 = const 4 : u64i
+                %31 = call @memcpy(%28, %29, %30) : void* [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_anon2E1, "u", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = cast(bitcast) %1 : void*
+    %4 = const 0 : s32i
+    %5 = const 8 : u64i
+    %6 = call @memset(%3, %4, %5) : void* [all]
+    %7 = const 1 : s64i
+    %8 = get_member %1[0] "buf" : s8i[5]*
+    %9 = get_element %8[%7] : s8i*
+    call @frob_entry(%9) [all]
+    %10 = const 0 : s32i
+    store %10, %0
+    %11 = load %0 : s32i
+    return %11
+}

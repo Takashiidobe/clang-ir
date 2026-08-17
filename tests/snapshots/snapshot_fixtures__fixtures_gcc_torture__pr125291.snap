@@ -1,0 +1,136 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr125291.c" (c, x86_64-unknown-linux-gnu)
+global buf : s8i[1111] = zero [external, default, align 16, dso_local]
+global archive_le16dec_filename : s8i* = @buf [external, default, align 8, dso_local]
+global archive_le16dec_p : s8i[2] = [21, 127] [external, default, align 1, dso_local]
+global archive_le16dec_filename_size : u32i = 0 [external, default, align 4, dso_local]
+global archive_le16dec_end : u32i = 0 [external, default, align 4, dso_local]
+global archive_le16dec_fn_end : u32i = 0 [external, default, align 4, dso_local]
+global archive_le16dec_offset : u32i = 0 [external, default, align 4, dso_local]
+
+fn archive_le16dec() -> void [external, c, no_inline, dso_local, nothrow] {
+    %10 = alloca u8i, "flagbits", align 1
+    %11 = alloca u8i, "flagbyte", align 1
+    %12 = get_global @archive_le16dec_filename_size : u32i*
+    %13 = load %12 : u32i, align 4
+    %14 = cast(integral) %13 : s16i
+    %15 = cast(integral) %14 : u32i
+    %16 = get_global @archive_le16dec_filename_size : u32i*
+    store %15, %16, align 4
+    %17 = const 0 : u8i
+    store %17, %10, align 1
+    %18 = get_global @archive_le16dec_filename_size : u32i*
+    %19 = load %18 : u32i, align 4
+    %20 = get_global @archive_le16dec_end : u32i*
+    store %19, %20, align 4
+    %21 = get_global @archive_le16dec_filename_size : u32i*
+    %22 = load %21 : u32i, align 4
+    %23 = const 2 : u32i
+    %24 = mul %22, %23 : u32i
+    %25 = get_global @archive_le16dec_fn_end : u32i*
+    store %24, %25, align 4
+    %26 = const 0 : u8i
+    store %26, %10, align 1
+    %27 = const 0 : u32i
+    %28 = get_global @archive_le16dec_filename_size : u32i*
+    store %27, %28, align 4
+    scope {
+        while {
+            %58 = get_global @archive_le16dec_offset : u32i*
+            %59 = load %58 : u32i, align 4
+            %60 = get_global @archive_le16dec_end : u32i*
+            %61 = load %60 : u32i, align 4
+            %62 = cmp lt %59, %61 : bool
+            %63 = ternary %62 ? { : bool
+                %65 = get_global @archive_le16dec_filename_size : u32i*
+                %66 = load %65 : u32i, align 4
+                %67 = get_global @archive_le16dec_fn_end : u32i*
+                %68 = load %67 : u32i, align 4
+                %69 = cmp lt %66, %68 : bool
+                yield %69
+            } : {
+                %64 = const #false : bool
+                yield %64
+            }
+            condition %63
+        } do {
+            scope {
+                scope {
+                    %46 = load %10 : u8i, align 1
+                    %47 = cast(int_to_bool) %46 : bool
+                    %48 = not %47 : bool
+                    if %48 {
+                        %49 = get_global @archive_le16dec_offset : u32i*
+                        %50 = load %49 : u32i, align 4
+                        %51 = inc %50 : u32i
+                        store %51, %49, align 4
+                        %52 = cast(integral) %50 : u64i
+                        %53 = get_global @archive_le16dec_p : s8i[2]*
+                        %54 = get_element %53[%52] : s8i*
+                        %55 = load %54 : s8i, align 1
+                        %56 = cast(integral) %55 : u8i
+                        store %56, %11, align 1
+                        %57 = const 8 : u8i
+                        store %57, %10, align 1
+                        yield
+                    }
+                    yield
+                }
+                %29 = const 2 : s32i
+                %30 = load %10 : u8i, align 1
+                %31 = cast(integral) %30 : s32i
+                %32 = sub %31, %29 : s32i [nsw]
+                %33 = cast(integral) %32 : u8i
+                store %33, %10, align 1
+                scope {
+                    %34 = load %11 : u8i, align 1
+                    %35 = cast(integral) %34 : s32i
+                    %36 = load %10 : u8i, align 1
+                    %37 = cast(integral) %36 : s32i
+                    %38 = shift right %35, %37 : s32i
+                    %39 = const 3 : s32i
+                    %40 = and %38, %39 : s32i
+                    %41 = cast(int_to_bool) %40 : bool
+                    %42 = not %41 : bool
+                    if %42 {
+                        %43 = get_global @archive_le16dec_filename_size : u32i*
+                        %44 = load %43 : u32i, align 4
+                        %45 = inc %44 : u32i
+                        store %45, %43, align 4
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 2 : u32i
+    %3 = get_global @archive_le16dec_filename_size : u32i*
+    store %2, %3, align 4
+    %4 = get_global @archive_le16dec : (() -> void)*
+    call @archive_le16dec() [all]
+    scope {
+        %6 = get_global @archive_le16dec_filename_size : u32i*
+        %7 = load %6 : u32i, align 4
+        %8 = const 1 : u32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            <unmodeled: cir.trap>
+        }
+        yield
+    }
+    %5 = load %0 : s32i
+    return %5
+}

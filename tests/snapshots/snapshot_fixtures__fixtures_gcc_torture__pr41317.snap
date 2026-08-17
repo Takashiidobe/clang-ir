@@ -1,0 +1,44 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr41317.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: rec_B*) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_B*):
+        %13 = alloca rec_B*, "p", align 8
+        store %arg0, %13
+        %14 = const 1 : s32i
+        %15 = load %13 : rec_B*, align 8
+        %16 = cast(bitcast) %15 : rec_A*
+        %17 = get_member %16[0] "i" : s32i*
+        store %14, %17, align 4
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_A, "a", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 0 : s32i
+    %4 = get_member %1[0] "i" : s32i*
+    store %3, %4, align 4
+    %5 = cast(bitcast) %1 : rec_B*
+    call @foo(%5) [all]
+    scope {
+        %8 = get_member %1[0] "i" : s32i*
+        %9 = load %8 : s32i, align 4
+        %10 = const 1 : s32i
+        %11 = cmp ne %9, %10 : bool
+        if %11 {
+            %12 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = load %0 : s32i
+    return %7
+}

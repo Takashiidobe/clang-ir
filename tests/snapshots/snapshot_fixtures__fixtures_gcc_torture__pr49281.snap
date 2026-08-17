@@ -1,0 +1,107 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr49281.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i):
+        %46 = alloca s32i, "x", align 4
+        %47 = alloca s32i, "__retval", align 4
+        store %arg1, %46
+        %48 = load %46 : s32i, align 4
+        %49 = const 2 : s32i
+        %50 = shift left %48, %49 : s32i
+        %51 = const 4 : s32i
+        %52 = or %50, %51 : s32i
+        store %52, %47
+        %53 = load %47 : s32i
+        return %53
+}
+fn bar(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %38 = alloca s32i, "x", align 4
+        %39 = alloca s32i, "__retval", align 4
+        store %arg0, %38
+        %40 = load %38 : s32i, align 4
+        %41 = const 2 : s32i
+        %42 = shift left %40, %41 : s32i
+        %43 = const 3 : s32i
+        %44 = or %42, %43 : s32i
+        store %44, %39
+        %45 = load %39 : s32i
+        return %45
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %21 = const 43 : s32i
+        %22 = call @foo(%21) : s32i [all]
+        %23 = const 172 : s32i
+        %24 = cmp ne %22, %23 : bool
+        %25 = ternary %24 ? { : bool
+            %37 = const #true : bool
+            yield %37
+        } : {
+            %33 = const 1 : s32i
+            %34 = call @foo(%33) : s32i [all]
+            %35 = const 4 : s32i
+            %36 = cmp ne %34, %35 : bool
+            yield %36
+        }
+        %26 = ternary %25 ? { : bool
+            %32 = const #true : bool
+            yield %32
+        } : {
+            %28 = const 2 : s32i
+            %29 = call @foo(%28) : s32i [all]
+            %30 = const 12 : s32i
+            %31 = cmp ne %29, %30 : bool
+            yield %31
+        }
+        if %26 {
+            %27 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %4 = const 43 : s32i
+        %5 = call @bar(%4) : s32i [all]
+        %6 = const 175 : s32i
+        %7 = cmp ne %5, %6 : bool
+        %8 = ternary %7 ? { : bool
+            %20 = const #true : bool
+            yield %20
+        } : {
+            %16 = const 1 : s32i
+            %17 = call @bar(%16) : s32i [all]
+            %18 = const 7 : s32i
+            %19 = cmp ne %17, %18 : bool
+            yield %19
+        }
+        %9 = ternary %8 ? { : bool
+            %15 = const #true : bool
+            yield %15
+        } : {
+            %11 = const 2 : s32i
+            %12 = call @bar(%11) : s32i [all]
+            %13 = const 11 : s32i
+            %14 = cmp ne %12, %13 : bool
+            yield %14
+        }
+        if %9 {
+            %10 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

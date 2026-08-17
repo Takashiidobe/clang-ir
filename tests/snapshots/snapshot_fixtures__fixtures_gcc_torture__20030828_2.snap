@@ -1,0 +1,52 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20030828-2.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i[2], "tmp", align 4
+    %2 = alloca rec_rtx_def*, "r", align 8
+    %3 = alloca rec_rtx_def, "s", align 4
+    %4 = alloca s32i*, "p", align 8
+    %5 = alloca s32i*, "q", align 8
+    %6 = const 0 : s32i
+    store %6, %0
+    store %3, %2, align 8
+    %7 = const 39 : s32i
+    %8 = load %2 : rec_rtx_def*, align 8
+    %9 = get_member %8[0] "code" : s32i*
+    store %7, %9, align 4
+    %10 = cast(array_to_ptrdecay) %1 : s32i*
+    store %10, %4, align 8
+    %11 = load %4 : s32i*, align 8
+    %12 = const 1 : s32i
+    %13 = ptr_stride %11, %12 : s32i*
+    store %13, %5, align 8
+    %14 = const 0 : s32i
+    %15 = load %5 : s32i*, align 8
+    store %14, %15, align 4
+    %16 = const 39 : s32i
+    %17 = const 1 : s64i
+    %18 = get_element %1[%17] : s32i*
+    store %16, %18, align 4
+    scope {
+        %22 = load %5 : s32i*, align 8
+        %23 = load %22 : s32i, align 4
+        %24 = const 39 : s32i
+        %25 = cmp ne %23, %24 : bool
+        if %25 {
+            %26 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %19 = get_global @exit : ((s32i) -> void)*
+    %20 = const 0 : s32i
+    call @exit(%20) [all]
+    %21 = load %0 : s32i
+    return %21
+}

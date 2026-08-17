@@ -1,0 +1,142 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr31169.c" (c, x86_64-unknown-linux-gnu)
+fn sign_bit_p(%arg0: rec_tree_type*, %arg1: s64i, %arg2: u64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_tree_type*, %arg1: s64i, %arg2: u64i):
+        %14 = alloca rec_tree_type*, "t", align 8
+        %15 = alloca s64i, "val_hi", align 8
+        %16 = alloca u64i, "val_lo", align 8
+        %17 = alloca s32i, "__retval", align 4
+        %18 = alloca u64i, "mask_lo", align 8
+        %19 = alloca u64i, "lo", align 8
+        %20 = alloca s64i, "mask_hi", align 8
+        %21 = alloca s64i, "hi", align 8
+        %22 = alloca s32i, "width", align 4
+        store %arg0, %14
+        store %arg1, %15
+        store %arg2, %16
+        %23 = load %14 : rec_tree_type*, align 8
+        %24 = get_member %23[0] "precision" : u16i*
+        <unmodeled: cir.get_bitfield>
+        %26 = cast(integral) %25 : s32i
+        store %26, %22, align 4
+        scope {
+            %43 = load %22 : s32i, align 4
+            %44 = cast(integral) %43 : u64i
+            %45 = const 8 : u64i
+            %46 = const 8 : u64i
+            %47 = mul %45, %46 : u64i
+            %48 = cmp gt %44, %47 : bool
+            if %48 {
+                %64 = const 1 : u64i
+                %65 = load %22 : s32i, align 4
+                %66 = cast(integral) %65 : u64i
+                %67 = const 8 : u64i
+                %68 = const 8 : u64i
+                %69 = mul %67, %68 : u64i
+                %70 = sub %66, %69 : u64i
+                %71 = const 1 : u64i
+                %72 = sub %70, %71 : u64i
+                %73 = shift left %64, %72 : u64i
+                %74 = cast(integral) %73 : s64i
+                store %74, %21, align 8
+                %75 = const 0 : u64i
+                store %75, %19, align 8
+                %76 = const 18446744073709551615 : u64i
+                %77 = const 2 : u64i
+                %78 = const 8 : u64i
+                %79 = const 8 : u64i
+                %80 = mul %78, %79 : u64i
+                %81 = mul %77, %80 : u64i
+                %82 = load %22 : s32i, align 4
+                %83 = cast(integral) %82 : u64i
+                %84 = sub %81, %83 : u64i
+                %85 = shift right %76, %84 : u64i
+                %86 = cast(integral) %85 : s64i
+                store %86, %20, align 8
+                %87 = const 18446744073709551615 : u64i
+                store %87, %18, align 8
+                yield
+            } else {
+                %49 = const 0 : s64i
+                store %49, %21, align 8
+                %50 = const 1 : u64i
+                %51 = load %22 : s32i, align 4
+                %52 = const 1 : s32i
+                %53 = sub %51, %52 : s32i [nsw]
+                %54 = shift left %50, %53 : u64i
+                store %54, %19, align 8
+                %55 = const 0 : s64i
+                store %55, %20, align 8
+                %56 = const 18446744073709551615 : u64i
+                %57 = const 8 : u64i
+                %58 = const 8 : u64i
+                %59 = mul %57, %58 : u64i
+                %60 = load %22 : s32i, align 4
+                %61 = cast(integral) %60 : u64i
+                %62 = sub %59, %61 : u64i
+                %63 = shift right %56, %62 : u64i
+                store %63, %18, align 8
+                yield
+            }
+            yield
+        }
+        scope {
+            %29 = load %15 : s64i, align 8
+            %30 = load %20 : s64i, align 8
+            %31 = and %29, %30 : s64i
+            %32 = load %21 : s64i, align 8
+            %33 = cmp eq %31, %32 : bool
+            %34 = ternary %33 ? { : bool
+                %38 = load %16 : u64i, align 8
+                %39 = load %18 : u64i, align 8
+                %40 = and %38, %39 : u64i
+                %41 = load %19 : u64i, align 8
+                %42 = cmp eq %40, %41 : bool
+                yield %42
+            } : {
+                %37 = const #false : bool
+                yield %37
+            }
+            if %34 {
+                %35 = const 1 : s32i
+                store %35, %17
+                %36 = load %17 : s32i
+                return %36
+            }
+            yield
+        }
+        %27 = const 0 : s32i
+        store %27, %17
+        %28 = load %17 : s32i
+        return %28
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_tree_type, "t", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 1 : u32i
+    %4 = get_member %1[0] "precision" : u16i*
+    <unmodeled: cir.set_bitfield>
+    scope {
+        %8 = const 0 : s64i
+        %9 = const 18446744073709551615 : u64i
+        %10 = call @sign_bit_p(%1, %8, %9) : s32i [all]
+        %11 = cast(int_to_bool) %10 : bool
+        %12 = not %11 : bool
+        if %12 {
+            %13 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = load %0 : s32i
+    return %7
+}

@@ -1,0 +1,65 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr44164.c" (c, x86_64-unknown-linux-gnu)
+global a : rec_X = zero [external, default, align 4, dso_local]
+
+fn foo(%arg0: rec_Z*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_Z*):
+        %18 = alloca rec_Z*, "p", align 8
+        %19 = alloca s32i, "__retval", align 4
+        %20 = alloca s32i, "i", align 4
+        %21 = alloca rec_Y, ".compoundliteral", align 4
+        store %arg0, %18
+        %22 = load %18 : rec_Z*, align 8
+        %23 = get_member %22[0] "i" : s32i*
+        %24 = load %23 : s32i, align 4
+        store %24, %20, align 4
+        %25 = get_global @a : rec_X*
+        %26 = get_member %25[0] "b" : rec_Y*
+        %27 = get_member %21[0] "bb" : rec_YY*
+        %28 = const zero : rec_YY
+        store %28, %27, align 4
+        copy %26, %21
+        %29 = load %18 : rec_Z*, align 8
+        %30 = get_member %29[0] "i" : s32i*
+        %31 = load %30 : s32i, align 4
+        %32 = load %20 : s32i, align 4
+        %33 = add %31, %32 : s32i [nsw]
+        store %33, %19
+        %34 = load %19 : s32i
+        return %34
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 1 : s32i
+    %3 = get_global @a : rec_X*
+    %4 = get_member %3[0] "b" : rec_Y*
+    %5 = get_member %4[0] "bb" : rec_YY*
+    %6 = get_member %5[0] "c" : rec_Z*
+    %7 = get_member %6[0] "i" : s32i*
+    store %2, %7, align 4
+    scope {
+        %10 = get_global @a : rec_X*
+        %11 = get_member %10[0] "b" : rec_Y*
+        %12 = get_member %11[0] "bb" : rec_YY*
+        %13 = get_member %12[0] "c" : rec_Z*
+        %14 = call @foo(%13) : s32i [all]
+        %15 = const 1 : s32i
+        %16 = cmp ne %14, %15 : bool
+        if %16 {
+            %17 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %8 = const 0 : s32i
+    store %8, %0
+    %9 = load %0 : s32i
+    return %9
+}

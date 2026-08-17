@@ -1,0 +1,131 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/ieee__mzero3.c" (c, x86_64-unknown-linux-gnu)
+global nzerod : double = -0.000000e+00 [external, default, align 8, dso_local]
+global nzerof : float = -0.000000e+00 [external, default, align 4, dso_local]
+global zerod : double = 0.000000e+00 [external, default, align 8, dso_local]
+global zerof : float = 0.000000e+00 [external, default, align 4, dso_local]
+
+fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn expectd(%arg4: double, %arg5: double) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: double, %arg5: double):
+        %49 = alloca double, "value", align 8
+        %50 = alloca double, "expected", align 8
+        store %arg4, %49
+        store %arg5, %50
+        scope {
+            %51 = load %49 : double, align 8
+            %52 = load %50 : double, align 8
+            %53 = cmp ne %51, %52 : bool
+            %54 = ternary %53 ? { : bool
+                %62 = const #true : bool
+                yield %62
+            } : {
+                %56 = cast(bitcast) %49 : void*
+                %57 = cast(bitcast) %50 : void*
+                %58 = const 8 : u64i
+                %59 = call @memcmp(%56, %57, %58) : s32i [all]
+                %60 = const 0 : s32i
+                %61 = cmp ne %59, %60 : bool
+                yield %61
+            }
+            if %54 {
+                %55 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn negd(%arg3: double) -> double [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: double):
+        %44 = alloca double, "v", align 8
+        %45 = alloca double, "__retval", align 8
+        store %arg3, %44
+        %46 = load %44 : double, align 8
+        %47 = fneg %46 : double
+        store %47, %45
+        %48 = load %45 : double
+        return %48
+}
+fn expectf(%arg1: float, %arg2: float) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: float, %arg2: float):
+        %30 = alloca float, "value", align 4
+        %31 = alloca float, "expected", align 4
+        store %arg1, %30
+        store %arg2, %31
+        scope {
+            %32 = load %30 : float, align 4
+            %33 = load %31 : float, align 4
+            %34 = cmp ne %32, %33 : bool
+            %35 = ternary %34 ? { : bool
+                %43 = const #true : bool
+                yield %43
+            } : {
+                %37 = cast(bitcast) %30 : void*
+                %38 = cast(bitcast) %31 : void*
+                %39 = const 4 : u64i
+                %40 = call @memcmp(%37, %38, %39) : s32i [all]
+                %41 = const 0 : s32i
+                %42 = cmp ne %40, %41 : bool
+                yield %42
+            }
+            if %35 {
+                %36 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn negf(%arg0: float) -> float [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: float):
+        %25 = alloca float, "v", align 4
+        %26 = alloca float, "__retval", align 4
+        store %arg0, %25
+        %27 = load %25 : float, align 4
+        %28 = fneg %27 : float
+        store %28, %26
+        %29 = load %26 : float
+        return %29
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @zerod : double*
+    %3 = load %2 : double, align 8
+    %4 = call @negd(%3) : double [all]
+    %5 = get_global @nzerod : double*
+    %6 = load %5 : double, align 8
+    call @expectd(%4, %6) [all]
+    %7 = get_global @zerof : float*
+    %8 = load %7 : float, align 4
+    %9 = call @negf(%8) : float [all]
+    %10 = get_global @nzerof : float*
+    %11 = load %10 : float, align 4
+    call @expectf(%9, %11) [all]
+    %12 = get_global @nzerod : double*
+    %13 = load %12 : double, align 8
+    %14 = call @negd(%13) : double [all]
+    %15 = get_global @zerod : double*
+    %16 = load %15 : double, align 8
+    call @expectd(%14, %16) [all]
+    %17 = get_global @nzerof : float*
+    %18 = load %17 : float, align 4
+    %19 = call @negf(%18) : float [all]
+    %20 = get_global @zerof : float*
+    %21 = load %20 : float, align 4
+    call @expectf(%19, %21) [all]
+    %22 = get_global @exit : ((s32i) -> void)*
+    %23 = const 0 : s32i
+    call @exit(%23) [all]
+    %24 = load %0 : s32i
+    return %24
+}

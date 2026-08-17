@@ -1,0 +1,41 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/ctype_libc_setlocale_c.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[2] = "C" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn setlocale(%arg0: s32i, %arg1: s8i*) -> s8i* [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn toupper(%arg0: s32i) -> s32i [external, c, pure, nothrow];
+fn tolower(%arg0: s32i) -> s32i [external, c, pure, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "lower", align 4
+    %2 = alloca s32i, "upper", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 6 : s32i
+    %5 = get_global @.str : s8i[2]*
+    %6 = cast(array_to_ptrdecay) %5 : s8i*
+    %7 = call @setlocale(%4, %6) : s8i* [all]
+    %8 = const 113 : s32i
+    store %8, %1, align 4
+    %9 = const 81 : s32i
+    store %9, %2, align 4
+    %10 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %11 = get_global @.str.1 : s8i[7]*
+    %12 = cast(array_to_ptrdecay) %11 : s8i*
+    %13 = get_global @toupper : ((s32i) -> s32i)*
+    %14 = load %1 : s32i, align 4
+    %15 = call @toupper(%14) : s32i [pure]
+    %16 = get_global @tolower : ((s32i) -> s32i)*
+    %17 = load %2 : s32i, align 4
+    %18 = call @tolower(%17) : s32i [pure]
+    %19 = call @printf(%12, %15, %18) : s32i [all]
+    %20 = const 0 : s32i
+    store %20, %0
+    %21 = load %0 : s32i
+    return %21
+}

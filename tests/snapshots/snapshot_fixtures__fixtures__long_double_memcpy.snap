@@ -1,0 +1,107 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/long_double_memcpy.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[3] = "ok" [cir_private, default, align 1, dso_local, constant]
+
+fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
+fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
+fn puts(%arg0: s8i*) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_ld_union, "src", align 16
+    %2 = alloca rec_ld_union, "dst", align 16
+    %3 = alloca s32i, "i", align 4
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+    %6 = cast(bitcast) %1 : void*
+    %7 = const 0 : s32i
+    %8 = const 16 : u64i
+    %9 = call @memset(%6, %7, %8) : void* [all]
+    scope {
+        %41 = const 0 : s32i
+        store %41, %3, align 4
+        for cond: {
+            %54 = load %3 : s32i, align 4
+            %55 = const 10 : s32i
+            %56 = cmp lt %54, %55 : bool
+            condition %56
+        } step: {
+            %42 = load %3 : s32i, align 4
+            %43 = inc %42 : s32i [nsw]
+            store %43, %3, align 4
+            yield
+        } do {
+            %44 = load %3 : s32i, align 4
+            %45 = const 17 : s32i
+            %46 = mul %44, %45 : s32i [nsw]
+            %47 = const 3 : s32i
+            %48 = add %46, %47 : s32i [nsw]
+            %49 = cast(integral) %48 : u8i
+            %50 = load %3 : s32i, align 4
+            %51 = cast(integral) %50 : s64i
+            %52 = get_member %1[1] "bytes" : u8i[16]*
+            %53 = get_element %52[%51] : u8i*
+            store %49, %53, align 1
+            yield
+        }
+        yield
+    }
+    %10 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+    %11 = cast(bitcast) %2 : void*
+    %12 = cast(bitcast) %1 : void*
+    %13 = const 16 : u64i
+    %14 = call @memcpy(%11, %12, %13) : void* [all]
+    scope {
+        %20 = const 0 : s32i
+        store %20, %3, align 4
+        for cond: {
+            %38 = load %3 : s32i, align 4
+            %39 = const 10 : s32i
+            %40 = cmp lt %38, %39 : bool
+            condition %40
+        } step: {
+            %21 = load %3 : s32i, align 4
+            %22 = inc %21 : s32i [nsw]
+            store %22, %3, align 4
+            yield
+        } do {
+            scope {
+                scope {
+                    %23 = load %3 : s32i, align 4
+                    %24 = cast(integral) %23 : s64i
+                    %25 = get_member %2[1] "bytes" : u8i[16]*
+                    %26 = get_element %25[%24] : u8i*
+                    %27 = load %26 : u8i, align 1
+                    %28 = cast(integral) %27 : s32i
+                    %29 = load %3 : s32i, align 4
+                    %30 = cast(integral) %29 : s64i
+                    %31 = get_member %1[1] "bytes" : u8i[16]*
+                    %32 = get_element %31[%30] : u8i*
+                    %33 = load %32 : u8i, align 1
+                    %34 = cast(integral) %33 : s32i
+                    %35 = cmp ne %28, %34 : bool
+                    if %35 {
+                        %36 = const 1 : s32i
+                        store %36, %0
+                        %37 = load %0 : s32i
+                        return %37
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %15 = get_global @.str : s8i[3]*
+    %16 = cast(array_to_ptrdecay) %15 : s8i*
+    %17 = call @puts(%16) : s32i [all]
+    %18 = const 0 : s32i
+    store %18, %0
+    %19 = load %0 : s32i
+    return %19
+}

@@ -1,0 +1,47 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20071011-1.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn foo(%arg0: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i*):
+        %6 = alloca s32i*, "p", align 8
+        %7 = alloca s32i, "x", align 4
+        %8 = alloca s32i, "y", align 4
+        store %arg0, %6
+        %9 = load %6 : s32i*, align 8
+        %10 = load %9 : s32i, align 4
+        store %10, %7, align 4
+        %11 = const 0 : s32i
+        %12 = load %6 : s32i*, align 8
+        store %11, %12, align 4
+        %13 = load %6 : s32i*, align 8
+        %14 = load %13 : s32i, align 4
+        store %14, %8, align 4
+        scope {
+            %16 = load %7 : s32i, align 4
+            %17 = load %8 : s32i, align 4
+            %18 = cmp ne %16, %17 : bool
+            if %18 {
+                return
+            }
+            yield
+        }
+        %15 = get_global @abort : (() -> void)*
+        call @abort() [all]
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "a", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 1 : s32i
+    store %3, %1, align 4
+    call @foo(%1) [all]
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

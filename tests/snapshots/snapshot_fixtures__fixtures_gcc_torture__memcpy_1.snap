@@ -1,0 +1,374 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/memcpy-1.c" (c, x86_64-unknown-linux-gnu)
+fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
+fn copy(%arg0: void*, %arg1: void*, %arg2: u32i) -> void* [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: void*, %arg1: void*, %arg2: u32i):
+        %213 = alloca void*, "o", align 8
+        %214 = alloca void*, "i", align 8
+        %215 = alloca u32i, "l", align 4
+        %216 = alloca void*, "__retval", align 8
+        store %arg0, %213
+        store %arg1, %214
+        store %arg2, %215
+        %217 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %218 = load %213 : void*, align 8
+        %219 = load %214 : void*, align 8
+        %220 = load %215 : u32i, align 4
+        %221 = cast(integral) %220 : u64i
+        %222 = call @memcpy(%218, %219, %221) : void* [all]
+        store %222, %216
+        %223 = load %216 : void*
+        return %223
+}
+fn abort() -> void [external, c, nothrow];
+fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u32i, "i", align 4
+    %2 = alloca u8i[131072], "src", align 16
+    %3 = alloca u8i[131072], "dst", align 16
+    %4 = const 0 : s32i
+    store %4, %0
+    scope {
+        %195 = const 0 : u32i
+        store %195, %1, align 4
+        for cond: {
+            %207 = load %1 : u32i, align 4
+            %208 = const 1 : s32i
+            %209 = const 17 : s32i
+            %210 = shift left %208, %209 : s32i
+            %211 = cast(integral) %210 : u32i
+            %212 = cmp lt %207, %211 : bool
+            condition %212
+        } step: {
+            %196 = load %1 : u32i, align 4
+            %197 = inc %196 : u32i
+            store %197, %1, align 4
+            yield
+        } do {
+            %198 = load %1 : u32i, align 4
+            %199 = cast(integral) %198 : u8i
+            %200 = load %1 : u32i, align 4
+            %201 = cast(integral) %200 : u64i
+            %202 = get_element %2[%201] : u8i*
+            store %199, %202, align 1
+            %203 = const 0 : u8i
+            %204 = load %1 : u32i, align 4
+            %205 = cast(integral) %204 : u64i
+            %206 = get_element %3[%205] : u8i*
+            store %203, %206, align 1
+            yield
+        }
+        yield
+    }
+    %5 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+    %6 = cast(array_to_ptrdecay) %3 : u8i*
+    %7 = cast(bitcast) %6 : void*
+    %8 = cast(array_to_ptrdecay) %2 : u8i*
+    %9 = cast(bitcast) %8 : void*
+    %10 = const 1 : s32i
+    %11 = const 17 : s32i
+    %12 = shift left %10, %11 : s32i
+    %13 = const 128 : s32i
+    %14 = div %12, %13 : s32i
+    %15 = cast(integral) %14 : u64i
+    %16 = call @memcpy(%7, %9, %15) : void* [all]
+    scope {
+        %174 = const 0 : u32i
+        store %174, %1, align 4
+        for cond: {
+            %187 = load %1 : u32i, align 4
+            %188 = const 1 : s32i
+            %189 = const 17 : s32i
+            %190 = shift left %188, %189 : s32i
+            %191 = const 128 : s32i
+            %192 = div %190, %191 : s32i
+            %193 = cast(integral) %192 : u32i
+            %194 = cmp lt %187, %193 : bool
+            condition %194
+        } step: {
+            %175 = load %1 : u32i, align 4
+            %176 = inc %175 : u32i
+            store %176, %1, align 4
+            yield
+        } do {
+            scope {
+                %177 = load %1 : u32i, align 4
+                %178 = cast(integral) %177 : u64i
+                %179 = get_element %3[%178] : u8i*
+                %180 = load %179 : u8i, align 1
+                %181 = cast(integral) %180 : s32i
+                %182 = load %1 : u32i, align 4
+                %183 = cast(integral) %182 : u8i
+                %184 = cast(integral) %183 : s32i
+                %185 = cmp ne %181, %184 : bool
+                if %185 {
+                    %186 = get_global @abort : (() -> void)*
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %17 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+    %18 = cast(array_to_ptrdecay) %3 : u8i*
+    %19 = cast(bitcast) %18 : void*
+    %20 = const 1 : s32i
+    %21 = const 1 : s32i
+    %22 = const 17 : s32i
+    %23 = shift left %21, %22 : s32i
+    %24 = const 128 : s32i
+    %25 = div %23, %24 : s32i
+    %26 = cast(integral) %25 : u64i
+    %27 = call @memset(%19, %20, %26) : void* [all]
+    scope {
+        %155 = const 0 : u32i
+        store %155, %1, align 4
+        for cond: {
+            %166 = load %1 : u32i, align 4
+            %167 = const 1 : s32i
+            %168 = const 17 : s32i
+            %169 = shift left %167, %168 : s32i
+            %170 = const 128 : s32i
+            %171 = div %169, %170 : s32i
+            %172 = cast(integral) %171 : u32i
+            %173 = cmp lt %166, %172 : bool
+            condition %173
+        } step: {
+            %156 = load %1 : u32i, align 4
+            %157 = inc %156 : u32i
+            store %157, %1, align 4
+            yield
+        } do {
+            scope {
+                %158 = load %1 : u32i, align 4
+                %159 = cast(integral) %158 : u64i
+                %160 = get_element %3[%159] : u8i*
+                %161 = load %160 : u8i, align 1
+                %162 = cast(integral) %161 : s32i
+                %163 = const 1 : s32i
+                %164 = cmp ne %162, %163 : bool
+                if %164 {
+                    %165 = get_global @abort : (() -> void)*
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %28 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+    %29 = cast(array_to_ptrdecay) %3 : u8i*
+    %30 = cast(bitcast) %29 : void*
+    %31 = cast(array_to_ptrdecay) %2 : u8i*
+    %32 = cast(bitcast) %31 : void*
+    %33 = const 1 : s32i
+    %34 = const 17 : s32i
+    %35 = shift left %33, %34 : s32i
+    %36 = cast(integral) %35 : u64i
+    %37 = call @memcpy(%30, %32, %36) : void* [all]
+    scope {
+        %136 = const 0 : u32i
+        store %136, %1, align 4
+        for cond: {
+            %149 = load %1 : u32i, align 4
+            %150 = const 1 : s32i
+            %151 = const 17 : s32i
+            %152 = shift left %150, %151 : s32i
+            %153 = cast(integral) %152 : u32i
+            %154 = cmp lt %149, %153 : bool
+            condition %154
+        } step: {
+            %137 = load %1 : u32i, align 4
+            %138 = inc %137 : u32i
+            store %138, %1, align 4
+            yield
+        } do {
+            scope {
+                %139 = load %1 : u32i, align 4
+                %140 = cast(integral) %139 : u64i
+                %141 = get_element %3[%140] : u8i*
+                %142 = load %141 : u8i, align 1
+                %143 = cast(integral) %142 : s32i
+                %144 = load %1 : u32i, align 4
+                %145 = cast(integral) %144 : u8i
+                %146 = cast(integral) %145 : s32i
+                %147 = cmp ne %143, %146 : bool
+                if %147 {
+                    %148 = get_global @abort : (() -> void)*
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %38 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+    %39 = cast(array_to_ptrdecay) %3 : u8i*
+    %40 = cast(bitcast) %39 : void*
+    %41 = const 0 : s32i
+    %42 = const 1 : s32i
+    %43 = const 17 : s32i
+    %44 = shift left %42, %43 : s32i
+    %45 = cast(integral) %44 : u64i
+    %46 = call @memset(%40, %41, %45) : void* [all]
+    scope {
+        %119 = const 0 : u32i
+        store %119, %1, align 4
+        for cond: {
+            %130 = load %1 : u32i, align 4
+            %131 = const 1 : s32i
+            %132 = const 17 : s32i
+            %133 = shift left %131, %132 : s32i
+            %134 = cast(integral) %133 : u32i
+            %135 = cmp lt %130, %134 : bool
+            condition %135
+        } step: {
+            %120 = load %1 : u32i, align 4
+            %121 = inc %120 : u32i
+            store %121, %1, align 4
+            yield
+        } do {
+            scope {
+                %122 = load %1 : u32i, align 4
+                %123 = cast(integral) %122 : u64i
+                %124 = get_element %3[%123] : u8i*
+                %125 = load %124 : u8i, align 1
+                %126 = cast(integral) %125 : s32i
+                %127 = const 0 : s32i
+                %128 = cmp ne %126, %127 : bool
+                if %128 {
+                    %129 = get_global @abort : (() -> void)*
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %47 = cast(array_to_ptrdecay) %3 : u8i*
+    %48 = cast(bitcast) %47 : void*
+    %49 = cast(array_to_ptrdecay) %2 : u8i*
+    %50 = cast(bitcast) %49 : void*
+    %51 = const 1 : s32i
+    %52 = const 17 : s32i
+    %53 = shift left %51, %52 : s32i
+    %54 = const 128 : s32i
+    %55 = div %53, %54 : s32i
+    %56 = cast(integral) %55 : u32i
+    %57 = call @copy(%48, %50, %56) : void* [all]
+    scope {
+        %98 = const 0 : u32i
+        store %98, %1, align 4
+        for cond: {
+            %111 = load %1 : u32i, align 4
+            %112 = const 1 : s32i
+            %113 = const 17 : s32i
+            %114 = shift left %112, %113 : s32i
+            %115 = const 128 : s32i
+            %116 = div %114, %115 : s32i
+            %117 = cast(integral) %116 : u32i
+            %118 = cmp lt %111, %117 : bool
+            condition %118
+        } step: {
+            %99 = load %1 : u32i, align 4
+            %100 = inc %99 : u32i
+            store %100, %1, align 4
+            yield
+        } do {
+            scope {
+                %101 = load %1 : u32i, align 4
+                %102 = cast(integral) %101 : u64i
+                %103 = get_element %3[%102] : u8i*
+                %104 = load %103 : u8i, align 1
+                %105 = cast(integral) %104 : s32i
+                %106 = load %1 : u32i, align 4
+                %107 = cast(integral) %106 : u8i
+                %108 = cast(integral) %107 : s32i
+                %109 = cmp ne %105, %108 : bool
+                if %109 {
+                    %110 = get_global @abort : (() -> void)*
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %58 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+    %59 = cast(array_to_ptrdecay) %3 : u8i*
+    %60 = cast(bitcast) %59 : void*
+    %61 = const 0 : s32i
+    %62 = const 1 : s32i
+    %63 = const 17 : s32i
+    %64 = shift left %62, %63 : s32i
+    %65 = cast(integral) %64 : u64i
+    %66 = call @memset(%60, %61, %65) : void* [all]
+    %67 = cast(array_to_ptrdecay) %3 : u8i*
+    %68 = cast(bitcast) %67 : void*
+    %69 = cast(array_to_ptrdecay) %2 : u8i*
+    %70 = cast(bitcast) %69 : void*
+    %71 = const 1 : s32i
+    %72 = const 17 : s32i
+    %73 = shift left %71, %72 : s32i
+    %74 = cast(integral) %73 : u32i
+    %75 = call @copy(%68, %70, %74) : void* [all]
+    scope {
+        %79 = const 0 : u32i
+        store %79, %1, align 4
+        for cond: {
+            %92 = load %1 : u32i, align 4
+            %93 = const 1 : s32i
+            %94 = const 17 : s32i
+            %95 = shift left %93, %94 : s32i
+            %96 = cast(integral) %95 : u32i
+            %97 = cmp lt %92, %96 : bool
+            condition %97
+        } step: {
+            %80 = load %1 : u32i, align 4
+            %81 = inc %80 : u32i
+            store %81, %1, align 4
+            yield
+        } do {
+            scope {
+                %82 = load %1 : u32i, align 4
+                %83 = cast(integral) %82 : u64i
+                %84 = get_element %3[%83] : u8i*
+                %85 = load %84 : u8i, align 1
+                %86 = cast(integral) %85 : s32i
+                %87 = load %1 : u32i, align 4
+                %88 = cast(integral) %87 : u8i
+                %89 = cast(integral) %88 : s32i
+                %90 = cmp ne %86, %89 : bool
+                if %90 {
+                    %91 = get_global @abort : (() -> void)*
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %76 = get_global @exit : ((s32i) -> void)*
+    %77 = const 0 : s32i
+    call @exit(%77) [all]
+    %78 = load %0 : s32i
+    return %78
+}

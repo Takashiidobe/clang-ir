@@ -1,0 +1,96 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20150611-1.c" (c, x86_64-unknown-linux-gnu)
+global b : s16i = 0 [external, default, align 2, dso_local]
+global a : s32i = 0 [external, default, align 4, dso_local]
+global d : s32i = 0 [external, default, align 4, dso_local]
+global c : s32i = 0 [external, default, align 4, dso_local]
+
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i[1], "e", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    scope {
+        for cond: {
+            %34 = get_global @b : s16i*
+            %35 = load %34 : s16i, align 2
+            %36 = cast(integral) %35 : s32i
+            %37 = const 2 : s32i
+            %38 = cmp lt %36, %37 : bool
+            condition %38
+        } step: {
+            %5 = get_global @b : s16i*
+            %6 = load %5 : s16i, align 2
+            %7 = inc %6 : s16i
+            store %7, %5, align 2
+            yield
+        } do {
+            scope {
+                %8 = const 0 : s32i
+                %9 = get_global @a : s32i*
+                store %8, %9, align 4
+                scope {
+                    %23 = get_global @b : s16i*
+                    %24 = load %23 : s16i, align 2
+                    %25 = cast(integral) %24 : s32i
+                    %26 = const 28378 : s32i
+                    %27 = cmp eq %25, %26 : bool
+                    if %27 {
+                        %28 = get_global @b : s16i*
+                        %29 = load %28 : s16i, align 2
+                        %30 = cast(integral) %29 : s64i
+                        %31 = get_element %1[%30] : s32i*
+                        %32 = load %31 : s32i, align 4
+                        %33 = get_global @a : s32i*
+                        store %32, %33, align 4
+                        yield
+                    }
+                    yield
+                }
+                scope {
+                    %10 = get_global @d : s32i*
+                    %11 = load %10 : s32i, align 4
+                    %12 = cast(int_to_bool) %11 : bool
+                    %13 = ternary %12 ? { : bool
+                        %22 = const #true : bool
+                        yield %22
+                    } : {
+                        %18 = get_global @b : s16i*
+                        %19 = load %18 : s16i, align 2
+                        %20 = cast(integral) %19 : s32i
+                        %21 = cast(int_to_bool) %20 : bool
+                        yield %21
+                    }
+                    %14 = not %13 : bool
+                    if %14 {
+                        scope {
+                            for cond: {
+                                %15 = get_global @c : s32i*
+                                %16 = load %15 : s32i, align 4
+                                %17 = cast(int_to_bool) %16 : bool
+                                condition %17
+                            } step: {
+                                yield
+                            } do {
+                                yield
+                            }
+                            yield
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

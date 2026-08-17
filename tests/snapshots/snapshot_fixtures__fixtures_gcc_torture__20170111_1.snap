@@ -1,0 +1,77 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20170111-1.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: rec_S*) -> s64i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_S*):
+        %23 = alloca rec_S*, "s", align 8
+        %24 = alloca s64i, "__retval", align 8
+        %25 = alloca s64i, "a", align 8
+        store %arg0, %23
+        %26 = const 1 : s64i
+        store %26, %25, align 8
+        %27 = load %23 : rec_S*, align 8
+        %28 = get_member %27[4] "e" : u16i*
+        %29 = load %28 : u16i, align 4
+        %30 = cast(integral) %29 : s64i
+        %31 = load %25 : s64i, align 8
+        %32 = div %31, %30 : s64i
+        store %32, %25, align 8
+        %33 = load %25 : s64i, align 8
+        %34 = load %23 : rec_S*, align 8
+        %35 = get_member %34[5] "f" : s64i**
+        %36 = load %35 : s64i*, align 8
+        %37 = ptr_stride %36, %33 : s64i*
+        %38 = load %37 : s64i, align 8
+        %39 = dec %38 : s64i [nsw]
+        store %39, %37, align 8
+        %40 = load %25 : s64i, align 8
+        store %40, %24
+        %41 = load %24 : s64i
+        return %41
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s64i, "val", align 8
+    %2 = alloca rec_S, "s", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 1 : s64i
+    store %4, %1, align 8
+    %5 = get_member %2[0] "a" : s16i*
+    %6 = const 0 : s16i
+    store %6, %5, align 8
+    %7 = get_member %2[1] "b" : s64i*
+    %8 = const 0 : s64i
+    store %8, %7, align 8
+    %9 = get_member %2[2] "c" : s16i*
+    %10 = const 0 : s16i
+    store %10, %9, align 8
+    %11 = get_member %2[3] "d" : s8i*
+    %12 = const 0 : s8i
+    store %12, %11, align 2
+    %13 = get_member %2[4] "e" : u16i*
+    %14 = const 2 : u16i
+    store %14, %13, align 4
+    %15 = get_member %2[5] "f" : s64i**
+    store %1, %15, align 8
+    %16 = call @foo(%2) : s64i [all]
+    store %16, %1, align 8
+    scope {
+        %19 = load %1 : s64i, align 8
+        %20 = const 0 : s64i
+        %21 = cmp ne %19, %20 : bool
+        if %21 {
+            %22 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %17 = const 0 : s32i
+    store %17, %0
+    %18 = load %0 : s32i
+    return %18
+}

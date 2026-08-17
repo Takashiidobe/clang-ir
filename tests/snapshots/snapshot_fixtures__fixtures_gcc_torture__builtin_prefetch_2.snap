@@ -1,0 +1,311 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/builtin-prefetch-2.c" (c, x86_64-unknown-linux-gnu)
+global simple_static_local.ix : s32i = 0 [internal, default, align 4, dso_local]
+global simple_static_local.hx : s32i* = @simple_static_local.gx [internal, default, align 8, dso_local]
+global simple_static_local.gx : s32i[100] = zero [internal, default, align 16, dso_local]
+global glob_int_arr : s32i[100] = zero [external, default, align 16, dso_local]
+global glob_ptr_int : s32i* = @glob_int_arr [external, default, align 8, dso_local]
+global glob_int : s32i = 4 [external, default, align 4, dso_local]
+global str : rec_S = zero [external, default, align 8, dso_local]
+global ptr_str : rec_S* = @str [external, default, align 8, dso_local]
+global stat_int_arr : s32i[100] = zero [internal, default, align 16, dso_local]
+global stat_ptr_int : s32i* = @stat_int_arr [internal, default, align 8, dso_local]
+global stat_int : s32i = 0 [internal, default, align 4, dso_local]
+
+fn simple_global() -> void [external, c, no_inline, dso_local, nothrow] {
+    %192 = get_global @glob_int_arr : s32i[100]*
+    %193 = cast(array_to_ptrdecay) %192 : s32i*
+    %194 = cast(bitcast) %193 : void*
+    <unmodeled: cir.prefetch>
+    %195 = get_global @glob_ptr_int : s32i**
+    %196 = load %195 : s32i*, align 8
+    %197 = cast(bitcast) %196 : void*
+    <unmodeled: cir.prefetch>
+    %198 = get_global @glob_int : s32i*
+    %199 = cast(bitcast) %198 : void*
+    <unmodeled: cir.prefetch>
+    return
+}
+fn simple_file() -> void [external, c, no_inline, dso_local, nothrow] {
+    %184 = get_global @stat_int_arr : s32i[100]*
+    %185 = cast(array_to_ptrdecay) %184 : s32i*
+    %186 = cast(bitcast) %185 : void*
+    <unmodeled: cir.prefetch>
+    %187 = get_global @stat_ptr_int : s32i**
+    %188 = load %187 : s32i*, align 8
+    %189 = cast(bitcast) %188 : void*
+    <unmodeled: cir.prefetch>
+    %190 = get_global @stat_int : s32i*
+    %191 = cast(bitcast) %190 : void*
+    <unmodeled: cir.prefetch>
+    return
+}
+fn simple_static_local() -> void [external, c, no_inline, dso_local, nothrow] {
+    %176 = get_global @simple_static_local.gx : s32i[100]*
+    %177 = get_global @simple_static_local.hx : s32i**
+    %178 = get_global @simple_static_local.ix : s32i*
+    %179 = cast(array_to_ptrdecay) %176 : s32i*
+    %180 = cast(bitcast) %179 : void*
+    <unmodeled: cir.prefetch>
+    %181 = load %177 : s32i*, align 8
+    %182 = cast(bitcast) %181 : void*
+    <unmodeled: cir.prefetch>
+    %183 = cast(bitcast) %178 : void*
+    <unmodeled: cir.prefetch>
+    return
+}
+fn simple_local() -> void [external, c, no_inline, dso_local, nothrow] {
+    %167 = alloca s32i[100], "gx", align 16
+    %168 = alloca s32i*, "hx", align 8
+    %169 = alloca s32i, "ix", align 4
+    %170 = cast(array_to_ptrdecay) %167 : s32i*
+    store %170, %168, align 8
+    %171 = cast(array_to_ptrdecay) %167 : s32i*
+    %172 = cast(bitcast) %171 : void*
+    <unmodeled: cir.prefetch>
+    %173 = load %168 : s32i*, align 8
+    %174 = cast(bitcast) %173 : void*
+    <unmodeled: cir.prefetch>
+    %175 = cast(bitcast) %169 : void*
+    <unmodeled: cir.prefetch>
+    return
+}
+fn simple_arg(%arg0: s32i*, %arg1: s32i*, %arg2: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i*, %arg1: s32i*, %arg2: s32i):
+        %159 = alloca s32i*, "g", align 8
+        %160 = alloca s32i*, "h", align 8
+        %161 = alloca s32i, "i", align 4
+        store %arg0, %159
+        store %arg1, %160
+        store %arg2, %161
+        %162 = load %159 : s32i*, align 8
+        %163 = cast(bitcast) %162 : void*
+        <unmodeled: cir.prefetch>
+        %164 = load %160 : s32i*, align 8
+        %165 = cast(bitcast) %164 : void*
+        <unmodeled: cir.prefetch>
+        %166 = cast(bitcast) %161 : void*
+        <unmodeled: cir.prefetch>
+        return
+}
+fn expr_global() -> void [external, c, no_inline, dso_local, nothrow] {
+    %82 = get_global @str : rec_S*
+    %83 = cast(bitcast) %82 : void*
+    <unmodeled: cir.prefetch>
+    %84 = get_global @ptr_str : rec_S**
+    %85 = load %84 : rec_S*, align 8
+    %86 = cast(bitcast) %85 : void*
+    <unmodeled: cir.prefetch>
+    %87 = get_global @str : rec_S*
+    %88 = get_member %87[1] "b" : s16i*
+    %89 = cast(bitcast) %88 : void*
+    <unmodeled: cir.prefetch>
+    %90 = get_global @ptr_str : rec_S**
+    %91 = load %90 : rec_S*, align 8
+    %92 = get_member %91[1] "b" : s16i*
+    %93 = cast(bitcast) %92 : void*
+    <unmodeled: cir.prefetch>
+    %94 = get_global @str : rec_S*
+    %95 = get_member %94[3] "d" : s8i[8]*
+    %96 = cast(bitcast) %95 : void*
+    <unmodeled: cir.prefetch>
+    %97 = get_global @ptr_str : rec_S**
+    %98 = load %97 : rec_S*, align 8
+    %99 = get_member %98[3] "d" : s8i[8]*
+    %100 = cast(bitcast) %99 : void*
+    <unmodeled: cir.prefetch>
+    %101 = get_global @str : rec_S*
+    %102 = get_member %101[4] "next" : rec_S**
+    %103 = load %102 : rec_S*, align 8
+    %104 = cast(bitcast) %103 : void*
+    <unmodeled: cir.prefetch>
+    %105 = get_global @ptr_str : rec_S**
+    %106 = load %105 : rec_S*, align 8
+    %107 = get_member %106[4] "next" : rec_S**
+    %108 = load %107 : rec_S*, align 8
+    %109 = cast(bitcast) %108 : void*
+    <unmodeled: cir.prefetch>
+    %110 = get_global @str : rec_S*
+    %111 = get_member %110[4] "next" : rec_S**
+    %112 = load %111 : rec_S*, align 8
+    %113 = get_member %112[3] "d" : s8i[8]*
+    %114 = cast(array_to_ptrdecay) %113 : s8i*
+    %115 = cast(bitcast) %114 : void*
+    <unmodeled: cir.prefetch>
+    %116 = get_global @ptr_str : rec_S**
+    %117 = load %116 : rec_S*, align 8
+    %118 = get_member %117[4] "next" : rec_S**
+    %119 = load %118 : rec_S*, align 8
+    %120 = get_member %119[3] "d" : s8i[8]*
+    %121 = cast(array_to_ptrdecay) %120 : s8i*
+    %122 = cast(bitcast) %121 : void*
+    <unmodeled: cir.prefetch>
+    %123 = get_global @glob_int_arr : s32i[100]*
+    %124 = cast(bitcast) %123 : void*
+    <unmodeled: cir.prefetch>
+    %125 = get_global @glob_ptr_int : s32i**
+    %126 = load %125 : s32i*, align 8
+    %127 = cast(bitcast) %126 : void*
+    <unmodeled: cir.prefetch>
+    %128 = const 2 : s64i
+    %129 = get_global @glob_int_arr : s32i[100]*
+    %130 = get_element %129[%128] : s32i*
+    %131 = cast(bitcast) %130 : void*
+    <unmodeled: cir.prefetch>
+    %132 = const 3 : s64i
+    %133 = get_global @glob_ptr_int : s32i**
+    %134 = load %133 : s32i*, align 8
+    %135 = ptr_stride %134, %132 : s32i*
+    %136 = cast(bitcast) %135 : void*
+    <unmodeled: cir.prefetch>
+    %137 = get_global @glob_int_arr : s32i[100]*
+    %138 = cast(array_to_ptrdecay) %137 : s32i*
+    %139 = const 3 : s32i
+    %140 = ptr_stride %138, %139 : s32i*
+    %141 = cast(bitcast) %140 : void*
+    <unmodeled: cir.prefetch>
+    %142 = get_global @glob_int_arr : s32i[100]*
+    %143 = cast(array_to_ptrdecay) %142 : s32i*
+    %144 = get_global @glob_int : s32i*
+    %145 = load %144 : s32i, align 4
+    %146 = ptr_stride %143, %145 : s32i*
+    %147 = cast(bitcast) %146 : void*
+    <unmodeled: cir.prefetch>
+    %148 = get_global @glob_ptr_int : s32i**
+    %149 = load %148 : s32i*, align 8
+    %150 = const 5 : s32i
+    %151 = ptr_stride %149, %150 : s32i*
+    %152 = cast(bitcast) %151 : void*
+    <unmodeled: cir.prefetch>
+    %153 = get_global @glob_ptr_int : s32i**
+    %154 = load %153 : s32i*, align 8
+    %155 = get_global @glob_int : s32i*
+    %156 = load %155 : s32i, align 4
+    %157 = ptr_stride %154, %156 : s32i*
+    %158 = cast(bitcast) %157 : void*
+    <unmodeled: cir.prefetch>
+    return
+}
+fn expr_local() -> void [external, c, no_inline, dso_local, nothrow] {
+    %18 = alloca s32i[10], "b", align 16
+    %19 = alloca s32i*, "pb", align 8
+    %20 = alloca rec_S, "t", align 8
+    %21 = alloca rec_S*, "pt", align 8
+    %22 = alloca s32i, "j", align 4
+    %23 = cast(array_to_ptrdecay) %18 : s32i*
+    store %23, %19, align 8
+    store %20, %21, align 8
+    %24 = const 4 : s32i
+    store %24, %22, align 4
+    %25 = cast(bitcast) %20 : void*
+    <unmodeled: cir.prefetch>
+    %26 = load %21 : rec_S*, align 8
+    %27 = cast(bitcast) %26 : void*
+    <unmodeled: cir.prefetch>
+    %28 = get_member %20[1] "b" : s16i*
+    %29 = cast(bitcast) %28 : void*
+    <unmodeled: cir.prefetch>
+    %30 = load %21 : rec_S*, align 8
+    %31 = get_member %30[1] "b" : s16i*
+    %32 = cast(bitcast) %31 : void*
+    <unmodeled: cir.prefetch>
+    %33 = get_member %20[3] "d" : s8i[8]*
+    %34 = cast(bitcast) %33 : void*
+    <unmodeled: cir.prefetch>
+    %35 = load %21 : rec_S*, align 8
+    %36 = get_member %35[3] "d" : s8i[8]*
+    %37 = cast(bitcast) %36 : void*
+    <unmodeled: cir.prefetch>
+    %38 = get_member %20[4] "next" : rec_S**
+    %39 = load %38 : rec_S*, align 8
+    %40 = cast(bitcast) %39 : void*
+    <unmodeled: cir.prefetch>
+    %41 = load %21 : rec_S*, align 8
+    %42 = get_member %41[4] "next" : rec_S**
+    %43 = load %42 : rec_S*, align 8
+    %44 = cast(bitcast) %43 : void*
+    <unmodeled: cir.prefetch>
+    %45 = get_member %20[4] "next" : rec_S**
+    %46 = load %45 : rec_S*, align 8
+    %47 = get_member %46[3] "d" : s8i[8]*
+    %48 = cast(array_to_ptrdecay) %47 : s8i*
+    %49 = cast(bitcast) %48 : void*
+    <unmodeled: cir.prefetch>
+    %50 = load %21 : rec_S*, align 8
+    %51 = get_member %50[4] "next" : rec_S**
+    %52 = load %51 : rec_S*, align 8
+    %53 = get_member %52[3] "d" : s8i[8]*
+    %54 = cast(array_to_ptrdecay) %53 : s8i*
+    %55 = cast(bitcast) %54 : void*
+    <unmodeled: cir.prefetch>
+    %56 = cast(bitcast) %18 : void*
+    <unmodeled: cir.prefetch>
+    %57 = load %19 : s32i*, align 8
+    %58 = cast(bitcast) %57 : void*
+    <unmodeled: cir.prefetch>
+    %59 = const 2 : s64i
+    %60 = get_element %18[%59] : s32i*
+    %61 = cast(bitcast) %60 : void*
+    <unmodeled: cir.prefetch>
+    %62 = const 3 : s64i
+    %63 = load %19 : s32i*, align 8
+    %64 = ptr_stride %63, %62 : s32i*
+    %65 = cast(bitcast) %64 : void*
+    <unmodeled: cir.prefetch>
+    %66 = cast(array_to_ptrdecay) %18 : s32i*
+    %67 = const 3 : s32i
+    %68 = ptr_stride %66, %67 : s32i*
+    %69 = cast(bitcast) %68 : void*
+    <unmodeled: cir.prefetch>
+    %70 = cast(array_to_ptrdecay) %18 : s32i*
+    %71 = load %22 : s32i, align 4
+    %72 = ptr_stride %70, %71 : s32i*
+    %73 = cast(bitcast) %72 : void*
+    <unmodeled: cir.prefetch>
+    %74 = load %19 : s32i*, align 8
+    %75 = const 5 : s32i
+    %76 = ptr_stride %74, %75 : s32i*
+    %77 = cast(bitcast) %76 : void*
+    <unmodeled: cir.prefetch>
+    %78 = load %19 : s32i*, align 8
+    %79 = load %22 : s32i, align 4
+    %80 = ptr_stride %78, %79 : s32i*
+    %81 = cast(bitcast) %80 : void*
+    <unmodeled: cir.prefetch>
+    return
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @simple_global : (() -> void)*
+    call @simple_global() [all]
+    %3 = get_global @simple_file : (() -> void)*
+    call @simple_file() [all]
+    %4 = get_global @simple_static_local : (() -> void)*
+    call @simple_static_local() [all]
+    %5 = get_global @simple_local : (() -> void)*
+    call @simple_local() [all]
+    %6 = get_global @glob_int_arr : s32i[100]*
+    %7 = cast(array_to_ptrdecay) %6 : s32i*
+    %8 = get_global @glob_ptr_int : s32i**
+    %9 = load %8 : s32i*, align 8
+    %10 = get_global @glob_int : s32i*
+    %11 = load %10 : s32i, align 4
+    call @simple_arg(%7, %9, %11) [all]
+    %12 = get_global @str : rec_S*
+    %13 = get_global @str : rec_S*
+    %14 = get_member %13[4] "next" : rec_S**
+    store %12, %14, align 8
+    call @expr_global() [all]
+    call @expr_local() [all]
+    %15 = get_global @exit : ((s32i) -> void)*
+    %16 = const 0 : s32i
+    call @exit(%16) [all]
+    %17 = load %0 : s32i
+    return %17
+}

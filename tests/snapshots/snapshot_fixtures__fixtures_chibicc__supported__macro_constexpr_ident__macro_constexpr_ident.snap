@@ -1,0 +1,39 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.chibicc/supported/macro_constexpr_ident/macro_constexpr_ident.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[2] = "m" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[4] = "OK\n" [cir_private, default, align 1, dso_local, constant]
+
+fn assert(%arg0: s32i, %arg1: s32i, %arg2: s8i*) -> void [external, c];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "m", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 0 : s32i
+    store %3, %1, align 4
+    %4 = const 5 : s32i
+    store %4, %1, align 4
+    %5 = const 5 : s32i
+    %6 = load %1 : s32i, align 4
+    %7 = get_global @.str : s8i[2]*
+    %8 = cast(array_to_ptrdecay) %7 : s8i*
+    call @assert(%5, %6, %8) [all]
+    %9 = const 7 : s32i
+    store %9, %1, align 4
+    %10 = const 7 : s32i
+    %11 = load %1 : s32i, align 4
+    %12 = get_global @.str : s8i[2]*
+    %13 = cast(array_to_ptrdecay) %12 : s8i*
+    call @assert(%10, %11, %13) [all]
+    %14 = get_global @.str.1 : s8i[4]*
+    %15 = cast(array_to_ptrdecay) %14 : s8i*
+    %16 = call @printf(%15) : s32i [all]
+    %17 = const 0 : s32i
+    store %17, %0
+    %18 = load %0 : s32i
+    return %18
+}

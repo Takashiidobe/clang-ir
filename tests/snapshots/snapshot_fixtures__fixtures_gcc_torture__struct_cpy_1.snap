@@ -1,0 +1,96 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/struct-cpy-1.c" (c, x86_64-unknown-linux-gnu)
+global pty : rec_tty_driver = zero [internal, default, align 8, dso_local]
+global zero_t : rec_termios = zero [internal, default, align 4, dso_local]
+
+fn ini() -> void [external, c, no_inline, dso_local, nothrow] {
+    %35 = get_global @pty : rec_tty_driver*
+    %36 = get_member %35[1] "t" : rec_termios*
+    %37 = get_global @zero_t : rec_termios*
+    copy %36, %37
+    %38 = const 1 : u32i
+    %39 = get_global @pty : rec_tty_driver*
+    %40 = get_member %39[1] "t" : rec_termios*
+    %41 = get_member %40[0] "a" : u32i*
+    store %38, %41, align 8
+    %42 = const 2 : u32i
+    %43 = get_global @pty : rec_tty_driver*
+    %44 = get_member %43[1] "t" : rec_termios*
+    %45 = get_member %44[1] "b" : u32i*
+    store %42, %45, align 4
+    %46 = const 3 : u32i
+    %47 = get_global @pty : rec_tty_driver*
+    %48 = get_member %47[1] "t" : rec_termios*
+    %49 = get_member %48[2] "c" : u32i*
+    store %46, %49, align 8
+    %50 = const 4 : u32i
+    %51 = get_global @pty : rec_tty_driver*
+    %52 = get_member %51[1] "t" : rec_termios*
+    %53 = get_member %52[3] "d" : u32i*
+    store %50, %53, align 4
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    call @ini() [all]
+    scope {
+        %4 = get_global @pty : rec_tty_driver*
+        %5 = get_member %4[1] "t" : rec_termios*
+        %6 = get_member %5[0] "a" : u32i*
+        %7 = load %6 : u32i, align 8
+        %8 = const 1 : u32i
+        %9 = cmp ne %7, %8 : bool
+        %10 = ternary %9 ? { : bool
+            %34 = const #true : bool
+            yield %34
+        } : {
+            %28 = get_global @pty : rec_tty_driver*
+            %29 = get_member %28[1] "t" : rec_termios*
+            %30 = get_member %29[1] "b" : u32i*
+            %31 = load %30 : u32i, align 4
+            %32 = const 2 : u32i
+            %33 = cmp ne %31, %32 : bool
+            yield %33
+        }
+        %11 = ternary %10 ? { : bool
+            %27 = const #true : bool
+            yield %27
+        } : {
+            %21 = get_global @pty : rec_tty_driver*
+            %22 = get_member %21[1] "t" : rec_termios*
+            %23 = get_member %22[2] "c" : u32i*
+            %24 = load %23 : u32i, align 8
+            %25 = const 3 : u32i
+            %26 = cmp ne %24, %25 : bool
+            yield %26
+        }
+        %12 = ternary %11 ? { : bool
+            %20 = const #true : bool
+            yield %20
+        } : {
+            %14 = get_global @pty : rec_tty_driver*
+            %15 = get_member %14[1] "t" : rec_termios*
+            %16 = get_member %15[3] "d" : u32i*
+            %17 = load %16 : u32i, align 4
+            %18 = const 4 : u32i
+            %19 = cmp ne %17, %18 : bool
+            yield %19
+        }
+        if %12 {
+            %13 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

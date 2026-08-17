@@ -1,0 +1,68 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00140.c" (c, x86_64-unknown-linux-gnu)
+fn f1(%arg0: rec_foo*, %arg1: rec_foo*, %arg2: s32i, ...) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_foo*, %arg1: rec_foo*, %arg2: s32i):
+        %19 = load %arg0 : rec_foo
+        %20 = alloca rec_foo, "f", align 8
+        %21 = alloca rec_foo*, "p", align 8
+        %22 = alloca s32i, "n", align 4
+        %23 = alloca s32i, "__retval", align 4
+        store %19, %20
+        store %arg1, %21
+        store %arg2, %22
+        scope {
+            %30 = get_member %20[0] "i" : s32i*
+            %31 = load %30 : s32i, align 8
+            %32 = load %21 : rec_foo*, align 8
+            %33 = get_member %32[0] "i" : s32i*
+            %34 = load %33 : s32i, align 8
+            %35 = cmp ne %31, %34 : bool
+            if %35 {
+                %36 = const 0 : s32i
+                store %36, %23
+                %37 = load %23 : s32i
+                return %37
+            }
+            yield
+        }
+        %24 = load %21 : rec_foo*, align 8
+        %25 = get_member %24[1] "j" : s32i*
+        %26 = load %25 : s32i, align 4
+        %27 = load %22 : s32i, align 4
+        %28 = add %26, %27 : s32i [nsw]
+        store %28, %23
+        %29 = load %23 : s32i
+        return %29
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_foo, "f", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 1 : s32i
+    %4 = get_member %1[1] "j" : s32i*
+    store %3, %4, align 4
+    %5 = get_member %1[0] "i" : s32i*
+    store %3, %5, align 8
+    %6 = const 2 : s32i
+    %7 = load %1 : rec_foo, align 8
+    %8 = alloca rec_foo, "byval", align 8
+    store %7, %8
+    %9 = call @f1(%8, %1, %6) : s32i [all]
+    %10 = const 2 : s32i
+    %11 = const 1 : s32i
+    %12 = load %1 : rec_foo, align 8
+    %13 = load %1 : rec_foo, align 8
+    %14 = alloca rec_foo, "byval", align 8
+    store %12, %14
+    %15 = alloca rec_foo, "byval", align 8
+    store %13, %15
+    %16 = call @f1(%14, %1, %10, %11, %15, %1) : s32i [all]
+    %17 = const 0 : s32i
+    store %17, %0
+    %18 = load %0 : s32i
+    return %18
+}

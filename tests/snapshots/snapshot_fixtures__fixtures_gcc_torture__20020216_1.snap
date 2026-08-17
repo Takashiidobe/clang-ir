@@ -1,0 +1,72 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20020216-1.c" (c, x86_64-unknown-linux-gnu)
+global c : s8i = -1 [external, default, align 1, dso_local]
+
+fn foo() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %24 = alloca s32i, "__retval", align 4
+    %25 = get_global @c : s8i*
+    %26 = load %25 : s8i, align 1
+    %27 = cast(integral) %26 : u16i
+    %28 = cast(integral) %27 : s32i
+    %29 = const -103 : s32i
+    %30 = xor %28, %29 : s32i
+    store %30, %24
+    %31 = load %24 : s32i
+    return %31
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %9 = const 255 : s32i
+        %10 = const 255 : s32i
+        %11 = cmp ne %9, %10 : bool
+        %12 = ternary %11 ? { : bool
+            %23 = const #true : bool
+            yield %23
+        } : {
+            %20 = const 2 : u64i
+            %21 = const 2 : u64i
+            %22 = cmp ne %20, %21 : bool
+            yield %22
+        }
+        %13 = ternary %12 ? { : bool
+            %19 = const #true : bool
+            yield %19
+        } : {
+            %16 = const 4 : u64i
+            %17 = const 4 : u64i
+            %18 = cmp ne %16, %17 : bool
+            yield %18
+        }
+        if %13 {
+            %14 = get_global @exit : ((s32i) -> void)*
+            %15 = const 0 : s32i
+            call @exit(%15) [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %5 = call @foo() : s32i [all]
+        %6 = const -65434 : s32i
+        %7 = cmp ne %5, %6 : bool
+        if %7 {
+            %8 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

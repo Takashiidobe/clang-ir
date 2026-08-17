@@ -1,0 +1,76 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/buffer_cursor.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[8] = "%d %ld\n" [cir_private, default, align 1, dso_local, constant]
+
+fn getchar() -> s32i [external, c];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i[4], "values", align 16
+    %2 = alloca rec_cursor, "c", align 8
+    %3 = alloca rec_cursor, "d", align 8
+    %4 = const 0 : s32i
+    store %4, %0
+    scope {
+        %31 = alloca s32i, "i", align 4
+        %32 = const 0 : s32i
+        store %32, %31, align 4
+        for cond: {
+            %41 = load %31 : s32i, align 4
+            %42 = const 4 : s32i
+            %43 = cmp lt %41, %42 : bool
+            condition %43
+        } step: {
+            %33 = load %31 : s32i, align 4
+            %34 = inc %33 : s32i [nsw]
+            store %34, %31, align 4
+            yield
+        } do {
+            scope {
+                %35 = load %31 : s32i, align 4
+                %36 = call @getchar() : s32i [all]
+                %37 = add %35, %36 : s32i [nsw]
+                %38 = load %31 : s32i, align 4
+                %39 = cast(integral) %38 : s64i
+                %40 = get_element %1[%39] : s32i*
+                store %37, %40, align 4
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %5 = cast(array_to_ptrdecay) %1 : s32i*
+    %6 = const 1 : s32i
+    %7 = ptr_stride %5, %6 : s32i*
+    %8 = get_member %2[0] "ptr" : s32i**
+    store %7, %8, align 8
+    %9 = cast(array_to_ptrdecay) %1 : s32i*
+    %10 = const 3 : s32i
+    %11 = ptr_stride %9, %10 : s32i*
+    %12 = get_member %3[0] "ptr" : s32i**
+    store %11, %12, align 8
+    %13 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %14 = get_global @.str : s8i[8]*
+    %15 = cast(array_to_ptrdecay) %14 : s8i*
+    %16 = get_member %2[0] "ptr" : s32i**
+    %17 = load %16 : s32i*, align 8
+    %18 = load %17 : s32i, align 4
+    %19 = get_member %3[0] "ptr" : s32i**
+    %20 = load %19 : s32i*, align 8
+    %21 = load %20 : s32i, align 4
+    %22 = add %18, %21 : s32i [nsw]
+    %23 = get_member %3[0] "ptr" : s32i**
+    %24 = load %23 : s32i*, align 8
+    %25 = get_member %2[0] "ptr" : s32i**
+    %26 = load %25 : s32i*, align 8
+    %27 = ptr_diff %24, %26 : s64i
+    %28 = call @printf(%15, %22, %27) : s32i [all]
+    %29 = const 0 : s32i
+    store %29, %0
+    %30 = load %0 : s32i
+    return %30
+}

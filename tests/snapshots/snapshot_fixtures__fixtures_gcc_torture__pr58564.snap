@@ -1,0 +1,61 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr58564.c" (c, x86_64-unknown-linux-gnu)
+global c : s16i* = #cir.ptr<null> [external, default, align 8, dso_local]
+global d : s16i** = @c [external, default, align 8, dso_local]
+global a : s32i = 0 [external, default, align 4, dso_local]
+global b : s32i = 0 [external, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 0 : s32i
+    %3 = get_global @c : s16i**
+    %4 = get_global @d : s16i***
+    %5 = load %4 : s16i**, align 8
+    %6 = cmp eq %3, %5 : bool
+    %7 = cast(bool_to_int) %6 : s32i
+    %8 = const 1 : s32i
+    %9 = cast(int_to_bool) %8 : bool
+    %10 = ternary %9 ? { : bool
+        %28 = get_global @a : s32i*
+        %29 = load %28 : s32i, align 4
+        %30 = const 1 : s32i
+        %31 = xor %29, %30 : s32i
+        %32 = cast(int_to_bool) %31 : bool
+        yield %32
+    } : {
+        %27 = const #false : bool
+        yield %27
+    }
+    %11 = cast(bool_to_int) %10 : s32i
+    %12 = and %7, %11 : s32i
+    %13 = cmp gt %2, %12 : bool
+    %14 = cast(bool_to_int) %13 : s32i
+    %15 = cast(integral) %14 : u32i
+    %16 = const 0 : u32i
+    %17 = or %15, %16 : u32i
+    %18 = cast(integral) %17 : s32i
+    %19 = get_global @b : s32i*
+    store %18, %19, align 4
+    scope {
+        %22 = get_global @b : s32i*
+        %23 = load %22 : s32i, align 4
+        %24 = const 0 : s32i
+        %25 = cmp ne %23, %24 : bool
+        if %25 {
+            %26 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %20 = const 0 : s32i
+    store %20, %0
+    %21 = load %0 : s32i
+    return %21
+}

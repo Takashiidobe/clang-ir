@@ -1,0 +1,47 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/alias-access-path-1.c" (c, x86_64-unknown-linux-gnu)
+global a : rec_a = {1} [external, default, align 4, dso_local]
+global val : s32i = 0 [external, default, align 4, dso_local]
+global cptr : rec_c* = @val [external, default, align 8, dso_local]
+global a2 : rec_a = zero [external, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @cptr : rec_c**
+    %3 = load %2 : rec_c*, align 8
+    %4 = get_member %3[0] "b" : rec_b*
+    %5 = get_member %4[0] "a" : rec_a*
+    %6 = get_global @a : rec_a*
+    copy %5, %6
+    %7 = const 2 : s32i
+    %8 = get_global @val : s32i*
+    store %7, %8, align 4
+    %9 = get_global @a2 : rec_a*
+    %10 = get_global @cptr : rec_c**
+    %11 = load %10 : rec_c*, align 8
+    %12 = get_member %11[0] "b" : rec_b*
+    %13 = get_member %12[0] "a" : rec_a*
+    copy %9, %13
+    scope {
+        %15 = get_global @a2 : rec_a*
+        %16 = get_member %15[0] "val" : s32i*
+        %17 = load %16 : s32i, align 4
+        %18 = get_global @a : rec_a*
+        %19 = get_member %18[0] "val" : s32i*
+        %20 = load %19 : s32i, align 4
+        %21 = cmp eq %17, %20 : bool
+        if %21 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %14 = load %0 : s32i
+    return %14
+}

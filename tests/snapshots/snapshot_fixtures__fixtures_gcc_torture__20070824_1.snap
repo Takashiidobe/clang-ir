@@ -1,0 +1,66 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20070824-1.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_S*, "s", align 8
+    %2 = alloca rec_S**, "p", align 8
+    %3 = alloca rec_S*, "n", align 8
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const #cir.ptr<null> : rec_S*
+    store %5, %1, align 8
+    scope {
+        store %1, %2, align 8
+        for cond: {
+            %28 = load %2 : rec_S**, align 8
+            %29 = load %28 : rec_S*, align 8
+            %30 = cast(ptr_to_bool) %29 : bool
+            condition %30
+        } step: {
+            %25 = load %2 : rec_S**, align 8
+            %26 = load %25 : rec_S*, align 8
+            %27 = get_member %26[0] "a" : rec_S**
+            store %27, %2, align 8
+            yield
+        } do {
+            yield
+        }
+        yield
+    }
+    %6 = const 16 : u64i
+    %7 = alloca u8i, "bi_alloca", align 16, dynamic %6
+    %8 = cast(bitcast) %7 : void*
+    %9 = cast(bitcast) %8 : rec_S*
+    store %9, %3, align 8
+    %10 = load %2 : rec_S**, align 8
+    %11 = load %10 : rec_S*, align 8
+    %12 = load %3 : rec_S*, align 8
+    %13 = get_member %12[0] "a" : rec_S**
+    store %11, %13, align 8
+    %14 = const 1 : s32i
+    %15 = load %3 : rec_S*, align 8
+    %16 = get_member %15[1] "b" : s32i*
+    store %14, %16, align 8
+    %17 = load %3 : rec_S*, align 8
+    %18 = load %2 : rec_S**, align 8
+    store %17, %18, align 8
+    scope {
+        %21 = load %1 : rec_S*, align 8
+        %22 = cast(ptr_to_bool) %21 : bool
+        %23 = not %22 : bool
+        if %23 {
+            %24 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %19 = const 0 : s32i
+    store %19, %0
+    %20 = load %0 : s32i
+    return %20
+}

@@ -1,0 +1,63 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr68381.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn foo(%arg0: u16i, %arg1: u16i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u16i, %arg1: u16i):
+        %17 = alloca u16i, "x", align 2
+        %18 = alloca u16i, "y", align 2
+        %19 = alloca s32i, "__retval", align 4
+        %20 = alloca s32i, "r", align 4
+        store %arg0, %17
+        store %arg1, %18
+        scope {
+            %23 = load %17 : u16i, align 2
+            %24 = load %18 : u16i, align 2
+            %25 = cast(integral) %23 : s32i
+            %26 = cast(integral) %24 : s32i
+            <unmodeled: cir.mul.overflow>
+            store %27#0, %20, align 4
+            if %27#1 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        %21 = load %20 : s32i, align 4
+        store %21, %19
+        %22 = load %19 : s32i
+        return %22
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "x", align 4
+    %2 = alloca s32i, "y", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 1 : s32i
+    store %4, %1, align 4
+    %5 = const 2 : s32i
+    store %5, %2, align 4
+    scope {
+        %8 = load %1 : s32i, align 4
+        %9 = cast(integral) %8 : u16i
+        %10 = load %2 : s32i, align 4
+        %11 = cast(integral) %10 : u16i
+        %12 = call @foo(%9, %11) : s32i [all]
+        %13 = load %1 : s32i, align 4
+        %14 = load %2 : s32i, align 4
+        %15 = mul %13, %14 : s32i [nsw]
+        %16 = cmp ne %12, %15 : bool
+        if %16 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = load %0 : s32i
+    return %7
+}

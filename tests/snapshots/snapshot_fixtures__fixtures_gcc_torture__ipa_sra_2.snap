@@ -1,0 +1,77 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/ipa-sra-2.c" (c, x86_64-unknown-linux-gnu)
+fn calloc(%arg0: u64i, %arg1: u64i) -> void* [external, c];
+fn foo(%arg2: s32i, %arg3: rec_both*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i, %arg3: rec_both*):
+        %22 = alloca s32i, "fail", align 4
+        %23 = alloca rec_both*, "agg", align 8
+        %24 = alloca s32i, "__retval", align 4
+        %25 = alloca s32i, "r", align 4
+        store %arg2, %22
+        store %arg3, %23
+        scope {
+            %28 = load %22 : s32i, align 4
+            %29 = cast(int_to_bool) %28 : bool
+            if %29 {
+                %36 = const 999999 : s64i
+                %37 = load %23 : rec_both*, align 8
+                %38 = get_member %37[0] "big" : rec_big*
+                %39 = get_member %38[0] "data" : s32i[1000000]*
+                %40 = get_element %39[%36] : s32i*
+                %41 = load %40 : s32i, align 4
+                store %41, %25, align 4
+                yield
+            } else {
+                %30 = const 0 : s64i
+                %31 = load %23 : rec_both*, align 8
+                %32 = get_member %31[1] "small" : rec_small*
+                %33 = get_member %32[0] "data" : s32i[10]*
+                %34 = get_element %33[%30] : s32i*
+                %35 = load %34 : s32i, align 4
+                store %35, %25, align 4
+                yield
+            }
+            yield
+        }
+        %26 = load %25 : s32i, align 4
+        store %26, %24
+        %27 = load %24 : s32i
+        return %27
+}
+fn free(%arg0: void*) -> void [external, c];
+fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s8i**):
+        %0 = alloca s32i, "argc", align 4
+        %1 = alloca s8i**, "argv", align 8
+        %2 = alloca s32i, "__retval", align 4
+        %3 = alloca rec_both*, "agg", align 8
+        %4 = alloca s32i, "r", align 4
+        store %arg0, %0
+        store %arg1, %1
+        %5 = const 0 : s32i
+        store %5, %2
+        %6 = get_global @calloc : ((u64i, u64i) -> void*)*
+        %7 = const 1 : u64i
+        %8 = const 40 : u64i
+        %9 = call @calloc(%7, %8) : void* [all]
+        %10 = cast(bitcast) %9 : rec_both*
+        store %10, %3, align 8
+        %11 = load %0 : s32i, align 4
+        %12 = const 2000 : s32i
+        %13 = cmp gt %11, %12 : bool
+        %14 = cast(bool_to_int) %13 : s32i
+        %15 = load %3 : rec_both*, align 8
+        %16 = call @foo(%14, %15) : s32i [all]
+        store %16, %4, align 4
+        %17 = get_global @free : ((void*) -> void)*
+        %18 = load %3 : rec_both*, align 8
+        %19 = cast(bitcast) %18 : void*
+        call @free(%19) [all]
+        %20 = load %4 : s32i, align 4
+        store %20, %2
+        %21 = load %2 : s32i
+        return %21
+}

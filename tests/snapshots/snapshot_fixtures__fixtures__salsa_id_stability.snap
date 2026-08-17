@@ -1,0 +1,37 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/salsa_id_stability.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn stable_function(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %10 = alloca s32i, "value", align 4
+        %11 = alloca s32i, "__retval", align 4
+        store %arg0, %10
+        %12 = load %10 : s32i, align 4
+        %13 = const 3 : s32i
+        %14 = mul %12, %13 : s32i [nsw]
+        %15 = const 1 : s32i
+        %16 = add %14, %15 : s32i [nsw]
+        store %16, %11
+        %17 = load %11 : s32i
+        return %17
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[4]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 7 : s32i
+    %6 = call @stable_function(%5) : s32i [all]
+    %7 = call @printf(%4, %6) : s32i [all]
+    %8 = const 0 : s32i
+    store %8, %0
+    %9 = load %0 : s32i
+    return %9
+}

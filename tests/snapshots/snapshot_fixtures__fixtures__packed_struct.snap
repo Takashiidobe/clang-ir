@@ -1,0 +1,54 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/packed_struct.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[9] = "%zu %zu\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[13] = "%zu %zu %zu\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[10] = "%d %x %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_Packed, "p", align 1
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 1 : s8i
+    %4 = get_member %1[0] "a" : s8i*
+    store %3, %4, align 1
+    %5 = const 287454020 : s32i
+    %6 = get_member %1[1] "b" : s32i*
+    store %5, %6, align 1
+    %7 = const 2 : s8i
+    %8 = get_member %1[2] "c" : s8i*
+    store %7, %8, align 1
+    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %10 = get_global @.str : s8i[9]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = const 6 : u64i
+    %13 = const 1 : u64i
+    %14 = call @printf(%11, %12, %13) : s32i [all]
+    %15 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %16 = get_global @.str.1 : s8i[13]*
+    %17 = cast(array_to_ptrdecay) %16 : s8i*
+    %18 = const 0 : u64i
+    %19 = const 1 : u64i
+    %20 = const 5 : u64i
+    %21 = call @printf(%17, %18, %19, %20) : s32i [all]
+    %22 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %23 = get_global @.str.2 : s8i[10]*
+    %24 = cast(array_to_ptrdecay) %23 : s8i*
+    %25 = get_member %1[0] "a" : s8i*
+    %26 = load %25 : s8i, align 1
+    %27 = cast(integral) %26 : s32i
+    %28 = get_member %1[1] "b" : s32i*
+    %29 = load %28 : s32i, align 1
+    %30 = get_member %1[2] "c" : s8i*
+    %31 = load %30 : s8i, align 1
+    %32 = cast(integral) %31 : s32i
+    %33 = call @printf(%24, %27, %29, %32) : s32i [all]
+    %34 = const 0 : s32i
+    store %34, %0
+    %35 = load %0 : s32i
+    return %35
+}

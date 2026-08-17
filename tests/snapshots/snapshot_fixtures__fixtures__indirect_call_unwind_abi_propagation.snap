@@ -1,0 +1,185 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/indirect_call_unwind_abi_propagation.c" (c, x86_64-unknown-linux-gnu)
+global g_callback : ((s32i) -> void)* = #cir.ptr<null> [internal, default, align 8, dso_local]
+global env : rec___jmp_buf_tag[1] = zero [internal, default, align 16, dso_local]
+global failures : s32i = 0 [internal, default, align 4, dso_local]
+global .str : s8i[20] = "recovered quiet %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[22] = "recovered panicky %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[13] = "failures=%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[10] = "quiet %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[12] = "panicky %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn dispatcher(%arg2: s32i, %arg3: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i, %arg3: s32i):
+        %84 = alloca s32i, "x", align 4
+        %85 = alloca s32i, "y", align 4
+        store %arg2, %84
+        store %arg3, %85
+        %86 = load %85 : s32i, align 4
+        %87 = get_global @g_callback : ((s32i) -> void)**
+        %88 = load %87 : ((s32i) -> void)*, align 8
+        %89 = load %84 : s32i, align 4
+        call %88(%89) [all]
+        return
+}
+fn quiet_callback(%arg1: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i):
+        %78 = alloca s32i, "x", align 4
+        store %arg1, %78
+        %79 = get_global @printf : ((s8i*, ...) -> s32i)*
+        %80 = get_global @.str.3 : s8i[10]*
+        %81 = cast(array_to_ptrdecay) %80 : s8i*
+        %82 = load %78 : s32i, align 4
+        %83 = call @printf(%81, %82) : s32i [all]
+        return
+}
+fn _setjmp(%arg0: rec___jmp_buf_tag*) -> s32i [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn longjmp(%arg0: rec___jmp_buf_tag*, %arg1: s32i) -> void [external, c, nothrow];
+fn panicky_callback(%arg0: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %65 = alloca s32i, "x", align 4
+        store %arg0, %65
+        scope {
+            %71 = load %65 : s32i, align 4
+            %72 = const 2 : s32i
+            %73 = cmp eq %71, %72 : bool
+            if %73 {
+                %74 = get_global @longjmp : ((rec___jmp_buf_tag*, s32i) -> void)*
+                %75 = get_global @env : rec___jmp_buf_tag[1]*
+                %76 = cast(array_to_ptrdecay) %75 : rec___jmp_buf_tag*
+                %77 = const 1 : s32i
+                call @longjmp(%76, %77) [all]
+                yield
+            }
+            yield
+        }
+        %66 = get_global @printf : ((s8i*, ...) -> s32i)*
+        %67 = get_global @.str.4 : s8i[12]*
+        %68 = cast(array_to_ptrdecay) %67 : s8i*
+        %69 = load %65 : s32i, align 4
+        %70 = call @printf(%68, %69) : s32i [all]
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_Ctx, "c", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @dispatcher : ((s32i, s32i) -> void)*
+    %4 = get_member %1[0] "run" : ((s32i, s32i) -> void)**
+    store %3, %4, align 8
+    %5 = get_global @quiet_callback : ((s32i) -> void)*
+    %6 = get_global @g_callback : ((s32i) -> void)**
+    store %5, %6, align 8
+    scope {
+        %41 = alloca s32i, "i", align 4
+        %42 = const 0 : s32i
+        store %42, %41, align 4
+        for cond: {
+            %62 = load %41 : s32i, align 4
+            %63 = const 2 : s32i
+            %64 = cmp lt %62, %63 : bool
+            condition %64
+        } step: {
+            %43 = load %41 : s32i, align 4
+            %44 = inc %43 : s32i [nsw]
+            store %44, %41, align 4
+            yield
+        } do {
+            scope {
+                scope {
+                    %49 = get_global @_setjmp : ((rec___jmp_buf_tag*) -> s32i)*
+                    %50 = get_global @env : rec___jmp_buf_tag[1]*
+                    %51 = cast(array_to_ptrdecay) %50 : rec___jmp_buf_tag*
+                    %52 = call @_setjmp(%51) : s32i [all]
+                    %53 = cast(int_to_bool) %52 : bool
+                    if %53 {
+                        %54 = get_global @failures : s32i*
+                        %55 = load %54 : s32i, align 4
+                        %56 = inc %55 : s32i [nsw]
+                        store %56, %54, align 4
+                        %57 = get_global @printf : ((s8i*, ...) -> s32i)*
+                        %58 = get_global @.str : s8i[20]*
+                        %59 = cast(array_to_ptrdecay) %58 : s8i*
+                        %60 = load %41 : s32i, align 4
+                        %61 = call @printf(%59, %60) : s32i [all]
+                        continue
+                    }
+                    yield
+                }
+                %45 = get_member %1[0] "run" : ((s32i, s32i) -> void)**
+                %46 = load %45 : ((s32i, s32i) -> void)*, align 8
+                %47 = load %41 : s32i, align 4
+                %48 = const 0 : s32i
+                call %46(%47, %48) [all]
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %7 = get_global @panicky_callback : ((s32i) -> void)*
+    %8 = get_global @g_callback : ((s32i) -> void)**
+    store %7, %8, align 8
+    scope {
+        %17 = alloca s32i, "i", align 4
+        %18 = const 0 : s32i
+        store %18, %17, align 4
+        for cond: {
+            %38 = load %17 : s32i, align 4
+            %39 = const 5 : s32i
+            %40 = cmp lt %38, %39 : bool
+            condition %40
+        } step: {
+            %19 = load %17 : s32i, align 4
+            %20 = inc %19 : s32i [nsw]
+            store %20, %17, align 4
+            yield
+        } do {
+            scope {
+                scope {
+                    %25 = get_global @_setjmp : ((rec___jmp_buf_tag*) -> s32i)*
+                    %26 = get_global @env : rec___jmp_buf_tag[1]*
+                    %27 = cast(array_to_ptrdecay) %26 : rec___jmp_buf_tag*
+                    %28 = call @_setjmp(%27) : s32i [all]
+                    %29 = cast(int_to_bool) %28 : bool
+                    if %29 {
+                        %30 = get_global @failures : s32i*
+                        %31 = load %30 : s32i, align 4
+                        %32 = inc %31 : s32i [nsw]
+                        store %32, %30, align 4
+                        %33 = get_global @printf : ((s8i*, ...) -> s32i)*
+                        %34 = get_global @.str.1 : s8i[22]*
+                        %35 = cast(array_to_ptrdecay) %34 : s8i*
+                        %36 = load %17 : s32i, align 4
+                        %37 = call @printf(%35, %36) : s32i [all]
+                        continue
+                    }
+                    yield
+                }
+                %21 = get_member %1[0] "run" : ((s32i, s32i) -> void)**
+                %22 = load %21 : ((s32i, s32i) -> void)*, align 8
+                %23 = load %17 : s32i, align 4
+                %24 = const 0 : s32i
+                call %22(%23, %24) [all]
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %10 = get_global @.str.2 : s8i[13]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = get_global @failures : s32i*
+    %13 = load %12 : s32i, align 4
+    %14 = call @printf(%11, %13) : s32i [all]
+    %15 = const 0 : s32i
+    store %15, %0
+    %16 = load %0 : s32i
+    return %16
+}

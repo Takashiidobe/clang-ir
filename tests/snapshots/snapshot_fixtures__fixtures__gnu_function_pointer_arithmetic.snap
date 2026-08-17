@@ -1,0 +1,64 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/gnu_function_pointer_arithmetic.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[16] = "%td %td %td %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn target() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %39 = alloca s32i, "__retval", align 4
+    %40 = const 42 : s32i
+    store %40, %39
+    %41 = load %39 : s32i
+    return %41
+}
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca (() -> s32i)*, "base", align 8
+    %2 = alloca s64i, "forward", align 8
+    %3 = alloca s64i, "backward", align 8
+    %4 = alloca s64i, "difference", align 8
+    %5 = alloca s32i, "unchanged", align 4
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = get_global @target : (() -> s32i)*
+    store %7, %1, align 8
+    %8 = load %1 : (() -> s32i)*, align 8
+    %9 = const 3 : s32i
+    %10 = ptr_stride %8, %9 : (() -> s32i)*
+    %11 = load %1 : (() -> s32i)*, align 8
+    %12 = ptr_diff %10, %11 : s64i
+    store %12, %2, align 8
+    %13 = load %1 : (() -> s32i)*, align 8
+    %14 = const -2 : s32i
+    %15 = ptr_stride %13, %14 : (() -> s32i)*
+    %16 = load %1 : (() -> s32i)*, align 8
+    %17 = ptr_diff %15, %16 : s64i
+    store %17, %3, align 8
+    %18 = load %1 : (() -> s32i)*, align 8
+    %19 = load %1 : (() -> s32i)*, align 8
+    %20 = const 3 : s32i
+    %21 = ptr_stride %19, %20 : (() -> s32i)*
+    %22 = ptr_diff %18, %21 : s64i
+    store %22, %4, align 8
+    %23 = load %1 : (() -> s32i)*, align 8
+    %24 = const 0 : s32i
+    %25 = ptr_stride %23, %24 : (() -> s32i)*
+    %26 = load %1 : (() -> s32i)*, align 8
+    %27 = cmp eq %25, %26 : bool
+    %28 = cast(bool_to_int) %27 : s32i
+    store %28, %5, align 4
+    %29 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %30 = get_global @.str : s8i[16]*
+    %31 = cast(array_to_ptrdecay) %30 : s8i*
+    %32 = load %2 : s64i, align 8
+    %33 = load %3 : s64i, align 8
+    %34 = load %4 : s64i, align 8
+    %35 = load %5 : s32i, align 4
+    %36 = call @printf(%31, %32, %33, %34, %35) : s32i [all]
+    %37 = const 0 : s32i
+    store %37, %0
+    %38 = load %0 : s32i
+    return %38
+}

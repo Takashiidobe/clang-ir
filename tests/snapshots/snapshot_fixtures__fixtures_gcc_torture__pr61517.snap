@@ -1,0 +1,63 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr61517.c" (c, x86_64-unknown-linux-gnu)
+global a : s32i = 0 [external, default, align 4, dso_local]
+global c : s32i* = @a [external, default, align 8, dso_local]
+global b : s32i = 0 [external, default, align 4, dso_local]
+global d : u16i = 0 [external, default, align 2, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u32i, "e", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @a : s32i*
+    %4 = load %3 : s32i, align 4
+    %5 = cast(integral) %4 : u32i
+    store %5, %1, align 4
+    %6 = const 1 : s32i
+    %7 = get_global @c : s32i**
+    %8 = load %7 : s32i*, align 8
+    store %6, %8, align 4
+    scope {
+        %15 = get_global @b : s32i*
+        %16 = load %15 : s32i, align 4
+        %17 = cast(int_to_bool) %16 : bool
+        %18 = not %17 : bool
+        if %18 {
+            %19 = load %1 : u32i, align 4
+            %20 = cast(integral) %19 : u16i
+            %21 = get_global @d : u16i*
+            store %20, %21, align 2
+            %22 = get_global @d : u16i*
+            %23 = load %22 : u16i, align 2
+            %24 = cast(integral) %23 : u32i
+            %25 = load %1 : u32i, align 4
+            %26 = or %24, %25 : u32i
+            %27 = cast(integral) %26 : s32i
+            %28 = get_global @c : s32i**
+            %29 = load %28 : s32i*, align 8
+            store %27, %29, align 4
+            yield
+        }
+        yield
+    }
+    scope {
+        %11 = get_global @a : s32i*
+        %12 = load %11 : s32i, align 4
+        %13 = const 0 : s32i
+        %14 = cmp ne %12, %13 : bool
+        if %14 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %9 = const 0 : s32i
+    store %9, %0
+    %10 = load %0 : s32i
+    return %10
+}

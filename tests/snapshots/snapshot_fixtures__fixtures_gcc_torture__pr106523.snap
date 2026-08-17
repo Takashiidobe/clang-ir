@@ -1,0 +1,81 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr106523.c" (c, x86_64-unknown-linux-gnu)
+fn f7(%arg0: u8i, %arg1: u32i) -> u8i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u8i, %arg1: u32i):
+        %24 = alloca u8i, "x", align 1
+        %25 = alloca u32i, "y", align 4
+        %26 = alloca u8i, "__retval", align 1
+        %27 = alloca u32i, "t", align 4
+        store %arg0, %24
+        store %arg1, %25
+        %28 = load %24 : u8i, align 1
+        %29 = cast(integral) %28 : u32i
+        store %29, %27, align 4
+        %30 = load %27 : u32i, align 4
+        %31 = load %25 : u32i, align 4
+        %32 = shift left %30, %31 : u32i
+        %33 = load %27 : u32i, align 4
+        %34 = load %25 : u32i, align 4
+        %35 = minus %34 : u32i
+        %36 = const 7 : u32i
+        %37 = and %35, %36 : u32i
+        %38 = shift right %33, %37 : u32i
+        %39 = or %32, %38 : u32i
+        %40 = cast(integral) %39 : u8i
+        store %40, %26
+        %41 = load %26 : u8i
+        return %41
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u8i, "x", align 1
+    %2 = alloca u32i, "y", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    scope {
+        %14 = const 8 : s32i
+        %15 = const 8 : s32i
+        %16 = cmp ne %14, %15 : bool
+        %17 = ternary %16 ? { : bool
+            %23 = const #true : bool
+            yield %23
+        } : {
+            %20 = const 4 : s32i
+            %21 = const 4 : s32i
+            %22 = cmp ne %20, %21 : bool
+            yield %22
+        }
+        if %17 {
+            %18 = const 0 : s32i
+            store %18, %0
+            %19 = load %0 : s32i
+            return %19
+        }
+        yield
+    }
+    %4 = const 152 : u8i
+    store %4, %1, align 1, volatile
+    %5 = const 19 : u32i
+    store %5, %2, align 4, volatile
+    scope {
+        %8 = load %1 : u8i, align 1, volatile
+        %9 = load %2 : u32i, align 4, volatile
+        %10 = call @f7(%8, %9) : u8i [all]
+        %11 = cast(integral) %10 : s32i
+        %12 = const 4 : s32i
+        %13 = cmp ne %11, %12 : bool
+        if %13 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = load %0 : s32i
+    return %7
+}

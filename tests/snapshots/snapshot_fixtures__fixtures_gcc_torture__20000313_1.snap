@@ -1,0 +1,76 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20000313-1.c" (c, x86_64-unknown-linux-gnu)
+fn buggy(%arg0: u32i*) -> u32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i*):
+        %18 = alloca u32i*, "param", align 8
+        %19 = alloca u32i, "__retval", align 4
+        %20 = alloca u32i, "accu", align 4
+        %21 = alloca u32i, "zero", align 4
+        %22 = alloca u32i, "borrow", align 4
+        store %arg0, %18
+        %23 = const 0 : u32i
+        store %23, %21, align 4
+        %24 = load %18 : u32i*, align 8
+        %25 = load %24 : u32i, align 4
+        %26 = minus %25 : u32i
+        store %26, %20, align 4
+        %27 = load %20 : u32i, align 4
+        %28 = load %21 : u32i, align 4
+        %29 = cmp gt %27, %28 : bool
+        %30 = cast(bool_to_int) %29 : s32i
+        %31 = minus %30 : s32i [nsw]
+        %32 = cast(integral) %31 : u32i
+        store %32, %22, align 4
+        %33 = load %20 : u32i, align 4
+        %34 = load %18 : u32i*, align 8
+        %35 = load %34 : u32i, align 4
+        %36 = add %35, %33 : u32i
+        store %36, %34, align 4
+        %37 = load %22 : u32i, align 4
+        store %37, %19
+        %38 = load %19 : u32i
+        return %38
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u32i, "param", align 4
+    %2 = alloca u32i, "borrow", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 1 : u32i
+    store %4, %1, align 4
+    %5 = call @buggy(%1) : u32i [all]
+    store %5, %2, align 4
+    scope {
+        %14 = load %1 : u32i, align 4
+        %15 = const 0 : u32i
+        %16 = cmp ne %14, %15 : bool
+        if %16 {
+            %17 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %8 = load %2 : u32i, align 4
+        %9 = const 1 : u32i
+        %10 = add %8, %9 : u32i
+        %11 = const 0 : u32i
+        %12 = cmp ne %10, %11 : bool
+        if %12 {
+            %13 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = load %0 : s32i
+    return %7
+}

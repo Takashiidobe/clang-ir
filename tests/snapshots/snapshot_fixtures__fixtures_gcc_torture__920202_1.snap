@@ -1,0 +1,46 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/920202-1.c" (c, x86_64-unknown-linux-gnu)
+global rule_text_needs_stack_pop : s32i = 0 [internal, default, align 4, dso_local]
+global input_stack_pos : s32i = 1 [internal, default, align 4, dso_local]
+
+fn f() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %6 = alloca s32i, "__retval", align 4
+    %7 = const 1 : s32i
+    %8 = get_global @rule_text_needs_stack_pop : s32i*
+    store %7, %8, align 4
+    scope {
+        %10 = get_global @input_stack_pos : s32i*
+        %11 = load %10 : s32i, align 4
+        %12 = const 0 : s32i
+        %13 = cmp le %11, %12 : bool
+        if %13 {
+            %16 = const 1 : s32i
+            store %16, %6
+            %17 = load %6 : s32i
+            return %17
+        } else {
+            %14 = const 0 : s32i
+            store %14, %6
+            %15 = load %6 : s32i
+            return %15
+        }
+        yield
+    }
+    %9 = load %6 : s32i
+    return %9
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = call @f() : s32i [all]
+    %3 = get_global @exit : ((s32i) -> void)*
+    %4 = const 0 : s32i
+    call @exit(%4) [all]
+    %5 = load %0 : s32i
+    return %5
+}

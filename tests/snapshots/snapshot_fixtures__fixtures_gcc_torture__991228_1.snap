@@ -1,0 +1,85 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/991228-1.c" (c, x86_64-unknown-linux-gnu)
+global u : rec_anon2E0 = {-2.500000e-01} [external, default, align 8, dso_local]
+global endianness_test : s64i = 1 [external, default, align 8, dso_local]
+
+fn signbit(%arg0: double) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: double):
+        %29 = alloca double, "x", align 8
+        %30 = alloca s32i, "__retval", align 4
+        %31 = alloca rec_anon2E1, "u", align 8
+        store %arg0, %29
+        %32 = get_member %31[0] "d" : double*
+        %33 = load %29 : double, align 8
+        store %33, %32, align 8
+        %34 = get_global @endianness_test : s64i*
+        %35 = cast(bitcast) %34 : s32i*
+        %36 = load %35 : s32i, align 8
+        %37 = cast(integral) %36 : s64i
+        %38 = get_member %31[1] "i" : s32i[2]*
+        %39 = get_element %38[%37] : s32i*
+        %40 = load %39 : s32i, align 4
+        %41 = const 0 : s32i
+        %42 = cmp lt %40, %41 : bool
+        %43 = cast(bool_to_int) %42 : s32i
+        store %43, %30
+        %44 = load %30 : s32i
+        return %44
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %10 = const 2 : u64i
+        %11 = const 4 : u64i
+        %12 = mul %10, %11 : u64i
+        %13 = const 8 : u64i
+        %14 = cmp ne %12, %13 : bool
+        %15 = ternary %14 ? { : bool
+            %28 = const #true : bool
+            yield %28
+        } : {
+            %18 = get_global @endianness_test : s64i*
+            %19 = cast(bitcast) %18 : s32i*
+            %20 = load %19 : s32i, align 8
+            %21 = cast(integral) %20 : s64i
+            %22 = get_global @u : rec_anon2E0*
+            %23 = get_member %22[1] "i" : s32i[2]*
+            %24 = get_element %23[%21] : s32i*
+            %25 = load %24 : s32i, align 4
+            %26 = const 0 : s32i
+            %27 = cmp ge %25, %26 : bool
+            yield %27
+        }
+        if %15 {
+            %16 = get_global @exit : ((s32i) -> void)*
+            %17 = const 0 : s32i
+            call @exit(%17) [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %5 = const -2.500000e-01 : double
+        %6 = call @signbit(%5) : s32i [all]
+        %7 = cast(int_to_bool) %6 : bool
+        %8 = not %7 : bool
+        if %8 {
+            %9 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

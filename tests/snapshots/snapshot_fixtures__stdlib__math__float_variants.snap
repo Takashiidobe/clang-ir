@@ -1,0 +1,77 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/math/float_variants.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[21] = "%.6f %.6f %.6f %.6f\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[19] = "%.6f %d %.6f %.6f\n" [cir_private, default, align 1, dso_local, constant]
+
+fn frexpf(%arg0: float, %arg1: s32i*) -> float [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn sinf(%arg0: float) -> float [external, c, nothrow];
+fn cosf(%arg0: float) -> float [external, c, nothrow];
+fn sqrtf(%arg0: float) -> float [external, c, nothrow];
+fn fmodf(%arg0: float, %arg1: float) -> float [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "e", align 4
+    %2 = alloca float, "ip", align 4
+    %3 = alloca float, "x", align 4
+    %4 = alloca float, "y", align 4
+    %5 = alloca float, "m", align 4
+    %6 = alloca float, "frac", align 4
+    %7 = const 0 : s32i
+    store %7, %0
+    %8 = const 0 : s32i
+    store %8, %1, align 4
+    %9 = const 0.000000e+00 : float
+    store %9, %2, align 4
+    %10 = const 9.000000e+00 : float
+    store %10, %3, align 4
+    %11 = const 2.000000e+00 : float
+    store %11, %4, align 4
+    %12 = get_global @frexpf : ((float, s32i*) -> float)*
+    %13 = load %3 : float, align 4
+    %14 = call @frexpf(%13, %1) : float [all]
+    store %14, %5, align 4
+    %15 = const 3.750000e+00 : float
+    <unmodeled: cir.modf>
+    store %16#1, %2, align 4
+    store %16#0, %6, align 4
+    %17 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %18 = get_global @.str : s8i[21]*
+    %19 = cast(array_to_ptrdecay) %18 : s8i*
+    %20 = get_global @sinf : ((float) -> float)*
+    %21 = const 5.000000e-01 : float
+    %22 = call @sinf(%21) : float [all]
+    %23 = cast(floating) %22 : double
+    %24 = get_global @cosf : ((float) -> float)*
+    %25 = const 5.000000e-01 : float
+    %26 = call @cosf(%25) : float [all]
+    %27 = cast(floating) %26 : double
+    %28 = get_global @sqrtf : ((float) -> float)*
+    %29 = load %3 : float, align 4
+    %30 = call @sqrtf(%29) : float [all]
+    %31 = cast(floating) %30 : double
+    %32 = get_global @fmodf : ((float, float) -> float)*
+    %33 = load %3 : float, align 4
+    %34 = load %4 : float, align 4
+    %35 = call @fmodf(%33, %34) : float [all]
+    %36 = cast(floating) %35 : double
+    %37 = call @printf(%19, %23, %27, %31, %36) : s32i [all]
+    %38 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %39 = get_global @.str.1 : s8i[19]*
+    %40 = cast(array_to_ptrdecay) %39 : s8i*
+    %41 = load %5 : float, align 4
+    %42 = cast(floating) %41 : double
+    %43 = load %1 : s32i, align 4
+    %44 = load %2 : float, align 4
+    %45 = cast(floating) %44 : double
+    %46 = load %6 : float, align 4
+    %47 = cast(floating) %46 : double
+    %48 = call @printf(%40, %42, %43, %45, %47) : s32i [all]
+    %49 = const 0 : s32i
+    store %49, %0
+    %50 = load %0 : s32i
+    return %50
+}

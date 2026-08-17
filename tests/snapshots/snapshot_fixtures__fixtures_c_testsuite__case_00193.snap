@@ -1,0 +1,63 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00193.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[3] = "1\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[3] = "2\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[3] = "3\n" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[5] = "out\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn fred(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %7 = alloca s32i, "x", align 4
+        store %arg0, %7
+        scope {
+            %12 = load %7 : s32i, align 4
+            switch %12 {
+                case equal 1 {
+                    %21 = get_global @printf : ((s8i*, ...) -> s32i)*
+                    %22 = get_global @.str : s8i[3]*
+                    %23 = cast(array_to_ptrdecay) %22 : s8i*
+                    %24 = call @printf(%23) : s32i [all]
+                    return
+                }
+                case equal 2 {
+                    %17 = get_global @printf : ((s8i*, ...) -> s32i)*
+                    %18 = get_global @.str.1 : s8i[3]*
+                    %19 = cast(array_to_ptrdecay) %18 : s8i*
+                    %20 = call @printf(%19) : s32i [all]
+                    break
+                }
+                case equal 3 {
+                    %13 = get_global @printf : ((s8i*, ...) -> s32i)*
+                    %14 = get_global @.str.2 : s8i[3]*
+                    %15 = cast(array_to_ptrdecay) %14 : s8i*
+                    %16 = call @printf(%15) : s32i [all]
+                    return
+                }
+            }
+            yield
+        }
+        %8 = get_global @printf : ((s8i*, ...) -> s32i)*
+        %9 = get_global @.str.3 : s8i[5]*
+        %10 = cast(array_to_ptrdecay) %9 : s8i*
+        %11 = call @printf(%10) : s32i [all]
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 1 : s32i
+    call @fred(%2) [all]
+    %3 = const 2 : s32i
+    call @fred(%3) [all]
+    %4 = const 3 : s32i
+    call @fred(%4) [all]
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = load %0 : s32i
+    return %6
+}

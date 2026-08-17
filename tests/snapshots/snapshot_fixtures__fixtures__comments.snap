@@ -1,0 +1,65 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/comments.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.holder : rec_Holder = {1} [cir_private, default, dso_local, constant]
+global completed_count : s32i = 1 [internal, default, align 4, dso_local]
+
+fn increment(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %24 = alloca s32i, "value", align 4
+        %25 = alloca s32i, "__retval", align 4
+        %26 = alloca s32i, "next", align 4
+        store %arg0, %24
+        %27 = load %24 : s32i, align 4
+        %28 = const 1 : s32i
+        %29 = add %27, %28 : s32i [nsw]
+        store %29, %26, align 4, volatile
+        %30 = get_global @completed_count : s32i*
+        %31 = load %30 : s32i, align 4
+        %32 = inc %31 : s32i [nsw]
+        store %32, %30, align 4
+        %33 = load %26 : s32i, align 4, volatile
+        store %33, %25
+        %34 = load %25 : s32i
+        return %34
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_Holder, "holder", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @__const.main.holder : rec_Holder*
+    copy %1, %3
+    %4 = get_member %1[0] "mode" : u32i*
+    %5 = load %4 : u32i, align 4
+    %6 = const 1 : u32i
+    %7 = cmp eq %5, %6 : bool
+    %8 = ternary %7 ? { : bool
+        %20 = const 1 : s32i
+        %21 = call @increment(%20) : s32i [all]
+        %22 = const 2 : s32i
+        %23 = cmp eq %21, %22 : bool
+        yield %23
+    } : {
+        %19 = const #false : bool
+        yield %19
+    }
+    %9 = ternary %8 ? { : bool
+        %15 = get_global @completed_count : s32i*
+        %16 = load %15 : s32i, align 4
+        %17 = const 2 : s32i
+        %18 = cmp eq %16, %17 : bool
+        yield %18
+    } : {
+        %14 = const #false : bool
+        yield %14
+    }
+    %10 = const 0 : s32i
+    %11 = const 1 : s32i
+    %12 = select %9, %10, %11 : s32i
+    store %12, %0
+    %13 = load %0 : s32i
+    return %13
+}

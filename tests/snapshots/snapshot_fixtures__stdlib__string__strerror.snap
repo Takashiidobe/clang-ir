@@ -1,0 +1,49 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/string/strerror.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[8] = "No such" [cir_private, default, align 1, dso_local, constant]
+
+fn strerror(%arg0: s32i) -> s8i* [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn strstr(%arg0: s8i*, %arg1: s8i*) -> s8i* [external, c, pure, nothrow];
+fn strlen(%arg0: s8i*) -> u64i [external, c, pure, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i*, "a", align 8
+    %2 = alloca s8i*, "b", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_global @strerror : ((s32i) -> s8i*)*
+    %5 = const 2 : s32i
+    %6 = call @strerror(%5) : s8i* [all]
+    store %6, %1, align 8
+    %7 = get_global @strerror : ((s32i) -> s8i*)*
+    %8 = const 0 : s32i
+    %9 = call @strerror(%8) : s8i* [all]
+    store %9, %2, align 8
+    %10 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %11 = get_global @.str : s8i[7]*
+    %12 = cast(array_to_ptrdecay) %11 : s8i*
+    %13 = get_global @strstr : ((s8i*, s8i*) -> s8i*)*
+    %14 = load %1 : s8i*, align 8
+    %15 = get_global @.str.1 : s8i[8]*
+    %16 = cast(array_to_ptrdecay) %15 : s8i*
+    %17 = call @strstr(%14, %16) : s8i* [pure]
+    %18 = const #cir.ptr<null> : s8i*
+    %19 = cmp ne %17, %18 : bool
+    %20 = cast(bool_to_int) %19 : s32i
+    %21 = get_global @strlen : ((s8i*) -> u64i)*
+    %22 = load %2 : s8i*, align 8
+    %23 = call @strlen(%22) : u64i [pure]
+    %24 = const 0 : u64i
+    %25 = cmp gt %23, %24 : bool
+    %26 = cast(bool_to_int) %25 : s32i
+    %27 = call @printf(%12, %20, %26) : s32i [all]
+    %28 = const 0 : s32i
+    store %28, %0
+    %29 = load %0 : s32i
+    return %29
+}

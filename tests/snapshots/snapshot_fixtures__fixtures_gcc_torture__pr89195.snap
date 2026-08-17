@@ -1,0 +1,61 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr89195.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.d : rec_S = {1193046} [cir_private, default, dso_local, constant]
+global x : u8i = 0 [external, default, align 1, dso_local]
+
+fn foo(%arg0: u32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i):
+        %17 = alloca u32i, "coerce", align 4
+        store %arg0, %17
+        %18 = cast(bitcast) %17 : rec_S*
+        %19 = load %18 : rec_S
+        %20 = alloca rec_S, "d", align 4
+        %21 = alloca s32i, "__retval", align 4
+        store %19, %20
+        %22 = get_member %20[0] "i" : u32i*
+        <unmodeled: cir.get_bitfield>
+        %24 = cast(integral) %23 : s32i
+        %25 = get_global @x : u8i*
+        %26 = load %25 : u8i, align 1, volatile
+        %27 = cast(integral) %26 : s32i
+        %28 = and %24, %27 : s32i
+        store %28, %21
+        %29 = load %21 : s32i
+        return %29
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca rec_S, "coerce", align 4
+    %1 = alloca s32i, "__retval", align 4
+    %2 = alloca rec_S, "d", align 4
+    %3 = const 0 : s32i
+    store %3, %1
+    %4 = get_global @__const.main.d : rec_S*
+    copy %2, %4
+    %5 = const 117 : u8i
+    %6 = get_global @x : u8i*
+    store %5, %6, align 1, volatile
+    scope {
+        %9 = load %2 : rec_S, align 4
+        store %9, %0
+        %10 = cast(bitcast) %0 : u32i*
+        %11 = load %10 : u32i
+        %12 = call @foo(%11) : s32i [all]
+        %13 = const 86 : s32i
+        %14 = const 117 : s32i
+        %15 = and %13, %14 : s32i
+        %16 = cmp ne %12, %15 : bool
+        if %16 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %7 = const 0 : s32i
+    store %7, %1
+    %8 = load %1 : s32i
+    return %8
+}

@@ -1,0 +1,43 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/heap_vec_calloc.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn calloc(%arg0: u64i, %arg1: u64i) -> void* [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn free(%arg0: void*) -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i*, "p", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @calloc : ((u64i, u64i) -> void*)*
+    %4 = const 4 : u64i
+    %5 = const 4 : u64i
+    %6 = call @calloc(%4, %5) : void* [all]
+    %7 = cast(bitcast) %6 : s32i*
+    store %7, %1, align 8
+    %8 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %9 = get_global @.str : s8i[4]*
+    %10 = cast(array_to_ptrdecay) %9 : s8i*
+    %11 = const 0 : s64i
+    %12 = load %1 : s32i*, align 8
+    %13 = ptr_stride %12, %11 : s32i*
+    %14 = load %13 : s32i, align 4
+    %15 = const 3 : s64i
+    %16 = load %1 : s32i*, align 8
+    %17 = ptr_stride %16, %15 : s32i*
+    %18 = load %17 : s32i, align 4
+    %19 = add %14, %18 : s32i [nsw]
+    %20 = call @printf(%10, %19) : s32i [all]
+    %21 = get_global @free : ((void*) -> void)*
+    %22 = load %1 : s32i*, align 8
+    %23 = cast(bitcast) %22 : void*
+    call @free(%23) [all]
+    %24 = const 0 : s32i
+    store %24, %0
+    %25 = load %0 : s32i
+    return %25
+}

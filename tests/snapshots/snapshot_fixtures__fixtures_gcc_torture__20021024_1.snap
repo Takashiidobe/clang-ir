@@ -1,0 +1,130 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20021024-1.c" (c, x86_64-unknown-linux-gnu)
+global main.r : u64i[64] = zero [internal, default, align 16, dso_local]
+global cp : u64i* = #cir.ptr<null> [external, default, align 8, dso_local]
+global m : u64i = 0 [external, default, align 8, dso_local]
+
+fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
+    return
+}
+fn bar(%arg0: u32i, %arg1: u64i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i, %arg1: u64i*):
+        %33 = alloca u32i, "rop", align 4
+        %34 = alloca u64i*, "r", align 8
+        %35 = alloca u32i, "rs1", align 4
+        %36 = alloca u32i, "rs2", align 4
+        %37 = alloca u32i, "rd", align 4
+        store %arg0, %33
+        store %arg1, %34
+        br ^bb1
+    ^bb1():
+        label top:
+        %38 = load %33 : u32i, align 4
+        %39 = const 23 : s32i
+        %40 = shift right %38, %39 : u32i
+        %41 = const 511 : u32i
+        %42 = and %40, %41 : u32i
+        store %42, %36, align 4
+        %43 = load %33 : u32i, align 4
+        %44 = const 9 : s32i
+        %45 = shift right %43, %44 : u32i
+        %46 = const 511 : u32i
+        %47 = and %45, %46 : u32i
+        store %47, %35, align 4
+        %48 = load %33 : u32i, align 4
+        %49 = const 511 : u32i
+        %50 = and %48, %49 : u32i
+        store %50, %37, align 4
+        %51 = const 1 : u64i
+        %52 = get_global @cp : u64i**
+        %53 = load %52 : u64i*, align 8
+        store %51, %53, align 8
+        %54 = load %35 : u32i, align 4
+        %55 = cast(integral) %54 : u64i
+        %56 = load %34 : u64i*, align 8
+        %57 = ptr_stride %56, %55 : u64i*
+        %58 = load %57 : u64i, align 8
+        %59 = load %36 : u32i, align 4
+        %60 = cast(integral) %59 : u64i
+        %61 = load %34 : u64i*, align 8
+        %62 = ptr_stride %61, %60 : u64i*
+        %63 = load %62 : u64i, align 8
+        %64 = add %58, %63 : u64i
+        %65 = get_global @m : u64i*
+        store %64, %65, align 8
+        %66 = const 2 : u64i
+        %67 = get_global @cp : u64i**
+        %68 = load %67 : u64i*, align 8
+        store %66, %68, align 8
+        call @foo() [all]
+        scope {
+            %74 = load %37 : u32i, align 4
+            %75 = cast(int_to_bool) %74 : bool
+            %76 = not %75 : bool
+            if %76 {
+                goto top
+            }
+            yield
+        }
+        %69 = const 1 : u64i
+        %70 = load %37 : u32i, align 4
+        %71 = cast(integral) %70 : u64i
+        %72 = load %34 : u64i*, align 8
+        %73 = ptr_stride %72, %71 : u64i*
+        store %69, %73, align 8
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u64i, "cr", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @main.r : u64i[64]*
+    %4 = get_global @cp : u64i**
+    store %1, %4, align 8
+    %5 = const 47 : u64i
+    %6 = const 4 : s64i
+    %7 = get_element %3[%6] : u64i*
+    store %5, %7, align 16
+    %8 = const 11 : u64i
+    %9 = const 8 : s64i
+    %10 = get_element %3[%9] : u64i*
+    store %8, %10, align 16
+    %11 = const 8 : s32i
+    %12 = const 23 : s32i
+    %13 = shift left %11, %12 : s32i
+    %14 = const 4 : s32i
+    %15 = const 9 : s32i
+    %16 = shift left %14, %15 : s32i
+    %17 = or %13, %16 : s32i
+    %18 = const 15 : s32i
+    %19 = or %17, %18 : s32i
+    %20 = cast(integral) %19 : u32i
+    %21 = cast(array_to_ptrdecay) %3 : u64i*
+    call @bar(%20, %21) [all]
+    scope {
+        %25 = get_global @m : u64i*
+        %26 = load %25 : u64i, align 8
+        %27 = const 47 : s32i
+        %28 = const 11 : s32i
+        %29 = add %27, %28 : s32i [nsw]
+        %30 = cast(integral) %29 : u64i
+        %31 = cmp ne %26, %30 : bool
+        if %31 {
+            %32 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %22 = get_global @exit : ((s32i) -> void)*
+    %23 = const 0 : s32i
+    call @exit(%23) [all]
+    %24 = load %0 : s32i
+    return %24
+}

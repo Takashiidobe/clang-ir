@@ -1,0 +1,58 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/printf_integer_precision.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[11] = "%.3d %.3d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[20] = "%8.3d|%-8.3d|%+.3d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[8] = "%08.3d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[21] = "%.3u %.4x %.4X %.4o\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "a", align 4
+    %2 = alloca s32i, "neg", align 4
+    %3 = alloca u32i, "u", align 4
+    %4 = alloca u32i, "hex", align 4
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = const 5 : s32i
+    store %6, %1, align 4
+    %7 = const -5 : s32i
+    store %7, %2, align 4
+    %8 = const 5 : u32i
+    store %8, %3, align 4
+    %9 = const 255 : u32i
+    store %9, %4, align 4
+    %10 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %11 = get_global @.str : s8i[11]*
+    %12 = cast(array_to_ptrdecay) %11 : s8i*
+    %13 = load %1 : s32i, align 4
+    %14 = load %2 : s32i, align 4
+    %15 = call @printf(%12, %13, %14) : s32i [all]
+    %16 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %17 = get_global @.str.1 : s8i[20]*
+    %18 = cast(array_to_ptrdecay) %17 : s8i*
+    %19 = load %1 : s32i, align 4
+    %20 = load %2 : s32i, align 4
+    %21 = load %1 : s32i, align 4
+    %22 = call @printf(%18, %19, %20, %21) : s32i [all]
+    %23 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %24 = get_global @.str.2 : s8i[8]*
+    %25 = cast(array_to_ptrdecay) %24 : s8i*
+    %26 = load %2 : s32i, align 4
+    %27 = call @printf(%25, %26) : s32i [all]
+    %28 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %29 = get_global @.str.3 : s8i[21]*
+    %30 = cast(array_to_ptrdecay) %29 : s8i*
+    %31 = load %3 : u32i, align 4
+    %32 = load %4 : u32i, align 4
+    %33 = load %4 : u32i, align 4
+    %34 = load %4 : u32i, align 4
+    %35 = call @printf(%30, %31, %32, %33, %34) : s32i [all]
+    %36 = const 0 : s32i
+    store %36, %0
+    %37 = load %0 : s32i
+    return %37
+}

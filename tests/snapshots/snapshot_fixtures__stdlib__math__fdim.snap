@@ -1,0 +1,36 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/math/fdim.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[7] = "%f %f\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn fdim(%arg0: double, %arg1: double) -> double [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca double, "a", align 8
+    %2 = alloca double, "b", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 7.000000e+00 : double
+    store %4, %1, align 8, volatile
+    %5 = const 3.000000e+00 : double
+    store %5, %2, align 8, volatile
+    %6 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %7 = get_global @.str : s8i[7]*
+    %8 = cast(array_to_ptrdecay) %7 : s8i*
+    %9 = get_global @fdim : ((double, double) -> double)*
+    %10 = load %1 : double, align 8, volatile
+    %11 = load %2 : double, align 8, volatile
+    %12 = call @fdim(%10, %11) : double [all]
+    %13 = get_global @fdim : ((double, double) -> double)*
+    %14 = load %2 : double, align 8, volatile
+    %15 = load %1 : double, align 8, volatile
+    %16 = call @fdim(%14, %15) : double [all]
+    %17 = call @printf(%8, %12, %16) : s32i [all]
+    %18 = const 0 : s32i
+    store %18, %0
+    %19 = load %0 : s32i
+    return %19
+}

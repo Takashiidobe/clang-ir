@@ -1,0 +1,23 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.link/long_double_aggregate/native.c" (c, x86_64-unknown-linux-gnu)
+fn ext_pair_roundtrip(%arg0: rec_ld_pair*, %arg1: rec_ld_pair*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_ld_pair*, %arg1: rec_ld_pair*):
+        %0 = load %arg1 : rec_ld_pair
+        %1 = alloca rec_ld_pair, "p", align 16
+        store %0, %1
+        %2 = const 1.000000e+00 : long_double<f80>
+        %3 = get_member %1[0] "a" : long_double<f80>*
+        %4 = load %3 : long_double<f80>, align 16
+        %5 = fadd %4, %2 : long_double<f80>
+        store %5, %3, align 16
+        %6 = const 2.000000e+00 : long_double<f80>
+        %7 = get_member %1[1] "b" : long_double<f80>*
+        %8 = load %7 : long_double<f80>, align 16
+        %9 = fadd %8, %6 : long_double<f80>
+        store %9, %7, align 16
+        copy %arg0, %1
+        return
+}

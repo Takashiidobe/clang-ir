@@ -1,0 +1,38 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20030626-1.c" (c, x86_64-unknown-linux-gnu)
+global buf : s8i[10] = zero [external, default, align 1, dso_local]
+global .str : s8i[8] = "foo\0bar" [cir_private, default, align 1, dso_local, constant]
+
+fn sprintf(%arg0: s8i*, %arg1: s8i*, ...) -> s32i [external, c, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "l", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @sprintf : ((s8i*, s8i*, ...) -> s32i)*
+    %4 = get_global @buf : s8i[10]*
+    %5 = cast(array_to_ptrdecay) %4 : s8i*
+    %6 = get_global @.str : s8i[8]*
+    %7 = cast(array_to_ptrdecay) %6 : s8i*
+    %8 = call @sprintf(%5, %7) : s32i [all]
+    store %8, %1, align 4
+    scope {
+        %11 = load %1 : s32i, align 4
+        %12 = const 3 : s32i
+        %13 = cmp ne %11, %12 : bool
+        if %13 {
+            %14 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %9 = const 0 : s32i
+    store %9, %0
+    %10 = load %0 : s32i
+    return %10
+}

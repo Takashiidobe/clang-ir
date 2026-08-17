@@ -1,0 +1,71 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr81503.c" (c, x86_64-unknown-linux-gnu)
+global a : u16i = 41461 [external, default, align 2, dso_local]
+global b : u16i = 3419 [external, default, align 2, dso_local]
+global c : s32i = 0 [external, default, align 4, dso_local]
+
+fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
+    scope {
+        %11 = get_global @a : u16i*
+        %12 = load %11 : u16i, align 2
+        %13 = cast(integral) %12 : s32i
+        %14 = get_global @b : u16i*
+        %15 = load %14 : u16i, align 2
+        %16 = cast(integral) %15 : s32i
+        %17 = const 0 : s32i
+        %18 = const 5 : s32i
+        %19 = cmp ne %17, %18 : bool
+        %20 = cast(bool_to_int) %19 : s32i
+        %21 = not %20 : s32i
+        %22 = mul %16, %21 : s32i [nsw]
+        %23 = add %13, %22 : s32i [nsw]
+        %24 = cast(int_to_bool) %23 : bool
+        if %24 {
+            %25 = get_global @b : u16i*
+            %26 = load %25 : u16i, align 2
+            %27 = cast(integral) %26 : s32i
+            %28 = const 0 : s32i
+            %29 = const 5 : s32i
+            %30 = cmp ne %28, %29 : bool
+            %31 = cast(bool_to_int) %30 : s32i
+            %32 = not %31 : s32i
+            %33 = mul %27, %32 : s32i [nsw]
+            %34 = not %33 : s32i
+            %35 = minus %34 : s32i [nsw]
+            %36 = const 2147483647 : s32i
+            %37 = add %35, %36 : s32i [nsw]
+            %38 = get_global @c : s32i*
+            store %37, %38, align 4
+            yield
+        }
+        yield
+    }
+    return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @foo : (() -> void)*
+    call @foo() [all]
+    scope {
+        %5 = get_global @c : s32i*
+        %6 = load %5 : s32i, align 4
+        %7 = const 2147476810 : s32i
+        %8 = cmp ne %6, %7 : bool
+        if %8 {
+            %9 = const -1 : s32i
+            store %9, %0
+            %10 = load %0 : s32i
+            return %10
+        }
+        yield
+    }
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

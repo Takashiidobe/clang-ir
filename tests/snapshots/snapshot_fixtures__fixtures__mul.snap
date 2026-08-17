@@ -1,0 +1,49 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/mul.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[4] = "%u\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn imul(%arg0: s32i, %arg1: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s32i):
+        %20 = alloca s32i, "a", align 4
+        %21 = alloca s32i, "b", align 4
+        %22 = alloca s32i, "__retval", align 4
+        store %arg0, %20
+        store %arg1, %21
+        %23 = load %20 : s32i, align 4
+        %24 = load %21 : s32i, align 4
+        %25 = mul %23, %24 : s32i [nsw]
+        store %25, %22
+        %26 = load %22 : s32i
+        return %26
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u32i, "u", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %4 = get_global @.str : s8i[4]*
+    %5 = cast(array_to_ptrdecay) %4 : s8i*
+    %6 = const -4 : s32i
+    %7 = const 7 : s32i
+    %8 = call @imul(%6, %7) : s32i [all]
+    %9 = call @printf(%5, %8) : s32i [all]
+    %10 = const 100000 : u32i
+    store %10, %1, align 4
+    %11 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %12 = get_global @.str.1 : s8i[4]*
+    %13 = cast(array_to_ptrdecay) %12 : s8i*
+    %14 = load %1 : u32i, align 4
+    %15 = load %1 : u32i, align 4
+    %16 = mul %14, %15 : u32i
+    %17 = call @printf(%13, %16) : s32i [all]
+    %18 = const 0 : s32i
+    store %18, %0
+    %19 = load %0 : s32i
+    return %19
+}

@@ -1,0 +1,108 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20070517-1.c" (c, x86_64-unknown-linux-gnu)
+fn get_kind(%arg1: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i):
+        %39 = alloca s32i, "v", align 4
+        %40 = alloca s32i, "__retval", align 4
+        %41 = alloca s32i, "k", align 4
+        store %arg1, %39
+        %42 = load %39 : s32i, align 4
+        store %42, %41, align 4, volatile
+        %43 = load %41 : s32i, align 4, volatile
+        store %43, %40
+        %44 = load %40 : s32i
+        return %44
+}
+fn some_call() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %36 = alloca s32i, "__retval", align 4
+    %37 = const 0 : s32i
+    store %37, %36
+    %38 = load %36 : s32i
+    return %38
+}
+fn abort() -> void [external, c, nothrow];
+fn example(%arg0: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %5 = alloca s32i, "arg", align 4
+        %6 = alloca s32i, "tmp", align 4
+        %7 = alloca s32i, "kind", align 4
+        store %arg0, %5
+        %8 = load %5 : s32i, align 4
+        %9 = call @get_kind(%8) : s32i [all]
+        store %9, %7, align 4
+        scope {
+            %10 = load %7 : s32i, align 4
+            %11 = const 9 : s32i
+            %12 = cmp eq %10, %11 : bool
+            %13 = ternary %12 ? { : bool
+                %35 = const #true : bool
+                yield %35
+            } : {
+                %32 = load %7 : s32i, align 4
+                %33 = const 10 : s32i
+                %34 = cmp eq %32, %33 : bool
+                yield %34
+            }
+            %14 = ternary %13 ? { : bool
+                %31 = const #true : bool
+                yield %31
+            } : {
+                %28 = load %7 : s32i, align 4
+                %29 = const 5 : s32i
+                %30 = cmp eq %28, %29 : bool
+                yield %30
+            }
+            if %14 {
+                scope {
+                    %15 = call @some_call() : s32i [all]
+                    %16 = const 0 : s32i
+                    %17 = cmp eq %15, %16 : bool
+                    if %17 {
+                        scope {
+                            %18 = load %7 : s32i, align 4
+                            %19 = const 9 : s32i
+                            %20 = cmp eq %18, %19 : bool
+                            %21 = ternary %20 ? { : bool
+                                %27 = const #true : bool
+                                yield %27
+                            } : {
+                                %24 = load %7 : s32i, align 4
+                                %25 = const 10 : s32i
+                                %26 = cmp eq %24, %25 : bool
+                                yield %26
+                            }
+                            if %21 {
+                                %23 = load %5 : s32i, align 4
+                                store %23, %6, align 4
+                                yield
+                            } else {
+                                %22 = get_global @abort : (() -> void)*
+                                call @abort() [all]
+                                yield
+                            }
+                            yield
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 10 : s32i
+    call @example(%2) [all]
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

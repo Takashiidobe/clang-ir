@@ -1,0 +1,28 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/math/log.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%f\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn log(%arg0: double) -> double [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca double, "x", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 1.000000e+00 : double
+    store %3, %1, align 8, volatile
+    %4 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %5 = get_global @.str : s8i[4]*
+    %6 = cast(array_to_ptrdecay) %5 : s8i*
+    %7 = get_global @log : ((double) -> double)*
+    %8 = load %1 : double, align 8, volatile
+    %9 = call @log(%8) : double [all]
+    %10 = call @printf(%6, %9) : s32i [all]
+    %11 = const 0 : s32i
+    store %11, %0
+    %12 = load %0 : s32i
+    return %12
+}

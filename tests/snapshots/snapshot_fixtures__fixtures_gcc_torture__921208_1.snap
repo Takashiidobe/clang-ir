@@ -1,0 +1,56 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/921208-1.c" (c, x86_64-unknown-linux-gnu)
+fn f(%arg2: double) -> double [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: double):
+        %18 = alloca double, "x", align 8
+        %19 = alloca double, "__retval", align 8
+        store %arg2, %18
+        %20 = load %18 : double, align 8
+        %21 = load %18 : double, align 8
+        %22 = fmul %20, %21 : double
+        store %22, %19
+        %23 = load %19 : double
+        return %23
+}
+fn Int(%arg0: ((double) -> double)*, %arg1: double) -> double [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: ((double) -> double)*, %arg1: double):
+        %11 = alloca ((double) -> double)*, "f", align 8
+        %12 = alloca double, "a", align 8
+        %13 = alloca double, "__retval", align 8
+        store %arg0, %11
+        store %arg1, %12
+        %14 = load %11 : ((double) -> double)*, align 8
+        %15 = load %12 : double, align 8
+        %16 = call %14(%15) : double [all]
+        store %16, %13
+        %17 = load %13 : double
+        return %17
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %5 = get_global @f : ((double) -> double)*
+        %6 = const 2.000000e+00 : double
+        %7 = call @Int(%5, %6) : double [all]
+        %8 = const 4.000000e+00 : double
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            %10 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

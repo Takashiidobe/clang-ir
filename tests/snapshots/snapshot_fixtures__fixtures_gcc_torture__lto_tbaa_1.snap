@@ -1,0 +1,88 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/lto-tbaa-1.c" (c, x86_64-unknown-linux-gnu)
+global d : s32i = 0 [external, default, align 4, dso_local]
+global e : s32i = 0 [external, default, align 4, dso_local]
+global b : rec_b = {@e} [external, default, align 8, dso_local]
+global b2 : rec_b = zero [external, default, align 8, dso_local]
+global ptr : s32i** = @b2 [external, default, align 8, dso_local]
+global a : rec_a* = #cir.ptr<null> [external, default, align 8, dso_local]
+global b3 : rec_b = zero [external, default, align 8, dso_local]
+global c : rec_c* = #cir.ptr<null> [external, default, align 8, dso_local]
+
+fn use_a(%arg3: rec_a*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: rec_a*):
+        %32 = alloca rec_a*, "a", align 8
+        store %arg3, %32
+        return
+}
+fn set_b(%arg2: s32i**) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i**):
+        %29 = alloca s32i**, "a", align 8
+        store %arg2, %29
+        %30 = get_global @d : s32i*
+        %31 = load %29 : s32i**, align 8
+        store %30, %31, align 8
+        return
+}
+fn use_c(%arg1: rec_c*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: rec_c*):
+        %28 = alloca rec_c*, "a", align 8
+        store %arg1, %28
+        return
+}
+fn retme(%arg0: s32i**) -> s32i** [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i**):
+        %24 = alloca s32i**, "val", align 8
+        %25 = alloca s32i**, "__retval", align 8
+        store %arg0, %24
+        %26 = load %24 : s32i**, align 8
+        store %26, %25
+        %27 = load %25 : s32i**
+        return %27
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const #cir.ptr<null> : rec_a*
+    %3 = get_global @a : rec_a**
+    store %2, %3, align 8
+    %4 = get_global @e : s32i*
+    %5 = get_global @b : rec_b*
+    %6 = get_member %5[0] "b" : s32i**
+    store %4, %6, align 8
+    %7 = get_global @b : rec_b*
+    %8 = get_member %7[0] "b" : s32i**
+    %9 = call @retme(%8) : s32i** [all]
+    %10 = get_global @ptr : s32i***
+    store %9, %10, align 8
+    %11 = get_global @ptr : s32i***
+    %12 = load %11 : s32i**, align 8
+    call @set_b(%12) [all]
+    %13 = get_global @b3 : rec_b*
+    %14 = get_global @b : rec_b*
+    copy %13, %14
+    scope {
+        %19 = get_global @b3 : rec_b*
+        %20 = get_member %19[0] "b" : s32i**
+        %21 = load %20 : s32i*, align 8
+        %22 = get_global @d : s32i*
+        %23 = cmp ne %21, %22 : bool
+        if %23 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %15 = const #cir.ptr<null> : rec_c*
+    %16 = get_global @c : rec_c**
+    store %15, %16, align 8
+    %17 = const 0 : s32i
+    store %17, %0
+    %18 = load %0 : s32i
+    return %18
+}

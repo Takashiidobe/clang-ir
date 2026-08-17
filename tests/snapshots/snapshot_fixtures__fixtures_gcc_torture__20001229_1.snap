@@ -1,0 +1,41 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20001229-1.c" (c, x86_64-unknown-linux-gnu)
+global __const.showinfo.tty : s8i[38] = "/dev/" [cir_private, default, dso_local, constant]
+global __const.showinfo.uname : s8i[33] = zero [cir_private, default, dso_local, constant]
+
+fn foo(%arg0: s8i*, %arg1: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i*, %arg1: s8i*):
+        %12 = alloca s8i*, "a", align 8
+        %13 = alloca s8i*, "b", align 8
+        store %arg0, %12
+        store %arg1, %13
+        return
+}
+fn showinfo() -> void [external, c, no_inline, dso_local, nothrow] {
+    %6 = alloca s8i[33], "uname", align 16
+    %7 = alloca s8i[38], "tty", align 16
+    %8 = get_global @__const.showinfo.uname : s8i[33]*
+    copy %6, %8
+    %9 = get_global @__const.showinfo.tty : s8i[38]*
+    copy %7, %9
+    %10 = cast(array_to_ptrdecay) %6 : s8i*
+    %11 = cast(array_to_ptrdecay) %7 : s8i*
+    call @foo(%10, %11) [all]
+    return
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @showinfo : (() -> void)*
+    call @showinfo() [all]
+    %3 = get_global @exit : ((s32i) -> void)*
+    %4 = const 0 : s32i
+    call @exit(%4) [all]
+    %5 = load %0 : s32i
+    return %5
+}

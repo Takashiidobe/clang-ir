@@ -1,0 +1,106 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/990524-1.c" (c, x86_64-unknown-linux-gnu)
+global a : s8i[6] = "12345" [external, default, align 1, dso_local]
+global b : s8i[6] = "12345" [external, default, align 1, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn loop(%arg0: s8i*, %arg1: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i*, %arg1: s8i*):
+        %9 = alloca s8i*, "pz", align 8
+        %10 = alloca s8i*, "pzDta", align 8
+        store %arg0, %9
+        store %arg1, %10
+        scope {
+            for cond: {
+                %40 = const #true : bool
+                condition %40
+            } step: {
+                yield
+            } do {
+                scope {
+                    scope {
+                        %21 = load %10 : s8i*, align 8
+                        %22 = const 1 : s32i
+                        %23 = ptr_stride %21, %22 : s8i*
+                        store %23, %10, align 8
+                        %24 = load %21 : s8i, align 1
+                        %25 = load %9 : s8i*, align 8
+                        %26 = const 1 : s32i
+                        %27 = ptr_stride %25, %26 : s8i*
+                        store %27, %9, align 8
+                        store %24, %25, align 1
+                        %28 = cast(integral) %24 : s32i
+                        switch %28 {
+                            case equal 0 {
+                                goto loopDone2
+                            }
+                            case equal 34 {
+                                yield
+                            }
+                            case equal 92 {
+                                %29 = const 92 : s8i
+                                %30 = const -1 : s64i
+                                %31 = load %9 : s8i*, align 8
+                                %32 = ptr_stride %31, %30 : s8i*
+                                store %29, %32, align 1
+                                %33 = const -1 : s64i
+                                %34 = load %10 : s8i*, align 8
+                                %35 = ptr_stride %34, %33 : s8i*
+                                %36 = load %35 : s8i, align 1
+                                %37 = load %9 : s8i*, align 8
+                                %38 = const 1 : s32i
+                                %39 = ptr_stride %37, %38 : s8i*
+                                store %39, %9, align 8
+                                store %36, %37, align 1
+                                yield
+                            }
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        br ^bb1
+    ^bb1():
+        label loopDone2:
+        scope {
+            %11 = get_global @a : s8i[6]*
+            %12 = cast(array_to_ptrdecay) %11 : s8i*
+            %13 = load %9 : s8i*, align 8
+            %14 = ptr_diff %12, %13 : s64i
+            %15 = get_global @b : s8i[6]*
+            %16 = cast(array_to_ptrdecay) %15 : s8i*
+            %17 = load %10 : s8i*, align 8
+            %18 = ptr_diff %16, %17 : s64i
+            %19 = cmp ne %14, %18 : bool
+            if %19 {
+                %20 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @a : s8i[6]*
+    %3 = cast(array_to_ptrdecay) %2 : s8i*
+    %4 = get_global @b : s8i[6]*
+    %5 = cast(array_to_ptrdecay) %4 : s8i*
+    call @loop(%3, %5) [all]
+    %6 = get_global @exit : ((s32i) -> void)*
+    %7 = const 0 : s32i
+    call @exit(%7) [all]
+    %8 = load %0 : s32i
+    return %8
+}

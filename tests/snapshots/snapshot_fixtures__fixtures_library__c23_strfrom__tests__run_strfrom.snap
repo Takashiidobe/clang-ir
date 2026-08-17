@@ -1,0 +1,66 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.library/c23_strfrom/tests/run-strfrom.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.output : s8i[16] = zero [cir_private, default, dso_local, constant]
+
+fn format_pi(%arg0: s8i*, %arg1: u64i) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i[16], "output", align 16
+    %2 = alloca s32i, "written", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_global @__const.main.output : s8i[16]*
+    copy %1, %4
+    %5 = cast(array_to_ptrdecay) %1 : s8i*
+    %6 = const 16 : u64i
+    %7 = call @format_pi(%5, %6) : s32i [all]
+    store %7, %2, align 4
+    %8 = load %2 : s32i, align 4
+    %9 = const 3 : s32i
+    %10 = cmp eq %8, %9 : bool
+    %11 = ternary %10 ? { : bool
+        %33 = const 0 : s64i
+        %34 = get_element %1[%33] : s8i*
+        %35 = load %34 : s8i, align 16
+        %36 = cast(integral) %35 : s32i
+        %37 = const 51 : s32i
+        %38 = cmp eq %36, %37 : bool
+        yield %38
+    } : {
+        %32 = const #false : bool
+        yield %32
+    }
+    %12 = ternary %11 ? { : bool
+        %26 = const 1 : s64i
+        %27 = get_element %1[%26] : s8i*
+        %28 = load %27 : s8i, align 1
+        %29 = cast(integral) %28 : s32i
+        %30 = const 46 : s32i
+        %31 = cmp eq %29, %30 : bool
+        yield %31
+    } : {
+        %25 = const #false : bool
+        yield %25
+    }
+    %13 = ternary %12 ? { : bool
+        %19 = const 2 : s64i
+        %20 = get_element %1[%19] : s8i*
+        %21 = load %20 : s8i, align 2
+        %22 = cast(integral) %21 : s32i
+        %23 = const 53 : s32i
+        %24 = cmp eq %22, %23 : bool
+        yield %24
+    } : {
+        %18 = const #false : bool
+        yield %18
+    }
+    %14 = const 0 : s32i
+    %15 = const 1 : s32i
+    %16 = select %13, %14, %15 : s32i
+    store %16, %0
+    %17 = load %0 : s32i
+    return %17
+}

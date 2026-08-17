@@ -1,0 +1,136 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/conditionals.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn classify(%arg1: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i):
+        %59 = alloca s32i, "n", align 4
+        %60 = alloca s32i, "__retval", align 4
+        store %arg1, %59
+        scope {
+            %62 = load %59 : s32i, align 4
+            %63 = const 0 : s32i
+            %64 = cmp lt %62, %63 : bool
+            if %64 {
+                %72 = const -1 : s32i
+                store %72, %60
+                %73 = load %60 : s32i
+                return %73
+            } else {
+                scope {
+                    %65 = load %59 : s32i, align 4
+                    %66 = const 0 : s32i
+                    %67 = cmp eq %65, %66 : bool
+                    if %67 {
+                        %70 = const 0 : s32i
+                        store %70, %60
+                        %71 = load %60 : s32i
+                        return %71
+                    } else {
+                        %68 = const 1 : s32i
+                        store %68, %60
+                        %69 = load %60 : s32i
+                        return %69
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %61 = load %60 : s32i
+        return %61
+}
+fn clamp_low(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %49 = alloca s32i, "n", align 4
+        %50 = alloca s32i, "__retval", align 4
+        %51 = alloca s32i, "r", align 4
+        store %arg0, %49
+        %52 = load %49 : s32i, align 4
+        store %52, %51, align 4
+        scope {
+            %55 = load %49 : s32i, align 4
+            %56 = const 10 : s32i
+            %57 = cmp lt %55, %56 : bool
+            if %57 {
+                %58 = const 10 : s32i
+                store %58, %51, align 4
+                yield
+            }
+            yield
+        }
+        %53 = load %51 : s32i, align 4
+        store %53, %50
+        %54 = load %50 : s32i
+        return %54
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "x", align 4
+    %2 = alloca s32i, "label", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %5 = get_global @.str : s8i[4]*
+    %6 = cast(array_to_ptrdecay) %5 : s8i*
+    %7 = const -5 : s32i
+    %8 = call @classify(%7) : s32i [all]
+    %9 = call @printf(%6, %8) : s32i [all]
+    %10 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %11 = get_global @.str : s8i[4]*
+    %12 = cast(array_to_ptrdecay) %11 : s8i*
+    %13 = const 0 : s32i
+    %14 = call @classify(%13) : s32i [all]
+    %15 = call @printf(%12, %14) : s32i [all]
+    %16 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %17 = get_global @.str : s8i[4]*
+    %18 = cast(array_to_ptrdecay) %17 : s8i*
+    %19 = const 42 : s32i
+    %20 = call @classify(%19) : s32i [all]
+    %21 = call @printf(%18, %20) : s32i [all]
+    %22 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %23 = get_global @.str : s8i[4]*
+    %24 = cast(array_to_ptrdecay) %23 : s8i*
+    %25 = const 3 : s32i
+    %26 = call @clamp_low(%25) : s32i [all]
+    %27 = call @printf(%24, %26) : s32i [all]
+    %28 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %29 = get_global @.str : s8i[4]*
+    %30 = cast(array_to_ptrdecay) %29 : s8i*
+    %31 = const 20 : s32i
+    %32 = call @clamp_low(%31) : s32i [all]
+    %33 = call @printf(%30, %32) : s32i [all]
+    %34 = const 7 : s32i
+    store %34, %1, align 4
+    scope {
+        %42 = load %1 : s32i, align 4
+        %43 = const 2 : s32i
+        %44 = rem %42, %43 : s32i
+        %45 = const 0 : s32i
+        %46 = cmp eq %44, %45 : bool
+        if %46 {
+            %48 = const 100 : s32i
+            store %48, %2, align 4
+            yield
+        } else {
+            %47 = const 200 : s32i
+            store %47, %2, align 4
+            yield
+        }
+        yield
+    }
+    %35 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %36 = get_global @.str : s8i[4]*
+    %37 = cast(array_to_ptrdecay) %36 : s8i*
+    %38 = load %2 : s32i, align 4
+    %39 = call @printf(%37, %38) : s32i [all]
+    %40 = const 0 : s32i
+    store %40, %0
+    %41 = load %0 : s32i
+    return %41
+}

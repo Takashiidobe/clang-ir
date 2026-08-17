@@ -1,0 +1,25 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.library/hidden_visibility_callback/src/user.c" (c, x86_64-unknown-linux-gnu)
+fn set_handler(%arg0: rec_Parser*, %arg1: ((s32i, s32i) -> s32i)*) -> void [external, c];
+fn add_ignore_b(%arg0: s32i, %arg1: s32i) -> s32i [external, c];
+fn use_it(%arg0: rec_Parser*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_Parser*):
+        %0 = alloca rec_Parser*, "p", align 8
+        %1 = alloca s32i, "__retval", align 4
+        store %arg0, %0
+        %2 = load %0 : rec_Parser*, align 8
+        %3 = get_global @add_ignore_b : ((s32i, s32i) -> s32i)*
+        call @set_handler(%2, %3) [all]
+        %4 = load %0 : rec_Parser*, align 8
+        %5 = get_member %4[0] "handler" : ((s32i, s32i) -> s32i)**
+        %6 = load %5 : ((s32i, s32i) -> s32i)*, align 8
+        %7 = const 5 : s32i
+        %8 = const 99 : s32i
+        %9 = call %6(%7, %8) : s32i [all]
+        store %9, %1
+        %10 = load %1 : s32i
+        return %10
+}

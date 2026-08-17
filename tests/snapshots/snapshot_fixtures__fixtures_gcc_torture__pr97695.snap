@@ -1,0 +1,121 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr97695.c" (c, x86_64-unknown-linux-gnu)
+global a : s32i* = #cir.ptr<null> [external, default, align 8, dso_local]
+global c : s32i** = @a [external, default, align 8, dso_local]
+global d : s32i = 0 [external, default, align 4, dso_local]
+global b : s32i = 0 [external, default, align 4, dso_local]
+global e : s32i = 0 [external, default, align 4, dso_local]
+
+fn f(%arg1: s32i, %arg2: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i, %arg2: s32i):
+        %31 = alloca s32i, "g", align 4
+        %32 = alloca s32i, "h", align 4
+        %33 = alloca s32i, "__retval", align 4
+        store %arg1, %31
+        store %arg2, %32
+        %34 = load %32 : s32i, align 4
+        %35 = cast(int_to_bool) %34 : bool
+        %36 = not %35 : bool
+        %37 = ternary %36 ? { : bool
+            %51 = const #true : bool
+            yield %51
+        } : {
+            %44 = load %31 : s32i, align 4
+            %45 = cast(int_to_bool) %44 : bool
+            %46 = ternary %45 ? { : bool
+                %48 = load %32 : s32i, align 4
+                %49 = const 1 : s32i
+                %50 = cmp eq %48, %49 : bool
+                yield %50
+            } : {
+                %47 = const #false : bool
+                yield %47
+            }
+            yield %46
+        }
+        %38 = ternary %37 ? { : s32i
+            %43 = const 0 : s32i
+            yield %43
+        } : {
+            %40 = load %31 : s32i, align 4
+            %41 = load %32 : s32i, align 4
+            %42 = div %40, %41 : s32i
+            yield %42
+        }
+        store %38, %33
+        %39 = load %33 : s32i
+        return %39
+}
+fn i(%arg0: s32i) -> void* [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %13 = alloca s32i, "g", align 4
+        %14 = alloca void*, "__retval", align 8
+        store %arg0, %13
+        scope {
+            while {
+                %27 = get_global @e : s32i*
+                %28 = load %27 : s32i, align 4
+                %29 = const 2 : s32i
+                %30 = cmp lt %28, %29 : bool
+                condition %30
+            } do {
+                scope {
+                    %17 = load %13 : s32i, align 4
+                    %18 = const 9 : s32i
+                    %19 = call @f(%17, %18) : s32i [all]
+                    %20 = cast(int_to_bool) %19 : bool
+                    %21 = not %20 : bool
+                    if %21 {
+                        scope {
+                            while {
+                                %24 = get_global @b : s32i*
+                                %25 = load %24 : s32i, align 4
+                                %26 = cast(int_to_bool) %25 : bool
+                                condition %26
+                            } do {
+                                yield
+                            }
+                            yield
+                        }
+                        %22 = const #cir.ptr<null> : void*
+                        store %22, %14
+                        %23 = load %14 : void*
+                        return %23
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %15 = const #cir.ptr<null> : void*
+        store %15, %14
+        %16 = load %14 : void*
+        return %16
+}
+fn j() -> void [external, c, no_inline, dso_local, nothrow] {
+    %5 = const 1 : s32i
+    %6 = call @i(%5) : void* [all]
+    %7 = get_global @d : s32i*
+    %8 = load %7 : s32i, align 4
+    %9 = call @i(%8) : void* [all]
+    %10 = cast(bitcast) %9 : s32i*
+    %11 = get_global @c : s32i***
+    %12 = load %11 : s32i**, align 8
+    store %10, %12, align 8
+    return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @j : (() -> void)*
+    call @j() [all]
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

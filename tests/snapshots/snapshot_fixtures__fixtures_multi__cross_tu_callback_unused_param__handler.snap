@@ -1,0 +1,39 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.multi/cross_tu_callback_unused_param/handler.c" (c, x86_64-unknown-linux-gnu)
+fn add_ignore_b(%arg3: s32i, %arg4: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: s32i, %arg4: s32i):
+        %11 = alloca s32i, "a", align 4
+        %12 = alloca s32i, "b", align 4
+        %13 = alloca s32i, "__retval", align 4
+        store %arg3, %11
+        store %arg4, %12
+        %14 = load %12 : s32i, align 4
+        %15 = load %11 : s32i, align 4
+        %16 = const 1 : s32i
+        %17 = add %15, %16 : s32i [nsw]
+        store %17, %13
+        %18 = load %13 : s32i
+        return %18
+}
+fn call_handler(%arg0: rec_Callback*, %arg1: s32i, %arg2: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_Callback*, %arg1: s32i, %arg2: s32i):
+        %0 = alloca rec_Callback*, "cb", align 8
+        %1 = alloca s32i, "a", align 4
+        %2 = alloca s32i, "b", align 4
+        %3 = alloca s32i, "__retval", align 4
+        store %arg0, %0
+        store %arg1, %1
+        store %arg2, %2
+        %4 = load %0 : rec_Callback*, align 8
+        %5 = get_member %4[0] "handler" : ((s32i, s32i) -> s32i)**
+        %6 = load %5 : ((s32i, s32i) -> s32i)*, align 8
+        %7 = load %1 : s32i, align 4
+        %8 = load %2 : s32i, align 4
+        %9 = call %6(%7, %8) : s32i [all]
+        store %9, %3
+        %10 = load %3 : s32i
+        return %10
+}

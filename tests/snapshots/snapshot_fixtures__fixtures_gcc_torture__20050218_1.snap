@@ -1,0 +1,127 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20050218-1.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[2] = "a" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[3] = "bc" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[3] = "de" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[4] = "fgh" [cir_private, default, align 1, dso_local, constant]
+global a : s8i*[16] = [@.str, @.str.1, @.str.2, @.str.3] [external, default, align 16, dso_local]
+global .str.4 : s8i[6] = "abcde" [cir_private, default, align 1, dso_local, constant]
+
+fn strncmp(%arg0: s8i*, %arg1: s8i*, %arg2: u64i) -> s32i [external, c, nothrow];
+fn strlen(%arg0: s8i*) -> u64i [external, c, nothrow];
+fn foo(%arg0: s8i*, %arg1: s8i*, %arg2: u64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i*, %arg1: s8i*, %arg2: u64i):
+        %12 = alloca s8i*, "x", align 8
+        %13 = alloca s8i*, "y", align 8
+        %14 = alloca u64i, "n", align 8
+        %15 = alloca s32i, "__retval", align 4
+        %16 = alloca u64i, "i", align 8
+        %17 = alloca u64i, "j", align 8
+        store %arg0, %12
+        store %arg1, %13
+        store %arg2, %14
+        %18 = const 0 : u64i
+        store %18, %17, align 8
+        scope {
+            %21 = const 0 : u64i
+            store %21, %16, align 8
+            for cond: {
+                %58 = load %16 : u64i, align 8
+                %59 = load %14 : u64i, align 8
+                %60 = cmp lt %58, %59 : bool
+                condition %60
+            } step: {
+                %22 = load %16 : u64i, align 8
+                %23 = inc %22 : u64i
+                store %23, %16, align 8
+                yield
+            } do {
+                scope {
+                    scope {
+                        %39 = get_global @strncmp : ((s8i*, s8i*, u64i) -> s32i)*
+                        %40 = load %12 : s8i*, align 8
+                        %41 = load %17 : u64i, align 8
+                        %42 = ptr_stride %40, %41 : s8i*
+                        %43 = load %16 : u64i, align 8
+                        %44 = get_global @a : s8i*[16]*
+                        %45 = get_element %44[%43] : s8i**
+                        %46 = load %45 : s8i*, align 8
+                        %47 = get_global @strlen : ((s8i*) -> u64i)*
+                        %48 = load %16 : u64i, align 8
+                        %49 = get_global @a : s8i*[16]*
+                        %50 = get_element %49[%48] : s8i**
+                        %51 = load %50 : s8i*, align 8
+                        %52 = call @strlen(%51) : u64i [all]
+                        %53 = call @strncmp(%42, %46, %52) : s32i [all]
+                        %54 = const 0 : s32i
+                        %55 = cmp ne %53, %54 : bool
+                        if %55 {
+                            %56 = const 2 : s32i
+                            store %56, %15
+                            %57 = load %15 : s32i
+                            return %57
+                        }
+                        yield
+                    }
+                    %24 = get_global @strlen : ((s8i*) -> u64i)*
+                    %25 = load %16 : u64i, align 8
+                    %26 = get_global @a : s8i*[16]*
+                    %27 = get_element %26[%25] : s8i**
+                    %28 = load %27 : s8i*, align 8
+                    %29 = call @strlen(%28) : u64i [all]
+                    %30 = load %17 : u64i, align 8
+                    %31 = add %30, %29 : u64i
+                    store %31, %17, align 8
+                    scope {
+                        %32 = load %13 : s8i*, align 8
+                        %33 = cast(ptr_to_bool) %32 : bool
+                        if %33 {
+                            %34 = get_global @strlen : ((s8i*) -> u64i)*
+                            %35 = load %13 : s8i*, align 8
+                            %36 = call @strlen(%35) : u64i [all]
+                            %37 = load %17 : u64i, align 8
+                            %38 = add %37, %36 : u64i
+                            store %38, %17, align 8
+                            yield
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %19 = const 0 : s32i
+        store %19, %15
+        %20 = load %15 : s32i
+        return %20
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = get_global @.str.4 : s8i[6]*
+        %5 = cast(array_to_ptrdecay) %4 : s8i*
+        %6 = const #cir.ptr<null> : s8i*
+        %7 = const 3 : u64i
+        %8 = call @foo(%5, %6, %7) : s32i [all]
+        %9 = const 0 : s32i
+        %10 = cmp ne %8, %9 : bool
+        if %10 {
+            %11 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

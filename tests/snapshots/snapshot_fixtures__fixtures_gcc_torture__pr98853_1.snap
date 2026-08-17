@@ -1,0 +1,56 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr98853-1.c" (c, x86_64-unknown-linux-gnu)
+fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
+fn foo(%arg0: u32i, %arg1: u64i, %arg2: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i, %arg1: u64i, %arg2: u64i):
+        %10 = alloca u32i, "x", align 4
+        %11 = alloca u64i, "y", align 8
+        %12 = alloca u64i, "z", align 8
+        %13 = alloca u64i, "__retval", align 8
+        store %arg0, %10
+        store %arg1, %11
+        store %arg2, %12
+        %14 = const 2 : s32i
+        %15 = cast(bitcast) %10 : s8i*
+        %16 = ptr_stride %15, %14 : s8i*
+        %17 = cast(bitcast) %16 : void*
+        %18 = const 2 : s32i
+        %19 = cast(bitcast) %11 : s8i*
+        %20 = ptr_stride %19, %18 : s8i*
+        %21 = cast(bitcast) %20 : void*
+        %22 = const 2 : u64i
+        %23 = call @memcpy(%17, %21, %22) : void* [all]
+        %24 = load %10 : u32i, align 4
+        %25 = cast(integral) %24 : u64i
+        %26 = load %12 : u64i, align 8
+        %27 = add %25, %26 : u64i
+        store %27, %13
+        %28 = load %13 : u64i
+        return %28
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = const 1145324612 : u32i
+        %5 = const 1229782938247303441 : u64i
+        %6 = const 2459565876494606882 : u64i
+        %7 = call @foo(%4, %5, %6) : u64i [all]
+        %8 = const 2459565876780951142 : u64i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

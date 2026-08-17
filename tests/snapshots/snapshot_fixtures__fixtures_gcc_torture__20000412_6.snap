@@ -1,0 +1,80 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20000412-6.c" (c, x86_64-unknown-linux-gnu)
+global buf : u16i[5] = [1, 4, 16, 64, 256] [external, default, align 2, dso_local]
+
+fn bug(%arg0: u16i, %arg1: u16i*, %arg2: u16i*) -> u32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u16i, %arg1: u16i*, %arg2: u16i*):
+        %16 = alloca u16i, "value", align 2
+        %17 = alloca u16i*, "buffer", align 8
+        %18 = alloca u16i*, "bufend", align 8
+        %19 = alloca u32i, "__retval", align 4
+        %20 = alloca u16i*, "tmp", align 8
+        store %arg0, %16
+        store %arg1, %17
+        store %arg2, %18
+        scope {
+            %24 = load %17 : u16i*, align 8
+            store %24, %20, align 8
+            for cond: {
+                %35 = load %20 : u16i*, align 8
+                %36 = load %18 : u16i*, align 8
+                %37 = cmp lt %35, %36 : bool
+                condition %37
+            } step: {
+                %25 = load %20 : u16i*, align 8
+                %26 = const 1 : s32i
+                %27 = ptr_stride %25, %26 : u16i*
+                store %27, %20, align 8
+                yield
+            } do {
+                %28 = load %20 : u16i*, align 8
+                %29 = load %28 : u16i, align 2
+                %30 = cast(integral) %29 : s32i
+                %31 = load %16 : u16i, align 2
+                %32 = cast(integral) %31 : s32i
+                %33 = sub %32, %30 : s32i [nsw]
+                %34 = cast(integral) %33 : u16i
+                store %34, %16, align 2
+                yield
+            }
+            yield
+        }
+        %21 = load %16 : u16i, align 2
+        %22 = cast(integral) %21 : u32i
+        store %22, %19
+        %23 = load %19 : u32i
+        return %23
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %5 = const 512 : u16i
+        %6 = get_global @buf : u16i[5]*
+        %7 = cast(array_to_ptrdecay) %6 : u16i*
+        %8 = get_global @buf : u16i[5]*
+        %9 = cast(array_to_ptrdecay) %8 : u16i*
+        %10 = const 3 : s32i
+        %11 = ptr_stride %9, %10 : u16i*
+        %12 = call @bug(%5, %7, %11) : u32i [all]
+        %13 = const 491 : u32i
+        %14 = cmp ne %12, %13 : bool
+        if %14 {
+            %15 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

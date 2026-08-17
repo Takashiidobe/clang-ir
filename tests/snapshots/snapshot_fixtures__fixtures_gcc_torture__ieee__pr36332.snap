@@ -1,0 +1,38 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/ieee__pr36332.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: long_double<f80>) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: long_double<f80>):
+        %7 = alloca long_double<f80>, "ld", align 16
+        %8 = alloca s32i, "__retval", align 4
+        store %arg0, %7
+        %9 = load %7 : long_double<f80>, align 16
+        %10 = const 0x7FFF8000000000000000 : long_double<f80>
+        %11 = cmp eq %9, %10 : bool
+        %12 = cast(bool_to_int) %11 : s32i
+        store %12, %8
+        %13 = load %8 : s32i
+        return %13
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = const 1.18973149535723176502E+4932 : long_double<f80>
+        %5 = call @foo(%4) : s32i [all]
+        %6 = cast(int_to_bool) %5 : bool
+        if %6 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

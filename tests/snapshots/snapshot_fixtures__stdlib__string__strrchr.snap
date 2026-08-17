@@ -1,0 +1,49 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/string/strrchr.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[6] = "hello" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[12] = "%ld %ld %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn strrchr(%arg0: s8i*, %arg1: s32i) -> s8i* [external, c, pure, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i*, "v", align 8
+    %2 = alloca s8i*, "s", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_global @.str : s8i[6]*
+    %5 = cast(array_to_ptrdecay) %4 : s8i*
+    store %5, %1, align 8, volatile
+    %6 = load %1 : s8i*, align 8, volatile
+    store %6, %2, align 8
+    %7 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %8 = get_global @.str.1 : s8i[12]*
+    %9 = cast(array_to_ptrdecay) %8 : s8i*
+    %10 = get_global @strrchr : ((s8i*, s32i) -> s8i*)*
+    %11 = load %2 : s8i*, align 8
+    %12 = const 108 : s32i
+    %13 = call @strrchr(%11, %12) : s8i* [pure]
+    %14 = load %2 : s8i*, align 8
+    %15 = ptr_diff %13, %14 : s64i
+    %16 = get_global @strrchr : ((s8i*, s32i) -> s8i*)*
+    %17 = load %2 : s8i*, align 8
+    %18 = const 0 : s32i
+    %19 = call @strrchr(%17, %18) : s8i* [pure]
+    %20 = load %2 : s8i*, align 8
+    %21 = ptr_diff %19, %20 : s64i
+    %22 = get_global @strrchr : ((s8i*, s32i) -> s8i*)*
+    %23 = load %2 : s8i*, align 8
+    %24 = const 122 : s32i
+    %25 = call @strrchr(%23, %24) : s8i* [pure]
+    %26 = const #cir.ptr<null> : s8i*
+    %27 = cmp eq %25, %26 : bool
+    %28 = cast(bool_to_int) %27 : s32i
+    %29 = call @printf(%9, %15, %21, %28) : s32i [all]
+    %30 = const 0 : s32i
+    store %30, %0
+    %31 = load %0 : s32i
+    return %31
+}

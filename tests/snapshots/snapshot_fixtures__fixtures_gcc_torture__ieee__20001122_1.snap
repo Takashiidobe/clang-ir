@@ -1,0 +1,69 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/ieee__20001122-1.c" (c, x86_64-unknown-linux-gnu)
+global p : double* = #cir.ptr<null> [external, default, align 8, dso_local]
+global a : double = 0.000000e+00 [external, default, align 8, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca double, "c", align 8
+    %2 = alloca double, "d", align 8
+    %3 = alloca double, "b", align 8
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 1.000000e+00 : double
+    store %5, %2, align 8
+    %6 = get_global @p : double**
+    store %3, %6, align 8
+    scope {
+        do {
+            scope {
+                %22 = load %2 : double, align 8
+                store %22, %1, align 8
+                %23 = load %1 : double, align 8
+                %24 = const 5.000000e-01 : double
+                %25 = fmul %23, %24 : double
+                store %25, %2, align 8
+                %26 = const 1 : s32i
+                %27 = cast(int_to_float) %26 : double
+                %28 = load %2 : double, align 8
+                %29 = fadd %27, %28 : double
+                store %29, %3, align 8, volatile
+                yield
+            }
+            yield
+        } while {
+            %19 = load %3 : double, align 8, volatile
+            %20 = const 1.000000e+00 : double
+            %21 = cmp ne %19, %20 : bool
+            condition %21
+        }
+        yield
+    }
+    %7 = const 1.000000e+00 : double
+    %8 = load %1 : double, align 8
+    %9 = fadd %7, %8 : double
+    %10 = get_global @a : double*
+    store %9, %10, align 8, volatile
+    scope {
+        %14 = get_global @a : double*
+        %15 = load %14 : double, align 8, volatile
+        %16 = const 1.000000e+00 : double
+        %17 = cmp eq %15, %16 : bool
+        if %17 {
+            %18 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %11 = get_global @exit : ((s32i) -> void)*
+    %12 = const 0 : s32i
+    call @exit(%12) [all]
+    %13 = load %0 : s32i
+    return %13
+}

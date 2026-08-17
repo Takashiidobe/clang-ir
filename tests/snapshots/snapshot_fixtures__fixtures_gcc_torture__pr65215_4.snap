@@ -1,0 +1,107 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr65215-4.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg1: u32i) -> u32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: u32i):
+        %40 = alloca u32i, "x", align 4
+        %41 = alloca u32i, "__retval", align 4
+        store %arg1, %40
+        %42 = load %40 : u32i, align 4
+        %43 = const 24 : s32i
+        %44 = shift right %42, %43 : u32i
+        %45 = load %40 : u32i, align 4
+        %46 = const 8 : s32i
+        %47 = shift right %45, %46 : u32i
+        %48 = const 65280 : u32i
+        %49 = and %47, %48 : u32i
+        %50 = or %44, %49 : u32i
+        %51 = load %40 : u32i, align 4
+        %52 = const 8 : s32i
+        %53 = shift left %51, %52 : u32i
+        %54 = const 16711680 : u32i
+        %55 = and %53, %54 : u32i
+        %56 = or %50, %55 : u32i
+        %57 = load %40 : u32i, align 4
+        %58 = const 24 : s32i
+        %59 = shift left %57, %58 : u32i
+        %60 = or %56, %59 : u32i
+        store %60, %41
+        %61 = load %41 : u32i
+        return %61
+}
+fn bar(%arg0: rec_S*) -> u32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_S*):
+        %32 = alloca rec_S*, "x", align 8
+        %33 = alloca u32i, "__retval", align 4
+        store %arg0, %32
+        %34 = load %32 : rec_S*, align 8
+        %35 = get_member %34[0] "l1" : u64i*
+        <unmodeled: cir.get_bitfield>
+        %37 = cast(integral) %36 : u32i
+        %38 = call @foo(%37) : u32i [all]
+        store %38, %33
+        %39 = load %33 : u32i
+        return %39
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_S, "s", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    scope {
+        %17 = const 8 : s32i
+        %18 = const 8 : s32i
+        %19 = cmp ne %17, %18 : bool
+        %20 = ternary %19 ? { : bool
+            %31 = const #true : bool
+            yield %31
+        } : {
+            %28 = const 4 : u64i
+            %29 = const 4 : u64i
+            %30 = cmp ne %28, %29 : bool
+            yield %30
+        }
+        %21 = ternary %20 ? { : bool
+            %27 = const #true : bool
+            yield %27
+        } : {
+            %24 = const 8 : u64i
+            %25 = const 8 : u64i
+            %26 = cmp ne %24, %25 : bool
+            yield %26
+        }
+        if %21 {
+            %22 = const 0 : s32i
+            store %22, %0
+            %23 = load %0 : s32i
+            return %23
+        }
+        yield
+    }
+    %3 = const 3735928559 : u32i
+    %4 = call @foo(%3) : u32i [all]
+    %5 = cast(integral) %4 : u64i
+    %6 = const 65261 : u64i
+    %7 = const 32 : s32i
+    %8 = shift left %6, %7 : u64i
+    %9 = or %5, %8 : u64i
+    %10 = get_member %1[0] "l1" : u64i*
+    <unmodeled: cir.set_bitfield>
+    scope {
+        %14 = call @bar(%1) : u32i [all]
+        %15 = const 3735928559 : u32i
+        %16 = cmp ne %14, %15 : bool
+        if %16 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %12 = const 0 : s32i
+    store %12, %0
+    %13 = load %0 : s32i
+    return %13
+}

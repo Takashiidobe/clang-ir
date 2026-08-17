@@ -1,0 +1,190 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/long_double_f80_arithmetic.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.near_bits : u8i[10] = [1, 0, 0, 0, 0, 0, 0, 128, 255, 63] [cir_private, default, dso_local, constant]
+global __const.main.two_bits : u8i[10] = [0, 0, 0, 0, 0, 0, 0, 128, 0, 64] [cir_private, default, dso_local, constant]
+global __const.main.one_bits : u8i[10] = [0, 0, 0, 0, 0, 0, 0, 128, 255, 63] [cir_private, default, dso_local, constant]
+global .str : s8i[4] = "add" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[4] = "sub" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[4] = "mul" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[4] = "div" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[4] = "neg" [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[13] = "%d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.7 : s8i[9] = "from_i64" [cir_private, default, align 1, dso_local, constant]
+global .str.8 : s8i[3] = "%s" [cir_private, default, align 1, dso_local, constant]
+global .str.9 : s8i[5] = "%02x" [cir_private, default, align 1, dso_local, constant]
+global .str.10 : s8i[2] = "\n" [cir_private, default, align 1, dso_local, constant]
+
+fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
+fn load80(%arg2: u8i*) -> long_double<f80> [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: u8i*):
+        %116 = alloca u8i*, "bytes", align 8
+        %117 = alloca long_double<f80>, "__retval", align 16
+        %118 = alloca long_double<f80>, "value", align 16
+        store %arg2, %116
+        %119 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %120 = cast(bitcast) %118 : void*
+        %121 = load %116 : u8i*, align 8
+        %122 = cast(bitcast) %121 : void*
+        %123 = const 10 : u64i
+        %124 = call @memcpy(%120, %122, %123) : void* [all]
+        %125 = load %118 : long_double<f80>, align 16
+        store %125, %117
+        %126 = load %117 : long_double<f80>
+        return %126
+}
+fn dump80(%arg0: s8i*, %arg1: long_double<f80>) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i*, %arg1: long_double<f80>):
+        %82 = alloca s8i*, "name", align 8
+        %83 = alloca long_double<f80>, "value", align 16
+        %84 = alloca u8i[10], "bytes", align 1
+        store %arg0, %82
+        store %arg1, %83
+        %85 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %86 = cast(array_to_ptrdecay) %84 : u8i*
+        %87 = cast(bitcast) %86 : void*
+        %88 = cast(bitcast) %83 : void*
+        %89 = const 10 : u64i
+        %90 = call @memcpy(%87, %88, %89) : void* [all]
+        %91 = get_global @printf : ((s8i*, ...) -> s32i)*
+        %92 = get_global @.str.8 : s8i[3]*
+        %93 = cast(array_to_ptrdecay) %92 : s8i*
+        %94 = load %82 : s8i*, align 8
+        %95 = call @printf(%93, %94) : s32i [all]
+        scope {
+            %100 = alloca s32i, "i", align 4
+            %101 = const 0 : s32i
+            store %101, %100, align 4
+            for cond: {
+                %113 = load %100 : s32i, align 4
+                %114 = const 10 : s32i
+                %115 = cmp lt %113, %114 : bool
+                condition %115
+            } step: {
+                %102 = load %100 : s32i, align 4
+                %103 = inc %102 : s32i [nsw]
+                store %103, %100, align 4
+                yield
+            } do {
+                %104 = get_global @printf : ((s8i*, ...) -> s32i)*
+                %105 = get_global @.str.9 : s8i[5]*
+                %106 = cast(array_to_ptrdecay) %105 : s8i*
+                %107 = load %100 : s32i, align 4
+                %108 = cast(integral) %107 : s64i
+                %109 = get_element %84[%108] : u8i*
+                %110 = load %109 : u8i, align 1
+                %111 = cast(integral) %110 : s32i
+                %112 = call @printf(%106, %111) : s32i [all]
+                yield
+            }
+            yield
+        }
+        %96 = get_global @printf : ((s8i*, ...) -> s32i)*
+        %97 = get_global @.str.10 : s8i[2]*
+        %98 = cast(array_to_ptrdecay) %97 : s8i*
+        %99 = call @printf(%98) : s32i [all]
+        return
+}
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u8i[10], "one_bits", align 1
+    %2 = alloca u8i[10], "two_bits", align 1
+    %3 = alloca u8i[10], "near_bits", align 1
+    %4 = alloca long_double<f80>, "one", align 16
+    %5 = alloca long_double<f80>, "two", align 16
+    %6 = alloca long_double<f80>, "near", align 16
+    %7 = const 0 : s32i
+    store %7, %0
+    %8 = get_global @__const.main.one_bits : u8i[10]*
+    copy %1, %8
+    %9 = get_global @__const.main.two_bits : u8i[10]*
+    copy %2, %9
+    %10 = get_global @__const.main.near_bits : u8i[10]*
+    copy %3, %10
+    %11 = cast(array_to_ptrdecay) %1 : u8i*
+    %12 = call @load80(%11) : long_double<f80> [all]
+    store %12, %4, align 16
+    %13 = cast(array_to_ptrdecay) %2 : u8i*
+    %14 = call @load80(%13) : long_double<f80> [all]
+    store %14, %5, align 16
+    %15 = cast(array_to_ptrdecay) %3 : u8i*
+    %16 = call @load80(%15) : long_double<f80> [all]
+    store %16, %6, align 16
+    %17 = get_global @.str : s8i[4]*
+    %18 = cast(array_to_ptrdecay) %17 : s8i*
+    %19 = load %4 : long_double<f80>, align 16
+    %20 = load %5 : long_double<f80>, align 16
+    %21 = fadd %19, %20 : long_double<f80>
+    call @dump80(%18, %21) [all]
+    %22 = get_global @.str.1 : s8i[4]*
+    %23 = cast(array_to_ptrdecay) %22 : s8i*
+    %24 = load %6 : long_double<f80>, align 16
+    %25 = load %4 : long_double<f80>, align 16
+    %26 = fsub %24, %25 : long_double<f80>
+    call @dump80(%23, %26) [all]
+    %27 = get_global @.str.2 : s8i[4]*
+    %28 = cast(array_to_ptrdecay) %27 : s8i*
+    %29 = load %4 : long_double<f80>, align 16
+    %30 = load %5 : long_double<f80>, align 16
+    %31 = fmul %29, %30 : long_double<f80>
+    call @dump80(%28, %31) [all]
+    %32 = get_global @.str.3 : s8i[4]*
+    %33 = cast(array_to_ptrdecay) %32 : s8i*
+    %34 = load %5 : long_double<f80>, align 16
+    %35 = load %4 : long_double<f80>, align 16
+    %36 = fdiv %34, %35 : long_double<f80>
+    call @dump80(%33, %36) [all]
+    %37 = get_global @.str.4 : s8i[4]*
+    %38 = cast(array_to_ptrdecay) %37 : s8i*
+    %39 = load %6 : long_double<f80>, align 16
+    %40 = fneg %39 : long_double<f80>
+    call @dump80(%38, %40) [all]
+    %41 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %42 = get_global @.str.5 : s8i[13]*
+    %43 = cast(array_to_ptrdecay) %42 : s8i*
+    %44 = load %4 : long_double<f80>, align 16
+    %45 = load %5 : long_double<f80>, align 16
+    %46 = cmp lt %44, %45 : bool
+    %47 = cast(bool_to_int) %46 : s32i
+    %48 = load %6 : long_double<f80>, align 16
+    %49 = load %4 : long_double<f80>, align 16
+    %50 = cmp gt %48, %49 : bool
+    %51 = cast(bool_to_int) %50 : s32i
+    %52 = load %4 : long_double<f80>, align 16
+    %53 = load %4 : long_double<f80>, align 16
+    %54 = cmp eq %52, %53 : bool
+    %55 = cast(bool_to_int) %54 : s32i
+    %56 = load %6 : long_double<f80>, align 16
+    %57 = load %4 : long_double<f80>, align 16
+    %58 = cmp ne %56, %57 : bool
+    %59 = cast(bool_to_int) %58 : s32i
+    %60 = call @printf(%43, %47, %51, %55, %59) : s32i [all]
+    %61 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %62 = get_global @.str.6 : s8i[4]*
+    %63 = cast(array_to_ptrdecay) %62 : s8i*
+    %64 = load %4 : long_double<f80>, align 16
+    %65 = load %5 : long_double<f80>, align 16
+    %66 = fadd %64, %65 : long_double<f80>
+    %67 = cast(float_to_int) %66 : s32i
+    %68 = call @printf(%63, %67) : s32i [all]
+    %69 = get_global @.str.7 : s8i[9]*
+    %70 = cast(array_to_ptrdecay) %69 : s8i*
+    %71 = const 1234567890123 : s64i
+    %72 = cast(int_to_float) %71 : long_double<f80>
+    call @dump80(%70, %72) [all]
+    %73 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %74 = get_global @.str.6 : s8i[4]*
+    %75 = cast(array_to_ptrdecay) %74 : s8i*
+    %76 = const 123456789 : s32i
+    %77 = cast(int_to_float) %76 : long_double<f80>
+    %78 = cast(float_to_int) %77 : s32i
+    %79 = call @printf(%75, %78) : s32i [all]
+    %80 = const 0 : s32i
+    store %80, %0
+    %81 = load %0 : s32i
+    return %81
+}

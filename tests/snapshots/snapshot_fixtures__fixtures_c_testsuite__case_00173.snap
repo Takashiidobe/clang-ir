@@ -1,0 +1,112 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00173.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[6] = "hello" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[4] = "%s\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[8] = "%c: %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[21] = "copied string is %s\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "x", align 4
+    %2 = alloca s8i, "y", align 1
+    %3 = alloca s8i*, "a", align 8
+    %4 = alloca s32i, "c", align 4
+    %5 = alloca s8i*, "b", align 8
+    %6 = alloca s8i[10], "destarray", align 1
+    %7 = alloca s8i*, "dest", align 8
+    %8 = alloca s8i*, "src", align 8
+    %9 = const 0 : s32i
+    store %9, %0
+    %10 = const 97 : s32i
+    store %10, %1, align 4
+    %11 = load %1 : s32i, align 4
+    %12 = cast(integral) %11 : s8i
+    store %12, %2, align 1
+    %13 = get_global @.str : s8i[6]*
+    %14 = cast(array_to_ptrdecay) %13 : s8i*
+    store %14, %3, align 8
+    %15 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %16 = get_global @.str.1 : s8i[4]*
+    %17 = cast(array_to_ptrdecay) %16 : s8i*
+    %18 = load %3 : s8i*, align 8
+    %19 = call @printf(%17, %18) : s32i [all]
+    %20 = load %3 : s8i*, align 8
+    %21 = load %20 : s8i, align 1
+    %22 = cast(integral) %21 : s32i
+    store %22, %4, align 4
+    scope {
+        %47 = load %3 : s8i*, align 8
+        store %47, %5, align 8
+        for cond: {
+            %61 = load %5 : s8i*, align 8
+            %62 = load %61 : s8i, align 1
+            %63 = cast(integral) %62 : s32i
+            %64 = const 0 : s32i
+            %65 = cmp ne %63, %64 : bool
+            condition %65
+        } step: {
+            %48 = load %5 : s8i*, align 8
+            %49 = const 1 : s32i
+            %50 = ptr_stride %48, %49 : s8i*
+            store %50, %5, align 8
+            yield
+        } do {
+            %51 = get_global @printf : ((s8i*, ...) -> s32i)*
+            %52 = get_global @.str.2 : s8i[8]*
+            %53 = cast(array_to_ptrdecay) %52 : s8i*
+            %54 = load %5 : s8i*, align 8
+            %55 = load %54 : s8i, align 1
+            %56 = cast(integral) %55 : s32i
+            %57 = load %5 : s8i*, align 8
+            %58 = load %57 : s8i, align 1
+            %59 = cast(integral) %58 : s32i
+            %60 = call @printf(%53, %56, %59) : s32i [all]
+            yield
+        }
+        yield
+    }
+    %23 = const 0 : s64i
+    %24 = get_element %6[%23] : s8i*
+    store %24, %7, align 8
+    %25 = load %3 : s8i*, align 8
+    store %25, %8, align 8
+    scope {
+        while {
+            %42 = load %8 : s8i*, align 8
+            %43 = load %42 : s8i, align 1
+            %44 = cast(integral) %43 : s32i
+            %45 = const 0 : s32i
+            %46 = cmp ne %44, %45 : bool
+            condition %46
+        } do {
+            %35 = load %8 : s8i*, align 8
+            %36 = const 1 : s32i
+            %37 = ptr_stride %35, %36 : s8i*
+            store %37, %8, align 8
+            %38 = load %35 : s8i, align 1
+            %39 = load %7 : s8i*, align 8
+            %40 = const 1 : s32i
+            %41 = ptr_stride %39, %40 : s8i*
+            store %41, %7, align 8
+            store %38, %39, align 1
+            yield
+        }
+        yield
+    }
+    %26 = const 0 : s8i
+    %27 = load %7 : s8i*, align 8
+    store %26, %27, align 1
+    %28 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %29 = get_global @.str.3 : s8i[21]*
+    %30 = cast(array_to_ptrdecay) %29 : s8i*
+    %31 = cast(array_to_ptrdecay) %6 : s8i*
+    %32 = call @printf(%30, %31) : s32i [all]
+    %33 = const 0 : s32i
+    store %33, %0
+    %34 = load %0 : s32i
+    return %34
+}

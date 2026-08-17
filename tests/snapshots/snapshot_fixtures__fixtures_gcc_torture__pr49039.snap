@@ -1,0 +1,108 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr49039.c" (c, x86_64-unknown-linux-gnu)
+global cnt : s32i = 0 [external, default, align 4, dso_local]
+
+fn foo(%arg0: u32i, %arg1: u32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i, %arg1: u32i):
+        %11 = alloca u32i, "x", align 4
+        %12 = alloca u32i, "y", align 4
+        %13 = alloca u32i, "minv", align 4
+        %14 = alloca u32i, "maxv", align 4
+        store %arg0, %11
+        store %arg1, %12
+        scope {
+            %39 = load %11 : u32i, align 4
+            %40 = const 1 : u32i
+            %41 = cmp eq %39, %40 : bool
+            %42 = ternary %41 ? { : bool
+                %46 = const #true : bool
+                yield %46
+            } : {
+                %43 = load %12 : u32i, align 4
+                %44 = const 4294967294 : u32i
+                %45 = cmp eq %43, %44 : bool
+                yield %45
+            }
+            if %42 {
+                return
+            }
+            yield
+        }
+        %15 = load %11 : u32i, align 4
+        %16 = load %12 : u32i, align 4
+        %17 = cmp lt %15, %16 : bool
+        %18 = ternary %17 ? { : u32i
+            %38 = load %11 : u32i, align 4
+            yield %38
+        } : {
+            %37 = load %12 : u32i, align 4
+            yield %37
+        }
+        store %18, %13, align 4
+        %19 = load %11 : u32i, align 4
+        %20 = load %12 : u32i, align 4
+        %21 = cmp gt %19, %20 : bool
+        %22 = ternary %21 ? { : u32i
+            %36 = load %11 : u32i, align 4
+            yield %36
+        } : {
+            %35 = load %12 : u32i, align 4
+            yield %35
+        }
+        store %22, %14, align 4
+        scope {
+            %29 = load %13 : u32i, align 4
+            %30 = const 1 : u32i
+            %31 = cmp eq %29, %30 : bool
+            if %31 {
+                %32 = get_global @cnt : s32i*
+                %33 = load %32 : s32i, align 4
+                %34 = inc %33 : s32i [nsw]
+                store %34, %32, align 4
+                yield
+            }
+            yield
+        }
+        scope {
+            %23 = load %14 : u32i, align 4
+            %24 = const 4294967294 : u32i
+            %25 = cmp eq %23, %24 : bool
+            if %25 {
+                %26 = get_global @cnt : s32i*
+                %27 = load %26 : s32i, align 4
+                %28 = inc %27 : s32i [nsw]
+                store %28, %26, align 4
+                yield
+            }
+            yield
+        }
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 4294967294 : u32i
+    %3 = const 1 : u32i
+    call @foo(%2, %3) [all]
+    scope {
+        %6 = get_global @cnt : s32i*
+        %7 = load %6 : s32i, align 4
+        %8 = const 2 : s32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            %10 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

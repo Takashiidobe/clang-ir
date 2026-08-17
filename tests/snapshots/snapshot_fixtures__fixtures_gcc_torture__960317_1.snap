@@ -1,0 +1,81 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/960317-1.c" (c, x86_64-unknown-linux-gnu)
+fn f(%arg0: u32i, %arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i, %arg1: s32i):
+        %10 = alloca u32i, "bitcount", align 4
+        %11 = alloca s32i, "mant", align 4
+        %12 = alloca s32i, "__retval", align 4
+        %13 = alloca s32i, "mask", align 4
+        store %arg0, %10
+        store %arg1, %11
+        %14 = const -1 : s32i
+        %15 = load %10 : u32i, align 4
+        %16 = shift left %14, %15 : s32i
+        store %16, %13, align 4
+        scope {
+            scope {
+                %26 = load %11 : s32i, align 4
+                %27 = load %13 : s32i, align 4
+                %28 = minus %27 : s32i [nsw]
+                %29 = and %26, %28 : s32i
+                %30 = cast(int_to_bool) %29 : bool
+                %31 = not %30 : bool
+                if %31 {
+                    goto ab
+                }
+                yield
+            }
+            scope {
+                %21 = load %11 : s32i, align 4
+                %22 = load %13 : s32i, align 4
+                %23 = not %22 : s32i
+                %24 = and %21, %23 : s32i
+                %25 = cast(int_to_bool) %24 : bool
+                if %25 {
+                    goto auf
+                }
+                yield
+            }
+            yield
+        }
+        br ^bb1
+    ^bb1():
+        label ab:
+        %17 = const 0 : s32i
+        store %17, %12
+        %18 = load %12 : s32i
+        return %18
+    ^bb2():
+        label auf:
+        %19 = const 1 : s32i
+        store %19, %12
+        %20 = load %12 : s32i
+        return %20
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %5 = const 0 : u32i
+        %6 = const -1 : s32i
+        %7 = call @f(%5, %6) : s32i [all]
+        %8 = cast(int_to_bool) %7 : bool
+        if %8 {
+            %9 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

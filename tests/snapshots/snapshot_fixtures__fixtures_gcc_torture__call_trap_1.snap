@@ -1,0 +1,33 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/call-trap-1.c" (c, x86_64-unknown-linux-gnu)
+fn exit(%arg0: s32i) -> void [external, c];
+fn foo() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %8 = alloca s32i, "__retval", align 4
+    %9 = get_global @exit : ((s32i) -> void)*
+    %10 = const 0 : s32i
+    call @exit(%10) [all]
+    %11 = const 0 : s32i
+    store %11, %8
+    %12 = load %8 : s32i
+    return %12
+}
+fn bar() -> void [external, c, no_inline, dso_local, nothrow] {
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @bar : (() -> void)*
+    %3 = cast(bitcast) %2 : ((s32i) -> s64i)*
+    %4 = call @foo() : s32i [all]
+    %5 = call %3(%4) : s64i [all]
+    %6 = get_global @abort : (() -> void)*
+    call @abort() [all]
+    %7 = load %0 : s32i
+    return %7
+}

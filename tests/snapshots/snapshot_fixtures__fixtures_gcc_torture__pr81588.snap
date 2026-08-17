@@ -1,0 +1,155 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr81588.c" (c, x86_64-unknown-linux-gnu)
+fn bar(%arg2: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i):
+        %64 = alloca s32i, "x", align 4
+        %65 = alloca s32i, "__retval", align 4
+        store %arg2, %64
+        %66 = load %64 : s32i, align 4
+        <unmodeled: cir.asm>
+        %67 = load %65 : s32i
+        return %67
+}
+fn foo(%arg0: u32i, %arg1: s64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i, %arg1: s64i):
+        %43 = alloca u32i, "x", align 4
+        %44 = alloca s64i, "y", align 8
+        %45 = alloca s32i, "__retval", align 4
+        store %arg0, %43
+        store %arg1, %44
+        scope {
+            %59 = load %44 : s64i, align 8
+            %60 = const 0 : s64i
+            %61 = cmp lt %59, %60 : bool
+            if %61 {
+                %62 = const 0 : s32i
+                store %62, %45
+                %63 = load %45 : s32i
+                return %63
+            }
+            yield
+        }
+        scope {
+            %48 = load %44 : s64i, align 8
+            %49 = const 4 : u32i
+            %50 = load %43 : u32i, align 4
+            %51 = mul %49, %50 : u32i
+            %52 = cast(integral) %51 : s64i
+            %53 = cmp lt %48, %52 : bool
+            if %53 {
+                %54 = load %44 : s64i, align 8
+                %55 = cast(integral) %54 : s32i
+                %56 = call @bar(%55) : s32i [all]
+                %57 = const 1 : s32i
+                store %57, %45
+                %58 = load %45 : s32i
+                return %58
+            }
+            yield
+        }
+        %46 = const 0 : s32i
+        store %46, %45
+        %47 = load %45 : s32i
+        return %47
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u32i, "x", align 4
+    %2 = alloca s64i, "y", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 10 : u32i
+    store %4, %1, align 4, volatile
+    %5 = const -10000 : s64i
+    store %5, %2, align 8, volatile
+    scope {
+        %38 = load %1 : u32i, align 4, volatile
+        %39 = load %2 : s64i, align 8, volatile
+        %40 = call @foo(%38, %39) : s32i [all]
+        %41 = const 0 : s32i
+        %42 = cmp ne %40, %41 : bool
+        if %42 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = const -1 : s64i
+    store %6, %2, align 8, volatile
+    scope {
+        %33 = load %1 : u32i, align 4, volatile
+        %34 = load %2 : s64i, align 8, volatile
+        %35 = call @foo(%33, %34) : s32i [all]
+        %36 = const 0 : s32i
+        %37 = cmp ne %35, %36 : bool
+        if %37 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %7 = const 0 : s64i
+    store %7, %2, align 8, volatile
+    scope {
+        %28 = load %1 : u32i, align 4, volatile
+        %29 = load %2 : s64i, align 8, volatile
+        %30 = call @foo(%28, %29) : s32i [all]
+        %31 = const 1 : s32i
+        %32 = cmp ne %30, %31 : bool
+        if %32 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %8 = const 39 : s64i
+    store %8, %2, align 8, volatile
+    scope {
+        %23 = load %1 : u32i, align 4, volatile
+        %24 = load %2 : s64i, align 8, volatile
+        %25 = call @foo(%23, %24) : s32i [all]
+        %26 = const 1 : s32i
+        %27 = cmp ne %25, %26 : bool
+        if %27 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %9 = const 40 : s64i
+    store %9, %2, align 8, volatile
+    scope {
+        %18 = load %1 : u32i, align 4, volatile
+        %19 = load %2 : s64i, align 8, volatile
+        %20 = call @foo(%18, %19) : s32i [all]
+        %21 = const 0 : s32i
+        %22 = cmp ne %20, %21 : bool
+        if %22 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %10 = const 10000 : s64i
+    store %10, %2, align 8, volatile
+    scope {
+        %13 = load %1 : u32i, align 4, volatile
+        %14 = load %2 : s64i, align 8, volatile
+        %15 = call @foo(%13, %14) : s32i [all]
+        %16 = const 0 : s32i
+        %17 = cmp ne %15, %16 : bool
+        if %17 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %11 = const 0 : s32i
+    store %11, %0
+    %12 = load %0 : s32i
+    return %12
+}

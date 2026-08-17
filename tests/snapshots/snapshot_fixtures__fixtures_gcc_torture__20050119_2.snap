@@ -1,0 +1,114 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20050119-2.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn foo(%arg0: rec_S*) -> u32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_S*):
+        %43 = alloca rec_S*, "s", align 8
+        %44 = alloca u32i, "__retval", align 4
+        store %arg0, %43
+        scope {
+            %57 = load %43 : rec_S*, align 8
+            %58 = get_member %57[0] "a" : u8i*
+            %59 = load %58 : u8i, align 1
+            %60 = cast(integral) %59 : s32i
+            %61 = load %43 : rec_S*, align 8
+            %62 = get_member %61[1] "b" : u8i*
+            %63 = load %62 : u8i, align 1
+            %64 = cast(integral) %63 : s32i
+            %65 = cmp ne %60, %64 : bool
+            if %65 {
+                %66 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %50 = load %43 : rec_S*, align 8
+            %51 = get_member %50[2] "c" : u8i*
+            %52 = load %51 : u8i, align 1
+            %53 = cast(integral) %52 : s32i
+            %54 = const 2 : s32i
+            %55 = cmp ne %53, %54 : bool
+            if %55 {
+                %56 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        %45 = load %43 : rec_S*, align 8
+        %46 = get_member %45[3] "d" : u8i*
+        %47 = load %46 : u8i, align 1
+        %48 = cast(integral) %47 : u32i
+        store %48, %44
+        %49 = load %44 : u32i
+        return %49
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_S[2], "s", align 1
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 1 : u8i
+    %4 = const 0 : s64i
+    %5 = get_element %1[%4] : rec_S*
+    %6 = get_member %5[0] "a" : u8i*
+    store %3, %6, align 1
+    %7 = const 1 : u8i
+    %8 = const 0 : s64i
+    %9 = get_element %1[%8] : rec_S*
+    %10 = get_member %9[1] "b" : u8i*
+    store %7, %10, align 1
+    %11 = const 2 : u8i
+    %12 = const 0 : s64i
+    %13 = get_element %1[%12] : rec_S*
+    %14 = get_member %13[2] "c" : u8i*
+    store %11, %14, align 1
+    %15 = const 3 : u8i
+    %16 = const 0 : s64i
+    %17 = get_element %1[%16] : rec_S*
+    %18 = get_member %17[3] "d" : u8i*
+    store %15, %18, align 1
+    %19 = const 3 : u8i
+    %20 = const 1 : s64i
+    %21 = get_element %1[%20] : rec_S*
+    %22 = get_member %21[0] "a" : u8i*
+    store %19, %22, align 1
+    %23 = const 2 : u8i
+    %24 = const 1 : s64i
+    %25 = get_element %1[%24] : rec_S*
+    %26 = get_member %25[1] "b" : u8i*
+    store %23, %26, align 1
+    %27 = const 1 : u8i
+    %28 = const 1 : s64i
+    %29 = get_element %1[%28] : rec_S*
+    %30 = get_member %29[2] "c" : u8i*
+    store %27, %30, align 1
+    %31 = const 0 : u8i
+    %32 = const 1 : s64i
+    %33 = get_element %1[%32] : rec_S*
+    %34 = get_member %33[3] "d" : u8i*
+    store %31, %34, align 1
+    scope {
+        %38 = cast(array_to_ptrdecay) %1 : rec_S*
+        %39 = call @foo(%38) : u32i [all]
+        %40 = const 3 : u32i
+        %41 = cmp ne %39, %40 : bool
+        if %41 {
+            %42 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %35 = get_global @exit : ((s32i) -> void)*
+    %36 = const 0 : s32i
+    call @exit(%36) [all]
+    %37 = load %0 : s32i
+    return %37
+}

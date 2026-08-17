@@ -1,0 +1,129 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/loop-ivopts-1.c" (c, x86_64-unknown-linux-gnu)
+global foo.tmp : float[4] = zero [internal, default, align 16, dso_local]
+global foo.t16 : float[16] = [1.000000e+00, 2.000000e+00, 3.000000e+00, 4.000000e+00, 5.000000e+00, 6.000000e+00, 7.000000e+00, 8.000000e+00, 9.000000e+00, 1.000000e+01, 1.100000e+01, 1.200000e+01, 1.300000e+01, 1.400000e+01, 1.500000e+01, 1.600000e+01] [internal, default, align 16, dso_local]
+
+fn foo(%arg0: float*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: float*):
+        %6 = alloca float*, "x", align 8
+        %7 = alloca s32i, "i", align 4
+        %8 = alloca s32i, "j", align 4
+        %9 = alloca s32i, "k", align 4
+        %10 = alloca float, "temp", align 4
+        store %arg0, %6
+        %11 = get_global @foo.t16 : float[16]*
+        %12 = get_global @foo.tmp : float[4]*
+        scope {
+            %37 = const 0 : s32i
+            store %37, %7, align 4
+            for cond: {
+                %70 = load %7 : s32i, align 4
+                %71 = const 4 : s32i
+                %72 = cmp lt %70, %71 : bool
+                condition %72
+            } step: {
+                %38 = load %7 : s32i, align 4
+                %39 = inc %38 : s32i [nsw]
+                store %39, %7, align 4
+                yield
+            } do {
+                scope {
+                    %40 = const 3 : s32i
+                    %41 = load %7 : s32i, align 4
+                    %42 = sub %40, %41 : s32i [nsw]
+                    store %42, %9, align 4
+                    %43 = const 5 : s32i
+                    %44 = load %9 : s32i, align 4
+                    %45 = mul %43, %44 : s32i [nsw]
+                    %46 = cast(integral) %45 : s64i
+                    %47 = get_element %11[%46] : float*
+                    %48 = load %47 : float, align 4
+                    store %48, %10, align 4
+                    scope {
+                        %49 = load %9 : s32i, align 4
+                        %50 = const 1 : s32i
+                        %51 = add %49, %50 : s32i [nsw]
+                        store %51, %8, align 4
+                        for cond: {
+                            %67 = load %8 : s32i, align 4
+                            %68 = const 4 : s32i
+                            %69 = cmp lt %67, %68 : bool
+                            condition %69
+                        } step: {
+                            %52 = load %8 : s32i, align 4
+                            %53 = inc %52 : s32i [nsw]
+                            store %53, %8, align 4
+                            yield
+                        } do {
+                            scope {
+                                %54 = load %9 : s32i, align 4
+                                %55 = load %8 : s32i, align 4
+                                %56 = const 4 : s32i
+                                %57 = mul %55, %56 : s32i [nsw]
+                                %58 = add %54, %57 : s32i [nsw]
+                                %59 = cast(integral) %58 : s64i
+                                %60 = get_element %11[%59] : float*
+                                %61 = load %60 : float, align 4
+                                %62 = load %10 : float, align 4
+                                %63 = fmul %61, %62 : float
+                                %64 = load %9 : s32i, align 4
+                                %65 = cast(integral) %64 : s64i
+                                %66 = get_element %12[%65] : float*
+                                store %63, %66, align 4
+                                yield
+                            }
+                            yield
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %13 = const 0 : s64i
+        %14 = get_element %12[%13] : float*
+        %15 = load %14 : float, align 16
+        %16 = const 0 : s64i
+        %17 = load %6 : float*, align 8
+        %18 = ptr_stride %17, %16 : float*
+        store %15, %18, align 4
+        %19 = const 1 : s64i
+        %20 = get_element %12[%19] : float*
+        %21 = load %20 : float, align 4
+        %22 = const 1 : s64i
+        %23 = load %6 : float*, align 8
+        %24 = ptr_stride %23, %22 : float*
+        store %21, %24, align 4
+        %25 = const 2 : s64i
+        %26 = get_element %12[%25] : float*
+        %27 = load %26 : float, align 8
+        %28 = const 2 : s64i
+        %29 = load %6 : float*, align 8
+        %30 = ptr_stride %29, %28 : float*
+        store %27, %30, align 4
+        %31 = const 3 : s64i
+        %32 = get_element %12[%31] : float*
+        %33 = load %32 : float, align 4
+        %34 = const 3 : s64i
+        %35 = load %6 : float*, align 8
+        %36 = ptr_stride %35, %34 : float*
+        store %33, %36, align 4
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca float[4], "x", align 16
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = cast(array_to_ptrdecay) %1 : float*
+    call @foo(%3) [all]
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

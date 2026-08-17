@@ -1,0 +1,263 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/ieee__copysign1.c" (c, x86_64-unknown-linux-gnu)
+global Tf : rec_Df[8] = [{1.000000e+00, 2.000000e+00, 1.000000e+00}, {1.000000e+00, -2.000000e+00, -1.000000e+00}, {-1.000000e+00, -2.000000e+00, -1.000000e+00}, {0.000000e+00, -2.000000e+00, -0.000000e+00}, {-0.000000e+00, -2.000000e+00, -0.000000e+00}, {-0.000000e+00, 2.000000e+00, 0.000000e+00}, {0x7F800000, -0.000000e+00, 0xFF800000}, {0xFFC00000, 0x7F800000, 0x7FC00000}] [internal, default, align 16, dso_local, constant]
+global T : rec_D[8] = [{1.000000e+00, 2.000000e+00, 1.000000e+00}, {1.000000e+00, -2.000000e+00, -1.000000e+00}, {-1.000000e+00, -2.000000e+00, -1.000000e+00}, {0.000000e+00, -2.000000e+00, -0.000000e+00}, {-0.000000e+00, -2.000000e+00, -0.000000e+00}, {-0.000000e+00, 2.000000e+00, 0.000000e+00}, {0x7FF0000000000000, -0.000000e+00, 0xFFF0000000000000}, {0xFFF8000000000000, 0x7FF0000000000000, 0x7FF8000000000000}] [internal, default, align 16, dso_local, constant]
+global Tl : rec_Dl[8] = [{1.000000e+00, 2.000000e+00, 1.000000e+00}, {1.000000e+00, -2.000000e+00, -1.000000e+00}, {-1.000000e+00, -2.000000e+00, -1.000000e+00}, {0.000000e+00, -2.000000e+00, -0.000000e+00}, {-0.000000e+00, -2.000000e+00, -0.000000e+00}, {-0.000000e+00, 2.000000e+00, 0.000000e+00}, {0x7FFF8000000000000000, -0.000000e+00, 0xFFFF8000000000000000}, {0xFFFFC000000000000000, 0x7FFF8000000000000000, 0x7FFFC000000000000000}] [internal, default, align 16, dso_local, constant]
+
+fn cf(%arg4: float, %arg5: float) -> float [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: float, %arg5: float):
+        %135 = alloca float, "x", align 4
+        %136 = alloca float, "y", align 4
+        %137 = alloca float, "__retval", align 4
+        store %arg4, %135
+        store %arg5, %136
+        %138 = load %135 : float, align 4
+        %139 = load %136 : float, align 4
+        <unmodeled: cir.copysign>
+        store %140, %137
+        %141 = load %137 : float
+        return %141
+}
+fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c, pure, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn testf() -> void [external, c, no_inline, dso_local, nothrow] {
+    %96 = alloca s32i, "i", align 4
+    %97 = alloca s32i, "n", align 4
+    %98 = alloca float, "r", align 4
+    %99 = const 96 : u64i
+    %100 = const 12 : u64i
+    %101 = div %99, %100 : u64i
+    %102 = cast(integral) %101 : s32i
+    store %102, %97, align 4
+    scope {
+        %103 = const 0 : s32i
+        store %103, %96, align 4
+        for cond: {
+            %132 = load %96 : s32i, align 4
+            %133 = load %97 : s32i, align 4
+            %134 = cmp lt %132, %133 : bool
+            condition %134
+        } step: {
+            %104 = load %96 : s32i, align 4
+            %105 = inc %104 : s32i [nsw]
+            store %105, %96, align 4
+            yield
+        } do {
+            scope {
+                %106 = load %96 : s32i, align 4
+                %107 = cast(integral) %106 : s64i
+                %108 = get_global @Tf : rec_Df[8]*
+                %109 = get_element %108[%107] : rec_Df*
+                %110 = get_member %109[0] "x" : float*
+                %111 = load %110 : float, align 4
+                %112 = load %96 : s32i, align 4
+                %113 = cast(integral) %112 : s64i
+                %114 = get_global @Tf : rec_Df[8]*
+                %115 = get_element %114[%113] : rec_Df*
+                %116 = get_member %115[1] "y" : float*
+                %117 = load %116 : float, align 4
+                %118 = call @cf(%111, %117) : float [all]
+                store %118, %98, align 4
+                scope {
+                    %119 = get_global @memcmp : ((void*, void*, u64i) -> s32i)*
+                    %120 = cast(bitcast) %98 : void*
+                    %121 = load %96 : s32i, align 4
+                    %122 = cast(integral) %121 : s64i
+                    %123 = get_global @Tf : rec_Df[8]*
+                    %124 = get_element %123[%122] : rec_Df*
+                    %125 = get_member %124[2] "z" : float*
+                    %126 = cast(bitcast) %125 : void*
+                    %127 = const 4 : u64i
+                    %128 = call @memcmp(%120, %126, %127) : s32i [pure]
+                    %129 = const 0 : s32i
+                    %130 = cmp ne %128, %129 : bool
+                    if %130 {
+                        %131 = get_global @abort : (() -> void)*
+                        call @abort() [all]
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    return
+}
+fn c(%arg2: double, %arg3: double) -> double [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: double, %arg3: double):
+        %89 = alloca double, "x", align 8
+        %90 = alloca double, "y", align 8
+        %91 = alloca double, "__retval", align 8
+        store %arg2, %89
+        store %arg3, %90
+        %92 = load %89 : double, align 8
+        %93 = load %90 : double, align 8
+        <unmodeled: cir.copysign>
+        store %94, %91
+        %95 = load %91 : double
+        return %95
+}
+fn test() -> void [external, c, no_inline, dso_local, nothrow] {
+    %50 = alloca s32i, "i", align 4
+    %51 = alloca s32i, "n", align 4
+    %52 = alloca double, "r", align 8
+    %53 = const 192 : u64i
+    %54 = const 24 : u64i
+    %55 = div %53, %54 : u64i
+    %56 = cast(integral) %55 : s32i
+    store %56, %51, align 4
+    scope {
+        %57 = const 0 : s32i
+        store %57, %50, align 4
+        for cond: {
+            %86 = load %50 : s32i, align 4
+            %87 = load %51 : s32i, align 4
+            %88 = cmp lt %86, %87 : bool
+            condition %88
+        } step: {
+            %58 = load %50 : s32i, align 4
+            %59 = inc %58 : s32i [nsw]
+            store %59, %50, align 4
+            yield
+        } do {
+            scope {
+                %60 = load %50 : s32i, align 4
+                %61 = cast(integral) %60 : s64i
+                %62 = get_global @T : rec_D[8]*
+                %63 = get_element %62[%61] : rec_D*
+                %64 = get_member %63[0] "x" : double*
+                %65 = load %64 : double, align 8
+                %66 = load %50 : s32i, align 4
+                %67 = cast(integral) %66 : s64i
+                %68 = get_global @T : rec_D[8]*
+                %69 = get_element %68[%67] : rec_D*
+                %70 = get_member %69[1] "y" : double*
+                %71 = load %70 : double, align 8
+                %72 = call @c(%65, %71) : double [all]
+                store %72, %52, align 8
+                scope {
+                    %73 = get_global @memcmp : ((void*, void*, u64i) -> s32i)*
+                    %74 = cast(bitcast) %52 : void*
+                    %75 = load %50 : s32i, align 4
+                    %76 = cast(integral) %75 : s64i
+                    %77 = get_global @T : rec_D[8]*
+                    %78 = get_element %77[%76] : rec_D*
+                    %79 = get_member %78[2] "z" : double*
+                    %80 = cast(bitcast) %79 : void*
+                    %81 = const 8 : u64i
+                    %82 = call @memcmp(%74, %80, %81) : s32i [pure]
+                    %83 = const 0 : s32i
+                    %84 = cmp ne %82, %83 : bool
+                    if %84 {
+                        %85 = get_global @abort : (() -> void)*
+                        call @abort() [all]
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    return
+}
+fn cl(%arg0: long_double<f80>, %arg1: long_double<f80>) -> long_double<f80> [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: long_double<f80>, %arg1: long_double<f80>):
+        %43 = alloca long_double<f80>, "x", align 16
+        %44 = alloca long_double<f80>, "y", align 16
+        %45 = alloca long_double<f80>, "__retval", align 16
+        store %arg0, %43
+        store %arg1, %44
+        %46 = load %43 : long_double<f80>, align 16
+        %47 = load %44 : long_double<f80>, align 16
+        <unmodeled: cir.copysign>
+        store %48, %45
+        %49 = load %45 : long_double<f80>
+        return %49
+}
+fn testl() -> void [external, c, no_inline, dso_local, nothrow] {
+    %4 = alloca s32i, "i", align 4
+    %5 = alloca s32i, "n", align 4
+    %6 = alloca long_double<f80>, "r", align 16
+    %7 = const 384 : u64i
+    %8 = const 48 : u64i
+    %9 = div %7, %8 : u64i
+    %10 = cast(integral) %9 : s32i
+    store %10, %5, align 4
+    scope {
+        %11 = const 0 : s32i
+        store %11, %4, align 4
+        for cond: {
+            %40 = load %4 : s32i, align 4
+            %41 = load %5 : s32i, align 4
+            %42 = cmp lt %40, %41 : bool
+            condition %42
+        } step: {
+            %12 = load %4 : s32i, align 4
+            %13 = inc %12 : s32i [nsw]
+            store %13, %4, align 4
+            yield
+        } do {
+            scope {
+                %14 = load %4 : s32i, align 4
+                %15 = cast(integral) %14 : s64i
+                %16 = get_global @Tl : rec_Dl[8]*
+                %17 = get_element %16[%15] : rec_Dl*
+                %18 = get_member %17[0] "x" : long_double<f80>*
+                %19 = load %18 : long_double<f80>, align 16
+                %20 = load %4 : s32i, align 4
+                %21 = cast(integral) %20 : s64i
+                %22 = get_global @Tl : rec_Dl[8]*
+                %23 = get_element %22[%21] : rec_Dl*
+                %24 = get_member %23[1] "y" : long_double<f80>*
+                %25 = load %24 : long_double<f80>, align 16
+                %26 = call @cl(%19, %25) : long_double<f80> [all]
+                store %26, %6, align 16
+                scope {
+                    %27 = get_global @memcmp : ((void*, void*, u64i) -> s32i)*
+                    %28 = cast(bitcast) %6 : void*
+                    %29 = load %4 : s32i, align 4
+                    %30 = cast(integral) %29 : s64i
+                    %31 = get_global @Tl : rec_Dl[8]*
+                    %32 = get_element %31[%30] : rec_Dl*
+                    %33 = get_member %32[2] "z" : long_double<f80>*
+                    %34 = cast(bitcast) %33 : void*
+                    %35 = const 10 : u64i
+                    %36 = call @memcmp(%28, %34, %35) : s32i [pure]
+                    %37 = const 0 : s32i
+                    %38 = cmp ne %36, %37 : bool
+                    if %38 {
+                        %39 = get_global @abort : (() -> void)*
+                        call @abort() [all]
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    call @testf() [all]
+    call @test() [all]
+    call @testl() [all]
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

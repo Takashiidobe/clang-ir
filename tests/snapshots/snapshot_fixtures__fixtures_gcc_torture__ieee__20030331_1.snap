@@ -1,0 +1,102 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/ieee__20030331-1.c" (c, x86_64-unknown-linux-gnu)
+global rintf.TWO23 : float = 0x4B000000 [internal, default, align 4, dso_local, constant]
+global x : float = -1.500000e+00 [external, default, align 4, dso_local]
+
+fn rintf() -> float [external, c, no_inline, dso_local, nothrow] {
+    %11 = alloca float, "__retval", align 4
+    %12 = get_global @rintf.TWO23 : float*
+    scope {
+        %16 = get_global @x : float*
+        %17 = load %16 : float, align 4
+        %18 = cast(floating) %17 : double
+        <unmodeled: cir.fabs>
+        %20 = load %12 : float, align 4
+        %21 = cast(floating) %20 : double
+        %22 = cmp lt %19, %21 : bool
+        if %22 {
+            scope {
+                %23 = get_global @x : float*
+                %24 = load %23 : float, align 4
+                %25 = cast(floating) %24 : double
+                %26 = const 0.000000e+00 : double
+                %27 = cmp gt %25, %26 : bool
+                if %27 {
+                    %44 = load %12 : float, align 4
+                    %45 = get_global @x : float*
+                    %46 = load %45 : float, align 4
+                    %47 = fadd %46, %44 : float
+                    store %47, %45, align 4
+                    %48 = load %12 : float, align 4
+                    %49 = get_global @x : float*
+                    %50 = load %49 : float, align 4
+                    %51 = fsub %50, %48 : float
+                    store %51, %49, align 4
+                    yield
+                } else {
+                    scope {
+                        %28 = get_global @x : float*
+                        %29 = load %28 : float, align 4
+                        %30 = cast(floating) %29 : double
+                        %31 = const 0.000000e+00 : double
+                        %32 = cmp lt %30, %31 : bool
+                        if %32 {
+                            %33 = load %12 : float, align 4
+                            %34 = get_global @x : float*
+                            %35 = load %34 : float, align 4
+                            %36 = fsub %33, %35 : float
+                            %37 = get_global @x : float*
+                            store %36, %37, align 4
+                            %38 = get_global @x : float*
+                            %39 = load %38 : float, align 4
+                            %40 = load %12 : float, align 4
+                            %41 = fsub %39, %40 : float
+                            %42 = fneg %41 : float
+                            %43 = get_global @x : float*
+                            store %42, %43, align 4
+                            yield
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %13 = get_global @x : float*
+    %14 = load %13 : float, align 4
+    store %14, %11
+    %15 = load %11 : float
+    return %15
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %5 = get_global @rintf : (() -> float)*
+        %6 = call @rintf() : float [all]
+        %7 = cast(floating) %6 : double
+        %8 = const -2.000000e+00 : double
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            %10 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

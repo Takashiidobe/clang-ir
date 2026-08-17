@@ -1,0 +1,78 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00157.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "Count", align 4
+    %2 = alloca s32i[10], "Array", align 16
+    %3 = const 0 : s32i
+    store %3, %0
+    scope {
+        %20 = const 1 : s32i
+        store %20, %1, align 4
+        for cond: {
+            %31 = load %1 : s32i, align 4
+            %32 = const 10 : s32i
+            %33 = cmp le %31, %32 : bool
+            condition %33
+        } step: {
+            %21 = load %1 : s32i, align 4
+            %22 = inc %21 : s32i [nsw]
+            store %22, %1, align 4
+            yield
+        } do {
+            scope {
+                %23 = load %1 : s32i, align 4
+                %24 = load %1 : s32i, align 4
+                %25 = mul %23, %24 : s32i [nsw]
+                %26 = load %1 : s32i, align 4
+                %27 = const 1 : s32i
+                %28 = sub %26, %27 : s32i [nsw]
+                %29 = cast(integral) %28 : s64i
+                %30 = get_element %2[%29] : s32i*
+                store %25, %30, align 4
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    scope {
+        %6 = const 0 : s32i
+        store %6, %1, align 4
+        for cond: {
+            %17 = load %1 : s32i, align 4
+            %18 = const 10 : s32i
+            %19 = cmp lt %17, %18 : bool
+            condition %19
+        } step: {
+            %7 = load %1 : s32i, align 4
+            %8 = inc %7 : s32i [nsw]
+            store %8, %1, align 4
+            yield
+        } do {
+            scope {
+                %9 = get_global @printf : ((s8i*, ...) -> s32i)*
+                %10 = get_global @.str : s8i[4]*
+                %11 = cast(array_to_ptrdecay) %10 : s8i*
+                %12 = load %1 : s32i, align 4
+                %13 = cast(integral) %12 : s64i
+                %14 = get_element %2[%13] : s32i*
+                %15 = load %14 : s32i, align 4
+                %16 = call @printf(%11, %15) : s32i [all]
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

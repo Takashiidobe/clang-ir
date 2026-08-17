@@ -1,0 +1,70 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20170419-1.c" (c, x86_64-unknown-linux-gnu)
+global x : s32i = 0 [external, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "a", align 4
+    %2 = alloca s32i, "b", align 4
+    %3 = alloca s32i, "j", align 4
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 0 : s32i
+    store %5, %1, align 4, volatile
+    %6 = const -2147483647 : s32i
+    store %6, %2, align 4, volatile
+    scope {
+        %13 = const 0 : s32i
+        store %13, %3, align 4
+        for cond: {
+            %29 = load %3 : s32i, align 4
+            %30 = const 18 : s32i
+            %31 = cmp lt %29, %30 : bool
+            condition %31
+        } step: {
+            %14 = const 1 : s32i
+            %15 = load %3 : s32i, align 4
+            %16 = add %15, %14 : s32i [nsw]
+            store %16, %3, align 4
+            yield
+        } do {
+            scope {
+                %17 = load %1 : s32i, align 4, volatile
+                %18 = const 0 : s32i
+                %19 = cmp eq %17, %18 : bool
+                %20 = cast(bool_to_int) %19 : s32i
+                %21 = load %2 : s32i, align 4, volatile
+                %22 = const -2147483647 : s32i
+                %23 = const 1 : s32i
+                %24 = sub %22, %23 : s32i [nsw]
+                %25 = sub %21, %24 : s32i [nsw]
+                %26 = cmp ne %20, %25 : bool
+                %27 = cast(bool_to_int) %26 : s32i
+                %28 = get_global @x : s32i*
+                store %27, %28, align 4
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    scope {
+        %9 = get_global @x : s32i*
+        %10 = load %9 : s32i, align 4
+        %11 = const 0 : s32i
+        %12 = cmp ne %10, %11 : bool
+        if %12 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %7 = const 0 : s32i
+    store %7, %0
+    %8 = load %0 : s32i
+    return %8
+}

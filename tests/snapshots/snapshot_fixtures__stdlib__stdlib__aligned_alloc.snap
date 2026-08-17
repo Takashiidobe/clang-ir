@@ -1,0 +1,89 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/stdlib/aligned_alloc.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[13] = "alloc failed" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn aligned_alloc(%arg0: u64i, %arg1: u64i) -> void* [external, c, nothrow];
+fn puts(%arg0: s8i*) -> s32i [external, c];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn free(%arg0: void*) -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i*, "p", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @aligned_alloc : ((u64i, u64i) -> void*)*
+    %4 = const 16 : u64i
+    %5 = const 4 : u64i
+    %6 = const 4 : u64i
+    %7 = mul %5, %6 : u64i
+    %8 = call @aligned_alloc(%4, %7) : void* [all]
+    %9 = cast(bitcast) %8 : s32i*
+    store %9, %1, align 8
+    scope {
+        %51 = load %1 : s32i*, align 8
+        %52 = cast(ptr_to_bool) %51 : bool
+        %53 = not %52 : bool
+        if %53 {
+            %54 = get_global @.str : s8i[13]*
+            %55 = cast(array_to_ptrdecay) %54 : s8i*
+            %56 = call @puts(%55) : s32i [all]
+            %57 = const 1 : s32i
+            store %57, %0
+            %58 = load %0 : s32i
+            return %58
+        }
+        yield
+    }
+    %10 = const 3 : s32i
+    %11 = const 0 : s64i
+    %12 = load %1 : s32i*, align 8
+    %13 = ptr_stride %12, %11 : s32i*
+    store %10, %13, align 4
+    %14 = const 4 : s32i
+    %15 = const 1 : s64i
+    %16 = load %1 : s32i*, align 8
+    %17 = ptr_stride %16, %15 : s32i*
+    store %14, %17, align 4
+    %18 = const 5 : s32i
+    %19 = const 2 : s64i
+    %20 = load %1 : s32i*, align 8
+    %21 = ptr_stride %20, %19 : s32i*
+    store %18, %21, align 4
+    %22 = const 6 : s32i
+    %23 = const 3 : s64i
+    %24 = load %1 : s32i*, align 8
+    %25 = ptr_stride %24, %23 : s32i*
+    store %22, %25, align 4
+    %26 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %27 = get_global @.str.1 : s8i[7]*
+    %28 = cast(array_to_ptrdecay) %27 : s8i*
+    %29 = load %1 : s32i*, align 8
+    %30 = cast(ptr_to_int) %29 : u64i
+    %31 = const 16 : u64i
+    %32 = rem %30, %31 : u64i
+    %33 = const 0 : u64i
+    %34 = cmp eq %32, %33 : bool
+    %35 = cast(bool_to_int) %34 : s32i
+    %36 = const 0 : s64i
+    %37 = load %1 : s32i*, align 8
+    %38 = ptr_stride %37, %36 : s32i*
+    %39 = load %38 : s32i, align 4
+    %40 = const 3 : s64i
+    %41 = load %1 : s32i*, align 8
+    %42 = ptr_stride %41, %40 : s32i*
+    %43 = load %42 : s32i, align 4
+    %44 = add %39, %43 : s32i [nsw]
+    %45 = call @printf(%28, %35, %44) : s32i [all]
+    %46 = get_global @free : ((void*) -> void)*
+    %47 = load %1 : s32i*, align 8
+    %48 = cast(bitcast) %47 : void*
+    call @free(%48) [all]
+    %49 = const 0 : s32i
+    store %49, %0
+    %50 = load %0 : s32i
+    return %50
+}

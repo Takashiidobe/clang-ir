@@ -1,0 +1,43 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/wchar/wcschr.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.s : s32i[7] = [97, 98, 99, 100, 101, 102] [cir_private, default, dso_local, constant]
+global .str : s8i[8] = "%ld %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn wcschr(%arg0: s32i*, %arg1: s32i) -> s32i* [external, c, pure, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i[7], "s", align 16
+    %2 = alloca s32i*, "p", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_global @__const.main.s : s32i[7]*
+    copy %1, %4
+    %5 = get_global @wcschr : ((s32i*, s32i) -> s32i*)*
+    %6 = cast(array_to_ptrdecay) %1 : s32i*
+    %7 = const 100 : s32i
+    %8 = call @wcschr(%6, %7) : s32i* [pure]
+    store %8, %2, align 8
+    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %10 = get_global @.str : s8i[8]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = load %2 : s32i*, align 8
+    %13 = cast(array_to_ptrdecay) %1 : s32i*
+    %14 = ptr_diff %12, %13 : s64i
+    %15 = get_global @wcschr : ((s32i*, s32i) -> s32i*)*
+    %16 = cast(array_to_ptrdecay) %1 : s32i*
+    %17 = const 122 : s32i
+    %18 = call @wcschr(%16, %17) : s32i* [pure]
+    %19 = const #cir.ptr<null> : void*
+    %20 = cast(bitcast) %19 : s32i*
+    %21 = cmp eq %18, %20 : bool
+    %22 = cast(bool_to_int) %21 : s32i
+    %23 = call @printf(%11, %14, %22) : s32i [all]
+    %24 = const 0 : s32i
+    store %24, %0
+    %25 = load %0 : s32i
+    return %25
+}

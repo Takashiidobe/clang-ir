@@ -1,0 +1,103 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr65215-1.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg1: u32i) -> u32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: u32i):
+        %35 = alloca u32i, "x", align 4
+        %36 = alloca u32i, "__retval", align 4
+        store %arg1, %35
+        %37 = load %35 : u32i, align 4
+        %38 = const 24 : s32i
+        %39 = shift right %37, %38 : u32i
+        %40 = load %35 : u32i, align 4
+        %41 = const 8 : s32i
+        %42 = shift right %40, %41 : u32i
+        %43 = const 65280 : u32i
+        %44 = and %42, %43 : u32i
+        %45 = or %39, %44 : u32i
+        %46 = load %35 : u32i, align 4
+        %47 = const 8 : s32i
+        %48 = shift left %46, %47 : u32i
+        %49 = const 16711680 : u32i
+        %50 = and %48, %49 : u32i
+        %51 = or %45, %50 : u32i
+        %52 = load %35 : u32i, align 4
+        %53 = const 24 : s32i
+        %54 = shift left %52, %53 : u32i
+        %55 = or %51, %54 : u32i
+        store %55, %36
+        %56 = load %36 : u32i
+        return %56
+}
+fn bar(%arg0: u64i*) -> u32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u64i*):
+        %28 = alloca u64i*, "x", align 8
+        %29 = alloca u32i, "__retval", align 4
+        store %arg0, %28
+        %30 = load %28 : u64i*, align 8
+        %31 = load %30 : u64i, align 8
+        %32 = cast(integral) %31 : u32i
+        %33 = call @foo(%32) : u32i [all]
+        store %33, %29
+        %34 = load %29 : u32i
+        return %34
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u64i, "l", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    scope {
+        %13 = const 8 : s32i
+        %14 = const 8 : s32i
+        %15 = cmp ne %13, %14 : bool
+        %16 = ternary %15 ? { : bool
+            %27 = const #true : bool
+            yield %27
+        } : {
+            %24 = const 4 : u64i
+            %25 = const 4 : u64i
+            %26 = cmp ne %24, %25 : bool
+            yield %26
+        }
+        %17 = ternary %16 ? { : bool
+            %23 = const #true : bool
+            yield %23
+        } : {
+            %20 = const 8 : u64i
+            %21 = const 8 : u64i
+            %22 = cmp ne %20, %21 : bool
+            yield %22
+        }
+        if %17 {
+            %18 = const 0 : s32i
+            store %18, %0
+            %19 = load %0 : s32i
+            return %19
+        }
+        yield
+    }
+    %3 = const 3735928559 : u32i
+    %4 = call @foo(%3) : u32i [all]
+    %5 = cast(integral) %4 : u64i
+    %6 = const 18369548083877904384 : u64i
+    %7 = or %5, %6 : u64i
+    store %7, %1, align 8
+    scope {
+        %10 = call @bar(%1) : u32i [all]
+        %11 = const 3735928559 : u32i
+        %12 = cmp ne %10, %11 : bool
+        if %12 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %8 = const 0 : s32i
+    store %8, %0
+    %9 = load %0 : s32i
+    return %9
+}

@@ -1,0 +1,60 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/decrement.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[13] = "%d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[4] = "%u\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "a", align 4
+    %2 = alloca s32i, "post", align 4
+    %3 = alloca s32i, "pre", align 4
+    %4 = alloca s32i, "sum", align 4
+    %5 = alloca u8i, "c", align 1
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = const 5 : s32i
+    store %7, %1, align 4
+    %8 = load %1 : s32i, align 4
+    %9 = dec %8 : s32i [nsw]
+    store %9, %1, align 4
+    store %8, %2, align 4
+    %10 = load %1 : s32i, align 4
+    %11 = dec %10 : s32i [nsw]
+    store %11, %1, align 4
+    store %11, %3, align 4
+    %12 = load %1 : s32i, align 4
+    %13 = dec %12 : s32i [nsw]
+    store %13, %1, align 4
+    %14 = load %3 : s32i, align 4
+    %15 = dec %14 : s32i [nsw]
+    store %15, %3, align 4
+    %16 = add %12, %15 : s32i [nsw]
+    store %16, %4, align 4
+    %17 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %18 = get_global @.str : s8i[13]*
+    %19 = cast(array_to_ptrdecay) %18 : s8i*
+    %20 = load %1 : s32i, align 4
+    %21 = load %2 : s32i, align 4
+    %22 = load %3 : s32i, align 4
+    %23 = load %4 : s32i, align 4
+    %24 = call @printf(%19, %20, %21, %22, %23) : s32i [all]
+    %25 = const 0 : u8i
+    store %25, %5, align 1
+    %26 = load %5 : u8i, align 1
+    %27 = dec %26 : u8i
+    store %27, %5, align 1
+    %28 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %29 = get_global @.str.1 : s8i[4]*
+    %30 = cast(array_to_ptrdecay) %29 : s8i*
+    %31 = load %5 : u8i, align 1
+    %32 = cast(integral) %31 : u32i
+    %33 = call @printf(%30, %32) : s32i [all]
+    %34 = const 0 : s32i
+    store %34, %0
+    %35 = load %0 : s32i
+    return %35
+}

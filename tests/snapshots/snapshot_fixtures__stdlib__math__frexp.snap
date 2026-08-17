@@ -1,0 +1,35 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/math/frexp.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[7] = "%f %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn frexp(%arg0: double, %arg1: s32i*) -> double [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "e", align 4
+    %2 = alloca double, "x", align 8
+    %3 = alloca double, "m", align 8
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 0 : s32i
+    store %5, %1, align 4
+    %6 = const 8.000000e+00 : double
+    store %6, %2, align 8, volatile
+    %7 = get_global @frexp : ((double, s32i*) -> double)*
+    %8 = load %2 : double, align 8, volatile
+    %9 = call @frexp(%8, %1) : double [all]
+    store %9, %3, align 8
+    %10 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %11 = get_global @.str : s8i[7]*
+    %12 = cast(array_to_ptrdecay) %11 : s8i*
+    %13 = load %3 : double, align 8
+    %14 = load %1 : s32i, align 4
+    %15 = call @printf(%12, %13, %14) : s32i [all]
+    %16 = const 0 : s32i
+    store %16, %0
+    %17 = load %0 : s32i
+    return %17
+}

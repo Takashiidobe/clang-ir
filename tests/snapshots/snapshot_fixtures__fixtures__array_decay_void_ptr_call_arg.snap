@@ -1,0 +1,38 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/array_decay_void_ptr_call_arg.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.text : s8i[6] = "hello" [cir_private, default, dso_local, constant]
+global .str : s8i[4] = "%s\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn set_data(%arg0: void*) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: void*):
+        %7 = alloca void*, "ptr", align 8
+        %8 = alloca s8i*, "p", align 8
+        store %arg0, %7
+        %9 = load %7 : void*, align 8
+        %10 = cast(bitcast) %9 : s8i*
+        store %10, %8, align 8
+        %11 = get_global @printf : ((s8i*, ...) -> s32i)*
+        %12 = get_global @.str : s8i[4]*
+        %13 = cast(array_to_ptrdecay) %12 : s8i*
+        %14 = load %8 : s8i*, align 8
+        %15 = call @printf(%13, %14) : s32i [all]
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i[6], "text", align 1
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @__const.main.text : s8i[6]*
+    copy %1, %3
+    %4 = cast(bitcast) %1 : void*
+    call @set_data(%4) [all]
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = load %0 : s32i
+    return %6
+}

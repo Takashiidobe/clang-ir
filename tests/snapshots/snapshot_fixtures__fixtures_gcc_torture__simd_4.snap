@@ -1,0 +1,70 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/simd-4.c" (c, x86_64-unknown-linux-gnu)
+global s64 : s64i = 0 [external, default, align 8, dso_local]
+
+fn __ev_convert_s64(%arg0: double) -> s64i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: double):
+        %30 = alloca double, "coerce", align 8
+        store %arg0, %30
+        %31 = cast(bitcast) %30 : vector<2 x s32i>*
+        %32 = load %31 : vector<2 x s32i>
+        %33 = alloca vector<2 x s32i>, "a", align 8
+        %34 = alloca s64i, "__retval", align 8
+        store %32, %33
+        %35 = load %33 : vector<2 x s32i>, align 8
+        %36 = cast(bitcast) %35 : s64i
+        store %36, %34
+        %37 = load %34 : s64i
+        return %37
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca vector<2 x s32i>, "coerce", align 8
+    %1 = alloca s32i, "__retval", align 4
+    %2 = alloca rec_anon2E0, "endianness_test", align 8
+    %3 = alloca s32i, "little_endian", align 4
+    %4 = alloca vector<2 x s32i>, ".compoundliteral", align 8
+    %5 = const 0 : s32i
+    store %5, %1
+    %6 = const 1 : s64i
+    %7 = get_member %2[0] "ll" : s64i*
+    store %6, %7, align 8
+    %8 = const 0 : s64i
+    %9 = get_member %2[1] "i" : s32i[2]*
+    %10 = get_element %9[%8] : s32i*
+    %11 = load %10 : s32i, align 8
+    store %11, %3, align 4
+    %12 = const [1, -1] : vector<2 x s32i>
+    store %12, %4, align 8
+    %13 = load %4 : vector<2 x s32i>, align 8
+    store %13, %0
+    %14 = cast(bitcast) %0 : double*
+    %15 = load %14 : double
+    %16 = call @__ev_convert_s64(%15) : s64i [all]
+    %17 = get_global @s64 : s64i*
+    store %16, %17, align 8
+    scope {
+        %20 = get_global @s64 : s64i*
+        %21 = load %20 : s64i, align 8
+        %22 = cast(integral) %21 : u64i
+        %23 = load %3 : s32i, align 4
+        %24 = cast(int_to_bool) %23 : bool
+        %25 = const 18446744069414584321 : u64i
+        %26 = const 8589934591 : u64i
+        %27 = select %24, %25, %26 : u64i
+        %28 = cmp ne %22, %27 : bool
+        if %28 {
+            %29 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %18 = const 0 : s32i
+    store %18, %1
+    %19 = load %1 : s32i
+    return %19
+}

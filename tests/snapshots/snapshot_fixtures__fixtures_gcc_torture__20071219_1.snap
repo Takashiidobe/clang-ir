@@ -1,0 +1,153 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20071219-1.c" (c, x86_64-unknown-linux-gnu)
+global p : rec_S* = #cir.ptr<null> [external, default, align 8, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn foo(%arg0: rec_S*, %arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_S*, %arg1: s32i):
+        %43 = alloca rec_S*, "x", align 8
+        %44 = alloca s32i, "set", align 4
+        %45 = alloca s32i, "i", align 4
+        store %arg0, %43
+        store %arg1, %44
+        scope {
+            %48 = const 0 : s32i
+            store %48, %45, align 4
+            for cond: {
+                %70 = load %45 : s32i, align 4
+                %71 = cast(integral) %70 : u64i
+                %72 = const 25 : u64i
+                %73 = cmp lt %71, %72 : bool
+                condition %73
+            } step: {
+                %49 = load %45 : s32i, align 4
+                %50 = inc %49 : s32i [nsw]
+                store %50, %45, align 4
+                yield
+            } do {
+                scope {
+                    %51 = load %45 : s32i, align 4
+                    %52 = cast(integral) %51 : s64i
+                    %53 = load %43 : rec_S*, align 8
+                    %54 = get_member %53[0] "s" : s8i[25]*
+                    %55 = get_element %54[%52] : s8i*
+                    %56 = load %55 : s8i, align 1
+                    %57 = cast(integral) %56 : s32i
+                    %58 = const 0 : s32i
+                    %59 = cmp ne %57, %58 : bool
+                    if %59 {
+                        %69 = get_global @abort : (() -> void)*
+                        call @abort() [all]
+                        yield
+                    } else {
+                        scope {
+                            %60 = load %44 : s32i, align 4
+                            %61 = cast(int_to_bool) %60 : bool
+                            if %61 {
+                                %62 = load %44 : s32i, align 4
+                                %63 = cast(integral) %62 : s8i
+                                %64 = load %45 : s32i, align 4
+                                %65 = cast(integral) %64 : s64i
+                                %66 = load %43 : rec_S*, align 8
+                                %67 = get_member %66[0] "s" : s8i[25]*
+                                %68 = get_element %67[%65] : s8i*
+                                store %63, %68, align 1
+                                yield
+                            }
+                            yield
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %46 = load %43 : rec_S*, align 8
+        %47 = get_global @p : rec_S**
+        store %46, %47, align 8
+        return
+}
+fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
+fn test1() -> void [external, c, no_inline, dso_local, nothrow] {
+    %32 = alloca rec_S, "a", align 1
+    %33 = alloca rec_S, "b", align 1
+    %34 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+    %35 = get_member %32[0] "s" : s8i[25]*
+    %36 = cast(bitcast) %35 : void*
+    %37 = const 0 : s32i
+    %38 = const 25 : u64i
+    %39 = call @memset(%36, %37, %38) : void* [all]
+    %40 = const 0 : s32i
+    call @foo(%32, %40) [all]
+    copy %33, %32
+    %41 = const 1 : s32i
+    call @foo(%33, %41) [all]
+    copy %33, %32
+    copy %33, %33
+    %42 = const 0 : s32i
+    call @foo(%33, %42) [all]
+    return
+}
+fn test2() -> void [external, c, no_inline, dso_local, nothrow] {
+    %19 = alloca rec_S, "a", align 1
+    %20 = alloca rec_S, "b", align 1
+    %21 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+    %22 = get_member %19[0] "s" : s8i[25]*
+    %23 = cast(bitcast) %22 : void*
+    %24 = const 0 : s32i
+    %25 = const 25 : u64i
+    %26 = call @memset(%23, %24, %25) : void* [all]
+    %27 = const 0 : s32i
+    call @foo(%19, %27) [all]
+    copy %20, %19
+    %28 = const 1 : s32i
+    call @foo(%20, %28) [all]
+    copy %20, %19
+    %29 = get_global @p : rec_S**
+    %30 = load %29 : rec_S*, align 8
+    copy %20, %30
+    %31 = const 0 : s32i
+    call @foo(%20, %31) [all]
+    return
+}
+fn test3() -> void [external, c, no_inline, dso_local, nothrow] {
+    %4 = alloca rec_S, "a", align 1
+    %5 = alloca rec_S, "b", align 1
+    %6 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+    %7 = get_member %4[0] "s" : s8i[25]*
+    %8 = cast(bitcast) %7 : void*
+    %9 = const 0 : s32i
+    %10 = const 25 : u64i
+    %11 = call @memset(%8, %9, %10) : void* [all]
+    %12 = const 0 : s32i
+    call @foo(%4, %12) [all]
+    copy %5, %4
+    %13 = const 1 : s32i
+    call @foo(%5, %13) [all]
+    %14 = get_global @p : rec_S**
+    %15 = load %14 : rec_S*, align 8
+    copy %15, %4
+    %16 = get_global @p : rec_S**
+    %17 = load %16 : rec_S*, align 8
+    copy %17, %5
+    %18 = const 0 : s32i
+    call @foo(%5, %18) [all]
+    return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    call @test1() [all]
+    call @test2() [all]
+    call @test3() [all]
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

@@ -1,0 +1,30 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.multi/cross_tu/math.c" (c, x86_64-unknown-linux-gnu)
+fn square(%arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i):
+        %7 = alloca s32i, "x", align 4
+        %8 = alloca s32i, "__retval", align 4
+        store %arg1, %7
+        %9 = load %7 : s32i, align 4
+        %10 = load %7 : s32i, align 4
+        %11 = mul %9, %10 : s32i [nsw]
+        store %11, %8
+        %12 = load %8 : s32i
+        return %12
+}
+fn cube(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %0 = alloca s32i, "x", align 4
+        %1 = alloca s32i, "__retval", align 4
+        store %arg0, %0
+        %2 = load %0 : s32i, align 4
+        %3 = call @square(%2) : s32i [all]
+        %4 = load %0 : s32i, align 4
+        %5 = mul %3, %4 : s32i [nsw]
+        store %5, %1
+        %6 = load %1 : s32i
+        return %6
+}

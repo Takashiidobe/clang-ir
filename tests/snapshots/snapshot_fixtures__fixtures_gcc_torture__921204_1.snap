@@ -1,0 +1,95 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/921204-1.c" (c, x86_64-unknown-linux-gnu)
+fn f(%arg0: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i):
+        %27 = alloca rec_bu, "coerce", align 4
+        %28 = alloca u32i, "coerce", align 4
+        store %arg0, %28
+        %29 = cast(bitcast) %28 : rec_bu*
+        %30 = load %29 : rec_bu
+        %31 = alloca rec_bu, "i", align 4
+        %32 = alloca rec_bu, "__retval", align 4
+        store %30, %31
+        copy %32, %31
+        scope {
+            %36 = get_member %32[0] "b" : rec_bf*
+            %37 = get_member %36[0] "b0" : u32i*
+            <unmodeled: cir.get_bitfield>
+            %39 = cast(int_to_bool) %38 : bool
+            if %39 {
+                %48 = const 1 : u32i
+                %49 = get_member %32[0] "b" : rec_bf*
+                %50 = get_member %49[0] "b18" : u32i*
+                <unmodeled: cir.set_bitfield>
+                %52 = const 1 : u32i
+                %53 = get_member %32[0] "b" : rec_bf*
+                %54 = get_member %53[0] "b20" : u32i*
+                <unmodeled: cir.set_bitfield>
+                yield
+            } else {
+                %40 = const 0 : u32i
+                %41 = get_member %32[0] "b" : rec_bf*
+                %42 = get_member %41[0] "b18" : u32i*
+                <unmodeled: cir.set_bitfield>
+                %44 = const 0 : u32i
+                %45 = get_member %32[0] "b" : rec_bf*
+                %46 = get_member %45[0] "b20" : u32i*
+                <unmodeled: cir.set_bitfield>
+                yield
+            }
+            yield
+        }
+        %33 = load %32 : rec_bu
+        store %33, %27
+        %34 = cast(bitcast) %27 : u32i*
+        %35 = load %34 : u32i
+        return %35
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca u32i, "coerce", align 4
+    %1 = alloca rec_bu, "coerce", align 4
+    %2 = alloca s32i, "__retval", align 4
+    %3 = alloca rec_bu, "a", align 4
+    %4 = alloca rec_bu, "r", align 4
+    %5 = const 0 : s32i
+    store %5, %2
+    %6 = const 67108864 : u32i
+    %7 = get_member %3[1] "w" : u32i*
+    store %6, %7, align 4
+    %8 = const 0 : u32i
+    %9 = get_member %3[0] "b" : rec_bf*
+    %10 = get_member %9[0] "b0" : u32i*
+    <unmodeled: cir.set_bitfield>
+    %12 = load %3 : rec_bu, align 4
+    store %12, %1
+    %13 = cast(bitcast) %1 : u32i*
+    %14 = load %13 : u32i
+    %15 = call @f(%14) : u32i [all]
+    store %15, %0
+    %16 = cast(bitcast) %0 : rec_bu*
+    %17 = load %16 : rec_bu
+    store %17, %4, align 4
+    scope {
+        %21 = get_member %3[1] "w" : u32i*
+        %22 = load %21 : u32i, align 4
+        %23 = get_member %4[1] "w" : u32i*
+        %24 = load %23 : u32i, align 4
+        %25 = cmp ne %22, %24 : bool
+        if %25 {
+            %26 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %18 = get_global @exit : ((s32i) -> void)*
+    %19 = const 0 : s32i
+    call @exit(%19) [all]
+    %20 = load %2 : s32i
+    return %20
+}

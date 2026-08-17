@@ -1,0 +1,161 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/961206-1.c" (c, x86_64-unknown-linux-gnu)
+fn sub1(%arg3: u64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: u64i):
+        %51 = alloca u64i, "i", align 8
+        %52 = alloca s32i, "__retval", align 4
+        store %arg3, %51
+        scope {
+            %54 = load %51 : u64i, align 8
+            %55 = const 2147483648 : u64i
+            %56 = cmp lt %54, %55 : bool
+            if %56 {
+                %59 = const 1 : s32i
+                store %59, %52
+                %60 = load %52 : s32i
+                return %60
+            } else {
+                %57 = const 0 : s32i
+                store %57, %52
+                %58 = load %52 : s32i
+                return %58
+            }
+            yield
+        }
+        %53 = load %52 : s32i
+        return %53
+}
+fn sub2(%arg2: u64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: u64i):
+        %41 = alloca u64i, "i", align 8
+        %42 = alloca s32i, "__retval", align 4
+        store %arg2, %41
+        scope {
+            %44 = load %41 : u64i, align 8
+            %45 = const 2147483647 : u64i
+            %46 = cmp le %44, %45 : bool
+            if %46 {
+                %49 = const 1 : s32i
+                store %49, %42
+                %50 = load %42 : s32i
+                return %50
+            } else {
+                %47 = const 0 : s32i
+                store %47, %42
+                %48 = load %42 : s32i
+                return %48
+            }
+            yield
+        }
+        %43 = load %42 : s32i
+        return %43
+}
+fn sub3(%arg1: u64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: u64i):
+        %31 = alloca u64i, "i", align 8
+        %32 = alloca s32i, "__retval", align 4
+        store %arg1, %31
+        scope {
+            %34 = load %31 : u64i, align 8
+            %35 = const 2147483648 : u64i
+            %36 = cmp ge %34, %35 : bool
+            if %36 {
+                %39 = const 0 : s32i
+                store %39, %32
+                %40 = load %32 : s32i
+                return %40
+            } else {
+                %37 = const 1 : s32i
+                store %37, %32
+                %38 = load %32 : s32i
+                return %38
+            }
+            yield
+        }
+        %33 = load %32 : s32i
+        return %33
+}
+fn sub4(%arg0: u64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u64i):
+        %21 = alloca u64i, "i", align 8
+        %22 = alloca s32i, "__retval", align 4
+        store %arg0, %21
+        scope {
+            %24 = load %21 : u64i, align 8
+            %25 = const 2147483647 : u64i
+            %26 = cmp gt %24, %25 : bool
+            if %26 {
+                %29 = const 0 : s32i
+                store %29, %22
+                %30 = load %22 : s32i
+                return %30
+            } else {
+                %27 = const 1 : s32i
+                store %27, %22
+                %28 = load %22 : s32i
+                return %28
+            }
+            yield
+        }
+        %23 = load %22 : s32i
+        return %23
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %17 = const 2147483648 : u64i
+        %18 = call @sub1(%17) : s32i [all]
+        %19 = cast(int_to_bool) %18 : bool
+        if %19 {
+            %20 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %13 = const 2147483648 : u64i
+        %14 = call @sub2(%13) : s32i [all]
+        %15 = cast(int_to_bool) %14 : bool
+        if %15 {
+            %16 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %9 = const 2147483648 : u64i
+        %10 = call @sub3(%9) : s32i [all]
+        %11 = cast(int_to_bool) %10 : bool
+        if %11 {
+            %12 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %5 = const 2147483648 : u64i
+        %6 = call @sub4(%5) : s32i [all]
+        %7 = cast(int_to_bool) %6 : bool
+        if %7 {
+            %8 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

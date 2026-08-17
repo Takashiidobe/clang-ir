@@ -1,0 +1,88 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr61306-2.c" (c, x86_64-unknown-linux-gnu)
+fn fake_bswap32(%arg0: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i):
+        %22 = alloca u32i, "in", align 4
+        %23 = alloca u32i, "__retval", align 4
+        store %arg0, %22
+        %24 = load %22 : u32i, align 4
+        %25 = const 255 : u32i
+        %26 = and %24, %25 : u32i
+        %27 = const 24 : s32i
+        %28 = shift left %26, %27 : u32i
+        %29 = load %22 : u32i, align 4
+        %30 = cast(integral) %29 : s16i
+        %31 = cast(integral) %30 : u32i
+        %32 = const 16776960 : u32i
+        %33 = and %31, %32 : u32i
+        %34 = const 8 : s32i
+        %35 = shift left %33, %34 : u32i
+        %36 = or %28, %35 : u32i
+        %37 = load %22 : u32i, align 4
+        %38 = const 16711680 : u32i
+        %39 = and %37, %38 : u32i
+        %40 = const 8 : s32i
+        %41 = shift right %39, %40 : u32i
+        %42 = or %36, %41 : u32i
+        %43 = load %22 : u32i, align 4
+        %44 = const 4278190080 : u32i
+        %45 = and %43, %44 : u32i
+        %46 = const 24 : s32i
+        %47 = shift right %45, %46 : u32i
+        %48 = or %42, %47 : u32i
+        store %48, %23
+        %49 = load %23 : u32i
+        return %49
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %15 = const 4 : u64i
+        %16 = const 8 : u64i
+        %17 = mul %15, %16 : u64i
+        %18 = const 32 : u64i
+        %19 = cmp ne %17, %18 : bool
+        if %19 {
+            %20 = const 0 : s32i
+            store %20, %0
+            %21 = load %0 : s32i
+            return %21
+        }
+        yield
+    }
+    scope {
+        %8 = const 2 : u64i
+        %9 = const 8 : u64i
+        %10 = mul %8, %9 : u64i
+        %11 = const 16 : u64i
+        %12 = cmp ne %10, %11 : bool
+        if %12 {
+            %13 = const 0 : s32i
+            store %13, %0
+            %14 = load %0 : s32i
+            return %14
+        }
+        yield
+    }
+    scope {
+        %4 = const 2172814212 : u32i
+        %5 = call @fake_bswap32(%4) : u32i [all]
+        %6 = const 4286808705 : u32i
+        %7 = cmp ne %5, %6 : bool
+        if %7 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

@@ -1,0 +1,82 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20181120-1.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.f : rec_U1 = {67305985} [cir_private, default, dso_local, constant]
+global d : s32i = 0 [external, default, align 4, dso_local]
+global e : s32i* = @d [external, default, align 8, dso_local]
+global u : rec_U1 = {67305985} [external, default, align 4, dso_local]
+global c : s32i = 0 [external, default, align 4, dso_local]
+global b : s32i = 0 [external, default, align 4, dso_local]
+global a : s32i = 0 [external, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %11 = const 0 : s32i
+        %12 = get_global @c : s32i*
+        store %11, %12, align 4
+        for cond: {
+            %29 = get_global @c : s32i*
+            %30 = load %29 : s32i, align 4
+            %31 = const 1 : s32i
+            %32 = cmp le %30, %31 : bool
+            condition %32
+        } step: {
+            %13 = get_global @c : s32i*
+            %14 = load %13 : s32i, align 4
+            %15 = inc %14 : s32i [nsw]
+            store %15, %13, align 4
+            yield
+        } do {
+            scope {
+                %16 = alloca rec_U1, "f", align 4
+                %17 = get_global @__const.main.f : rec_U1*
+                copy %16, %17
+                scope {
+                    %23 = get_global @c : s32i*
+                    %24 = load %23 : s32i, align 4
+                    %25 = const 1 : s32i
+                    %26 = cmp eq %24, %25 : bool
+                    if %26 {
+                        %27 = get_global @b : s32i*
+                        %28 = load %27 : s32i, align 4, volatile
+                        yield
+                    }
+                    yield
+                }
+                %18 = get_member %16[1] "f1" : u16i*
+                <unmodeled: cir.get_bitfield>
+                %20 = cast(integral) %19 : s32i
+                %21 = get_global @e : s32i**
+                %22 = load %21 : s32i*, align 8
+                store %20, %22, align 4
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    scope {
+        %4 = get_global @d : s32i*
+        %5 = load %4 : s32i, align 4
+        %6 = get_global @u : rec_U1*
+        %7 = get_member %6[1] "f1" : u16i*
+        <unmodeled: cir.get_bitfield>
+        %9 = cast(integral) %8 : s32i
+        %10 = cmp ne %5, %9 : bool
+        if %10 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

@@ -1,0 +1,96 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr83362.c" (c, x86_64-unknown-linux-gnu)
+global a : u32i = 0 [external, default, align 4, dso_local]
+global b : u32i = 0 [external, default, align 4, dso_local]
+global d : u32i = 0 [external, default, align 4, dso_local]
+global e : u32i = 0 [external, default, align 4, dso_local]
+global c : u8i = 0 [external, default, align 1, dso_local]
+
+fn foo(%arg0: u32i) -> u32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i):
+        %10 = alloca u32i, "p", align 4
+        %11 = alloca u32i, "__retval", align 4
+        store %arg0, %10
+        scope {
+            do {
+                scope {
+                    %19 = const 4095 : u32i
+                    %20 = get_global @e : u32i*
+                    %21 = load %20 : u32i, align 4
+                    %22 = div %21, %19 : u32i
+                    store %22, %20, align 4
+                    scope {
+                        %37 = load %10 : u32i, align 4
+                        %38 = get_global @c : u8i*
+                        %39 = load %38 : u8i, align 1
+                        %40 = cast(integral) %39 : u32i
+                        %41 = cmp gt %37, %40 : bool
+                        if %41 {
+                            %42 = const 0 : u32i
+                            %43 = get_global @d : u32i*
+                            store %42, %43, align 4
+                            yield
+                        }
+                        yield
+                    }
+                    %23 = const 3 : u32i
+                    %24 = get_global @e : u32i*
+                    %25 = load %24 : u32i, align 4
+                    %26 = sub %25, %23 : u32i
+                    store %26, %24, align 4
+                    %27 = get_global @b : u32i*
+                    %28 = load %27 : u32i, align 4
+                    %29 = get_global @a : u32i*
+                    %30 = load %29 : u32i, align 4
+                    %31 = cmp le %28, %30 : bool
+                    %32 = cast(bool_to_int) %31 : s32i
+                    %33 = cast(integral) %32 : u32i
+                    %34 = get_global @e : u32i*
+                    %35 = load %34 : u32i, align 4
+                    %36 = mul %35, %33 : u32i
+                    store %36, %34, align 4
+                    yield
+                }
+                yield
+            } while {
+                %15 = get_global @e : u32i*
+                %16 = load %15 : u32i, align 4
+                %17 = const 88030 : u32i
+                %18 = cmp ge %16, %17 : bool
+                condition %18
+            }
+            yield
+        }
+        %12 = get_global @e : u32i*
+        %13 = load %12 : u32i, align 4
+        store %13, %11
+        %14 = load %11 : u32i
+        return %14
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u32i, "x", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 1164 : u32i
+    %4 = call @foo(%3) : u32i [all]
+    store %4, %1, align 4
+    scope {
+        %7 = load %1 : u32i, align 4
+        %8 = const 253 : u32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = load %0 : s32i
+    return %6
+}

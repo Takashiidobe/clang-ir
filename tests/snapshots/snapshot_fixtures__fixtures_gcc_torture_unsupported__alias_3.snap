@@ -1,0 +1,40 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture.unsupported/alias-3.c" (c, x86_64-unknown-linux-gnu)
+global b : s32i [external, default, dso_local]
+global a : s32i = 0 [internal, default, align 4, dso_local]
+
+fn inc() -> void [internal, c, no_inline, dso_local, nothrow] {
+    %10 = get_global @b : s32i*
+    %11 = load %10 : s32i, align 4
+    %12 = inc %11 : s32i [nsw]
+    store %12, %10, align 4
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 0 : s32i
+    %3 = get_global @a : s32i*
+    store %2, %3, align 4
+    call @inc() [all]
+    scope {
+        %6 = get_global @a : s32i*
+        %7 = load %6 : s32i, align 4
+        %8 = const 1 : s32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

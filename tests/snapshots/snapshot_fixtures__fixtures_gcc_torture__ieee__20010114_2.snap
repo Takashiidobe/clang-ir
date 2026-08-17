@@ -1,0 +1,95 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/ieee__20010114-2.c" (c, x86_64-unknown-linux-gnu)
+global rintf.TWO23 : float = 0x4B000000 [internal, default, align 4, dso_local, constant]
+
+fn rintf(%arg0: float) -> float [external, c, no_inline, const, dso_local, nothrow] {
+    ^bb0(%arg0: float):
+        %12 = alloca float, "x", align 4
+        %13 = alloca float, "__retval", align 4
+        store %arg0, %12
+        %14 = get_global @rintf.TWO23 : float*
+        scope {
+            %17 = load %12 : float, align 4
+            %18 = cast(floating) %17 : double
+            <unmodeled: cir.fabs>
+            %20 = load %14 : float, align 4
+            %21 = cast(floating) %20 : double
+            %22 = cmp lt %19, %21 : bool
+            if %22 {
+                scope {
+                    %23 = load %12 : float, align 4
+                    %24 = cast(floating) %23 : double
+                    %25 = const 0.000000e+00 : double
+                    %26 = cmp gt %24, %25 : bool
+                    if %26 {
+                        %38 = load %14 : float, align 4
+                        %39 = load %12 : float, align 4
+                        %40 = fadd %39, %38 : float
+                        store %40, %12, align 4
+                        %41 = load %14 : float, align 4
+                        %42 = load %12 : float, align 4
+                        %43 = fsub %42, %41 : float
+                        store %43, %12, align 4
+                        yield
+                    } else {
+                        scope {
+                            %27 = load %12 : float, align 4
+                            %28 = cast(floating) %27 : double
+                            %29 = const 0.000000e+00 : double
+                            %30 = cmp lt %28, %29 : bool
+                            if %30 {
+                                %31 = load %14 : float, align 4
+                                %32 = load %12 : float, align 4
+                                %33 = fsub %31, %32 : float
+                                store %33, %12, align 4
+                                %34 = load %12 : float, align 4
+                                %35 = load %14 : float, align 4
+                                %36 = fsub %34, %35 : float
+                                %37 = fneg %36 : float
+                                store %37, %12, align 4
+                                yield
+                            }
+                            yield
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %15 = load %12 : float, align 4
+        store %15, %13
+        %16 = load %13 : float
+        return %16
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %5 = const -1.500000e+00 : double
+        %6 = cast(floating) %5 : float
+        <unmodeled: cir.rint>
+        %8 = cast(floating) %7 : double
+        %9 = const -2.000000e+00 : double
+        %10 = cmp ne %8, %9 : bool
+        if %10 {
+            %11 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

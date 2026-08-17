@@ -1,0 +1,202 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr78622.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[5] = "%hhd" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[14] = "\"%hhd\" => %i\n" [cir_private, default, align 1, dso_local, constant]
+
+fn snprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, ...) -> s32i [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c, nothrow];
+fn foo(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %81 = alloca s32i, "x", align 4
+        %82 = alloca s32i, "__retval", align 4
+        %83 = alloca s8i[5], "buf", align 1
+        %84 = alloca s32i, "n", align 4
+        store %arg0, %81
+        scope {
+            %102 = load %81 : s32i, align 4
+            %103 = const 4096 : s32i
+            %104 = const 8 : s32i
+            %105 = add %103, %104 : s32i [nsw]
+            %106 = cmp lt %102, %105 : bool
+            %107 = ternary %106 ? { : bool
+                %117 = const #true : bool
+                yield %117
+            } : {
+                %110 = load %81 : s32i, align 4
+                %111 = const 4096 : s32i
+                %112 = const 256 : s32i
+                %113 = add %111, %112 : s32i [nsw]
+                %114 = const 8 : s32i
+                %115 = add %113, %114 : s32i [nsw]
+                %116 = cmp ge %110, %115 : bool
+                yield %116
+            }
+            if %107 {
+                %108 = const -1 : s32i
+                store %108, %82
+                %109 = load %82 : s32i
+                return %109
+            }
+            yield
+        }
+        %85 = cast(array_to_ptrdecay) %83 : s8i*
+        %86 = const 5 : u64i
+        %87 = get_global @.str : s8i[5]*
+        %88 = cast(array_to_ptrdecay) %87 : s8i*
+        %89 = load %81 : s32i, align 4
+        %90 = const 1 : s32i
+        %91 = add %89, %90 : s32i [nsw]
+        %92 = call @snprintf(%85, %86, %88, %91) : s32i [all]
+        store %92, %84, align 4
+        %93 = get_global @.str.1 : s8i[14]*
+        %94 = cast(array_to_ptrdecay) %93 : s8i*
+        %95 = load %81 : s32i, align 4
+        %96 = const 1 : s32i
+        %97 = add %95, %96 : s32i [nsw]
+        %98 = load %84 : s32i, align 4
+        %99 = call @printf(%94, %97, %98) : s32i [all]
+        %100 = load %84 : s32i, align 4
+        store %100, %82
+        %101 = load %82 : s32i
+        return %101
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %66 = const 127 : s32i
+        %67 = const 127 : s32i
+        %68 = cmp ne %66, %67 : bool
+        %69 = ternary %68 ? { : bool
+            %80 = const #true : bool
+            yield %80
+        } : {
+            %77 = const 8 : s32i
+            %78 = const 8 : s32i
+            %79 = cmp ne %77, %78 : bool
+            yield %79
+        }
+        %70 = ternary %69 ? { : bool
+            %76 = const #true : bool
+            yield %76
+        } : {
+            %73 = const 4 : s32i
+            %74 = const 4 : s32i
+            %75 = cmp ne %73, %74 : bool
+            yield %75
+        }
+        if %70 {
+            %71 = const 0 : s32i
+            store %71, %0
+            %72 = load %0 : s32i
+            return %72
+        }
+        yield
+    }
+    scope {
+        %4 = const 4095 : s32i
+        %5 = const 9 : s32i
+        %6 = add %4, %5 : s32i [nsw]
+        %7 = call @foo(%6) : s32i [all]
+        %8 = const 1 : s32i
+        %9 = cmp ne %7, %8 : bool
+        %10 = ternary %9 ? { : bool
+            %65 = const #true : bool
+            yield %65
+        } : {
+            %59 = const 4095 : s32i
+            %60 = const 32 : s32i
+            %61 = add %59, %60 : s32i [nsw]
+            %62 = call @foo(%61) : s32i [all]
+            %63 = const 2 : s32i
+            %64 = cmp ne %62, %63 : bool
+            yield %64
+        }
+        %11 = ternary %10 ? { : bool
+            %58 = const #true : bool
+            yield %58
+        } : {
+            %52 = const 4095 : s32i
+            %53 = const 127 : s32i
+            %54 = add %52, %53 : s32i [nsw]
+            %55 = call @foo(%54) : s32i [all]
+            %56 = const 3 : s32i
+            %57 = cmp ne %55, %56 : bool
+            yield %57
+        }
+        %12 = ternary %11 ? { : bool
+            %51 = const #true : bool
+            yield %51
+        } : {
+            %45 = const 4095 : s32i
+            %46 = const 128 : s32i
+            %47 = add %45, %46 : s32i [nsw]
+            %48 = call @foo(%47) : s32i [all]
+            %49 = const 4 : s32i
+            %50 = cmp ne %48, %49 : bool
+            yield %50
+        }
+        %13 = ternary %12 ? { : bool
+            %44 = const #true : bool
+            yield %44
+        } : {
+            %38 = const 4095 : s32i
+            %39 = const 240 : s32i
+            %40 = add %38, %39 : s32i [nsw]
+            %41 = call @foo(%40) : s32i [all]
+            %42 = const 3 : s32i
+            %43 = cmp ne %41, %42 : bool
+            yield %43
+        }
+        %14 = ternary %13 ? { : bool
+            %37 = const #true : bool
+            yield %37
+        } : {
+            %31 = const 4095 : s32i
+            %32 = const 248 : s32i
+            %33 = add %31, %32 : s32i [nsw]
+            %34 = call @foo(%33) : s32i [all]
+            %35 = const 2 : s32i
+            %36 = cmp ne %34, %35 : bool
+            yield %36
+        }
+        %15 = ternary %14 ? { : bool
+            %30 = const #true : bool
+            yield %30
+        } : {
+            %24 = const 4095 : s32i
+            %25 = const 255 : s32i
+            %26 = add %24, %25 : s32i [nsw]
+            %27 = call @foo(%26) : s32i [all]
+            %28 = const 2 : s32i
+            %29 = cmp ne %27, %28 : bool
+            yield %29
+        }
+        %16 = ternary %15 ? { : bool
+            %23 = const #true : bool
+            yield %23
+        } : {
+            %17 = const 4095 : s32i
+            %18 = const 256 : s32i
+            %19 = add %17, %18 : s32i [nsw]
+            %20 = call @foo(%19) : s32i [all]
+            %21 = const 1 : s32i
+            %22 = cmp ne %20, %21 : bool
+            yield %22
+        }
+        if %16 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

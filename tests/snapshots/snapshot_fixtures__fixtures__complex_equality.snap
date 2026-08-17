@@ -1,0 +1,62 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/complex_equality.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca complex<float>, "f", align 4
+    %2 = alloca complex<double>, "d", align 8
+    %3 = alloca complex<long_double<f80>>, "l", align 16
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const (1.000000e+00, 2.000000e+00) : complex<float>
+    store %5, %1, align 4
+    %6 = const (3.000000e+00, 4.000000e+00) : complex<double>
+    store %6, %2, align 8
+    %7 = const (5.000000e+00, 6.000000e+00) : complex<long_double<f80>>
+    store %7, %3, align 16
+    %8 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %9 = get_global @.str : s8i[7]*
+    %10 = cast(array_to_ptrdecay) %9 : s8i*
+    %11 = load %1 : complex<float>, align 4
+    %12 = const (1.000000e+00, 2.000000e+00) : complex<float>
+    %13 = cmp eq %11, %12 : bool
+    %14 = cast(bool_to_int) %13 : s32i
+    %15 = load %1 : complex<float>, align 4
+    %16 = const (1.000000e+00, 3.000000e+00) : complex<float>
+    %17 = cmp ne %15, %16 : bool
+    %18 = cast(bool_to_int) %17 : s32i
+    %19 = call @printf(%10, %14, %18) : s32i [all]
+    %20 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %21 = get_global @.str : s8i[7]*
+    %22 = cast(array_to_ptrdecay) %21 : s8i*
+    %23 = load %2 : complex<double>, align 8
+    %24 = const (3.000000e+00, 4.000000e+00) : complex<double>
+    %25 = cmp eq %23, %24 : bool
+    %26 = cast(bool_to_int) %25 : s32i
+    %27 = load %2 : complex<double>, align 8
+    %28 = const (3.000000e+00, 5.000000e+00) : complex<double>
+    %29 = cmp ne %27, %28 : bool
+    %30 = cast(bool_to_int) %29 : s32i
+    %31 = call @printf(%22, %26, %30) : s32i [all]
+    %32 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %33 = get_global @.str : s8i[7]*
+    %34 = cast(array_to_ptrdecay) %33 : s8i*
+    %35 = load %3 : complex<long_double<f80>>, align 16
+    %36 = const (5.000000e+00, 6.000000e+00) : complex<long_double<f80>>
+    %37 = cmp eq %35, %36 : bool
+    %38 = cast(bool_to_int) %37 : s32i
+    %39 = load %3 : complex<long_double<f80>>, align 16
+    %40 = const (5.000000e+00, 7.000000e+00) : complex<long_double<f80>>
+    %41 = cmp ne %39, %40 : bool
+    %42 = cast(bool_to_int) %41 : s32i
+    %43 = call @printf(%34, %38, %42) : s32i [all]
+    %44 = const 0 : s32i
+    store %44, %0
+    %45 = load %0 : s32i
+    return %45
+}

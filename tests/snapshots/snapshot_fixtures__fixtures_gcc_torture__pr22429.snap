@@ -1,0 +1,78 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr22429.c" (c, x86_64-unknown-linux-gnu)
+fn f(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %14 = alloca s32i, "n", align 4
+        %15 = alloca s32i, "__retval", align 4
+        store %arg0, %14
+        scope {
+            %18 = const 1 : s32i
+            %19 = const 4 : u64i
+            %20 = const 8 : u64i
+            %21 = mul %19, %20 : u64i
+            %22 = const 2 : u64i
+            %23 = sub %21, %22 : u64i
+            %24 = shift left %18, %23 : s32i
+            %25 = minus %24 : s32i [nsw]
+            %26 = load %14 : s32i, align 4
+            %27 = cmp le %25, %26 : bool
+            %28 = ternary %27 ? { : bool
+                %32 = load %14 : s32i, align 4
+                %33 = const 1 : s32i
+                %34 = const 4 : u64i
+                %35 = const 8 : u64i
+                %36 = mul %34, %35 : u64i
+                %37 = const 2 : u64i
+                %38 = sub %36, %37 : u64i
+                %39 = shift left %33, %38 : s32i
+                %40 = const 1 : s32i
+                %41 = sub %39, %40 : s32i [nsw]
+                %42 = cmp le %32, %41 : bool
+                yield %42
+            } : {
+                %31 = const #false : bool
+                yield %31
+            }
+            if %28 {
+                %29 = const 1 : s32i
+                store %29, %15
+                %30 = load %15 : s32i
+                return %30
+            }
+            yield
+        }
+        %16 = const 0 : s32i
+        store %16, %15
+        %17 = load %15 : s32i
+        return %17
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = const 1 : s32i
+        %5 = const 4 : u64i
+        %6 = const 8 : u64i
+        %7 = mul %5, %6 : u64i
+        %8 = const 2 : u64i
+        %9 = sub %7, %8 : u64i
+        %10 = shift left %4, %9 : s32i
+        %11 = call @f(%10) : s32i [all]
+        %12 = cast(int_to_bool) %11 : bool
+        if %12 {
+            %13 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

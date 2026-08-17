@@ -1,0 +1,88 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/990222-1.c" (c, x86_64-unknown-linux-gnu)
+global line : s8i[4] = [49, 57, 57] [external, default, align 1, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i*, "ptr", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @line : s8i[4]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 3 : s32i
+    %6 = ptr_stride %4, %5 : s8i*
+    store %6, %1, align 8
+    scope {
+        while {
+            %37 = const 1 : s32i
+            %38 = load %1 : s8i*, align 8
+            %39 = const -1 : s32i
+            %40 = ptr_stride %38, %39 : s8i*
+            store %40, %1, align 8
+            %41 = load %40 : s8i, align 1
+            %42 = cast(integral) %41 : s32i
+            %43 = add %42, %37 : s32i [nsw]
+            %44 = cast(integral) %43 : s8i
+            store %44, %40, align 1
+            %45 = cast(integral) %44 : s32i
+            %46 = const 57 : s32i
+            %47 = cmp gt %45, %46 : bool
+            condition %47
+        } do {
+            %35 = const 48 : s8i
+            %36 = load %1 : s8i*, align 8
+            store %35, %36, align 1
+            yield
+        }
+        yield
+    }
+    scope {
+        %9 = const 0 : s64i
+        %10 = get_global @line : s8i[4]*
+        %11 = get_element %10[%9] : s8i*
+        %12 = load %11 : s8i, align 1
+        %13 = cast(integral) %12 : s32i
+        %14 = const 50 : s32i
+        %15 = cmp ne %13, %14 : bool
+        %16 = ternary %15 ? { : bool
+            %34 = const #true : bool
+            yield %34
+        } : {
+            %27 = const 1 : s64i
+            %28 = get_global @line : s8i[4]*
+            %29 = get_element %28[%27] : s8i*
+            %30 = load %29 : s8i, align 1
+            %31 = cast(integral) %30 : s32i
+            %32 = const 48 : s32i
+            %33 = cmp ne %31, %32 : bool
+            yield %33
+        }
+        %17 = ternary %16 ? { : bool
+            %26 = const #true : bool
+            yield %26
+        } : {
+            %19 = const 2 : s64i
+            %20 = get_global @line : s8i[4]*
+            %21 = get_element %20[%19] : s8i*
+            %22 = load %21 : s8i, align 1
+            %23 = cast(integral) %22 : s32i
+            %24 = const 48 : s32i
+            %25 = cmp ne %23, %24 : bool
+            yield %25
+        }
+        if %17 {
+            %18 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %7 = const 0 : s32i
+    store %7, %0
+    %8 = load %0 : s32i
+    return %8
+}

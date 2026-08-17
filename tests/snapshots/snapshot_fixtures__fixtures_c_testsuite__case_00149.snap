@@ -1,0 +1,47 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00149.c" (c, x86_64-unknown-linux-gnu)
+global .compoundliteral : rec_S = {1, 2} [internal, default, align 4, dso_local]
+global s : rec_S* = @.compoundliteral [external, default, align 8, dso_local]
+
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %12 = get_global @s : rec_S**
+        %13 = load %12 : rec_S*, align 8
+        %14 = get_member %13[0] "a" : s32i*
+        %15 = load %14 : s32i, align 4
+        %16 = const 1 : s32i
+        %17 = cmp ne %15, %16 : bool
+        if %17 {
+            %18 = const 1 : s32i
+            store %18, %0
+            %19 = load %0 : s32i
+            return %19
+        }
+        yield
+    }
+    scope {
+        %4 = get_global @s : rec_S**
+        %5 = load %4 : rec_S*, align 8
+        %6 = get_member %5[1] "b" : s32i*
+        %7 = load %6 : s32i, align 4
+        %8 = const 2 : s32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            %10 = const 2 : s32i
+            store %10, %0
+            %11 = load %0 : s32i
+            return %11
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

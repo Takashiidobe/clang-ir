@@ -1,0 +1,618 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr49886.c" (c, x86_64-unknown-linux-gnu)
+global cond : s32i = 0 [external, default, align 4, dso_local]
+global gi : s32i = 0 [external, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn never_ever(%arg8: s32i, %arg9: rec_PMC*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg8: s32i, %arg9: rec_PMC*):
+        %370 = alloca s32i, "interp", align 4
+        %371 = alloca rec_PMC*, "pmc", align 8
+        store %arg8, %370
+        store %arg9, %371
+        %372 = get_global @abort : (() -> void)*
+        call @abort() [all]
+        return
+}
+fn foo(%arg6: s32i*, %arg7: rec_Pcc_cell*) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg6: s32i*, %arg7: rec_Pcc_cell*):
+        %366 = alloca s32i*, "interp", align 8
+        %367 = alloca rec_Pcc_cell*, "c", align 8
+        store %arg6, %366
+        store %arg7, %367
+        %368 = load %366 : s32i*, align 8
+        %369 = load %367 : rec_Pcc_cell*, align 8
+        call @mark_cell(%368, %369) [all]
+        return
+}
+fn getnull() -> rec_Pcc_cell* [internal, c, no_inline, dso_local, nothrow] {
+    %363 = alloca rec_Pcc_cell*, "__retval", align 8
+    %364 = const #cir.ptr<null> : rec_Pcc_cell*
+    store %364, %363
+    %365 = load %363 : rec_Pcc_cell*
+    return %365
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %348 = alloca s32i, "__retval", align 4
+    %349 = alloca s32i, "i", align 4
+    %350 = const 0 : s32i
+    store %350, %348
+    %351 = const 1 : s32i
+    %352 = get_global @cond : s32i*
+    store %351, %352, align 4
+    scope {
+        %355 = const 0 : s32i
+        store %355, %349, align 4
+        for cond: {
+            %360 = load %349 : s32i, align 4
+            %361 = const 100 : s32i
+            %362 = cmp lt %360, %361 : bool
+            condition %362
+        } step: {
+            %356 = load %349 : s32i, align 4
+            %357 = inc %356 : s32i [nsw]
+            store %357, %349, align 4
+            yield
+        } do {
+            %358 = get_global @gi : s32i*
+            %359 = call @getnull() : rec_Pcc_cell* [all]
+            call @foo(%358, %359) [all]
+            yield
+        }
+        yield
+    }
+    %353 = const 0 : s32i
+    store %353, %348
+    %354 = load %348 : s32i
+    return %354
+}
+fn mark_cell(%arg4: s32i*, %arg5: rec_Pcc_cell*) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: s32i*, %arg5: rec_Pcc_cell*):
+        %18 = alloca s32i*, "interp", align 8
+        %19 = alloca rec_Pcc_cell*, "c", align 8
+        store %arg4, %18
+        store %arg5, %19
+        scope {
+            %344 = get_global @cond : s32i*
+            %345 = load %344 : s32i, align 4
+            %346 = cast(int_to_bool) %345 : bool
+            %347 = not %346 : bool
+            if %347 {
+                return
+            }
+            yield
+        }
+        scope {
+            %308 = load %19 : rec_Pcc_cell*, align 8
+            %309 = cast(ptr_to_bool) %308 : bool
+            %310 = ternary %309 ? { : bool
+                %339 = load %19 : rec_Pcc_cell*, align 8
+                %340 = get_member %339[2] "type" : s64i*
+                %341 = load %340 : s64i, align 8
+                %342 = const 4 : s64i
+                %343 = cmp eq %341, %342 : bool
+                yield %343
+            } : {
+                %338 = const #false : bool
+                yield %338
+            }
+            %311 = ternary %310 ? { : bool
+                %334 = load %19 : rec_Pcc_cell*, align 8
+                %335 = get_member %334[0] "p" : rec_PMC**
+                %336 = load %335 : rec_PMC*, align 8
+                %337 = cast(ptr_to_bool) %336 : bool
+                yield %337
+            } : {
+                %333 = const #false : bool
+                yield %333
+            }
+            %312 = ternary %311 ? { : bool
+                %321 = load %19 : rec_Pcc_cell*, align 8
+                %322 = get_member %321[0] "p" : rec_PMC**
+                %323 = load %322 : rec_PMC*, align 8
+                %324 = get_member %323[0] "flags" : u32i*
+                %325 = load %324 : u32i, align 4
+                %326 = const 1 : s32i
+                %327 = const 18 : s32i
+                %328 = shift left %326, %327 : s32i
+                %329 = cast(integral) %328 : u32i
+                %330 = and %325, %329 : u32i
+                %331 = cast(int_to_bool) %330 : bool
+                %332 = not %331 : bool
+                yield %332
+            } : {
+                %320 = const #false : bool
+                yield %320
+            }
+            if %312 {
+                %313 = get_global @gi : s32i*
+                %314 = load %313 : s32i, align 4
+                %315 = const 1 : s32i
+                %316 = add %314, %315 : s32i [nsw]
+                %317 = load %19 : rec_Pcc_cell*, align 8
+                %318 = get_member %317[0] "p" : rec_PMC**
+                %319 = load %318 : rec_PMC*, align 8
+                call @never_ever(%316, %319) [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %272 = load %19 : rec_Pcc_cell*, align 8
+            %273 = cast(ptr_to_bool) %272 : bool
+            %274 = ternary %273 ? { : bool
+                %303 = load %19 : rec_Pcc_cell*, align 8
+                %304 = get_member %303[2] "type" : s64i*
+                %305 = load %304 : s64i, align 8
+                %306 = const 4 : s64i
+                %307 = cmp eq %305, %306 : bool
+                yield %307
+            } : {
+                %302 = const #false : bool
+                yield %302
+            }
+            %275 = ternary %274 ? { : bool
+                %298 = load %19 : rec_Pcc_cell*, align 8
+                %299 = get_member %298[0] "p" : rec_PMC**
+                %300 = load %299 : rec_PMC*, align 8
+                %301 = cast(ptr_to_bool) %300 : bool
+                yield %301
+            } : {
+                %297 = const #false : bool
+                yield %297
+            }
+            %276 = ternary %275 ? { : bool
+                %285 = load %19 : rec_Pcc_cell*, align 8
+                %286 = get_member %285[0] "p" : rec_PMC**
+                %287 = load %286 : rec_PMC*, align 8
+                %288 = get_member %287[0] "flags" : u32i*
+                %289 = load %288 : u32i, align 4
+                %290 = const 1 : s32i
+                %291 = const 17 : s32i
+                %292 = shift left %290, %291 : s32i
+                %293 = cast(integral) %292 : u32i
+                %294 = and %289, %293 : u32i
+                %295 = cast(int_to_bool) %294 : bool
+                %296 = not %295 : bool
+                yield %296
+            } : {
+                %284 = const #false : bool
+                yield %284
+            }
+            if %276 {
+                %277 = get_global @gi : s32i*
+                %278 = load %277 : s32i, align 4
+                %279 = const 2 : s32i
+                %280 = add %278, %279 : s32i [nsw]
+                %281 = load %19 : rec_Pcc_cell*, align 8
+                %282 = get_member %281[0] "p" : rec_PMC**
+                %283 = load %282 : rec_PMC*, align 8
+                call @never_ever(%280, %283) [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %236 = load %19 : rec_Pcc_cell*, align 8
+            %237 = cast(ptr_to_bool) %236 : bool
+            %238 = ternary %237 ? { : bool
+                %267 = load %19 : rec_Pcc_cell*, align 8
+                %268 = get_member %267[2] "type" : s64i*
+                %269 = load %268 : s64i, align 8
+                %270 = const 4 : s64i
+                %271 = cmp eq %269, %270 : bool
+                yield %271
+            } : {
+                %266 = const #false : bool
+                yield %266
+            }
+            %239 = ternary %238 ? { : bool
+                %262 = load %19 : rec_Pcc_cell*, align 8
+                %263 = get_member %262[0] "p" : rec_PMC**
+                %264 = load %263 : rec_PMC*, align 8
+                %265 = cast(ptr_to_bool) %264 : bool
+                yield %265
+            } : {
+                %261 = const #false : bool
+                yield %261
+            }
+            %240 = ternary %239 ? { : bool
+                %249 = load %19 : rec_Pcc_cell*, align 8
+                %250 = get_member %249[0] "p" : rec_PMC**
+                %251 = load %250 : rec_PMC*, align 8
+                %252 = get_member %251[0] "flags" : u32i*
+                %253 = load %252 : u32i, align 4
+                %254 = const 1 : s32i
+                %255 = const 16 : s32i
+                %256 = shift left %254, %255 : s32i
+                %257 = cast(integral) %256 : u32i
+                %258 = and %253, %257 : u32i
+                %259 = cast(int_to_bool) %258 : bool
+                %260 = not %259 : bool
+                yield %260
+            } : {
+                %248 = const #false : bool
+                yield %248
+            }
+            if %240 {
+                %241 = get_global @gi : s32i*
+                %242 = load %241 : s32i, align 4
+                %243 = const 3 : s32i
+                %244 = add %242, %243 : s32i [nsw]
+                %245 = load %19 : rec_Pcc_cell*, align 8
+                %246 = get_member %245[0] "p" : rec_PMC**
+                %247 = load %246 : rec_PMC*, align 8
+                call @never_ever(%244, %247) [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %200 = load %19 : rec_Pcc_cell*, align 8
+            %201 = cast(ptr_to_bool) %200 : bool
+            %202 = ternary %201 ? { : bool
+                %231 = load %19 : rec_Pcc_cell*, align 8
+                %232 = get_member %231[2] "type" : s64i*
+                %233 = load %232 : s64i, align 8
+                %234 = const 4 : s64i
+                %235 = cmp eq %233, %234 : bool
+                yield %235
+            } : {
+                %230 = const #false : bool
+                yield %230
+            }
+            %203 = ternary %202 ? { : bool
+                %226 = load %19 : rec_Pcc_cell*, align 8
+                %227 = get_member %226[0] "p" : rec_PMC**
+                %228 = load %227 : rec_PMC*, align 8
+                %229 = cast(ptr_to_bool) %228 : bool
+                yield %229
+            } : {
+                %225 = const #false : bool
+                yield %225
+            }
+            %204 = ternary %203 ? { : bool
+                %213 = load %19 : rec_Pcc_cell*, align 8
+                %214 = get_member %213[0] "p" : rec_PMC**
+                %215 = load %214 : rec_PMC*, align 8
+                %216 = get_member %215[0] "flags" : u32i*
+                %217 = load %216 : u32i, align 4
+                %218 = const 1 : s32i
+                %219 = const 15 : s32i
+                %220 = shift left %218, %219 : s32i
+                %221 = cast(integral) %220 : u32i
+                %222 = and %217, %221 : u32i
+                %223 = cast(int_to_bool) %222 : bool
+                %224 = not %223 : bool
+                yield %224
+            } : {
+                %212 = const #false : bool
+                yield %212
+            }
+            if %204 {
+                %205 = get_global @gi : s32i*
+                %206 = load %205 : s32i, align 4
+                %207 = const 4 : s32i
+                %208 = add %206, %207 : s32i [nsw]
+                %209 = load %19 : rec_Pcc_cell*, align 8
+                %210 = get_member %209[0] "p" : rec_PMC**
+                %211 = load %210 : rec_PMC*, align 8
+                call @never_ever(%208, %211) [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %164 = load %19 : rec_Pcc_cell*, align 8
+            %165 = cast(ptr_to_bool) %164 : bool
+            %166 = ternary %165 ? { : bool
+                %195 = load %19 : rec_Pcc_cell*, align 8
+                %196 = get_member %195[2] "type" : s64i*
+                %197 = load %196 : s64i, align 8
+                %198 = const 4 : s64i
+                %199 = cmp eq %197, %198 : bool
+                yield %199
+            } : {
+                %194 = const #false : bool
+                yield %194
+            }
+            %167 = ternary %166 ? { : bool
+                %190 = load %19 : rec_Pcc_cell*, align 8
+                %191 = get_member %190[0] "p" : rec_PMC**
+                %192 = load %191 : rec_PMC*, align 8
+                %193 = cast(ptr_to_bool) %192 : bool
+                yield %193
+            } : {
+                %189 = const #false : bool
+                yield %189
+            }
+            %168 = ternary %167 ? { : bool
+                %177 = load %19 : rec_Pcc_cell*, align 8
+                %178 = get_member %177[0] "p" : rec_PMC**
+                %179 = load %178 : rec_PMC*, align 8
+                %180 = get_member %179[0] "flags" : u32i*
+                %181 = load %180 : u32i, align 4
+                %182 = const 1 : s32i
+                %183 = const 14 : s32i
+                %184 = shift left %182, %183 : s32i
+                %185 = cast(integral) %184 : u32i
+                %186 = and %181, %185 : u32i
+                %187 = cast(int_to_bool) %186 : bool
+                %188 = not %187 : bool
+                yield %188
+            } : {
+                %176 = const #false : bool
+                yield %176
+            }
+            if %168 {
+                %169 = get_global @gi : s32i*
+                %170 = load %169 : s32i, align 4
+                %171 = const 5 : s32i
+                %172 = add %170, %171 : s32i [nsw]
+                %173 = load %19 : rec_Pcc_cell*, align 8
+                %174 = get_member %173[0] "p" : rec_PMC**
+                %175 = load %174 : rec_PMC*, align 8
+                call @never_ever(%172, %175) [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %128 = load %19 : rec_Pcc_cell*, align 8
+            %129 = cast(ptr_to_bool) %128 : bool
+            %130 = ternary %129 ? { : bool
+                %159 = load %19 : rec_Pcc_cell*, align 8
+                %160 = get_member %159[2] "type" : s64i*
+                %161 = load %160 : s64i, align 8
+                %162 = const 4 : s64i
+                %163 = cmp eq %161, %162 : bool
+                yield %163
+            } : {
+                %158 = const #false : bool
+                yield %158
+            }
+            %131 = ternary %130 ? { : bool
+                %154 = load %19 : rec_Pcc_cell*, align 8
+                %155 = get_member %154[0] "p" : rec_PMC**
+                %156 = load %155 : rec_PMC*, align 8
+                %157 = cast(ptr_to_bool) %156 : bool
+                yield %157
+            } : {
+                %153 = const #false : bool
+                yield %153
+            }
+            %132 = ternary %131 ? { : bool
+                %141 = load %19 : rec_Pcc_cell*, align 8
+                %142 = get_member %141[0] "p" : rec_PMC**
+                %143 = load %142 : rec_PMC*, align 8
+                %144 = get_member %143[0] "flags" : u32i*
+                %145 = load %144 : u32i, align 4
+                %146 = const 1 : s32i
+                %147 = const 13 : s32i
+                %148 = shift left %146, %147 : s32i
+                %149 = cast(integral) %148 : u32i
+                %150 = and %145, %149 : u32i
+                %151 = cast(int_to_bool) %150 : bool
+                %152 = not %151 : bool
+                yield %152
+            } : {
+                %140 = const #false : bool
+                yield %140
+            }
+            if %132 {
+                %133 = get_global @gi : s32i*
+                %134 = load %133 : s32i, align 4
+                %135 = const 6 : s32i
+                %136 = add %134, %135 : s32i [nsw]
+                %137 = load %19 : rec_Pcc_cell*, align 8
+                %138 = get_member %137[0] "p" : rec_PMC**
+                %139 = load %138 : rec_PMC*, align 8
+                call @never_ever(%136, %139) [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %92 = load %19 : rec_Pcc_cell*, align 8
+            %93 = cast(ptr_to_bool) %92 : bool
+            %94 = ternary %93 ? { : bool
+                %123 = load %19 : rec_Pcc_cell*, align 8
+                %124 = get_member %123[2] "type" : s64i*
+                %125 = load %124 : s64i, align 8
+                %126 = const 4 : s64i
+                %127 = cmp eq %125, %126 : bool
+                yield %127
+            } : {
+                %122 = const #false : bool
+                yield %122
+            }
+            %95 = ternary %94 ? { : bool
+                %118 = load %19 : rec_Pcc_cell*, align 8
+                %119 = get_member %118[0] "p" : rec_PMC**
+                %120 = load %119 : rec_PMC*, align 8
+                %121 = cast(ptr_to_bool) %120 : bool
+                yield %121
+            } : {
+                %117 = const #false : bool
+                yield %117
+            }
+            %96 = ternary %95 ? { : bool
+                %105 = load %19 : rec_Pcc_cell*, align 8
+                %106 = get_member %105[0] "p" : rec_PMC**
+                %107 = load %106 : rec_PMC*, align 8
+                %108 = get_member %107[0] "flags" : u32i*
+                %109 = load %108 : u32i, align 4
+                %110 = const 1 : s32i
+                %111 = const 12 : s32i
+                %112 = shift left %110, %111 : s32i
+                %113 = cast(integral) %112 : u32i
+                %114 = and %109, %113 : u32i
+                %115 = cast(int_to_bool) %114 : bool
+                %116 = not %115 : bool
+                yield %116
+            } : {
+                %104 = const #false : bool
+                yield %104
+            }
+            if %96 {
+                %97 = get_global @gi : s32i*
+                %98 = load %97 : s32i, align 4
+                %99 = const 7 : s32i
+                %100 = add %98, %99 : s32i [nsw]
+                %101 = load %19 : rec_Pcc_cell*, align 8
+                %102 = get_member %101[0] "p" : rec_PMC**
+                %103 = load %102 : rec_PMC*, align 8
+                call @never_ever(%100, %103) [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %56 = load %19 : rec_Pcc_cell*, align 8
+            %57 = cast(ptr_to_bool) %56 : bool
+            %58 = ternary %57 ? { : bool
+                %87 = load %19 : rec_Pcc_cell*, align 8
+                %88 = get_member %87[2] "type" : s64i*
+                %89 = load %88 : s64i, align 8
+                %90 = const 4 : s64i
+                %91 = cmp eq %89, %90 : bool
+                yield %91
+            } : {
+                %86 = const #false : bool
+                yield %86
+            }
+            %59 = ternary %58 ? { : bool
+                %82 = load %19 : rec_Pcc_cell*, align 8
+                %83 = get_member %82[0] "p" : rec_PMC**
+                %84 = load %83 : rec_PMC*, align 8
+                %85 = cast(ptr_to_bool) %84 : bool
+                yield %85
+            } : {
+                %81 = const #false : bool
+                yield %81
+            }
+            %60 = ternary %59 ? { : bool
+                %69 = load %19 : rec_Pcc_cell*, align 8
+                %70 = get_member %69[0] "p" : rec_PMC**
+                %71 = load %70 : rec_PMC*, align 8
+                %72 = get_member %71[0] "flags" : u32i*
+                %73 = load %72 : u32i, align 4
+                %74 = const 1 : s32i
+                %75 = const 11 : s32i
+                %76 = shift left %74, %75 : s32i
+                %77 = cast(integral) %76 : u32i
+                %78 = and %73, %77 : u32i
+                %79 = cast(int_to_bool) %78 : bool
+                %80 = not %79 : bool
+                yield %80
+            } : {
+                %68 = const #false : bool
+                yield %68
+            }
+            if %60 {
+                %61 = get_global @gi : s32i*
+                %62 = load %61 : s32i, align 4
+                %63 = const 8 : s32i
+                %64 = add %62, %63 : s32i [nsw]
+                %65 = load %19 : rec_Pcc_cell*, align 8
+                %66 = get_member %65[0] "p" : rec_PMC**
+                %67 = load %66 : rec_PMC*, align 8
+                call @never_ever(%64, %67) [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %20 = load %19 : rec_Pcc_cell*, align 8
+            %21 = cast(ptr_to_bool) %20 : bool
+            %22 = ternary %21 ? { : bool
+                %51 = load %19 : rec_Pcc_cell*, align 8
+                %52 = get_member %51[2] "type" : s64i*
+                %53 = load %52 : s64i, align 8
+                %54 = const 4 : s64i
+                %55 = cmp eq %53, %54 : bool
+                yield %55
+            } : {
+                %50 = const #false : bool
+                yield %50
+            }
+            %23 = ternary %22 ? { : bool
+                %46 = load %19 : rec_Pcc_cell*, align 8
+                %47 = get_member %46[0] "p" : rec_PMC**
+                %48 = load %47 : rec_PMC*, align 8
+                %49 = cast(ptr_to_bool) %48 : bool
+                yield %49
+            } : {
+                %45 = const #false : bool
+                yield %45
+            }
+            %24 = ternary %23 ? { : bool
+                %33 = load %19 : rec_Pcc_cell*, align 8
+                %34 = get_member %33[0] "p" : rec_PMC**
+                %35 = load %34 : rec_PMC*, align 8
+                %36 = get_member %35[0] "flags" : u32i*
+                %37 = load %36 : u32i, align 4
+                %38 = const 1 : s32i
+                %39 = const 10 : s32i
+                %40 = shift left %38, %39 : s32i
+                %41 = cast(integral) %40 : u32i
+                %42 = and %37, %41 : u32i
+                %43 = cast(int_to_bool) %42 : bool
+                %44 = not %43 : bool
+                yield %44
+            } : {
+                %32 = const #false : bool
+                yield %32
+            }
+            if %24 {
+                %25 = get_global @gi : s32i*
+                %26 = load %25 : s32i, align 4
+                %27 = const 9 : s32i
+                %28 = add %26, %27 : s32i [nsw]
+                %29 = load %19 : rec_Pcc_cell*, align 8
+                %30 = get_member %29[0] "p" : rec_PMC**
+                %31 = load %30 : rec_PMC*, align 8
+                call @never_ever(%28, %31) [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn bar_1(%arg2: s32i*, %arg3: rec_Pcc_cell*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i*, %arg3: rec_Pcc_cell*):
+        %9 = alloca s32i*, "interp", align 8
+        %10 = alloca rec_Pcc_cell*, "c", align 8
+        store %arg2, %9
+        store %arg3, %10
+        %11 = const 1 : s64i
+        %12 = load %10 : rec_Pcc_cell*, align 8
+        %13 = get_member %12[1] "bla" : s64i*
+        %14 = load %13 : s64i, align 8
+        %15 = add %14, %11 : s64i [nsw]
+        store %15, %13, align 8
+        %16 = load %9 : s32i*, align 8
+        %17 = load %10 : rec_Pcc_cell*, align 8
+        call @mark_cell(%16, %17) [all]
+        return
+}
+fn bar_2(%arg0: s32i*, %arg1: rec_Pcc_cell*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i*, %arg1: rec_Pcc_cell*):
+        %0 = alloca s32i*, "interp", align 8
+        %1 = alloca rec_Pcc_cell*, "c", align 8
+        store %arg0, %0
+        store %arg1, %1
+        %2 = const 2 : s64i
+        %3 = load %1 : rec_Pcc_cell*, align 8
+        %4 = get_member %3[1] "bla" : s64i*
+        %5 = load %4 : s64i, align 8
+        %6 = add %5, %2 : s64i [nsw]
+        store %6, %4, align 8
+        %7 = load %0 : s32i*, align 8
+        %8 = load %1 : rec_Pcc_cell*, align 8
+        call @mark_cell(%7, %8) [all]
+        return
+}

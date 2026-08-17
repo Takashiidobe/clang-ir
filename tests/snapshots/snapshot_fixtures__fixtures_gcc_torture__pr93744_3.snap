@@ -1,0 +1,96 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr93744-3.c" (c, x86_64-unknown-linux-gnu)
+global w : s32i = 0 [external, default, align 4, dso_local]
+
+fn foo(%arg0: s32i, %arg1: s32i, %arg2: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s32i, %arg2: s32i):
+        %30 = alloca s32i, "x", align 4
+        %31 = alloca s32i, "y", align 4
+        %32 = alloca s32i, "z", align 4
+        %33 = alloca s32i, "__retval", align 4
+        %34 = alloca s32i, "r", align 4
+        store %arg0, %30
+        store %arg1, %31
+        store %arg2, %32
+        %35 = load %32 : s32i, align 4
+        %36 = get_global @w : s32i*
+        %37 = load %36 : s32i, align 4
+        %38 = inc %37 : s32i [nsw]
+        store %38, %36, align 4
+        %39 = load %32 : s32i, align 4
+        %40 = sub %37, %39 : s32i [nsw]
+        %41 = load %30 : s32i, align 4
+        %42 = load %31 : s32i, align 4
+        %43 = cmp lt %41, %42 : bool
+        %44 = cast(bool_to_int) %43 : s32i
+        %45 = minus %44 : s32i [nsw]
+        %46 = and %40, %45 : s32i
+        %47 = add %35, %46 : s32i [nsw]
+        store %47, %34, align 4
+        %48 = load %34 : s32i, align 4
+        store %48, %33
+        %49 = load %33 : s32i
+        return %49
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 4 : s32i
+    %3 = get_global @w : s32i*
+    store %2, %3, align 4
+    scope {
+        %18 = const 5 : s32i
+        %19 = const 7 : s32i
+        %20 = const 12 : s32i
+        %21 = call @foo(%18, %19, %20) : s32i [all]
+        %22 = const 4 : s32i
+        %23 = cmp ne %21, %22 : bool
+        %24 = ternary %23 ? { : bool
+            %29 = const #true : bool
+            yield %29
+        } : {
+            %25 = get_global @w : s32i*
+            %26 = load %25 : s32i, align 4
+            %27 = const 5 : s32i
+            %28 = cmp ne %26, %27 : bool
+            yield %28
+        }
+        if %24 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %6 = const 7 : s32i
+        %7 = const 5 : s32i
+        %8 = const 12 : s32i
+        %9 = call @foo(%6, %7, %8) : s32i [all]
+        %10 = const 12 : s32i
+        %11 = cmp ne %9, %10 : bool
+        %12 = ternary %11 ? { : bool
+            %17 = const #true : bool
+            yield %17
+        } : {
+            %13 = get_global @w : s32i*
+            %14 = load %13 : s32i, align 4
+            %15 = const 6 : s32i
+            %16 = cmp ne %14, %15 : bool
+            yield %16
+        }
+        if %12 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

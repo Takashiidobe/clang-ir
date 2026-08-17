@@ -1,0 +1,126 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr88693.c" (c, x86_64-unknown-linux-gnu)
+global baz.u : u8i[9] = [106, 107, 108, 109, 110, 111, 112, 113, 114] [internal, default, align 1, dso_local]
+global bar.u : u8i[9] = "abcdefghi" [internal, default, align 1, dso_local]
+
+fn strlen(%arg0: s8i*) -> u64i [external, c, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn foo(%arg1: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s8i*):
+        %51 = alloca s8i*, "p", align 8
+        store %arg1, %51
+        scope {
+            %52 = load %51 : s8i*, align 8
+            %53 = call @strlen(%52) : u64i [all]
+            %54 = const 9 : u64i
+            %55 = cmp ne %53, %54 : bool
+            if %55 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn quux(%arg0: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i*):
+        %35 = alloca s8i*, "p", align 8
+        %36 = alloca s32i, "i", align 4
+        store %arg0, %35
+        scope {
+            %37 = const 0 : s32i
+            store %37, %36, align 4
+            for cond: {
+                %48 = load %36 : s32i, align 4
+                %49 = const 100 : s32i
+                %50 = cmp lt %48, %49 : bool
+                condition %50
+            } step: {
+                %38 = load %36 : s32i, align 4
+                %39 = inc %38 : s32i [nsw]
+                store %39, %36, align 4
+                yield
+            } do {
+                scope {
+                    %40 = load %36 : s32i, align 4
+                    %41 = cast(integral) %40 : s64i
+                    %42 = load %35 : s8i*, align 8
+                    %43 = ptr_stride %42, %41 : s8i*
+                    %44 = load %43 : s8i, align 1
+                    %45 = cast(integral) %44 : s32i
+                    %46 = const 120 : s32i
+                    %47 = cmp ne %45, %46 : bool
+                    if %47 {
+                        call @abort() [all]
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        return
+}
+fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
+fn qux() -> void [external, c, no_inline, dso_local, nothrow] {
+    %28 = alloca s8i[100], "b", align 16
+    %29 = cast(array_to_ptrdecay) %28 : s8i*
+    %30 = cast(bitcast) %29 : void*
+    %31 = const 120 : s32i
+    %32 = const 100 : u64i
+    %33 = call @memset(%30, %31, %32) : void* [all]
+    %34 = cast(array_to_ptrdecay) %28 : s8i*
+    call @quux(%34) [all]
+    return
+}
+fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
+fn bar() -> void [external, c, no_inline, dso_local, nothrow] {
+    %16 = alloca s8i[100], "b", align 16
+    %17 = get_global @bar.u : u8i[9]*
+    %18 = cast(array_to_ptrdecay) %16 : s8i*
+    %19 = cast(bitcast) %18 : void*
+    %20 = cast(array_to_ptrdecay) %17 : u8i*
+    %21 = cast(bitcast) %20 : void*
+    %22 = const 9 : u64i
+    %23 = call @memcpy(%19, %21, %22) : void* [all]
+    %24 = const 0 : s8i
+    %25 = const 9 : u64i
+    %26 = get_element %16[%25] : s8i*
+    store %24, %26, align 1
+    %27 = cast(array_to_ptrdecay) %16 : s8i*
+    call @foo(%27) [all]
+    return
+}
+fn baz() -> void [external, c, no_inline, dso_local, nothrow] {
+    %4 = alloca s8i[100], "b", align 16
+    %5 = get_global @baz.u : u8i[9]*
+    %6 = cast(array_to_ptrdecay) %4 : s8i*
+    %7 = cast(bitcast) %6 : void*
+    %8 = cast(array_to_ptrdecay) %5 : u8i*
+    %9 = cast(bitcast) %8 : void*
+    %10 = const 9 : u64i
+    %11 = call @memcpy(%7, %9, %10) : void* [all]
+    %12 = const 0 : s8i
+    %13 = const 9 : u64i
+    %14 = get_element %4[%13] : s8i*
+    store %12, %14, align 1
+    %15 = cast(array_to_ptrdecay) %4 : s8i*
+    call @foo(%15) [all]
+    return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    call @qux() [all]
+    call @bar() [all]
+    call @baz() [all]
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

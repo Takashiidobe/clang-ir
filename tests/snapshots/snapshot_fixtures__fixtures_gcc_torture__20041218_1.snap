@@ -1,0 +1,311 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20041218-1.c" (c, x86_64-unknown-linux-gnu)
+global __const.bar.t : rec_T = zero [cir_private, default, dso_local, constant]
+global baz.v : rec_V = zero [internal, default, align 8, dso_local]
+global .str : s8i[1] = zero [cir_private, default, align 1, dso_local, constant]
+
+fn dummy1(%arg10: void*) -> void* [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg10: void*):
+        %155 = alloca void*, "x", align 8
+        %156 = alloca void*, "__retval", align 8
+        store %arg10, %155
+        %157 = get_global @.str : s8i[1]*
+        %158 = cast(array_to_ptrdecay) %157 : s8i*
+        %159 = cast(bitcast) %158 : void*
+        store %159, %156
+        %160 = load %156 : void*
+        return %160
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn dummy2(%arg8: void*, %arg9: void*) -> void* [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg8: void*, %arg9: void*):
+        %149 = alloca void*, "x", align 8
+        %150 = alloca void*, "y", align 8
+        %151 = alloca void*, "__retval", align 8
+        store %arg8, %149
+        store %arg9, %150
+        %152 = get_global @exit : ((s32i) -> void)*
+        %153 = const 0 : s32i
+        call @exit(%153) [all]
+        %154 = load %151 : void*
+        return %154
+}
+fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
+fn baz(%arg7: u32i) -> rec_V* [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg7: u32i):
+        %141 = alloca u32i, "x", align 4
+        %142 = alloca rec_V*, "__retval", align 8
+        store %arg7, %141
+        %143 = get_global @baz.v : rec_V*
+        %144 = cast(bitcast) %143 : void*
+        %145 = const 85 : s32i
+        %146 = const 72 : u64i
+        %147 = call @memset(%144, %145, %146) : void* [all]
+        store %143, %142
+        %148 = load %142 : rec_V*
+        return %148
+}
+fn abort() -> void [external, c, nothrow];
+fn check(%arg5: void*, %arg6: rec_S*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg5: void*, %arg6: rec_S*):
+        %102 = alloca void*, "x", align 8
+        %103 = alloca rec_S*, "y", align 8
+        %104 = alloca s32i, "__retval", align 4
+        store %arg5, %102
+        store %arg6, %103
+        scope {
+            %107 = load %103 : rec_S*, align 8
+            %108 = get_member %107[0] "a" : u32i*
+            %109 = load %108 : u32i, align 8
+            %110 = cast(int_to_bool) %109 : bool
+            %111 = ternary %110 ? { : bool
+                %140 = const #true : bool
+                yield %140
+            } : {
+                %135 = load %103 : rec_S*, align 8
+                %136 = get_member %135[1] "f" : rec_T*
+                %137 = get_member %136[0] "b" : u32i*
+                %138 = load %137 : u32i, align 8
+                %139 = cast(int_to_bool) %138 : bool
+                yield %139
+            }
+            %112 = ternary %111 ? { : bool
+                %134 = const #true : bool
+                yield %134
+            } : {
+                %129 = load %103 : rec_S*, align 8
+                %130 = get_member %129[1] "f" : rec_T*
+                %131 = get_member %130[1] "c" : u32i*
+                %132 = load %131 : u32i, align 4
+                %133 = cast(int_to_bool) %132 : bool
+                yield %133
+            }
+            %113 = ternary %112 ? { : bool
+                %128 = const #true : bool
+                yield %128
+            } : {
+                %123 = load %103 : rec_S*, align 8
+                %124 = get_member %123[1] "f" : rec_T*
+                %125 = get_member %124[2] "d" : u32i**
+                %126 = load %125 : u32i*, align 8
+                %127 = cast(ptr_to_bool) %126 : bool
+                yield %127
+            }
+            %114 = ternary %113 ? { : bool
+                %122 = const #true : bool
+                yield %122
+            } : {
+                %116 = load %103 : rec_S*, align 8
+                %117 = get_member %116[1] "f" : rec_T*
+                %118 = get_member %117[3] "e" : u8i*
+                %119 = load %118 : u8i, align 8
+                %120 = cast(integral) %119 : s32i
+                %121 = cast(int_to_bool) %120 : bool
+                yield %121
+            }
+            if %114 {
+                %115 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        %105 = const 1 : s32i
+        store %105, %104
+        %106 = load %104 : s32i
+        return %106
+}
+fn bar(%arg3: u32i, %arg4: void*) -> rec_V* [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: u32i, %arg4: void*):
+        %45 = alloca u32i, "x", align 4
+        %46 = alloca void*, "y", align 8
+        %47 = alloca rec_V*, "__retval", align 8
+        %48 = alloca rec_T, "t", align 8
+        %49 = alloca rec_V*, "u", align 8
+        %50 = alloca void*, "v", align 8
+        store %arg3, %45
+        store %arg4, %46
+        %51 = get_global @__const.bar.t : rec_T*
+        copy %48, %51
+        %52 = load %46 : void*, align 8
+        %53 = call @dummy1(%52) : void* [all]
+        store %53, %50, align 8
+        scope {
+            %97 = load %50 : void*, align 8
+            %98 = cast(ptr_to_bool) %97 : bool
+            %99 = not %98 : bool
+            if %99 {
+                %100 = const #cir.ptr<null> : rec_V*
+                store %100, %47
+                %101 = load %47 : rec_V*
+                return %101
+            }
+            yield
+        }
+        %54 = const 72 : u32i
+        %55 = call @baz(%54) : rec_V* [all]
+        store %55, %49, align 8
+        %56 = load %45 : u32i, align 4
+        %57 = load %49 : rec_V*, align 8
+        %58 = get_member %57[0] "i" : u32i*
+        store %56, %58, align 8
+        %59 = const 0 : u32i
+        %60 = load %49 : rec_V*, align 8
+        %61 = get_member %60[1] "j" : rec_U*
+        %62 = get_member %61[0] "g" : rec_S*
+        %63 = get_member %62[0] "a" : u32i*
+        store %59, %63, align 8
+        %64 = load %49 : rec_V*, align 8
+        %65 = get_member %64[1] "j" : rec_U*
+        %66 = get_member %65[0] "g" : rec_S*
+        %67 = get_member %66[1] "f" : rec_T*
+        copy %67, %48
+        %68 = const 0 : u32i
+        %69 = load %49 : rec_V*, align 8
+        %70 = get_member %69[1] "j" : rec_U*
+        %71 = get_member %70[1] "h" : rec_S*
+        %72 = get_member %71[0] "a" : u32i*
+        store %68, %72, align 8
+        %73 = load %49 : rec_V*, align 8
+        %74 = get_member %73[1] "j" : rec_U*
+        %75 = get_member %74[1] "h" : rec_S*
+        %76 = get_member %75[1] "f" : rec_T*
+        copy %76, %48
+        scope {
+            %79 = load %50 : void*, align 8
+            %80 = load %49 : rec_V*, align 8
+            %81 = get_member %80[1] "j" : rec_U*
+            %82 = get_member %81[0] "g" : rec_S*
+            %83 = call @check(%79, %82) : s32i [all]
+            %84 = cast(int_to_bool) %83 : bool
+            %85 = not %84 : bool
+            %86 = ternary %85 ? { : bool
+                %96 = const #true : bool
+                yield %96
+            } : {
+                %89 = load %50 : void*, align 8
+                %90 = load %49 : rec_V*, align 8
+                %91 = get_member %90[1] "j" : rec_U*
+                %92 = get_member %91[1] "h" : rec_S*
+                %93 = call @check(%89, %92) : s32i [all]
+                %94 = cast(int_to_bool) %93 : bool
+                %95 = not %94 : bool
+                yield %95
+            }
+            if %86 {
+                %87 = const #cir.ptr<null> : rec_V*
+                store %87, %47
+                %88 = load %47 : rec_V*
+                return %88
+            }
+            yield
+        }
+        %77 = load %49 : rec_V*, align 8
+        store %77, %47
+        %78 = load %47 : rec_V*
+        return %78
+}
+fn foo(%arg0: u32i*, %arg1: u32i, %arg2: void**) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i*, %arg1: u32i, %arg2: void**):
+        %9 = alloca u32i*, "x", align 8
+        %10 = alloca u32i, "y", align 4
+        %11 = alloca void**, "z", align 8
+        %12 = alloca s32i, "__retval", align 4
+        %13 = alloca void*, "v", align 8
+        %14 = alloca u32i, "i", align 4
+        %15 = alloca u32i, "j", align 4
+        store %arg0, %9
+        store %arg1, %10
+        store %arg2, %11
+        %16 = const #cir.ptr<null> : void*
+        store %16, %13, align 8
+        %17 = load %11 : void**, align 8
+        store %16, %17, align 8
+        scope {
+            %22 = const 0 : u32i
+            store %22, %14, align 4
+            for cond: {
+                %42 = load %14 : u32i, align 4
+                %43 = load %10 : u32i, align 4
+                %44 = cmp lt %42, %43 : bool
+                condition %44
+            } step: {
+                %23 = load %14 : u32i, align 4
+                %24 = inc %23 : u32i
+                store %24, %14, align 4
+                yield
+            } do {
+                scope {
+                    %25 = alloca rec_V*, "c", align 8
+                    %26 = load %9 : u32i*, align 8
+                    %27 = load %26 : u32i, align 4
+                    store %27, %15, align 4
+                    scope {
+                        %36 = load %15 : u32i, align 4
+                        switch %36 {
+                            case equal 1 {
+                                %38 = load %15 : u32i, align 4
+                                %39 = load %9 : u32i*, align 8
+                                %40 = cast(bitcast) %39 : void*
+                                %41 = call @bar(%38, %40) : rec_V* [all]
+                                store %41, %25, align 8
+                                break
+                            }
+                            case default {
+                                %37 = const #cir.ptr<null> : rec_V*
+                                store %37, %25, align 8
+                                break
+                            }
+                        }
+                        yield
+                    }
+                    scope {
+                        %28 = load %25 : rec_V*, align 8
+                        %29 = cast(ptr_to_bool) %28 : bool
+                        if %29 {
+                            %32 = load %13 : void*, align 8
+                            %33 = load %25 : rec_V*, align 8
+                            %34 = cast(bitcast) %33 : void*
+                            %35 = call @dummy2(%32, %34) : void* [all]
+                            store %35, %13, align 8
+                            yield
+                        } else {
+                            %30 = const 1 : s32i
+                            store %30, %12
+                            %31 = load %12 : s32i
+                            return %31
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %18 = load %13 : void*, align 8
+        %19 = load %11 : void**, align 8
+        store %18, %19, align 8
+        %20 = const 0 : s32i
+        store %20, %12
+        %21 = load %12 : s32i
+        return %21
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u32i, "one", align 4
+    %2 = alloca void*, "p", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 1 : u32i
+    store %4, %1, align 4
+    %5 = const 1 : u32i
+    %6 = call @foo(%1, %5, %2) : s32i [all]
+    %7 = get_global @abort : (() -> void)*
+    call @abort() [all]
+    %8 = load %0 : s32i
+    return %8
+}

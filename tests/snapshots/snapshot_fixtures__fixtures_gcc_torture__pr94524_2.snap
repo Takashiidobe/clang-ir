@@ -1,0 +1,88 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr94524-2.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: vector<16 x s8i>) -> vector<16 x s8i> [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: vector<16 x s8i>):
+        %35 = alloca vector<16 x s8i>, "c", align 16
+        %36 = alloca vector<16 x s8i>, "__retval", align 16
+        store %arg0, %35
+        %37 = const -128 : s8i
+        <unmodeled: cir.vec.splat>
+        %39 = load %35 : vector<16 x s8i>, align 16
+        %40 = rem %39, %38 : vector<16 x s8i>
+        store %40, %35, align 16
+        %41 = load %35 : vector<16 x s8i>, align 16
+        store %41, %36
+        %42 = load %36 : vector<16 x s8i>
+        return %42
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca vector<16 x s8i>, "x", align 16
+    %2 = alloca vector<16 x s8i>, ".compoundliteral", align 16
+    %3 = alloca vector<16 x s8i>, ".compoundliteral", align 16
+    %4 = alloca vector<16 x s8i>, ".compoundliteral", align 16
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = const [-128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : vector<16 x s8i>
+    store %6, %2, align 16
+    %7 = load %2 : vector<16 x s8i>, align 16
+    %8 = call @foo(%7) : vector<16 x s8i> [all]
+    store %8, %1, align 16
+    scope {
+        %29 = load %1 : vector<16 x s8i>, align 16
+        %30 = const 0 : s32i
+        <unmodeled: cir.vec.extract>
+        %32 = cast(integral) %31 : s32i
+        %33 = const 0 : s32i
+        %34 = cmp ne %32, %33 : bool
+        if %34 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %9 = const [-127, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : vector<16 x s8i>
+    store %9, %3, align 16
+    %10 = load %3 : vector<16 x s8i>, align 16
+    %11 = call @foo(%10) : vector<16 x s8i> [all]
+    store %11, %1, align 16
+    scope {
+        %23 = load %1 : vector<16 x s8i>, align 16
+        %24 = const 0 : s32i
+        <unmodeled: cir.vec.extract>
+        %26 = cast(integral) %25 : s32i
+        %27 = const -127 : s32i
+        %28 = cmp ne %26, %27 : bool
+        if %28 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %12 = const [127, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : vector<16 x s8i>
+    store %12, %4, align 16
+    %13 = load %4 : vector<16 x s8i>, align 16
+    %14 = call @foo(%13) : vector<16 x s8i> [all]
+    store %14, %1, align 16
+    scope {
+        %17 = load %1 : vector<16 x s8i>, align 16
+        %18 = const 0 : s32i
+        <unmodeled: cir.vec.extract>
+        %20 = cast(integral) %19 : s32i
+        %21 = const 127 : s32i
+        %22 = cmp ne %20, %21 : bool
+        if %22 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %15 = const 0 : s32i
+    store %15, %0
+    %16 = load %0 : s32i
+    return %16
+}

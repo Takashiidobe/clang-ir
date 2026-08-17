@@ -1,0 +1,94 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr61375.c" (c, x86_64-unknown-linux-gnu)
+fn uint128_central_bitsi_ior(%arg2: u128i, %arg3: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: u128i, %arg3: u64i):
+        %31 = alloca u128i, "in1", align 16
+        %32 = alloca u64i, "in2", align 8
+        %33 = alloca u64i, "__retval", align 8
+        %34 = alloca s128i, "mask", align 16
+        store %arg2, %31
+        store %arg3, %32
+        %35 = const 65535 : s128i
+        %36 = const 56 : s32i
+        %37 = shift left %35, %36 : s128i
+        store %37, %34, align 16
+        %38 = load %31 : u128i, align 16
+        %39 = load %34 : s128i, align 16
+        %40 = cast(integral) %39 : u128i
+        %41 = and %38, %40 : u128i
+        %42 = const 56 : s32i
+        %43 = shift right %41, %42 : u128i
+        %44 = load %32 : u64i, align 8
+        %45 = cast(integral) %44 : u128i
+        %46 = or %43, %45 : u128i
+        %47 = cast(integral) %46 : u64i
+        store %47, %33
+        %48 = load %33 : u64i
+        return %48
+}
+fn abort() -> void [external, c, nothrow];
+fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s8i**):
+        %0 = alloca s32i, "argc", align 4
+        %1 = alloca s8i**, "argv", align 8
+        %2 = alloca s32i, "__retval", align 4
+        %3 = alloca s128i, "in", align 16
+        store %arg0, %0
+        store %arg1, %1
+        %4 = const 0 : s32i
+        store %4, %2
+        %5 = const 1 : s128i
+        store %5, %3, align 16
+        %6 = const 64 : s32i
+        %7 = load %3 : s128i, align 16
+        %8 = shift left %7, %6 : s128i
+        store %8, %3, align 16
+        scope {
+            %24 = const 8 : u64i
+            %25 = const 8 : u64i
+            %26 = mul %24, %25 : u64i
+            %27 = const 64 : u64i
+            %28 = cmp ne %26, %27 : bool
+            if %28 {
+                %29 = const 0 : s32i
+                store %29, %2
+                %30 = load %2 : s32i
+                return %30
+            }
+            yield
+        }
+        scope {
+            %17 = const 16 : u64i
+            %18 = const 8 : u64i
+            %19 = mul %17, %18 : u64i
+            %20 = const 128 : u64i
+            %21 = cmp ne %19, %20 : bool
+            if %21 {
+                %22 = const 0 : s32i
+                store %22, %2
+                %23 = load %2 : s32i
+                return %23
+            }
+            yield
+        }
+        scope {
+            %11 = load %3 : s128i, align 16
+            %12 = cast(integral) %11 : u128i
+            %13 = const 2 : u64i
+            %14 = call @uint128_central_bitsi_ior(%12, %13) : u64i [all]
+            %15 = const 258 : u64i
+            %16 = cmp ne %14, %15 : bool
+            if %16 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        %9 = const 0 : s32i
+        store %9, %2
+        %10 = load %2 : s32i
+        return %10
+}

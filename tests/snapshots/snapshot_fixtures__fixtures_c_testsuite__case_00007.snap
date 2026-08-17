@@ -1,0 +1,64 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00007.c" (c, x86_64-unknown-linux-gnu)
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "x", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 1 : s32i
+    store %3, %1, align 4
+    scope {
+        %16 = const 10 : s32i
+        store %16, %1, align 4
+        for cond: {
+            %20 = load %1 : s32i, align 4
+            %21 = cast(int_to_bool) %20 : bool
+            condition %21
+        } step: {
+            %17 = load %1 : s32i, align 4
+            %18 = const 1 : s32i
+            %19 = sub %17, %18 : s32i [nsw]
+            store %19, %1, align 4
+            yield
+        } do {
+            yield
+        }
+        yield
+    }
+    scope {
+        %12 = load %1 : s32i, align 4
+        %13 = cast(int_to_bool) %12 : bool
+        if %13 {
+            %14 = const 1 : s32i
+            store %14, %0
+            %15 = load %0 : s32i
+            return %15
+        }
+        yield
+    }
+    %4 = const 10 : s32i
+    store %4, %1, align 4
+    scope {
+        for cond: {
+            %10 = load %1 : s32i, align 4
+            %11 = cast(int_to_bool) %10 : bool
+            condition %11
+        } step: {
+            yield
+        } do {
+            %7 = load %1 : s32i, align 4
+            %8 = const 1 : s32i
+            %9 = sub %7, %8 : s32i [nsw]
+            store %9, %1, align 4
+            yield
+        }
+        yield
+    }
+    %5 = load %1 : s32i, align 4
+    store %5, %0
+    %6 = load %0 : s32i
+    return %6
+}

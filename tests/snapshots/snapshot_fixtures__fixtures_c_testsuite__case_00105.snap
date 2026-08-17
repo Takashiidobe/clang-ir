@@ -1,0 +1,42 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00105.c" (c, x86_64-unknown-linux-gnu)
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "i", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    scope {
+        %5 = const 0 : s32i
+        store %5, %1, align 4
+        for cond: {
+            %11 = load %1 : s32i, align 4
+            %12 = const 10 : s32i
+            %13 = cmp lt %11, %12 : bool
+            condition %13
+        } step: {
+            %6 = load %1 : s32i, align 4
+            %7 = inc %6 : s32i [nsw]
+            store %7, %1, align 4
+            yield
+        } do {
+            scope {
+                %8 = load %1 : s32i, align 4
+                %9 = cast(int_to_bool) %8 : bool
+                %10 = not %9 : bool
+                if %10 {
+                    continue
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

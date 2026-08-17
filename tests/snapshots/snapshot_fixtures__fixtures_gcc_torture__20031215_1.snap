@@ -1,0 +1,104 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20031215-1.c" (c, x86_64-unknown-linux-gnu)
+global ao : rec_pstr = {2, 2, "OK"} [external, default, align 4, dso_local, constant]
+global a : rec_pstr* = @ao [external, default, align 8, dso_local, constant]
+
+fn test1() -> void [external, c, no_inline, dso_local, nothrow] {
+    scope {
+        %40 = get_global @a : rec_pstr**
+        %41 = load %40 : rec_pstr*, align 8
+        %42 = const 2 : s64i
+        %43 = get_global @a : rec_pstr**
+        %44 = load %43 : rec_pstr*, align 8
+        %45 = get_member %44[2] "ch" : s8i[3]*
+        %46 = get_element %45[%42] : s8i*
+        %47 = load %46 : s8i, align 2
+        %48 = cast(int_to_bool) %47 : bool
+        if %48 {
+            %49 = const 0 : s8i
+            %50 = get_global @a : rec_pstr**
+            %51 = load %50 : rec_pstr*, align 8
+            %52 = const 2 : s64i
+            %53 = get_global @a : rec_pstr**
+            %54 = load %53 : rec_pstr*, align 8
+            %55 = get_member %54[2] "ch" : s8i[3]*
+            %56 = cast(array_to_ptrdecay) %55 : s8i*
+            %57 = ptr_stride %56, %52 : s8i*
+            store %49, %57, align 1
+            yield
+        }
+        yield
+    }
+    return
+}
+fn test2() -> void [external, c, no_inline, dso_local, nothrow] {
+    scope {
+        %22 = get_global @a : rec_pstr**
+        %23 = load %22 : rec_pstr*, align 8
+        %24 = const 2 : s64i
+        %25 = get_global @a : rec_pstr**
+        %26 = load %25 : rec_pstr*, align 8
+        %27 = get_member %26[2] "ch" : s8i[3]*
+        %28 = get_element %27[%24] : s8i*
+        %29 = load %28 : s8i, align 2
+        %30 = cast(int_to_bool) %29 : bool
+        if %30 {
+            %31 = const -1 : s8i
+            %32 = get_global @a : rec_pstr**
+            %33 = load %32 : rec_pstr*, align 8
+            %34 = const 2 : s64i
+            %35 = get_global @a : rec_pstr**
+            %36 = load %35 : rec_pstr*, align 8
+            %37 = get_member %36[2] "ch" : s8i[3]*
+            %38 = cast(array_to_ptrdecay) %37 : s8i*
+            %39 = ptr_stride %38, %34 : s8i*
+            store %31, %39, align 1
+            yield
+        }
+        yield
+    }
+    return
+}
+fn test3() -> void [external, c, no_inline, dso_local, nothrow] {
+    scope {
+        %4 = get_global @a : rec_pstr**
+        %5 = load %4 : rec_pstr*, align 8
+        %6 = const 2 : s64i
+        %7 = get_global @a : rec_pstr**
+        %8 = load %7 : rec_pstr*, align 8
+        %9 = get_member %8[2] "ch" : s8i[3]*
+        %10 = get_element %9[%6] : s8i*
+        %11 = load %10 : s8i, align 2
+        %12 = cast(int_to_bool) %11 : bool
+        if %12 {
+            %13 = const 1 : s8i
+            %14 = get_global @a : rec_pstr**
+            %15 = load %14 : rec_pstr*, align 8
+            %16 = const 2 : s64i
+            %17 = get_global @a : rec_pstr**
+            %18 = load %17 : rec_pstr*, align 8
+            %19 = get_member %18[2] "ch" : s8i[3]*
+            %20 = cast(array_to_ptrdecay) %19 : s8i*
+            %21 = ptr_stride %20, %16 : s8i*
+            store %13, %21, align 1
+            yield
+        }
+        yield
+    }
+    return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    call @test1() [all]
+    call @test2() [all]
+    call @test3() [all]
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

@@ -1,0 +1,113 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr34456.c" (c, x86_64-unknown-linux-gnu)
+global array : rec_s[2] = [{1, @bad_compare}, {-1, @bad_compare}] [external, default, align 16, dso_local]
+global errors : s32i = 0 [external, default, align 4, dso_local]
+
+fn debug() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %59 = alloca s32i, "__retval", align 4
+    %60 = const 1 : s32i
+    store %60, %59
+    %61 = load %59 : s32i
+    return %61
+}
+fn bad_compare(%arg2: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i):
+        %54 = alloca s32i, "x", align 4
+        %55 = alloca s32i, "__retval", align 4
+        store %arg2, %54
+        %56 = load %54 : s32i, align 4
+        %57 = minus %56 : s32i [nsw]
+        store %57, %55
+        %58 = load %55 : s32i
+        return %58
+}
+fn qsort(%arg0: void*, %arg1: u64i, %arg2: u64i, %arg3: ((void*, void*) -> s32i)*) -> void [external, c];
+fn compare(%arg0: void*, %arg1: void*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: void*, %arg1: void*):
+        %14 = alloca void*, "x", align 8
+        %15 = alloca void*, "y", align 8
+        %16 = alloca s32i, "__retval", align 4
+        %17 = alloca rec_s*, "s1", align 8
+        %18 = alloca rec_s*, "s2", align 8
+        %19 = alloca ((s32i) -> s32i)*, "compare1", align 8
+        %20 = alloca s32i, "elt2", align 4
+        store %arg0, %14
+        store %arg1, %15
+        %21 = load %14 : void*, align 8
+        %22 = cast(bitcast) %21 : rec_s*
+        store %22, %17, align 8
+        %23 = load %15 : void*, align 8
+        %24 = cast(bitcast) %23 : rec_s*
+        store %24, %18, align 8
+        %25 = load %17 : rec_s*, align 8
+        %26 = get_member %25[1] "compare" : ((s32i) -> s32i)**
+        %27 = load %26 : ((s32i) -> s32i)*, align 8
+        store %27, %19, align 8
+        %28 = load %18 : rec_s*, align 8
+        %29 = get_member %28[0] "elt" : s32i*
+        %30 = load %29 : s32i, align 8
+        store %30, %20, align 4
+        scope {
+            %35 = load %20 : s32i, align 4
+            %36 = const 0 : s32i
+            %37 = cmp ne %35, %36 : bool
+            %38 = ternary %37 ? { : bool
+                %52 = call @debug() : s32i [all]
+                %53 = cast(int_to_bool) %52 : bool
+                yield %53
+            } : {
+                %51 = const #false : bool
+                yield %51
+            }
+            %39 = ternary %38 ? { : bool
+                %44 = load %19 : ((s32i) -> s32i)*, align 8
+                %45 = load %17 : rec_s*, align 8
+                %46 = get_member %45[0] "elt" : s32i*
+                %47 = load %46 : s32i, align 8
+                %48 = call %44(%47) : s32i [all]
+                %49 = const 0 : s32i
+                %50 = cmp ne %48, %49 : bool
+                yield %50
+            } : {
+                %43 = const #false : bool
+                yield %43
+            }
+            if %39 {
+                %40 = get_global @errors : s32i*
+                %41 = load %40 : s32i, align 4
+                %42 = inc %41 : s32i [nsw]
+                store %42, %40, align 4
+                yield
+            }
+            yield
+        }
+        %31 = load %19 : ((s32i) -> s32i)*, align 8
+        %32 = load %20 : s32i, align 4
+        %33 = call %31(%32) : s32i [all]
+        store %33, %16
+        %34 = load %16 : s32i
+        return %34
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @array : rec_s[2]*
+    %3 = cast(array_to_ptrdecay) %2 : rec_s*
+    %4 = cast(bitcast) %3 : void*
+    %5 = const 2 : u64i
+    %6 = const 16 : u64i
+    %7 = get_global @compare : ((void*, void*) -> s32i)*
+    call @qsort(%4, %5, %6, %7) [all]
+    %8 = get_global @errors : s32i*
+    %9 = load %8 : s32i, align 4
+    %10 = const 0 : s32i
+    %11 = cmp eq %9, %10 : bool
+    %12 = cast(bool_to_int) %11 : s32i
+    store %12, %0
+    %13 = load %0 : s32i
+    return %13
+}

@@ -1,0 +1,91 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20101013-1.c" (c, x86_64-unknown-linux-gnu)
+fn get_addr_base_and_unit_offset(%arg4: void*, %arg5: s64i*) -> void* [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: void*, %arg5: s64i*):
+        %35 = alloca void*, "base", align 8
+        %36 = alloca s64i*, "i", align 8
+        %37 = alloca void*, "__retval", align 8
+        store %arg4, %35
+        store %arg5, %36
+        %38 = const 0 : s64i
+        %39 = load %36 : s64i*, align 8
+        store %38, %39, align 8
+        %40 = load %35 : void*, align 8
+        store %40, %37
+        %41 = load %37 : void*
+        return %41
+}
+fn build_int_cst(%arg2: void*, %arg3: s64i) -> void* [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: void*, %arg3: s64i):
+        %26 = alloca void*, "base", align 8
+        %27 = alloca s64i, "offset", align 8
+        %28 = alloca void*, "__retval", align 8
+        store %arg2, %26
+        store %arg3, %27
+        scope {
+            %31 = load %27 : s64i, align 8
+            %32 = const 4 : s64i
+            %33 = cmp ne %31, %32 : bool
+            if %33 {
+                %34 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        %29 = load %26 : void*, align 8
+        store %29, %28
+        %30 = load %28 : void*
+        return %30
+}
+fn build_ref_for_offset(%arg0: void*, %arg1: s64i) -> void* [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: void*, %arg1: s64i):
+        %12 = alloca void*, "base", align 8
+        %13 = alloca s64i, "offset", align 8
+        %14 = alloca void*, "__retval", align 8
+        %15 = alloca s64i, "base_offset", align 8
+        store %arg0, %12
+        store %arg1, %13
+        %16 = load %12 : void*, align 8
+        %17 = call @get_addr_base_and_unit_offset(%16, %15) : void* [all]
+        store %17, %12, align 8
+        %18 = load %12 : void*, align 8
+        %19 = load %15 : s64i, align 8
+        %20 = load %13 : s64i, align 8
+        %21 = const 8 : s64i
+        %22 = div %20, %21 : s64i
+        %23 = add %19, %22 : s64i [nsw]
+        %24 = call @build_int_cst(%18, %23) : void* [all]
+        store %24, %14
+        %25 = load %14 : void*
+        return %25
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca void*, "ret", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const #cir.ptr<null> : void*
+    %4 = const 32 : s64i
+    %5 = call @build_ref_for_offset(%3, %4) : void* [all]
+    store %5, %1, align 8
+    scope {
+        %8 = load %1 : void*, align 8
+        %9 = const #cir.ptr<null> : void*
+        %10 = cmp ne %8, %9 : bool
+        if %10 {
+            %11 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = load %0 : s32i
+    return %7
+}

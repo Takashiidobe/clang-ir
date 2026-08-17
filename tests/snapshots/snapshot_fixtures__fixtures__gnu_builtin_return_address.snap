@@ -1,0 +1,46 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/gnu_builtin_return_address.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn address_probe() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %9 = alloca s32i, "__retval", align 4
+    %10 = alloca void*, "return_address", align 8
+    %11 = alloca void*, "frame_address", align 8
+    %12 = const 0 : u32i
+    <unmodeled: cir.return_address>
+    store %13, %10, align 8
+    %14 = const 0 : u32i
+    <unmodeled: cir.frame_address>
+    %16 = cast(bitcast) %15 : void*
+    store %16, %11, align 8
+    %17 = load %10 : void*, align 8
+    %18 = const #cir.ptr<null> : void*
+    %19 = cmp ne %17, %18 : bool
+    %20 = cast(bool_to_int) %19 : s32i
+    %21 = load %11 : void*, align 8
+    %22 = const #cir.ptr<null> : void*
+    %23 = cmp ne %21, %22 : bool
+    %24 = cast(bool_to_int) %23 : s32i
+    %25 = add %20, %24 : s32i [nsw]
+    store %25, %9
+    %26 = load %9 : s32i
+    return %26
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[4]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = call @address_probe() : s32i [all]
+    %6 = call @printf(%4, %5) : s32i [all]
+    %7 = const 0 : s32i
+    store %7, %0
+    %8 = load %0 : s32i
+    return %8
+}

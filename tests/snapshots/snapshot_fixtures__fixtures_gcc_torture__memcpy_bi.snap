@@ -1,0 +1,2560 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/memcpy-bi.c" (c, x86_64-unknown-linux-gnu)
+global src : s8i[80] = zero [external, default, align 16, dso_local]
+global dst : s8i[80] = zero [external, default, align 16, dso_local]
+
+fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c, pure, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn check(%arg0: s8i*, %arg1: s8i*, %arg2: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i*, %arg1: s8i*, %arg2: s32i):
+        %2183 = alloca s8i*, "test", align 8
+        %2184 = alloca s8i*, "match", align 8
+        %2185 = alloca s32i, "n", align 4
+        store %arg0, %2183
+        store %arg1, %2184
+        store %arg2, %2185
+        scope {
+            %2186 = get_global @memcmp : ((void*, void*, u64i) -> s32i)*
+            %2187 = load %2183 : s8i*, align 8
+            %2188 = cast(bitcast) %2187 : void*
+            %2189 = load %2184 : s8i*, align 8
+            %2190 = cast(bitcast) %2189 : void*
+            %2191 = load %2185 : s32i, align 4
+            %2192 = cast(integral) %2191 : u64i
+            %2193 = call @memcmp(%2188, %2190, %2192) : s32i [pure]
+            %2194 = cast(int_to_bool) %2193 : bool
+            if %2194 {
+                %2195 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
+fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "i", align 4
+    %2 = alloca s32i, "j", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    scope {
+        %2166 = const 0 : s32i
+        store %2166, %1, align 4
+        for cond: {
+            %2179 = load %1 : s32i, align 4
+            %2180 = cast(integral) %2179 : u64i
+            %2181 = const 80 : u64i
+            %2182 = cmp lt %2180, %2181 : bool
+            condition %2182
+        } step: {
+            %2167 = load %1 : s32i, align 4
+            %2168 = inc %2167 : s32i [nsw]
+            store %2168, %1, align 4
+            yield
+        } do {
+            %2169 = const 97 : s32i
+            %2170 = load %1 : s32i, align 4
+            %2171 = const 26 : s32i
+            %2172 = rem %2170, %2171 : s32i
+            %2173 = add %2169, %2172 : s32i [nsw]
+            %2174 = cast(integral) %2173 : s8i
+            %2175 = load %1 : s32i, align 4
+            %2176 = cast(integral) %2175 : s64i
+            %2177 = get_global @src : s8i[80]*
+            %2178 = get_element %2177[%2176] : s8i*
+            store %2174, %2178, align 1
+            yield
+        }
+        yield
+    }
+    scope {
+        %2145 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %2146 = get_global @dst : s8i[80]*
+        %2147 = cast(array_to_ptrdecay) %2146 : s8i*
+        %2148 = cast(bitcast) %2147 : void*
+        %2149 = const 0 : s32i
+        %2150 = const 0 : u64i
+        %2151 = call @memset(%2148, %2149, %2150) : void* [all]
+        %2152 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %2153 = get_global @dst : s8i[80]*
+        %2154 = cast(array_to_ptrdecay) %2153 : s8i*
+        %2155 = cast(bitcast) %2154 : void*
+        %2156 = get_global @src : s8i[80]*
+        %2157 = cast(array_to_ptrdecay) %2156 : s8i*
+        %2158 = cast(bitcast) %2157 : void*
+        %2159 = const 0 : u64i
+        %2160 = call @memcpy(%2155, %2158, %2159) : void* [all]
+        %2161 = get_global @dst : s8i[80]*
+        %2162 = cast(array_to_ptrdecay) %2161 : s8i*
+        %2163 = get_global @src : s8i[80]*
+        %2164 = cast(array_to_ptrdecay) %2163 : s8i*
+        %2165 = const 0 : s32i
+        call @check(%2162, %2164, %2165) [all]
+        yield
+    }
+    scope {
+        %2116 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %2117 = get_global @dst : s8i[80]*
+        %2118 = cast(array_to_ptrdecay) %2117 : s8i*
+        %2119 = cast(bitcast) %2118 : void*
+        %2120 = const 0 : s32i
+        %2121 = const 0 : s32i
+        %2122 = const 1 : s32i
+        %2123 = add %2121, %2122 : s32i [nsw]
+        %2124 = cast(integral) %2123 : u64i
+        %2125 = call @memset(%2119, %2120, %2124) : void* [all]
+        %2126 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %2127 = get_global @dst : s8i[80]*
+        %2128 = cast(array_to_ptrdecay) %2127 : s8i*
+        %2129 = cast(bitcast) %2128 : void*
+        %2130 = get_global @src : s8i[80]*
+        %2131 = cast(array_to_ptrdecay) %2130 : s8i*
+        %2132 = cast(bitcast) %2131 : void*
+        %2133 = const 0 : s32i
+        %2134 = const 1 : s32i
+        %2135 = add %2133, %2134 : s32i [nsw]
+        %2136 = cast(integral) %2135 : u64i
+        %2137 = call @memcpy(%2129, %2132, %2136) : void* [all]
+        %2138 = get_global @dst : s8i[80]*
+        %2139 = cast(array_to_ptrdecay) %2138 : s8i*
+        %2140 = get_global @src : s8i[80]*
+        %2141 = cast(array_to_ptrdecay) %2140 : s8i*
+        %2142 = const 0 : s32i
+        %2143 = const 1 : s32i
+        %2144 = add %2142, %2143 : s32i [nsw]
+        call @check(%2139, %2141, %2144) [all]
+        yield
+    }
+    scope {
+        %2087 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %2088 = get_global @dst : s8i[80]*
+        %2089 = cast(array_to_ptrdecay) %2088 : s8i*
+        %2090 = cast(bitcast) %2089 : void*
+        %2091 = const 0 : s32i
+        %2092 = const 0 : s32i
+        %2093 = const 2 : s32i
+        %2094 = add %2092, %2093 : s32i [nsw]
+        %2095 = cast(integral) %2094 : u64i
+        %2096 = call @memset(%2090, %2091, %2095) : void* [all]
+        %2097 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %2098 = get_global @dst : s8i[80]*
+        %2099 = cast(array_to_ptrdecay) %2098 : s8i*
+        %2100 = cast(bitcast) %2099 : void*
+        %2101 = get_global @src : s8i[80]*
+        %2102 = cast(array_to_ptrdecay) %2101 : s8i*
+        %2103 = cast(bitcast) %2102 : void*
+        %2104 = const 0 : s32i
+        %2105 = const 2 : s32i
+        %2106 = add %2104, %2105 : s32i [nsw]
+        %2107 = cast(integral) %2106 : u64i
+        %2108 = call @memcpy(%2100, %2103, %2107) : void* [all]
+        %2109 = get_global @dst : s8i[80]*
+        %2110 = cast(array_to_ptrdecay) %2109 : s8i*
+        %2111 = get_global @src : s8i[80]*
+        %2112 = cast(array_to_ptrdecay) %2111 : s8i*
+        %2113 = const 0 : s32i
+        %2114 = const 2 : s32i
+        %2115 = add %2113, %2114 : s32i [nsw]
+        call @check(%2110, %2112, %2115) [all]
+        yield
+    }
+    scope {
+        %2058 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %2059 = get_global @dst : s8i[80]*
+        %2060 = cast(array_to_ptrdecay) %2059 : s8i*
+        %2061 = cast(bitcast) %2060 : void*
+        %2062 = const 0 : s32i
+        %2063 = const 0 : s32i
+        %2064 = const 3 : s32i
+        %2065 = add %2063, %2064 : s32i [nsw]
+        %2066 = cast(integral) %2065 : u64i
+        %2067 = call @memset(%2061, %2062, %2066) : void* [all]
+        %2068 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %2069 = get_global @dst : s8i[80]*
+        %2070 = cast(array_to_ptrdecay) %2069 : s8i*
+        %2071 = cast(bitcast) %2070 : void*
+        %2072 = get_global @src : s8i[80]*
+        %2073 = cast(array_to_ptrdecay) %2072 : s8i*
+        %2074 = cast(bitcast) %2073 : void*
+        %2075 = const 0 : s32i
+        %2076 = const 3 : s32i
+        %2077 = add %2075, %2076 : s32i [nsw]
+        %2078 = cast(integral) %2077 : u64i
+        %2079 = call @memcpy(%2071, %2074, %2078) : void* [all]
+        %2080 = get_global @dst : s8i[80]*
+        %2081 = cast(array_to_ptrdecay) %2080 : s8i*
+        %2082 = get_global @src : s8i[80]*
+        %2083 = cast(array_to_ptrdecay) %2082 : s8i*
+        %2084 = const 0 : s32i
+        %2085 = const 3 : s32i
+        %2086 = add %2084, %2085 : s32i [nsw]
+        call @check(%2081, %2083, %2086) [all]
+        yield
+    }
+    scope {
+        %2037 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %2038 = get_global @dst : s8i[80]*
+        %2039 = cast(array_to_ptrdecay) %2038 : s8i*
+        %2040 = cast(bitcast) %2039 : void*
+        %2041 = const 0 : s32i
+        %2042 = const 4 : u64i
+        %2043 = call @memset(%2040, %2041, %2042) : void* [all]
+        %2044 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %2045 = get_global @dst : s8i[80]*
+        %2046 = cast(array_to_ptrdecay) %2045 : s8i*
+        %2047 = cast(bitcast) %2046 : void*
+        %2048 = get_global @src : s8i[80]*
+        %2049 = cast(array_to_ptrdecay) %2048 : s8i*
+        %2050 = cast(bitcast) %2049 : void*
+        %2051 = const 4 : u64i
+        %2052 = call @memcpy(%2047, %2050, %2051) : void* [all]
+        %2053 = get_global @dst : s8i[80]*
+        %2054 = cast(array_to_ptrdecay) %2053 : s8i*
+        %2055 = get_global @src : s8i[80]*
+        %2056 = cast(array_to_ptrdecay) %2055 : s8i*
+        %2057 = const 4 : s32i
+        call @check(%2054, %2056, %2057) [all]
+        yield
+    }
+    scope {
+        %2008 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %2009 = get_global @dst : s8i[80]*
+        %2010 = cast(array_to_ptrdecay) %2009 : s8i*
+        %2011 = cast(bitcast) %2010 : void*
+        %2012 = const 0 : s32i
+        %2013 = const 4 : s32i
+        %2014 = const 1 : s32i
+        %2015 = add %2013, %2014 : s32i [nsw]
+        %2016 = cast(integral) %2015 : u64i
+        %2017 = call @memset(%2011, %2012, %2016) : void* [all]
+        %2018 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %2019 = get_global @dst : s8i[80]*
+        %2020 = cast(array_to_ptrdecay) %2019 : s8i*
+        %2021 = cast(bitcast) %2020 : void*
+        %2022 = get_global @src : s8i[80]*
+        %2023 = cast(array_to_ptrdecay) %2022 : s8i*
+        %2024 = cast(bitcast) %2023 : void*
+        %2025 = const 4 : s32i
+        %2026 = const 1 : s32i
+        %2027 = add %2025, %2026 : s32i [nsw]
+        %2028 = cast(integral) %2027 : u64i
+        %2029 = call @memcpy(%2021, %2024, %2028) : void* [all]
+        %2030 = get_global @dst : s8i[80]*
+        %2031 = cast(array_to_ptrdecay) %2030 : s8i*
+        %2032 = get_global @src : s8i[80]*
+        %2033 = cast(array_to_ptrdecay) %2032 : s8i*
+        %2034 = const 4 : s32i
+        %2035 = const 1 : s32i
+        %2036 = add %2034, %2035 : s32i [nsw]
+        call @check(%2031, %2033, %2036) [all]
+        yield
+    }
+    scope {
+        %1979 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1980 = get_global @dst : s8i[80]*
+        %1981 = cast(array_to_ptrdecay) %1980 : s8i*
+        %1982 = cast(bitcast) %1981 : void*
+        %1983 = const 0 : s32i
+        %1984 = const 4 : s32i
+        %1985 = const 2 : s32i
+        %1986 = add %1984, %1985 : s32i [nsw]
+        %1987 = cast(integral) %1986 : u64i
+        %1988 = call @memset(%1982, %1983, %1987) : void* [all]
+        %1989 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1990 = get_global @dst : s8i[80]*
+        %1991 = cast(array_to_ptrdecay) %1990 : s8i*
+        %1992 = cast(bitcast) %1991 : void*
+        %1993 = get_global @src : s8i[80]*
+        %1994 = cast(array_to_ptrdecay) %1993 : s8i*
+        %1995 = cast(bitcast) %1994 : void*
+        %1996 = const 4 : s32i
+        %1997 = const 2 : s32i
+        %1998 = add %1996, %1997 : s32i [nsw]
+        %1999 = cast(integral) %1998 : u64i
+        %2000 = call @memcpy(%1992, %1995, %1999) : void* [all]
+        %2001 = get_global @dst : s8i[80]*
+        %2002 = cast(array_to_ptrdecay) %2001 : s8i*
+        %2003 = get_global @src : s8i[80]*
+        %2004 = cast(array_to_ptrdecay) %2003 : s8i*
+        %2005 = const 4 : s32i
+        %2006 = const 2 : s32i
+        %2007 = add %2005, %2006 : s32i [nsw]
+        call @check(%2002, %2004, %2007) [all]
+        yield
+    }
+    scope {
+        %1950 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1951 = get_global @dst : s8i[80]*
+        %1952 = cast(array_to_ptrdecay) %1951 : s8i*
+        %1953 = cast(bitcast) %1952 : void*
+        %1954 = const 0 : s32i
+        %1955 = const 4 : s32i
+        %1956 = const 3 : s32i
+        %1957 = add %1955, %1956 : s32i [nsw]
+        %1958 = cast(integral) %1957 : u64i
+        %1959 = call @memset(%1953, %1954, %1958) : void* [all]
+        %1960 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1961 = get_global @dst : s8i[80]*
+        %1962 = cast(array_to_ptrdecay) %1961 : s8i*
+        %1963 = cast(bitcast) %1962 : void*
+        %1964 = get_global @src : s8i[80]*
+        %1965 = cast(array_to_ptrdecay) %1964 : s8i*
+        %1966 = cast(bitcast) %1965 : void*
+        %1967 = const 4 : s32i
+        %1968 = const 3 : s32i
+        %1969 = add %1967, %1968 : s32i [nsw]
+        %1970 = cast(integral) %1969 : u64i
+        %1971 = call @memcpy(%1963, %1966, %1970) : void* [all]
+        %1972 = get_global @dst : s8i[80]*
+        %1973 = cast(array_to_ptrdecay) %1972 : s8i*
+        %1974 = get_global @src : s8i[80]*
+        %1975 = cast(array_to_ptrdecay) %1974 : s8i*
+        %1976 = const 4 : s32i
+        %1977 = const 3 : s32i
+        %1978 = add %1976, %1977 : s32i [nsw]
+        call @check(%1973, %1975, %1978) [all]
+        yield
+    }
+    scope {
+        %1929 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1930 = get_global @dst : s8i[80]*
+        %1931 = cast(array_to_ptrdecay) %1930 : s8i*
+        %1932 = cast(bitcast) %1931 : void*
+        %1933 = const 0 : s32i
+        %1934 = const 8 : u64i
+        %1935 = call @memset(%1932, %1933, %1934) : void* [all]
+        %1936 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1937 = get_global @dst : s8i[80]*
+        %1938 = cast(array_to_ptrdecay) %1937 : s8i*
+        %1939 = cast(bitcast) %1938 : void*
+        %1940 = get_global @src : s8i[80]*
+        %1941 = cast(array_to_ptrdecay) %1940 : s8i*
+        %1942 = cast(bitcast) %1941 : void*
+        %1943 = const 8 : u64i
+        %1944 = call @memcpy(%1939, %1942, %1943) : void* [all]
+        %1945 = get_global @dst : s8i[80]*
+        %1946 = cast(array_to_ptrdecay) %1945 : s8i*
+        %1947 = get_global @src : s8i[80]*
+        %1948 = cast(array_to_ptrdecay) %1947 : s8i*
+        %1949 = const 8 : s32i
+        call @check(%1946, %1948, %1949) [all]
+        yield
+    }
+    scope {
+        %1900 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1901 = get_global @dst : s8i[80]*
+        %1902 = cast(array_to_ptrdecay) %1901 : s8i*
+        %1903 = cast(bitcast) %1902 : void*
+        %1904 = const 0 : s32i
+        %1905 = const 8 : s32i
+        %1906 = const 1 : s32i
+        %1907 = add %1905, %1906 : s32i [nsw]
+        %1908 = cast(integral) %1907 : u64i
+        %1909 = call @memset(%1903, %1904, %1908) : void* [all]
+        %1910 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1911 = get_global @dst : s8i[80]*
+        %1912 = cast(array_to_ptrdecay) %1911 : s8i*
+        %1913 = cast(bitcast) %1912 : void*
+        %1914 = get_global @src : s8i[80]*
+        %1915 = cast(array_to_ptrdecay) %1914 : s8i*
+        %1916 = cast(bitcast) %1915 : void*
+        %1917 = const 8 : s32i
+        %1918 = const 1 : s32i
+        %1919 = add %1917, %1918 : s32i [nsw]
+        %1920 = cast(integral) %1919 : u64i
+        %1921 = call @memcpy(%1913, %1916, %1920) : void* [all]
+        %1922 = get_global @dst : s8i[80]*
+        %1923 = cast(array_to_ptrdecay) %1922 : s8i*
+        %1924 = get_global @src : s8i[80]*
+        %1925 = cast(array_to_ptrdecay) %1924 : s8i*
+        %1926 = const 8 : s32i
+        %1927 = const 1 : s32i
+        %1928 = add %1926, %1927 : s32i [nsw]
+        call @check(%1923, %1925, %1928) [all]
+        yield
+    }
+    scope {
+        %1871 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1872 = get_global @dst : s8i[80]*
+        %1873 = cast(array_to_ptrdecay) %1872 : s8i*
+        %1874 = cast(bitcast) %1873 : void*
+        %1875 = const 0 : s32i
+        %1876 = const 8 : s32i
+        %1877 = const 2 : s32i
+        %1878 = add %1876, %1877 : s32i [nsw]
+        %1879 = cast(integral) %1878 : u64i
+        %1880 = call @memset(%1874, %1875, %1879) : void* [all]
+        %1881 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1882 = get_global @dst : s8i[80]*
+        %1883 = cast(array_to_ptrdecay) %1882 : s8i*
+        %1884 = cast(bitcast) %1883 : void*
+        %1885 = get_global @src : s8i[80]*
+        %1886 = cast(array_to_ptrdecay) %1885 : s8i*
+        %1887 = cast(bitcast) %1886 : void*
+        %1888 = const 8 : s32i
+        %1889 = const 2 : s32i
+        %1890 = add %1888, %1889 : s32i [nsw]
+        %1891 = cast(integral) %1890 : u64i
+        %1892 = call @memcpy(%1884, %1887, %1891) : void* [all]
+        %1893 = get_global @dst : s8i[80]*
+        %1894 = cast(array_to_ptrdecay) %1893 : s8i*
+        %1895 = get_global @src : s8i[80]*
+        %1896 = cast(array_to_ptrdecay) %1895 : s8i*
+        %1897 = const 8 : s32i
+        %1898 = const 2 : s32i
+        %1899 = add %1897, %1898 : s32i [nsw]
+        call @check(%1894, %1896, %1899) [all]
+        yield
+    }
+    scope {
+        %1842 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1843 = get_global @dst : s8i[80]*
+        %1844 = cast(array_to_ptrdecay) %1843 : s8i*
+        %1845 = cast(bitcast) %1844 : void*
+        %1846 = const 0 : s32i
+        %1847 = const 8 : s32i
+        %1848 = const 3 : s32i
+        %1849 = add %1847, %1848 : s32i [nsw]
+        %1850 = cast(integral) %1849 : u64i
+        %1851 = call @memset(%1845, %1846, %1850) : void* [all]
+        %1852 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1853 = get_global @dst : s8i[80]*
+        %1854 = cast(array_to_ptrdecay) %1853 : s8i*
+        %1855 = cast(bitcast) %1854 : void*
+        %1856 = get_global @src : s8i[80]*
+        %1857 = cast(array_to_ptrdecay) %1856 : s8i*
+        %1858 = cast(bitcast) %1857 : void*
+        %1859 = const 8 : s32i
+        %1860 = const 3 : s32i
+        %1861 = add %1859, %1860 : s32i [nsw]
+        %1862 = cast(integral) %1861 : u64i
+        %1863 = call @memcpy(%1855, %1858, %1862) : void* [all]
+        %1864 = get_global @dst : s8i[80]*
+        %1865 = cast(array_to_ptrdecay) %1864 : s8i*
+        %1866 = get_global @src : s8i[80]*
+        %1867 = cast(array_to_ptrdecay) %1866 : s8i*
+        %1868 = const 8 : s32i
+        %1869 = const 3 : s32i
+        %1870 = add %1868, %1869 : s32i [nsw]
+        call @check(%1865, %1867, %1870) [all]
+        yield
+    }
+    scope {
+        %1821 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1822 = get_global @dst : s8i[80]*
+        %1823 = cast(array_to_ptrdecay) %1822 : s8i*
+        %1824 = cast(bitcast) %1823 : void*
+        %1825 = const 0 : s32i
+        %1826 = const 12 : u64i
+        %1827 = call @memset(%1824, %1825, %1826) : void* [all]
+        %1828 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1829 = get_global @dst : s8i[80]*
+        %1830 = cast(array_to_ptrdecay) %1829 : s8i*
+        %1831 = cast(bitcast) %1830 : void*
+        %1832 = get_global @src : s8i[80]*
+        %1833 = cast(array_to_ptrdecay) %1832 : s8i*
+        %1834 = cast(bitcast) %1833 : void*
+        %1835 = const 12 : u64i
+        %1836 = call @memcpy(%1831, %1834, %1835) : void* [all]
+        %1837 = get_global @dst : s8i[80]*
+        %1838 = cast(array_to_ptrdecay) %1837 : s8i*
+        %1839 = get_global @src : s8i[80]*
+        %1840 = cast(array_to_ptrdecay) %1839 : s8i*
+        %1841 = const 12 : s32i
+        call @check(%1838, %1840, %1841) [all]
+        yield
+    }
+    scope {
+        %1792 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1793 = get_global @dst : s8i[80]*
+        %1794 = cast(array_to_ptrdecay) %1793 : s8i*
+        %1795 = cast(bitcast) %1794 : void*
+        %1796 = const 0 : s32i
+        %1797 = const 12 : s32i
+        %1798 = const 1 : s32i
+        %1799 = add %1797, %1798 : s32i [nsw]
+        %1800 = cast(integral) %1799 : u64i
+        %1801 = call @memset(%1795, %1796, %1800) : void* [all]
+        %1802 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1803 = get_global @dst : s8i[80]*
+        %1804 = cast(array_to_ptrdecay) %1803 : s8i*
+        %1805 = cast(bitcast) %1804 : void*
+        %1806 = get_global @src : s8i[80]*
+        %1807 = cast(array_to_ptrdecay) %1806 : s8i*
+        %1808 = cast(bitcast) %1807 : void*
+        %1809 = const 12 : s32i
+        %1810 = const 1 : s32i
+        %1811 = add %1809, %1810 : s32i [nsw]
+        %1812 = cast(integral) %1811 : u64i
+        %1813 = call @memcpy(%1805, %1808, %1812) : void* [all]
+        %1814 = get_global @dst : s8i[80]*
+        %1815 = cast(array_to_ptrdecay) %1814 : s8i*
+        %1816 = get_global @src : s8i[80]*
+        %1817 = cast(array_to_ptrdecay) %1816 : s8i*
+        %1818 = const 12 : s32i
+        %1819 = const 1 : s32i
+        %1820 = add %1818, %1819 : s32i [nsw]
+        call @check(%1815, %1817, %1820) [all]
+        yield
+    }
+    scope {
+        %1763 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1764 = get_global @dst : s8i[80]*
+        %1765 = cast(array_to_ptrdecay) %1764 : s8i*
+        %1766 = cast(bitcast) %1765 : void*
+        %1767 = const 0 : s32i
+        %1768 = const 12 : s32i
+        %1769 = const 2 : s32i
+        %1770 = add %1768, %1769 : s32i [nsw]
+        %1771 = cast(integral) %1770 : u64i
+        %1772 = call @memset(%1766, %1767, %1771) : void* [all]
+        %1773 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1774 = get_global @dst : s8i[80]*
+        %1775 = cast(array_to_ptrdecay) %1774 : s8i*
+        %1776 = cast(bitcast) %1775 : void*
+        %1777 = get_global @src : s8i[80]*
+        %1778 = cast(array_to_ptrdecay) %1777 : s8i*
+        %1779 = cast(bitcast) %1778 : void*
+        %1780 = const 12 : s32i
+        %1781 = const 2 : s32i
+        %1782 = add %1780, %1781 : s32i [nsw]
+        %1783 = cast(integral) %1782 : u64i
+        %1784 = call @memcpy(%1776, %1779, %1783) : void* [all]
+        %1785 = get_global @dst : s8i[80]*
+        %1786 = cast(array_to_ptrdecay) %1785 : s8i*
+        %1787 = get_global @src : s8i[80]*
+        %1788 = cast(array_to_ptrdecay) %1787 : s8i*
+        %1789 = const 12 : s32i
+        %1790 = const 2 : s32i
+        %1791 = add %1789, %1790 : s32i [nsw]
+        call @check(%1786, %1788, %1791) [all]
+        yield
+    }
+    scope {
+        %1734 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1735 = get_global @dst : s8i[80]*
+        %1736 = cast(array_to_ptrdecay) %1735 : s8i*
+        %1737 = cast(bitcast) %1736 : void*
+        %1738 = const 0 : s32i
+        %1739 = const 12 : s32i
+        %1740 = const 3 : s32i
+        %1741 = add %1739, %1740 : s32i [nsw]
+        %1742 = cast(integral) %1741 : u64i
+        %1743 = call @memset(%1737, %1738, %1742) : void* [all]
+        %1744 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1745 = get_global @dst : s8i[80]*
+        %1746 = cast(array_to_ptrdecay) %1745 : s8i*
+        %1747 = cast(bitcast) %1746 : void*
+        %1748 = get_global @src : s8i[80]*
+        %1749 = cast(array_to_ptrdecay) %1748 : s8i*
+        %1750 = cast(bitcast) %1749 : void*
+        %1751 = const 12 : s32i
+        %1752 = const 3 : s32i
+        %1753 = add %1751, %1752 : s32i [nsw]
+        %1754 = cast(integral) %1753 : u64i
+        %1755 = call @memcpy(%1747, %1750, %1754) : void* [all]
+        %1756 = get_global @dst : s8i[80]*
+        %1757 = cast(array_to_ptrdecay) %1756 : s8i*
+        %1758 = get_global @src : s8i[80]*
+        %1759 = cast(array_to_ptrdecay) %1758 : s8i*
+        %1760 = const 12 : s32i
+        %1761 = const 3 : s32i
+        %1762 = add %1760, %1761 : s32i [nsw]
+        call @check(%1757, %1759, %1762) [all]
+        yield
+    }
+    scope {
+        %1713 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1714 = get_global @dst : s8i[80]*
+        %1715 = cast(array_to_ptrdecay) %1714 : s8i*
+        %1716 = cast(bitcast) %1715 : void*
+        %1717 = const 0 : s32i
+        %1718 = const 16 : u64i
+        %1719 = call @memset(%1716, %1717, %1718) : void* [all]
+        %1720 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1721 = get_global @dst : s8i[80]*
+        %1722 = cast(array_to_ptrdecay) %1721 : s8i*
+        %1723 = cast(bitcast) %1722 : void*
+        %1724 = get_global @src : s8i[80]*
+        %1725 = cast(array_to_ptrdecay) %1724 : s8i*
+        %1726 = cast(bitcast) %1725 : void*
+        %1727 = const 16 : u64i
+        %1728 = call @memcpy(%1723, %1726, %1727) : void* [all]
+        %1729 = get_global @dst : s8i[80]*
+        %1730 = cast(array_to_ptrdecay) %1729 : s8i*
+        %1731 = get_global @src : s8i[80]*
+        %1732 = cast(array_to_ptrdecay) %1731 : s8i*
+        %1733 = const 16 : s32i
+        call @check(%1730, %1732, %1733) [all]
+        yield
+    }
+    scope {
+        %1684 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1685 = get_global @dst : s8i[80]*
+        %1686 = cast(array_to_ptrdecay) %1685 : s8i*
+        %1687 = cast(bitcast) %1686 : void*
+        %1688 = const 0 : s32i
+        %1689 = const 16 : s32i
+        %1690 = const 1 : s32i
+        %1691 = add %1689, %1690 : s32i [nsw]
+        %1692 = cast(integral) %1691 : u64i
+        %1693 = call @memset(%1687, %1688, %1692) : void* [all]
+        %1694 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1695 = get_global @dst : s8i[80]*
+        %1696 = cast(array_to_ptrdecay) %1695 : s8i*
+        %1697 = cast(bitcast) %1696 : void*
+        %1698 = get_global @src : s8i[80]*
+        %1699 = cast(array_to_ptrdecay) %1698 : s8i*
+        %1700 = cast(bitcast) %1699 : void*
+        %1701 = const 16 : s32i
+        %1702 = const 1 : s32i
+        %1703 = add %1701, %1702 : s32i [nsw]
+        %1704 = cast(integral) %1703 : u64i
+        %1705 = call @memcpy(%1697, %1700, %1704) : void* [all]
+        %1706 = get_global @dst : s8i[80]*
+        %1707 = cast(array_to_ptrdecay) %1706 : s8i*
+        %1708 = get_global @src : s8i[80]*
+        %1709 = cast(array_to_ptrdecay) %1708 : s8i*
+        %1710 = const 16 : s32i
+        %1711 = const 1 : s32i
+        %1712 = add %1710, %1711 : s32i [nsw]
+        call @check(%1707, %1709, %1712) [all]
+        yield
+    }
+    scope {
+        %1655 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1656 = get_global @dst : s8i[80]*
+        %1657 = cast(array_to_ptrdecay) %1656 : s8i*
+        %1658 = cast(bitcast) %1657 : void*
+        %1659 = const 0 : s32i
+        %1660 = const 16 : s32i
+        %1661 = const 2 : s32i
+        %1662 = add %1660, %1661 : s32i [nsw]
+        %1663 = cast(integral) %1662 : u64i
+        %1664 = call @memset(%1658, %1659, %1663) : void* [all]
+        %1665 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1666 = get_global @dst : s8i[80]*
+        %1667 = cast(array_to_ptrdecay) %1666 : s8i*
+        %1668 = cast(bitcast) %1667 : void*
+        %1669 = get_global @src : s8i[80]*
+        %1670 = cast(array_to_ptrdecay) %1669 : s8i*
+        %1671 = cast(bitcast) %1670 : void*
+        %1672 = const 16 : s32i
+        %1673 = const 2 : s32i
+        %1674 = add %1672, %1673 : s32i [nsw]
+        %1675 = cast(integral) %1674 : u64i
+        %1676 = call @memcpy(%1668, %1671, %1675) : void* [all]
+        %1677 = get_global @dst : s8i[80]*
+        %1678 = cast(array_to_ptrdecay) %1677 : s8i*
+        %1679 = get_global @src : s8i[80]*
+        %1680 = cast(array_to_ptrdecay) %1679 : s8i*
+        %1681 = const 16 : s32i
+        %1682 = const 2 : s32i
+        %1683 = add %1681, %1682 : s32i [nsw]
+        call @check(%1678, %1680, %1683) [all]
+        yield
+    }
+    scope {
+        %1626 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1627 = get_global @dst : s8i[80]*
+        %1628 = cast(array_to_ptrdecay) %1627 : s8i*
+        %1629 = cast(bitcast) %1628 : void*
+        %1630 = const 0 : s32i
+        %1631 = const 16 : s32i
+        %1632 = const 3 : s32i
+        %1633 = add %1631, %1632 : s32i [nsw]
+        %1634 = cast(integral) %1633 : u64i
+        %1635 = call @memset(%1629, %1630, %1634) : void* [all]
+        %1636 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1637 = get_global @dst : s8i[80]*
+        %1638 = cast(array_to_ptrdecay) %1637 : s8i*
+        %1639 = cast(bitcast) %1638 : void*
+        %1640 = get_global @src : s8i[80]*
+        %1641 = cast(array_to_ptrdecay) %1640 : s8i*
+        %1642 = cast(bitcast) %1641 : void*
+        %1643 = const 16 : s32i
+        %1644 = const 3 : s32i
+        %1645 = add %1643, %1644 : s32i [nsw]
+        %1646 = cast(integral) %1645 : u64i
+        %1647 = call @memcpy(%1639, %1642, %1646) : void* [all]
+        %1648 = get_global @dst : s8i[80]*
+        %1649 = cast(array_to_ptrdecay) %1648 : s8i*
+        %1650 = get_global @src : s8i[80]*
+        %1651 = cast(array_to_ptrdecay) %1650 : s8i*
+        %1652 = const 16 : s32i
+        %1653 = const 3 : s32i
+        %1654 = add %1652, %1653 : s32i [nsw]
+        call @check(%1649, %1651, %1654) [all]
+        yield
+    }
+    scope {
+        %1605 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1606 = get_global @dst : s8i[80]*
+        %1607 = cast(array_to_ptrdecay) %1606 : s8i*
+        %1608 = cast(bitcast) %1607 : void*
+        %1609 = const 0 : s32i
+        %1610 = const 20 : u64i
+        %1611 = call @memset(%1608, %1609, %1610) : void* [all]
+        %1612 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1613 = get_global @dst : s8i[80]*
+        %1614 = cast(array_to_ptrdecay) %1613 : s8i*
+        %1615 = cast(bitcast) %1614 : void*
+        %1616 = get_global @src : s8i[80]*
+        %1617 = cast(array_to_ptrdecay) %1616 : s8i*
+        %1618 = cast(bitcast) %1617 : void*
+        %1619 = const 20 : u64i
+        %1620 = call @memcpy(%1615, %1618, %1619) : void* [all]
+        %1621 = get_global @dst : s8i[80]*
+        %1622 = cast(array_to_ptrdecay) %1621 : s8i*
+        %1623 = get_global @src : s8i[80]*
+        %1624 = cast(array_to_ptrdecay) %1623 : s8i*
+        %1625 = const 20 : s32i
+        call @check(%1622, %1624, %1625) [all]
+        yield
+    }
+    scope {
+        %1576 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1577 = get_global @dst : s8i[80]*
+        %1578 = cast(array_to_ptrdecay) %1577 : s8i*
+        %1579 = cast(bitcast) %1578 : void*
+        %1580 = const 0 : s32i
+        %1581 = const 20 : s32i
+        %1582 = const 1 : s32i
+        %1583 = add %1581, %1582 : s32i [nsw]
+        %1584 = cast(integral) %1583 : u64i
+        %1585 = call @memset(%1579, %1580, %1584) : void* [all]
+        %1586 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1587 = get_global @dst : s8i[80]*
+        %1588 = cast(array_to_ptrdecay) %1587 : s8i*
+        %1589 = cast(bitcast) %1588 : void*
+        %1590 = get_global @src : s8i[80]*
+        %1591 = cast(array_to_ptrdecay) %1590 : s8i*
+        %1592 = cast(bitcast) %1591 : void*
+        %1593 = const 20 : s32i
+        %1594 = const 1 : s32i
+        %1595 = add %1593, %1594 : s32i [nsw]
+        %1596 = cast(integral) %1595 : u64i
+        %1597 = call @memcpy(%1589, %1592, %1596) : void* [all]
+        %1598 = get_global @dst : s8i[80]*
+        %1599 = cast(array_to_ptrdecay) %1598 : s8i*
+        %1600 = get_global @src : s8i[80]*
+        %1601 = cast(array_to_ptrdecay) %1600 : s8i*
+        %1602 = const 20 : s32i
+        %1603 = const 1 : s32i
+        %1604 = add %1602, %1603 : s32i [nsw]
+        call @check(%1599, %1601, %1604) [all]
+        yield
+    }
+    scope {
+        %1547 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1548 = get_global @dst : s8i[80]*
+        %1549 = cast(array_to_ptrdecay) %1548 : s8i*
+        %1550 = cast(bitcast) %1549 : void*
+        %1551 = const 0 : s32i
+        %1552 = const 20 : s32i
+        %1553 = const 2 : s32i
+        %1554 = add %1552, %1553 : s32i [nsw]
+        %1555 = cast(integral) %1554 : u64i
+        %1556 = call @memset(%1550, %1551, %1555) : void* [all]
+        %1557 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1558 = get_global @dst : s8i[80]*
+        %1559 = cast(array_to_ptrdecay) %1558 : s8i*
+        %1560 = cast(bitcast) %1559 : void*
+        %1561 = get_global @src : s8i[80]*
+        %1562 = cast(array_to_ptrdecay) %1561 : s8i*
+        %1563 = cast(bitcast) %1562 : void*
+        %1564 = const 20 : s32i
+        %1565 = const 2 : s32i
+        %1566 = add %1564, %1565 : s32i [nsw]
+        %1567 = cast(integral) %1566 : u64i
+        %1568 = call @memcpy(%1560, %1563, %1567) : void* [all]
+        %1569 = get_global @dst : s8i[80]*
+        %1570 = cast(array_to_ptrdecay) %1569 : s8i*
+        %1571 = get_global @src : s8i[80]*
+        %1572 = cast(array_to_ptrdecay) %1571 : s8i*
+        %1573 = const 20 : s32i
+        %1574 = const 2 : s32i
+        %1575 = add %1573, %1574 : s32i [nsw]
+        call @check(%1570, %1572, %1575) [all]
+        yield
+    }
+    scope {
+        %1518 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1519 = get_global @dst : s8i[80]*
+        %1520 = cast(array_to_ptrdecay) %1519 : s8i*
+        %1521 = cast(bitcast) %1520 : void*
+        %1522 = const 0 : s32i
+        %1523 = const 20 : s32i
+        %1524 = const 3 : s32i
+        %1525 = add %1523, %1524 : s32i [nsw]
+        %1526 = cast(integral) %1525 : u64i
+        %1527 = call @memset(%1521, %1522, %1526) : void* [all]
+        %1528 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1529 = get_global @dst : s8i[80]*
+        %1530 = cast(array_to_ptrdecay) %1529 : s8i*
+        %1531 = cast(bitcast) %1530 : void*
+        %1532 = get_global @src : s8i[80]*
+        %1533 = cast(array_to_ptrdecay) %1532 : s8i*
+        %1534 = cast(bitcast) %1533 : void*
+        %1535 = const 20 : s32i
+        %1536 = const 3 : s32i
+        %1537 = add %1535, %1536 : s32i [nsw]
+        %1538 = cast(integral) %1537 : u64i
+        %1539 = call @memcpy(%1531, %1534, %1538) : void* [all]
+        %1540 = get_global @dst : s8i[80]*
+        %1541 = cast(array_to_ptrdecay) %1540 : s8i*
+        %1542 = get_global @src : s8i[80]*
+        %1543 = cast(array_to_ptrdecay) %1542 : s8i*
+        %1544 = const 20 : s32i
+        %1545 = const 3 : s32i
+        %1546 = add %1544, %1545 : s32i [nsw]
+        call @check(%1541, %1543, %1546) [all]
+        yield
+    }
+    scope {
+        %1497 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1498 = get_global @dst : s8i[80]*
+        %1499 = cast(array_to_ptrdecay) %1498 : s8i*
+        %1500 = cast(bitcast) %1499 : void*
+        %1501 = const 0 : s32i
+        %1502 = const 24 : u64i
+        %1503 = call @memset(%1500, %1501, %1502) : void* [all]
+        %1504 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1505 = get_global @dst : s8i[80]*
+        %1506 = cast(array_to_ptrdecay) %1505 : s8i*
+        %1507 = cast(bitcast) %1506 : void*
+        %1508 = get_global @src : s8i[80]*
+        %1509 = cast(array_to_ptrdecay) %1508 : s8i*
+        %1510 = cast(bitcast) %1509 : void*
+        %1511 = const 24 : u64i
+        %1512 = call @memcpy(%1507, %1510, %1511) : void* [all]
+        %1513 = get_global @dst : s8i[80]*
+        %1514 = cast(array_to_ptrdecay) %1513 : s8i*
+        %1515 = get_global @src : s8i[80]*
+        %1516 = cast(array_to_ptrdecay) %1515 : s8i*
+        %1517 = const 24 : s32i
+        call @check(%1514, %1516, %1517) [all]
+        yield
+    }
+    scope {
+        %1468 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1469 = get_global @dst : s8i[80]*
+        %1470 = cast(array_to_ptrdecay) %1469 : s8i*
+        %1471 = cast(bitcast) %1470 : void*
+        %1472 = const 0 : s32i
+        %1473 = const 24 : s32i
+        %1474 = const 1 : s32i
+        %1475 = add %1473, %1474 : s32i [nsw]
+        %1476 = cast(integral) %1475 : u64i
+        %1477 = call @memset(%1471, %1472, %1476) : void* [all]
+        %1478 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1479 = get_global @dst : s8i[80]*
+        %1480 = cast(array_to_ptrdecay) %1479 : s8i*
+        %1481 = cast(bitcast) %1480 : void*
+        %1482 = get_global @src : s8i[80]*
+        %1483 = cast(array_to_ptrdecay) %1482 : s8i*
+        %1484 = cast(bitcast) %1483 : void*
+        %1485 = const 24 : s32i
+        %1486 = const 1 : s32i
+        %1487 = add %1485, %1486 : s32i [nsw]
+        %1488 = cast(integral) %1487 : u64i
+        %1489 = call @memcpy(%1481, %1484, %1488) : void* [all]
+        %1490 = get_global @dst : s8i[80]*
+        %1491 = cast(array_to_ptrdecay) %1490 : s8i*
+        %1492 = get_global @src : s8i[80]*
+        %1493 = cast(array_to_ptrdecay) %1492 : s8i*
+        %1494 = const 24 : s32i
+        %1495 = const 1 : s32i
+        %1496 = add %1494, %1495 : s32i [nsw]
+        call @check(%1491, %1493, %1496) [all]
+        yield
+    }
+    scope {
+        %1439 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1440 = get_global @dst : s8i[80]*
+        %1441 = cast(array_to_ptrdecay) %1440 : s8i*
+        %1442 = cast(bitcast) %1441 : void*
+        %1443 = const 0 : s32i
+        %1444 = const 24 : s32i
+        %1445 = const 2 : s32i
+        %1446 = add %1444, %1445 : s32i [nsw]
+        %1447 = cast(integral) %1446 : u64i
+        %1448 = call @memset(%1442, %1443, %1447) : void* [all]
+        %1449 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1450 = get_global @dst : s8i[80]*
+        %1451 = cast(array_to_ptrdecay) %1450 : s8i*
+        %1452 = cast(bitcast) %1451 : void*
+        %1453 = get_global @src : s8i[80]*
+        %1454 = cast(array_to_ptrdecay) %1453 : s8i*
+        %1455 = cast(bitcast) %1454 : void*
+        %1456 = const 24 : s32i
+        %1457 = const 2 : s32i
+        %1458 = add %1456, %1457 : s32i [nsw]
+        %1459 = cast(integral) %1458 : u64i
+        %1460 = call @memcpy(%1452, %1455, %1459) : void* [all]
+        %1461 = get_global @dst : s8i[80]*
+        %1462 = cast(array_to_ptrdecay) %1461 : s8i*
+        %1463 = get_global @src : s8i[80]*
+        %1464 = cast(array_to_ptrdecay) %1463 : s8i*
+        %1465 = const 24 : s32i
+        %1466 = const 2 : s32i
+        %1467 = add %1465, %1466 : s32i [nsw]
+        call @check(%1462, %1464, %1467) [all]
+        yield
+    }
+    scope {
+        %1410 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1411 = get_global @dst : s8i[80]*
+        %1412 = cast(array_to_ptrdecay) %1411 : s8i*
+        %1413 = cast(bitcast) %1412 : void*
+        %1414 = const 0 : s32i
+        %1415 = const 24 : s32i
+        %1416 = const 3 : s32i
+        %1417 = add %1415, %1416 : s32i [nsw]
+        %1418 = cast(integral) %1417 : u64i
+        %1419 = call @memset(%1413, %1414, %1418) : void* [all]
+        %1420 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1421 = get_global @dst : s8i[80]*
+        %1422 = cast(array_to_ptrdecay) %1421 : s8i*
+        %1423 = cast(bitcast) %1422 : void*
+        %1424 = get_global @src : s8i[80]*
+        %1425 = cast(array_to_ptrdecay) %1424 : s8i*
+        %1426 = cast(bitcast) %1425 : void*
+        %1427 = const 24 : s32i
+        %1428 = const 3 : s32i
+        %1429 = add %1427, %1428 : s32i [nsw]
+        %1430 = cast(integral) %1429 : u64i
+        %1431 = call @memcpy(%1423, %1426, %1430) : void* [all]
+        %1432 = get_global @dst : s8i[80]*
+        %1433 = cast(array_to_ptrdecay) %1432 : s8i*
+        %1434 = get_global @src : s8i[80]*
+        %1435 = cast(array_to_ptrdecay) %1434 : s8i*
+        %1436 = const 24 : s32i
+        %1437 = const 3 : s32i
+        %1438 = add %1436, %1437 : s32i [nsw]
+        call @check(%1433, %1435, %1438) [all]
+        yield
+    }
+    scope {
+        %1389 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1390 = get_global @dst : s8i[80]*
+        %1391 = cast(array_to_ptrdecay) %1390 : s8i*
+        %1392 = cast(bitcast) %1391 : void*
+        %1393 = const 0 : s32i
+        %1394 = const 28 : u64i
+        %1395 = call @memset(%1392, %1393, %1394) : void* [all]
+        %1396 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1397 = get_global @dst : s8i[80]*
+        %1398 = cast(array_to_ptrdecay) %1397 : s8i*
+        %1399 = cast(bitcast) %1398 : void*
+        %1400 = get_global @src : s8i[80]*
+        %1401 = cast(array_to_ptrdecay) %1400 : s8i*
+        %1402 = cast(bitcast) %1401 : void*
+        %1403 = const 28 : u64i
+        %1404 = call @memcpy(%1399, %1402, %1403) : void* [all]
+        %1405 = get_global @dst : s8i[80]*
+        %1406 = cast(array_to_ptrdecay) %1405 : s8i*
+        %1407 = get_global @src : s8i[80]*
+        %1408 = cast(array_to_ptrdecay) %1407 : s8i*
+        %1409 = const 28 : s32i
+        call @check(%1406, %1408, %1409) [all]
+        yield
+    }
+    scope {
+        %1360 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1361 = get_global @dst : s8i[80]*
+        %1362 = cast(array_to_ptrdecay) %1361 : s8i*
+        %1363 = cast(bitcast) %1362 : void*
+        %1364 = const 0 : s32i
+        %1365 = const 28 : s32i
+        %1366 = const 1 : s32i
+        %1367 = add %1365, %1366 : s32i [nsw]
+        %1368 = cast(integral) %1367 : u64i
+        %1369 = call @memset(%1363, %1364, %1368) : void* [all]
+        %1370 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1371 = get_global @dst : s8i[80]*
+        %1372 = cast(array_to_ptrdecay) %1371 : s8i*
+        %1373 = cast(bitcast) %1372 : void*
+        %1374 = get_global @src : s8i[80]*
+        %1375 = cast(array_to_ptrdecay) %1374 : s8i*
+        %1376 = cast(bitcast) %1375 : void*
+        %1377 = const 28 : s32i
+        %1378 = const 1 : s32i
+        %1379 = add %1377, %1378 : s32i [nsw]
+        %1380 = cast(integral) %1379 : u64i
+        %1381 = call @memcpy(%1373, %1376, %1380) : void* [all]
+        %1382 = get_global @dst : s8i[80]*
+        %1383 = cast(array_to_ptrdecay) %1382 : s8i*
+        %1384 = get_global @src : s8i[80]*
+        %1385 = cast(array_to_ptrdecay) %1384 : s8i*
+        %1386 = const 28 : s32i
+        %1387 = const 1 : s32i
+        %1388 = add %1386, %1387 : s32i [nsw]
+        call @check(%1383, %1385, %1388) [all]
+        yield
+    }
+    scope {
+        %1331 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1332 = get_global @dst : s8i[80]*
+        %1333 = cast(array_to_ptrdecay) %1332 : s8i*
+        %1334 = cast(bitcast) %1333 : void*
+        %1335 = const 0 : s32i
+        %1336 = const 28 : s32i
+        %1337 = const 2 : s32i
+        %1338 = add %1336, %1337 : s32i [nsw]
+        %1339 = cast(integral) %1338 : u64i
+        %1340 = call @memset(%1334, %1335, %1339) : void* [all]
+        %1341 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1342 = get_global @dst : s8i[80]*
+        %1343 = cast(array_to_ptrdecay) %1342 : s8i*
+        %1344 = cast(bitcast) %1343 : void*
+        %1345 = get_global @src : s8i[80]*
+        %1346 = cast(array_to_ptrdecay) %1345 : s8i*
+        %1347 = cast(bitcast) %1346 : void*
+        %1348 = const 28 : s32i
+        %1349 = const 2 : s32i
+        %1350 = add %1348, %1349 : s32i [nsw]
+        %1351 = cast(integral) %1350 : u64i
+        %1352 = call @memcpy(%1344, %1347, %1351) : void* [all]
+        %1353 = get_global @dst : s8i[80]*
+        %1354 = cast(array_to_ptrdecay) %1353 : s8i*
+        %1355 = get_global @src : s8i[80]*
+        %1356 = cast(array_to_ptrdecay) %1355 : s8i*
+        %1357 = const 28 : s32i
+        %1358 = const 2 : s32i
+        %1359 = add %1357, %1358 : s32i [nsw]
+        call @check(%1354, %1356, %1359) [all]
+        yield
+    }
+    scope {
+        %1302 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1303 = get_global @dst : s8i[80]*
+        %1304 = cast(array_to_ptrdecay) %1303 : s8i*
+        %1305 = cast(bitcast) %1304 : void*
+        %1306 = const 0 : s32i
+        %1307 = const 28 : s32i
+        %1308 = const 3 : s32i
+        %1309 = add %1307, %1308 : s32i [nsw]
+        %1310 = cast(integral) %1309 : u64i
+        %1311 = call @memset(%1305, %1306, %1310) : void* [all]
+        %1312 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1313 = get_global @dst : s8i[80]*
+        %1314 = cast(array_to_ptrdecay) %1313 : s8i*
+        %1315 = cast(bitcast) %1314 : void*
+        %1316 = get_global @src : s8i[80]*
+        %1317 = cast(array_to_ptrdecay) %1316 : s8i*
+        %1318 = cast(bitcast) %1317 : void*
+        %1319 = const 28 : s32i
+        %1320 = const 3 : s32i
+        %1321 = add %1319, %1320 : s32i [nsw]
+        %1322 = cast(integral) %1321 : u64i
+        %1323 = call @memcpy(%1315, %1318, %1322) : void* [all]
+        %1324 = get_global @dst : s8i[80]*
+        %1325 = cast(array_to_ptrdecay) %1324 : s8i*
+        %1326 = get_global @src : s8i[80]*
+        %1327 = cast(array_to_ptrdecay) %1326 : s8i*
+        %1328 = const 28 : s32i
+        %1329 = const 3 : s32i
+        %1330 = add %1328, %1329 : s32i [nsw]
+        call @check(%1325, %1327, %1330) [all]
+        yield
+    }
+    scope {
+        %1281 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1282 = get_global @dst : s8i[80]*
+        %1283 = cast(array_to_ptrdecay) %1282 : s8i*
+        %1284 = cast(bitcast) %1283 : void*
+        %1285 = const 0 : s32i
+        %1286 = const 32 : u64i
+        %1287 = call @memset(%1284, %1285, %1286) : void* [all]
+        %1288 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1289 = get_global @dst : s8i[80]*
+        %1290 = cast(array_to_ptrdecay) %1289 : s8i*
+        %1291 = cast(bitcast) %1290 : void*
+        %1292 = get_global @src : s8i[80]*
+        %1293 = cast(array_to_ptrdecay) %1292 : s8i*
+        %1294 = cast(bitcast) %1293 : void*
+        %1295 = const 32 : u64i
+        %1296 = call @memcpy(%1291, %1294, %1295) : void* [all]
+        %1297 = get_global @dst : s8i[80]*
+        %1298 = cast(array_to_ptrdecay) %1297 : s8i*
+        %1299 = get_global @src : s8i[80]*
+        %1300 = cast(array_to_ptrdecay) %1299 : s8i*
+        %1301 = const 32 : s32i
+        call @check(%1298, %1300, %1301) [all]
+        yield
+    }
+    scope {
+        %1252 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1253 = get_global @dst : s8i[80]*
+        %1254 = cast(array_to_ptrdecay) %1253 : s8i*
+        %1255 = cast(bitcast) %1254 : void*
+        %1256 = const 0 : s32i
+        %1257 = const 32 : s32i
+        %1258 = const 1 : s32i
+        %1259 = add %1257, %1258 : s32i [nsw]
+        %1260 = cast(integral) %1259 : u64i
+        %1261 = call @memset(%1255, %1256, %1260) : void* [all]
+        %1262 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1263 = get_global @dst : s8i[80]*
+        %1264 = cast(array_to_ptrdecay) %1263 : s8i*
+        %1265 = cast(bitcast) %1264 : void*
+        %1266 = get_global @src : s8i[80]*
+        %1267 = cast(array_to_ptrdecay) %1266 : s8i*
+        %1268 = cast(bitcast) %1267 : void*
+        %1269 = const 32 : s32i
+        %1270 = const 1 : s32i
+        %1271 = add %1269, %1270 : s32i [nsw]
+        %1272 = cast(integral) %1271 : u64i
+        %1273 = call @memcpy(%1265, %1268, %1272) : void* [all]
+        %1274 = get_global @dst : s8i[80]*
+        %1275 = cast(array_to_ptrdecay) %1274 : s8i*
+        %1276 = get_global @src : s8i[80]*
+        %1277 = cast(array_to_ptrdecay) %1276 : s8i*
+        %1278 = const 32 : s32i
+        %1279 = const 1 : s32i
+        %1280 = add %1278, %1279 : s32i [nsw]
+        call @check(%1275, %1277, %1280) [all]
+        yield
+    }
+    scope {
+        %1223 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1224 = get_global @dst : s8i[80]*
+        %1225 = cast(array_to_ptrdecay) %1224 : s8i*
+        %1226 = cast(bitcast) %1225 : void*
+        %1227 = const 0 : s32i
+        %1228 = const 32 : s32i
+        %1229 = const 2 : s32i
+        %1230 = add %1228, %1229 : s32i [nsw]
+        %1231 = cast(integral) %1230 : u64i
+        %1232 = call @memset(%1226, %1227, %1231) : void* [all]
+        %1233 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1234 = get_global @dst : s8i[80]*
+        %1235 = cast(array_to_ptrdecay) %1234 : s8i*
+        %1236 = cast(bitcast) %1235 : void*
+        %1237 = get_global @src : s8i[80]*
+        %1238 = cast(array_to_ptrdecay) %1237 : s8i*
+        %1239 = cast(bitcast) %1238 : void*
+        %1240 = const 32 : s32i
+        %1241 = const 2 : s32i
+        %1242 = add %1240, %1241 : s32i [nsw]
+        %1243 = cast(integral) %1242 : u64i
+        %1244 = call @memcpy(%1236, %1239, %1243) : void* [all]
+        %1245 = get_global @dst : s8i[80]*
+        %1246 = cast(array_to_ptrdecay) %1245 : s8i*
+        %1247 = get_global @src : s8i[80]*
+        %1248 = cast(array_to_ptrdecay) %1247 : s8i*
+        %1249 = const 32 : s32i
+        %1250 = const 2 : s32i
+        %1251 = add %1249, %1250 : s32i [nsw]
+        call @check(%1246, %1248, %1251) [all]
+        yield
+    }
+    scope {
+        %1194 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1195 = get_global @dst : s8i[80]*
+        %1196 = cast(array_to_ptrdecay) %1195 : s8i*
+        %1197 = cast(bitcast) %1196 : void*
+        %1198 = const 0 : s32i
+        %1199 = const 32 : s32i
+        %1200 = const 3 : s32i
+        %1201 = add %1199, %1200 : s32i [nsw]
+        %1202 = cast(integral) %1201 : u64i
+        %1203 = call @memset(%1197, %1198, %1202) : void* [all]
+        %1204 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1205 = get_global @dst : s8i[80]*
+        %1206 = cast(array_to_ptrdecay) %1205 : s8i*
+        %1207 = cast(bitcast) %1206 : void*
+        %1208 = get_global @src : s8i[80]*
+        %1209 = cast(array_to_ptrdecay) %1208 : s8i*
+        %1210 = cast(bitcast) %1209 : void*
+        %1211 = const 32 : s32i
+        %1212 = const 3 : s32i
+        %1213 = add %1211, %1212 : s32i [nsw]
+        %1214 = cast(integral) %1213 : u64i
+        %1215 = call @memcpy(%1207, %1210, %1214) : void* [all]
+        %1216 = get_global @dst : s8i[80]*
+        %1217 = cast(array_to_ptrdecay) %1216 : s8i*
+        %1218 = get_global @src : s8i[80]*
+        %1219 = cast(array_to_ptrdecay) %1218 : s8i*
+        %1220 = const 32 : s32i
+        %1221 = const 3 : s32i
+        %1222 = add %1220, %1221 : s32i [nsw]
+        call @check(%1217, %1219, %1222) [all]
+        yield
+    }
+    scope {
+        %1173 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1174 = get_global @dst : s8i[80]*
+        %1175 = cast(array_to_ptrdecay) %1174 : s8i*
+        %1176 = cast(bitcast) %1175 : void*
+        %1177 = const 0 : s32i
+        %1178 = const 36 : u64i
+        %1179 = call @memset(%1176, %1177, %1178) : void* [all]
+        %1180 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1181 = get_global @dst : s8i[80]*
+        %1182 = cast(array_to_ptrdecay) %1181 : s8i*
+        %1183 = cast(bitcast) %1182 : void*
+        %1184 = get_global @src : s8i[80]*
+        %1185 = cast(array_to_ptrdecay) %1184 : s8i*
+        %1186 = cast(bitcast) %1185 : void*
+        %1187 = const 36 : u64i
+        %1188 = call @memcpy(%1183, %1186, %1187) : void* [all]
+        %1189 = get_global @dst : s8i[80]*
+        %1190 = cast(array_to_ptrdecay) %1189 : s8i*
+        %1191 = get_global @src : s8i[80]*
+        %1192 = cast(array_to_ptrdecay) %1191 : s8i*
+        %1193 = const 36 : s32i
+        call @check(%1190, %1192, %1193) [all]
+        yield
+    }
+    scope {
+        %1144 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1145 = get_global @dst : s8i[80]*
+        %1146 = cast(array_to_ptrdecay) %1145 : s8i*
+        %1147 = cast(bitcast) %1146 : void*
+        %1148 = const 0 : s32i
+        %1149 = const 36 : s32i
+        %1150 = const 1 : s32i
+        %1151 = add %1149, %1150 : s32i [nsw]
+        %1152 = cast(integral) %1151 : u64i
+        %1153 = call @memset(%1147, %1148, %1152) : void* [all]
+        %1154 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1155 = get_global @dst : s8i[80]*
+        %1156 = cast(array_to_ptrdecay) %1155 : s8i*
+        %1157 = cast(bitcast) %1156 : void*
+        %1158 = get_global @src : s8i[80]*
+        %1159 = cast(array_to_ptrdecay) %1158 : s8i*
+        %1160 = cast(bitcast) %1159 : void*
+        %1161 = const 36 : s32i
+        %1162 = const 1 : s32i
+        %1163 = add %1161, %1162 : s32i [nsw]
+        %1164 = cast(integral) %1163 : u64i
+        %1165 = call @memcpy(%1157, %1160, %1164) : void* [all]
+        %1166 = get_global @dst : s8i[80]*
+        %1167 = cast(array_to_ptrdecay) %1166 : s8i*
+        %1168 = get_global @src : s8i[80]*
+        %1169 = cast(array_to_ptrdecay) %1168 : s8i*
+        %1170 = const 36 : s32i
+        %1171 = const 1 : s32i
+        %1172 = add %1170, %1171 : s32i [nsw]
+        call @check(%1167, %1169, %1172) [all]
+        yield
+    }
+    scope {
+        %1115 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1116 = get_global @dst : s8i[80]*
+        %1117 = cast(array_to_ptrdecay) %1116 : s8i*
+        %1118 = cast(bitcast) %1117 : void*
+        %1119 = const 0 : s32i
+        %1120 = const 36 : s32i
+        %1121 = const 2 : s32i
+        %1122 = add %1120, %1121 : s32i [nsw]
+        %1123 = cast(integral) %1122 : u64i
+        %1124 = call @memset(%1118, %1119, %1123) : void* [all]
+        %1125 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1126 = get_global @dst : s8i[80]*
+        %1127 = cast(array_to_ptrdecay) %1126 : s8i*
+        %1128 = cast(bitcast) %1127 : void*
+        %1129 = get_global @src : s8i[80]*
+        %1130 = cast(array_to_ptrdecay) %1129 : s8i*
+        %1131 = cast(bitcast) %1130 : void*
+        %1132 = const 36 : s32i
+        %1133 = const 2 : s32i
+        %1134 = add %1132, %1133 : s32i [nsw]
+        %1135 = cast(integral) %1134 : u64i
+        %1136 = call @memcpy(%1128, %1131, %1135) : void* [all]
+        %1137 = get_global @dst : s8i[80]*
+        %1138 = cast(array_to_ptrdecay) %1137 : s8i*
+        %1139 = get_global @src : s8i[80]*
+        %1140 = cast(array_to_ptrdecay) %1139 : s8i*
+        %1141 = const 36 : s32i
+        %1142 = const 2 : s32i
+        %1143 = add %1141, %1142 : s32i [nsw]
+        call @check(%1138, %1140, %1143) [all]
+        yield
+    }
+    scope {
+        %1086 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1087 = get_global @dst : s8i[80]*
+        %1088 = cast(array_to_ptrdecay) %1087 : s8i*
+        %1089 = cast(bitcast) %1088 : void*
+        %1090 = const 0 : s32i
+        %1091 = const 36 : s32i
+        %1092 = const 3 : s32i
+        %1093 = add %1091, %1092 : s32i [nsw]
+        %1094 = cast(integral) %1093 : u64i
+        %1095 = call @memset(%1089, %1090, %1094) : void* [all]
+        %1096 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1097 = get_global @dst : s8i[80]*
+        %1098 = cast(array_to_ptrdecay) %1097 : s8i*
+        %1099 = cast(bitcast) %1098 : void*
+        %1100 = get_global @src : s8i[80]*
+        %1101 = cast(array_to_ptrdecay) %1100 : s8i*
+        %1102 = cast(bitcast) %1101 : void*
+        %1103 = const 36 : s32i
+        %1104 = const 3 : s32i
+        %1105 = add %1103, %1104 : s32i [nsw]
+        %1106 = cast(integral) %1105 : u64i
+        %1107 = call @memcpy(%1099, %1102, %1106) : void* [all]
+        %1108 = get_global @dst : s8i[80]*
+        %1109 = cast(array_to_ptrdecay) %1108 : s8i*
+        %1110 = get_global @src : s8i[80]*
+        %1111 = cast(array_to_ptrdecay) %1110 : s8i*
+        %1112 = const 36 : s32i
+        %1113 = const 3 : s32i
+        %1114 = add %1112, %1113 : s32i [nsw]
+        call @check(%1109, %1111, %1114) [all]
+        yield
+    }
+    scope {
+        %1065 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1066 = get_global @dst : s8i[80]*
+        %1067 = cast(array_to_ptrdecay) %1066 : s8i*
+        %1068 = cast(bitcast) %1067 : void*
+        %1069 = const 0 : s32i
+        %1070 = const 40 : u64i
+        %1071 = call @memset(%1068, %1069, %1070) : void* [all]
+        %1072 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1073 = get_global @dst : s8i[80]*
+        %1074 = cast(array_to_ptrdecay) %1073 : s8i*
+        %1075 = cast(bitcast) %1074 : void*
+        %1076 = get_global @src : s8i[80]*
+        %1077 = cast(array_to_ptrdecay) %1076 : s8i*
+        %1078 = cast(bitcast) %1077 : void*
+        %1079 = const 40 : u64i
+        %1080 = call @memcpy(%1075, %1078, %1079) : void* [all]
+        %1081 = get_global @dst : s8i[80]*
+        %1082 = cast(array_to_ptrdecay) %1081 : s8i*
+        %1083 = get_global @src : s8i[80]*
+        %1084 = cast(array_to_ptrdecay) %1083 : s8i*
+        %1085 = const 40 : s32i
+        call @check(%1082, %1084, %1085) [all]
+        yield
+    }
+    scope {
+        %1036 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1037 = get_global @dst : s8i[80]*
+        %1038 = cast(array_to_ptrdecay) %1037 : s8i*
+        %1039 = cast(bitcast) %1038 : void*
+        %1040 = const 0 : s32i
+        %1041 = const 40 : s32i
+        %1042 = const 1 : s32i
+        %1043 = add %1041, %1042 : s32i [nsw]
+        %1044 = cast(integral) %1043 : u64i
+        %1045 = call @memset(%1039, %1040, %1044) : void* [all]
+        %1046 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1047 = get_global @dst : s8i[80]*
+        %1048 = cast(array_to_ptrdecay) %1047 : s8i*
+        %1049 = cast(bitcast) %1048 : void*
+        %1050 = get_global @src : s8i[80]*
+        %1051 = cast(array_to_ptrdecay) %1050 : s8i*
+        %1052 = cast(bitcast) %1051 : void*
+        %1053 = const 40 : s32i
+        %1054 = const 1 : s32i
+        %1055 = add %1053, %1054 : s32i [nsw]
+        %1056 = cast(integral) %1055 : u64i
+        %1057 = call @memcpy(%1049, %1052, %1056) : void* [all]
+        %1058 = get_global @dst : s8i[80]*
+        %1059 = cast(array_to_ptrdecay) %1058 : s8i*
+        %1060 = get_global @src : s8i[80]*
+        %1061 = cast(array_to_ptrdecay) %1060 : s8i*
+        %1062 = const 40 : s32i
+        %1063 = const 1 : s32i
+        %1064 = add %1062, %1063 : s32i [nsw]
+        call @check(%1059, %1061, %1064) [all]
+        yield
+    }
+    scope {
+        %1007 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %1008 = get_global @dst : s8i[80]*
+        %1009 = cast(array_to_ptrdecay) %1008 : s8i*
+        %1010 = cast(bitcast) %1009 : void*
+        %1011 = const 0 : s32i
+        %1012 = const 40 : s32i
+        %1013 = const 2 : s32i
+        %1014 = add %1012, %1013 : s32i [nsw]
+        %1015 = cast(integral) %1014 : u64i
+        %1016 = call @memset(%1010, %1011, %1015) : void* [all]
+        %1017 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %1018 = get_global @dst : s8i[80]*
+        %1019 = cast(array_to_ptrdecay) %1018 : s8i*
+        %1020 = cast(bitcast) %1019 : void*
+        %1021 = get_global @src : s8i[80]*
+        %1022 = cast(array_to_ptrdecay) %1021 : s8i*
+        %1023 = cast(bitcast) %1022 : void*
+        %1024 = const 40 : s32i
+        %1025 = const 2 : s32i
+        %1026 = add %1024, %1025 : s32i [nsw]
+        %1027 = cast(integral) %1026 : u64i
+        %1028 = call @memcpy(%1020, %1023, %1027) : void* [all]
+        %1029 = get_global @dst : s8i[80]*
+        %1030 = cast(array_to_ptrdecay) %1029 : s8i*
+        %1031 = get_global @src : s8i[80]*
+        %1032 = cast(array_to_ptrdecay) %1031 : s8i*
+        %1033 = const 40 : s32i
+        %1034 = const 2 : s32i
+        %1035 = add %1033, %1034 : s32i [nsw]
+        call @check(%1030, %1032, %1035) [all]
+        yield
+    }
+    scope {
+        %978 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %979 = get_global @dst : s8i[80]*
+        %980 = cast(array_to_ptrdecay) %979 : s8i*
+        %981 = cast(bitcast) %980 : void*
+        %982 = const 0 : s32i
+        %983 = const 40 : s32i
+        %984 = const 3 : s32i
+        %985 = add %983, %984 : s32i [nsw]
+        %986 = cast(integral) %985 : u64i
+        %987 = call @memset(%981, %982, %986) : void* [all]
+        %988 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %989 = get_global @dst : s8i[80]*
+        %990 = cast(array_to_ptrdecay) %989 : s8i*
+        %991 = cast(bitcast) %990 : void*
+        %992 = get_global @src : s8i[80]*
+        %993 = cast(array_to_ptrdecay) %992 : s8i*
+        %994 = cast(bitcast) %993 : void*
+        %995 = const 40 : s32i
+        %996 = const 3 : s32i
+        %997 = add %995, %996 : s32i [nsw]
+        %998 = cast(integral) %997 : u64i
+        %999 = call @memcpy(%991, %994, %998) : void* [all]
+        %1000 = get_global @dst : s8i[80]*
+        %1001 = cast(array_to_ptrdecay) %1000 : s8i*
+        %1002 = get_global @src : s8i[80]*
+        %1003 = cast(array_to_ptrdecay) %1002 : s8i*
+        %1004 = const 40 : s32i
+        %1005 = const 3 : s32i
+        %1006 = add %1004, %1005 : s32i [nsw]
+        call @check(%1001, %1003, %1006) [all]
+        yield
+    }
+    scope {
+        %957 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %958 = get_global @dst : s8i[80]*
+        %959 = cast(array_to_ptrdecay) %958 : s8i*
+        %960 = cast(bitcast) %959 : void*
+        %961 = const 0 : s32i
+        %962 = const 44 : u64i
+        %963 = call @memset(%960, %961, %962) : void* [all]
+        %964 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %965 = get_global @dst : s8i[80]*
+        %966 = cast(array_to_ptrdecay) %965 : s8i*
+        %967 = cast(bitcast) %966 : void*
+        %968 = get_global @src : s8i[80]*
+        %969 = cast(array_to_ptrdecay) %968 : s8i*
+        %970 = cast(bitcast) %969 : void*
+        %971 = const 44 : u64i
+        %972 = call @memcpy(%967, %970, %971) : void* [all]
+        %973 = get_global @dst : s8i[80]*
+        %974 = cast(array_to_ptrdecay) %973 : s8i*
+        %975 = get_global @src : s8i[80]*
+        %976 = cast(array_to_ptrdecay) %975 : s8i*
+        %977 = const 44 : s32i
+        call @check(%974, %976, %977) [all]
+        yield
+    }
+    scope {
+        %928 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %929 = get_global @dst : s8i[80]*
+        %930 = cast(array_to_ptrdecay) %929 : s8i*
+        %931 = cast(bitcast) %930 : void*
+        %932 = const 0 : s32i
+        %933 = const 44 : s32i
+        %934 = const 1 : s32i
+        %935 = add %933, %934 : s32i [nsw]
+        %936 = cast(integral) %935 : u64i
+        %937 = call @memset(%931, %932, %936) : void* [all]
+        %938 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %939 = get_global @dst : s8i[80]*
+        %940 = cast(array_to_ptrdecay) %939 : s8i*
+        %941 = cast(bitcast) %940 : void*
+        %942 = get_global @src : s8i[80]*
+        %943 = cast(array_to_ptrdecay) %942 : s8i*
+        %944 = cast(bitcast) %943 : void*
+        %945 = const 44 : s32i
+        %946 = const 1 : s32i
+        %947 = add %945, %946 : s32i [nsw]
+        %948 = cast(integral) %947 : u64i
+        %949 = call @memcpy(%941, %944, %948) : void* [all]
+        %950 = get_global @dst : s8i[80]*
+        %951 = cast(array_to_ptrdecay) %950 : s8i*
+        %952 = get_global @src : s8i[80]*
+        %953 = cast(array_to_ptrdecay) %952 : s8i*
+        %954 = const 44 : s32i
+        %955 = const 1 : s32i
+        %956 = add %954, %955 : s32i [nsw]
+        call @check(%951, %953, %956) [all]
+        yield
+    }
+    scope {
+        %899 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %900 = get_global @dst : s8i[80]*
+        %901 = cast(array_to_ptrdecay) %900 : s8i*
+        %902 = cast(bitcast) %901 : void*
+        %903 = const 0 : s32i
+        %904 = const 44 : s32i
+        %905 = const 2 : s32i
+        %906 = add %904, %905 : s32i [nsw]
+        %907 = cast(integral) %906 : u64i
+        %908 = call @memset(%902, %903, %907) : void* [all]
+        %909 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %910 = get_global @dst : s8i[80]*
+        %911 = cast(array_to_ptrdecay) %910 : s8i*
+        %912 = cast(bitcast) %911 : void*
+        %913 = get_global @src : s8i[80]*
+        %914 = cast(array_to_ptrdecay) %913 : s8i*
+        %915 = cast(bitcast) %914 : void*
+        %916 = const 44 : s32i
+        %917 = const 2 : s32i
+        %918 = add %916, %917 : s32i [nsw]
+        %919 = cast(integral) %918 : u64i
+        %920 = call @memcpy(%912, %915, %919) : void* [all]
+        %921 = get_global @dst : s8i[80]*
+        %922 = cast(array_to_ptrdecay) %921 : s8i*
+        %923 = get_global @src : s8i[80]*
+        %924 = cast(array_to_ptrdecay) %923 : s8i*
+        %925 = const 44 : s32i
+        %926 = const 2 : s32i
+        %927 = add %925, %926 : s32i [nsw]
+        call @check(%922, %924, %927) [all]
+        yield
+    }
+    scope {
+        %870 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %871 = get_global @dst : s8i[80]*
+        %872 = cast(array_to_ptrdecay) %871 : s8i*
+        %873 = cast(bitcast) %872 : void*
+        %874 = const 0 : s32i
+        %875 = const 44 : s32i
+        %876 = const 3 : s32i
+        %877 = add %875, %876 : s32i [nsw]
+        %878 = cast(integral) %877 : u64i
+        %879 = call @memset(%873, %874, %878) : void* [all]
+        %880 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %881 = get_global @dst : s8i[80]*
+        %882 = cast(array_to_ptrdecay) %881 : s8i*
+        %883 = cast(bitcast) %882 : void*
+        %884 = get_global @src : s8i[80]*
+        %885 = cast(array_to_ptrdecay) %884 : s8i*
+        %886 = cast(bitcast) %885 : void*
+        %887 = const 44 : s32i
+        %888 = const 3 : s32i
+        %889 = add %887, %888 : s32i [nsw]
+        %890 = cast(integral) %889 : u64i
+        %891 = call @memcpy(%883, %886, %890) : void* [all]
+        %892 = get_global @dst : s8i[80]*
+        %893 = cast(array_to_ptrdecay) %892 : s8i*
+        %894 = get_global @src : s8i[80]*
+        %895 = cast(array_to_ptrdecay) %894 : s8i*
+        %896 = const 44 : s32i
+        %897 = const 3 : s32i
+        %898 = add %896, %897 : s32i [nsw]
+        call @check(%893, %895, %898) [all]
+        yield
+    }
+    scope {
+        %849 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %850 = get_global @dst : s8i[80]*
+        %851 = cast(array_to_ptrdecay) %850 : s8i*
+        %852 = cast(bitcast) %851 : void*
+        %853 = const 0 : s32i
+        %854 = const 48 : u64i
+        %855 = call @memset(%852, %853, %854) : void* [all]
+        %856 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %857 = get_global @dst : s8i[80]*
+        %858 = cast(array_to_ptrdecay) %857 : s8i*
+        %859 = cast(bitcast) %858 : void*
+        %860 = get_global @src : s8i[80]*
+        %861 = cast(array_to_ptrdecay) %860 : s8i*
+        %862 = cast(bitcast) %861 : void*
+        %863 = const 48 : u64i
+        %864 = call @memcpy(%859, %862, %863) : void* [all]
+        %865 = get_global @dst : s8i[80]*
+        %866 = cast(array_to_ptrdecay) %865 : s8i*
+        %867 = get_global @src : s8i[80]*
+        %868 = cast(array_to_ptrdecay) %867 : s8i*
+        %869 = const 48 : s32i
+        call @check(%866, %868, %869) [all]
+        yield
+    }
+    scope {
+        %820 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %821 = get_global @dst : s8i[80]*
+        %822 = cast(array_to_ptrdecay) %821 : s8i*
+        %823 = cast(bitcast) %822 : void*
+        %824 = const 0 : s32i
+        %825 = const 48 : s32i
+        %826 = const 1 : s32i
+        %827 = add %825, %826 : s32i [nsw]
+        %828 = cast(integral) %827 : u64i
+        %829 = call @memset(%823, %824, %828) : void* [all]
+        %830 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %831 = get_global @dst : s8i[80]*
+        %832 = cast(array_to_ptrdecay) %831 : s8i*
+        %833 = cast(bitcast) %832 : void*
+        %834 = get_global @src : s8i[80]*
+        %835 = cast(array_to_ptrdecay) %834 : s8i*
+        %836 = cast(bitcast) %835 : void*
+        %837 = const 48 : s32i
+        %838 = const 1 : s32i
+        %839 = add %837, %838 : s32i [nsw]
+        %840 = cast(integral) %839 : u64i
+        %841 = call @memcpy(%833, %836, %840) : void* [all]
+        %842 = get_global @dst : s8i[80]*
+        %843 = cast(array_to_ptrdecay) %842 : s8i*
+        %844 = get_global @src : s8i[80]*
+        %845 = cast(array_to_ptrdecay) %844 : s8i*
+        %846 = const 48 : s32i
+        %847 = const 1 : s32i
+        %848 = add %846, %847 : s32i [nsw]
+        call @check(%843, %845, %848) [all]
+        yield
+    }
+    scope {
+        %791 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %792 = get_global @dst : s8i[80]*
+        %793 = cast(array_to_ptrdecay) %792 : s8i*
+        %794 = cast(bitcast) %793 : void*
+        %795 = const 0 : s32i
+        %796 = const 48 : s32i
+        %797 = const 2 : s32i
+        %798 = add %796, %797 : s32i [nsw]
+        %799 = cast(integral) %798 : u64i
+        %800 = call @memset(%794, %795, %799) : void* [all]
+        %801 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %802 = get_global @dst : s8i[80]*
+        %803 = cast(array_to_ptrdecay) %802 : s8i*
+        %804 = cast(bitcast) %803 : void*
+        %805 = get_global @src : s8i[80]*
+        %806 = cast(array_to_ptrdecay) %805 : s8i*
+        %807 = cast(bitcast) %806 : void*
+        %808 = const 48 : s32i
+        %809 = const 2 : s32i
+        %810 = add %808, %809 : s32i [nsw]
+        %811 = cast(integral) %810 : u64i
+        %812 = call @memcpy(%804, %807, %811) : void* [all]
+        %813 = get_global @dst : s8i[80]*
+        %814 = cast(array_to_ptrdecay) %813 : s8i*
+        %815 = get_global @src : s8i[80]*
+        %816 = cast(array_to_ptrdecay) %815 : s8i*
+        %817 = const 48 : s32i
+        %818 = const 2 : s32i
+        %819 = add %817, %818 : s32i [nsw]
+        call @check(%814, %816, %819) [all]
+        yield
+    }
+    scope {
+        %762 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %763 = get_global @dst : s8i[80]*
+        %764 = cast(array_to_ptrdecay) %763 : s8i*
+        %765 = cast(bitcast) %764 : void*
+        %766 = const 0 : s32i
+        %767 = const 48 : s32i
+        %768 = const 3 : s32i
+        %769 = add %767, %768 : s32i [nsw]
+        %770 = cast(integral) %769 : u64i
+        %771 = call @memset(%765, %766, %770) : void* [all]
+        %772 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %773 = get_global @dst : s8i[80]*
+        %774 = cast(array_to_ptrdecay) %773 : s8i*
+        %775 = cast(bitcast) %774 : void*
+        %776 = get_global @src : s8i[80]*
+        %777 = cast(array_to_ptrdecay) %776 : s8i*
+        %778 = cast(bitcast) %777 : void*
+        %779 = const 48 : s32i
+        %780 = const 3 : s32i
+        %781 = add %779, %780 : s32i [nsw]
+        %782 = cast(integral) %781 : u64i
+        %783 = call @memcpy(%775, %778, %782) : void* [all]
+        %784 = get_global @dst : s8i[80]*
+        %785 = cast(array_to_ptrdecay) %784 : s8i*
+        %786 = get_global @src : s8i[80]*
+        %787 = cast(array_to_ptrdecay) %786 : s8i*
+        %788 = const 48 : s32i
+        %789 = const 3 : s32i
+        %790 = add %788, %789 : s32i [nsw]
+        call @check(%785, %787, %790) [all]
+        yield
+    }
+    scope {
+        %741 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %742 = get_global @dst : s8i[80]*
+        %743 = cast(array_to_ptrdecay) %742 : s8i*
+        %744 = cast(bitcast) %743 : void*
+        %745 = const 0 : s32i
+        %746 = const 52 : u64i
+        %747 = call @memset(%744, %745, %746) : void* [all]
+        %748 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %749 = get_global @dst : s8i[80]*
+        %750 = cast(array_to_ptrdecay) %749 : s8i*
+        %751 = cast(bitcast) %750 : void*
+        %752 = get_global @src : s8i[80]*
+        %753 = cast(array_to_ptrdecay) %752 : s8i*
+        %754 = cast(bitcast) %753 : void*
+        %755 = const 52 : u64i
+        %756 = call @memcpy(%751, %754, %755) : void* [all]
+        %757 = get_global @dst : s8i[80]*
+        %758 = cast(array_to_ptrdecay) %757 : s8i*
+        %759 = get_global @src : s8i[80]*
+        %760 = cast(array_to_ptrdecay) %759 : s8i*
+        %761 = const 52 : s32i
+        call @check(%758, %760, %761) [all]
+        yield
+    }
+    scope {
+        %712 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %713 = get_global @dst : s8i[80]*
+        %714 = cast(array_to_ptrdecay) %713 : s8i*
+        %715 = cast(bitcast) %714 : void*
+        %716 = const 0 : s32i
+        %717 = const 52 : s32i
+        %718 = const 1 : s32i
+        %719 = add %717, %718 : s32i [nsw]
+        %720 = cast(integral) %719 : u64i
+        %721 = call @memset(%715, %716, %720) : void* [all]
+        %722 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %723 = get_global @dst : s8i[80]*
+        %724 = cast(array_to_ptrdecay) %723 : s8i*
+        %725 = cast(bitcast) %724 : void*
+        %726 = get_global @src : s8i[80]*
+        %727 = cast(array_to_ptrdecay) %726 : s8i*
+        %728 = cast(bitcast) %727 : void*
+        %729 = const 52 : s32i
+        %730 = const 1 : s32i
+        %731 = add %729, %730 : s32i [nsw]
+        %732 = cast(integral) %731 : u64i
+        %733 = call @memcpy(%725, %728, %732) : void* [all]
+        %734 = get_global @dst : s8i[80]*
+        %735 = cast(array_to_ptrdecay) %734 : s8i*
+        %736 = get_global @src : s8i[80]*
+        %737 = cast(array_to_ptrdecay) %736 : s8i*
+        %738 = const 52 : s32i
+        %739 = const 1 : s32i
+        %740 = add %738, %739 : s32i [nsw]
+        call @check(%735, %737, %740) [all]
+        yield
+    }
+    scope {
+        %683 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %684 = get_global @dst : s8i[80]*
+        %685 = cast(array_to_ptrdecay) %684 : s8i*
+        %686 = cast(bitcast) %685 : void*
+        %687 = const 0 : s32i
+        %688 = const 52 : s32i
+        %689 = const 2 : s32i
+        %690 = add %688, %689 : s32i [nsw]
+        %691 = cast(integral) %690 : u64i
+        %692 = call @memset(%686, %687, %691) : void* [all]
+        %693 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %694 = get_global @dst : s8i[80]*
+        %695 = cast(array_to_ptrdecay) %694 : s8i*
+        %696 = cast(bitcast) %695 : void*
+        %697 = get_global @src : s8i[80]*
+        %698 = cast(array_to_ptrdecay) %697 : s8i*
+        %699 = cast(bitcast) %698 : void*
+        %700 = const 52 : s32i
+        %701 = const 2 : s32i
+        %702 = add %700, %701 : s32i [nsw]
+        %703 = cast(integral) %702 : u64i
+        %704 = call @memcpy(%696, %699, %703) : void* [all]
+        %705 = get_global @dst : s8i[80]*
+        %706 = cast(array_to_ptrdecay) %705 : s8i*
+        %707 = get_global @src : s8i[80]*
+        %708 = cast(array_to_ptrdecay) %707 : s8i*
+        %709 = const 52 : s32i
+        %710 = const 2 : s32i
+        %711 = add %709, %710 : s32i [nsw]
+        call @check(%706, %708, %711) [all]
+        yield
+    }
+    scope {
+        %654 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %655 = get_global @dst : s8i[80]*
+        %656 = cast(array_to_ptrdecay) %655 : s8i*
+        %657 = cast(bitcast) %656 : void*
+        %658 = const 0 : s32i
+        %659 = const 52 : s32i
+        %660 = const 3 : s32i
+        %661 = add %659, %660 : s32i [nsw]
+        %662 = cast(integral) %661 : u64i
+        %663 = call @memset(%657, %658, %662) : void* [all]
+        %664 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %665 = get_global @dst : s8i[80]*
+        %666 = cast(array_to_ptrdecay) %665 : s8i*
+        %667 = cast(bitcast) %666 : void*
+        %668 = get_global @src : s8i[80]*
+        %669 = cast(array_to_ptrdecay) %668 : s8i*
+        %670 = cast(bitcast) %669 : void*
+        %671 = const 52 : s32i
+        %672 = const 3 : s32i
+        %673 = add %671, %672 : s32i [nsw]
+        %674 = cast(integral) %673 : u64i
+        %675 = call @memcpy(%667, %670, %674) : void* [all]
+        %676 = get_global @dst : s8i[80]*
+        %677 = cast(array_to_ptrdecay) %676 : s8i*
+        %678 = get_global @src : s8i[80]*
+        %679 = cast(array_to_ptrdecay) %678 : s8i*
+        %680 = const 52 : s32i
+        %681 = const 3 : s32i
+        %682 = add %680, %681 : s32i [nsw]
+        call @check(%677, %679, %682) [all]
+        yield
+    }
+    scope {
+        %633 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %634 = get_global @dst : s8i[80]*
+        %635 = cast(array_to_ptrdecay) %634 : s8i*
+        %636 = cast(bitcast) %635 : void*
+        %637 = const 0 : s32i
+        %638 = const 56 : u64i
+        %639 = call @memset(%636, %637, %638) : void* [all]
+        %640 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %641 = get_global @dst : s8i[80]*
+        %642 = cast(array_to_ptrdecay) %641 : s8i*
+        %643 = cast(bitcast) %642 : void*
+        %644 = get_global @src : s8i[80]*
+        %645 = cast(array_to_ptrdecay) %644 : s8i*
+        %646 = cast(bitcast) %645 : void*
+        %647 = const 56 : u64i
+        %648 = call @memcpy(%643, %646, %647) : void* [all]
+        %649 = get_global @dst : s8i[80]*
+        %650 = cast(array_to_ptrdecay) %649 : s8i*
+        %651 = get_global @src : s8i[80]*
+        %652 = cast(array_to_ptrdecay) %651 : s8i*
+        %653 = const 56 : s32i
+        call @check(%650, %652, %653) [all]
+        yield
+    }
+    scope {
+        %604 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %605 = get_global @dst : s8i[80]*
+        %606 = cast(array_to_ptrdecay) %605 : s8i*
+        %607 = cast(bitcast) %606 : void*
+        %608 = const 0 : s32i
+        %609 = const 56 : s32i
+        %610 = const 1 : s32i
+        %611 = add %609, %610 : s32i [nsw]
+        %612 = cast(integral) %611 : u64i
+        %613 = call @memset(%607, %608, %612) : void* [all]
+        %614 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %615 = get_global @dst : s8i[80]*
+        %616 = cast(array_to_ptrdecay) %615 : s8i*
+        %617 = cast(bitcast) %616 : void*
+        %618 = get_global @src : s8i[80]*
+        %619 = cast(array_to_ptrdecay) %618 : s8i*
+        %620 = cast(bitcast) %619 : void*
+        %621 = const 56 : s32i
+        %622 = const 1 : s32i
+        %623 = add %621, %622 : s32i [nsw]
+        %624 = cast(integral) %623 : u64i
+        %625 = call @memcpy(%617, %620, %624) : void* [all]
+        %626 = get_global @dst : s8i[80]*
+        %627 = cast(array_to_ptrdecay) %626 : s8i*
+        %628 = get_global @src : s8i[80]*
+        %629 = cast(array_to_ptrdecay) %628 : s8i*
+        %630 = const 56 : s32i
+        %631 = const 1 : s32i
+        %632 = add %630, %631 : s32i [nsw]
+        call @check(%627, %629, %632) [all]
+        yield
+    }
+    scope {
+        %575 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %576 = get_global @dst : s8i[80]*
+        %577 = cast(array_to_ptrdecay) %576 : s8i*
+        %578 = cast(bitcast) %577 : void*
+        %579 = const 0 : s32i
+        %580 = const 56 : s32i
+        %581 = const 2 : s32i
+        %582 = add %580, %581 : s32i [nsw]
+        %583 = cast(integral) %582 : u64i
+        %584 = call @memset(%578, %579, %583) : void* [all]
+        %585 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %586 = get_global @dst : s8i[80]*
+        %587 = cast(array_to_ptrdecay) %586 : s8i*
+        %588 = cast(bitcast) %587 : void*
+        %589 = get_global @src : s8i[80]*
+        %590 = cast(array_to_ptrdecay) %589 : s8i*
+        %591 = cast(bitcast) %590 : void*
+        %592 = const 56 : s32i
+        %593 = const 2 : s32i
+        %594 = add %592, %593 : s32i [nsw]
+        %595 = cast(integral) %594 : u64i
+        %596 = call @memcpy(%588, %591, %595) : void* [all]
+        %597 = get_global @dst : s8i[80]*
+        %598 = cast(array_to_ptrdecay) %597 : s8i*
+        %599 = get_global @src : s8i[80]*
+        %600 = cast(array_to_ptrdecay) %599 : s8i*
+        %601 = const 56 : s32i
+        %602 = const 2 : s32i
+        %603 = add %601, %602 : s32i [nsw]
+        call @check(%598, %600, %603) [all]
+        yield
+    }
+    scope {
+        %546 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %547 = get_global @dst : s8i[80]*
+        %548 = cast(array_to_ptrdecay) %547 : s8i*
+        %549 = cast(bitcast) %548 : void*
+        %550 = const 0 : s32i
+        %551 = const 56 : s32i
+        %552 = const 3 : s32i
+        %553 = add %551, %552 : s32i [nsw]
+        %554 = cast(integral) %553 : u64i
+        %555 = call @memset(%549, %550, %554) : void* [all]
+        %556 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %557 = get_global @dst : s8i[80]*
+        %558 = cast(array_to_ptrdecay) %557 : s8i*
+        %559 = cast(bitcast) %558 : void*
+        %560 = get_global @src : s8i[80]*
+        %561 = cast(array_to_ptrdecay) %560 : s8i*
+        %562 = cast(bitcast) %561 : void*
+        %563 = const 56 : s32i
+        %564 = const 3 : s32i
+        %565 = add %563, %564 : s32i [nsw]
+        %566 = cast(integral) %565 : u64i
+        %567 = call @memcpy(%559, %562, %566) : void* [all]
+        %568 = get_global @dst : s8i[80]*
+        %569 = cast(array_to_ptrdecay) %568 : s8i*
+        %570 = get_global @src : s8i[80]*
+        %571 = cast(array_to_ptrdecay) %570 : s8i*
+        %572 = const 56 : s32i
+        %573 = const 3 : s32i
+        %574 = add %572, %573 : s32i [nsw]
+        call @check(%569, %571, %574) [all]
+        yield
+    }
+    scope {
+        %525 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %526 = get_global @dst : s8i[80]*
+        %527 = cast(array_to_ptrdecay) %526 : s8i*
+        %528 = cast(bitcast) %527 : void*
+        %529 = const 0 : s32i
+        %530 = const 60 : u64i
+        %531 = call @memset(%528, %529, %530) : void* [all]
+        %532 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %533 = get_global @dst : s8i[80]*
+        %534 = cast(array_to_ptrdecay) %533 : s8i*
+        %535 = cast(bitcast) %534 : void*
+        %536 = get_global @src : s8i[80]*
+        %537 = cast(array_to_ptrdecay) %536 : s8i*
+        %538 = cast(bitcast) %537 : void*
+        %539 = const 60 : u64i
+        %540 = call @memcpy(%535, %538, %539) : void* [all]
+        %541 = get_global @dst : s8i[80]*
+        %542 = cast(array_to_ptrdecay) %541 : s8i*
+        %543 = get_global @src : s8i[80]*
+        %544 = cast(array_to_ptrdecay) %543 : s8i*
+        %545 = const 60 : s32i
+        call @check(%542, %544, %545) [all]
+        yield
+    }
+    scope {
+        %496 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %497 = get_global @dst : s8i[80]*
+        %498 = cast(array_to_ptrdecay) %497 : s8i*
+        %499 = cast(bitcast) %498 : void*
+        %500 = const 0 : s32i
+        %501 = const 60 : s32i
+        %502 = const 1 : s32i
+        %503 = add %501, %502 : s32i [nsw]
+        %504 = cast(integral) %503 : u64i
+        %505 = call @memset(%499, %500, %504) : void* [all]
+        %506 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %507 = get_global @dst : s8i[80]*
+        %508 = cast(array_to_ptrdecay) %507 : s8i*
+        %509 = cast(bitcast) %508 : void*
+        %510 = get_global @src : s8i[80]*
+        %511 = cast(array_to_ptrdecay) %510 : s8i*
+        %512 = cast(bitcast) %511 : void*
+        %513 = const 60 : s32i
+        %514 = const 1 : s32i
+        %515 = add %513, %514 : s32i [nsw]
+        %516 = cast(integral) %515 : u64i
+        %517 = call @memcpy(%509, %512, %516) : void* [all]
+        %518 = get_global @dst : s8i[80]*
+        %519 = cast(array_to_ptrdecay) %518 : s8i*
+        %520 = get_global @src : s8i[80]*
+        %521 = cast(array_to_ptrdecay) %520 : s8i*
+        %522 = const 60 : s32i
+        %523 = const 1 : s32i
+        %524 = add %522, %523 : s32i [nsw]
+        call @check(%519, %521, %524) [all]
+        yield
+    }
+    scope {
+        %467 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %468 = get_global @dst : s8i[80]*
+        %469 = cast(array_to_ptrdecay) %468 : s8i*
+        %470 = cast(bitcast) %469 : void*
+        %471 = const 0 : s32i
+        %472 = const 60 : s32i
+        %473 = const 2 : s32i
+        %474 = add %472, %473 : s32i [nsw]
+        %475 = cast(integral) %474 : u64i
+        %476 = call @memset(%470, %471, %475) : void* [all]
+        %477 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %478 = get_global @dst : s8i[80]*
+        %479 = cast(array_to_ptrdecay) %478 : s8i*
+        %480 = cast(bitcast) %479 : void*
+        %481 = get_global @src : s8i[80]*
+        %482 = cast(array_to_ptrdecay) %481 : s8i*
+        %483 = cast(bitcast) %482 : void*
+        %484 = const 60 : s32i
+        %485 = const 2 : s32i
+        %486 = add %484, %485 : s32i [nsw]
+        %487 = cast(integral) %486 : u64i
+        %488 = call @memcpy(%480, %483, %487) : void* [all]
+        %489 = get_global @dst : s8i[80]*
+        %490 = cast(array_to_ptrdecay) %489 : s8i*
+        %491 = get_global @src : s8i[80]*
+        %492 = cast(array_to_ptrdecay) %491 : s8i*
+        %493 = const 60 : s32i
+        %494 = const 2 : s32i
+        %495 = add %493, %494 : s32i [nsw]
+        call @check(%490, %492, %495) [all]
+        yield
+    }
+    scope {
+        %438 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %439 = get_global @dst : s8i[80]*
+        %440 = cast(array_to_ptrdecay) %439 : s8i*
+        %441 = cast(bitcast) %440 : void*
+        %442 = const 0 : s32i
+        %443 = const 60 : s32i
+        %444 = const 3 : s32i
+        %445 = add %443, %444 : s32i [nsw]
+        %446 = cast(integral) %445 : u64i
+        %447 = call @memset(%441, %442, %446) : void* [all]
+        %448 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %449 = get_global @dst : s8i[80]*
+        %450 = cast(array_to_ptrdecay) %449 : s8i*
+        %451 = cast(bitcast) %450 : void*
+        %452 = get_global @src : s8i[80]*
+        %453 = cast(array_to_ptrdecay) %452 : s8i*
+        %454 = cast(bitcast) %453 : void*
+        %455 = const 60 : s32i
+        %456 = const 3 : s32i
+        %457 = add %455, %456 : s32i [nsw]
+        %458 = cast(integral) %457 : u64i
+        %459 = call @memcpy(%451, %454, %458) : void* [all]
+        %460 = get_global @dst : s8i[80]*
+        %461 = cast(array_to_ptrdecay) %460 : s8i*
+        %462 = get_global @src : s8i[80]*
+        %463 = cast(array_to_ptrdecay) %462 : s8i*
+        %464 = const 60 : s32i
+        %465 = const 3 : s32i
+        %466 = add %464, %465 : s32i [nsw]
+        call @check(%461, %463, %466) [all]
+        yield
+    }
+    scope {
+        %417 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %418 = get_global @dst : s8i[80]*
+        %419 = cast(array_to_ptrdecay) %418 : s8i*
+        %420 = cast(bitcast) %419 : void*
+        %421 = const 0 : s32i
+        %422 = const 64 : u64i
+        %423 = call @memset(%420, %421, %422) : void* [all]
+        %424 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %425 = get_global @dst : s8i[80]*
+        %426 = cast(array_to_ptrdecay) %425 : s8i*
+        %427 = cast(bitcast) %426 : void*
+        %428 = get_global @src : s8i[80]*
+        %429 = cast(array_to_ptrdecay) %428 : s8i*
+        %430 = cast(bitcast) %429 : void*
+        %431 = const 64 : u64i
+        %432 = call @memcpy(%427, %430, %431) : void* [all]
+        %433 = get_global @dst : s8i[80]*
+        %434 = cast(array_to_ptrdecay) %433 : s8i*
+        %435 = get_global @src : s8i[80]*
+        %436 = cast(array_to_ptrdecay) %435 : s8i*
+        %437 = const 64 : s32i
+        call @check(%434, %436, %437) [all]
+        yield
+    }
+    scope {
+        %388 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %389 = get_global @dst : s8i[80]*
+        %390 = cast(array_to_ptrdecay) %389 : s8i*
+        %391 = cast(bitcast) %390 : void*
+        %392 = const 0 : s32i
+        %393 = const 64 : s32i
+        %394 = const 1 : s32i
+        %395 = add %393, %394 : s32i [nsw]
+        %396 = cast(integral) %395 : u64i
+        %397 = call @memset(%391, %392, %396) : void* [all]
+        %398 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %399 = get_global @dst : s8i[80]*
+        %400 = cast(array_to_ptrdecay) %399 : s8i*
+        %401 = cast(bitcast) %400 : void*
+        %402 = get_global @src : s8i[80]*
+        %403 = cast(array_to_ptrdecay) %402 : s8i*
+        %404 = cast(bitcast) %403 : void*
+        %405 = const 64 : s32i
+        %406 = const 1 : s32i
+        %407 = add %405, %406 : s32i [nsw]
+        %408 = cast(integral) %407 : u64i
+        %409 = call @memcpy(%401, %404, %408) : void* [all]
+        %410 = get_global @dst : s8i[80]*
+        %411 = cast(array_to_ptrdecay) %410 : s8i*
+        %412 = get_global @src : s8i[80]*
+        %413 = cast(array_to_ptrdecay) %412 : s8i*
+        %414 = const 64 : s32i
+        %415 = const 1 : s32i
+        %416 = add %414, %415 : s32i [nsw]
+        call @check(%411, %413, %416) [all]
+        yield
+    }
+    scope {
+        %359 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %360 = get_global @dst : s8i[80]*
+        %361 = cast(array_to_ptrdecay) %360 : s8i*
+        %362 = cast(bitcast) %361 : void*
+        %363 = const 0 : s32i
+        %364 = const 64 : s32i
+        %365 = const 2 : s32i
+        %366 = add %364, %365 : s32i [nsw]
+        %367 = cast(integral) %366 : u64i
+        %368 = call @memset(%362, %363, %367) : void* [all]
+        %369 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %370 = get_global @dst : s8i[80]*
+        %371 = cast(array_to_ptrdecay) %370 : s8i*
+        %372 = cast(bitcast) %371 : void*
+        %373 = get_global @src : s8i[80]*
+        %374 = cast(array_to_ptrdecay) %373 : s8i*
+        %375 = cast(bitcast) %374 : void*
+        %376 = const 64 : s32i
+        %377 = const 2 : s32i
+        %378 = add %376, %377 : s32i [nsw]
+        %379 = cast(integral) %378 : u64i
+        %380 = call @memcpy(%372, %375, %379) : void* [all]
+        %381 = get_global @dst : s8i[80]*
+        %382 = cast(array_to_ptrdecay) %381 : s8i*
+        %383 = get_global @src : s8i[80]*
+        %384 = cast(array_to_ptrdecay) %383 : s8i*
+        %385 = const 64 : s32i
+        %386 = const 2 : s32i
+        %387 = add %385, %386 : s32i [nsw]
+        call @check(%382, %384, %387) [all]
+        yield
+    }
+    scope {
+        %330 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %331 = get_global @dst : s8i[80]*
+        %332 = cast(array_to_ptrdecay) %331 : s8i*
+        %333 = cast(bitcast) %332 : void*
+        %334 = const 0 : s32i
+        %335 = const 64 : s32i
+        %336 = const 3 : s32i
+        %337 = add %335, %336 : s32i [nsw]
+        %338 = cast(integral) %337 : u64i
+        %339 = call @memset(%333, %334, %338) : void* [all]
+        %340 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %341 = get_global @dst : s8i[80]*
+        %342 = cast(array_to_ptrdecay) %341 : s8i*
+        %343 = cast(bitcast) %342 : void*
+        %344 = get_global @src : s8i[80]*
+        %345 = cast(array_to_ptrdecay) %344 : s8i*
+        %346 = cast(bitcast) %345 : void*
+        %347 = const 64 : s32i
+        %348 = const 3 : s32i
+        %349 = add %347, %348 : s32i [nsw]
+        %350 = cast(integral) %349 : u64i
+        %351 = call @memcpy(%343, %346, %350) : void* [all]
+        %352 = get_global @dst : s8i[80]*
+        %353 = cast(array_to_ptrdecay) %352 : s8i*
+        %354 = get_global @src : s8i[80]*
+        %355 = cast(array_to_ptrdecay) %354 : s8i*
+        %356 = const 64 : s32i
+        %357 = const 3 : s32i
+        %358 = add %356, %357 : s32i [nsw]
+        call @check(%353, %355, %358) [all]
+        yield
+    }
+    scope {
+        %309 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %310 = get_global @dst : s8i[80]*
+        %311 = cast(array_to_ptrdecay) %310 : s8i*
+        %312 = cast(bitcast) %311 : void*
+        %313 = const 0 : s32i
+        %314 = const 68 : u64i
+        %315 = call @memset(%312, %313, %314) : void* [all]
+        %316 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %317 = get_global @dst : s8i[80]*
+        %318 = cast(array_to_ptrdecay) %317 : s8i*
+        %319 = cast(bitcast) %318 : void*
+        %320 = get_global @src : s8i[80]*
+        %321 = cast(array_to_ptrdecay) %320 : s8i*
+        %322 = cast(bitcast) %321 : void*
+        %323 = const 68 : u64i
+        %324 = call @memcpy(%319, %322, %323) : void* [all]
+        %325 = get_global @dst : s8i[80]*
+        %326 = cast(array_to_ptrdecay) %325 : s8i*
+        %327 = get_global @src : s8i[80]*
+        %328 = cast(array_to_ptrdecay) %327 : s8i*
+        %329 = const 68 : s32i
+        call @check(%326, %328, %329) [all]
+        yield
+    }
+    scope {
+        %280 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %281 = get_global @dst : s8i[80]*
+        %282 = cast(array_to_ptrdecay) %281 : s8i*
+        %283 = cast(bitcast) %282 : void*
+        %284 = const 0 : s32i
+        %285 = const 68 : s32i
+        %286 = const 1 : s32i
+        %287 = add %285, %286 : s32i [nsw]
+        %288 = cast(integral) %287 : u64i
+        %289 = call @memset(%283, %284, %288) : void* [all]
+        %290 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %291 = get_global @dst : s8i[80]*
+        %292 = cast(array_to_ptrdecay) %291 : s8i*
+        %293 = cast(bitcast) %292 : void*
+        %294 = get_global @src : s8i[80]*
+        %295 = cast(array_to_ptrdecay) %294 : s8i*
+        %296 = cast(bitcast) %295 : void*
+        %297 = const 68 : s32i
+        %298 = const 1 : s32i
+        %299 = add %297, %298 : s32i [nsw]
+        %300 = cast(integral) %299 : u64i
+        %301 = call @memcpy(%293, %296, %300) : void* [all]
+        %302 = get_global @dst : s8i[80]*
+        %303 = cast(array_to_ptrdecay) %302 : s8i*
+        %304 = get_global @src : s8i[80]*
+        %305 = cast(array_to_ptrdecay) %304 : s8i*
+        %306 = const 68 : s32i
+        %307 = const 1 : s32i
+        %308 = add %306, %307 : s32i [nsw]
+        call @check(%303, %305, %308) [all]
+        yield
+    }
+    scope {
+        %251 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %252 = get_global @dst : s8i[80]*
+        %253 = cast(array_to_ptrdecay) %252 : s8i*
+        %254 = cast(bitcast) %253 : void*
+        %255 = const 0 : s32i
+        %256 = const 68 : s32i
+        %257 = const 2 : s32i
+        %258 = add %256, %257 : s32i [nsw]
+        %259 = cast(integral) %258 : u64i
+        %260 = call @memset(%254, %255, %259) : void* [all]
+        %261 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %262 = get_global @dst : s8i[80]*
+        %263 = cast(array_to_ptrdecay) %262 : s8i*
+        %264 = cast(bitcast) %263 : void*
+        %265 = get_global @src : s8i[80]*
+        %266 = cast(array_to_ptrdecay) %265 : s8i*
+        %267 = cast(bitcast) %266 : void*
+        %268 = const 68 : s32i
+        %269 = const 2 : s32i
+        %270 = add %268, %269 : s32i [nsw]
+        %271 = cast(integral) %270 : u64i
+        %272 = call @memcpy(%264, %267, %271) : void* [all]
+        %273 = get_global @dst : s8i[80]*
+        %274 = cast(array_to_ptrdecay) %273 : s8i*
+        %275 = get_global @src : s8i[80]*
+        %276 = cast(array_to_ptrdecay) %275 : s8i*
+        %277 = const 68 : s32i
+        %278 = const 2 : s32i
+        %279 = add %277, %278 : s32i [nsw]
+        call @check(%274, %276, %279) [all]
+        yield
+    }
+    scope {
+        %222 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %223 = get_global @dst : s8i[80]*
+        %224 = cast(array_to_ptrdecay) %223 : s8i*
+        %225 = cast(bitcast) %224 : void*
+        %226 = const 0 : s32i
+        %227 = const 68 : s32i
+        %228 = const 3 : s32i
+        %229 = add %227, %228 : s32i [nsw]
+        %230 = cast(integral) %229 : u64i
+        %231 = call @memset(%225, %226, %230) : void* [all]
+        %232 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %233 = get_global @dst : s8i[80]*
+        %234 = cast(array_to_ptrdecay) %233 : s8i*
+        %235 = cast(bitcast) %234 : void*
+        %236 = get_global @src : s8i[80]*
+        %237 = cast(array_to_ptrdecay) %236 : s8i*
+        %238 = cast(bitcast) %237 : void*
+        %239 = const 68 : s32i
+        %240 = const 3 : s32i
+        %241 = add %239, %240 : s32i [nsw]
+        %242 = cast(integral) %241 : u64i
+        %243 = call @memcpy(%235, %238, %242) : void* [all]
+        %244 = get_global @dst : s8i[80]*
+        %245 = cast(array_to_ptrdecay) %244 : s8i*
+        %246 = get_global @src : s8i[80]*
+        %247 = cast(array_to_ptrdecay) %246 : s8i*
+        %248 = const 68 : s32i
+        %249 = const 3 : s32i
+        %250 = add %248, %249 : s32i [nsw]
+        call @check(%245, %247, %250) [all]
+        yield
+    }
+    scope {
+        %201 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %202 = get_global @dst : s8i[80]*
+        %203 = cast(array_to_ptrdecay) %202 : s8i*
+        %204 = cast(bitcast) %203 : void*
+        %205 = const 0 : s32i
+        %206 = const 72 : u64i
+        %207 = call @memset(%204, %205, %206) : void* [all]
+        %208 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %209 = get_global @dst : s8i[80]*
+        %210 = cast(array_to_ptrdecay) %209 : s8i*
+        %211 = cast(bitcast) %210 : void*
+        %212 = get_global @src : s8i[80]*
+        %213 = cast(array_to_ptrdecay) %212 : s8i*
+        %214 = cast(bitcast) %213 : void*
+        %215 = const 72 : u64i
+        %216 = call @memcpy(%211, %214, %215) : void* [all]
+        %217 = get_global @dst : s8i[80]*
+        %218 = cast(array_to_ptrdecay) %217 : s8i*
+        %219 = get_global @src : s8i[80]*
+        %220 = cast(array_to_ptrdecay) %219 : s8i*
+        %221 = const 72 : s32i
+        call @check(%218, %220, %221) [all]
+        yield
+    }
+    scope {
+        %172 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %173 = get_global @dst : s8i[80]*
+        %174 = cast(array_to_ptrdecay) %173 : s8i*
+        %175 = cast(bitcast) %174 : void*
+        %176 = const 0 : s32i
+        %177 = const 72 : s32i
+        %178 = const 1 : s32i
+        %179 = add %177, %178 : s32i [nsw]
+        %180 = cast(integral) %179 : u64i
+        %181 = call @memset(%175, %176, %180) : void* [all]
+        %182 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %183 = get_global @dst : s8i[80]*
+        %184 = cast(array_to_ptrdecay) %183 : s8i*
+        %185 = cast(bitcast) %184 : void*
+        %186 = get_global @src : s8i[80]*
+        %187 = cast(array_to_ptrdecay) %186 : s8i*
+        %188 = cast(bitcast) %187 : void*
+        %189 = const 72 : s32i
+        %190 = const 1 : s32i
+        %191 = add %189, %190 : s32i [nsw]
+        %192 = cast(integral) %191 : u64i
+        %193 = call @memcpy(%185, %188, %192) : void* [all]
+        %194 = get_global @dst : s8i[80]*
+        %195 = cast(array_to_ptrdecay) %194 : s8i*
+        %196 = get_global @src : s8i[80]*
+        %197 = cast(array_to_ptrdecay) %196 : s8i*
+        %198 = const 72 : s32i
+        %199 = const 1 : s32i
+        %200 = add %198, %199 : s32i [nsw]
+        call @check(%195, %197, %200) [all]
+        yield
+    }
+    scope {
+        %143 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %144 = get_global @dst : s8i[80]*
+        %145 = cast(array_to_ptrdecay) %144 : s8i*
+        %146 = cast(bitcast) %145 : void*
+        %147 = const 0 : s32i
+        %148 = const 72 : s32i
+        %149 = const 2 : s32i
+        %150 = add %148, %149 : s32i [nsw]
+        %151 = cast(integral) %150 : u64i
+        %152 = call @memset(%146, %147, %151) : void* [all]
+        %153 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %154 = get_global @dst : s8i[80]*
+        %155 = cast(array_to_ptrdecay) %154 : s8i*
+        %156 = cast(bitcast) %155 : void*
+        %157 = get_global @src : s8i[80]*
+        %158 = cast(array_to_ptrdecay) %157 : s8i*
+        %159 = cast(bitcast) %158 : void*
+        %160 = const 72 : s32i
+        %161 = const 2 : s32i
+        %162 = add %160, %161 : s32i [nsw]
+        %163 = cast(integral) %162 : u64i
+        %164 = call @memcpy(%156, %159, %163) : void* [all]
+        %165 = get_global @dst : s8i[80]*
+        %166 = cast(array_to_ptrdecay) %165 : s8i*
+        %167 = get_global @src : s8i[80]*
+        %168 = cast(array_to_ptrdecay) %167 : s8i*
+        %169 = const 72 : s32i
+        %170 = const 2 : s32i
+        %171 = add %169, %170 : s32i [nsw]
+        call @check(%166, %168, %171) [all]
+        yield
+    }
+    scope {
+        %114 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %115 = get_global @dst : s8i[80]*
+        %116 = cast(array_to_ptrdecay) %115 : s8i*
+        %117 = cast(bitcast) %116 : void*
+        %118 = const 0 : s32i
+        %119 = const 72 : s32i
+        %120 = const 3 : s32i
+        %121 = add %119, %120 : s32i [nsw]
+        %122 = cast(integral) %121 : u64i
+        %123 = call @memset(%117, %118, %122) : void* [all]
+        %124 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %125 = get_global @dst : s8i[80]*
+        %126 = cast(array_to_ptrdecay) %125 : s8i*
+        %127 = cast(bitcast) %126 : void*
+        %128 = get_global @src : s8i[80]*
+        %129 = cast(array_to_ptrdecay) %128 : s8i*
+        %130 = cast(bitcast) %129 : void*
+        %131 = const 72 : s32i
+        %132 = const 3 : s32i
+        %133 = add %131, %132 : s32i [nsw]
+        %134 = cast(integral) %133 : u64i
+        %135 = call @memcpy(%127, %130, %134) : void* [all]
+        %136 = get_global @dst : s8i[80]*
+        %137 = cast(array_to_ptrdecay) %136 : s8i*
+        %138 = get_global @src : s8i[80]*
+        %139 = cast(array_to_ptrdecay) %138 : s8i*
+        %140 = const 72 : s32i
+        %141 = const 3 : s32i
+        %142 = add %140, %141 : s32i [nsw]
+        call @check(%137, %139, %142) [all]
+        yield
+    }
+    scope {
+        %93 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %94 = get_global @dst : s8i[80]*
+        %95 = cast(array_to_ptrdecay) %94 : s8i*
+        %96 = cast(bitcast) %95 : void*
+        %97 = const 0 : s32i
+        %98 = const 76 : u64i
+        %99 = call @memset(%96, %97, %98) : void* [all]
+        %100 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %101 = get_global @dst : s8i[80]*
+        %102 = cast(array_to_ptrdecay) %101 : s8i*
+        %103 = cast(bitcast) %102 : void*
+        %104 = get_global @src : s8i[80]*
+        %105 = cast(array_to_ptrdecay) %104 : s8i*
+        %106 = cast(bitcast) %105 : void*
+        %107 = const 76 : u64i
+        %108 = call @memcpy(%103, %106, %107) : void* [all]
+        %109 = get_global @dst : s8i[80]*
+        %110 = cast(array_to_ptrdecay) %109 : s8i*
+        %111 = get_global @src : s8i[80]*
+        %112 = cast(array_to_ptrdecay) %111 : s8i*
+        %113 = const 76 : s32i
+        call @check(%110, %112, %113) [all]
+        yield
+    }
+    scope {
+        %64 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %65 = get_global @dst : s8i[80]*
+        %66 = cast(array_to_ptrdecay) %65 : s8i*
+        %67 = cast(bitcast) %66 : void*
+        %68 = const 0 : s32i
+        %69 = const 76 : s32i
+        %70 = const 1 : s32i
+        %71 = add %69, %70 : s32i [nsw]
+        %72 = cast(integral) %71 : u64i
+        %73 = call @memset(%67, %68, %72) : void* [all]
+        %74 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %75 = get_global @dst : s8i[80]*
+        %76 = cast(array_to_ptrdecay) %75 : s8i*
+        %77 = cast(bitcast) %76 : void*
+        %78 = get_global @src : s8i[80]*
+        %79 = cast(array_to_ptrdecay) %78 : s8i*
+        %80 = cast(bitcast) %79 : void*
+        %81 = const 76 : s32i
+        %82 = const 1 : s32i
+        %83 = add %81, %82 : s32i [nsw]
+        %84 = cast(integral) %83 : u64i
+        %85 = call @memcpy(%77, %80, %84) : void* [all]
+        %86 = get_global @dst : s8i[80]*
+        %87 = cast(array_to_ptrdecay) %86 : s8i*
+        %88 = get_global @src : s8i[80]*
+        %89 = cast(array_to_ptrdecay) %88 : s8i*
+        %90 = const 76 : s32i
+        %91 = const 1 : s32i
+        %92 = add %90, %91 : s32i [nsw]
+        call @check(%87, %89, %92) [all]
+        yield
+    }
+    scope {
+        %35 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %36 = get_global @dst : s8i[80]*
+        %37 = cast(array_to_ptrdecay) %36 : s8i*
+        %38 = cast(bitcast) %37 : void*
+        %39 = const 0 : s32i
+        %40 = const 76 : s32i
+        %41 = const 2 : s32i
+        %42 = add %40, %41 : s32i [nsw]
+        %43 = cast(integral) %42 : u64i
+        %44 = call @memset(%38, %39, %43) : void* [all]
+        %45 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %46 = get_global @dst : s8i[80]*
+        %47 = cast(array_to_ptrdecay) %46 : s8i*
+        %48 = cast(bitcast) %47 : void*
+        %49 = get_global @src : s8i[80]*
+        %50 = cast(array_to_ptrdecay) %49 : s8i*
+        %51 = cast(bitcast) %50 : void*
+        %52 = const 76 : s32i
+        %53 = const 2 : s32i
+        %54 = add %52, %53 : s32i [nsw]
+        %55 = cast(integral) %54 : u64i
+        %56 = call @memcpy(%48, %51, %55) : void* [all]
+        %57 = get_global @dst : s8i[80]*
+        %58 = cast(array_to_ptrdecay) %57 : s8i*
+        %59 = get_global @src : s8i[80]*
+        %60 = cast(array_to_ptrdecay) %59 : s8i*
+        %61 = const 76 : s32i
+        %62 = const 2 : s32i
+        %63 = add %61, %62 : s32i [nsw]
+        call @check(%58, %60, %63) [all]
+        yield
+    }
+    scope {
+        %6 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+        %7 = get_global @dst : s8i[80]*
+        %8 = cast(array_to_ptrdecay) %7 : s8i*
+        %9 = cast(bitcast) %8 : void*
+        %10 = const 0 : s32i
+        %11 = const 76 : s32i
+        %12 = const 3 : s32i
+        %13 = add %11, %12 : s32i [nsw]
+        %14 = cast(integral) %13 : u64i
+        %15 = call @memset(%9, %10, %14) : void* [all]
+        %16 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %17 = get_global @dst : s8i[80]*
+        %18 = cast(array_to_ptrdecay) %17 : s8i*
+        %19 = cast(bitcast) %18 : void*
+        %20 = get_global @src : s8i[80]*
+        %21 = cast(array_to_ptrdecay) %20 : s8i*
+        %22 = cast(bitcast) %21 : void*
+        %23 = const 76 : s32i
+        %24 = const 3 : s32i
+        %25 = add %23, %24 : s32i [nsw]
+        %26 = cast(integral) %25 : u64i
+        %27 = call @memcpy(%19, %22, %26) : void* [all]
+        %28 = get_global @dst : s8i[80]*
+        %29 = cast(array_to_ptrdecay) %28 : s8i*
+        %30 = get_global @src : s8i[80]*
+        %31 = cast(array_to_ptrdecay) %30 : s8i*
+        %32 = const 76 : s32i
+        %33 = const 3 : s32i
+        %34 = add %32, %33 : s32i [nsw]
+        call @check(%29, %31, %34) [all]
+        yield
+    }
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

@@ -1,0 +1,86 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr109040.c" (c, x86_64-unknown-linux-gnu)
+global a : u16i = 0 [external, default, align 2, dso_local]
+global b : u16i = 0 [external, default, align 2, dso_local]
+global c : u16i = 0 [external, default, align 2, dso_local]
+global d : u16i = 0 [external, default, align 2, dso_local]
+
+fn foo(%arg0: vector<16 x u16i>*, %arg1: u16i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: vector<16 x u16i>*, %arg1: u16i*):
+        %13 = load %arg0 : vector<16 x u16i>
+        %14 = alloca vector<16 x u16i>, "m", align 32
+        %15 = alloca u16i*, "ret", align 8
+        %16 = alloca vector<16 x u16i>, "v", align 32
+        %17 = alloca vector<16 x u16i>, ".compoundliteral", align 32
+        %18 = alloca u16i, "uc", align 2
+        store %13, %14
+        store %arg1, %15
+        %19 = const 6 : u16i
+        <unmodeled: cir.vec.splat>
+        %21 = const [2124, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : vector<16 x u16i>
+        store %21, %17, align 32
+        %22 = load %17 : vector<16 x u16i>, align 32
+        %23 = load %14 : vector<16 x u16i>, align 32
+        %24 = and %22, %23 : vector<16 x u16i>
+        <unmodeled: cir.vec.cmp>
+        %26 = cast(bitcast) %25 : vector<16 x u16i>
+        store %26, %16, align 32
+        %27 = load %16 : vector<16 x u16i>, align 32
+        %28 = const 0 : s32i
+        <unmodeled: cir.vec.extract>
+        %30 = cast(integral) %29 : s32i
+        %31 = get_global @a : u16i*
+        %32 = load %31 : u16i, align 2
+        %33 = cast(integral) %32 : s32i
+        %34 = add %30, %33 : s32i [nsw]
+        %35 = get_global @b : u16i*
+        %36 = load %35 : u16i, align 2
+        %37 = cast(integral) %36 : s32i
+        %38 = add %34, %37 : s32i [nsw]
+        %39 = get_global @c : u16i*
+        %40 = load %39 : u16i, align 2
+        %41 = cast(integral) %40 : s32i
+        %42 = add %38, %41 : s32i [nsw]
+        %43 = get_global @d : u16i*
+        %44 = load %43 : u16i, align 2
+        %45 = cast(integral) %44 : s32i
+        %46 = add %42, %45 : s32i [nsw]
+        %47 = cast(integral) %46 : u16i
+        store %47, %18, align 2
+        %48 = load %18 : u16i, align 2
+        %49 = load %15 : u16i*, align 8
+        store %48, %49, align 2
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u16i, "x", align 2
+    %2 = alloca vector<16 x u16i>, ".compoundliteral", align 32
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const [0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : vector<16 x u16i>
+    store %4, %2, align 32
+    %5 = load %2 : vector<16 x u16i>, align 32
+    %6 = alloca vector<16 x u16i>, "byval", align 32
+    store %5, %6
+    call @foo(%6, %1) [all]
+    scope {
+        %9 = load %1 : u16i, align 2
+        %10 = cast(integral) %9 : s32i
+        %11 = const 65535 : s32i
+        %12 = cmp ne %10, %11 : bool
+        if %12 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %7 = const 0 : s32i
+    store %7, %0
+    %8 = load %0 : s32i
+    return %8
+}

@@ -1,0 +1,72 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20000605-2.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn f1(%arg0: rec_F*, %arg1: rec_F*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_F*, %arg1: rec_F*):
+        %11 = alloca rec_F*, "x", align 8
+        %12 = alloca rec_F*, "y", align 8
+        %13 = alloca s32i, "timeout", align 4
+        store %arg0, %11
+        store %arg1, %12
+        %14 = const 0 : s32i
+        store %14, %13, align 4
+        scope {
+            for cond: {
+                %24 = load %11 : rec_F*, align 8
+                %25 = get_member %24[0] "i" : s32i*
+                %26 = load %25 : s32i, align 4
+                %27 = load %12 : rec_F*, align 8
+                %28 = get_member %27[0] "i" : s32i*
+                %29 = load %28 : s32i, align 4
+                %30 = cmp lt %26, %29 : bool
+                condition %30
+            } step: {
+                %15 = load %11 : rec_F*, align 8
+                %16 = get_member %15[0] "i" : s32i*
+                %17 = load %16 : s32i, align 4
+                %18 = inc %17 : s32i [nsw]
+                store %18, %16, align 4
+                yield
+            } do {
+                scope {
+                    %19 = load %13 : s32i, align 4
+                    %20 = inc %19 : s32i [nsw]
+                    store %20, %13, align 4
+                    %21 = const 5 : s32i
+                    %22 = cmp gt %20, %21 : bool
+                    if %22 {
+                        %23 = get_global @abort : (() -> void)*
+                        call @abort() [all]
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        return
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_F, "x", align 4
+    %2 = alloca rec_F, "y", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 0 : s32i
+    %5 = get_member %1[0] "i" : s32i*
+    store %4, %5, align 4
+    %6 = const 1 : s32i
+    %7 = get_member %2[0] "i" : s32i*
+    store %6, %7, align 4
+    call @f1(%1, %2) [all]
+    %8 = get_global @exit : ((s32i) -> void)*
+    %9 = const 0 : s32i
+    call @exit(%9) [all]
+    %10 = load %0 : s32i
+    return %10
+}

@@ -1,0 +1,44 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00078.c" (c, x86_64-unknown-linux-gnu)
+fn f1(%arg0: s8i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i*):
+        %12 = alloca s8i*, "p", align 8
+        %13 = alloca s32i, "__retval", align 4
+        store %arg0, %12
+        %14 = load %12 : s8i*, align 8
+        %15 = load %14 : s8i, align 1
+        %16 = cast(integral) %15 : s32i
+        %17 = const 1 : s32i
+        %18 = add %16, %17 : s32i [nsw]
+        store %18, %13
+        %19 = load %13 : s32i
+        return %19
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i, "s", align 1
+    %2 = alloca s32i[1000], "v", align 16
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 1 : s8i
+    store %4, %1, align 1
+    scope {
+        %7 = call @f1(%1) : s32i [all]
+        %8 = const 2 : s32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            %10 = const 1 : s32i
+            store %10, %0
+            %11 = load %0 : s32i
+            return %11
+        }
+        yield
+    }
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = load %0 : s32i
+    return %6
+}

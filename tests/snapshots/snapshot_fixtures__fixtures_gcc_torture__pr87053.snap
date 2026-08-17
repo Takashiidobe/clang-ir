@@ -1,0 +1,30 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr87053.c" (c, x86_64-unknown-linux-gnu)
+global u : rec_anon2E0 = {{"1234", "567"}} [external, default, align 1, dso_local, constant]
+
+fn strlen(%arg0: s8i*) -> u64i [external, c, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %3 = get_global @u : rec_anon2E0*
+        %4 = get_member %3[1] "" : rec_anon2E2*
+        %5 = get_member %4[0] "z" : s8i[8]*
+        %6 = cast(array_to_ptrdecay) %5 : s8i*
+        %7 = call @strlen(%6) : u64i [all]
+        %8 = const 7 : u64i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = load %0 : s32i
+    return %2
+}

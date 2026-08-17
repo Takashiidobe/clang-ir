@@ -1,0 +1,89 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr36343.c" (c, x86_64-unknown-linux-gnu)
+fn bar(%arg1: s32i**) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i**):
+        %31 = alloca s32i**, "p", align 8
+        %32 = alloca float*, "q", align 8
+        store %arg1, %31
+        %33 = load %31 : s32i**, align 8
+        %34 = cast(bitcast) %33 : float*
+        store %34, %32, align 8
+        %35 = const 0.000000e+00 : double
+        %36 = cast(floating) %35 : float
+        %37 = load %32 : float*, align 8
+        store %36, %37, align 4
+        return
+}
+fn foo(%arg0: s32i) -> float [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %10 = alloca s32i, "b", align 4
+        %11 = alloca float, "__retval", align 4
+        %12 = alloca s32i*, "i", align 8
+        %13 = alloca float, "f", align 4
+        %14 = alloca s32i**, "p", align 8
+        store %arg0, %10
+        %15 = const #cir.ptr<null> : s32i*
+        store %15, %12, align 8
+        %16 = const 1.000000e+00 : double
+        %17 = cast(floating) %16 : float
+        store %17, %13, align 4
+        scope {
+            %28 = load %10 : s32i, align 4
+            %29 = cast(int_to_bool) %28 : bool
+            if %29 {
+                store %12, %14, align 8
+                yield
+            } else {
+                %30 = cast(bitcast) %13 : s32i**
+                store %30, %14, align 8
+                yield
+            }
+            yield
+        }
+        %18 = load %14 : s32i**, align 8
+        call @bar(%18) [all]
+        scope {
+            %21 = load %10 : s32i, align 4
+            %22 = cast(int_to_bool) %21 : bool
+            if %22 {
+                %23 = load %14 : s32i**, align 8
+                %24 = load %23 : s32i*, align 8
+                %25 = load %24 : s32i, align 4
+                %26 = cast(int_to_float) %25 : float
+                store %26, %11
+                %27 = load %11 : float
+                return %27
+            }
+            yield
+        }
+        %19 = load %13 : float, align 4
+        store %19, %11
+        %20 = load %11 : float
+        return %20
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = const 0 : s32i
+        %5 = call @foo(%4) : float [all]
+        %6 = cast(floating) %5 : double
+        %7 = const 0.000000e+00 : double
+        %8 = cmp ne %6, %7 : bool
+        if %8 {
+            %9 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

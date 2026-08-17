@@ -1,0 +1,45 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr20621-1.c" (c, x86_64-unknown-linux-gnu)
+global gb : rec_big = zero [external, default, align 4, dso_local]
+
+fn foo(%arg0: rec_big*, %arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_big*, %arg1: s32i):
+        %14 = load %arg0 : rec_big
+        %15 = alloca rec_big, "b", align 4
+        %16 = alloca s32i, "x", align 4
+        %17 = alloca s32i, "__retval", align 4
+        store %14, %15
+        store %arg1, %16
+        %18 = load %16 : s32i, align 4
+        %19 = cast(integral) %18 : s64i
+        %20 = get_member %15[0] "i" : s32i[16384]*
+        %21 = get_element %20[%19] : s32i*
+        %22 = load %21 : s32i, align 4
+        store %22, %17
+        %23 = load %17 : s32i
+        return %23
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @gb : rec_big*
+    %3 = const 0 : s32i
+    %4 = load %2 : rec_big, align 4
+    %5 = alloca rec_big, "byval", align 8
+    store %4, %5
+    %6 = call @foo(%5, %3) : s32i [all]
+    %7 = get_global @gb : rec_big*
+    %8 = const 1 : s32i
+    %9 = load %7 : rec_big, align 4
+    %10 = alloca rec_big, "byval", align 8
+    store %9, %10
+    %11 = call @foo(%10, %8) : s32i [all]
+    %12 = add %6, %11 : s32i [nsw]
+    store %12, %0
+    %13 = load %0 : s32i
+    return %13
+}

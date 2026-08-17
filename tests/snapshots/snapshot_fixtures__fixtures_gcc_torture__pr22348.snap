@@ -1,0 +1,67 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr22348.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn f(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %21 = alloca s32i, "i", align 4
+        store %arg0, %21
+        scope {
+            %22 = load %21 : s32i, align 4
+            %23 = const 4 : s32i
+            %24 = const 3 : s32i
+            %25 = const 16 : s32i
+            %26 = mul %24, %25 : s32i [nsw]
+            %27 = add %23, %26 : s32i [nsw]
+            %28 = cmp gt %22, %27 : bool
+            if %28 {
+                %29 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u32i, "buflen", align 4
+    %2 = alloca u32i, "i", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 4 : s32i
+    %5 = const 3 : s32i
+    %6 = const 16 : s32i
+    %7 = mul %5, %6 : s32i [nsw]
+    %8 = add %4, %7 : s32i [nsw]
+    %9 = cast(integral) %8 : u32i
+    store %9, %1, align 4
+    scope {
+        %12 = const 4 : u32i
+        store %12, %2, align 4
+        for cond: {
+            %18 = load %2 : u32i, align 4
+            %19 = load %1 : u32i, align 4
+            %20 = cmp lt %18, %19 : bool
+            condition %20
+        } step: {
+            %13 = const 3 : u32i
+            %14 = load %2 : u32i, align 4
+            %15 = add %14, %13 : u32i
+            store %15, %2, align 4
+            yield
+        } do {
+            %16 = load %2 : u32i, align 4
+            %17 = cast(integral) %16 : s32i
+            call @f(%17) [all]
+            yield
+        }
+        yield
+    }
+    %10 = const 0 : s32i
+    store %10, %0
+    %11 = load %0 : s32i
+    return %11
+}

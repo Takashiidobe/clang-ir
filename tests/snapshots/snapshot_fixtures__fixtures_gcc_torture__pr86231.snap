@@ -1,0 +1,164 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr86231.c" (c, x86_64-unknown-linux-gnu)
+global v : s32i[8] = zero [external, default, align 16, dso_local]
+
+fn foo(%arg0: void*, %arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: void*, %arg1: s32i):
+        %68 = alloca void*, "p", align 8
+        %69 = alloca s32i, "x", align 4
+        %70 = alloca s32i, "__retval", align 4
+        store %arg0, %68
+        store %arg1, %69
+        scope {
+            %89 = load %68 : void*, align 8
+            %90 = const 1 : u64i
+            %91 = cast(int_to_ptr) %90 : void*
+            %92 = cmp eq %89, %91 : bool
+            if %92 {
+                %93 = const 0 : s32i
+                store %93, %70
+                %94 = load %70 : s32i
+                return %94
+            }
+            yield
+        }
+        scope {
+            %79 = load %68 : void*, align 8
+            %80 = cast(ptr_to_bool) %79 : bool
+            %81 = not %80 : bool
+            if %81 {
+                %82 = load %69 : s32i, align 4
+                %83 = cast(int_to_bool) %82 : bool
+                %84 = const 2 : u64i
+                %85 = cast(int_to_ptr) %84 : void*
+                %86 = const 1 : u64i
+                %87 = cast(int_to_ptr) %86 : void*
+                %88 = select %83, %85, %87 : void*
+                store %88, %68, align 8
+                yield
+            }
+            yield
+        }
+        %71 = load %68 : void*, align 8
+        %72 = const 1 : u64i
+        %73 = cast(int_to_ptr) %72 : void*
+        %74 = cmp eq %71, %73 : bool
+        %75 = const 0 : s32i
+        %76 = const 1 : s32i
+        %77 = select %74, %75, %76 : s32i
+        store %77, %70
+        %78 = load %70 : s32i
+        return %78
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = const #cir.ptr<null> : void*
+        %5 = const 0 : s32i
+        %6 = call @foo(%4, %5) : s32i [all]
+        %7 = const 0 : s32i
+        %8 = cmp ne %6, %7 : bool
+        %9 = ternary %8 ? { : bool
+            %67 = const #true : bool
+            yield %67
+        } : {
+            %62 = const #cir.ptr<null> : void*
+            %63 = const 1 : s32i
+            %64 = call @foo(%62, %63) : s32i [all]
+            %65 = const 1 : s32i
+            %66 = cmp ne %64, %65 : bool
+            yield %66
+        }
+        %10 = ternary %9 ? { : bool
+            %61 = const #true : bool
+            yield %61
+        } : {
+            %55 = const 1 : u64i
+            %56 = cast(int_to_ptr) %55 : void*
+            %57 = const 0 : s32i
+            %58 = call @foo(%56, %57) : s32i [all]
+            %59 = const 0 : s32i
+            %60 = cmp ne %58, %59 : bool
+            yield %60
+        }
+        %11 = ternary %10 ? { : bool
+            %54 = const #true : bool
+            yield %54
+        } : {
+            %48 = const 1 : u64i
+            %49 = cast(int_to_ptr) %48 : void*
+            %50 = const 1 : s32i
+            %51 = call @foo(%49, %50) : s32i [all]
+            %52 = const 0 : s32i
+            %53 = cmp ne %51, %52 : bool
+            yield %53
+        }
+        %12 = ternary %11 ? { : bool
+            %47 = const #true : bool
+            yield %47
+        } : {
+            %41 = const 2 : u64i
+            %42 = cast(int_to_ptr) %41 : void*
+            %43 = const 0 : s32i
+            %44 = call @foo(%42, %43) : s32i [all]
+            %45 = const 1 : s32i
+            %46 = cmp ne %44, %45 : bool
+            yield %46
+        }
+        %13 = ternary %12 ? { : bool
+            %40 = const #true : bool
+            yield %40
+        } : {
+            %34 = const 2 : u64i
+            %35 = cast(int_to_ptr) %34 : void*
+            %36 = const 1 : s32i
+            %37 = call @foo(%35, %36) : s32i [all]
+            %38 = const 1 : s32i
+            %39 = cmp ne %37, %38 : bool
+            yield %39
+        }
+        %14 = ternary %13 ? { : bool
+            %33 = const #true : bool
+            yield %33
+        } : {
+            %25 = const 7 : s64i
+            %26 = get_global @v : s32i[8]*
+            %27 = get_element %26[%25] : s32i*
+            %28 = cast(bitcast) %27 : void*
+            %29 = const 0 : s32i
+            %30 = call @foo(%28, %29) : s32i [all]
+            %31 = const 1 : s32i
+            %32 = cmp ne %30, %31 : bool
+            yield %32
+        }
+        %15 = ternary %14 ? { : bool
+            %24 = const #true : bool
+            yield %24
+        } : {
+            %16 = const 7 : s64i
+            %17 = get_global @v : s32i[8]*
+            %18 = get_element %17[%16] : s32i*
+            %19 = cast(bitcast) %18 : void*
+            %20 = const 1 : s32i
+            %21 = call @foo(%19, %20) : s32i [all]
+            %22 = const 1 : s32i
+            %23 = cmp ne %21, %22 : bool
+            yield %23
+        }
+        if %15 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

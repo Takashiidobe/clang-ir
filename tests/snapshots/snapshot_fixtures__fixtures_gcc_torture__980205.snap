@@ -1,0 +1,55 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/980205.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn fdouble(%arg0: double, ...) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: double):
+        %7 = alloca double, "one", align 8
+        %8 = alloca double, "value", align 8
+        %9 = alloca rec___va_list_tag[1], "ap", align 16
+        store %arg0, %7
+        %10 = cast(array_to_ptrdecay) %9 : rec___va_list_tag*
+        <unmodeled: cir.va_start>
+        %11 = cast(array_to_ptrdecay) %9 : rec___va_list_tag*
+        <unmodeled: cir.va_arg>
+        store %12, %8, align 8
+        %13 = cast(array_to_ptrdecay) %9 : rec___va_list_tag*
+        <unmodeled: cir.va_end>
+        scope {
+            %14 = load %7 : double, align 8
+            %15 = const 1.000000e+00 : double
+            %16 = cmp ne %14, %15 : bool
+            %17 = ternary %16 ? { : bool
+                %22 = const #true : bool
+                yield %22
+            } : {
+                %19 = load %8 : double, align 8
+                %20 = const 2.000000e+00 : double
+                %21 = cmp ne %19, %20 : bool
+                yield %21
+            }
+            if %17 {
+                %18 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 1.000000e+00 : double
+    %3 = const 2.000000e+00 : double
+    call @fdouble(%2, %3) [all]
+    %4 = get_global @exit : ((s32i) -> void)*
+    %5 = const 0 : s32i
+    call @exit(%5) [all]
+    %6 = load %0 : s32i
+    return %6
+}

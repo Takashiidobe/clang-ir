@@ -1,0 +1,80 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/zero-struct-1.c" (c, x86_64-unknown-linux-gnu)
+global y : s8i[3] = zero [external, default, align 1, dso_local]
+global f : s8i* = @y [external, default, align 8, dso_local]
+global ff : s8i* = @y [external, default, align 8, dso_local]
+
+fn h() -> void [external, c, no_inline, dso_local, nothrow] {
+    %18 = alloca rec_g, "t", align 1
+    %19 = alloca rec_g, ".compoundliteral", align 1
+    %20 = get_global @f : s8i**
+    %21 = load %20 : s8i*, align 8
+    %22 = const 1 : s32i
+    %23 = ptr_stride %21, %22 : s8i*
+    store %23, %20, align 8
+    %24 = cast(bitcast) %21 : rec_g*
+    %25 = get_global @ff : s8i**
+    %26 = load %25 : s8i*, align 8
+    %27 = const 1 : s32i
+    %28 = ptr_stride %26, %27 : s8i*
+    store %28, %25, align 8
+    %29 = cast(bitcast) %26 : rec_g*
+    copy %24, %29
+    %30 = get_global @f : s8i**
+    %31 = load %30 : s8i*, align 8
+    %32 = const 1 : s32i
+    %33 = ptr_stride %31, %32 : s8i*
+    store %33, %30, align 8
+    %34 = cast(bitcast) %31 : rec_g*
+    copy %34, %19
+    %35 = get_global @ff : s8i**
+    %36 = load %35 : s8i*, align 8
+    %37 = const 1 : s32i
+    %38 = ptr_stride %36, %37 : s8i*
+    store %38, %35, align 8
+    %39 = cast(bitcast) %36 : rec_g*
+    copy %18, %39
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    call @h() [all]
+    scope {
+        %11 = get_global @f : s8i**
+        %12 = load %11 : s8i*, align 8
+        %13 = const 2 : s64i
+        %14 = get_global @y : s8i[3]*
+        %15 = get_element %14[%13] : s8i*
+        %16 = cmp ne %12, %15 : bool
+        if %16 {
+            %17 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %4 = get_global @ff : s8i**
+        %5 = load %4 : s8i*, align 8
+        %6 = const 2 : s64i
+        %7 = get_global @y : s8i[3]*
+        %8 = get_element %7[%6] : s8i*
+        %9 = cmp ne %5, %8 : bool
+        if %9 {
+            %10 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

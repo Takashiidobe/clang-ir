@@ -1,0 +1,35 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/math/exp2_log2.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[7] = "%f %f\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn exp2(%arg0: double) -> double [external, c, nothrow];
+fn log2(%arg0: double) -> double [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca double, "x", align 8
+    %2 = alloca double, "y", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 1.000000e+01 : double
+    store %4, %1, align 8, volatile
+    %5 = const 1.024000e+03 : double
+    store %5, %2, align 8, volatile
+    %6 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %7 = get_global @.str : s8i[7]*
+    %8 = cast(array_to_ptrdecay) %7 : s8i*
+    %9 = get_global @exp2 : ((double) -> double)*
+    %10 = load %1 : double, align 8, volatile
+    %11 = call @exp2(%10) : double [all]
+    %12 = get_global @log2 : ((double) -> double)*
+    %13 = load %2 : double, align 8, volatile
+    %14 = call @log2(%13) : double [all]
+    %15 = call @printf(%8, %11, %14) : s32i [all]
+    %16 = const 0 : s32i
+    store %16, %0
+    %17 = load %0 : s32i
+    return %17
+}

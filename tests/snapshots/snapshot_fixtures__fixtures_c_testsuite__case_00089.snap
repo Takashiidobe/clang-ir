@@ -1,0 +1,45 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00089.c" (c, x86_64-unknown-linux-gnu)
+global s : rec_S = {@zero} [external, default, align 8, dso_local]
+
+fn zero() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %18 = alloca s32i, "__retval", align 4
+    %19 = const 0 : s32i
+    store %19, %18
+    %20 = load %18 : s32i
+    return %20
+}
+fn anon() -> rec_S* [external, c, no_inline, dso_local, nothrow] {
+    %15 = alloca rec_S*, "__retval", align 8
+    %16 = get_global @s : rec_S*
+    store %16, %15
+    %17 = load %15 : rec_S*
+    return %17
+}
+fn go() -> ((...) -> rec_S*)* [external, c, no_inline, dso_local, nothrow] {
+    %11 = alloca ((...) -> rec_S*)*, "__retval", align 8
+    %12 = get_global @anon : (() -> rec_S*)*
+    %13 = cast(bitcast) %12 : ((...) -> rec_S*)*
+    store %13, %11
+    %14 = load %11 : ((...) -> rec_S*)*
+    return %14
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @go : (() -> ((...) -> rec_S*)*)*
+    %3 = call @go() : ((...) -> rec_S*)* [all]
+    %4 = cast(bitcast) %3 : (() -> rec_S*)*
+    %5 = call %4() : rec_S* [all]
+    %6 = get_member %5[0] "zerofunc" : ((...) -> s32i)**
+    %7 = load %6 : ((...) -> s32i)*, align 8
+    %8 = cast(bitcast) %7 : (() -> s32i)*
+    %9 = call %8() : s32i [all]
+    store %9, %0
+    %10 = load %0 : s32i
+    return %10
+}

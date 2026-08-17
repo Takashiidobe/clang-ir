@@ -1,0 +1,85 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/casts.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%f\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[4] = "%u\n" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[5] = "%ld\n" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca double, "d", align 8
+    %2 = alloca float, "f", align 4
+    %3 = alloca s32i, "i", align 4
+    %4 = alloca u32i, "u", align 4
+    %5 = alloca s64i, "l", align 8
+    %6 = alloca u8i, "c", align 1
+    %7 = alloca bool, "b0", align 1
+    %8 = alloca bool, "b1", align 1
+    %9 = const 0 : s32i
+    store %9, %0
+    %10 = const 7.750000e+00 : double
+    store %10, %1, align 8
+    %11 = load %1 : double, align 8
+    %12 = cast(floating) %11 : float
+    store %12, %2, align 4
+    %13 = load %1 : double, align 8
+    %14 = cast(float_to_int) %13 : s32i
+    store %14, %3, align 4
+    %15 = const 4294967295 : u32i
+    store %15, %4, align 4
+    %16 = load %3 : s32i, align 4
+    %17 = cast(integral) %16 : s64i
+    store %17, %5, align 8
+    %18 = const 4 : u8i
+    store %18, %6, align 1
+    %19 = const 0.000000e+00 : double
+    %20 = cast(float_to_bool) %19 : bool
+    store %20, %7, align 1
+    %21 = const -3 : s32i
+    %22 = cast(int_to_bool) %21 : bool
+    store %22, %8, align 1
+    %23 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %24 = get_global @.str : s8i[4]*
+    %25 = cast(array_to_ptrdecay) %24 : s8i*
+    %26 = load %2 : float, align 4
+    %27 = cast(floating) %26 : double
+    %28 = call @printf(%25, %27) : s32i [all]
+    %29 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %30 = get_global @.str.1 : s8i[4]*
+    %31 = cast(array_to_ptrdecay) %30 : s8i*
+    %32 = load %3 : s32i, align 4
+    %33 = call @printf(%31, %32) : s32i [all]
+    %34 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %35 = get_global @.str.2 : s8i[4]*
+    %36 = cast(array_to_ptrdecay) %35 : s8i*
+    %37 = load %4 : u32i, align 4
+    %38 = call @printf(%36, %37) : s32i [all]
+    %39 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %40 = get_global @.str.3 : s8i[5]*
+    %41 = cast(array_to_ptrdecay) %40 : s8i*
+    %42 = load %5 : s64i, align 8
+    %43 = call @printf(%41, %42) : s32i [all]
+    %44 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %45 = get_global @.str.2 : s8i[4]*
+    %46 = cast(array_to_ptrdecay) %45 : s8i*
+    %47 = load %6 : u8i, align 1
+    %48 = cast(integral) %47 : s32i
+    %49 = call @printf(%46, %48) : s32i [all]
+    %50 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %51 = get_global @.str.4 : s8i[7]*
+    %52 = cast(array_to_ptrdecay) %51 : s8i*
+    %53 = load %7 : bool, align 1
+    %54 = cast(bool_to_int) %53 : s32i
+    %55 = load %8 : bool, align 1
+    %56 = cast(bool_to_int) %55 : s32i
+    %57 = call @printf(%52, %54, %56) : s32i [all]
+    %58 = const 0 : s32i
+    store %58, %0
+    %59 = load %0 : s32i
+    return %59
+}

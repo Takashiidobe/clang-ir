@@ -1,0 +1,104 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr79737-1.c" (c, x86_64-unknown-linux-gnu)
+global __const.foo.m : rec_S = {[5, 0, 216, 255, 255, 79, 0, 20, 0]} [cir_private, default, dso_local, constant]
+global j : s32i = 0 [external, default, align 4, dso_local]
+global k : s32i = 0 [external, default, align 4, dso_local]
+global h : rec_S = zero [internal, default, align 1, dso_local]
+global g : s32i = 0 [external, default, align 4, dso_local]
+global i : rec_S = zero [external, default, align 1, dso_local]
+
+fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
+    scope {
+        %28 = const 0 : s32i
+        %29 = get_global @j : s32i*
+        store %28, %29, align 4
+        for cond: {
+            %35 = get_global @j : s32i*
+            %36 = load %35 : s32i, align 4
+            %37 = const 6 : s32i
+            %38 = cmp lt %36, %37 : bool
+            condition %38
+        } step: {
+            %30 = get_global @j : s32i*
+            %31 = load %30 : s32i, align 4
+            %32 = inc %31 : s32i [nsw]
+            store %32, %30, align 4
+            yield
+        } do {
+            %33 = const 0 : s32i
+            %34 = get_global @k : s32i*
+            store %33, %34, align 4
+            yield
+        }
+        yield
+    }
+    scope {
+        for cond: {
+            %24 = get_global @k : s32i*
+            %25 = load %24 : s32i, align 4
+            %26 = const 3 : s32i
+            %27 = cmp lt %25, %26 : bool
+            condition %27
+        } step: {
+            %10 = get_global @k : s32i*
+            %11 = load %10 : s32i, align 4
+            %12 = inc %11 : s32i [nsw]
+            store %12, %10, align 4
+            yield
+        } do {
+            scope {
+                %13 = alloca rec_S, "m", align 1
+                %14 = get_global @__const.foo.m : rec_S*
+                copy %13, %14
+                %15 = get_global @h : rec_S*
+                copy %15, %13
+                scope {
+                    %20 = get_global @g : s32i*
+                    %21 = load %20 : s32i, align 4
+                    %22 = cast(int_to_bool) %21 : bool
+                    if %22 {
+                        %23 = get_global @i : rec_S*
+                        copy %23, %13
+                        yield
+                    }
+                    yield
+                }
+                %16 = const 0 : s32i
+                %17 = get_global @h : rec_S*
+                %18 = get_member %17[0] "e" : u8i[9]*
+                <unmodeled: cir.set_bitfield>
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @foo : (() -> void)*
+    call @foo() [all]
+    scope {
+        %5 = get_global @h : rec_S*
+        %6 = get_member %5[0] "e" : u8i[9]*
+        <unmodeled: cir.get_bitfield>
+        %8 = const 0 : s32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

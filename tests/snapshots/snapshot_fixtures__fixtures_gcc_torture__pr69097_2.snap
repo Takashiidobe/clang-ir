@@ -1,0 +1,102 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr69097-2.c" (c, x86_64-unknown-linux-gnu)
+fn f1(%arg4: s32i, %arg5: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: s32i, %arg5: s32i):
+        %47 = alloca s32i, "x", align 4
+        %48 = alloca s32i, "y", align 4
+        %49 = alloca s32i, "__retval", align 4
+        store %arg4, %47
+        store %arg5, %48
+        %50 = load %47 : s32i, align 4
+        %51 = load %48 : s32i, align 4
+        %52 = rem %50, %51 : s32i
+        store %52, %49
+        %53 = load %49 : s32i
+        return %53
+}
+fn f2(%arg2: s32i, %arg3: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i, %arg3: s32i):
+        %39 = alloca s32i, "x", align 4
+        %40 = alloca s32i, "y", align 4
+        %41 = alloca s32i, "__retval", align 4
+        store %arg2, %39
+        store %arg3, %40
+        %42 = load %39 : s32i, align 4
+        %43 = load %40 : s32i, align 4
+        %44 = minus %43 : s32i [nsw]
+        %45 = rem %42, %44 : s32i
+        store %45, %41
+        %46 = load %41 : s32i
+        return %46
+}
+fn f3(%arg0: s32i, %arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s32i):
+        %29 = alloca s32i, "x", align 4
+        %30 = alloca s32i, "y", align 4
+        %31 = alloca s32i, "__retval", align 4
+        %32 = alloca s32i, "z", align 4
+        store %arg0, %29
+        store %arg1, %30
+        %33 = load %30 : s32i, align 4
+        %34 = minus %33 : s32i [nsw]
+        store %34, %32, align 4
+        %35 = load %29 : s32i, align 4
+        %36 = load %32 : s32i, align 4
+        %37 = rem %35, %36 : s32i
+        store %37, %31
+        %38 = load %31 : s32i
+        return %38
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = const -2147483647 : s32i
+        %5 = const 1 : s32i
+        %6 = sub %4, %5 : s32i [nsw]
+        %7 = const 1 : s32i
+        %8 = call @f1(%6, %7) : s32i [all]
+        %9 = const 0 : s32i
+        %10 = cmp ne %8, %9 : bool
+        %11 = ternary %10 ? { : bool
+            %28 = const #true : bool
+            yield %28
+        } : {
+            %21 = const -2147483647 : s32i
+            %22 = const 1 : s32i
+            %23 = sub %21, %22 : s32i [nsw]
+            %24 = const -1 : s32i
+            %25 = call @f2(%23, %24) : s32i [all]
+            %26 = const 0 : s32i
+            %27 = cmp ne %25, %26 : bool
+            yield %27
+        }
+        %12 = ternary %11 ? { : bool
+            %20 = const #true : bool
+            yield %20
+        } : {
+            %13 = const -2147483647 : s32i
+            %14 = const 1 : s32i
+            %15 = sub %13, %14 : s32i [nsw]
+            %16 = const -1 : s32i
+            %17 = call @f3(%15, %16) : s32i [all]
+            %18 = const 0 : s32i
+            %19 = cmp ne %17, %18 : bool
+            yield %19
+        }
+        if %12 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

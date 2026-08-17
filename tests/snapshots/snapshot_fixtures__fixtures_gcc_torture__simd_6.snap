@@ -1,0 +1,83 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/simd-6.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: double, %arg1: double) -> double [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: double, %arg1: double):
+        %31 = alloca vector<8 x u8i>, "coerce", align 8
+        %32 = alloca double, "coerce", align 8
+        store %arg1, %32
+        %33 = cast(bitcast) %32 : vector<8 x u8i>*
+        %34 = load %33 : vector<8 x u8i>
+        %35 = alloca double, "coerce", align 8
+        store %arg0, %35
+        %36 = cast(bitcast) %35 : vector<8 x u8i>*
+        %37 = load %36 : vector<8 x u8i>
+        %38 = alloca vector<8 x u8i>, "x", align 8
+        %39 = alloca vector<8 x u8i>, "y", align 8
+        %40 = alloca vector<8 x u8i>, "__retval", align 8
+        store %37, %38
+        store %34, %39
+        %41 = load %38 : vector<8 x u8i>, align 8
+        %42 = load %39 : vector<8 x u8i>, align 8
+        %43 = mul %41, %42 : vector<8 x u8i>
+        store %43, %40
+        %44 = load %40 : vector<8 x u8i>
+        store %44, %31
+        %45 = cast(bitcast) %31 : double*
+        %46 = load %45 : double
+        return %46
+}
+fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca double, "coerce", align 8
+    %1 = alloca vector<8 x u8i>, "coerce", align 8
+    %2 = alloca vector<8 x u8i>, "coerce", align 8
+    %3 = alloca s32i, "__retval", align 4
+    %4 = alloca vector<8 x u8i>, "a", align 8
+    %5 = alloca vector<8 x u8i>, "b", align 8
+    %6 = alloca vector<8 x u8i>, "c", align 8
+    %7 = alloca vector<8 x u8i>, "r", align 8
+    %8 = const 0 : s32i
+    store %8, %3
+    %9 = const [1, 2, 3, 4, 5, 6, 7, 8] : vector<8 x u8i>
+    store %9, %4, align 8
+    %10 = const [3, 3, 3, 3, 3, 3, 3, 3] : vector<8 x u8i>
+    store %10, %5, align 8
+    %11 = const [3, 6, 9, 12, 15, 18, 21, 24] : vector<8 x u8i>
+    store %11, %6, align 8
+    %12 = load %4 : vector<8 x u8i>, align 8
+    %13 = load %5 : vector<8 x u8i>, align 8
+    store %12, %2
+    %14 = cast(bitcast) %2 : double*
+    %15 = load %14 : double
+    store %13, %1
+    %16 = cast(bitcast) %1 : double*
+    %17 = load %16 : double
+    %18 = call @foo(%15, %17) : double [all]
+    store %18, %0
+    %19 = cast(bitcast) %0 : vector<8 x u8i>*
+    %20 = load %19 : vector<8 x u8i>
+    store %20, %7, align 8
+    scope {
+        %23 = get_global @memcmp : ((void*, void*, u64i) -> s32i)*
+        %24 = cast(bitcast) %7 : void*
+        %25 = cast(bitcast) %6 : void*
+        %26 = const 8 : u64i
+        %27 = call @memcmp(%24, %25, %26) : s32i [all]
+        %28 = const 0 : s32i
+        %29 = cmp ne %27, %28 : bool
+        if %29 {
+            %30 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %21 = const 0 : s32i
+    store %21, %3
+    %22 = load %3 : s32i
+    return %22
+}

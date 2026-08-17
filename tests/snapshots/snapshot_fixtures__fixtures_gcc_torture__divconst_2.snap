@@ -1,0 +1,126 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/divconst-2.c" (c, x86_64-unknown-linux-gnu)
+global nums : s64i[3] = [-1, 2147483647, -2147483648] [external, default, align 16, dso_local]
+
+fn f(%arg5: s64i) -> s64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg5: s64i):
+        %64 = alloca s64i, "x", align 8
+        %65 = alloca s64i, "__retval", align 8
+        store %arg5, %64
+        %66 = load %64 : s64i, align 8
+        %67 = const -2147483647 : s64i
+        %68 = const 1 : s64i
+        %69 = sub %67, %68 : s64i [nsw]
+        %70 = div %66, %69 : s64i
+        store %70, %65
+        %71 = load %65 : s64i
+        return %71
+}
+fn r(%arg4: s64i) -> s64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: s64i):
+        %56 = alloca s64i, "x", align 8
+        %57 = alloca s64i, "__retval", align 8
+        store %arg4, %56
+        %58 = load %56 : s64i, align 8
+        %59 = const -2147483647 : s64i
+        %60 = const 1 : s64i
+        %61 = sub %59, %60 : s64i [nsw]
+        %62 = rem %58, %61 : s64i
+        store %62, %57
+        %63 = load %57 : s64i
+        return %63
+}
+fn std_eqn(%arg0: s64i, %arg1: s64i, %arg2: s64i, %arg3: s64i) -> s64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s64i, %arg1: s64i, %arg2: s64i, %arg3: s64i):
+        %39 = alloca s64i, "num", align 8
+        %40 = alloca s64i, "denom", align 8
+        %41 = alloca s64i, "quot", align 8
+        %42 = alloca s64i, "rem", align 8
+        %43 = alloca s64i, "__retval", align 8
+        store %arg0, %39
+        store %arg1, %40
+        store %arg2, %41
+        store %arg3, %42
+        %44 = load %41 : s64i, align 8
+        %45 = const -2147483647 : s64i
+        %46 = const 1 : s64i
+        %47 = sub %45, %46 : s64i [nsw]
+        %48 = mul %44, %47 : s64i [nsw]
+        %49 = load %42 : s64i, align 8
+        %50 = add %48, %49 : s64i [nsw]
+        %51 = load %39 : s64i, align 8
+        %52 = cmp eq %50, %51 : bool
+        %53 = cast(bool_to_int) %52 : s32i
+        %54 = cast(integral) %53 : s64i
+        store %54, %43
+        %55 = load %43 : s64i
+        return %55
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "i", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    scope {
+        %6 = const 0 : s32i
+        store %6, %1, align 4
+        for cond: {
+            %33 = load %1 : s32i, align 4
+            %34 = cast(integral) %33 : u64i
+            %35 = const 24 : u64i
+            %36 = const 8 : u64i
+            %37 = div %35, %36 : u64i
+            %38 = cmp lt %34, %37 : bool
+            condition %38
+        } step: {
+            %7 = load %1 : s32i, align 4
+            %8 = inc %7 : s32i [nsw]
+            store %8, %1, align 4
+            yield
+        } do {
+            scope {
+                %9 = load %1 : s32i, align 4
+                %10 = cast(integral) %9 : s64i
+                %11 = get_global @nums : s64i[3]*
+                %12 = get_element %11[%10] : s64i*
+                %13 = load %12 : s64i, align 8
+                %14 = const -2147483647 : s64i
+                %15 = const 1 : s64i
+                %16 = sub %14, %15 : s64i [nsw]
+                %17 = load %1 : s32i, align 4
+                %18 = cast(integral) %17 : s64i
+                %19 = get_global @nums : s64i[3]*
+                %20 = get_element %19[%18] : s64i*
+                %21 = load %20 : s64i, align 8
+                %22 = call @f(%21) : s64i [all]
+                %23 = load %1 : s32i, align 4
+                %24 = cast(integral) %23 : s64i
+                %25 = get_global @nums : s64i[3]*
+                %26 = get_element %25[%24] : s64i*
+                %27 = load %26 : s64i, align 8
+                %28 = call @r(%27) : s64i [all]
+                %29 = call @std_eqn(%13, %16, %22, %28) : s64i [all]
+                %30 = const 0 : s64i
+                %31 = cmp eq %29, %30 : bool
+                if %31 {
+                    %32 = get_global @abort : (() -> void)*
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %3 = get_global @exit : ((s32i) -> void)*
+    %4 = const 0 : s32i
+    call @exit(%4) [all]
+    %5 = load %0 : s32i
+    return %5
+}

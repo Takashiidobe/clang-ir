@@ -1,0 +1,52 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20030903-1.c" (c, x86_64-unknown-linux-gnu)
+global test : u32i = 0 [internal, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn y(%arg0: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %10 = alloca s32i, "x", align 4
+        store %arg0, %10
+        %11 = get_global @abort : (() -> void)*
+        call @abort() [all]
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = get_global @test : u32i*
+        %5 = load %4 : u32i, align 4, volatile
+        switch %5 {
+            case equal 1 {
+                %9 = const 1 : s32i
+                call @y(%9) [all]
+                break
+            }
+            case equal 2 {
+                %8 = const 2 : s32i
+                call @y(%8) [all]
+                break
+            }
+            case equal 3 {
+                %7 = const 3 : s32i
+                call @y(%7) [all]
+                break
+            }
+            case equal 4 {
+                %6 = const 4 : s32i
+                call @y(%6) [all]
+                break
+            }
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

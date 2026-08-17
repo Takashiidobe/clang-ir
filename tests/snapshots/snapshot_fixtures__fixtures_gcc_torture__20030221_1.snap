@@ -1,0 +1,57 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20030221-1.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.buf : s8i[16] = "1234567890" [cir_private, default, dso_local, constant]
+
+fn strlen(%arg0: s8i*) -> u64i [external, c, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s8i[16], "buf", align 16
+    %2 = alloca s8i*, "p", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = get_global @__const.main.buf : s8i[16]*
+    copy %1, %4
+    %5 = cast(array_to_ptrdecay) %1 : s8i*
+    store %5, %2, align 8
+    %6 = cast(array_to_ptrdecay) %1 : s8i*
+    %7 = call @strlen(%6) : u64i [all]
+    %8 = cast(integral) %7 : s8i
+    %9 = load %2 : s8i*, align 8
+    %10 = const 1 : s32i
+    %11 = ptr_stride %9, %10 : s8i*
+    store %11, %2, align 8
+    store %8, %9, align 1
+    scope {
+        %14 = const 0 : s64i
+        %15 = get_element %1[%14] : s8i*
+        %16 = load %15 : s8i, align 16
+        %17 = cast(integral) %16 : s32i
+        %18 = const 10 : s32i
+        %19 = cmp ne %17, %18 : bool
+        %20 = ternary %19 ? { : bool
+            %27 = const #true : bool
+            yield %27
+        } : {
+            %22 = load %2 : s8i*, align 8
+            %23 = cast(array_to_ptrdecay) %1 : s8i*
+            %24 = ptr_diff %22, %23 : s64i
+            %25 = const 1 : s64i
+            %26 = cmp ne %24, %25 : bool
+            yield %26
+        }
+        if %20 {
+            %21 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %12 = const 0 : s32i
+    store %12, %0
+    %13 = load %0 : s32i
+    return %13
+}

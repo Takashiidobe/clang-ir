@@ -1,0 +1,83 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20040805-1.c" (c, x86_64-unknown-linux-gnu)
+global a : s32i[2] = [2, 3] [external, default, align 4, dso_local]
+
+fn bar(%arg1: s32i, %arg2: void*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i, %arg2: void*):
+        %34 = alloca s32i, "x", align 4
+        %35 = alloca void*, "b", align 8
+        %36 = alloca s32i, "__retval", align 4
+        store %arg1, %34
+        store %arg2, %35
+        %37 = const 0 : s64i
+        %38 = get_global @a : s32i[2]*
+        %39 = get_element %38[%37] : s32i*
+        %40 = load %39 : s32i, align 4
+        %41 = inc %40 : s32i [nsw]
+        store %41, %39, align 4
+        %42 = load %34 : s32i, align 4
+        store %42, %36
+        %43 = load %36 : s32i
+        return %43
+}
+fn foo(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %10 = alloca s32i, "x", align 4
+        %11 = alloca s32i, "__retval", align 4
+        %12 = alloca s8i[65536], "buf", align 16
+        %13 = alloca s32i, "y", align 4
+        store %arg0, %10
+        %14 = const 0 : s64i
+        %15 = get_global @a : s32i[2]*
+        %16 = get_element %15[%14] : s32i*
+        %17 = load %16 : s32i, align 4
+        store %17, %13, align 4
+        %18 = load %13 : s32i, align 4
+        %19 = const 1 : s64i
+        %20 = get_global @a : s32i[2]*
+        %21 = get_element %20[%19] : s32i*
+        store %18, %21, align 4
+        %22 = load %10 : s32i, align 4
+        %23 = cast(array_to_ptrdecay) %12 : s8i*
+        %24 = cast(bitcast) %23 : void*
+        %25 = call @bar(%22, %24) : s32i [all]
+        store %25, %10, align 4
+        %26 = load %13 : s32i, align 4
+        %27 = cast(array_to_ptrdecay) %12 : s8i*
+        %28 = cast(bitcast) %27 : void*
+        %29 = call @bar(%26, %28) : s32i [all]
+        store %29, %13, align 4
+        %30 = load %10 : s32i, align 4
+        %31 = load %13 : s32i, align 4
+        %32 = add %30, %31 : s32i [nsw]
+        store %32, %11
+        %33 = load %11 : s32i
+        return %33
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %5 = const 100 : s32i
+        %6 = call @foo(%5) : s32i [all]
+        %7 = const 102 : s32i
+        %8 = cmp ne %6, %7 : bool
+        if %8 {
+            %9 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

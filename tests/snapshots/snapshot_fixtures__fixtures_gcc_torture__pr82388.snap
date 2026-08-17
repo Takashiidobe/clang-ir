@@ -1,0 +1,41 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr82388.c" (c, x86_64-unknown-linux-gnu)
+global __const.foo.h : rec_A[30] = zero [cir_private, default, dso_local, constant]
+global e : rec_A = zero [external, default, align 4, dso_local]
+
+fn foo() -> rec_anon_struct [external, c, no_inline, dso_local, nothrow] {
+    %11 = alloca rec_anon_struct, "coerce", align 8
+    %12 = alloca rec_A, "__retval", align 4
+    %13 = alloca rec_A[30], "h", align 16
+    %14 = get_global @__const.foo.h : rec_A[30]*
+    copy %13, %14
+    %15 = const 29 : s64i
+    %16 = get_element %13[%15] : rec_A*
+    copy %12, %16
+    %17 = load %12 : rec_A
+    %18 = cast(bitcast) %11 : rec_A*
+    store %17, %18
+    %19 = load %11 : rec_anon_struct
+    return %19
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca rec_anon_struct, "coerce", align 8
+    %1 = alloca s32i, "__retval", align 4
+    %2 = const 0 : s32i
+    store %2, %1
+    %3 = get_global @e : rec_A*
+    %4 = call @foo() : rec_anon_struct [all]
+    store %4, %0
+    %5 = cast(bitcast) %0 : rec_A*
+    %6 = load %5 : rec_A
+    store %6, %3, align 4
+    %7 = get_global @e : rec_A*
+    %8 = get_member %7[0] "b" : s32i*
+    %9 = load %8 : s32i, align 4
+    store %9, %1
+    %10 = load %1 : s32i
+    return %10
+}

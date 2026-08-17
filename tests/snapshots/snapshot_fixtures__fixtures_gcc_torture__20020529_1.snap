@@ -1,0 +1,219 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20020529-1.c" (c, x86_64-unknown-linux-gnu)
+global f1.beenhere : s32i = 0 [internal, default, align 4, dso_local]
+
+fn f1(%arg4: rec_xx*) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: rec_xx*):
+        %75 = alloca rec_xx*, "p", align 8
+        %76 = alloca s32i, "__retval", align 4
+        store %arg4, %75
+        %77 = get_global @f1.beenhere : s32i*
+        scope {
+            %83 = load %77 : s32i, align 4
+            %84 = inc %83 : s32i [nsw]
+            store %84, %77, align 4
+            %85 = const 1 : s32i
+            %86 = cmp gt %83, %85 : bool
+            if %86 {
+                %87 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        %78 = load %77 : s32i, align 4
+        %79 = const 1 : s32i
+        %80 = cmp gt %78, %79 : bool
+        %81 = cast(bool_to_int) %80 : s32i
+        store %81, %76
+        %82 = load %76 : s32i
+        return %82
+}
+fn f2() -> void [external, c, no_inline, dso_local, nothrow] {
+    %74 = get_global @abort : (() -> void)*
+    call @abort() [all]
+    return
+}
+fn foo(%arg0: rec_xx*, %arg1: s32i, %arg2: s32i, %arg3: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_xx*, %arg1: s32i, %arg2: s32i, %arg3: s32i):
+        %36 = alloca rec_xx*, "p", align 8
+        %37 = alloca s32i, "b", align 4
+        %38 = alloca s32i, "c", align 4
+        %39 = alloca s32i, "d", align 4
+        %40 = alloca s32i, "__retval", align 4
+        %41 = alloca s32i, "a", align 4
+        store %arg0, %36
+        store %arg1, %37
+        store %arg2, %38
+        store %arg3, %39
+        scope {
+            for cond: {
+                %73 = const #true : bool
+                condition %73
+            } step: {
+                yield
+            } do {
+                scope {
+                    %44 = load %36 : rec_xx*, align 8
+                    %45 = call @f1(%44) : s32i [all]
+                    store %45, %41, align 4
+                    scope {
+                        %69 = load %41 : s32i, align 4
+                        %70 = cast(int_to_bool) %69 : bool
+                        if %70 {
+                            %71 = const 0 : s32i
+                            store %71, %40
+                            %72 = load %40 : s32i
+                            return %72
+                        }
+                        yield
+                    }
+                    scope {
+                        %67 = load %37 : s32i, align 4
+                        %68 = cast(int_to_bool) %67 : bool
+                        if %68 {
+                            continue
+                        }
+                        yield
+                    }
+                    %46 = load %39 : s32i, align 4
+                    %47 = cast(integral) %46 : s16i
+                    %48 = load %36 : rec_xx*, align 8
+                    %49 = get_member %48[2] "c" : s16i*
+                    store %47, %49, align 8
+                    scope {
+                        %63 = load %36 : rec_xx*, align 8
+                        %64 = get_member %63[0] "a" : s32i*
+                        %65 = load %64 : s32i, align 8
+                        %66 = cast(int_to_bool) %65 : bool
+                        if %66 {
+                            call @f2() [all]
+                            yield
+                        }
+                        yield
+                    }
+                    scope {
+                        %61 = load %38 : s32i, align 4
+                        %62 = cast(int_to_bool) %61 : bool
+                        if %62 {
+                            call @f2() [all]
+                            yield
+                        }
+                        yield
+                    }
+                    %50 = load %36 : rec_xx*, align 8
+                    %51 = get_member %50[2] "c" : s16i*
+                    %52 = load %51 : s16i, align 8
+                    %53 = cast(integral) %52 : s32i
+                    store %53, %39, align 4
+                    scope {
+                        %54 = load %41 : s32i, align 4
+                        switch %54 {
+                            case equal 1 {
+                                scope {
+                                    %57 = load %36 : rec_xx*, align 8
+                                    %58 = get_member %57[1] "b" : rec_xx**
+                                    %59 = load %58 : rec_xx*, align 8
+                                    %60 = cast(ptr_to_bool) %59 : bool
+                                    if %60 {
+                                        call @f2() [all]
+                                        yield
+                                    }
+                                    yield
+                                }
+                                scope {
+                                    %55 = load %38 : s32i, align 4
+                                    %56 = cast(int_to_bool) %55 : bool
+                                    if %56 {
+                                        call @f2() [all]
+                                        yield
+                                    }
+                                    yield
+                                }
+                                yield
+                            }
+                            case default {
+                                break
+                            }
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %42 = load %39 : s32i, align 4
+        store %42, %40
+        %43 = load %40 : s32i
+        return %43
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_xx, "s", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_member %1[0] "a" : s32i*
+    %4 = const 0 : s32i
+    store %4, %3, align 8
+    %5 = get_member %1[1] "b" : rec_xx**
+    store %1, %5, align 8
+    %6 = get_member %1[2] "c" : s16i*
+    %7 = const 23 : s16i
+    store %7, %6, align 8
+    scope {
+        %11 = const 0 : s32i
+        %12 = const 0 : s32i
+        %13 = const 0 : s32i
+        %14 = call @foo(%1, %11, %12, %13) : s32i [all]
+        %15 = const 0 : s32i
+        %16 = cmp ne %14, %15 : bool
+        %17 = ternary %16 ? { : bool
+            %35 = const #true : bool
+            yield %35
+        } : {
+            %31 = get_member %1[0] "a" : s32i*
+            %32 = load %31 : s32i, align 8
+            %33 = const 0 : s32i
+            %34 = cmp ne %32, %33 : bool
+            yield %34
+        }
+        %18 = ternary %17 ? { : bool
+            %30 = const #true : bool
+            yield %30
+        } : {
+            %27 = get_member %1[1] "b" : rec_xx**
+            %28 = load %27 : rec_xx*, align 8
+            %29 = cmp ne %28, %1 : bool
+            yield %29
+        }
+        %19 = ternary %18 ? { : bool
+            %26 = const #true : bool
+            yield %26
+        } : {
+            %21 = get_member %1[2] "c" : s16i*
+            %22 = load %21 : s16i, align 8
+            %23 = cast(integral) %22 : s32i
+            %24 = const 0 : s32i
+            %25 = cmp ne %23, %24 : bool
+            yield %25
+        }
+        if %19 {
+            %20 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %8 = get_global @exit : ((s32i) -> void)*
+    %9 = const 0 : s32i
+    call @exit(%9) [all]
+    %10 = load %0 : s32i
+    return %10
+}

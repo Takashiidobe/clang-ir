@@ -1,0 +1,84 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20010329-1.c" (c, x86_64-unknown-linux-gnu)
+fn exit(%arg0: s32i) -> void [external, c];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca void*, "x", align 8
+    %2 = alloca void*, "y", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 2147483647 : u32i
+    %5 = const 2 : u32i
+    %6 = add %4, %5 : u32i
+    %7 = cast(integral) %6 : u64i
+    %8 = cast(int_to_ptr) %7 : void*
+    store %8, %1, align 8
+    %9 = const 9223372036854775807 : u64i
+    %10 = const 2 : u64i
+    %11 = add %9, %10 : u64i
+    %12 = cast(int_to_ptr) %11 : void*
+    store %12, %2, align 8
+    scope {
+        %14 = load %1 : void*, align 8
+        %15 = const 2147483647 : u32i
+        %16 = const 1 : u32i
+        %17 = add %15, %16 : u32i
+        %18 = cast(integral) %17 : u64i
+        %19 = cast(int_to_ptr) %18 : void*
+        %20 = cmp ge %14, %19 : bool
+        %21 = ternary %20 ? { : bool
+            %42 = load %1 : void*, align 8
+            %43 = const 2147483647 : u32i
+            %44 = const 6 : u32i
+            %45 = add %43, %44 : u32i
+            %46 = cast(integral) %45 : u64i
+            %47 = cast(int_to_ptr) %46 : void*
+            %48 = cmp le %42, %47 : bool
+            yield %48
+        } : {
+            %41 = const #false : bool
+            yield %41
+        }
+        %22 = ternary %21 ? { : bool
+            %35 = load %2 : void*, align 8
+            %36 = const 9223372036854775807 : u64i
+            %37 = const 1 : u64i
+            %38 = add %36, %37 : u64i
+            %39 = cast(int_to_ptr) %38 : void*
+            %40 = cmp ge %35, %39 : bool
+            yield %40
+        } : {
+            %34 = const #false : bool
+            yield %34
+        }
+        %23 = ternary %22 ? { : bool
+            %28 = load %2 : void*, align 8
+            %29 = const 9223372036854775807 : u64i
+            %30 = const 6 : u64i
+            %31 = add %29, %30 : u64i
+            %32 = cast(int_to_ptr) %31 : void*
+            %33 = cmp le %28, %32 : bool
+            yield %33
+        } : {
+            %27 = const #false : bool
+            yield %27
+        }
+        if %23 {
+            %25 = get_global @exit : ((s32i) -> void)*
+            %26 = const 0 : s32i
+            call @exit(%26) [all]
+            yield
+        } else {
+            %24 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %13 = load %0 : s32i
+    return %13
+}

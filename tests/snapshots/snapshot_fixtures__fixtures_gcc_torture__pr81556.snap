@@ -1,0 +1,83 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr81556.c" (c, x86_64-unknown-linux-gnu)
+global b : u64i = 13272098465497875865 [external, default, align 8, dso_local]
+global c : u64i = 15341539099603541390 [external, default, align 8, dso_local]
+global d : u64i = 2 [external, default, align 8, dso_local]
+global f : u64i = 1 [external, default, align 8, dso_local]
+global g : u64i = 0 [external, default, align 8, dso_local]
+global h : u64i = 0 [external, default, align 8, dso_local]
+global e : u64i = 17471558040813171499 [external, default, align 8, dso_local]
+
+fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
+    %14 = alloca bool, "a", align 1
+    %15 = get_global @d : u64i*
+    %16 = load %15 : u64i, align 8
+    %17 = const 1 : u64i
+    %18 = cmp gt %16, %17 : bool
+    store %18, %14, align 1
+    %19 = get_global @f : u64i*
+    %20 = load %19 : u64i, align 8
+    %21 = get_global @d : u64i*
+    %22 = load %21 : u64i, align 8
+    %23 = const 1 : u64i
+    %24 = cmp gt %22, %23 : bool
+    %25 = cast(bool_to_int) %24 : s32i
+    %26 = const 9 : s32i
+    %27 = shift left %25, %26 : s32i
+    %28 = cast(integral) %27 : u64i
+    %29 = rem %20, %28 : u64i
+    %30 = get_global @g : u64i*
+    store %29, %30, align 8
+    %31 = load %14 : bool, align 1
+    %32 = cast(bool_to_int) %31 : u64i
+    %33 = get_global @e : u64i*
+    %34 = load %33 : u64i, align 8
+    %35 = load %14 : bool, align 1
+    %36 = cast(bool_to_int) %35 : u64i
+    %37 = get_global @b : u64i*
+    %38 = load %37 : u64i, align 8
+    %39 = and %36, %38 : u64i
+    %40 = get_global @c : u64i*
+    %41 = load %40 : u64i, align 8
+    %42 = and %39, %41 : u64i
+    %43 = and %34, %42 : u64i
+    %44 = and %32, %43 : u64i
+    %45 = get_global @h : u64i*
+    store %44, %45, align 8
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    call @foo() [all]
+    scope {
+        %4 = get_global @g : u64i*
+        %5 = load %4 : u64i, align 8
+        %6 = const 1 : u64i
+        %7 = cmp ne %5, %6 : bool
+        %8 = ternary %7 ? { : bool
+            %13 = const #true : bool
+            yield %13
+        } : {
+            %9 = get_global @h : u64i*
+            %10 = load %9 : u64i, align 8
+            %11 = const 0 : u64i
+            %12 = cmp ne %10, %11 : bool
+            yield %12
+        }
+        if %8 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

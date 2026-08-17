@@ -1,0 +1,38 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/stdio/tmpfile_fputc.c" (c, x86_64-unknown-linux-gnu)
+fn tmpfile() -> rec__IO_FILE* [external, c];
+fn fputc(%arg0: s32i, %arg1: rec__IO_FILE*) -> s32i [external, c];
+fn rewind(%arg0: rec__IO_FILE*) -> void [external, c];
+fn fgetc(%arg0: rec__IO_FILE*) -> s32i [external, c];
+fn putchar(%arg0: s32i) -> s32i [external, c];
+fn fclose(%arg0: rec__IO_FILE*) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec__IO_FILE*, "f", align 8
+    %2 = alloca s32i, "c", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = call @tmpfile() : rec__IO_FILE* [all]
+    store %4, %1, align 8
+    %5 = const 90 : s32i
+    %6 = load %1 : rec__IO_FILE*, align 8
+    %7 = call @fputc(%5, %6) : s32i [all]
+    %8 = load %1 : rec__IO_FILE*, align 8
+    call @rewind(%8) [all]
+    %9 = load %1 : rec__IO_FILE*, align 8
+    %10 = call @fgetc(%9) : s32i [all]
+    store %10, %2, align 4
+    %11 = load %2 : s32i, align 4
+    %12 = call @putchar(%11) : s32i [all]
+    %13 = const 10 : s32i
+    %14 = call @putchar(%13) : s32i [all]
+    %15 = load %1 : rec__IO_FILE*, align 8
+    %16 = call @fclose(%15) : s32i [all]
+    %17 = const 0 : s32i
+    store %17, %0
+    %18 = load %0 : s32i
+    return %18
+}

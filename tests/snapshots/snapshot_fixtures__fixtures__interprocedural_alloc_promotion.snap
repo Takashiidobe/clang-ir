@@ -1,0 +1,53 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/interprocedural_alloc_promotion.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn malloc(%arg0: u64i) -> void* [external, c, nothrow];
+fn alloc() -> s32i* [external, c, no_inline, dso_local, nothrow] {
+    %22 = alloca s32i*, "__retval", align 8
+    %23 = get_global @malloc : ((u64i) -> void*)*
+    %24 = const 4 : u64i
+    %25 = const 10 : u64i
+    %26 = mul %24, %25 : u64i
+    %27 = call @malloc(%26) : void* [all]
+    %28 = cast(bitcast) %27 : s32i*
+    store %28, %22
+    %29 = load %22 : s32i*
+    return %29
+}
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn free(%arg0: void*) -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i*, "x", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const #cir.ptr<null> : s32i*
+    store %3, %1, align 8
+    %4 = call @alloc() : s32i* [all]
+    store %4, %1, align 8
+    %5 = const 10 : s32i
+    %6 = const 0 : s64i
+    %7 = load %1 : s32i*, align 8
+    %8 = ptr_stride %7, %6 : s32i*
+    store %5, %8, align 4
+    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %10 = get_global @.str : s8i[4]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = const 0 : s64i
+    %13 = load %1 : s32i*, align 8
+    %14 = ptr_stride %13, %12 : s32i*
+    %15 = load %14 : s32i, align 4
+    %16 = call @printf(%11, %15) : s32i [all]
+    %17 = get_global @free : ((void*) -> void)*
+    %18 = load %1 : s32i*, align 8
+    %19 = cast(bitcast) %18 : void*
+    call @free(%19) [all]
+    %20 = const 0 : s32i
+    store %20, %0
+    %21 = load %0 : s32i
+    return %21
+}

@@ -1,0 +1,91 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr31448.c" (c, x86_64-unknown-linux-gnu)
+global next : rec__st* = #cir.ptr<null> [external, default, align 8, dso_local]
+global f.constreg : s32i[1] = [-16843010] [internal, default, align 4, dso_local, constant]
+global g.constreg : s32i[1] = zero [internal, default, align 4, dso_local, constant]
+
+fn g() -> void [external, c, no_inline, dso_local, nothrow] {
+    %39 = alloca rec__st*, "next", align 8
+    %40 = alloca s32i, "nIndx", align 4
+    %41 = const #cir.ptr<null> : rec__st*
+    store %41, %39, align 8
+    %42 = get_global @g.constreg : s32i[1]*
+    %43 = const 0 : s32i
+    store %43, %40, align 4
+    %44 = load %40 : s32i, align 4
+    %45 = cast(integral) %44 : s64i
+    %46 = get_element %42[%45] : s32i*
+    %47 = load %46 : s32i, align 4
+    %48 = load %39 : rec__st*, align 8
+    %49 = get_member %48[0] "iIndex" : u64i*
+    <unmodeled: cir.set_bitfield>
+    return
+}
+fn f() -> void [external, c, no_inline, dso_local, nothrow] {
+    %20 = alloca s32i, "nIndx", align 4
+    %21 = get_global @f.constreg : s32i[1]*
+    %22 = const 0 : s32i
+    store %22, %20, align 4
+    %23 = load %20 : s32i, align 4
+    %24 = cast(integral) %23 : s64i
+    %25 = get_element %21[%24] : s32i*
+    %26 = load %25 : s32i, align 4
+    %27 = get_global @next : rec__st**
+    %28 = load %27 : rec__st*, align 8
+    %29 = get_member %28[0] "iIndex" : u64i*
+    <unmodeled: cir.set_bitfield>
+    %31 = load %20 : s32i, align 4
+    %32 = cast(integral) %31 : s64i
+    %33 = get_element %21[%32] : s32i*
+    %34 = load %33 : s32i, align 4
+    %35 = get_global @next : rec__st**
+    %36 = load %35 : rec__st*, align 8
+    %37 = get_member %36[0] "iIndex1" : u64i*
+    <unmodeled: cir.set_bitfield>
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec__st, "a", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = get_global @next : rec__st**
+    store %1, %3, align 8
+    call @f() [all]
+    scope {
+        %13 = get_global @next : rec__st**
+        %14 = load %13 : rec__st*, align 8
+        %15 = get_member %14[0] "iIndex" : u64i*
+        <unmodeled: cir.get_bitfield>
+        %17 = cast(integral) %16 : u32i
+        %18 = const 4294901502 : u32i
+        %19 = cmp ne %17, %18 : bool
+        if %19 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %6 = get_global @next : rec__st**
+        %7 = load %6 : rec__st*, align 8
+        %8 = get_member %7[0] "iIndex1" : u64i*
+        <unmodeled: cir.get_bitfield>
+        %10 = cast(integral) %9 : u32i
+        %11 = const 4294901502 : u32i
+        %12 = cmp ne %10, %11 : bool
+        if %12 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

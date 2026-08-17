@@ -1,0 +1,59 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/packed_aligned_struct.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[9] = "%zu %zu\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[7] = "%d %x\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[4] = "%x\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_PackedAligned, "s", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 7 : s8i
+    %4 = get_member %1[0] "a" : s8i*
+    store %3, %4, align 4
+    %5 = const 4660 : s32i
+    %6 = get_member %1[1] "b" : s32i*
+    store %5, %6, align 1
+    %7 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %8 = get_global @.str : s8i[9]*
+    %9 = cast(array_to_ptrdecay) %8 : s8i*
+    %10 = const 8 : u64i
+    %11 = const 4 : u64i
+    %12 = call @printf(%9, %10, %11) : s32i [all]
+    %13 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %14 = get_global @.str : s8i[9]*
+    %15 = cast(array_to_ptrdecay) %14 : s8i*
+    %16 = const 0 : u64i
+    %17 = const 1 : u64i
+    %18 = call @printf(%15, %16, %17) : s32i [all]
+    %19 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %20 = get_global @.str.1 : s8i[7]*
+    %21 = cast(array_to_ptrdecay) %20 : s8i*
+    %22 = get_member %1[0] "a" : s8i*
+    %23 = load %22 : s8i, align 4
+    %24 = cast(integral) %23 : s32i
+    %25 = get_member %1[1] "b" : s32i*
+    %26 = load %25 : s32i, align 1
+    %27 = call @printf(%21, %24, %26) : s32i [all]
+    %28 = get_member %1[1] "b" : s32i*
+    %29 = load %28 : s32i, align 1
+    %30 = const 1 : s32i
+    %31 = add %29, %30 : s32i [nsw]
+    %32 = get_member %1[1] "b" : s32i*
+    store %31, %32, align 1
+    %33 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %34 = get_global @.str.2 : s8i[4]*
+    %35 = cast(array_to_ptrdecay) %34 : s8i*
+    %36 = get_member %1[1] "b" : s32i*
+    %37 = load %36 : s32i, align 1
+    %38 = call @printf(%35, %37) : s32i [all]
+    %39 = const 0 : s32i
+    store %39, %0
+    %40 = load %0 : s32i
+    return %40
+}

@@ -1,0 +1,101 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr15262.c" (c, x86_64-unknown-linux-gnu)
+fn bar(%arg3: float*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: float*):
+        %46 = alloca float*, "p", align 8
+        store %arg3, %46
+        %47 = const 5.200000e+00 : double
+        %48 = cast(floating) %47 : float
+        %49 = load %46 : float*, align 8
+        store %48, %49, align 4
+        return
+}
+fn foo(%arg0: rec_A*, %arg1: s32i, %arg2: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_A*, %arg1: s32i, %arg2: s32i):
+        %15 = alloca rec_A*, "locp", align 8
+        %16 = alloca s32i, "i", align 4
+        %17 = alloca s32i, "str", align 4
+        %18 = alloca s32i, "__retval", align 4
+        %19 = alloca float, "f", align 4
+        %20 = alloca float, "g", align 4
+        %21 = alloca float*, "p", align 8
+        %22 = alloca s32i, "T355", align 4
+        %23 = alloca s32i*, "T356", align 8
+        store %arg0, %15
+        store %arg1, %16
+        store %arg2, %17
+        %24 = load %16 : s32i, align 4
+        %25 = cast(int_to_bool) %24 : bool
+        %26 = ternary %25 ? { : float*
+            yield %20
+        } : {
+            yield %19
+        }
+        store %26, %21, align 8
+        %27 = load %21 : float*, align 8
+        call @bar(%27) [all]
+        scope {
+            %40 = load %21 : float*, align 8
+            %41 = load %40 : float, align 4
+            %42 = cast(floating) %41 : double
+            %43 = const 0.000000e+00 : double
+            %44 = cmp gt %42, %43 : bool
+            if %44 {
+                %45 = const 1 : s32i
+                store %45, %17, align 4
+                yield
+            }
+            yield
+        }
+        %28 = load %15 : rec_A*, align 8
+        %29 = get_member %28[1] "i" : s32i*
+        %30 = load %29 : s32i, align 4
+        store %30, %22, align 4
+        %31 = load %15 : rec_A*, align 8
+        %32 = get_member %31[1] "i" : s32i*
+        store %32, %23, align 8
+        %33 = load %17 : s32i, align 4
+        %34 = load %23 : s32i*, align 8
+        store %33, %34, align 4
+        %35 = load %15 : rec_A*, align 8
+        %36 = get_member %35[1] "i" : s32i*
+        %37 = load %36 : s32i, align 4
+        store %37, %22, align 4
+        %38 = load %22 : s32i, align 4
+        store %38, %18
+        %39 = load %18 : s32i
+        return %39
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_A, "loc", align 4
+    %2 = alloca s32i, "str", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 2 : s32i
+    %5 = get_member %1[1] "i" : s32i*
+    store %4, %5, align 4
+    %6 = const 10 : s32i
+    %7 = const 3 : s32i
+    %8 = call @foo(%1, %6, %7) : s32i [all]
+    store %8, %2, align 4
+    scope {
+        %11 = load %2 : s32i, align 4
+        %12 = const 1 : s32i
+        %13 = cmp ne %11, %12 : bool
+        if %13 {
+            %14 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %9 = const 0 : s32i
+    store %9, %0
+    %10 = load %0 : s32i
+    return %10
+}

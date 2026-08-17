@@ -1,0 +1,64 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/990127-2.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn fpEq(%arg2: double, %arg3: double) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: double, %arg3: double):
+        %23 = alloca double, "x", align 8
+        %24 = alloca double, "y", align 8
+        store %arg2, %23
+        store %arg3, %24
+        scope {
+            %25 = load %23 : double, align 8
+            %26 = load %24 : double, align 8
+            %27 = cmp ne %25, %26 : bool
+            if %27 {
+                %28 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn fpTest(%arg0: double, %arg1: double) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: double, %arg1: double):
+        %7 = alloca double, "x", align 8
+        %8 = alloca double, "y", align 8
+        %9 = alloca double, "result1", align 8
+        %10 = alloca double, "result2", align 8
+        store %arg0, %7
+        store %arg1, %8
+        %11 = const 3.570000e+01 : double
+        %12 = const 1.000000e+02 : double
+        %13 = fmul %11, %12 : double
+        %14 = const 4.500000e+01 : double
+        %15 = fdiv %13, %14 : double
+        store %15, %9, align 8
+        %16 = load %7 : double, align 8
+        %17 = const 1.000000e+02 : double
+        %18 = fmul %16, %17 : double
+        %19 = load %8 : double, align 8
+        %20 = fdiv %18, %19 : double
+        store %20, %10, align 8
+        %21 = load %9 : double, align 8
+        %22 = load %10 : double, align 8
+        call @fpEq(%21, %22) [all]
+        return
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 3.570000e+01 : double
+    %3 = const 4.500000e+01 : double
+    call @fpTest(%2, %3) [all]
+    %4 = get_global @exit : ((s32i) -> void)*
+    %5 = const 0 : s32i
+    call @exit(%5) [all]
+    %6 = load %0 : s32i
+    return %6
+}

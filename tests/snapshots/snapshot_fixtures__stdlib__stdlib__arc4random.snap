@@ -1,0 +1,35 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/stdlib/arc4random.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[7] = "%u %u\n" [cir_private, default, align 1, dso_local, constant]
+
+fn arc4random() -> u32i [external, c, nothrow];
+fn arc4random_buf(%arg0: void*, %arg1: u64i) -> void [external, c, nothrow];
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn arc4random_uniform(%arg0: u32i) -> u32i [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u8i, "byte", align 1
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 7 : u8i
+    store %3, %1, align 1
+    %4 = call @arc4random() : u32i [all]
+    %5 = cast(bitcast) %1 : void*
+    %6 = const 0 : u64i
+    call @arc4random_buf(%5, %6) [all]
+    %7 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %8 = get_global @.str : s8i[7]*
+    %9 = cast(array_to_ptrdecay) %8 : s8i*
+    %10 = const 1 : u32i
+    %11 = call @arc4random_uniform(%10) : u32i [all]
+    %12 = load %1 : u8i, align 1
+    %13 = cast(integral) %12 : s32i
+    %14 = call @printf(%9, %11, %13) : s32i [all]
+    %15 = const 0 : s32i
+    store %15, %0
+    %16 = load %0 : s32i
+    return %16
+}

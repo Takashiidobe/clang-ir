@@ -1,0 +1,75 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.c-testsuite/case_00171.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[11] = "b is NULL\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[15] = "b is not NULL\n" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[11] = "c is NULL\n" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[15] = "c is not NULL\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "a", align 4
+    %2 = alloca s32i*, "b", align 8
+    %3 = alloca s32i*, "c", align 8
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 42 : s32i
+    store %5, %1, align 4
+    store %1, %2, align 8
+    %6 = const #cir.ptr<null> : s32i*
+    store %6, %3, align 8
+    %7 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %8 = get_global @.str : s8i[4]*
+    %9 = cast(array_to_ptrdecay) %8 : s8i*
+    %10 = load %2 : s32i*, align 8
+    %11 = load %10 : s32i, align 4
+    %12 = call @printf(%9, %11) : s32i [all]
+    scope {
+        %27 = load %2 : s32i*, align 8
+        %28 = const #cir.ptr<null> : void*
+        %29 = cast(bitcast) %28 : s32i*
+        %30 = cmp eq %27, %29 : bool
+        if %30 {
+            %35 = get_global @printf : ((s8i*, ...) -> s32i)*
+            %36 = get_global @.str.1 : s8i[11]*
+            %37 = cast(array_to_ptrdecay) %36 : s8i*
+            %38 = call @printf(%37) : s32i [all]
+            yield
+        } else {
+            %31 = get_global @printf : ((s8i*, ...) -> s32i)*
+            %32 = get_global @.str.2 : s8i[15]*
+            %33 = cast(array_to_ptrdecay) %32 : s8i*
+            %34 = call @printf(%33) : s32i [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %15 = load %3 : s32i*, align 8
+        %16 = const #cir.ptr<null> : void*
+        %17 = cast(bitcast) %16 : s32i*
+        %18 = cmp eq %15, %17 : bool
+        if %18 {
+            %23 = get_global @printf : ((s8i*, ...) -> s32i)*
+            %24 = get_global @.str.3 : s8i[11]*
+            %25 = cast(array_to_ptrdecay) %24 : s8i*
+            %26 = call @printf(%25) : s32i [all]
+            yield
+        } else {
+            %19 = get_global @printf : ((s8i*, ...) -> s32i)*
+            %20 = get_global @.str.4 : s8i[15]*
+            %21 = cast(array_to_ptrdecay) %20 : s8i*
+            %22 = call @printf(%21) : s32i [all]
+            yield
+        }
+        yield
+    }
+    %13 = const 0 : s32i
+    store %13, %0
+    %14 = load %0 : s32i
+    return %14
+}

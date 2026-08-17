@@ -1,0 +1,80 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr110252-1.c" (c, x86_64-unknown-linux-gnu)
+fn g(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %19 = alloca s32i, "min_need_stall", align 4
+        %20 = alloca s32i, "__retval", align 4
+        store %arg0, %19
+        %21 = load %19 : s32i, align 4
+        %22 = const 0 : s32i
+        %23 = cmp lt %21, %22 : bool
+        %24 = ternary %23 ? { : s32i
+            %32 = const 1 : s32i
+            yield %32
+        } : {
+            %26 = load %19 : s32i, align 4
+            %27 = const 1 : s32i
+            %28 = cmp lt %26, %27 : bool
+            %29 = ternary %28 ? { : s32i
+                %31 = load %19 : s32i, align 4
+                yield %31
+            } : {
+                %30 = const 1 : s32i
+                yield %30
+            }
+            yield %29
+        }
+        store %24, %20
+        %25 = load %20 : s32i
+        return %25
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %3 = alloca s32i, "i", align 4
+        %4 = const -100 : s32i
+        store %4, %3, align 4
+        for cond: {
+            %16 = load %3 : s32i, align 4
+            %17 = const 100 : s32i
+            %18 = cmp le %16, %17 : bool
+            condition %18
+        } step: {
+            %5 = load %3 : s32i, align 4
+            %6 = inc %5 : s32i [nsw]
+            store %6, %3, align 4
+            yield
+        } do {
+            scope {
+                %7 = alloca s32i, "t", align 4
+                %8 = load %3 : s32i, align 4
+                %9 = call @g(%8) : s32i [all]
+                store %9, %7, align 4
+                scope {
+                    %10 = load %7 : s32i, align 4
+                    %11 = load %3 : s32i, align 4
+                    %12 = const 0 : s32i
+                    %13 = cmp ne %11, %12 : bool
+                    %14 = cast(bool_to_int) %13 : s32i
+                    %15 = cmp ne %10, %14 : bool
+                    if %15 {
+                        call @abort() [all]
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %2 = load %0 : s32i
+    return %2
+}

@@ -1,0 +1,57 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/unsigned.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%u\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn uadd(%arg0: u32i, %arg1: u32i) -> u32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i, %arg1: u32i):
+        %25 = alloca u32i, "a", align 4
+        %26 = alloca u32i, "b", align 4
+        %27 = alloca u32i, "__retval", align 4
+        %28 = alloca u32i, "c", align 4
+        store %arg0, %25
+        store %arg1, %26
+        %29 = load %25 : u32i, align 4
+        %30 = load %26 : u32i, align 4
+        %31 = add %29, %30 : u32i
+        store %31, %28, align 4
+        %32 = load %28 : u32i, align 4
+        store %32, %27
+        %33 = load %27 : u32i
+        return %33
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u32i, "a", align 4
+    %2 = alloca u32i, "b", align 4
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 4000000000 : u32i
+    store %4, %1, align 4
+    %5 = const 500000000 : u32i
+    store %5, %2, align 4
+    %6 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %7 = get_global @.str : s8i[4]*
+    %8 = cast(array_to_ptrdecay) %7 : s8i*
+    %9 = load %1 : u32i, align 4
+    %10 = load %2 : u32i, align 4
+    %11 = call @uadd(%9, %10) : u32i [all]
+    %12 = call @printf(%8, %11) : s32i [all]
+    %13 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %14 = get_global @.str : s8i[4]*
+    %15 = cast(array_to_ptrdecay) %14 : s8i*
+    %16 = load %1 : u32i, align 4
+    %17 = call @printf(%15, %16) : s32i [all]
+    %18 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %19 = get_global @.str : s8i[4]*
+    %20 = cast(array_to_ptrdecay) %19 : s8i*
+    %21 = load %2 : u32i, align 4
+    %22 = call @printf(%20, %21) : s32i [all]
+    %23 = const 0 : s32i
+    store %23, %0
+    %24 = load %0 : s32i
+    return %24
+}

@@ -1,0 +1,96 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr43784.c" (c, x86_64-unknown-linux-gnu)
+global p : rec_s* = @v [internal, default, align 8, dso_local]
+global q : rec_s* = @v [internal, default, align 8, dso_local]
+global v : rec_u = zero [internal, default, align 4, dso_local]
+
+fn rp(%arg0: rec_s*) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_s*):
+        %37 = get_global @p : rec_s**
+        %38 = load %37 : rec_s*, align 8
+        copy %arg0, %38
+        return
+}
+fn qp() -> void [internal, c, no_inline, dso_local, nothrow] {
+    %35 = get_global @q : rec_s**
+    %36 = load %35 : rec_s*, align 8
+    call @rp(%36) [all]
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "i", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    scope {
+        %21 = const 0 : s32i
+        store %21, %1, align 4
+        for cond: {
+            %32 = load %1 : s32i, align 4
+            %33 = const 256 : s32i
+            %34 = cmp lt %32, %33 : bool
+            condition %34
+        } step: {
+            %22 = load %1 : s32i, align 4
+            %23 = inc %22 : s32i [nsw]
+            store %23, %1, align 4
+            yield
+        } do {
+            %24 = load %1 : s32i, align 4
+            %25 = cast(integral) %24 : u8i
+            %26 = load %1 : s32i, align 4
+            %27 = cast(integral) %26 : s64i
+            %28 = get_global @p : rec_s**
+            %29 = load %28 : rec_s*, align 8
+            %30 = get_member %29[0] "a" : u8i[256]*
+            %31 = get_element %30[%27] : u8i*
+            store %25, %31, align 1
+            yield
+        }
+        yield
+    }
+    call @qp() [all]
+    scope {
+        %5 = const 0 : s32i
+        store %5, %1, align 4
+        for cond: {
+            %18 = load %1 : s32i, align 4
+            %19 = const 256 : s32i
+            %20 = cmp lt %18, %19 : bool
+            condition %20
+        } step: {
+            %6 = load %1 : s32i, align 4
+            %7 = inc %6 : s32i [nsw]
+            store %7, %1, align 4
+            yield
+        } do {
+            scope {
+                %8 = load %1 : s32i, align 4
+                %9 = cast(integral) %8 : s64i
+                %10 = get_global @q : rec_s**
+                %11 = load %10 : rec_s*, align 8
+                %12 = get_member %11[0] "a" : u8i[256]*
+                %13 = get_element %12[%9] : u8i*
+                %14 = load %13 : u8i, align 1
+                %15 = cast(integral) %14 : s32i
+                %16 = load %1 : s32i, align 4
+                %17 = cmp ne %15, %16 : bool
+                if %17 {
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

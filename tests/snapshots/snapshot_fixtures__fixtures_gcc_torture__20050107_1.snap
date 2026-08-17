@@ -1,0 +1,55 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20050107-1.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn foo(%arg0: rec_S*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_S*):
+        %9 = alloca rec_S*, "x", align 8
+        store %arg0, %9
+        scope {
+            %10 = load %9 : rec_S*, align 8
+            %11 = get_member %10[0] "a" : u8i*
+            %12 = load %11 : u8i, align 1
+            %13 = cast(integral) %12 : s32i
+            %14 = const 1 : s32i
+            %15 = cmp ne %13, %14 : bool
+            %16 = ternary %15 ? { : bool
+                %24 = const #true : bool
+                yield %24
+            } : {
+                %18 = load %9 : rec_S*, align 8
+                %19 = get_member %18[1] "b" : u8i*
+                %20 = load %19 : u8i, align 1
+                %21 = cast(integral) %20 : s32i
+                %22 = const 2 : s32i
+                %23 = cmp ne %21, %22 : bool
+                yield %23
+            }
+            if %16 {
+                %17 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_S, "s", align 1
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 1 : u8i
+    %4 = get_member %1[0] "a" : u8i*
+    store %3, %4, align 1
+    %5 = const 2 : u8i
+    %6 = get_member %1[1] "b" : u8i*
+    store %5, %6, align 1
+    call @foo(%1) [all]
+    %7 = const 0 : s32i
+    store %7, %0
+    %8 = load %0 : s32i
+    return %8
+}

@@ -1,0 +1,63 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr71554.c" (c, x86_64-unknown-linux-gnu)
+global v : s32i = 0 [external, default, align 4, dso_local]
+
+fn bar() -> void [external, c, no_inline, dso_local, nothrow] {
+    %21 = get_global @v : s32i*
+    %22 = load %21 : s32i, align 4
+    %23 = inc %22 : s32i [nsw]
+    store %23, %21, align 4
+    return
+}
+fn foo(%arg0: u32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u32i):
+        %8 = alloca u32i, "x", align 4
+        %9 = alloca s32i, "y", align 4
+        %10 = alloca s32i, "r", align 4
+        store %arg0, %8
+        %11 = const -2147483647 : s32i
+        %12 = const 1 : s32i
+        %13 = sub %11, %12 : s32i [nsw]
+        %14 = const 2 : s32i
+        %15 = div %13, %14 : s32i
+        store %15, %9, align 4
+        scope {
+            %16 = load %8 : u32i, align 4
+            %17 = load %9 : s32i, align 4
+            %18 = cast(integral) %16 : s33
+            %19 = cast(integral) %17 : s33
+            <unmodeled: cir.mul.overflow>
+            store %20#0, %10, align 4
+            if %20#1 {
+                call @bar() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 2 : u32i
+    call @foo(%2) [all]
+    scope {
+        %5 = get_global @v : s32i*
+        %6 = load %5 : s32i, align 4
+        %7 = cast(int_to_bool) %6 : bool
+        if %7 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = load %0 : s32i
+    return %4
+}

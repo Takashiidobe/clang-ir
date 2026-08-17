@@ -1,0 +1,59 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr36691.c" (c, x86_64-unknown-linux-gnu)
+global g_5 : u8i = 0 [external, default, align 1, dso_local]
+
+fn func_1() -> void [external, c, no_inline, dso_local, nothrow] {
+    scope {
+        %10 = const 9 : u8i
+        %11 = get_global @g_5 : u8i*
+        store %10, %11, align 1
+        for cond: {
+            %18 = get_global @g_5 : u8i*
+            %19 = load %18 : u8i, align 1
+            %20 = cast(integral) %19 : s32i
+            %21 = const 4 : s32i
+            %22 = cmp ge %20, %21 : bool
+            condition %22
+        } step: {
+            %12 = const 5 : s32i
+            %13 = get_global @g_5 : u8i*
+            %14 = load %13 : u8i, align 1
+            %15 = cast(integral) %14 : s32i
+            %16 = sub %15, %12 : s32i [nsw]
+            %17 = cast(integral) %16 : u8i
+            store %17, %13, align 1
+            yield
+        } do {
+            yield
+        }
+        yield
+    }
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    call @func_1() [all]
+    scope {
+        %4 = get_global @g_5 : u8i*
+        %5 = load %4 : u8i, align 1
+        %6 = cast(integral) %5 : s32i
+        %7 = const 0 : s32i
+        %8 = cmp ne %6, %7 : bool
+        if %8 {
+            %9 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

@@ -1,0 +1,62 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/strct-pack-4.c" (c, x86_64-unknown-linux-gnu)
+fn my_set_a() -> u8i [external, c, no_inline, dso_local, nothrow] {
+    %26 = alloca u8i, "__retval", align 1
+    %27 = const 171 : u8i
+    store %27, %26
+    %28 = load %26 : u8i
+    return %28
+}
+fn my_set_b() -> u16i [external, c, no_inline, dso_local, nothrow] {
+    %23 = alloca u16i, "__retval", align 2
+    %24 = const 4660 : u16i
+    store %24, %23
+    %25 = load %23 : u16i
+    return %25
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_three_char_t, "three_char", align 1
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = call @my_set_a() : u8i [all]
+    %4 = get_member %1[0] "a" : u8i*
+    store %3, %4, align 1
+    %5 = call @my_set_b() : u16i [all]
+    %6 = get_member %1[1] "b" : u16i*
+    store %5, %6, align 1
+    scope {
+        %10 = get_member %1[0] "a" : u8i*
+        %11 = load %10 : u8i, align 1
+        %12 = cast(integral) %11 : s32i
+        %13 = const 171 : s32i
+        %14 = cmp ne %12, %13 : bool
+        %15 = ternary %14 ? { : bool
+            %22 = const #true : bool
+            yield %22
+        } : {
+            %17 = get_member %1[1] "b" : u16i*
+            %18 = load %17 : u16i, align 1
+            %19 = cast(integral) %18 : s32i
+            %20 = const 4660 : s32i
+            %21 = cmp ne %19, %20 : bool
+            yield %21
+        }
+        if %15 {
+            %16 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %7 = get_global @exit : ((s32i) -> void)*
+    %8 = const 0 : s32i
+    call @exit(%8) [all]
+    %9 = load %0 : s32i
+    return %9
+}

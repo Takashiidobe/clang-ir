@@ -1,0 +1,59 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr19449.c" (c, x86_64-unknown-linux-gnu)
+global z : s32i = 3 [external, default, align 4, dso_local]
+global y : s32i = 0 [external, default, align 4, dso_local]
+
+fn foo(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %20 = alloca s32i, "x", align 4
+        %21 = alloca s32i, "__retval", align 4
+        store %arg0, %20
+        %22 = const 3 : s32i
+        store %22, %21
+        %23 = load %21 : s32i
+        return %23
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = get_global @y : s32i*
+        %5 = load %4 : s32i, align 4
+        %6 = cast(int_to_bool) %5 : bool
+        %7 = ternary %6 ? { : bool
+            %19 = const #true : bool
+            yield %19
+        } : {
+            %15 = get_global @z : s32i*
+            %16 = load %15 : s32i, align 4
+            %17 = const 3 : s32i
+            %18 = cmp ne %16, %17 : bool
+            yield %18
+        }
+        %8 = ternary %7 ? { : bool
+            %14 = const #true : bool
+            yield %14
+        } : {
+            %10 = const 4 : s32i
+            %11 = call @foo(%10) : s32i [all]
+            %12 = const 3 : s32i
+            %13 = cmp ne %11, %12 : bool
+            yield %13
+        }
+        if %8 {
+            %9 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

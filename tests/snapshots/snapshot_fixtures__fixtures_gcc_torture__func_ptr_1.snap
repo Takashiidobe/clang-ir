@@ -1,0 +1,48 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/func-ptr-1.c" (c, x86_64-unknown-linux-gnu)
+global fp : ((float) -> double)* = #cir.ptr<null> [internal, default, align 8, dso_local]
+
+fn f(%arg0: float) -> double [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: float):
+        %15 = alloca float, "a", align 4
+        %16 = alloca double, "__retval", align 8
+        store %arg0, %15
+        %17 = load %15 : float, align 4
+        %18 = cast(floating) %17 : double
+        store %18, %16
+        %19 = load %16 : double
+        return %19
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @f : ((float) -> double)*
+    %3 = get_global @fp : ((float) -> double)**
+    store %2, %3, align 8
+    scope {
+        %7 = get_global @fp : ((float) -> double)**
+        %8 = load %7 : ((float) -> double)*, align 8
+        %9 = const 1 : s32i
+        %10 = cast(int_to_float) %9 : float
+        %11 = call %8(%10) : double [all]
+        %12 = const 1.000000e+00 : double
+        %13 = cmp ne %11, %12 : bool
+        if %13 {
+            %14 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %4 = get_global @exit : ((s32i) -> void)*
+    %5 = const 0 : s32i
+    call @exit(%5) [all]
+    %6 = load %0 : s32i
+    return %6
+}

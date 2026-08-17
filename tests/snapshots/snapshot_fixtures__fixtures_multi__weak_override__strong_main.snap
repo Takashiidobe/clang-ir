@@ -1,0 +1,32 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.multi/weak_override/strong_main.c" (c, x86_64-unknown-linux-gnu)
+global weak_global : s32i = 91 [external, default, align 4, dso_local]
+global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn fallback_value() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %11 = alloca s32i, "__retval", align 4
+    %12 = const 42 : s32i
+    store %12, %11
+    %13 = load %11 : s32i
+    return %13
+}
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[7]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = call @fallback_value() : s32i [all]
+    %6 = get_global @weak_global : s32i*
+    %7 = load %6 : s32i, align 4
+    %8 = call @printf(%4, %5, %7) : s32i [all]
+    %9 = const 0 : s32i
+    store %9, %0
+    %10 = load %0 : s32i
+    return %10
+}

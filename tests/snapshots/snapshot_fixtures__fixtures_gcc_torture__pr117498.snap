@@ -1,0 +1,126 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr117498.c" (c, x86_64-unknown-linux-gnu)
+global c : s32i = 1 [external, default, align 4, dso_local]
+global d : s32i = 0 [external, default, align 4, dso_local]
+global g : s8i = 0 [external, default, align 1, dso_local]
+global f : s32i = 0 [external, default, align 4, dso_local]
+global a : s32i = 0 [external, default, align 4, dso_local]
+
+fn foo() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %50 = alloca s32i, "__retval", align 4
+    scope {
+        %53 = get_global @c : s32i*
+        %54 = load %53 : s32i, align 4, volatile
+        %55 = const 0 : s32i
+        %56 = cmp eq %54, %55 : bool
+        if %56 {
+            %57 = const -1 : s32i
+            store %57, %50
+            %58 = load %50 : s32i
+            return %58
+        }
+        yield
+    }
+    %51 = const 1 : s32i
+    store %51, %50
+    %52 = load %50 : s32i
+    return %52
+}
+fn bar(%arg1: s32i, %arg2: s32i, %arg3: s8i*, %arg4: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i, %arg2: s32i, %arg3: s8i*, %arg4: s8i*):
+        %20 = alloca s32i, "h", align 4
+        %21 = alloca s32i, "i", align 4
+        %22 = alloca s8i*, "k", align 8
+        %23 = alloca s8i*, "m", align 8
+        store %arg1, %20
+        store %arg2, %21
+        store %arg3, %22
+        store %arg4, %23
+        scope {
+            for cond: {
+                %46 = get_global @d : s32i*
+                %47 = load %46 : s32i, align 4
+                %48 = load %21 : s32i, align 4
+                %49 = cmp lt %47, %48 : bool
+                condition %49
+            } step: {
+                %24 = const 2 : s32i
+                %25 = get_global @d : s32i*
+                %26 = load %25 : s32i, align 4
+                %27 = add %26, %24 : s32i [nsw]
+                store %27, %25, align 4
+                yield
+            } do {
+                scope {
+                    %28 = alloca s32i, "j", align 4
+                    %29 = const 0 : s32i
+                    store %29, %28, align 4
+                    for cond: {
+                        %43 = load %28 : s32i, align 4
+                        %44 = load %20 : s32i, align 4
+                        %45 = cmp lt %43, %44 : bool
+                        condition %45
+                    } step: {
+                        %30 = load %28 : s32i, align 4
+                        %31 = inc %30 : s32i [nsw]
+                        store %31, %28, align 4
+                        yield
+                    } do {
+                        %32 = const 4 : s32i
+                        %33 = load %28 : s32i, align 4
+                        %34 = mul %32, %33 : s32i [nsw]
+                        %35 = cast(integral) %34 : s64i
+                        %36 = load %22 : s8i*, align 8
+                        %37 = ptr_stride %36, %35 : s8i*
+                        %38 = load %37 : s8i, align 1
+                        %39 = load %28 : s32i, align 4
+                        %40 = cast(integral) %39 : s64i
+                        %41 = load %23 : s8i*, align 8
+                        %42 = ptr_stride %41, %40 : s8i*
+                        store %38, %42, align 1
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        return
+}
+fn baz(%arg0: s64i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s64i):
+        %13 = alloca s64i, "h", align 8
+        %14 = alloca s8i, "n", align 1
+        store %arg0, %13
+        %15 = const 0 : s8i
+        store %15, %14, align 1
+        %16 = load %13 : s64i, align 8
+        %17 = cast(integral) %16 : s32i
+        %18 = const 4 : s32i
+        %19 = get_global @g : s8i*
+        call @bar(%17, %18, %14, %19) [all]
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @foo : (() -> s32i)*
+    %3 = call @foo() : s32i [all]
+    %4 = get_global @f : s32i*
+    store %3, %4, align 4
+    %5 = get_global @f : s32i*
+    %6 = load %5 : s32i, align 4
+    %7 = cast(integral) %6 : u8i
+    %8 = cast(integral) %7 : s32i
+    %9 = const 4 : s32i
+    %10 = sub %8, %9 : s32i [nsw]
+    %11 = cast(integral) %10 : s64i
+    call @baz(%11) [all]
+    %12 = load %0 : s32i
+    return %12
+}

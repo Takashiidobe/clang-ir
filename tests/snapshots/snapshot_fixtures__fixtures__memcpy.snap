@@ -1,0 +1,204 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/memcpy.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.dyn_dst : u8i[8] = zero [cir_private, default, dso_local, constant]
+global __const.main.dyn_src : u8i[8] = [1, 1, 1, 1, 1, 1, 1, 1] [cir_private, default, dso_local, constant]
+global __const.main.alias_buf : u8i[8] = [1, 2, 3, 4, 5, 6, 7, 8] [cir_private, default, dso_local, constant]
+global __const.main.partial_dst : u8i[8] = zero [cir_private, default, dso_local, constant]
+global __const.main.partial_src : u8i[8] = [9, 8, 7, 6, 5, 4, 3, 2] [cir_private, default, dso_local, constant]
+global __const.main.full_dst : u8i[8] = zero [cir_private, default, dso_local, constant]
+global __const.main.full_src : u8i[8] = [1, 2, 3, 4, 5, 6, 7, 8] [cir_private, default, dso_local, constant]
+global .str : s8i[4] = "%d " [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[2] = "\n" [cir_private, default, align 1, dso_local, constant]
+
+fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
+fn get_count() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %119 = alloca s32i, "__retval", align 4
+    %120 = const 4 : s32i
+    store %120, %119
+    %121 = load %119 : s32i
+    return %121
+}
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u8i[8], "full_src", align 1
+    %2 = alloca u8i[8], "full_dst", align 1
+    %3 = alloca u8i[8], "partial_src", align 1
+    %4 = alloca u8i[8], "partial_dst", align 1
+    %5 = alloca u8i[8], "alias_buf", align 1
+    %6 = alloca u8i[8], "dyn_src", align 1
+    %7 = alloca u8i[8], "dyn_dst", align 1
+    %8 = alloca s32i, "n", align 4
+    %9 = const 0 : s32i
+    store %9, %0
+    %10 = get_global @__const.main.full_src : u8i[8]*
+    copy %1, %10
+    %11 = get_global @__const.main.full_dst : u8i[8]*
+    copy %2, %11
+    %12 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+    %13 = cast(array_to_ptrdecay) %2 : u8i*
+    %14 = cast(bitcast) %13 : void*
+    %15 = cast(array_to_ptrdecay) %1 : u8i*
+    %16 = cast(bitcast) %15 : void*
+    %17 = const 8 : u64i
+    %18 = call @memcpy(%14, %16, %17) : void* [all]
+    %19 = get_global @__const.main.partial_src : u8i[8]*
+    copy %3, %19
+    %20 = get_global @__const.main.partial_dst : u8i[8]*
+    copy %4, %20
+    %21 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+    %22 = cast(array_to_ptrdecay) %4 : u8i*
+    %23 = cast(bitcast) %22 : void*
+    %24 = cast(array_to_ptrdecay) %3 : u8i*
+    %25 = cast(bitcast) %24 : void*
+    %26 = const 4 : u64i
+    %27 = call @memcpy(%23, %25, %26) : void* [all]
+    %28 = get_global @__const.main.alias_buf : u8i[8]*
+    copy %5, %28
+    %29 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+    %30 = cast(array_to_ptrdecay) %5 : u8i*
+    %31 = cast(bitcast) %30 : void*
+    %32 = cast(array_to_ptrdecay) %5 : u8i*
+    %33 = const 4 : s32i
+    %34 = ptr_stride %32, %33 : u8i*
+    %35 = cast(bitcast) %34 : void*
+    %36 = const 4 : u64i
+    %37 = call @memcpy(%31, %35, %36) : void* [all]
+    %38 = get_global @__const.main.dyn_src : u8i[8]*
+    copy %6, %38
+    %39 = get_global @__const.main.dyn_dst : u8i[8]*
+    copy %7, %39
+    %40 = call @get_count() : s32i [all]
+    store %40, %8, align 4
+    %41 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+    %42 = cast(array_to_ptrdecay) %7 : u8i*
+    %43 = cast(bitcast) %42 : void*
+    %44 = cast(array_to_ptrdecay) %6 : u8i*
+    %45 = cast(bitcast) %44 : void*
+    %46 = load %8 : s32i, align 4
+    %47 = cast(integral) %46 : u64i
+    %48 = call @memcpy(%43, %45, %47) : void* [all]
+    scope {
+        %103 = alloca s32i, "i", align 4
+        %104 = const 0 : s32i
+        store %104, %103, align 4
+        for cond: {
+            %116 = load %103 : s32i, align 4
+            %117 = const 8 : s32i
+            %118 = cmp lt %116, %117 : bool
+            condition %118
+        } step: {
+            %105 = load %103 : s32i, align 4
+            %106 = inc %105 : s32i [nsw]
+            store %106, %103, align 4
+            yield
+        } do {
+            %107 = get_global @printf : ((s8i*, ...) -> s32i)*
+            %108 = get_global @.str : s8i[4]*
+            %109 = cast(array_to_ptrdecay) %108 : s8i*
+            %110 = load %103 : s32i, align 4
+            %111 = cast(integral) %110 : s64i
+            %112 = get_element %2[%111] : u8i*
+            %113 = load %112 : u8i, align 1
+            %114 = cast(integral) %113 : s32i
+            %115 = call @printf(%109, %114) : s32i [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %87 = alloca s32i, "i", align 4
+        %88 = const 0 : s32i
+        store %88, %87, align 4
+        for cond: {
+            %100 = load %87 : s32i, align 4
+            %101 = const 8 : s32i
+            %102 = cmp lt %100, %101 : bool
+            condition %102
+        } step: {
+            %89 = load %87 : s32i, align 4
+            %90 = inc %89 : s32i [nsw]
+            store %90, %87, align 4
+            yield
+        } do {
+            %91 = get_global @printf : ((s8i*, ...) -> s32i)*
+            %92 = get_global @.str : s8i[4]*
+            %93 = cast(array_to_ptrdecay) %92 : s8i*
+            %94 = load %87 : s32i, align 4
+            %95 = cast(integral) %94 : s64i
+            %96 = get_element %4[%95] : u8i*
+            %97 = load %96 : u8i, align 1
+            %98 = cast(integral) %97 : s32i
+            %99 = call @printf(%93, %98) : s32i [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %71 = alloca s32i, "i", align 4
+        %72 = const 0 : s32i
+        store %72, %71, align 4
+        for cond: {
+            %84 = load %71 : s32i, align 4
+            %85 = const 8 : s32i
+            %86 = cmp lt %84, %85 : bool
+            condition %86
+        } step: {
+            %73 = load %71 : s32i, align 4
+            %74 = inc %73 : s32i [nsw]
+            store %74, %71, align 4
+            yield
+        } do {
+            %75 = get_global @printf : ((s8i*, ...) -> s32i)*
+            %76 = get_global @.str : s8i[4]*
+            %77 = cast(array_to_ptrdecay) %76 : s8i*
+            %78 = load %71 : s32i, align 4
+            %79 = cast(integral) %78 : s64i
+            %80 = get_element %5[%79] : u8i*
+            %81 = load %80 : u8i, align 1
+            %82 = cast(integral) %81 : s32i
+            %83 = call @printf(%77, %82) : s32i [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %55 = alloca s32i, "i", align 4
+        %56 = const 0 : s32i
+        store %56, %55, align 4
+        for cond: {
+            %68 = load %55 : s32i, align 4
+            %69 = const 8 : s32i
+            %70 = cmp lt %68, %69 : bool
+            condition %70
+        } step: {
+            %57 = load %55 : s32i, align 4
+            %58 = inc %57 : s32i [nsw]
+            store %58, %55, align 4
+            yield
+        } do {
+            %59 = get_global @printf : ((s8i*, ...) -> s32i)*
+            %60 = get_global @.str : s8i[4]*
+            %61 = cast(array_to_ptrdecay) %60 : s8i*
+            %62 = load %55 : s32i, align 4
+            %63 = cast(integral) %62 : s64i
+            %64 = get_element %7[%63] : u8i*
+            %65 = load %64 : u8i, align 1
+            %66 = cast(integral) %65 : s32i
+            %67 = call @printf(%61, %66) : s32i [all]
+            yield
+        }
+        yield
+    }
+    %49 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %50 = get_global @.str.1 : s8i[2]*
+    %51 = cast(array_to_ptrdecay) %50 : s8i*
+    %52 = call @printf(%51) : s32i [all]
+    %53 = const 0 : s32i
+    store %53, %0
+    %54 = load %0 : s32i
+    return %54
+}

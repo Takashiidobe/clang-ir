@@ -1,0 +1,103 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/atomic_fallbacks.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.values : s32i[4] = [10, 20, 30, 40] [cir_private, default, dso_local, constant]
+global .str : s8i[30] = "%.2f %.2f %td %td %d %td %td\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca float, "f", align 4
+    %2 = alloca float, "old_f", align 4
+    %3 = alloca float, ".atomictmp", align 4
+    %4 = alloca float, "atomic-temp", align 4
+    %5 = alloca float, "now_f", align 4
+    %6 = alloca float, "atomic-temp", align 4
+    %7 = alloca s32i[4], "values", align 16
+    %8 = alloca s32i*, "p", align 8
+    %9 = alloca s32i*, "old_p", align 8
+    %10 = alloca s64i, ".atomictmp", align 8
+    %11 = alloca s32i*, "atomic-temp", align 8
+    %12 = alloca s32i*, "now_p", align 8
+    %13 = alloca s32i*, "atomic-temp", align 8
+    %14 = alloca s32i*, "old_x", align 8
+    %15 = alloca s32i*, ".atomictmp", align 8
+    %16 = alloca s32i*, "atomic-temp", align 8
+    %17 = alloca s32i*, "now_x", align 8
+    %18 = alloca s32i*, "atomic-temp", align 8
+    %19 = const 0 : s32i
+    store %19, %0
+    %20 = const 1.500000e+00 : float
+    store %20, %1, align 4
+    %21 = const 2.250000e+00 : float
+    store %21, %3, align 4
+    %22 = load %3 : float, align 4
+    <unmodeled: cir.atomic.fetch>
+    store %23, %4, align 4
+    %24 = load %4 : float, align 4
+    store %24, %2, align 4
+    %25 = load %1 : float, align 4
+    store %25, %6, align 4
+    %26 = load %6 : float, align 4
+    store %26, %5, align 4
+    %27 = get_global @__const.main.values : s32i[4]*
+    copy %7, %27
+    %28 = cast(array_to_ptrdecay) %7 : s32i*
+    store %28, %8, align 8
+    %29 = const 2 : s64i
+    %30 = const 4 : s64i
+    %31 = mul %29, %30 : s64i
+    store %31, %10, align 8
+    %32 = cast(bitcast) %8 : s64i*
+    %33 = load %10 : s64i, align 8
+    <unmodeled: cir.atomic.fetch>
+    %35 = cast(bitcast) %11 : s64i*
+    store %34, %35, align 8
+    %36 = load %11 : s32i*, align 8
+    store %36, %9, align 8
+    %37 = load %8 : s32i*, align 8
+    store %37, %13, align 8
+    %38 = load %13 : s32i*, align 8
+    store %38, %12, align 8
+    %39 = cast(array_to_ptrdecay) %7 : s32i*
+    %40 = const 1 : s32i
+    %41 = ptr_stride %39, %40 : s32i*
+    store %41, %15, align 8
+    %42 = load %15 : s32i*, align 8
+    <unmodeled: cir.atomic.xchg>
+    store %43, %16, align 8
+    %44 = load %16 : s32i*, align 8
+    store %44, %14, align 8
+    %45 = load %8 : s32i*, align 8
+    store %45, %18, align 8
+    %46 = load %18 : s32i*, align 8
+    store %46, %17, align 8
+    %47 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %48 = get_global @.str : s8i[30]*
+    %49 = cast(array_to_ptrdecay) %48 : s8i*
+    %50 = load %2 : float, align 4
+    %51 = cast(floating) %50 : double
+    %52 = load %5 : float, align 4
+    %53 = cast(floating) %52 : double
+    %54 = load %9 : s32i*, align 8
+    %55 = cast(array_to_ptrdecay) %7 : s32i*
+    %56 = ptr_diff %54, %55 : s64i
+    %57 = load %12 : s32i*, align 8
+    %58 = cast(array_to_ptrdecay) %7 : s32i*
+    %59 = ptr_diff %57, %58 : s64i
+    %60 = load %12 : s32i*, align 8
+    %61 = load %60 : s32i, align 4
+    %62 = load %14 : s32i*, align 8
+    %63 = cast(array_to_ptrdecay) %7 : s32i*
+    %64 = ptr_diff %62, %63 : s64i
+    %65 = load %17 : s32i*, align 8
+    %66 = cast(array_to_ptrdecay) %7 : s32i*
+    %67 = ptr_diff %65, %66 : s64i
+    %68 = call @printf(%49, %51, %53, %56, %59, %61, %64, %67) : s32i [all]
+    %69 = const 0 : s32i
+    store %69, %0
+    %70 = load %0 : s32i
+    return %70
+}

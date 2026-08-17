@@ -1,0 +1,70 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20030811-1.c" (c, x86_64-unknown-linux-gnu)
+global i0 : s32i[0] = zero [external, default, align 4, dso_local]
+global i1 : s32i = 0 [external, default, align 4, dso_local]
+
+fn vararg(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %32 = alloca s32i, "i", align 4
+        store %arg0, %32
+        %33 = load %32 : s32i, align 4
+        return
+}
+fn test1() -> void [external, c, no_inline, dso_local, nothrow] {
+    %25 = alloca s32i, "a", align 4
+    %26 = const 0 : u32i
+    <unmodeled: cir.return_address>
+    %28 = cast(ptr_to_int) %27 : s64i
+    %29 = cast(integral) %28 : s32i
+    store %29, %25, align 4
+    %30 = const 0 : s32i
+    %31 = load %25 : s32i, align 4
+    call @vararg(%30, %31) [all]
+    return
+}
+fn test2() -> void [external, c, no_inline, dso_local, nothrow] {
+    %18 = const 0 : u32i
+    <unmodeled: cir.return_address>
+    %20 = cast(ptr_to_int) %19 : s64i
+    %21 = cast(integral) %20 : s32i
+    %22 = const 0 : s64i
+    %23 = get_global @i0 : s32i[0]*
+    %24 = get_element %23[%22] : s32i*
+    store %21, %24, align 4
+    return
+}
+fn test3() -> void [external, c, no_inline, dso_local, nothrow] {
+    %13 = const 0 : u32i
+    <unmodeled: cir.return_address>
+    %15 = cast(ptr_to_int) %14 : s64i
+    %16 = cast(integral) %15 : s32i
+    %17 = get_global @i1 : s32i*
+    store %16, %17, align 4
+    return
+}
+fn test4() -> void [external, c, no_inline, dso_local, nothrow] {
+    %4 = alloca s64i, "a", align 8
+    %5 = const 0 : u32i
+    <unmodeled: cir.return_address>
+    %7 = cast(ptr_to_int) %6 : s64i
+    store %7, %4, align 8, volatile
+    %8 = load %4 : s64i, align 8, volatile
+    %9 = cast(integral) %8 : s32i
+    %10 = const 0 : s64i
+    %11 = get_global @i0 : s32i[0]*
+    %12 = get_element %11[%10] : s32i*
+    store %9, %12, align 4
+    return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

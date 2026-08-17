@@ -1,0 +1,164 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr65215-3.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.s : rec_S = {18369548087902252478} [cir_private, default, dso_local, constant]
+
+fn foo(%arg1: u32i) -> u32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: u32i):
+        %83 = alloca u32i, "x", align 4
+        %84 = alloca u32i, "__retval", align 4
+        store %arg1, %83
+        %85 = load %83 : u32i, align 4
+        %86 = const 24 : s32i
+        %87 = shift right %85, %86 : u32i
+        %88 = load %83 : u32i, align 4
+        %89 = const 8 : s32i
+        %90 = shift right %88, %89 : u32i
+        %91 = const 65280 : u32i
+        %92 = and %90, %91 : u32i
+        %93 = or %87, %92 : u32i
+        %94 = load %83 : u32i, align 4
+        %95 = const 8 : s32i
+        %96 = shift left %94, %95 : u32i
+        %97 = const 16711680 : u32i
+        %98 = and %96, %97 : u32i
+        %99 = or %93, %98 : u32i
+        %100 = load %83 : u32i, align 4
+        %101 = const 24 : s32i
+        %102 = shift left %100, %101 : u32i
+        %103 = or %99, %102 : u32i
+        store %103, %84
+        %104 = load %84 : u32i
+        return %104
+}
+fn bar(%arg0: rec_S*) -> u64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_S*):
+        %54 = alloca rec_S*, "x", align 8
+        %55 = alloca u64i, "__retval", align 8
+        %56 = alloca u64i, "x1", align 8
+        %57 = alloca u64i, "x2", align 8
+        store %arg0, %54
+        %58 = load %54 : rec_S*, align 8
+        %59 = get_member %58[0] "l1" : u64i*
+        <unmodeled: cir.get_bitfield>
+        %61 = cast(integral) %60 : u32i
+        %62 = const 8 : s32i
+        %63 = shift left %61, %62 : u32i
+        %64 = load %54 : rec_S*, align 8
+        %65 = get_member %64[0] "l2" : u64i*
+        <unmodeled: cir.get_bitfield>
+        %67 = cast(integral) %66 : u32i
+        %68 = or %63, %67 : u32i
+        %69 = call @foo(%68) : u32i [all]
+        %70 = cast(integral) %69 : u64i
+        store %70, %56, align 8
+        %71 = load %54 : rec_S*, align 8
+        %72 = get_member %71[0] "l3" : u64i*
+        <unmodeled: cir.get_bitfield>
+        %74 = cast(integral) %73 : u32i
+        %75 = call @foo(%74) : u32i [all]
+        %76 = cast(integral) %75 : u64i
+        store %76, %57, align 8
+        %77 = load %57 : u64i, align 8
+        %78 = const 32 : s32i
+        %79 = shift left %77, %78 : u64i
+        %80 = load %56 : u64i, align 8
+        %81 = or %79, %80 : u64i
+        store %81, %55
+        %82 = load %55 : u64i
+        return %82
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_S, "s", align 8
+    %2 = alloca u64i, "l", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    scope {
+        %39 = const 8 : s32i
+        %40 = const 8 : s32i
+        %41 = cmp ne %39, %40 : bool
+        %42 = ternary %41 ? { : bool
+            %53 = const #true : bool
+            yield %53
+        } : {
+            %50 = const 4 : u64i
+            %51 = const 4 : u64i
+            %52 = cmp ne %50, %51 : bool
+            yield %52
+        }
+        %43 = ternary %42 ? { : bool
+            %49 = const #true : bool
+            yield %49
+        } : {
+            %46 = const 8 : u64i
+            %47 = const 8 : u64i
+            %48 = cmp ne %46, %47 : bool
+            yield %48
+        }
+        if %43 {
+            %44 = const 0 : s32i
+            store %44, %0
+            %45 = load %0 : s32i
+            return %45
+        }
+        yield
+    }
+    %4 = get_global @__const.main.s : rec_S*
+    copy %1, %4
+    %5 = call @bar(%1) : u64i [all]
+    store %5, %2, align 8
+    scope {
+        %8 = load %2 : u64i, align 8
+        %9 = const 32 : s32i
+        %10 = shift right %8, %9 : u64i
+        %11 = cast(integral) %10 : u32i
+        %12 = call @foo(%11) : u32i [all]
+        %13 = get_member %1[0] "l3" : u64i*
+        <unmodeled: cir.get_bitfield>
+        %15 = cast(integral) %14 : u32i
+        %16 = cmp ne %12, %15 : bool
+        %17 = ternary %16 ? { : bool
+            %38 = const #true : bool
+            yield %38
+        } : {
+            %29 = load %2 : u64i, align 8
+            %30 = cast(integral) %29 : u32i
+            %31 = call @foo(%30) : u32i [all]
+            %32 = const 8 : s32i
+            %33 = shift right %31, %32 : u32i
+            %34 = get_member %1[0] "l1" : u64i*
+            <unmodeled: cir.get_bitfield>
+            %36 = cast(integral) %35 : u32i
+            %37 = cmp ne %33, %36 : bool
+            yield %37
+        }
+        %18 = ternary %17 ? { : bool
+            %28 = const #true : bool
+            yield %28
+        } : {
+            %19 = load %2 : u64i, align 8
+            %20 = cast(integral) %19 : u32i
+            %21 = call @foo(%20) : u32i [all]
+            %22 = const 255 : u32i
+            %23 = and %21, %22 : u32i
+            %24 = get_member %1[0] "l2" : u64i*
+            <unmodeled: cir.get_bitfield>
+            %26 = cast(integral) %25 : u32i
+            %27 = cmp ne %23, %26 : bool
+            yield %27
+        }
+        if %18 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = load %0 : s32i
+    return %7
+}

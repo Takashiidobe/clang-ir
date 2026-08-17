@@ -1,0 +1,121 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/vrp-6.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn test01(%arg4: u32i, %arg5: u32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: u32i, %arg5: u32i):
+        %35 = alloca u32i, "a", align 4
+        %36 = alloca u32i, "b", align 4
+        store %arg4, %35
+        store %arg5, %36
+        scope {
+            %47 = load %35 : u32i, align 4
+            %48 = const 5 : u32i
+            %49 = cmp lt %47, %48 : bool
+            if %49 {
+                %50 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %43 = load %36 : u32i, align 4
+            %44 = const 5 : u32i
+            %45 = cmp lt %43, %44 : bool
+            if %45 {
+                %46 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %37 = load %35 : u32i, align 4
+            %38 = load %36 : u32i, align 4
+            %39 = sub %37, %38 : u32i
+            %40 = const 5 : u32i
+            %41 = cmp ne %39, %40 : bool
+            if %41 {
+                %42 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn test02(%arg2: u32i, %arg3: u32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: u32i, %arg3: u32i):
+        %15 = alloca u32i, "a", align 4
+        %16 = alloca u32i, "b", align 4
+        store %arg2, %15
+        store %arg3, %16
+        scope {
+            %17 = load %15 : u32i, align 4
+            %18 = const 12 : u32i
+            %19 = cmp ge %17, %18 : bool
+            if %19 {
+                scope {
+                    %20 = load %16 : u32i, align 4
+                    %21 = const 15 : u32i
+                    %22 = cmp gt %20, %21 : bool
+                    if %22 {
+                        scope {
+                            %23 = load %15 : u32i, align 4
+                            %24 = load %16 : u32i, align 4
+                            %25 = sub %23, %24 : u32i
+                            %26 = const 2147483647 : u32i
+                            %27 = const 2 : u32i
+                            %28 = mul %26, %27 : u32i
+                            %29 = const 1 : u32i
+                            %30 = add %28, %29 : u32i
+                            %31 = const 15 : u32i
+                            %32 = sub %30, %31 : u32i
+                            %33 = cmp lt %25, %32 : bool
+                            if %33 {
+                                %34 = get_global @abort : (() -> void)*
+                                call @abort() [all]
+                                yield
+                            }
+                            yield
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        return
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s8i**):
+        %0 = alloca s32i, "argc", align 4
+        %1 = alloca s8i**, "argv", align 8
+        %2 = alloca s32i, "__retval", align 4
+        %3 = alloca u32i, "x", align 4
+        store %arg0, %0
+        store %arg1, %1
+        %4 = const 0 : s32i
+        store %4, %2
+        %5 = const 2147483648 : u32i
+        store %5, %3, align 4
+        %6 = load %3 : u32i, align 4
+        %7 = const 5 : u32i
+        %8 = add %6, %7 : u32i
+        %9 = load %3 : u32i, align 4
+        call @test01(%8, %9) [all]
+        %10 = const 14 : u32i
+        %11 = const 16 : u32i
+        call @test02(%10, %11) [all]
+        %12 = get_global @exit : ((s32i) -> void)*
+        %13 = const 0 : s32i
+        call @exit(%13) [all]
+        %14 = load %2 : s32i
+        return %14
+}

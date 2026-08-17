@@ -1,0 +1,125 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/loop_break_continue.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn grid(%arg0: s32i, %arg1: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s32i):
+        %18 = alloca s32i, "rows", align 4
+        %19 = alloca s32i, "cols", align 4
+        %20 = alloca s32i, "__retval", align 4
+        %21 = alloca s32i, "total", align 4
+        store %arg0, %18
+        store %arg1, %19
+        %22 = const 0 : s32i
+        store %22, %21, align 4
+        scope {
+            %25 = alloca s32i, "r", align 4
+            %26 = const 0 : s32i
+            store %26, %25, align 4
+            for cond: {
+                %52 = load %25 : s32i, align 4
+                %53 = load %18 : s32i, align 4
+                %54 = cmp lt %52, %53 : bool
+                condition %54
+            } step: {
+                %27 = load %25 : s32i, align 4
+                %28 = inc %27 : s32i [nsw]
+                store %28, %25, align 4
+                yield
+            } do {
+                scope {
+                    scope {
+                        %32 = alloca s32i, "c", align 4
+                        %33 = const 0 : s32i
+                        store %33, %32, align 4
+                        for cond: {
+                            %49 = load %32 : s32i, align 4
+                            %50 = load %19 : s32i, align 4
+                            %51 = cmp lt %49, %50 : bool
+                            condition %51
+                        } step: {
+                            %34 = load %32 : s32i, align 4
+                            %35 = inc %34 : s32i [nsw]
+                            store %35, %32, align 4
+                            yield
+                        } do {
+                            scope {
+                                scope {
+                                    %46 = load %32 : s32i, align 4
+                                    %47 = load %25 : s32i, align 4
+                                    %48 = cmp eq %46, %47 : bool
+                                    if %48 {
+                                        continue
+                                    }
+                                    yield
+                                }
+                                scope {
+                                    %43 = load %32 : s32i, align 4
+                                    %44 = const 4 : s32i
+                                    %45 = cmp gt %43, %44 : bool
+                                    if %45 {
+                                        break
+                                    }
+                                    yield
+                                }
+                                %36 = load %25 : s32i, align 4
+                                %37 = load %19 : s32i, align 4
+                                %38 = mul %36, %37 : s32i [nsw]
+                                %39 = load %32 : s32i, align 4
+                                %40 = add %38, %39 : s32i [nsw]
+                                %41 = load %21 : s32i, align 4
+                                %42 = add %41, %40 : s32i [nsw]
+                                store %42, %21, align 4
+                                yield
+                            }
+                            yield
+                        }
+                        yield
+                    }
+                    scope {
+                        %29 = load %25 : s32i, align 4
+                        %30 = const 6 : s32i
+                        %31 = cmp gt %29, %30 : bool
+                        if %31 {
+                            break
+                        }
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %23 = load %21 : s32i, align 4
+        store %23, %20
+        %24 = load %20 : s32i
+        return %24
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[4]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 8 : s32i
+    %6 = const 8 : s32i
+    %7 = call @grid(%5, %6) : s32i [all]
+    %8 = call @printf(%4, %7) : s32i [all]
+    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %10 = get_global @.str : s8i[4]*
+    %11 = cast(array_to_ptrdecay) %10 : s8i*
+    %12 = const 3 : s32i
+    %13 = const 3 : s32i
+    %14 = call @grid(%12, %13) : s32i [all]
+    %15 = call @printf(%11, %14) : s32i [all]
+    %16 = const 0 : s32i
+    store %16, %0
+    %17 = load %0 : s32i
+    return %17
+}

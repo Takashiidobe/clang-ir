@@ -1,0 +1,56 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr71626-2.c" (c, x86_64-unknown-linux-gnu)
+fn foo() -> double [external, c, no_inline, dso_local, nothrow] {
+    %18 = alloca vector<1 x s64i>, "coerce", align 8
+    %19 = alloca vector<1 x s64i>, "__retval", align 8
+    %20 = alloca vector<1 x s64i>, "v", align 8
+    %21 = get_global @foo : (() -> double)*
+    %22 = cast(bitcast) %21 : (() -> vector<1 x s64i>)*
+    %23 = cast(bitcast) %22 : ((...) -> vector<1 x s64i>)*
+    %24 = cast(ptr_to_int) %23 : s64i
+    <unmodeled: cir.vec.create>
+    store %25, %20, align 8
+    %26 = load %20 : vector<1 x s64i>, align 8
+    store %26, %19
+    %27 = load %19 : vector<1 x s64i>
+    store %27, %18
+    %28 = cast(bitcast) %18 : double*
+    %29 = load %28 : double
+    return %29
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca double, "coerce", align 8
+    %1 = alloca s32i, "__retval", align 4
+    %2 = alloca vector<1 x s64i>, "v", align 8
+    %3 = const 0 : s32i
+    store %3, %1
+    %4 = get_global @foo : (() -> double)*
+    %5 = call @foo() : double [all]
+    store %5, %0
+    %6 = cast(bitcast) %0 : vector<1 x s64i>*
+    %7 = load %6 : vector<1 x s64i>
+    store %7, %2, align 8
+    scope {
+        %10 = load %2 : vector<1 x s64i>, align 8
+        %11 = const 0 : s32i
+        <unmodeled: cir.vec.extract>
+        %13 = get_global @foo : (() -> double)*
+        %14 = cast(bitcast) %13 : (() -> vector<1 x s64i>)*
+        %15 = cast(bitcast) %14 : ((...) -> vector<1 x s64i>)*
+        %16 = cast(ptr_to_int) %15 : s64i
+        %17 = cmp ne %12, %16 : bool
+        if %17 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %8 = const 0 : s32i
+    store %8, %1
+    %9 = load %1 : s32i
+    return %9
+}

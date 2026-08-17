@@ -1,0 +1,45 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20120111-1.c" (c, x86_64-unknown-linux-gnu)
+fn f0a(%arg0: u64i) -> u32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u64i):
+        %11 = alloca u64i, "arg", align 8
+        %12 = alloca u32i, "__retval", align 4
+        store %arg0, %11
+        %13 = load %11 : u64i, align 8
+        %14 = const 18446744073709551613 : u64i
+        %15 = cmp gt %13, %14 : bool
+        %16 = cast(bool_to_int) %15 : s32i
+        %17 = cast(integral) %16 : u32i
+        %18 = not %17 : u32i
+        store %18, %12
+        %19 = load %12 : u32i
+        return %19
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u32i, "r1", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 12094370573988097329 : u64i
+    %4 = call @f0a(%3) : u32i [all]
+    store %4, %1, align 4
+    scope {
+        %7 = load %1 : u32i, align 4
+        %8 = const 4294967295 : u32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            %10 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = load %0 : s32i
+    return %6
+}

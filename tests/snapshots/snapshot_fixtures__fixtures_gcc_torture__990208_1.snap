@@ -1,0 +1,70 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/990208-1.c" (c, x86_64-unknown-linux-gnu)
+global i : s32i = 1 [internal, default, align 4, dso_local]
+global ptr1 : void* = #cir.ptr<null> [internal, default, align 8, dso_local]
+global ptr2 : void* = #cir.ptr<null> [internal, default, align 8, dso_local]
+
+fn doit(%arg2: void**, %arg3: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: void**, %arg3: s32i):
+        %15 = alloca void**, "pptr", align 8
+        %16 = alloca s32i, "cond", align 4
+        store %arg2, %15
+        store %arg3, %16
+        scope {
+            %17 = load %16 : s32i, align 4
+            %18 = cast(int_to_bool) %17 : bool
+            if %18 {
+                br ^bb1
+                ^bb1():
+                    label here:
+                    <unmodeled: cir.block_address>
+                    %20 = load %15 : void**, align 8
+                    store %19, %20, align 8
+                    yield
+            }
+            yield
+        }
+        return
+}
+fn f(%arg1: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i):
+        %12 = alloca s32i, "cond", align 4
+        store %arg1, %12
+        %13 = get_global @ptr1 : void**
+        %14 = load %12 : s32i, align 4
+        call @doit(%13, %14) [all]
+        return
+}
+fn bar() -> void [internal, c, no_inline, dso_local, nothrow] {
+    return
+}
+fn g(%arg0: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %9 = alloca s32i, "cond", align 4
+        store %arg0, %9
+        %10 = get_global @ptr2 : void**
+        %11 = load %9 : s32i, align 4
+        call @doit(%10, %11) [all]
+        return
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @i : s32i*
+    %3 = load %2 : s32i, align 4
+    call @f(%3) [all]
+    call @bar() [all]
+    %4 = get_global @i : s32i*
+    %5 = load %4 : s32i, align 4
+    call @g(%5) [all]
+    %6 = get_global @exit : ((s32i) -> void)*
+    %7 = const 0 : s32i
+    call @exit(%7) [all]
+    %8 = load %0 : s32i
+    return %8
+}

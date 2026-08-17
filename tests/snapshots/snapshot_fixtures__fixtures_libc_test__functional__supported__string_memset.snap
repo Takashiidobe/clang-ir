@@ -1,0 +1,454 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/string_memset.c" (c, x86_64-unknown-linux-gnu)
+global t_status : s32i = 0 [external, default, align 4, dso_local]
+global pmemset : ((void*, s32i, u64i) -> void*)* = #cir.ptr<null> [internal, default, align 8, dso_local]
+global buf : s8i[500] = zero [internal, default, align 16, dso_local]
+global buf2 : s8i[500] = zero [internal, default, align 16, dso_local]
+global .str : s8i[129] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/string_memset.c:86: memset(%p,...) returned %p\n" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[145] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/string_memset.c:89: memset(align %d, '#', %d) failed at pos %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[14] = "got : '%.*s'\n" [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[14] = "want: '%.*s'\n" [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[129] = "/home/takashi/Projects/clang-ir-rs/tests/fixtures.libc-test/functional/supported/string_memset.c:102: memset(%d) failed: got %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn vsnprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec___va_list_tag*) -> s32i [external, c, nothrow];
+fn write(%arg0: s32i, %arg1: void*, %arg2: u64i) -> s64i [external, c];
+fn t_printf(%arg4: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: s8i*):
+        %213 = alloca s8i*, "s", align 8
+        %214 = alloca s32i, "__retval", align 4
+        %215 = alloca rec___va_list_tag[1], "ap", align 16
+        %216 = alloca s8i[512], "buf", align 16
+        %217 = alloca s32i, "n", align 4
+        store %arg4, %213
+        %218 = const 1 : s32i
+        %219 = get_global @t_status : s32i*
+        store %218, %219, align 4, volatile
+        %220 = cast(array_to_ptrdecay) %215 : rec___va_list_tag*
+        <unmodeled: cir.va_start>
+        %221 = get_global @vsnprintf : ((s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i)*
+        %222 = cast(array_to_ptrdecay) %216 : s8i*
+        %223 = const 512 : u64i
+        %224 = load %213 : s8i*, align 8
+        %225 = cast(array_to_ptrdecay) %215 : rec___va_list_tag*
+        %226 = call @vsnprintf(%222, %223, %224, %225) : s32i [all]
+        store %226, %217, align 4
+        %227 = cast(array_to_ptrdecay) %215 : rec___va_list_tag*
+        <unmodeled: cir.va_end>
+        scope {
+            %236 = load %217 : s32i, align 4
+            %237 = const 0 : s32i
+            %238 = cmp lt %236, %237 : bool
+            if %238 {
+                %268 = const 0 : s32i
+                store %268, %217, align 4
+                yield
+            } else {
+                scope {
+                    %239 = load %217 : s32i, align 4
+                    %240 = cast(integral) %239 : u64i
+                    %241 = const 512 : u64i
+                    %242 = cmp ge %240, %241 : bool
+                    if %242 {
+                        %243 = const 512 : s32i
+                        store %243, %217, align 4
+                        %244 = const 10 : s8i
+                        %245 = load %217 : s32i, align 4
+                        %246 = const 1 : s32i
+                        %247 = sub %245, %246 : s32i [nsw]
+                        %248 = cast(integral) %247 : s64i
+                        %249 = get_element %216[%248] : s8i*
+                        store %244, %249, align 1
+                        %250 = const 46 : s8i
+                        %251 = load %217 : s32i, align 4
+                        %252 = const 2 : s32i
+                        %253 = sub %251, %252 : s32i [nsw]
+                        %254 = cast(integral) %253 : s64i
+                        %255 = get_element %216[%254] : s8i*
+                        store %250, %255, align 1
+                        %256 = const 46 : s8i
+                        %257 = load %217 : s32i, align 4
+                        %258 = const 3 : s32i
+                        %259 = sub %257, %258 : s32i [nsw]
+                        %260 = cast(integral) %259 : s64i
+                        %261 = get_element %216[%260] : s8i*
+                        store %256, %261, align 1
+                        %262 = const 46 : s8i
+                        %263 = load %217 : s32i, align 4
+                        %264 = const 4 : s32i
+                        %265 = sub %263, %264 : s32i [nsw]
+                        %266 = cast(integral) %265 : s64i
+                        %267 = get_element %216[%266] : s8i*
+                        store %262, %267, align 1
+                        yield
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        %228 = const 1 : s32i
+        %229 = cast(array_to_ptrdecay) %216 : s8i*
+        %230 = cast(bitcast) %229 : void*
+        %231 = load %217 : s32i, align 4
+        %232 = cast(integral) %231 : u64i
+        %233 = call @write(%228, %230, %232) : s64i [all]
+        %234 = cast(integral) %233 : s32i
+        store %234, %214
+        %235 = load %214 : s32i
+        return %235
+}
+fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
+fn aligned(%arg3: void*) -> s8i* [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: void*):
+        %203 = alloca void*, "p", align 8
+        %204 = alloca s8i*, "__retval", align 8
+        store %arg3, %203
+        %205 = load %203 : void*, align 8
+        %206 = cast(ptr_to_int) %205 : u64i
+        %207 = const 63 : u64i
+        %208 = add %206, %207 : u64i
+        %209 = const 18446744073709551552 : u64i
+        %210 = and %208, %209 : u64i
+        %211 = cast(int_to_ptr) %210 : s8i*
+        store %211, %204
+        %212 = load %204 : s8i*
+        return %212
+}
+fn abort() -> void [external, c, nothrow];
+fn test_align(%arg1: s32i, %arg2: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg1: s32i, %arg2: s32i):
+        %68 = alloca s32i, "align", align 4
+        %69 = alloca s32i, "len", align 4
+        %70 = alloca s8i*, "s", align 8
+        %71 = alloca s8i*, "want", align 8
+        %72 = alloca s8i*, "p", align 8
+        %73 = alloca s32i, "i", align 4
+        store %arg1, %68
+        store %arg2, %69
+        %74 = get_global @buf : s8i[500]*
+        %75 = cast(array_to_ptrdecay) %74 : s8i*
+        %76 = const 64 : s32i
+        %77 = ptr_stride %75, %76 : s8i*
+        %78 = cast(bitcast) %77 : void*
+        %79 = call @aligned(%78) : s8i* [all]
+        %80 = load %68 : s32i, align 4
+        %81 = ptr_stride %79, %80 : s8i*
+        store %81, %70, align 8
+        %82 = get_global @buf2 : s8i[500]*
+        %83 = cast(array_to_ptrdecay) %82 : s8i*
+        %84 = const 64 : s32i
+        %85 = ptr_stride %83, %84 : s8i*
+        %86 = cast(bitcast) %85 : void*
+        %87 = call @aligned(%86) : s8i* [all]
+        %88 = load %68 : s32i, align 4
+        %89 = ptr_stride %87, %88 : s8i*
+        store %89, %71, align 8
+        scope {
+            %178 = load %69 : s32i, align 4
+            %179 = const 64 : s32i
+            %180 = add %178, %179 : s32i [nsw]
+            %181 = cast(integral) %180 : s64i
+            %182 = get_global @buf : s8i[500]*
+            %183 = cast(array_to_ptrdecay) %182 : s8i*
+            %184 = const 500 : s32i
+            %185 = ptr_stride %183, %184 : s8i*
+            %186 = load %70 : s8i*, align 8
+            %187 = ptr_diff %185, %186 : s64i
+            %188 = cmp gt %181, %187 : bool
+            %189 = ternary %188 ? { : bool
+                %202 = const #true : bool
+                yield %202
+            } : {
+                %191 = load %69 : s32i, align 4
+                %192 = const 64 : s32i
+                %193 = add %191, %192 : s32i [nsw]
+                %194 = cast(integral) %193 : s64i
+                %195 = get_global @buf2 : s8i[500]*
+                %196 = cast(array_to_ptrdecay) %195 : s8i*
+                %197 = const 500 : s32i
+                %198 = ptr_stride %196, %197 : s8i*
+                %199 = load %71 : s8i*, align 8
+                %200 = ptr_diff %198, %199 : s64i
+                %201 = cmp gt %194, %200 : bool
+                yield %201
+            }
+            if %189 {
+                %190 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %163 = const 0 : s32i
+            store %163, %73, align 4
+            for cond: {
+                %175 = load %73 : s32i, align 4
+                %176 = const 500 : s32i
+                %177 = cmp lt %175, %176 : bool
+                condition %177
+            } step: {
+                %164 = load %73 : s32i, align 4
+                %165 = inc %164 : s32i [nsw]
+                store %165, %73, align 4
+                yield
+            } do {
+                %166 = const 32 : s8i
+                %167 = load %73 : s32i, align 4
+                %168 = cast(integral) %167 : s64i
+                %169 = get_global @buf2 : s8i[500]*
+                %170 = get_element %169[%168] : s8i*
+                store %166, %170, align 1
+                %171 = load %73 : s32i, align 4
+                %172 = cast(integral) %171 : s64i
+                %173 = get_global @buf : s8i[500]*
+                %174 = get_element %173[%172] : s8i*
+                store %166, %174, align 1
+                yield
+            }
+            yield
+        }
+        scope {
+            %152 = const 0 : s32i
+            store %152, %73, align 4
+            for cond: {
+                %160 = load %73 : s32i, align 4
+                %161 = load %69 : s32i, align 4
+                %162 = cmp lt %160, %161 : bool
+                condition %162
+            } step: {
+                %153 = load %73 : s32i, align 4
+                %154 = inc %153 : s32i [nsw]
+                store %154, %73, align 4
+                yield
+            } do {
+                %155 = const 35 : s8i
+                %156 = load %73 : s32i, align 4
+                %157 = cast(integral) %156 : s64i
+                %158 = load %71 : s8i*, align 8
+                %159 = ptr_stride %158, %157 : s8i*
+                store %155, %159, align 1
+                yield
+            }
+            yield
+        }
+        %90 = get_global @pmemset : ((void*, s32i, u64i) -> void*)**
+        %91 = load %90 : ((void*, s32i, u64i) -> void*)*, align 8, volatile
+        %92 = load %70 : s8i*, align 8
+        %93 = cast(bitcast) %92 : void*
+        %94 = const 35 : s32i
+        %95 = load %69 : s32i, align 4
+        %96 = cast(integral) %95 : u64i
+        %97 = call %91(%93, %94, %96) : void* [all]
+        %98 = cast(bitcast) %97 : s8i*
+        store %98, %72, align 8
+        scope {
+            %144 = load %72 : s8i*, align 8
+            %145 = load %70 : s8i*, align 8
+            %146 = cmp ne %144, %145 : bool
+            if %146 {
+                %147 = get_global @.str : s8i[129]*
+                %148 = cast(array_to_ptrdecay) %147 : s8i*
+                %149 = load %70 : s8i*, align 8
+                %150 = load %72 : s8i*, align 8
+                %151 = call @t_printf(%148, %149, %150) : s32i [all]
+                yield
+            }
+            yield
+        }
+        scope {
+            %99 = const -64 : s32i
+            store %99, %73, align 4
+            for cond: {
+                %139 = load %73 : s32i, align 4
+                %140 = load %69 : s32i, align 4
+                %141 = const 64 : s32i
+                %142 = add %140, %141 : s32i [nsw]
+                %143 = cmp lt %139, %142 : bool
+                condition %143
+            } step: {
+                %100 = load %73 : s32i, align 4
+                %101 = inc %100 : s32i [nsw]
+                store %101, %73, align 4
+                yield
+            } do {
+                scope {
+                    %102 = load %73 : s32i, align 4
+                    %103 = cast(integral) %102 : s64i
+                    %104 = load %70 : s8i*, align 8
+                    %105 = ptr_stride %104, %103 : s8i*
+                    %106 = load %105 : s8i, align 1
+                    %107 = cast(integral) %106 : s32i
+                    %108 = load %73 : s32i, align 4
+                    %109 = cast(integral) %108 : s64i
+                    %110 = load %71 : s8i*, align 8
+                    %111 = ptr_stride %110, %109 : s8i*
+                    %112 = load %111 : s8i, align 1
+                    %113 = cast(integral) %112 : s32i
+                    %114 = cmp ne %107, %113 : bool
+                    if %114 {
+                        %115 = get_global @.str.1 : s8i[145]*
+                        %116 = cast(array_to_ptrdecay) %115 : s8i*
+                        %117 = load %68 : s32i, align 4
+                        %118 = load %69 : s32i, align 4
+                        %119 = load %73 : s32i, align 4
+                        %120 = call @t_printf(%116, %117, %118, %119) : s32i [all]
+                        %121 = get_global @.str.2 : s8i[14]*
+                        %122 = cast(array_to_ptrdecay) %121 : s8i*
+                        %123 = load %69 : s32i, align 4
+                        %124 = const 128 : s32i
+                        %125 = add %123, %124 : s32i [nsw]
+                        %126 = load %70 : s8i*, align 8
+                        %127 = const -64 : s32i
+                        %128 = ptr_stride %126, %127 : s8i*
+                        %129 = call @t_printf(%122, %125, %128) : s32i [all]
+                        %130 = get_global @.str.3 : s8i[14]*
+                        %131 = cast(array_to_ptrdecay) %130 : s8i*
+                        %132 = load %69 : s32i, align 4
+                        %133 = const 128 : s32i
+                        %134 = add %132, %133 : s32i [nsw]
+                        %135 = load %71 : s8i*, align 8
+                        %136 = const -64 : s32i
+                        %137 = ptr_stride %135, %136 : s8i*
+                        %138 = call @t_printf(%131, %134, %137) : s32i [all]
+                        break
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        return
+}
+fn test_value(%arg0: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %31 = alloca s32i, "c", align 4
+        %32 = alloca s32i, "i", align 4
+        store %arg0, %31
+        %33 = get_global @pmemset : ((void*, s32i, u64i) -> void*)**
+        %34 = load %33 : ((void*, s32i, u64i) -> void*)*, align 8, volatile
+        %35 = get_global @buf : s8i[500]*
+        %36 = cast(array_to_ptrdecay) %35 : s8i*
+        %37 = cast(bitcast) %36 : void*
+        %38 = load %31 : s32i, align 4
+        %39 = const 10 : u64i
+        %40 = call %34(%37, %38, %39) : void* [all]
+        scope {
+            %41 = const 0 : s32i
+            store %41, %32, align 4
+            for cond: {
+                %65 = load %32 : s32i, align 4
+                %66 = const 10 : s32i
+                %67 = cmp lt %65, %66 : bool
+                condition %67
+            } step: {
+                %42 = load %32 : s32i, align 4
+                %43 = inc %42 : s32i [nsw]
+                store %43, %32, align 4
+                yield
+            } do {
+                scope {
+                    %44 = load %32 : s32i, align 4
+                    %45 = cast(integral) %44 : s64i
+                    %46 = get_global @buf : s8i[500]*
+                    %47 = get_element %46[%45] : s8i*
+                    %48 = load %47 : s8i, align 1
+                    %49 = cast(integral) %48 : u8i
+                    %50 = cast(integral) %49 : s32i
+                    %51 = load %31 : s32i, align 4
+                    %52 = cast(integral) %51 : u8i
+                    %53 = cast(integral) %52 : s32i
+                    %54 = cmp ne %50, %53 : bool
+                    if %54 {
+                        %55 = get_global @.str.4 : s8i[129]*
+                        %56 = cast(array_to_ptrdecay) %55 : s8i*
+                        %57 = load %31 : s32i, align 4
+                        %58 = load %32 : s32i, align 4
+                        %59 = cast(integral) %58 : s64i
+                        %60 = get_global @buf : s8i[500]*
+                        %61 = get_element %60[%59] : s8i*
+                        %62 = load %61 : s8i, align 1
+                        %63 = cast(integral) %62 : s32i
+                        %64 = call @t_printf(%56, %57, %63) : s32i [all]
+                        break
+                    }
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "i", align 4
+    %2 = alloca s32i, "j", align 4
+    %3 = alloca s32i, "k", align 4
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = get_global @memset : ((void*, s32i, u64i) -> void*)*
+    %6 = get_global @pmemset : ((void*, s32i, u64i) -> void*)**
+    store %5, %6, align 8, volatile
+    scope {
+        %15 = const 0 : s32i
+        store %15, %1, align 4
+        for cond: {
+            %28 = load %1 : s32i, align 4
+            %29 = const 64 : s32i
+            %30 = cmp lt %28, %29 : bool
+            condition %30
+        } step: {
+            %16 = load %1 : s32i, align 4
+            %17 = inc %16 : s32i [nsw]
+            store %17, %1, align 4
+            yield
+        } do {
+            scope {
+                %18 = const 0 : s32i
+                store %18, %2, align 4
+                for cond: {
+                    %23 = load %2 : s32i, align 4
+                    %24 = const 500 : s32i
+                    %25 = const 256 : s32i
+                    %26 = sub %24, %25 : s32i [nsw]
+                    %27 = cmp lt %23, %26 : bool
+                    condition %27
+                } step: {
+                    %19 = load %2 : s32i, align 4
+                    %20 = inc %19 : s32i [nsw]
+                    store %20, %2, align 4
+                    yield
+                } do {
+                    %21 = load %1 : s32i, align 4
+                    %22 = load %2 : s32i, align 4
+                    call @test_align(%21, %22) [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %7 = const 99 : s32i
+    call @test_value(%7) [all]
+    %8 = const 0 : s32i
+    call @test_value(%8) [all]
+    %9 = const -1 : s32i
+    call @test_value(%9) [all]
+    %10 = const -5 : s32i
+    call @test_value(%10) [all]
+    %11 = const 171 : s32i
+    call @test_value(%11) [all]
+    %12 = get_global @t_status : s32i*
+    %13 = load %12 : s32i, align 4, volatile
+    store %13, %0
+    %14 = load %0 : s32i
+    return %14
+}

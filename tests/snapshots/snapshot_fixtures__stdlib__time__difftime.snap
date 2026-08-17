@@ -1,0 +1,31 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/time/difftime.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[6] = "%.1f\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn difftime(%arg0: s64i, %arg1: s64i) -> double [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s64i, "a", align 8
+    %2 = alloca s64i, "b", align 8
+    %3 = const 0 : s32i
+    store %3, %0
+    %4 = const 2000 : s64i
+    store %4, %1, align 8
+    %5 = const 500 : s64i
+    store %5, %2, align 8
+    %6 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %7 = get_global @.str : s8i[6]*
+    %8 = cast(array_to_ptrdecay) %7 : s8i*
+    %9 = load %1 : s64i, align 8
+    %10 = load %2 : s64i, align 8
+    %11 = call @difftime(%9, %10) : double [all]
+    %12 = call @printf(%8, %11) : s32i [all]
+    %13 = const 0 : s32i
+    store %13, %0
+    %14 = load %0 : s32i
+    return %14
+}

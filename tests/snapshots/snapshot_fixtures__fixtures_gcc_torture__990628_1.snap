@@ -1,0 +1,161 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/990628-1.c" (c, x86_64-unknown-linux-gnu)
+global data_tmp : rec_data_record = zero [external, default, align 4, dso_local]
+global sqlca : rec_anon2E0 = zero [external, default, align 8, dso_local]
+global data_ptr : rec_data_record* = #cir.ptr<null> [external, default, align 8, dso_local]
+global fetch.fetch_count : s32i = 0 [internal, default, align 4, dso_local]
+
+fn num_records() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %84 = alloca s32i, "__retval", align 4
+    %85 = const 1 : s32i
+    store %85, %84
+    %86 = load %84 : s32i
+    return %86
+}
+fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
+fn fetch() -> void [external, c, no_inline, dso_local, nothrow] {
+    %68 = get_global @fetch.fetch_count : s32i*
+    %69 = get_global @data_tmp : rec_data_record*
+    %70 = cast(bitcast) %69 : void*
+    %71 = const 85 : s32i
+    %72 = const 404 : u64i
+    %73 = call @memset(%70, %71, %72) : void* [all]
+    %74 = load %68 : s32i, align 4
+    %75 = inc %74 : s32i [nsw]
+    store %75, %68, align 4
+    %76 = const 1 : s32i
+    %77 = cmp gt %75, %76 : bool
+    %78 = const 100 : s32i
+    %79 = const 0 : s32i
+    %80 = select %77, %78, %79 : s32i
+    %81 = cast(integral) %80 : s64i
+    %82 = get_global @sqlca : rec_anon2E0*
+    %83 = get_member %82[0] "sqlcode" : s64i*
+    store %81, %83, align 8
+    return
+}
+fn malloc(%arg0: u64i) -> void* [external, c, nothrow];
+fn load_data() -> void [external, c, no_inline, dso_local, nothrow] {
+    %34 = alloca rec_data_record*, "p", align 8
+    %35 = alloca s32i, "num", align 4
+    %36 = get_global @num_records : (() -> s32i)*
+    %37 = call @num_records() : s32i [all]
+    store %37, %35, align 4
+    %38 = get_global @malloc : ((u64i) -> void*)*
+    %39 = load %35 : s32i, align 4
+    %40 = cast(integral) %39 : u64i
+    %41 = const 404 : u64i
+    %42 = mul %40, %41 : u64i
+    %43 = call @malloc(%42) : void* [all]
+    %44 = cast(bitcast) %43 : rec_data_record*
+    %45 = get_global @data_ptr : rec_data_record**
+    store %44, %45, align 8
+    %46 = get_global @data_ptr : rec_data_record**
+    %47 = load %46 : rec_data_record*, align 8
+    %48 = cast(bitcast) %47 : void*
+    %49 = const 170 : s32i
+    %50 = load %35 : s32i, align 4
+    %51 = cast(integral) %50 : u64i
+    %52 = const 404 : u64i
+    %53 = mul %51, %52 : u64i
+    %54 = call @memset(%48, %49, %53) : void* [all]
+    %55 = get_global @fetch : (() -> void)*
+    call @fetch() [all]
+    %56 = get_global @data_ptr : rec_data_record**
+    %57 = load %56 : rec_data_record*, align 8
+    store %57, %34, align 8
+    scope {
+        while {
+            %63 = get_global @sqlca : rec_anon2E0*
+            %64 = get_member %63[0] "sqlcode" : s64i*
+            %65 = load %64 : s64i, align 8
+            %66 = const 0 : s64i
+            %67 = cmp eq %65, %66 : bool
+            condition %67
+        } do {
+            scope {
+                %58 = load %34 : rec_data_record*, align 8
+                %59 = const 1 : s32i
+                %60 = ptr_stride %58, %59 : rec_data_record*
+                store %60, %34, align 8
+                %61 = get_global @data_tmp : rec_data_record*
+                copy %58, %61
+                %62 = get_global @fetch : (() -> void)*
+                call @fetch() [all]
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @load_data : (() -> void)*
+    call @load_data() [all]
+    scope {
+        %6 = const 4 : u64i
+        %7 = const 2 : u64i
+        %8 = cmp eq %6, %7 : bool
+        %9 = ternary %8 ? { : bool
+            %26 = const 0 : s64i
+            %27 = get_global @data_ptr : rec_data_record**
+            %28 = load %27 : rec_data_record*, align 8
+            %29 = ptr_stride %28, %26 : rec_data_record*
+            %30 = get_member %29[0] "dummy" : s32i*
+            %31 = load %30 : s32i, align 4
+            %32 = const 21845 : s32i
+            %33 = cmp ne %31, %32 : bool
+            yield %33
+        } : {
+            %25 = const #false : bool
+            yield %25
+        }
+        if %9 {
+            %24 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        } else {
+            scope {
+                %10 = const 4 : u64i
+                %11 = const 2 : u64i
+                %12 = cmp gt %10, %11 : bool
+                %13 = ternary %12 ? { : bool
+                    %16 = const 0 : s64i
+                    %17 = get_global @data_ptr : rec_data_record**
+                    %18 = load %17 : rec_data_record*, align 8
+                    %19 = ptr_stride %18, %16 : rec_data_record*
+                    %20 = get_member %19[0] "dummy" : s32i*
+                    %21 = load %20 : s32i, align 4
+                    %22 = const 1431655765 : s32i
+                    %23 = cmp ne %21, %22 : bool
+                    yield %23
+                } : {
+                    %15 = const #false : bool
+                    yield %15
+                }
+                if %13 {
+                    %14 = get_global @abort : (() -> void)*
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %3 = get_global @exit : ((s32i) -> void)*
+    %4 = const 0 : s32i
+    call @exit(%4) [all]
+    %5 = load %0 : s32i
+    return %5
+}

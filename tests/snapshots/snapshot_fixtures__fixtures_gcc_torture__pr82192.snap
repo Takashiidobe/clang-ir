@@ -1,0 +1,62 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr82192.c" (c, x86_64-unknown-linux-gnu)
+global a : u64i = 10798855141994013410 [external, default, align 8, dso_local]
+global b : rec_S = zero [external, default, align 4, dso_local]
+
+fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
+    %15 = get_global @a : u64i*
+    %16 = load %15 : u64i, align 8
+    %17 = cast(integral) %16 : u32i
+    %18 = const 7227976781724269559 : u64i
+    %19 = get_global @a : u64i*
+    %20 = load %19 : u64i, align 8
+    %21 = const 555582727 : u64i
+    %22 = and %20, %21 : u64i
+    %23 = or %22, %18 : u64i
+    %24 = const 7227976781724531672 : u64i
+    %25 = sub %23, %24 : u64i
+    %26 = shift right %17, %25 : u32i
+    %27 = get_global @b : rec_S*
+    %28 = get_member %27[0] "m" : u16i*
+    <unmodeled: cir.set_bitfield>
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %10 = const 2147483647 : u64i
+        %11 = const 2147483647 : u64i
+        %12 = cmp ne %10, %11 : bool
+        if %12 {
+            %13 = const 0 : s32i
+            store %13, %0
+            %14 = load %0 : s32i
+            return %14
+        }
+        yield
+    }
+    call @foo() [all]
+    scope {
+        %4 = get_global @b : rec_S*
+        %5 = get_member %4[0] "m" : u16i*
+        <unmodeled: cir.get_bitfield>
+        %7 = cast(integral) %6 : s32i
+        %8 = const 0 : s32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

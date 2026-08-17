@@ -1,0 +1,98 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20060905-1.c" (c, x86_64-unknown-linux-gnu)
+global s : s8i[3][256] = zero [external, default, align 16, dso_local]
+global g : s8i = 0 [external, default, align 1, dso_local]
+
+fn dummy(%arg0: s8i) -> void [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s8i):
+        %39 = alloca s8i, "a", align 1
+        store %arg0, %39
+        %40 = load %39 : s8i, align 1
+        %41 = get_global @g : s8i*
+        store %40, %41, align 1
+        return
+}
+fn foo() -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    %8 = alloca s32i, "__retval", align 4
+    %9 = alloca s32i, "i", align 4
+    %10 = alloca s32i, "j", align 4
+    %11 = const 0 : s32i
+    store %11, %10, align 4
+    scope {
+        %14 = const 0 : s32i
+        store %14, %9, align 4
+        for cond: {
+            %36 = load %9 : s32i, align 4
+            %37 = const 256 : s32i
+            %38 = cmp lt %36, %37 : bool
+            condition %38
+        } step: {
+            %15 = load %9 : s32i, align 4
+            %16 = inc %15 : s32i [nsw]
+            store %16, %9, align 4
+            yield
+        } do {
+            scope {
+                %17 = load %9 : s32i, align 4
+                %18 = const 128 : s32i
+                %19 = cmp ge %17, %18 : bool
+                %20 = ternary %19 ? { : bool
+                    %33 = load %9 : s32i, align 4
+                    %34 = const 256 : s32i
+                    %35 = cmp lt %33, %34 : bool
+                    yield %35
+                } : {
+                    %32 = const #false : bool
+                    yield %32
+                }
+                if %20 {
+                    %21 = const 0 : s64i
+                    %22 = load %9 : s32i, align 4
+                    %23 = const 128 : s32i
+                    %24 = sub %22, %23 : s32i [nsw]
+                    %25 = cast(integral) %24 : s64i
+                    %26 = get_global @s : s8i[3][256]*
+                    %27 = get_element %26[%25] : s8i[3]*
+                    %28 = get_element %27[%21] : s8i*
+                    %29 = load %28 : s8i, align 1, volatile
+                    call @dummy(%29) [all]
+                    %30 = load %10 : s32i, align 4
+                    %31 = inc %30 : s32i [nsw]
+                    store %31, %10, align 4
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %12 = load %10 : s32i, align 4
+    store %12, %8
+    %13 = load %8 : s32i
+    return %13
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %4 = call @foo() : s32i [all]
+        %5 = const 128 : s32i
+        %6 = cmp ne %4, %5 : bool
+        if %6 {
+            %7 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

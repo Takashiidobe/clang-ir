@@ -1,0 +1,92 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20020206-1.c" (c, x86_64-unknown-linux-gnu)
+fn bar() -> rec_anon_struct [external, c, no_inline, dso_local, nothrow] {
+    %33 = alloca rec_anon_struct, "coerce", align 8
+    %34 = alloca rec_A, "__retval", align 4
+    %35 = get_member %34[0] "a" : u32i*
+    %36 = const 176 : u32i
+    store %36, %35, align 4
+    %37 = get_member %34[1] "b" : u32i*
+    %38 = const 52 : u32i
+    store %38, %37, align 4
+    %39 = get_member %34[2] "c" : u32i*
+    %40 = const 31 : u32i
+    store %40, %39, align 4
+    %41 = load %34 : rec_A
+    %42 = cast(bitcast) %33 : rec_A*
+    store %41, %42
+    %43 = load %33 : rec_anon_struct
+    return %43
+}
+fn abort() -> void [external, c, nothrow];
+fn baz(%arg0: rec_A*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_A*):
+        %12 = alloca rec_A*, "a", align 8
+        store %arg0, %12
+        scope {
+            %13 = load %12 : rec_A*, align 8
+            %14 = get_member %13[0] "a" : u32i*
+            %15 = load %14 : u32i, align 4
+            %16 = const 176 : u32i
+            %17 = cmp ne %15, %16 : bool
+            %18 = ternary %17 ? { : bool
+                %32 = const #true : bool
+                yield %32
+            } : {
+                %27 = load %12 : rec_A*, align 8
+                %28 = get_member %27[1] "b" : u32i*
+                %29 = load %28 : u32i, align 4
+                %30 = const 52 : u32i
+                %31 = cmp ne %29, %30 : bool
+                yield %31
+            }
+            %19 = ternary %18 ? { : bool
+                %26 = const #true : bool
+                yield %26
+            } : {
+                %21 = load %12 : rec_A*, align 8
+                %22 = get_member %21[2] "c" : u32i*
+                %23 = load %22 : u32i, align 4
+                %24 = const 31 : u32i
+                %25 = cmp ne %23, %24 : bool
+                yield %25
+            }
+            if %19 {
+                %20 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca rec_anon_struct, "coerce", align 8
+    %1 = alloca s32i, "__retval", align 4
+    %2 = alloca rec_A, "d", align 4
+    %3 = alloca rec_A, "tmp", align 4
+    %4 = const 0 : s32i
+    store %4, %1
+    scope {
+        %8 = alloca rec_A, "tmp", align 4
+        scope {
+            %9 = call @bar() : rec_anon_struct [all]
+            store %9, %0
+            %10 = cast(bitcast) %0 : rec_A*
+            %11 = load %10 : rec_A
+            store %11, %2, align 4
+            yield
+        }
+        yield
+    }
+    call @baz(%2) [all]
+    %5 = get_global @exit : ((s32i) -> void)*
+    %6 = const 0 : s32i
+    call @exit(%6) [all]
+    %7 = load %1 : s32i
+    return %7
+}

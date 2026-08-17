@@ -1,0 +1,65 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr64718.c" (c, x86_64-unknown-linux-gnu)
+global a : s32i = 4660 [internal, default, align 4, dso_local]
+
+fn swap(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %15 = alloca s32i, "x", align 4
+        %16 = alloca s32i, "__retval", align 4
+        store %arg0, %15
+        %17 = load %15 : s32i, align 4
+        %18 = cast(integral) %17 : u16i
+        %19 = cast(integral) %18 : s32i
+        %20 = const 8 : s32i
+        %21 = shift left %19, %20 : s32i
+        %22 = load %15 : s32i, align 4
+        %23 = cast(integral) %22 : u16i
+        %24 = cast(integral) %23 : s32i
+        %25 = const 8 : s32i
+        %26 = shift right %24, %25 : s32i
+        %27 = or %21, %26 : s32i
+        %28 = cast(integral) %27 : u16i
+        %29 = cast(integral) %28 : s32i
+        store %29, %16
+        %30 = load %16 : s32i
+        return %30
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "b", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 4660 : s32i
+    store %3, %1, align 4
+    scope {
+        %10 = get_global @a : s32i*
+        %11 = load %10 : s32i, align 4
+        %12 = call @swap(%11) : s32i [all]
+        %13 = const 13330 : s32i
+        %14 = cmp ne %12, %13 : bool
+        if %14 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %6 = load %1 : s32i, align 4
+        %7 = call @swap(%6) : s32i [all]
+        %8 = const 13330 : s32i
+        %9 = cmp ne %7, %8 : bool
+        if %9 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = load %0 : s32i
+    return %5
+}

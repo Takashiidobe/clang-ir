@@ -1,0 +1,37 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/stdlib/stdio/printf_formats.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[17] = "%x %u %lld %.2f\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s32i, "x", align 4
+    %2 = alloca u32i, "u", align 4
+    %3 = alloca s64i, "ll", align 8
+    %4 = alloca double, "d", align 8
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = const 255 : s32i
+    store %6, %1, align 4
+    %7 = const 42 : u32i
+    store %7, %2, align 4
+    %8 = const 1234567890123 : s64i
+    store %8, %3, align 8
+    %9 = const 1.250000e+00 : double
+    store %9, %4, align 8
+    %10 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %11 = get_global @.str : s8i[17]*
+    %12 = cast(array_to_ptrdecay) %11 : s8i*
+    %13 = load %1 : s32i, align 4
+    %14 = load %2 : u32i, align 4
+    %15 = load %3 : s64i, align 8
+    %16 = load %4 : double, align 8
+    %17 = call @printf(%12, %13, %14, %15, %16) : s32i [all]
+    %18 = const 0 : s32i
+    store %18, %0
+    %19 = load %0 : s32i
+    return %19
+}

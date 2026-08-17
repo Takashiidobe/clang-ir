@@ -1,0 +1,45 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20221006-1.c" (c, x86_64-unknown-linux-gnu)
+fn atoi(%arg0: s8i*) -> s32i [external, c, pure, nothrow];
+fn abort() -> void [external, c, nothrow];
+fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s8i**):
+        %0 = alloca s32i, "argc", align 4
+        %1 = alloca s8i**, "argv", align 8
+        %2 = alloca s32i, "__retval", align 4
+        %3 = alloca s32i, "len", align 4
+        %4 = alloca s32i, "count", align 4
+        %5 = alloca s32i[64], "data", align 16
+        %6 = alloca u8i*, "saved_stack", align 8
+        store %arg0, %0
+        store %arg1, %1
+        %7 = const 0 : s32i
+        store %7, %2
+        %8 = load %0 : s32i, align 4
+        %9 = const 2 : s32i
+        %10 = cmp eq %8, %9 : bool
+        %11 = ternary %10 ? { : s32i
+            %137 = const 1 : s64i
+            %138 = load %1 : s8i**, align 8
+            %139 = ptr_stride %138, %137 : s8i**
+            %140 = load %139 : s8i*, align 8
+            %141 = call @atoi(%140) : s32i [pure]
+            yield %141
+        } : {
+            %136 = const 4 : s32i
+            yield %136
+        }
+        store %11, %3, align 4
+        %12 = load %3 : s32i, align 4
+        %13 = cast(integral) %12 : u64i
+        %14 = load %3 : s32i, align 4
+        %15 = cast(integral) %14 : u64i
+        <unmodeled: cir.stacksave>
+        store %16, %6, align 8
+        <unmodeled: cir.cleanup.scope>
+        %17 = load %2 : s32i
+        return %17
+}

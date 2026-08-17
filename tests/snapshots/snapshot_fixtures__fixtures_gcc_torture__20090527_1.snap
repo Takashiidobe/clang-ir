@@ -1,0 +1,72 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20090527-1.c" (c, x86_64-unknown-linux-gnu)
+fn abort() -> void [external, c, nothrow];
+fn new_unit(%arg0: rec_unit_flags*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_unit_flags*):
+        %7 = alloca rec_unit_flags*, "flags", align 8
+        store %arg0, %7
+        scope {
+            %20 = load %7 : rec_unit_flags*, align 8
+            %21 = get_member %20[1] "status" : u32i*
+            %22 = load %21 : u32i, align 4
+            %23 = const 1 : u32i
+            %24 = cmp eq %22, %23 : bool
+            if %24 {
+                %25 = const 0 : u32i
+                %26 = load %7 : rec_unit_flags*, align 8
+                %27 = get_member %26[1] "status" : u32i*
+                store %25, %27, align 4
+                yield
+            }
+            yield
+        }
+        scope {
+            %12 = load %7 : rec_unit_flags*, align 8
+            %13 = get_member %12[0] "position" : u32i*
+            %14 = load %13 : u32i, align 4
+            %15 = const 1 : u32i
+            %16 = cmp eq %14, %15 : bool
+            if %16 {
+                %17 = const 0 : u32i
+                %18 = load %7 : rec_unit_flags*, align 8
+                %19 = get_member %18[0] "position" : u32i*
+                store %17, %19, align 4
+                yield
+            }
+            yield
+        }
+        scope {
+            %8 = load %7 : rec_unit_flags*, align 8
+            %9 = get_member %8[1] "status" : u32i*
+            %10 = load %9 : u32i, align 4
+            switch %10 {
+                case equal 0 {
+                    break
+                }
+                case default {
+                    %11 = get_global @abort : (() -> void)*
+                    call @abort() [all]
+                    yield
+                }
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_unit_flags, "f", align 4
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 1 : u32i
+    %4 = get_member %1[1] "status" : u32i*
+    store %3, %4, align 4
+    call @new_unit(%1) [all]
+    %5 = const 0 : s32i
+    store %5, %0
+    %6 = load %0 : s32i
+    return %6
+}

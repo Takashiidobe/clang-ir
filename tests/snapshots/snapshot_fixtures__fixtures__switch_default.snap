@@ -1,0 +1,61 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/switch_default.c" (c, x86_64-unknown-linux-gnu)
+global .str : s8i[10] = "%d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+
+fn classify(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %14 = alloca s32i, "x", align 4
+        %15 = alloca s32i, "__retval", align 4
+        %16 = alloca s32i, "out", align 4
+        store %arg0, %14
+        %17 = const 0 : s32i
+        store %17, %16, align 4
+        scope {
+            %20 = load %14 : s32i, align 4
+            switch %20 {
+                case equal 1 {
+                    %23 = const 11 : s32i
+                    store %23, %16, align 4
+                    break
+                }
+                case equal 2 {
+                    %22 = const 22 : s32i
+                    store %22, %16, align 4
+                    break
+                }
+                case default {
+                    %21 = const 99 : s32i
+                    store %21, %16, align 4
+                    break
+                }
+            }
+            yield
+        }
+        %18 = load %16 : s32i, align 4
+        store %18, %15
+        %19 = load %15 : s32i
+        return %19
+}
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %3 = get_global @.str : s8i[10]*
+    %4 = cast(array_to_ptrdecay) %3 : s8i*
+    %5 = const 1 : s32i
+    %6 = call @classify(%5) : s32i [all]
+    %7 = const 2 : s32i
+    %8 = call @classify(%7) : s32i [all]
+    %9 = const 7 : s32i
+    %10 = call @classify(%9) : s32i [all]
+    %11 = call @printf(%4, %6, %8, %10) : s32i [all]
+    %12 = const 0 : s32i
+    store %12, %0
+    %13 = load %0 : s32i
+    return %13
+}

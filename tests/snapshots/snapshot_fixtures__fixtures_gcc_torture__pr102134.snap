@@ -1,0 +1,80 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr102134.c" (c, x86_64-unknown-linux-gnu)
+global g : u64i = 0 [external, default, align 8, dso_local]
+
+fn foo(%arg0: u64i, %arg1: u64i, %arg2: u64i, %arg3: u64i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: u64i, %arg1: u64i, %arg2: u64i, %arg3: u64i*):
+        %11 = alloca u64i, "a", align 8
+        %12 = alloca u64i, "b", align 8
+        %13 = alloca u64i, "c", align 8
+        %14 = alloca u64i*, "r", align 8
+        %15 = alloca u64i, "x", align 8
+        store %arg0, %11
+        store %arg1, %12
+        store %arg2, %13
+        store %arg3, %14
+        %16 = load %12 : u64i, align 8
+        %17 = load %12 : u64i, align 8
+        %18 = mul %17, %16 : u64i
+        store %18, %12, align 8
+        %19 = load %11 : u64i, align 8
+        %20 = cast(int_to_bool) %19 : bool
+        %21 = ternary %20 ? { : bool
+            %29 = load %12 : u64i, align 8
+            %30 = load %13 : u64i, align 8
+            %31 = const 63 : u64i
+            %32 = and %30, %31 : u64i
+            %33 = shift right %29, %32 : u64i
+            %34 = load %12 : u64i, align 8
+            %35 = load %13 : u64i, align 8
+            %36 = const 63 : u64i
+            %37 = and %35, %36 : u64i
+            %38 = shift left %34, %37 : u64i
+            %39 = get_global @g : u64i*
+            %40 = load %39 : u64i, align 8
+            %41 = and %38, %40 : u64i
+            %42 = or %33, %41 : u64i
+            %43 = cast(int_to_bool) %42 : bool
+            yield %43
+        } : {
+            %28 = const #false : bool
+            yield %28
+        }
+        %22 = cast(bool_to_int) %21 : s32i
+        %23 = cast(integral) %22 : u64i
+        store %23, %15, align 8
+        %24 = load %15 : u64i, align 8
+        %25 = load %11 : u64i, align 8
+        %26 = add %24, %25 : u64i
+        %27 = load %14 : u64i*, align 8
+        store %26, %27, align 8
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca u64i, "x", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = const 1 : u64i
+    %4 = const 3000 : u64i
+    %5 = const 0 : u64i
+    call @foo(%3, %4, %5, %1) [all]
+    scope {
+        %8 = load %1 : u64i, align 8
+        %9 = const 2 : u64i
+        %10 = cmp ne %8, %9 : bool
+        if %10 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = load %0 : s32i
+    return %7
+}

@@ -1,0 +1,51 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/divconst-3.c" (c, x86_64-unknown-linux-gnu)
+fn f(%arg0: s64i) -> s64i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s64i):
+        %16 = alloca s64i, "x", align 8
+        %17 = alloca s64i, "__retval", align 8
+        store %arg0, %16
+        %18 = load %16 : s64i, align 8
+        %19 = const 10000000000 : s64i
+        %20 = div %18, %19 : s64i
+        store %20, %17
+        %21 = load %17 : s64i
+        return %21
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %5 = const 10000000000 : s64i
+        %6 = call @f(%5) : s64i [all]
+        %7 = const 1 : s64i
+        %8 = cmp ne %6, %7 : bool
+        %9 = ternary %8 ? { : bool
+            %15 = const #true : bool
+            yield %15
+        } : {
+            %11 = const 100000000000 : s64i
+            %12 = call @f(%11) : s64i [all]
+            %13 = const 10 : s64i
+            %14 = cmp ne %12, %13 : bool
+            yield %14
+        }
+        if %9 {
+            %10 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = get_global @exit : ((s32i) -> void)*
+    %3 = const 0 : s32i
+    call @exit(%3) [all]
+    %4 = load %0 : s32i
+    return %4
+}

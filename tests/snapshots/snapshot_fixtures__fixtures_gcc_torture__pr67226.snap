@@ -1,0 +1,117 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr67226.c" (c, x86_64-unknown-linux-gnu)
+global from_input : rec_assembly_operand = zero [external, default, align 4, dso_local]
+global to_input : rec_assembly_operand = zero [external, default, align 4, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn assemblez_1(%arg2: s32i, %arg3: rec_assembly_operand*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i, %arg3: rec_assembly_operand*):
+        %51 = load %arg3 : rec_assembly_operand
+        %52 = alloca s32i, "internal_number", align 4
+        %53 = alloca rec_assembly_operand, "o1", align 4
+        store %arg2, %52
+        store %51, %53
+        scope {
+            %54 = get_member %53[0] "type" : s32i*
+            %55 = load %54 : s32i, align 4
+            %56 = get_global @from_input : rec_assembly_operand*
+            %57 = get_member %56[0] "type" : s32i*
+            %58 = load %57 : s32i, align 4
+            %59 = cmp ne %55, %58 : bool
+            if %59 {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn t0(%arg0: rec_assembly_operand*, %arg1: rec_assembly_operand*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: rec_assembly_operand*, %arg1: rec_assembly_operand*):
+        %40 = load %arg1 : rec_assembly_operand
+        %41 = load %arg0 : rec_assembly_operand
+        %42 = alloca rec_assembly_operand, "to", align 4
+        %43 = alloca rec_assembly_operand, "from", align 4
+        store %41, %42
+        store %40, %43
+        scope {
+            %44 = get_member %42[1] "value" : s32i*
+            %45 = load %44 : s32i, align 4
+            %46 = const 0 : s32i
+            %47 = cmp eq %45, %46 : bool
+            if %47 {
+                %48 = const 32 : s32i
+                %49 = load %43 : rec_assembly_operand, align 4
+                %50 = alloca rec_assembly_operand, "byval", align 8
+                store %49, %50
+                call @assemblez_1(%48, %50) [all]
+                yield
+            } else {
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 0 : s32i
+    %3 = get_global @to_input : rec_assembly_operand*
+    %4 = get_member %3[1] "value" : s32i*
+    store %2, %4, align 4
+    %5 = const 1 : s32i
+    %6 = get_global @to_input : rec_assembly_operand*
+    %7 = get_member %6[0] "type" : s32i*
+    store %5, %7, align 4
+    %8 = const 2 : s32i
+    %9 = get_global @to_input : rec_assembly_operand*
+    %10 = get_member %9[2] "symtype" : s32i*
+    store %8, %10, align 4
+    %11 = const 3 : s32i
+    %12 = get_global @to_input : rec_assembly_operand*
+    %13 = get_member %12[3] "symflags" : s32i*
+    store %11, %13, align 4
+    %14 = const 4 : s32i
+    %15 = get_global @to_input : rec_assembly_operand*
+    %16 = get_member %15[4] "marker" : s32i*
+    store %14, %16, align 4
+    %17 = const 5 : s32i
+    %18 = get_global @from_input : rec_assembly_operand*
+    %19 = get_member %18[1] "value" : s32i*
+    store %17, %19, align 4
+    %20 = const 6 : s32i
+    %21 = get_global @from_input : rec_assembly_operand*
+    %22 = get_member %21[0] "type" : s32i*
+    store %20, %22, align 4
+    %23 = const 7 : s32i
+    %24 = get_global @from_input : rec_assembly_operand*
+    %25 = get_member %24[2] "symtype" : s32i*
+    store %23, %25, align 4
+    %26 = const 8 : s32i
+    %27 = get_global @from_input : rec_assembly_operand*
+    %28 = get_member %27[3] "symflags" : s32i*
+    store %26, %28, align 4
+    %29 = const 9 : s32i
+    %30 = get_global @from_input : rec_assembly_operand*
+    %31 = get_member %30[4] "marker" : s32i*
+    store %29, %31, align 4
+    %32 = get_global @to_input : rec_assembly_operand*
+    %33 = get_global @from_input : rec_assembly_operand*
+    %34 = load %32 : rec_assembly_operand, align 4
+    %35 = load %33 : rec_assembly_operand, align 4
+    %36 = alloca rec_assembly_operand, "byval", align 8
+    store %34, %36
+    %37 = alloca rec_assembly_operand, "byval", align 8
+    store %35, %37
+    call @t0(%36, %37) [all]
+    %38 = const 0 : s32i
+    store %38, %0
+    %39 = load %0 : s32i
+    return %39
+}

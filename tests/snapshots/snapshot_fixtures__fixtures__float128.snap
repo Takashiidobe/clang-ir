@@ -1,0 +1,128 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/float128.c" (c, x86_64-unknown-linux-gnu)
+fn add(%arg0: f128, %arg1: f128) -> f128 [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: f128, %arg1: f128):
+        %52 = alloca f128, "a", align 16
+        %53 = alloca f128, "b", align 16
+        %54 = alloca f128, "__retval", align 16
+        store %arg0, %52
+        store %arg1, %53
+        %55 = load %52 : f128, align 16
+        %56 = load %53 : f128, align 16
+        %57 = fadd %55, %56 : f128
+        store %57, %54
+        %58 = load %54 : f128
+        return %58
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca f128, "one", align 16
+    %2 = alloca f128, "tiny", align 16
+    %3 = alloca f128, "sum", align 16
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 1.000000e+00 : f128
+    store %5, %1, align 16
+    %6 = const 7.88860905221011805411728565282786229E-31 : f128
+    store %6, %2, align 16
+    %7 = load %1 : f128, align 16
+    %8 = load %2 : f128, align 16
+    %9 = call @add(%7, %8) : f128 [all]
+    store %9, %3, align 16
+    scope {
+        %47 = load %3 : f128, align 16
+        %48 = load %1 : f128, align 16
+        %49 = cmp eq %47, %48 : bool
+        if %49 {
+            %50 = const 1 : s32i
+            store %50, %0
+            %51 = load %0 : s32i
+            return %51
+        }
+        yield
+    }
+    scope {
+        %40 = load %3 : f128, align 16
+        %41 = load %1 : f128, align 16
+        %42 = fsub %40, %41 : f128
+        %43 = load %2 : f128, align 16
+        %44 = cmp ne %42, %43 : bool
+        if %44 {
+            %45 = const 2 : s32i
+            store %45, %0
+            %46 = load %0 : s32i
+            return %46
+        }
+        yield
+    }
+    scope {
+        %34 = const 42 : s32i
+        %35 = cast(int_to_float) %34 : f128
+        %36 = const 4.200000e+01 : f128
+        %37 = cmp ne %35, %36 : bool
+        if %37 {
+            %38 = const 3 : s32i
+            store %38, %0
+            %39 = load %0 : s32i
+            return %39
+        }
+        yield
+    }
+    scope {
+        %28 = const 4.275000e+01 : f128
+        %29 = cast(float_to_int) %28 : s32i
+        %30 = const 42 : s32i
+        %31 = cmp ne %29, %30 : bool
+        if %31 {
+            %32 = const 4 : s32i
+            store %32, %0
+            %33 = load %0 : s32i
+            return %33
+        }
+        yield
+    }
+    scope {
+        %22 = const 1.500000e+00 : f128
+        %23 = cast(floating) %22 : double
+        %24 = const 1.500000e+00 : double
+        %25 = cmp ne %23, %24 : bool
+        if %25 {
+            %26 = const 5 : s32i
+            store %26, %0
+            %27 = load %0 : s32i
+            return %27
+        }
+        yield
+    }
+    scope {
+        %17 = const 16 : u64i
+        %18 = const 16 : u64i
+        %19 = cmp ne %17, %18 : bool
+        if %19 {
+            %20 = const 6 : s32i
+            store %20, %0
+            %21 = load %0 : s32i
+            return %21
+        }
+        yield
+    }
+    scope {
+        %12 = const 16 : u64i
+        %13 = const 16 : u64i
+        %14 = cmp ne %12, %13 : bool
+        if %14 {
+            %15 = const 7 : s32i
+            store %15, %0
+            %16 = load %0 : s32i
+            return %16
+        }
+        yield
+    }
+    %10 = const 0 : s32i
+    store %10, %0
+    %11 = load %0 : s32i
+    return %11
+}

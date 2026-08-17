@@ -1,0 +1,132 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/complex-1.c" (c, x86_64-unknown-linux-gnu)
+fn g0(%arg4: double) -> double [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg4: double):
+        %67 = alloca double, "x", align 8
+        %68 = alloca double, "__retval", align 8
+        store %arg4, %67
+        %69 = const 1.000000e+00 : double
+        store %69, %68
+        %70 = load %68 : double
+        return %70
+}
+fn g1(%arg3: double) -> double [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: double):
+        %63 = alloca double, "x", align 8
+        %64 = alloca double, "__retval", align 8
+        store %arg3, %63
+        %65 = const -1.000000e+00 : double
+        store %65, %64
+        %66 = load %64 : double
+        return %66
+}
+fn g2(%arg2: double) -> double [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: double):
+        %59 = alloca double, "x", align 8
+        %60 = alloca double, "__retval", align 8
+        store %arg2, %59
+        %61 = const 0.000000e+00 : double
+        store %61, %60
+        %62 = load %60 : double
+        return %62
+}
+fn xcexp(%arg0: double, %arg1: double) -> rec_anon_struct [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: double, %arg1: double):
+        %29 = alloca complex<double>, "coerce", align 8
+        %30 = alloca rec_anon_struct, "coerce", align 8
+        %31 = alloca rec_anon_struct, "coerce", align 8
+        %32 = get_member %31[0] "" : double*
+        store %arg0, %32
+        %33 = get_member %31[1] "" : double*
+        store %arg1, %33
+        %34 = load %31 : rec_anon_struct
+        store %34, %30
+        %35 = cast(bitcast) %30 : complex<double>*
+        %36 = load %35 : complex<double>
+        %37 = alloca complex<double>, "x", align 8
+        %38 = alloca complex<double>, "__retval", align 8
+        %39 = alloca double, "r", align 8
+        store %36, %37
+        %40 = load %37 : complex<double>, align 8
+        <unmodeled: cir.complex.real>
+        %42 = call @g0(%41) : double [all]
+        store %42, %39, align 8
+        %43 = load %39 : double, align 8
+        %44 = load %37 : complex<double>, align 8
+        <unmodeled: cir.complex.imag>
+        %46 = call @g1(%45) : double [all]
+        %47 = fmul %43, %46 : double
+        <unmodeled: cir.complex.real_ptr>
+        store %47, %48, align 8
+        %49 = load %39 : double, align 8
+        %50 = load %37 : complex<double>, align 8
+        <unmodeled: cir.complex.imag>
+        %52 = call @g2(%51) : double [all]
+        %53 = fmul %49, %52 : double
+        <unmodeled: cir.complex.imag_ptr>
+        store %53, %54, align 8
+        %55 = load %37 : complex<double>, align 8
+        store %55, %38, align 8
+        %56 = load %38 : complex<double>
+        store %56, %29
+        %57 = cast(bitcast) %29 : rec_anon_struct*
+        %58 = load %57 : rec_anon_struct
+        return %58
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca rec_anon_struct, "coerce", align 8
+    %1 = alloca complex<double>, "coerce", align 8
+    %2 = alloca s32i, "__retval", align 4
+    %3 = alloca complex<double>, "x", align 8
+    %4 = alloca complex<double>, "coerce", align 8
+    %5 = const 0 : s32i
+    store %5, %2
+    %6 = const (0.000000e+00, 1.000000e+00) : complex<double>
+    store %6, %4, align 8
+    %7 = load %4 : complex<double>, align 8
+    store %7, %1
+    %8 = cast(bitcast) %1 : rec_anon_struct*
+    %9 = get_member %8[0] "" : double*
+    %10 = load %9 : double
+    %11 = get_member %8[1] "" : double*
+    %12 = load %11 : double
+    %13 = call @xcexp(%10, %12) : rec_anon_struct [all]
+    store %13, %0
+    %14 = cast(bitcast) %0 : complex<double>*
+    %15 = load %14 : complex<double>
+    store %15, %3, align 8
+    scope {
+        %24 = load %3 : complex<double>, align 8
+        <unmodeled: cir.complex.real>
+        %26 = const -1.000000e+00 : double
+        %27 = cmp ne %25, %26 : bool
+        if %27 {
+            %28 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    scope {
+        %19 = load %3 : complex<double>, align 8
+        <unmodeled: cir.complex.imag>
+        %21 = const 0.000000e+00 : double
+        %22 = cmp ne %20, %21 : bool
+        if %22 {
+            %23 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %16 = get_global @exit : ((s32i) -> void)*
+    %17 = const 0 : s32i
+    call @exit(%17) [all]
+    %18 = load %2 : s32i
+    return %18
+}

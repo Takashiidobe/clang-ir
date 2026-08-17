@@ -1,0 +1,143 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr126405.c" (c, x86_64-unknown-linux-gnu)
+global g18 : vector<16 x s64i> = zero [external, default, align 128, dso_local]
+global g3 : vector<16 x s32i> = zero [external, default, align 64, dso_local]
+global g2 : s64i = 0 [external, default, align 8, dso_local]
+global g12 : s64i = 0 [external, default, align 8, dso_local]
+global g27 : void* = #cir.ptr<null> [external, default, align 8, dso_local]
+
+fn abort() -> void [external, c, nothrow];
+fn f31() -> void [external, c, no_inline, dso_local, nothrow] {
+    br ^bb1
+    ^bb1():
+        label lbl_br1:
+        %30 = get_global @g18 : vector<16 x s64i>*
+        %31 = load %30 : vector<16 x s64i>, align 128
+        %32 = not %31 : vector<16 x s64i>
+        %33 = get_global @g18 : vector<16 x s64i>*
+        store %32, %33, align 128
+        %34 = get_global @g3 : vector<16 x s32i>*
+        %35 = load %34 : vector<16 x s32i>, align 64
+        %36 = not %35 : vector<16 x s32i>
+        %37 = get_global @g3 : vector<16 x s32i>*
+        store %36, %37, align 64
+        scope {
+            %47 = get_global @g2 : s64i*
+            %48 = load %47 : s64i, align 8
+            %49 = cast(int_to_bool) %48 : bool
+            if %49 {
+                goto lbl_br1
+            }
+            yield
+        }
+        br ^bb2
+    ^bb2():
+        label lbl_b5:
+        scope {
+            %45 = get_global @g12 : s64i*
+            %46 = load %45 : s64i, align 8
+            switch %46 {
+                case equal 4 {
+                    yield
+                }
+                case equal 0 {
+                    goto lbl_sw8
+                }
+            }
+            yield
+        }
+        call @abort() [all]
+        br ^bb3
+    ^bb3():
+        label lbl_sw8:
+        scope {
+            %42 = get_global @g27 : void**
+            %43 = load %42 : void*, align 8
+            %44 = cast(ptr_to_bool) %43 : bool
+            if %44 {
+                goto lbl_b5
+            }
+            yield
+        }
+        %38 = get_global @g18 : vector<16 x s64i>*
+        %39 = load %38 : vector<16 x s64i>, align 128
+        %40 = not %39 : vector<16 x s64i>
+        %41 = get_global @g18 : vector<16 x s64i>*
+        store %40, %41, align 128
+        return
+}
+fn dirty_stack() -> void [internal, c, no_inline, dso_local, nothrow] {
+    %17 = alloca s8i[1024], "buf", align 16
+    scope {
+        %18 = alloca u32i, "i", align 4
+        %19 = const 0 : u32i
+        store %19, %18, align 4
+        for cond: {
+            %26 = load %18 : u32i, align 4
+            %27 = cast(integral) %26 : u64i
+            %28 = const 1024 : u64i
+            %29 = cmp lt %27, %28 : bool
+            condition %29
+        } step: {
+            %20 = load %18 : u32i, align 4
+            %21 = inc %20 : u32i
+            store %21, %18, align 4
+            yield
+        } do {
+            %22 = const -91 : s8i
+            %23 = load %18 : u32i, align 4
+            %24 = cast(integral) %23 : u64i
+            %25 = get_element %17[%24] : s8i*
+            store %22, %25, align 1, volatile
+            yield
+        }
+        yield
+    }
+    return
+}
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    call @dirty_stack() [all]
+    call @f31() [all]
+    scope {
+        %4 = alloca s32i, "i", align 4
+        %5 = const 0 : s32i
+        store %5, %4, align 4
+        for cond: {
+            %14 = load %4 : s32i, align 4
+            %15 = const 16 : s32i
+            %16 = cmp lt %14, %15 : bool
+            condition %16
+        } step: {
+            %6 = load %4 : s32i, align 4
+            %7 = inc %6 : s32i [nsw]
+            store %7, %4, align 4
+            yield
+        } do {
+            scope {
+                %8 = get_global @g18 : vector<16 x s64i>*
+                %9 = load %8 : vector<16 x s64i>, align 128
+                %10 = load %4 : s32i, align 4
+                <unmodeled: cir.vec.extract>
+                %12 = const 0 : s64i
+                %13 = cmp ne %11, %12 : bool
+                if %13 {
+                    call @abort() [all]
+                    yield
+                }
+                yield
+            }
+            yield
+        }
+        yield
+    }
+    %2 = const 0 : s32i
+    store %2, %0
+    %3 = load %0 : s32i
+    return %3
+}

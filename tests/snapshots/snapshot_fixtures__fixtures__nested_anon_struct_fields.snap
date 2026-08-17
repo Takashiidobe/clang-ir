@@ -1,0 +1,53 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures/nested_anon_struct_fields.c" (c, x86_64-unknown-linux-gnu)
+global __const.main.s : s8i[2] = "S" [cir_private, default, dso_local, constant]
+global __const.main.h : s8i[2] = "H" [cir_private, default, dso_local, constant]
+global .str : s8i[9] = "%d %s%s\n" [cir_private, default, align 1, dso_local, constant]
+
+fn printf(%arg0: s8i*, ...) -> s32i [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca rec_event, "e", align 8
+    %2 = alloca s8i[2], "h", align 1
+    %3 = alloca s8i[2], "s", align 1
+    %4 = const 0 : s32i
+    store %4, %0
+    %5 = const 1 : s32i
+    %6 = get_member %1[0] "type" : s32i*
+    store %5, %6, align 8
+    %7 = get_global @__const.main.h : s8i[2]*
+    copy %2, %7
+    %8 = get_global @__const.main.s : s8i[2]*
+    copy %3, %8
+    %9 = cast(array_to_ptrdecay) %2 : s8i*
+    %10 = get_member %1[1] "data" : rec_anon2E0*
+    %11 = get_member %10[1] "tag" : rec_anon2E2*
+    %12 = get_member %11[0] "handle" : s8i**
+    store %9, %12, align 8
+    %13 = cast(array_to_ptrdecay) %3 : s8i*
+    %14 = get_member %1[1] "data" : rec_anon2E0*
+    %15 = get_member %14[1] "tag" : rec_anon2E2*
+    %16 = get_member %15[1] "suffix" : s8i**
+    store %13, %16, align 8
+    %17 = get_global @printf : ((s8i*, ...) -> s32i)*
+    %18 = get_global @.str : s8i[9]*
+    %19 = cast(array_to_ptrdecay) %18 : s8i*
+    %20 = get_member %1[0] "type" : s32i*
+    %21 = load %20 : s32i, align 8
+    %22 = get_member %1[1] "data" : rec_anon2E0*
+    %23 = get_member %22[1] "tag" : rec_anon2E2*
+    %24 = get_member %23[0] "handle" : s8i**
+    %25 = load %24 : s8i*, align 8
+    %26 = get_member %1[1] "data" : rec_anon2E0*
+    %27 = get_member %26[1] "tag" : rec_anon2E2*
+    %28 = get_member %27[1] "suffix" : s8i**
+    %29 = load %28 : s8i*, align 8
+    %30 = call @printf(%19, %21, %25, %29) : s32i [all]
+    %31 = const 0 : s32i
+    store %31, %0
+    %32 = load %0 : s32i
+    return %32
+}

@@ -1,0 +1,70 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/20000706-3.c" (c, x86_64-unknown-linux-gnu)
+global c : s32i = 0 [external, default, align 4, dso_local]
+
+fn baz(%arg3: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg3: s32i*):
+        %21 = alloca s32i*, "p", align 8
+        store %arg3, %21
+        %22 = load %21 : s32i*, align 8
+        %23 = load %22 : s32i, align 4
+        %24 = get_global @c : s32i*
+        store %23, %24, align 4
+        return
+}
+fn abort() -> void [external, c, nothrow];
+fn bar(%arg2: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg2: s32i):
+        %10 = alloca s32i, "b", align 4
+        store %arg2, %10
+        scope {
+            %11 = get_global @c : s32i*
+            %12 = load %11 : s32i, align 4
+            %13 = const 1 : s32i
+            %14 = cmp ne %12, %13 : bool
+            %15 = ternary %14 ? { : bool
+                %20 = const #true : bool
+                yield %20
+            } : {
+                %17 = load %10 : s32i, align 4
+                %18 = const 2 : s32i
+                %19 = cmp ne %17, %18 : bool
+                yield %19
+            }
+            if %15 {
+                %16 = get_global @abort : (() -> void)*
+                call @abort() [all]
+                yield
+            }
+            yield
+        }
+        return
+}
+fn foo(%arg0: s32i, %arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i, %arg1: s32i):
+        %7 = alloca s32i, "a", align 4
+        %8 = alloca s32i, "b", align 4
+        store %arg0, %7
+        store %arg1, %8
+        call @baz(%7) [all]
+        %9 = load %8 : s32i, align 4
+        call @bar(%9) [all]
+        return
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 1 : s32i
+    %3 = const 2 : s32i
+    call @foo(%2, %3) [all]
+    %4 = get_global @exit : ((s32i) -> void)*
+    %5 = const 0 : s32i
+    call @exit(%5) [all]
+    %6 = load %0 : s32i
+    return %6
+}

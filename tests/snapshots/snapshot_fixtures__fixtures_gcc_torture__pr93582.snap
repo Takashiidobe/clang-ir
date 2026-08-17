@@ -1,0 +1,62 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr93582.c" (c, x86_64-unknown-linux-gnu)
+global c : s32i = 0 [external, default, align 4, dso_local]
+global b : s32i = 0 [external, default, align 4, dso_local]
+global a : s16i = 0 [external, default, align 2, dso_local]
+
+fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
+    %19 = get_global @c : s32i*
+    %20 = load %19 : s32i, align 4
+    %21 = get_global @b : s32i*
+    store %20, %21, align 4
+    %22 = const 7 : s32i
+    %23 = get_global @a : s16i*
+    %24 = load %23 : s16i, align 2
+    %25 = cast(integral) %24 : s32i
+    %26 = and %25, %22 : s32i
+    %27 = cast(integral) %26 : s16i
+    store %27, %23, align 2
+    return
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = const 27 : s32i
+    %3 = get_global @c : s32i*
+    store %2, %3, align 4
+    %4 = const 14 : s16i
+    %5 = get_global @a : s16i*
+    store %4, %5, align 2
+    call @foo() [all]
+    scope {
+        %8 = get_global @b : s32i*
+        %9 = load %8 : s32i, align 4
+        %10 = const 27 : s32i
+        %11 = cmp ne %9, %10 : bool
+        %12 = ternary %11 ? { : bool
+            %18 = const #true : bool
+            yield %18
+        } : {
+            %13 = get_global @a : s16i*
+            %14 = load %13 : s16i, align 2
+            %15 = cast(integral) %14 : s32i
+            %16 = const 6 : s32i
+            %17 = cmp ne %15, %16 : bool
+            yield %17
+        }
+        if %12 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %6 = const 0 : s32i
+    store %6, %0
+    %7 = load %0 : s32i
+    return %7
+}

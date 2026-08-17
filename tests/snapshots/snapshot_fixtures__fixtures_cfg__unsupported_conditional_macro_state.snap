@@ -1,0 +1,22 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.cfg/unsupported_conditional_macro_state.c" (c, x86_64-unknown-linux-gnu)
+global value_after_endif : s32i = 5 [internal, default, align 4, dso_local]
+
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    %2 = get_global @value_after_endif : s32i*
+    %3 = load %2 : s32i, align 4
+    %4 = const 5 : s32i
+    %5 = cmp eq %3, %4 : bool
+    %6 = const 0 : s32i
+    %7 = const 1 : s32i
+    %8 = select %5, %6, %7 : s32i
+    store %8, %0
+    %9 = load %0 : s32i
+    return %9
+}

@@ -1,0 +1,64 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr118638.c" (c, x86_64-unknown-linux-gnu)
+fn foo(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %7 = alloca s32i, "x", align 4
+        %8 = alloca s32i, "__retval", align 4
+        %9 = alloca s32i, "a", align 4
+        %10 = alloca s32i, "b", align 4
+        %11 = alloca s32i, "c", align 4
+        store %arg0, %7
+        %12 = load %7 : s32i, align 4
+        %13 = const -3 : s32i
+        %14 = cmp ne %12, %13 : bool
+        %15 = cast(bool_to_int) %14 : s32i
+        store %15, %9, align 4
+        %16 = const 3 : s32i
+        %17 = load %9 : s32i, align 4
+        %18 = mul %17, %16 : s32i [nsw]
+        store %18, %9, align 4
+        %19 = const 2 : s32i
+        %20 = load %7 : s32i, align 4
+        %21 = mul %19, %20 : s32i [nsw]
+        %22 = const 9 : s32i
+        %23 = sub %21, %22 : s32i [nsw]
+        store %23, %10, align 4
+        %24 = load %9 : s32i, align 4
+        %25 = load %10 : s32i, align 4
+        %26 = add %24, %25 : s32i [nsw]
+        store %26, %9, align 4
+        %27 = load %9 : s32i, align 4
+        %28 = not %27 : s32i
+        store %28, %9, align 4
+        %29 = load %9 : s32i, align 4
+        %30 = const 1 : s32i
+        %31 = and %29, %30 : s32i
+        store %31, %11, align 4
+        %32 = load %11 : s32i, align 4
+        %33 = minus %32 : s32i [nsw]
+        store %33, %8
+        %34 = load %8 : s32i
+        return %34
+}
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = const 0 : s32i
+    store %1, %0
+    scope {
+        %3 = const 0 : s32i
+        %4 = call @foo(%3) : s32i [all]
+        %5 = const -1 : s32i
+        %6 = cmp ne %4, %5 : bool
+        if %6 {
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %2 = load %0 : s32i
+    return %2
+}

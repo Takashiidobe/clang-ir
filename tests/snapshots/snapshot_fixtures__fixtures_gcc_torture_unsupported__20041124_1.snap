@@ -1,0 +1,51 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture.unsupported/20041124-1.c" (c, x86_64-unknown-linux-gnu)
+global gs : rec_s = {(100, 200)} [external, default, align 2, dso_local]
+
+fn foo() -> u32i [external, c, no_inline, dso_local, nothrow] {
+    %17 = alloca rec_s, "coerce", align 4
+    %18 = alloca rec_s, "__retval", align 2
+    %19 = get_global @gs : rec_s*
+    copy %18, %19
+    %20 = load %18 : rec_s
+    store %20, %17
+    %21 = cast(bitcast) %17 : u32i*
+    %22 = load %21 : u32i
+    return %22
+}
+fn abort() -> void [external, c, nothrow];
+fn exit(%arg0: s32i) -> void [external, c];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca u32i, "coerce", align 4
+    %1 = alloca s32i, "__retval", align 4
+    %2 = const 0 : s32i
+    store %2, %1
+    scope {
+        %6 = alloca rec_s, "ref.tmp0", align 2
+        %7 = call @foo() : u32i [all]
+        store %7, %0
+        %8 = cast(bitcast) %0 : rec_s*
+        %9 = load %8 : rec_s
+        store %9, %6, align 2
+        %10 = get_member %6[0] "x" : complex<u16i>*
+        %11 = load %10 : complex<u16i>, align 2
+        %12 = get_global @gs : rec_s*
+        %13 = get_member %12[0] "x" : complex<u16i>*
+        %14 = load %13 : complex<u16i>, align 2
+        %15 = cmp ne %11, %14 : bool
+        if %15 {
+            %16 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %3 = get_global @exit : ((s32i) -> void)*
+    %4 = const 0 : s32i
+    call @exit(%4) [all]
+    %5 = load %1 : s32i
+    return %5
+}

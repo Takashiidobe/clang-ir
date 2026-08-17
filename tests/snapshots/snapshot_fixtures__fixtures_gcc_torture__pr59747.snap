@@ -1,0 +1,93 @@
+---
+source: tests/snapshot_fixtures.rs
+expression: snapshot
+---
+module "/home/takashi/Projects/clang-ir-rs/tests/fixtures.gcc-torture/pr59747.c" (c, x86_64-unknown-linux-gnu)
+global c : s32i = 1 [external, default, align 4, dso_local]
+global a : s32i[6] = zero [external, default, align 16, dso_local]
+global e : s16i = 0 [external, default, align 2, dso_local]
+global d : s32i = 0 [external, default, align 4, dso_local]
+
+fn fn1(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: s32i):
+        %38 = alloca s32i, "p", align 4
+        %39 = alloca s32i, "__retval", align 4
+        store %arg0, %38
+        %40 = load %38 : s32i, align 4
+        %41 = cast(integral) %40 : s64i
+        %42 = get_global @a : s32i[6]*
+        %43 = get_element %42[%41] : s32i*
+        %44 = load %43 : s32i, align 4
+        store %44, %39
+        %45 = load %39 : s32i
+        return %45
+}
+fn exit(%arg0: s32i) -> void [external, c];
+fn abort() -> void [external, c, nothrow];
+fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
+    %0 = alloca s32i, "__retval", align 4
+    %1 = alloca s64i, "f", align 8
+    %2 = const 0 : s32i
+    store %2, %0
+    scope {
+        %33 = const 8 : u64i
+        %34 = const 8 : u64i
+        %35 = cmp ne %33, %34 : bool
+        if %35 {
+            %36 = get_global @exit : ((s32i) -> void)*
+            %37 = const 0 : s32i
+            call @exit(%37) [all]
+            yield
+        }
+        yield
+    }
+    %3 = const 1 : s32i
+    %4 = const 0 : s64i
+    %5 = get_global @a : s32i[6]*
+    %6 = get_element %5[%4] : s32i*
+    store %3, %6, align 16
+    scope {
+        %27 = get_global @c : s32i*
+        %28 = load %27 : s32i, align 4
+        %29 = cast(int_to_bool) %28 : bool
+        if %29 {
+            %30 = get_global @e : s16i*
+            %31 = load %30 : s16i, align 2
+            %32 = dec %31 : s16i
+            store %32, %30, align 2
+            yield
+        }
+        yield
+    }
+    %7 = get_global @e : s16i*
+    %8 = load %7 : s16i, align 2
+    %9 = cast(integral) %8 : s32i
+    %10 = get_global @d : s32i*
+    store %9, %10, align 4
+    %11 = get_global @e : s16i*
+    %12 = load %11 : s16i, align 2
+    %13 = cast(integral) %12 : s64i
+    store %13, %1, align 8
+    scope {
+        %17 = load %1 : s64i, align 8
+        %18 = const 56 : s32i
+        %19 = shift right %17, %18 : s64i
+        %20 = const 1 : s64i
+        %21 = and %19, %20 : s64i
+        %22 = cast(integral) %21 : s32i
+        %23 = call @fn1(%22) : s32i [all]
+        %24 = const 0 : s32i
+        %25 = cmp ne %23, %24 : bool
+        if %25 {
+            %26 = get_global @abort : (() -> void)*
+            call @abort() [all]
+            yield
+        }
+        yield
+    }
+    %14 = get_global @exit : ((s32i) -> void)*
+    %15 = const 0 : s32i
+    call @exit(%15) [all]
+    %16 = load %0 : s32i
+    return %16
+}
