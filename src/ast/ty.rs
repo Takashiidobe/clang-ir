@@ -91,6 +91,7 @@ pub struct StructType {
     pub kind: RecordKind,
     pub incomplete: bool,
     pub packed: bool,
+    pub padded: bool,
     pub members: Vec<(RecordMemberKind, Type)>,
     /// Anything after the member list we didn't specifically parse (e.g.
     /// AST-decl attributes), kept as raw source text.

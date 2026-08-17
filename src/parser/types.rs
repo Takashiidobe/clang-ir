@@ -214,6 +214,7 @@ impl<'a> Parser<'a> {
 
         let mut incomplete = false;
         let mut packed = false;
+        let mut padded = false;
         loop {
             match self.tok().clone() {
                 Tok::Ident(ref id) if id == "incomplete" => {
@@ -223,6 +224,10 @@ impl<'a> Parser<'a> {
                 Tok::Ident(ref id) if id == "packed" => {
                     self.bump();
                     packed = true;
+                }
+                Tok::Ident(ref id) if id == "padded" => {
+                    self.bump();
+                    padded = true;
                 }
                 _ => break,
             }
@@ -264,6 +269,7 @@ impl<'a> Parser<'a> {
             kind,
             incomplete,
             packed,
+            padded,
             members,
             trailing,
         }))
