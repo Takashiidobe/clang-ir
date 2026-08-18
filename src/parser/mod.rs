@@ -197,6 +197,7 @@ impl<'a> Parser<'a> {
                 }
             }
         }
+        m.resolve_named_attrs();
         Ok(m)
     }
 

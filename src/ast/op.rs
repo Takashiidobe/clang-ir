@@ -122,4 +122,79 @@ impl Module {
         }
         current
     }
+
+    /// Resolves every `Attribute::Named` reachable from `self.ops`
+    /// against `self.attr_aliases`, replacing each reference in place its referenced value.
+    pub fn resolve_named_attrs(&mut self) {
+        let aliases = self.attr_aliases.clone();
+        for op in &mut self.ops {
+            resolve_op_attrs(op, &aliases);
+        }
+    }
+}
+
+fn resolve_op_attrs(op: &mut Operation, aliases: &BTreeMap<String, Attribute>) {
+    for (_, attr) in op.properties.iter_mut().chain(op.attributes.iter_mut()) {
+        resolve_attr_in_place(attr, aliases);
+    }
+    for region in &mut op.regions {
+        for block in &mut region.blocks {
+            for nested in &mut block.ops {
+                resolve_op_attrs(nested, aliases);
+            }
+        }
+    }
+}
+
+fn resolve_attr_in_place(attr: &mut Attribute, aliases: &BTreeMap<String, Attribute>) {
+    if let Attribute::Named(name) = attr
+        && let Some(resolved) = resolve_alias_chain(name, aliases)
+    {
+        *attr = resolved;
+    }
+    match attr {
+        Attribute::Array(items) => {
+            for item in items {
+                resolve_attr_in_place(item, aliases);
+            }
+        }
+        Attribute::Dict(entries) => {
+            for (_, v) in entries {
+                resolve_attr_in_place(v, aliases);
+            }
+        }
+        Attribute::ConstVector { elements, .. } | Attribute::ConstRecord { elements, .. } => {
+            for item in elements {
+                resolve_attr_in_place(item, aliases);
+            }
+        }
+        Attribute::ConstComplex { real, imag, .. } => {
+            resolve_attr_in_place(real, aliases);
+            resolve_attr_in_place(imag, aliases);
+        }
+        Attribute::ConstArray {
+            data: super::attr::ConstArrayData::Elements(items),
+            ..
+        } => {
+            for item in items {
+                resolve_attr_in_place(item, aliases);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn resolve_alias_chain(name: &str, aliases: &BTreeMap<String, Attribute>) -> Option<Attribute> {
+    let mut seen = std::collections::HashSet::new();
+    let mut current = name.to_string();
+    loop {
+        if !seen.insert(current.clone()) {
+            return None;
+        }
+        match aliases.get(&current) {
+            Some(Attribute::Named(next)) => current = next.clone(),
+            Some(other) => return Some(other.clone()),
+            None => return None,
+        }
+    }
 }
