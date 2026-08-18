@@ -386,6 +386,16 @@ int_enum! {
 }
 
 int_enum! {
+    /// `cir.complex.mul`/`cir.complex.div`'s `range` field.
+    ComplexRangeKind from "CIROps.td:6476-6482" {
+        Full = 0 => "full",
+        Improved = 1 => "improved",
+        Promoted = 2 => "promoted",
+        Basic = 3 => "basic",
+    }
+}
+
+int_enum! {
     /// `cir.init_catch_param`'s `kind` field.
     InitCatchKind from "CIROps.td:8677-8685" {
         Reference = 0 => "reference",

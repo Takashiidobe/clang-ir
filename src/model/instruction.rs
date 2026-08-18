@@ -12,7 +12,7 @@
 use crate::ast::{Attribute, Block, Operation, Region, Type, ValueId};
 use crate::model::enums::{
     AsmFlavor, AssumeBundleKind, AtomicFetchKind, CaseOpKind, CastKind, CleanupKind, CmpOpKind,
-    FpClassFlags, InitCatchKind, MemOrder, SideEffect, SyncScopeKind,
+    ComplexRangeKind, FpClassFlags, InitCatchKind, MemOrder, SideEffect, SyncScopeKind,
 };
 
 /// A lowered region: almost always a single unlabeled block, but CIR can
@@ -648,6 +648,26 @@ pub enum Instruction {
         lhs: ValueId,
         rhs: ValueId,
     },
+    ComplexMul {
+        result: ValueId,
+        ty: Type,
+        lhs: ValueId,
+        rhs: ValueId,
+        range: ComplexRangeKind,
+    },
+    ComplexDiv {
+        result: ValueId,
+        ty: Type,
+        lhs: ValueId,
+        rhs: ValueId,
+        range: ComplexRangeKind,
+    },
+    /// Negates the imaginary part: `cir.complex.conj`.
+    ComplexConj {
+        result: ValueId,
+        ty: Type,
+        operand: ValueId,
+    },
 
     // -- varargs --
     VaStart {
@@ -886,6 +906,16 @@ pub enum Instruction {
     Switch {
         condition: ValueId,
         cases: Vec<SwitchCase>,
+    },
+    /// A region-less, block-successor form of `cir.switch`, closer to LLVM
+    /// IR's `switch` than the C/C++ language feature: `cir.switch.flat`.
+    /// Each case value maps 1:1 to a destination block (no `anyof`/`range`
+    /// case kinds, unlike `cir.switch`'s `cir.case`).
+    SwitchFlat {
+        condition: ValueId,
+        ty: Type,
+        default_dest: String,
+        cases: Vec<(Attribute, String)>,
     },
     /// A standalone `cir.case`, encountered when it's nested inside another
     /// case's body rather than a direct child of `cir.switch` (the "simple
@@ -1599,6 +1629,37 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 rhs: operand(op, 1)?.clone(),
             })
         }
+        "complex.mul" | "complex.div" => {
+            let (result, ty) = single_result(op)?;
+            let lhs = operand(op, 0)?.clone();
+            let rhs = operand(op, 1)?.clone();
+            let range = ComplexRangeKind::try_from(op.attr("range")?).ok()?;
+            Some(if op.mnemonic() == "complex.mul" {
+                Instruction::ComplexMul {
+                    result: result.clone(),
+                    ty: ty.clone(),
+                    lhs,
+                    rhs,
+                    range,
+                }
+            } else {
+                Instruction::ComplexDiv {
+                    result: result.clone(),
+                    ty: ty.clone(),
+                    lhs,
+                    rhs,
+                    range,
+                }
+            })
+        }
+        "complex.conj" => {
+            let (result, ty) = single_result(op)?;
+            Some(Instruction::ComplexConj {
+                result: result.clone(),
+                ty: ty.clone(),
+                operand: operand(op, 0)?.clone(),
+            })
+        }
         "va_start" => Some(Instruction::VaStart {
             addr: operand(op, 0)?.clone(),
         }),
@@ -1867,6 +1928,27 @@ fn try_lower(op: &Operation) -> Option<Instruction> {
                 .collect::<Option<Vec<_>>>()?;
             Some(Instruction::Switch {
                 condition: operand(op, 0)?.clone(),
+                cases,
+            })
+        }
+        "switch.flat" => {
+            let condition = operand(op, 0)?.clone();
+            let ty = op.operand_types.first()?.clone();
+            let default_dest = op.successors.first()?.clone();
+            let case_dests = op.successors.get(1..)?;
+            let case_values = op.attr("caseValues").and_then(Attribute::as_array)?;
+            if case_values.len() != case_dests.len() {
+                return None;
+            }
+            let cases = case_values
+                .iter()
+                .cloned()
+                .zip(case_dests.iter().cloned())
+                .collect();
+            Some(Instruction::SwitchFlat {
+                condition,
+                ty,
+                default_dest,
                 cases,
             })
         }
@@ -2603,6 +2685,30 @@ fn write_instruction(
             write_indent(f, level)?;
             writeln!(f, "%{result} = complex.sub %{lhs}, %{rhs} : {ty}")
         }
+        ComplexMul {
+            result,
+            ty,
+            lhs,
+            rhs,
+            range,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = complex.mul %{lhs}, %{rhs} range({range}) : {ty}")
+        }
+        ComplexDiv {
+            result,
+            ty,
+            lhs,
+            rhs,
+            range,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = complex.div %{lhs}, %{rhs} range({range}) : {ty}")
+        }
+        ComplexConj { result, ty, operand } => {
+            write_indent(f, level)?;
+            writeln!(f, "%{result} = complex.conj %{operand} : {ty}")
+        }
         VaStart { addr } => {
             write_indent(f, level)?;
             writeln!(f, "va_start %{addr}")
@@ -2966,6 +3072,21 @@ fn write_instruction(
                 write_body(&case.body, f, level + 2)?;
                 write_indent(f, level + 1)?;
                 writeln!(f, "}}")?;
+            }
+            write_indent(f, level)?;
+            writeln!(f, "}}")
+        }
+        SwitchFlat {
+            condition,
+            ty,
+            default_dest,
+            cases,
+        } => {
+            write_indent(f, level)?;
+            writeln!(f, "switch.flat %{condition} : {ty}, default: ^{default_dest} {{")?;
+            for (value, dest) in cases {
+                write_indent(f, level + 1)?;
+                writeln!(f, "{value}: ^{dest}")?;
             }
             write_indent(f, level)?;
             writeln!(f, "}}")
@@ -3679,6 +3800,73 @@ mod tests {
             Instruction::ComplexSub { ref result, ref lhs, ref rhs, .. }
                 if result == "2" && lhs == "0" && rhs == "1"
         ));
+    }
+
+    #[test]
+    fn complex_mul_lowers() {
+        let instr = lower_single_op(
+            r#"%2 = "cir.complex.mul"(%0, %1) <{range = 3 : i32}> : (!cir.complex<!cir.float>, !cir.complex<!cir.float>) -> !cir.complex<!cir.float>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::ComplexMul { ref result, ref lhs, ref rhs, range: ComplexRangeKind::Basic, .. }
+                if result == "2" && lhs == "0" && rhs == "1"
+        ));
+        assert_eq!(
+            instr.to_string(),
+            "%2 = complex.mul %0, %1 range(basic) : complex<float>\n"
+        );
+    }
+
+    #[test]
+    fn complex_div_lowers() {
+        let instr = lower_single_op(
+            r#"%2 = "cir.complex.div"(%0, %1) <{range = 0 : i32}> : (!cir.complex<!cir.float>, !cir.complex<!cir.float>) -> !cir.complex<!cir.float>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::ComplexDiv { ref result, ref lhs, ref rhs, range: ComplexRangeKind::Full, .. }
+                if result == "2" && lhs == "0" && rhs == "1"
+        ));
+        assert_eq!(
+            instr.to_string(),
+            "%2 = complex.div %0, %1 range(full) : complex<float>\n"
+        );
+    }
+
+    #[test]
+    fn complex_conj_lowers() {
+        let instr = lower_single_op(
+            r#"%1 = "cir.complex.conj"(%0) : (!cir.complex<!cir.float>) -> !cir.complex<!cir.float>"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::ComplexConj { ref result, ref operand, .. }
+                if result == "1" && operand == "0"
+        ));
+        assert_eq!(
+            instr.to_string(),
+            "%1 = complex.conj %0 : complex<float>\n"
+        );
+    }
+
+    #[test]
+    fn switch_flat_lowers() {
+        let instr = lower_single_op(
+            r#""cir.switch.flat"(%0)[^bb1, ^bb2, ^bb3] <{caseValues = [1, 2]}> : (!cir.int<s, 32>) -> ()"#,
+        );
+        assert!(matches!(
+            instr,
+            Instruction::SwitchFlat { ref condition, ref default_dest, ref cases, .. }
+                if condition == "0" && default_dest == "bb1"
+                    && cases.len() == 2
+                    && cases[0].1 == "bb2"
+                    && cases[1].1 == "bb3"
+        ));
+        assert_eq!(
+            instr.to_string(),
+            "switch.flat %0 : s32, default: ^bb1 {\n    1: ^bb2\n    2: ^bb3\n}\n"
+        );
     }
 
     #[test]
