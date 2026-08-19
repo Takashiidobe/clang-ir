@@ -198,6 +198,12 @@ pub struct GetGlobal {
 /// into the `ctorRegion`/`dtorRegion` runs under a constrained floating-point
 /// environment. LoweringPrepare forwards it to the `strictfp` attribute of the
 /// generated `__cxx_global_var_init` function.
+///
+/// The `init_priority` attribute records the priority specified by a
+/// C++ `init_priority` attribute on the source variable declaration.
+/// LoweringPrepare uses it to place the dynamic initializer emitted from
+/// `ctorRegion` into a priority-specific `_GLOBAL__I_<priority>` function
+/// instead of the default `_GLOBAL__sub_I_*` function.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Global {
@@ -239,6 +245,8 @@ pub struct Global {
     pub aliasee: Option<crate::attrs::Attribute>,
     /// unit attribute
     pub strictfp: bool,
+    /// 32-bit signless integer attribute
+    pub init_priority: Option<crate::attrs::Attribute>,
     pub ctor_region: super::Region,
     pub dtor_region: super::Region,
     pub loc: Option<crate::ast::SourceLocation>,

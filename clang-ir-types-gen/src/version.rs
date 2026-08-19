@@ -1,10 +1,6 @@
 use std::{env, fs, path::Path, process::Command};
 
-pub(crate) fn types_crate_version(
-    base_version: &str,
-    counter: u64,
-    llvm_commit: &str,
-) -> String {
+pub(crate) fn types_crate_version(base_version: &str, counter: u64, llvm_commit: &str) -> String {
     format!("{base_version}-{counter}-{llvm_commit}")
 }
 
@@ -17,11 +13,7 @@ pub(crate) fn read_counter(counter_file: &Path) -> Result<u64, Box<dyn std::erro
     let value = fs::read_to_string(counter_file)?;
     let value = value.trim();
     if value.is_empty() {
-        return Err(format!(
-            "counter file {} is empty",
-            counter_file.display()
-        )
-        .into());
+        return Err(format!("counter file {} is empty", counter_file.display()).into());
     }
     value.parse::<u64>().map_err(|_| {
         format!(

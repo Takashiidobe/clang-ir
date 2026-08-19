@@ -13,10 +13,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let keeper = io::parse_keeper(&config.llvm_dir.to_string_lossy())?;
 
     let base_version = version::template_version(&config.template_dir)?;
-    let counter = version::read_counter(&config.counter_file)?;
+    let counter = version::read_counter(&config.counter_file)? + 1;
     let llvm_commit = version::llvm_short_commit(&config.llvm_dir)?;
-    let crate_version =
-        version::types_crate_version(&base_version, counter, &llvm_commit);
+    let crate_version = version::types_crate_version(&base_version, counter, &llvm_commit);
 
     if config.out_dir.exists() {
         fs::remove_dir_all(&config.out_dir)?;
@@ -46,17 +45,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     )?;
 
     let (op_modules, op_variants) = ops::collect_ops(&keeper)?;
-    ops::write_ops(
-        &config.out_dir.join("src/ops"),
-        op_modules,
-        op_variants,
-    )?;
+    ops::write_ops(&config.out_dir.join("src/ops"), op_modules, op_variants)?;
 
     let out_dir = config.out_dir.canonicalize().unwrap_or(config.out_dir);
     println!(
         "generated clang-ir-types {crate_version} in {}",
         out_dir.display()
     );
+    fs::write(&config.counter_file, counter.to_string())?;
     Ok(())
 }
 
@@ -72,7 +68,7 @@ impl Config {
         let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         let mut llvm_dir = PathBuf::from(
             env::var("LLVM_PROJECT_DIR")
-                .unwrap_or_else(|_| "/home/takashi/llvm-project".into()),
+                .unwrap_or_else(|_| "/home/takashi/llvm-project-ref".into()),
         );
         let mut out_dir = manifest_dir.join("../clang-ir-types");
         let mut template_dir = manifest_dir.join("template");
@@ -84,10 +80,9 @@ impl Config {
             let arg = args[i].as_str();
             let value_for = |i: &mut usize| -> Result<String, Box<dyn std::error::Error>> {
                 *i += 1;
-                args.get(*i).cloned().ok_or_else(|| {
-                    format!("missing value for {}", args[*i - 1])
-                        .into()
-                })
+                args.get(*i)
+                    .cloned()
+                    .ok_or_else(|| format!("missing value for {}", args[*i - 1]).into())
             };
 
             if let Some(value) = arg.strip_prefix("--llvm-dir=") {

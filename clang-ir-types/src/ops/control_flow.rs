@@ -154,8 +154,8 @@ pub struct CleanupScope {
 /// Example:
 ///
 /// ```
-/// cir.for cond {
-///   cir.condition(%val) // Branches to `step` region or exits.
+/// cir.for : cond {
+///   cir.condition(%val) // Branches to `body` region or exits.
 /// } body {
 ///   cir.yield
 /// } step {
@@ -205,7 +205,7 @@ pub struct Continue {
 /// ^bb2:
 ///   cir.yield
 /// } while {
-///   cir.condition %cond : cir.bool
+///   cir.condition(%cond)
 /// }
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -234,13 +234,23 @@ pub struct Do {
 /// Example:
 ///
 /// ```
-/// cir.for cond {
+/// cir.for : cond {
 ///   cir.condition(%val)
 /// } body {
 ///   cir.break
 /// ^bb2:
 ///   cir.yield
 /// } step {
+///   cir.yield
+/// }
+///
+/// cir.for : cond {
+///   cir.condition(%val)
+/// } body {
+///   cir.yield
+/// } step {
+///   cir.yield
+/// } cleanup all {
 ///   cir.yield
 /// }
 /// ```
@@ -685,11 +695,17 @@ pub struct Unreachable {
 ///
 /// ```
 /// cir.while {
-///   cir.break
-/// ^bb2:
-///   cir.yield
+///   cir.condition(%cond)
 /// } do {
-///   cir.condition %cond : cir.bool
+///   cir.yield
+/// }
+///
+/// cir.while {
+///   cir.condition(%cond)
+/// } do {
+///   cir.yield
+/// } cleanup all {
+///   cir.yield
 /// }
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]

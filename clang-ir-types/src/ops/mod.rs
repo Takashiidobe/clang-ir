@@ -1307,8 +1307,8 @@ pub enum Op {
     /// Example:
     ///
     /// ```
-    /// cir.for cond {
-    ///   cir.condition(%val) // Branches to `step` region or exits.
+    /// cir.for : cond {
+    ///   cir.condition(%val) // Branches to `body` region or exits.
     /// } body {
     ///   cir.yield
     /// } step {
@@ -1661,7 +1661,7 @@ pub enum Op {
     /// ^bb2:
     ///   cir.yield
     /// } while {
-    ///   cir.condition %cond : cir.bool
+    ///   cir.condition(%cond)
     /// }
     /// ```
     Do(control_flow::Do),
@@ -2190,13 +2190,23 @@ pub enum Op {
     /// Example:
     ///
     /// ```
-    /// cir.for cond {
+    /// cir.for : cond {
     ///   cir.condition(%val)
     /// } body {
     ///   cir.break
     /// ^bb2:
     ///   cir.yield
     /// } step {
+    ///   cir.yield
+    /// }
+    ///
+    /// cir.for : cond {
+    ///   cir.condition(%val)
+    /// } body {
+    ///   cir.yield
+    /// } step {
+    ///   cir.yield
+    /// } cleanup all {
     ///   cir.yield
     /// }
     /// ```
@@ -2566,6 +2576,12 @@ pub enum Op {
     /// into the `ctorRegion`/`dtorRegion` runs under a constrained floating-point
     /// environment. LoweringPrepare forwards it to the `strictfp` attribute of the
     /// generated `__cxx_global_var_init` function.
+    ///
+    /// The `init_priority` attribute records the priority specified by a
+    /// C++ `init_priority` attribute on the source variable declaration.
+    /// LoweringPrepare uses it to place the dynamic initializer emitted from
+    /// `ctorRegion` into a priority-specific `_GLOBAL__I_<priority>` function
+    /// instead of the default `_GLOBAL__sub_I_*` function.
     Global(globals::Global),
     /// `cir.goto`
     ///
@@ -4452,11 +4468,17 @@ pub enum Op {
     ///
     /// ```
     /// cir.while {
-    ///   cir.break
-    /// ^bb2:
-    ///   cir.yield
+    ///   cir.condition(%cond)
     /// } do {
-    ///   cir.condition %cond : cir.bool
+    ///   cir.yield
+    /// }
+    ///
+    /// cir.while {
+    ///   cir.condition(%cond)
+    /// } do {
+    ///   cir.yield
+    /// } cleanup all {
+    ///   cir.yield
     /// }
     /// ```
     While(control_flow::While),
@@ -6339,6 +6361,7 @@ fn lower_global(op: &crate::ast::Operation) -> Option<Op> {
             annotations: op.attr("annotations").cloned(),
             aliasee: op.attr("aliasee").cloned(),
             strictfp: unit_attr(op, "strictfp"),
+            init_priority: op.attr("init_priority").cloned(),
             ctor_region: lower_region(op.regions.get(0)?),
             dtor_region: lower_region(op.regions.get(1)?),
             loc: op.loc.clone(),

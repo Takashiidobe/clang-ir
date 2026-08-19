@@ -24,15 +24,16 @@ pub(crate) fn enum_type_tokens(rec: Record<'_>) -> Result<TokenStream, Box<dyn s
 
 pub(crate) fn enum_type_name(rec: Record<'_>) -> Result<String, Box<dyn std::error::Error>> {
     if let Ok(name) = rec.str_value("className")
-        && !name.is_empty() {
-            return Ok(name.to_string());
-        }
+        && !name.is_empty()
+    {
+        return Ok(name.to_string());
+    }
     if let Ok(ret) = rec.str_value("returnType")
         && let Some(last) = ret.rsplit("::").next()
-            && !last.is_empty()
-        {
-            return Ok(last.to_string());
-        }
+        && !last.is_empty()
+    {
+        return Ok(last.to_string());
+    }
     variant_base_name(rec, "")
 }
 
