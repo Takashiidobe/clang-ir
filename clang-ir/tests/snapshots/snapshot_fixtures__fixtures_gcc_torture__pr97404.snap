@@ -1,15 +1,15 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr97404.c" (c, x86_64-unknown-linux-gnu)
-global c : s64i = 0 [external, default, align 8, dso_local]
-global f : s64i* = @c [external, default, align 8, dso_local]
-global d : s16i = 0 [external, default, align 2, dso_local]
-global e : s16i = 0 [external, default, align 2, dso_local]
-global g : s32i = 0 [external, default, align 4, dso_local]
-global a : s8i = 0 [external, default, align 1, dso_local]
-global b : s8i = 0 [external, default, align 1, dso_local]
+global c : s64i = CirInt { ty: Named("s64i"), value: "0" } [external, default, align 8, dso_local]
+global f : s64i* = GlobalView { ty: Pointer { pointee: Named("s64i"), addr_space: None }, symbol: "c", indices: None } [external, default, align 8, dso_local]
+global d : s16i = CirInt { ty: Named("s16i"), value: "0" } [external, default, align 2, dso_local]
+global e : s16i = CirInt { ty: Named("s16i"), value: "0" } [external, default, align 2, dso_local]
+global g : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global a : s8i = CirInt { ty: Named("s8i"), value: "0" } [external, default, align 1, dso_local]
+global b : s8i = CirInt { ty: Named("s8i"), value: "0" } [external, default, align 1, dso_local]
 
 fn h(%arg2: s8i) -> s8i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg2: s8i):
@@ -31,16 +31,16 @@ fn j(%arg0: s16i, %arg1: s32i) -> s16i [internal, c, no_inline, dso_local, nothr
         %35 = load %32 : s16i, align 2
         %36 = cast(integral) %35 : s32i
         %37 = const 0 : s32i
-        %38 = cmp lt %36, %37 : bool
+        cmp
         %39 = ternary %38 ? { : s32i
-            %46 = const 0 : s32i
-            yield %46
+                %46 = const 0 : s32i
+                yield %46
         } : {
-            %42 = load %32 : s16i, align 2
-            %43 = cast(integral) %42 : s32i
-            %44 = load %33 : s32i, align 4
-            %45 = shift right %43, %44 : s32i
-            yield %45
+                %42 = load %32 : s16i, align 2
+                %43 = cast(integral) %42 : s32i
+                %44 = load %33 : s32i, align 4
+                shift
+                yield %45
         }
         %40 = cast(integral) %39 : s16i
         store %40, %34
@@ -48,58 +48,58 @@ fn j(%arg0: s16i, %arg1: s32i) -> s16i [internal, c, no_inline, dso_local, nothr
         return %41
 }
 fn m() -> void [external, c, no_inline, dso_local, nothrow] {
-    %18 = get_global @d : s16i*
-    %19 = load %18 : s16i, align 2
-    %20 = cast(integral) %19 : s32i
-    %21 = const 9766 : s32i
-    %22 = or %20, %21 : s32i
-    %23 = cast(integral) %22 : s16i
-    %24 = const 11 : s32i
-    %25 = call @j(%23, %24) : s16i [all]
-    %26 = get_global @e : s16i*
-    store %25, %26, align 2
-    %27 = get_global @e : s16i*
-    %28 = load %27 : s16i, align 2
-    %29 = cast(integral) %28 : s64i
-    %30 = get_global @f : s64i**
-    %31 = load %30 : s64i*, align 8
-    store %29, %31, align 8
-    return
+        %18 = get_global @d : s16i*
+        %19 = load %18 : s16i, align 2
+        %20 = cast(integral) %19 : s32i
+        %21 = const 9766 : s32i
+        or
+        %23 = cast(integral) %22 : s16i
+        %24 = const 11 : s32i
+        %25 = call @j(%23, %24) : s16i [all]
+        %26 = get_global @e : s16i*
+        store %25, %26, align 2
+        %27 = get_global @e : s16i*
+        %28 = load %27 : s16i, align 2
+        %29 = cast(integral) %28 : s64i
+        %30 = get_global @f : s64i**
+        %31 = load %30 : s64i*, align 8
+        store %29, %31, align 8
+        return
 }
 fn l() -> void [external, c, no_inline, dso_local, nothrow] {
-    %8 = const 5 : s32i
-    %9 = get_global @g : s32i*
-    %10 = load %9 : s32i, align 4
-    %11 = or %10, %8 : s32i
-    %12 = cast(integral) %11 : s8i
-    %13 = get_global @a : s8i*
-    store %12, %13, align 1
-    %14 = get_global @a : s8i*
-    %15 = load %14 : s8i, align 1
-    %16 = call @h(%15) : s8i [all]
-    %17 = get_global @b : s8i*
-    store %16, %17, align 1
-    return
+        %8 = const 5 : s32i
+        %9 = get_global @g : s32i*
+        %10 = load %9 : s32i, align 4
+        or
+        %12 = cast(integral) %11 : s8i
+        %13 = get_global @a : s8i*
+        store %12, %13, align 1
+        %14 = get_global @a : s8i*
+        %15 = load %14 : s8i, align 1
+        %16 = call @h(%15) : s8i [all]
+        %17 = get_global @b : s8i*
+        store %16, %17, align 1
+        return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    call @m() [all]
-    scope {
-        %4 = get_global @c : s64i*
-        %5 = load %4 : s64i, align 8
-        %6 = const 4 : s64i
-        %7 = cmp ne %5, %6 : bool
-        if %7 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        call @m() [all]
+        scope {
+                %4 = get_global @c : s64i*
+                %5 = load %4 : s64i, align 8
+                %6 = const 4 : s64i
+                cmp
+                if %7 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

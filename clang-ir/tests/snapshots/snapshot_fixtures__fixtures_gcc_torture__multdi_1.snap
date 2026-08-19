@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/multdi-1.c" (c, x86_64-unknown-linux-gnu)
-global mpy_res : s64i = 0 [external, default, align 8, dso_local]
+global mpy_res : s64i = CirInt { ty: Named("s64i"), value: "0" } [external, default, align 8, dso_local]
 
 fn mpy(%arg0: s64i, %arg1: s64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s64i, %arg1: s64i):
@@ -16,36 +16,36 @@ fn mpy(%arg0: s64i, %arg1: s64i) -> u64i [external, c, no_inline, dso_local, not
         %18 = cast(integral) %17 : u64i
         %19 = load %15 : s64i, align 8
         %20 = cast(integral) %19 : u64i
-        %21 = mul %18, %20 : u64i
+        mul
         store %21, %16
         %22 = load %16 : u64i
         return %22
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : s64i
-    %3 = const -1 : s64i
-    %4 = call @mpy(%2, %3) : u64i [all]
-    %5 = cast(integral) %4 : s64i
-    %6 = get_global @mpy_res : s64i*
-    store %5, %6, align 8
-    scope {
-        %9 = get_global @mpy_res : s64i*
-        %10 = load %9 : s64i, align 8
-        %11 = const -1 : s64i
-        %12 = cmp ne %10, %11 : bool
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : s64i
+        %3 = const -1 : s64i
+        %4 = call @mpy(%2, %3) : u64i [all]
+        %5 = cast(integral) %4 : s64i
+        %6 = get_global @mpy_res : s64i*
+        store %5, %6, align 8
+        scope {
+                %9 = get_global @mpy_res : s64i*
+                %10 = load %9 : s64i, align 8
+                %11 = const -1 : s64i
+                cmp
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = load %0 : s32i
-    return %8
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = load %0 : s32i
+        return %8
 }

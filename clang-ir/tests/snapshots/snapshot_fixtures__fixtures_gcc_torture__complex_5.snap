@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/complex-5.c" (c, x86_64-unknown-linux-gnu)
-global x : complex<float> = (1.000000e+00, 1.400000e+01) [external, default, align 4, dso_local]
-global y : complex<float> = (7.000000e+00, 5.000000e+00) [external, default, align 4, dso_local]
-global w : complex<float> = (8.000000e+00, 1.900000e+01) [external, default, align 4, dso_local]
-global z : complex<float> = zero [external, default, align 4, dso_local]
+global x : complex<float> = ConstComplex { ty: Complex { element_type: Single }, real: CirFloat { ty: Single, value: "1.000000e+00" }, imag: CirFloat { ty: Single, value: "1.400000e+01" } } [external, default, align 4, dso_local]
+global y : complex<float> = ConstComplex { ty: Complex { element_type: Single }, real: CirFloat { ty: Single, value: "7.000000e+00" }, imag: CirFloat { ty: Single, value: "5.000000e+00" } } [external, default, align 4, dso_local]
+global w : complex<float> = ConstComplex { ty: Complex { element_type: Single }, real: CirFloat { ty: Single, value: "8.000000e+00" }, imag: CirFloat { ty: Single, value: "1.900000e+01" } } [external, default, align 4, dso_local]
+global z : complex<float> = Zero { ty: Complex { element_type: Single } } [external, default, align 4, dso_local]
 
 fn __divsc3(%arg0: float, %arg1: float, %arg2: float, %arg3: float) -> complex<float> [external, c];
 fn p(%arg0: vector<2 x float>, %arg1: vector<2 x float>) -> vector<2 x float> [external, c, no_inline, dso_local, nothrow] {
@@ -27,7 +27,7 @@ fn p(%arg0: vector<2 x float>, %arg1: vector<2 x float>) -> vector<2 x float> [e
         store %58, %63
         %65 = load %62 : complex<float>, align 4
         %66 = load %63 : complex<float>, align 4
-        %67 = complex.add %65, %66 : complex<float>
+        complex.add
         store %67, %64, align 4
         %68 = load %64 : complex<float>
         store %68, %55
@@ -38,81 +38,81 @@ fn p(%arg0: vector<2 x float>, %arg1: vector<2 x float>) -> vector<2 x float> [e
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca vector<2 x float>, "coerce", align 8
-    %1 = alloca complex<float>, "coerce", align 8
-    %2 = alloca complex<float>, "coerce", align 8
-    %3 = alloca vector<2 x float>, "coerce", align 8
-    %4 = alloca complex<float>, "coerce", align 8
-    %5 = alloca complex<float>, "coerce", align 8
-    %6 = alloca s32i, "__retval", align 4
-    %7 = alloca complex<float>, "coerce", align 4
-    %8 = alloca complex<float>, "coerce", align 4
-    %9 = alloca complex<float>, "coerce", align 4
-    %10 = alloca complex<float>, "coerce", align 4
-    %11 = const 0 : s32i
-    store %11, %6
-    %12 = get_global @x : complex<float>*
-    %13 = load %12 : complex<float>, align 4
-    %14 = get_global @y : complex<float>*
-    %15 = load %14 : complex<float>, align 4
-    store %13, %7, align 4
-    %16 = load %7 : complex<float>, align 4
-    store %15, %8, align 4
-    %17 = load %8 : complex<float>, align 4
-    store %16, %5
-    %18 = cast(bitcast) %5 : vector<2 x float>*
-    %19 = load %18 : vector<2 x float>
-    store %17, %4
-    %20 = cast(bitcast) %4 : vector<2 x float>*
-    %21 = load %20 : vector<2 x float>
-    %22 = call @p(%19, %21) : vector<2 x float> [all]
-    store %22, %3
-    %23 = cast(bitcast) %3 : complex<float>*
-    %24 = load %23 : complex<float>
-    %25 = get_global @z : complex<float>*
-    store %24, %25, align 4
-    %26 = get_global @x : complex<float>*
-    %27 = load %26 : complex<float>, align 4
-    %28 = get_global @z : complex<float>*
-    %29 = load %28 : complex<float>, align 4
-    %30 = const (1.000000e+00, 0.000000e+00) : complex<float>
-    %31 = complex.real %30 : float
-    %32 = complex.imag %30 : float
-    %33 = complex.real %29 : float
-    %34 = complex.imag %29 : float
-    %35 = call @__divsc3(%31, %32, %33, %34) : complex<float> [all]
-    store %27, %9, align 4
-    %36 = load %9 : complex<float>, align 4
-    store %35, %10, align 4
-    %37 = load %10 : complex<float>, align 4
-    store %36, %2
-    %38 = cast(bitcast) %2 : vector<2 x float>*
-    %39 = load %38 : vector<2 x float>
-    store %37, %1
-    %40 = cast(bitcast) %1 : vector<2 x float>*
-    %41 = load %40 : vector<2 x float>
-    %42 = call @p(%39, %41) : vector<2 x float> [all]
-    store %42, %0
-    %43 = cast(bitcast) %0 : complex<float>*
-    %44 = load %43 : complex<float>
-    %45 = get_global @y : complex<float>*
-    store %44, %45, align 4
-    scope {
-        %49 = get_global @z : complex<float>*
-        %50 = load %49 : complex<float>, align 4
-        %51 = get_global @w : complex<float>*
-        %52 = load %51 : complex<float>, align 4
-        %53 = cmp ne %50, %52 : bool
-        if %53 {
-            %54 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca vector<2 x float>, "coerce", align 8
+        %1 = alloca complex<float>, "coerce", align 8
+        %2 = alloca complex<float>, "coerce", align 8
+        %3 = alloca vector<2 x float>, "coerce", align 8
+        %4 = alloca complex<float>, "coerce", align 8
+        %5 = alloca complex<float>, "coerce", align 8
+        %6 = alloca s32i, "__retval", align 4
+        %7 = alloca complex<float>, "coerce", align 4
+        %8 = alloca complex<float>, "coerce", align 4
+        %9 = alloca complex<float>, "coerce", align 4
+        %10 = alloca complex<float>, "coerce", align 4
+        %11 = const 0 : s32i
+        store %11, %6
+        %12 = get_global @x : complex<float>*
+        %13 = load %12 : complex<float>, align 4
+        %14 = get_global @y : complex<float>*
+        %15 = load %14 : complex<float>, align 4
+        store %13, %7, align 4
+        %16 = load %7 : complex<float>, align 4
+        store %15, %8, align 4
+        %17 = load %8 : complex<float>, align 4
+        store %16, %5
+        %18 = cast(bitcast) %5 : vector<2 x float>*
+        %19 = load %18 : vector<2 x float>
+        store %17, %4
+        %20 = cast(bitcast) %4 : vector<2 x float>*
+        %21 = load %20 : vector<2 x float>
+        %22 = call @p(%19, %21) : vector<2 x float> [all]
+        store %22, %3
+        %23 = cast(bitcast) %3 : complex<float>*
+        %24 = load %23 : complex<float>
+        %25 = get_global @z : complex<float>*
+        store %24, %25, align 4
+        %26 = get_global @x : complex<float>*
+        %27 = load %26 : complex<float>, align 4
+        %28 = get_global @z : complex<float>*
+        %29 = load %28 : complex<float>, align 4
+        %30 = const (1.000000e+00, 0.000000e+00) : complex<float>
+        complex.real
+        complex.imag
+        complex.real
+        complex.imag
+        %35 = call @__divsc3(%31, %32, %33, %34) : complex<float> [all]
+        store %27, %9, align 4
+        %36 = load %9 : complex<float>, align 4
+        store %35, %10, align 4
+        %37 = load %10 : complex<float>, align 4
+        store %36, %2
+        %38 = cast(bitcast) %2 : vector<2 x float>*
+        %39 = load %38 : vector<2 x float>
+        store %37, %1
+        %40 = cast(bitcast) %1 : vector<2 x float>*
+        %41 = load %40 : vector<2 x float>
+        %42 = call @p(%39, %41) : vector<2 x float> [all]
+        store %42, %0
+        %43 = cast(bitcast) %0 : complex<float>*
+        %44 = load %43 : complex<float>
+        %45 = get_global @y : complex<float>*
+        store %44, %45, align 4
+        scope {
+                %49 = get_global @z : complex<float>*
+                %50 = load %49 : complex<float>, align 4
+                %51 = get_global @w : complex<float>*
+                %52 = load %51 : complex<float>, align 4
+                cmp
+                if %53 {
+                        %54 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %46 = get_global @exit : ((s32i) -> void)*
-    %47 = const 0 : s32i
-    call @exit(%47) [all]
-    %48 = load %6 : s32i
-    return %48
+        %46 = get_global @exit : (s32i) -> void*
+        %47 = const 0 : s32i
+        call @exit(%47) [all]
+        %48 = load %6 : s32i
+        return %48
 }

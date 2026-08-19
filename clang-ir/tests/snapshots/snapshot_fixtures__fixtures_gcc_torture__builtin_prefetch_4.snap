@@ -1,13 +1,13 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/builtin-prefetch-4.c" (c, x86_64-unknown-linux-gnu)
-global arr : s32i[100] = zero [external, default, align 16, dso_local]
-global ptr : s32i* = @arr[20] [external, default, align 8, dso_local]
-global arrindex : s32i = 4 [external, default, align 4, dso_local]
-global getptrcnt : s32i = 0 [external, default, align 4, dso_local]
-global getintcnt : s32i = 0 [external, default, align 4, dso_local]
+global arr : s32i[100] = Zero { ty: Array { element_type: Named("s32i"), size: 100 } } [external, default, align 16, dso_local]
+global ptr : s32i* = GlobalView { ty: Pointer { pointee: Named("s32i"), addr_space: None }, symbol: "arr", indices: Some(Array([Int { value: 20, ty: None }])) } [external, default, align 8, dso_local]
+global arrindex : s32i = CirInt { ty: Named("s32i"), value: "4" } [external, default, align 4, dso_local]
+global getptrcnt : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global getintcnt : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn assign_arg_ptr(%arg19: s32i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg19: s32i*):
@@ -18,31 +18,31 @@ fn assign_arg_ptr(%arg19: s32i*) -> s32i [external, c, no_inline, dso_local, not
         %490 = load %487 : s32i*, align 8
         store %490, %489, align 8
         %491 = cast(bitcast) %490 : void*
-        prefetch %491, locality(0)
+        prefetch
         %492 = load %489 : s32i*, align 8
         %493 = load %487 : s32i*, align 8
-        %494 = cmp eq %492, %493 : bool
+        cmp
         %495 = cast(bool_to_int) %494 : s32i
         store %495, %488
         %496 = load %488 : s32i
         return %496
 }
 fn assign_glob_ptr() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %476 = alloca s32i, "__retval", align 4
-    %477 = alloca s32i*, "q", align 8
-    %478 = get_global @ptr : s32i**
-    %479 = load %478 : s32i*, align 8
-    store %479, %477, align 8
-    %480 = cast(bitcast) %479 : void*
-    prefetch %480, locality(0)
-    %481 = load %477 : s32i*, align 8
-    %482 = get_global @ptr : s32i**
-    %483 = load %482 : s32i*, align 8
-    %484 = cmp eq %481, %483 : bool
-    %485 = cast(bool_to_int) %484 : s32i
-    store %485, %476
-    %486 = load %476 : s32i
-    return %486
+        %476 = alloca s32i, "__retval", align 4
+        %477 = alloca s32i*, "q", align 8
+        %478 = get_global @ptr : s32i**
+        %479 = load %478 : s32i*, align 8
+        store %479, %477, align 8
+        %480 = cast(bitcast) %479 : void*
+        prefetch
+        %481 = load %477 : s32i*, align 8
+        %482 = get_global @ptr : s32i**
+        %483 = load %482 : s32i*, align 8
+        cmp
+        %485 = cast(bool_to_int) %484 : s32i
+        store %485, %476
+        %486 = load %476 : s32i
+        return %486
 }
 fn assign_arg_idx(%arg17: s32i*, %arg18: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg17: s32i*, %arg18: s32i):
@@ -56,37 +56,37 @@ fn assign_arg_idx(%arg17: s32i*, %arg18: s32i) -> s32i [external, c, no_inline, 
         store %466, %465, align 4
         %467 = cast(integral) %466 : s64i
         %468 = load %462 : s32i*, align 8
-        %469 = ptr_stride %468, %467 : s32i*
+        ptr_stride
         %470 = cast(bitcast) %469 : void*
-        prefetch %470, locality(0)
+        prefetch
         %471 = load %465 : s32i, align 4
         %472 = load %463 : s32i, align 4
-        %473 = cmp eq %471, %472 : bool
+        cmp
         %474 = cast(bool_to_int) %473 : s32i
         store %474, %464
         %475 = load %464 : s32i
         return %475
 }
 fn assign_glob_idx() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %447 = alloca s32i, "__retval", align 4
-    %448 = alloca s32i, "j", align 4
-    %449 = get_global @arrindex : s32i*
-    %450 = load %449 : s32i, align 4
-    store %450, %448, align 4
-    %451 = cast(integral) %450 : s64i
-    %452 = get_global @ptr : s32i**
-    %453 = load %452 : s32i*, align 8
-    %454 = ptr_stride %453, %451 : s32i*
-    %455 = cast(bitcast) %454 : void*
-    prefetch %455, locality(0)
-    %456 = load %448 : s32i, align 4
-    %457 = get_global @arrindex : s32i*
-    %458 = load %457 : s32i, align 4
-    %459 = cmp eq %456, %458 : bool
-    %460 = cast(bool_to_int) %459 : s32i
-    store %460, %447
-    %461 = load %447 : s32i
-    return %461
+        %447 = alloca s32i, "__retval", align 4
+        %448 = alloca s32i, "j", align 4
+        %449 = get_global @arrindex : s32i*
+        %450 = load %449 : s32i, align 4
+        store %450, %448, align 4
+        %451 = cast(integral) %450 : s64i
+        %452 = get_global @ptr : s32i**
+        %453 = load %452 : s32i*, align 8
+        ptr_stride
+        %455 = cast(bitcast) %454 : void*
+        prefetch
+        %456 = load %448 : s32i, align 4
+        %457 = get_global @arrindex : s32i*
+        %458 = load %457 : s32i, align 4
+        cmp
+        %460 = cast(bool_to_int) %459 : s32i
+        store %460, %447
+        %461 = load %447 : s32i
+        return %461
 }
 fn preinc_arg_ptr(%arg16: s32i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg16: s32i*):
@@ -96,45 +96,45 @@ fn preinc_arg_ptr(%arg16: s32i*) -> s32i [external, c, no_inline, dso_local, not
         store %arg16, %432
         %435 = load %432 : s32i*, align 8
         %436 = const 1 : s32i
-        %437 = ptr_stride %435, %436 : s32i*
+        ptr_stride
         store %437, %434, align 8
         %438 = load %432 : s32i*, align 8
         %439 = const 1 : s32i
-        %440 = ptr_stride %438, %439 : s32i*
+        ptr_stride
         store %440, %432, align 8
         %441 = cast(bitcast) %440 : void*
-        prefetch %441, locality(0)
+        prefetch
         %442 = load %432 : s32i*, align 8
         %443 = load %434 : s32i*, align 8
-        %444 = cmp eq %442, %443 : bool
+        cmp
         %445 = cast(bool_to_int) %444 : s32i
         store %445, %433
         %446 = load %433 : s32i
         return %446
 }
 fn preinc_glob_ptr() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %415 = alloca s32i, "__retval", align 4
-    %416 = alloca s32i*, "q", align 8
-    %417 = get_global @ptr : s32i**
-    %418 = load %417 : s32i*, align 8
-    %419 = const 1 : s32i
-    %420 = ptr_stride %418, %419 : s32i*
-    store %420, %416, align 8
-    %421 = get_global @ptr : s32i**
-    %422 = load %421 : s32i*, align 8
-    %423 = const 1 : s32i
-    %424 = ptr_stride %422, %423 : s32i*
-    store %424, %421, align 8
-    %425 = cast(bitcast) %424 : void*
-    prefetch %425, locality(0)
-    %426 = get_global @ptr : s32i**
-    %427 = load %426 : s32i*, align 8
-    %428 = load %416 : s32i*, align 8
-    %429 = cmp eq %427, %428 : bool
-    %430 = cast(bool_to_int) %429 : s32i
-    store %430, %415
-    %431 = load %415 : s32i
-    return %431
+        %415 = alloca s32i, "__retval", align 4
+        %416 = alloca s32i*, "q", align 8
+        %417 = get_global @ptr : s32i**
+        %418 = load %417 : s32i*, align 8
+        %419 = const 1 : s32i
+        ptr_stride
+        store %420, %416, align 8
+        %421 = get_global @ptr : s32i**
+        %422 = load %421 : s32i*, align 8
+        %423 = const 1 : s32i
+        ptr_stride
+        store %424, %421, align 8
+        %425 = cast(bitcast) %424 : void*
+        prefetch
+        %426 = get_global @ptr : s32i**
+        %427 = load %426 : s32i*, align 8
+        %428 = load %416 : s32i*, align 8
+        cmp
+        %430 = cast(bool_to_int) %429 : s32i
+        store %430, %415
+        %431 = load %415 : s32i
+        return %431
 }
 fn postinc_arg_ptr(%arg15: s32i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg15: s32i*):
@@ -144,45 +144,45 @@ fn postinc_arg_ptr(%arg15: s32i*) -> s32i [external, c, no_inline, dso_local, no
         store %arg15, %400
         %403 = load %400 : s32i*, align 8
         %404 = const 1 : s32i
-        %405 = ptr_stride %403, %404 : s32i*
+        ptr_stride
         store %405, %402, align 8
         %406 = load %400 : s32i*, align 8
         %407 = const 1 : s32i
-        %408 = ptr_stride %406, %407 : s32i*
+        ptr_stride
         store %408, %400, align 8
         %409 = cast(bitcast) %406 : void*
-        prefetch %409, locality(0)
+        prefetch
         %410 = load %400 : s32i*, align 8
         %411 = load %402 : s32i*, align 8
-        %412 = cmp eq %410, %411 : bool
+        cmp
         %413 = cast(bool_to_int) %412 : s32i
         store %413, %401
         %414 = load %401 : s32i
         return %414
 }
 fn postinc_glob_ptr() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %383 = alloca s32i, "__retval", align 4
-    %384 = alloca s32i*, "q", align 8
-    %385 = get_global @ptr : s32i**
-    %386 = load %385 : s32i*, align 8
-    %387 = const 1 : s32i
-    %388 = ptr_stride %386, %387 : s32i*
-    store %388, %384, align 8
-    %389 = get_global @ptr : s32i**
-    %390 = load %389 : s32i*, align 8
-    %391 = const 1 : s32i
-    %392 = ptr_stride %390, %391 : s32i*
-    store %392, %389, align 8
-    %393 = cast(bitcast) %390 : void*
-    prefetch %393, locality(0)
-    %394 = get_global @ptr : s32i**
-    %395 = load %394 : s32i*, align 8
-    %396 = load %384 : s32i*, align 8
-    %397 = cmp eq %395, %396 : bool
-    %398 = cast(bool_to_int) %397 : s32i
-    store %398, %383
-    %399 = load %383 : s32i
-    return %399
+        %383 = alloca s32i, "__retval", align 4
+        %384 = alloca s32i*, "q", align 8
+        %385 = get_global @ptr : s32i**
+        %386 = load %385 : s32i*, align 8
+        %387 = const 1 : s32i
+        ptr_stride
+        store %388, %384, align 8
+        %389 = get_global @ptr : s32i**
+        %390 = load %389 : s32i*, align 8
+        %391 = const 1 : s32i
+        ptr_stride
+        store %392, %389, align 8
+        %393 = cast(bitcast) %390 : void*
+        prefetch
+        %394 = get_global @ptr : s32i**
+        %395 = load %394 : s32i*, align 8
+        %396 = load %384 : s32i*, align 8
+        cmp
+        %398 = cast(bool_to_int) %397 : s32i
+        store %398, %383
+        %399 = load %383 : s32i
+        return %399
 }
 fn predec_arg_ptr(%arg14: s32i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg14: s32i*):
@@ -192,45 +192,45 @@ fn predec_arg_ptr(%arg14: s32i*) -> s32i [external, c, no_inline, dso_local, not
         store %arg14, %368
         %371 = load %368 : s32i*, align 8
         %372 = const -1 : s32i
-        %373 = ptr_stride %371, %372 : s32i*
+        ptr_stride
         store %373, %370, align 8
         %374 = load %368 : s32i*, align 8
         %375 = const -1 : s32i
-        %376 = ptr_stride %374, %375 : s32i*
+        ptr_stride
         store %376, %368, align 8
         %377 = cast(bitcast) %376 : void*
-        prefetch %377, locality(0)
+        prefetch
         %378 = load %368 : s32i*, align 8
         %379 = load %370 : s32i*, align 8
-        %380 = cmp eq %378, %379 : bool
+        cmp
         %381 = cast(bool_to_int) %380 : s32i
         store %381, %369
         %382 = load %369 : s32i
         return %382
 }
 fn predec_glob_ptr() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %351 = alloca s32i, "__retval", align 4
-    %352 = alloca s32i*, "q", align 8
-    %353 = get_global @ptr : s32i**
-    %354 = load %353 : s32i*, align 8
-    %355 = const -1 : s32i
-    %356 = ptr_stride %354, %355 : s32i*
-    store %356, %352, align 8
-    %357 = get_global @ptr : s32i**
-    %358 = load %357 : s32i*, align 8
-    %359 = const -1 : s32i
-    %360 = ptr_stride %358, %359 : s32i*
-    store %360, %357, align 8
-    %361 = cast(bitcast) %360 : void*
-    prefetch %361, locality(0)
-    %362 = get_global @ptr : s32i**
-    %363 = load %362 : s32i*, align 8
-    %364 = load %352 : s32i*, align 8
-    %365 = cmp eq %363, %364 : bool
-    %366 = cast(bool_to_int) %365 : s32i
-    store %366, %351
-    %367 = load %351 : s32i
-    return %367
+        %351 = alloca s32i, "__retval", align 4
+        %352 = alloca s32i*, "q", align 8
+        %353 = get_global @ptr : s32i**
+        %354 = load %353 : s32i*, align 8
+        %355 = const -1 : s32i
+        ptr_stride
+        store %356, %352, align 8
+        %357 = get_global @ptr : s32i**
+        %358 = load %357 : s32i*, align 8
+        %359 = const -1 : s32i
+        ptr_stride
+        store %360, %357, align 8
+        %361 = cast(bitcast) %360 : void*
+        prefetch
+        %362 = get_global @ptr : s32i**
+        %363 = load %362 : s32i*, align 8
+        %364 = load %352 : s32i*, align 8
+        cmp
+        %366 = cast(bool_to_int) %365 : s32i
+        store %366, %351
+        %367 = load %351 : s32i
+        return %367
 }
 fn postdec_arg_ptr(%arg13: s32i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg13: s32i*):
@@ -240,45 +240,45 @@ fn postdec_arg_ptr(%arg13: s32i*) -> s32i [external, c, no_inline, dso_local, no
         store %arg13, %336
         %339 = load %336 : s32i*, align 8
         %340 = const -1 : s32i
-        %341 = ptr_stride %339, %340 : s32i*
+        ptr_stride
         store %341, %338, align 8
         %342 = load %336 : s32i*, align 8
         %343 = const -1 : s32i
-        %344 = ptr_stride %342, %343 : s32i*
+        ptr_stride
         store %344, %336, align 8
         %345 = cast(bitcast) %342 : void*
-        prefetch %345, locality(0)
+        prefetch
         %346 = load %336 : s32i*, align 8
         %347 = load %338 : s32i*, align 8
-        %348 = cmp eq %346, %347 : bool
+        cmp
         %349 = cast(bool_to_int) %348 : s32i
         store %349, %337
         %350 = load %337 : s32i
         return %350
 }
 fn postdec_glob_ptr() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %319 = alloca s32i, "__retval", align 4
-    %320 = alloca s32i*, "q", align 8
-    %321 = get_global @ptr : s32i**
-    %322 = load %321 : s32i*, align 8
-    %323 = const -1 : s32i
-    %324 = ptr_stride %322, %323 : s32i*
-    store %324, %320, align 8
-    %325 = get_global @ptr : s32i**
-    %326 = load %325 : s32i*, align 8
-    %327 = const -1 : s32i
-    %328 = ptr_stride %326, %327 : s32i*
-    store %328, %325, align 8
-    %329 = cast(bitcast) %326 : void*
-    prefetch %329, locality(0)
-    %330 = get_global @ptr : s32i**
-    %331 = load %330 : s32i*, align 8
-    %332 = load %320 : s32i*, align 8
-    %333 = cmp eq %331, %332 : bool
-    %334 = cast(bool_to_int) %333 : s32i
-    store %334, %319
-    %335 = load %319 : s32i
-    return %335
+        %319 = alloca s32i, "__retval", align 4
+        %320 = alloca s32i*, "q", align 8
+        %321 = get_global @ptr : s32i**
+        %322 = load %321 : s32i*, align 8
+        %323 = const -1 : s32i
+        ptr_stride
+        store %324, %320, align 8
+        %325 = get_global @ptr : s32i**
+        %326 = load %325 : s32i*, align 8
+        %327 = const -1 : s32i
+        ptr_stride
+        store %328, %325, align 8
+        %329 = cast(bitcast) %326 : void*
+        prefetch
+        %330 = get_global @ptr : s32i**
+        %331 = load %330 : s32i*, align 8
+        %332 = load %320 : s32i*, align 8
+        cmp
+        %334 = cast(bool_to_int) %333 : s32i
+        store %334, %319
+        %335 = load %319 : s32i
+        return %335
 }
 fn preinc_arg_idx(%arg11: s32i*, %arg12: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg11: s32i*, %arg12: s32i):
@@ -293,47 +293,47 @@ fn preinc_arg_idx(%arg11: s32i*, %arg12: s32i) -> s32i [external, c, no_inline, 
         %307 = add %305, %306 : s32i [nsw]
         store %307, %304, align 4
         %308 = load %302 : s32i, align 4
-        %309 = inc %308 : s32i [nsw]
+        inc
         store %309, %302, align 4
         %310 = cast(integral) %309 : s64i
         %311 = load %301 : s32i*, align 8
-        %312 = ptr_stride %311, %310 : s32i*
+        ptr_stride
         %313 = cast(bitcast) %312 : void*
-        prefetch %313, locality(0)
+        prefetch
         %314 = load %302 : s32i, align 4
         %315 = load %304 : s32i, align 4
-        %316 = cmp eq %314, %315 : bool
+        cmp
         %317 = cast(bool_to_int) %316 : s32i
         store %317, %303
         %318 = load %303 : s32i
         return %318
 }
 fn preinc_glob_idx() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %281 = alloca s32i, "__retval", align 4
-    %282 = alloca s32i, "j", align 4
-    %283 = get_global @arrindex : s32i*
-    %284 = load %283 : s32i, align 4
-    %285 = const 1 : s32i
-    %286 = add %284, %285 : s32i [nsw]
-    store %286, %282, align 4
-    %287 = get_global @arrindex : s32i*
-    %288 = load %287 : s32i, align 4
-    %289 = inc %288 : s32i [nsw]
-    store %289, %287, align 4
-    %290 = cast(integral) %289 : s64i
-    %291 = get_global @ptr : s32i**
-    %292 = load %291 : s32i*, align 8
-    %293 = ptr_stride %292, %290 : s32i*
-    %294 = cast(bitcast) %293 : void*
-    prefetch %294, locality(0)
-    %295 = get_global @arrindex : s32i*
-    %296 = load %295 : s32i, align 4
-    %297 = load %282 : s32i, align 4
-    %298 = cmp eq %296, %297 : bool
-    %299 = cast(bool_to_int) %298 : s32i
-    store %299, %281
-    %300 = load %281 : s32i
-    return %300
+        %281 = alloca s32i, "__retval", align 4
+        %282 = alloca s32i, "j", align 4
+        %283 = get_global @arrindex : s32i*
+        %284 = load %283 : s32i, align 4
+        %285 = const 1 : s32i
+        %286 = add %284, %285 : s32i [nsw]
+        store %286, %282, align 4
+        %287 = get_global @arrindex : s32i*
+        %288 = load %287 : s32i, align 4
+        inc
+        store %289, %287, align 4
+        %290 = cast(integral) %289 : s64i
+        %291 = get_global @ptr : s32i**
+        %292 = load %291 : s32i*, align 8
+        ptr_stride
+        %294 = cast(bitcast) %293 : void*
+        prefetch
+        %295 = get_global @arrindex : s32i*
+        %296 = load %295 : s32i, align 4
+        %297 = load %282 : s32i, align 4
+        cmp
+        %299 = cast(bool_to_int) %298 : s32i
+        store %299, %281
+        %300 = load %281 : s32i
+        return %300
 }
 fn postinc_arg_idx(%arg9: s32i*, %arg10: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg9: s32i*, %arg10: s32i):
@@ -348,47 +348,47 @@ fn postinc_arg_idx(%arg9: s32i*, %arg10: s32i) -> s32i [external, c, no_inline, 
         %269 = add %267, %268 : s32i [nsw]
         store %269, %266, align 4
         %270 = load %264 : s32i, align 4
-        %271 = inc %270 : s32i [nsw]
+        inc
         store %271, %264, align 4
         %272 = cast(integral) %270 : s64i
         %273 = load %263 : s32i*, align 8
-        %274 = ptr_stride %273, %272 : s32i*
+        ptr_stride
         %275 = cast(bitcast) %274 : void*
-        prefetch %275, locality(0)
+        prefetch
         %276 = load %264 : s32i, align 4
         %277 = load %266 : s32i, align 4
-        %278 = cmp eq %276, %277 : bool
+        cmp
         %279 = cast(bool_to_int) %278 : s32i
         store %279, %265
         %280 = load %265 : s32i
         return %280
 }
 fn postinc_glob_idx() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %243 = alloca s32i, "__retval", align 4
-    %244 = alloca s32i, "j", align 4
-    %245 = get_global @arrindex : s32i*
-    %246 = load %245 : s32i, align 4
-    %247 = const 1 : s32i
-    %248 = add %246, %247 : s32i [nsw]
-    store %248, %244, align 4
-    %249 = get_global @arrindex : s32i*
-    %250 = load %249 : s32i, align 4
-    %251 = inc %250 : s32i [nsw]
-    store %251, %249, align 4
-    %252 = cast(integral) %250 : s64i
-    %253 = get_global @ptr : s32i**
-    %254 = load %253 : s32i*, align 8
-    %255 = ptr_stride %254, %252 : s32i*
-    %256 = cast(bitcast) %255 : void*
-    prefetch %256, locality(0)
-    %257 = get_global @arrindex : s32i*
-    %258 = load %257 : s32i, align 4
-    %259 = load %244 : s32i, align 4
-    %260 = cmp eq %258, %259 : bool
-    %261 = cast(bool_to_int) %260 : s32i
-    store %261, %243
-    %262 = load %243 : s32i
-    return %262
+        %243 = alloca s32i, "__retval", align 4
+        %244 = alloca s32i, "j", align 4
+        %245 = get_global @arrindex : s32i*
+        %246 = load %245 : s32i, align 4
+        %247 = const 1 : s32i
+        %248 = add %246, %247 : s32i [nsw]
+        store %248, %244, align 4
+        %249 = get_global @arrindex : s32i*
+        %250 = load %249 : s32i, align 4
+        inc
+        store %251, %249, align 4
+        %252 = cast(integral) %250 : s64i
+        %253 = get_global @ptr : s32i**
+        %254 = load %253 : s32i*, align 8
+        ptr_stride
+        %256 = cast(bitcast) %255 : void*
+        prefetch
+        %257 = get_global @arrindex : s32i*
+        %258 = load %257 : s32i, align 4
+        %259 = load %244 : s32i, align 4
+        cmp
+        %261 = cast(bool_to_int) %260 : s32i
+        store %261, %243
+        %262 = load %243 : s32i
+        return %262
 }
 fn predec_arg_idx(%arg7: s32i*, %arg8: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg7: s32i*, %arg8: s32i):
@@ -400,50 +400,50 @@ fn predec_arg_idx(%arg7: s32i*, %arg8: s32i) -> s32i [external, c, no_inline, ds
         store %arg8, %226
         %229 = load %226 : s32i, align 4
         %230 = const 1 : s32i
-        %231 = sub %229, %230 : s32i [nsw]
+        sub
         store %231, %228, align 4
         %232 = load %226 : s32i, align 4
-        %233 = dec %232 : s32i [nsw]
+        dec
         store %233, %226, align 4
         %234 = cast(integral) %233 : s64i
         %235 = load %225 : s32i*, align 8
-        %236 = ptr_stride %235, %234 : s32i*
+        ptr_stride
         %237 = cast(bitcast) %236 : void*
-        prefetch %237, locality(0)
+        prefetch
         %238 = load %226 : s32i, align 4
         %239 = load %228 : s32i, align 4
-        %240 = cmp eq %238, %239 : bool
+        cmp
         %241 = cast(bool_to_int) %240 : s32i
         store %241, %227
         %242 = load %227 : s32i
         return %242
 }
 fn predec_glob_idx() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %205 = alloca s32i, "__retval", align 4
-    %206 = alloca s32i, "j", align 4
-    %207 = get_global @arrindex : s32i*
-    %208 = load %207 : s32i, align 4
-    %209 = const 1 : s32i
-    %210 = sub %208, %209 : s32i [nsw]
-    store %210, %206, align 4
-    %211 = get_global @arrindex : s32i*
-    %212 = load %211 : s32i, align 4
-    %213 = dec %212 : s32i [nsw]
-    store %213, %211, align 4
-    %214 = cast(integral) %213 : s64i
-    %215 = get_global @ptr : s32i**
-    %216 = load %215 : s32i*, align 8
-    %217 = ptr_stride %216, %214 : s32i*
-    %218 = cast(bitcast) %217 : void*
-    prefetch %218, locality(0)
-    %219 = get_global @arrindex : s32i*
-    %220 = load %219 : s32i, align 4
-    %221 = load %206 : s32i, align 4
-    %222 = cmp eq %220, %221 : bool
-    %223 = cast(bool_to_int) %222 : s32i
-    store %223, %205
-    %224 = load %205 : s32i
-    return %224
+        %205 = alloca s32i, "__retval", align 4
+        %206 = alloca s32i, "j", align 4
+        %207 = get_global @arrindex : s32i*
+        %208 = load %207 : s32i, align 4
+        %209 = const 1 : s32i
+        sub
+        store %210, %206, align 4
+        %211 = get_global @arrindex : s32i*
+        %212 = load %211 : s32i, align 4
+        dec
+        store %213, %211, align 4
+        %214 = cast(integral) %213 : s64i
+        %215 = get_global @ptr : s32i**
+        %216 = load %215 : s32i*, align 8
+        ptr_stride
+        %218 = cast(bitcast) %217 : void*
+        prefetch
+        %219 = get_global @arrindex : s32i*
+        %220 = load %219 : s32i, align 4
+        %221 = load %206 : s32i, align 4
+        cmp
+        %223 = cast(bool_to_int) %222 : s32i
+        store %223, %205
+        %224 = load %205 : s32i
+        return %224
 }
 fn postdec_arg_idx(%arg5: s32i*, %arg6: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg5: s32i*, %arg6: s32i):
@@ -455,50 +455,50 @@ fn postdec_arg_idx(%arg5: s32i*, %arg6: s32i) -> s32i [external, c, no_inline, d
         store %arg6, %188
         %191 = load %188 : s32i, align 4
         %192 = const 1 : s32i
-        %193 = sub %191, %192 : s32i [nsw]
+        sub
         store %193, %190, align 4
         %194 = load %188 : s32i, align 4
-        %195 = dec %194 : s32i [nsw]
+        dec
         store %195, %188, align 4
         %196 = cast(integral) %194 : s64i
         %197 = load %187 : s32i*, align 8
-        %198 = ptr_stride %197, %196 : s32i*
+        ptr_stride
         %199 = cast(bitcast) %198 : void*
-        prefetch %199, locality(0)
+        prefetch
         %200 = load %188 : s32i, align 4
         %201 = load %190 : s32i, align 4
-        %202 = cmp eq %200, %201 : bool
+        cmp
         %203 = cast(bool_to_int) %202 : s32i
         store %203, %189
         %204 = load %189 : s32i
         return %204
 }
 fn postdec_glob_idx() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %167 = alloca s32i, "__retval", align 4
-    %168 = alloca s32i, "j", align 4
-    %169 = get_global @arrindex : s32i*
-    %170 = load %169 : s32i, align 4
-    %171 = const 1 : s32i
-    %172 = sub %170, %171 : s32i [nsw]
-    store %172, %168, align 4
-    %173 = get_global @arrindex : s32i*
-    %174 = load %173 : s32i, align 4
-    %175 = dec %174 : s32i [nsw]
-    store %175, %173, align 4
-    %176 = cast(integral) %174 : s64i
-    %177 = get_global @ptr : s32i**
-    %178 = load %177 : s32i*, align 8
-    %179 = ptr_stride %178, %176 : s32i*
-    %180 = cast(bitcast) %179 : void*
-    prefetch %180, locality(0)
-    %181 = get_global @arrindex : s32i*
-    %182 = load %181 : s32i, align 4
-    %183 = load %168 : s32i, align 4
-    %184 = cmp eq %182, %183 : bool
-    %185 = cast(bool_to_int) %184 : s32i
-    store %185, %167
-    %186 = load %167 : s32i
-    return %186
+        %167 = alloca s32i, "__retval", align 4
+        %168 = alloca s32i, "j", align 4
+        %169 = get_global @arrindex : s32i*
+        %170 = load %169 : s32i, align 4
+        %171 = const 1 : s32i
+        sub
+        store %172, %168, align 4
+        %173 = get_global @arrindex : s32i*
+        %174 = load %173 : s32i, align 4
+        dec
+        store %175, %173, align 4
+        %176 = cast(integral) %174 : s64i
+        %177 = get_global @ptr : s32i**
+        %178 = load %177 : s32i*, align 8
+        ptr_stride
+        %180 = cast(bitcast) %179 : void*
+        prefetch
+        %181 = get_global @arrindex : s32i*
+        %182 = load %181 : s32i, align 4
+        %183 = load %168 : s32i, align 4
+        cmp
+        %185 = cast(bool_to_int) %184 : s32i
+        store %185, %167
+        %186 = load %167 : s32i
+        return %186
 }
 fn getptr(%arg4: s32i*) -> s32i* [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg4: s32i*):
@@ -507,11 +507,11 @@ fn getptr(%arg4: s32i*) -> s32i* [external, c, no_inline, dso_local, nothrow] {
         store %arg4, %158
         %160 = get_global @getptrcnt : s32i*
         %161 = load %160 : s32i, align 4
-        %162 = inc %161 : s32i [nsw]
+        inc
         store %162, %160, align 4
         %163 = load %158 : s32i*, align 8
         %164 = const 1 : s32i
-        %165 = ptr_stride %163, %164 : s32i*
+        ptr_stride
         store %165, %159
         %166 = load %159 : s32i*
         return %166
@@ -524,11 +524,11 @@ fn funccall_arg_ptr(%arg3: s32i*) -> s32i [external, c, no_inline, dso_local, no
         %149 = load %147 : s32i*, align 8
         %150 = call @getptr(%149) : s32i* [all]
         %151 = cast(bitcast) %150 : void*
-        prefetch %151, locality(0)
+        prefetch
         %152 = get_global @getptrcnt : s32i*
         %153 = load %152 : s32i, align 4
         %154 = const 1 : s32i
-        %155 = cmp eq %153, %154 : bool
+        cmp
         %156 = cast(bool_to_int) %155 : s32i
         store %156, %148
         %157 = load %148 : s32i
@@ -541,7 +541,7 @@ fn getint(%arg2: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %arg2, %138
         %140 = get_global @getintcnt : s32i*
         %141 = load %140 : s32i, align 4
-        %142 = inc %141 : s32i [nsw]
+        inc
         store %142, %140, align 4
         %143 = load %138 : s32i, align 4
         %144 = const 1 : s32i
@@ -561,13 +561,13 @@ fn funccall_arg_idx(%arg0: s32i*, %arg1: s32i) -> s32i [external, c, no_inline, 
         %127 = call @getint(%126) : s32i [all]
         %128 = cast(integral) %127 : s64i
         %129 = load %123 : s32i*, align 8
-        %130 = ptr_stride %129, %128 : s32i*
+        ptr_stride
         %131 = cast(bitcast) %130 : void*
-        prefetch %131, locality(0)
+        prefetch
         %132 = get_global @getintcnt : s32i*
         %133 = load %132 : s32i, align 4
         %134 = const 1 : s32i
-        %135 = cmp eq %133, %134 : bool
+        cmp
         %136 = cast(bool_to_int) %135 : s32i
         store %136, %125
         %137 = load %125 : s32i
@@ -576,284 +576,284 @@ fn funccall_arg_idx(%arg0: s32i*, %arg1: s32i) -> s32i [external, c, no_inline, 
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %117 = get_global @ptr : s32i**
-        %118 = load %117 : s32i*, align 8
-        %119 = call @assign_arg_ptr(%118) : s32i [all]
-        %120 = cast(int_to_bool) %119 : bool
-        %121 = not %120 : bool
-        if %121 {
-            %122 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %117 = get_global @ptr : s32i**
+                %118 = load %117 : s32i*, align 8
+                %119 = call @assign_arg_ptr(%118) : s32i [all]
+                %120 = cast(int_to_bool) %119 : bool
+                not
+                if %121 {
+                        %122 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %113 = call @assign_glob_ptr() : s32i [all]
-        %114 = cast(int_to_bool) %113 : bool
-        %115 = not %114 : bool
-        if %115 {
-            %116 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %113 = call @assign_glob_ptr() : s32i [all]
+                %114 = cast(int_to_bool) %113 : bool
+                not
+                if %115 {
+                        %116 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %106 = get_global @ptr : s32i**
-        %107 = load %106 : s32i*, align 8
-        %108 = const 4 : s32i
-        %109 = call @assign_arg_idx(%107, %108) : s32i [all]
-        %110 = cast(int_to_bool) %109 : bool
-        %111 = not %110 : bool
-        if %111 {
-            %112 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %106 = get_global @ptr : s32i**
+                %107 = load %106 : s32i*, align 8
+                %108 = const 4 : s32i
+                %109 = call @assign_arg_idx(%107, %108) : s32i [all]
+                %110 = cast(int_to_bool) %109 : bool
+                not
+                if %111 {
+                        %112 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %102 = call @assign_glob_idx() : s32i [all]
-        %103 = cast(int_to_bool) %102 : bool
-        %104 = not %103 : bool
-        if %104 {
-            %105 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %102 = call @assign_glob_idx() : s32i [all]
+                %103 = cast(int_to_bool) %102 : bool
+                not
+                if %104 {
+                        %105 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %96 = get_global @ptr : s32i**
-        %97 = load %96 : s32i*, align 8
-        %98 = call @preinc_arg_ptr(%97) : s32i [all]
-        %99 = cast(int_to_bool) %98 : bool
-        %100 = not %99 : bool
-        if %100 {
-            %101 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %96 = get_global @ptr : s32i**
+                %97 = load %96 : s32i*, align 8
+                %98 = call @preinc_arg_ptr(%97) : s32i [all]
+                %99 = cast(int_to_bool) %98 : bool
+                not
+                if %100 {
+                        %101 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %92 = call @preinc_glob_ptr() : s32i [all]
-        %93 = cast(int_to_bool) %92 : bool
-        %94 = not %93 : bool
-        if %94 {
-            %95 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %92 = call @preinc_glob_ptr() : s32i [all]
+                %93 = cast(int_to_bool) %92 : bool
+                not
+                if %94 {
+                        %95 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %86 = get_global @ptr : s32i**
-        %87 = load %86 : s32i*, align 8
-        %88 = call @postinc_arg_ptr(%87) : s32i [all]
-        %89 = cast(int_to_bool) %88 : bool
-        %90 = not %89 : bool
-        if %90 {
-            %91 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %86 = get_global @ptr : s32i**
+                %87 = load %86 : s32i*, align 8
+                %88 = call @postinc_arg_ptr(%87) : s32i [all]
+                %89 = cast(int_to_bool) %88 : bool
+                not
+                if %90 {
+                        %91 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %82 = call @postinc_glob_ptr() : s32i [all]
-        %83 = cast(int_to_bool) %82 : bool
-        %84 = not %83 : bool
-        if %84 {
-            %85 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %82 = call @postinc_glob_ptr() : s32i [all]
+                %83 = cast(int_to_bool) %82 : bool
+                not
+                if %84 {
+                        %85 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %76 = get_global @ptr : s32i**
-        %77 = load %76 : s32i*, align 8
-        %78 = call @predec_arg_ptr(%77) : s32i [all]
-        %79 = cast(int_to_bool) %78 : bool
-        %80 = not %79 : bool
-        if %80 {
-            %81 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %76 = get_global @ptr : s32i**
+                %77 = load %76 : s32i*, align 8
+                %78 = call @predec_arg_ptr(%77) : s32i [all]
+                %79 = cast(int_to_bool) %78 : bool
+                not
+                if %80 {
+                        %81 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %72 = call @predec_glob_ptr() : s32i [all]
-        %73 = cast(int_to_bool) %72 : bool
-        %74 = not %73 : bool
-        if %74 {
-            %75 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %72 = call @predec_glob_ptr() : s32i [all]
+                %73 = cast(int_to_bool) %72 : bool
+                not
+                if %74 {
+                        %75 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %66 = get_global @ptr : s32i**
-        %67 = load %66 : s32i*, align 8
-        %68 = call @postdec_arg_ptr(%67) : s32i [all]
-        %69 = cast(int_to_bool) %68 : bool
-        %70 = not %69 : bool
-        if %70 {
-            %71 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %66 = get_global @ptr : s32i**
+                %67 = load %66 : s32i*, align 8
+                %68 = call @postdec_arg_ptr(%67) : s32i [all]
+                %69 = cast(int_to_bool) %68 : bool
+                not
+                if %70 {
+                        %71 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %62 = call @postdec_glob_ptr() : s32i [all]
-        %63 = cast(int_to_bool) %62 : bool
-        %64 = not %63 : bool
-        if %64 {
-            %65 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %62 = call @postdec_glob_ptr() : s32i [all]
+                %63 = cast(int_to_bool) %62 : bool
+                not
+                if %64 {
+                        %65 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %55 = get_global @ptr : s32i**
-        %56 = load %55 : s32i*, align 8
-        %57 = const 3 : s32i
-        %58 = call @preinc_arg_idx(%56, %57) : s32i [all]
-        %59 = cast(int_to_bool) %58 : bool
-        %60 = not %59 : bool
-        if %60 {
-            %61 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %55 = get_global @ptr : s32i**
+                %56 = load %55 : s32i*, align 8
+                %57 = const 3 : s32i
+                %58 = call @preinc_arg_idx(%56, %57) : s32i [all]
+                %59 = cast(int_to_bool) %58 : bool
+                not
+                if %60 {
+                        %61 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %51 = call @preinc_glob_idx() : s32i [all]
-        %52 = cast(int_to_bool) %51 : bool
-        %53 = not %52 : bool
-        if %53 {
-            %54 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %51 = call @preinc_glob_idx() : s32i [all]
+                %52 = cast(int_to_bool) %51 : bool
+                not
+                if %53 {
+                        %54 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %44 = get_global @ptr : s32i**
-        %45 = load %44 : s32i*, align 8
-        %46 = const 3 : s32i
-        %47 = call @postinc_arg_idx(%45, %46) : s32i [all]
-        %48 = cast(int_to_bool) %47 : bool
-        %49 = not %48 : bool
-        if %49 {
-            %50 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %44 = get_global @ptr : s32i**
+                %45 = load %44 : s32i*, align 8
+                %46 = const 3 : s32i
+                %47 = call @postinc_arg_idx(%45, %46) : s32i [all]
+                %48 = cast(int_to_bool) %47 : bool
+                not
+                if %49 {
+                        %50 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %40 = call @postinc_glob_idx() : s32i [all]
-        %41 = cast(int_to_bool) %40 : bool
-        %42 = not %41 : bool
-        if %42 {
-            %43 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %40 = call @postinc_glob_idx() : s32i [all]
+                %41 = cast(int_to_bool) %40 : bool
+                not
+                if %42 {
+                        %43 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %33 = get_global @ptr : s32i**
-        %34 = load %33 : s32i*, align 8
-        %35 = const 3 : s32i
-        %36 = call @predec_arg_idx(%34, %35) : s32i [all]
-        %37 = cast(int_to_bool) %36 : bool
-        %38 = not %37 : bool
-        if %38 {
-            %39 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %33 = get_global @ptr : s32i**
+                %34 = load %33 : s32i*, align 8
+                %35 = const 3 : s32i
+                %36 = call @predec_arg_idx(%34, %35) : s32i [all]
+                %37 = cast(int_to_bool) %36 : bool
+                not
+                if %38 {
+                        %39 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %29 = call @predec_glob_idx() : s32i [all]
-        %30 = cast(int_to_bool) %29 : bool
-        %31 = not %30 : bool
-        if %31 {
-            %32 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %29 = call @predec_glob_idx() : s32i [all]
+                %30 = cast(int_to_bool) %29 : bool
+                not
+                if %31 {
+                        %32 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %22 = get_global @ptr : s32i**
-        %23 = load %22 : s32i*, align 8
-        %24 = const 3 : s32i
-        %25 = call @postdec_arg_idx(%23, %24) : s32i [all]
-        %26 = cast(int_to_bool) %25 : bool
-        %27 = not %26 : bool
-        if %27 {
-            %28 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %22 = get_global @ptr : s32i**
+                %23 = load %22 : s32i*, align 8
+                %24 = const 3 : s32i
+                %25 = call @postdec_arg_idx(%23, %24) : s32i [all]
+                %26 = cast(int_to_bool) %25 : bool
+                not
+                if %27 {
+                        %28 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %18 = call @postdec_glob_idx() : s32i [all]
-        %19 = cast(int_to_bool) %18 : bool
-        %20 = not %19 : bool
-        if %20 {
-            %21 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %18 = call @postdec_glob_idx() : s32i [all]
+                %19 = cast(int_to_bool) %18 : bool
+                not
+                if %20 {
+                        %21 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %12 = get_global @ptr : s32i**
-        %13 = load %12 : s32i*, align 8
-        %14 = call @funccall_arg_ptr(%13) : s32i [all]
-        %15 = cast(int_to_bool) %14 : bool
-        %16 = not %15 : bool
-        if %16 {
-            %17 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %12 = get_global @ptr : s32i**
+                %13 = load %12 : s32i*, align 8
+                %14 = call @funccall_arg_ptr(%13) : s32i [all]
+                %15 = cast(int_to_bool) %14 : bool
+                not
+                if %16 {
+                        %17 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %5 = get_global @ptr : s32i**
-        %6 = load %5 : s32i*, align 8
-        %7 = const 3 : s32i
-        %8 = call @funccall_arg_idx(%6, %7) : s32i [all]
-        %9 = cast(int_to_bool) %8 : bool
-        %10 = not %9 : bool
-        if %10 {
-            %11 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %5 = get_global @ptr : s32i**
+                %6 = load %5 : s32i*, align 8
+                %7 = const 3 : s32i
+                %8 = call @funccall_arg_idx(%6, %7) : s32i [all]
+                %9 = cast(int_to_bool) %8 : bool
+                not
+                if %10 {
+                        %11 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

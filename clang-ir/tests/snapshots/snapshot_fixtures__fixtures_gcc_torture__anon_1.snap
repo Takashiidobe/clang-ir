@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/anon-1.c" (c, x86_64-unknown-linux-gnu)
-global foo : rec_anon2E0 = zero [external, default, align 4, dso_local]
+global foo : rec_anon2E0 = Zero { ty: Named("rec_anon2E0") } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, nothrow] {
@@ -17,29 +17,29 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         store %3, %2
         %4 = const 6 : s32i
         %5 = get_global @foo : rec_anon2E0*
-        %6 = get_member %5[1] "" : rec_anon2E1*
-        %7 = get_member %6[1] "" : rec_anon2E2*
-        %8 = get_member %7[0] "b" : s32i*
+        get_member
+        get_member
+        get_member
         store %4, %8, align 4
         %9 = const 5 : s32i
         %10 = get_global @foo : rec_anon2E0*
-        %11 = get_member %10[1] "" : rec_anon2E1*
-        %12 = get_member %11[0] "a" : s32i*
+        get_member
+        get_member
         store %9, %12, align 4
         scope {
-            %15 = get_global @foo : rec_anon2E0*
-            %16 = get_member %15[1] "" : rec_anon2E1*
-            %17 = get_member %16[1] "" : rec_anon2E2*
-            %18 = get_member %17[0] "b" : s32i*
-            %19 = load %18 : s32i, align 4
-            %20 = const 6 : s32i
-            %21 = cmp ne %19, %20 : bool
-            if %21 {
-                %22 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %15 = get_global @foo : rec_anon2E0*
+                get_member
+                get_member
+                get_member
+                %19 = load %18 : s32i, align 4
+                %20 = const 6 : s32i
+                cmp
+                if %21 {
+                        %22 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %13 = const 0 : s32i
         store %13, %2

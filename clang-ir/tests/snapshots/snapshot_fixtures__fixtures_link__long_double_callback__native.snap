@@ -1,21 +1,21 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.link/long_double_callback/native.c" (c, x86_64-unknown-linux-gnu)
-fn invoke_cb(%arg0: ((long_double<f80>, long_double<f80>) -> long_double<f80>)*, %arg1: long_double<f80>, %arg2: long_double<f80>) -> long_double<f80> [external, c, no_inline, dso_local, nothrow] {
-    ^bb0(%arg0: ((long_double<f80>, long_double<f80>) -> long_double<f80>)*, %arg1: long_double<f80>, %arg2: long_double<f80>):
-        %0 = alloca ((long_double<f80>, long_double<f80>) -> long_double<f80>)*, "cb", align 8
+fn invoke_cb(%arg0: (long_double<f80>, long_double<f80>) -> long_double<f80>*, %arg1: long_double<f80>, %arg2: long_double<f80>) -> long_double<f80> [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: (long_double<f80>, long_double<f80>) -> long_double<f80>*, %arg1: long_double<f80>, %arg2: long_double<f80>):
+        %0 = alloca (long_double<f80>, long_double<f80>) -> long_double<f80>*, "cb", align 8
         %1 = alloca long_double<f80>, "a", align 16
         %2 = alloca long_double<f80>, "b", align 16
         %3 = alloca long_double<f80>, "__retval", align 16
         store %arg0, %0
         store %arg1, %1
         store %arg2, %2
-        %4 = load %0 : ((long_double<f80>, long_double<f80>) -> long_double<f80>)*, align 8
+        %4 = load %0 : (long_double<f80>, long_double<f80>) -> long_double<f80>*, align 8
         %5 = load %1 : long_double<f80>, align 16
         %6 = load %2 : long_double<f80>, align 16
-        %7 = call %4(%5, %6) : long_double<f80> [all]
+        %7 = call (%5, %6) : long_double<f80> [all]
         store %7, %3
         %8 = load %3 : long_double<f80>
         return %8

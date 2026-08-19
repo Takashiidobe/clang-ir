@@ -1,37 +1,37 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr24851.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i[10], "a", align 16
-    %2 = alloca s32i*, "p", align 8
-    %3 = alloca s32i*, "q", align 8
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = const 1 : s64i
-    %6 = get_element %1[%5] : s32i*
-    store %6, %3, align 8
-    %7 = const -1 : s64i
-    %8 = load %3 : s32i*, align 8
-    %9 = ptr_stride %8, %7 : s32i*
-    store %9, %2, align 8
-    scope {
-        %12 = load %2 : s32i*, align 8
-        %13 = const 9 : s64i
-        %14 = get_element %1[%13] : s32i*
-        %15 = cmp ge %12, %14 : bool
-        if %15 {
-            %16 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i[10], "a", align 16
+        %2 = alloca s32i*, "p", align 8
+        %3 = alloca s32i*, "q", align 8
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = const 1 : s64i
+        get_element
+        store %6, %3, align 8
+        %7 = const -1 : s64i
+        %8 = load %3 : s32i*, align 8
+        ptr_stride
+        store %9, %2, align 8
+        scope {
+                %12 = load %2 : s32i*, align 8
+                %13 = const 9 : s64i
+                get_element
+                cmp
+                if %15 {
+                        %16 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %10 = const 0 : s32i
-    store %10, %0
-    %11 = load %0 : s32i
-    return %11
+        %10 = const 0 : s32i
+        store %10, %0
+        %11 = load %0 : s32i
+        return %11
 }

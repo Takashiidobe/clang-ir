@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/bool.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn from_int(%arg3: s32i) -> bool [internal, c, no_inline, dso_local, nothrow] {
@@ -30,7 +30,7 @@ fn from_compare(%arg1: s32i, %arg2: s32i) -> bool [internal, c, no_inline, dso_l
         store %arg2, %54
         %57 = load %53 : s32i, align 4
         %58 = load %54 : s32i, align 4
-        %59 = cmp lt %57, %58 : bool
+        cmp
         store %59, %56, align 1
         %60 = load %56 : bool, align 1
         store %60, %55
@@ -49,55 +49,55 @@ fn use_bool(%arg0: bool) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         return %52
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[4]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = const 0 : s32i
-    %6 = call @from_int(%5) : bool [all]
-    %7 = cast(bool_to_int) %6 : s32i
-    %8 = call @printf(%4, %7) : s32i [all]
-    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %10 = get_global @.str : s8i[4]*
-    %11 = cast(array_to_ptrdecay) %10 : s8i*
-    %12 = const 42 : s32i
-    %13 = call @from_int(%12) : bool [all]
-    %14 = cast(bool_to_int) %13 : s32i
-    %15 = call @printf(%11, %14) : s32i [all]
-    %16 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %17 = get_global @.str : s8i[4]*
-    %18 = cast(array_to_ptrdecay) %17 : s8i*
-    %19 = const 2 : s32i
-    %20 = const 5 : s32i
-    %21 = call @from_compare(%19, %20) : bool [all]
-    %22 = cast(bool_to_int) %21 : s32i
-    %23 = call @printf(%18, %22) : s32i [all]
-    %24 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %25 = get_global @.str : s8i[4]*
-    %26 = cast(array_to_ptrdecay) %25 : s8i*
-    %27 = const 9 : s32i
-    %28 = const 5 : s32i
-    %29 = call @from_compare(%27, %28) : bool [all]
-    %30 = cast(bool_to_int) %29 : s32i
-    %31 = call @printf(%26, %30) : s32i [all]
-    %32 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %33 = get_global @.str : s8i[4]*
-    %34 = cast(array_to_ptrdecay) %33 : s8i*
-    %35 = const 2 : s32i
-    %36 = cast(int_to_bool) %35 : bool
-    %37 = call @use_bool(%36) : s32i [all]
-    %38 = call @printf(%34, %37) : s32i [all]
-    %39 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %40 = get_global @.str : s8i[4]*
-    %41 = cast(array_to_ptrdecay) %40 : s8i*
-    %42 = const 0 : s32i
-    %43 = cast(int_to_bool) %42 : bool
-    %44 = call @use_bool(%43) : s32i [all]
-    %45 = call @printf(%41, %44) : s32i [all]
-    %46 = const 0 : s32i
-    store %46, %0
-    %47 = load %0 : s32i
-    return %47
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[4]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = const 0 : s32i
+        %6 = call @from_int(%5) : bool [all]
+        %7 = cast(bool_to_int) %6 : s32i
+        %8 = call @printf(%4, %7) : s32i [all]
+        %9 = get_global @printf : (s8i*, ...) -> s32i*
+        %10 = get_global @.str : s8i[4]*
+        %11 = cast(array_to_ptrdecay) %10 : s8i*
+        %12 = const 42 : s32i
+        %13 = call @from_int(%12) : bool [all]
+        %14 = cast(bool_to_int) %13 : s32i
+        %15 = call @printf(%11, %14) : s32i [all]
+        %16 = get_global @printf : (s8i*, ...) -> s32i*
+        %17 = get_global @.str : s8i[4]*
+        %18 = cast(array_to_ptrdecay) %17 : s8i*
+        %19 = const 2 : s32i
+        %20 = const 5 : s32i
+        %21 = call @from_compare(%19, %20) : bool [all]
+        %22 = cast(bool_to_int) %21 : s32i
+        %23 = call @printf(%18, %22) : s32i [all]
+        %24 = get_global @printf : (s8i*, ...) -> s32i*
+        %25 = get_global @.str : s8i[4]*
+        %26 = cast(array_to_ptrdecay) %25 : s8i*
+        %27 = const 9 : s32i
+        %28 = const 5 : s32i
+        %29 = call @from_compare(%27, %28) : bool [all]
+        %30 = cast(bool_to_int) %29 : s32i
+        %31 = call @printf(%26, %30) : s32i [all]
+        %32 = get_global @printf : (s8i*, ...) -> s32i*
+        %33 = get_global @.str : s8i[4]*
+        %34 = cast(array_to_ptrdecay) %33 : s8i*
+        %35 = const 2 : s32i
+        %36 = cast(int_to_bool) %35 : bool
+        %37 = call @use_bool(%36) : s32i [all]
+        %38 = call @printf(%34, %37) : s32i [all]
+        %39 = get_global @printf : (s8i*, ...) -> s32i*
+        %40 = get_global @.str : s8i[4]*
+        %41 = cast(array_to_ptrdecay) %40 : s8i*
+        %42 = const 0 : s32i
+        %43 = cast(int_to_bool) %42 : bool
+        %44 = call @use_bool(%43) : s32i [all]
+        %45 = call @printf(%41, %44) : s32i [all]
+        %46 = const 0 : s32i
+        store %46, %0
+        %47 = load %0 : s32i
+        return %47
 }

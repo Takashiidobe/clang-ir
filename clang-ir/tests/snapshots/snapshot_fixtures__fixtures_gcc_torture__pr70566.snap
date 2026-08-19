@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr70566.c" (c, x86_64-unknown-linux-gnu)
@@ -29,23 +29,23 @@ fn set_f2(%arg1: rec_mystruct*, %arg2: s32i) -> void [internal, c, no_inline, ds
         store %arg1, %23
         store %arg2, %24
         scope {
-            %25 = load %23 : rec_mystruct*, align 8
-            %26 = get_member %25[0] "f2" : u8i*
-            %27 = get_bitfield %26, "f2": 1 bits @1 in u8i : u32i, align 4
-            %28 = cast(integral) %27 : s32i
-            %29 = load %24 : s32i, align 4
-            %30 = cmp ne %28, %29 : bool
-            if %30 {
-                %31 = const #cir.ptr<null> : void*
-                %32 = call @myfunc2(%31) : s32i [all]
-                %33 = const #cir.ptr<null> : void*
-                call @myfunc(%32, %33) [all]
+                %25 = load %23 : rec_mystruct*, align 8
+                get_member
+                get_bitfield
+                %28 = cast(integral) %27 : s32i
+                %29 = load %24 : s32i, align 4
+                cmp
+                if %30 {
+                        %31 = const #cir.ptr<null> : void*
+                        %32 = call @myfunc2(%31) : s32i [all]
+                        %33 = const #cir.ptr<null> : void*
+                        call @myfunc(%32, %33) [all]
+                        yield
+                } else {
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            } else {
-                call @abort() [all]
-                yield
-            }
-            yield
         }
         return
 }
@@ -58,36 +58,36 @@ fn foo(%arg0: void*) -> void [external, c, no_inline, dso_local, nothrow] {
         %15 = cast(bitcast) %14 : rec_mystruct*
         store %15, %13, align 8
         scope {
-            %16 = load %13 : rec_mystruct*, align 8
-            %17 = get_member %16[0] "f2" : u8i*
-            %18 = get_bitfield %17, "f2": 1 bits @1 in u8i : u32i, align 4
-            %19 = cast(int_to_bool) %18 : bool
-            %20 = not %19 : bool
-            if %20 {
-                %21 = load %13 : rec_mystruct*, align 8
-                %22 = const 1 : s32i
-                call @set_f2(%21, %22) [all]
+                %16 = load %13 : rec_mystruct*, align 8
+                get_member
+                get_bitfield
+                %19 = cast(int_to_bool) %18 : bool
+                not
+                if %20 {
+                        %21 = load %13 : rec_mystruct*, align 8
+                        %22 = const 1 : s32i
+                        call @set_f2(%21, %22) [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_mystruct, "a", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 1 : u32i
-    %4 = get_member %1[0] "f1" : u8i*
-    %5 = set_bitfield %4, %3, "f1": 1 bits @0 in u8i : u32i, align 4
-    %6 = const 0 : u32i
-    %7 = get_member %1[0] "f2" : u8i*
-    %8 = set_bitfield %7, %6, "f2": 1 bits @1 in u8i : u32i, align 4
-    %9 = cast(bitcast) %1 : void*
-    call @foo(%9) [all]
-    %10 = const 0 : s32i
-    store %10, %0
-    %11 = load %0 : s32i
-    return %11
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_mystruct, "a", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 1 : u32i
+        get_member
+        set_bitfield
+        %6 = const 0 : u32i
+        get_member
+        set_bitfield
+        %9 = cast(bitcast) %1 : void*
+        call @foo(%9) [all]
+        %10 = const 0 : s32i
+        store %10, %0
+        %11 = load %0 : s32i
+        return %11
 }

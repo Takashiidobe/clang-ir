@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr118623.c" (c, x86_64-unknown-linux-gnu)
@@ -13,20 +13,20 @@ fn foo(%arg1: s32i, %arg2: s32i) -> s32i [internal, c, no_inline, dso_local, not
         store %arg2, %19
         %22 = const 1 : s32i
         %23 = load %18 : s32i, align 4
-        %24 = shift left %22, %23 : s32i
+        shift
         store %24, %21, align 4
         scope {
-            %27 = load %19 : s32i, align 4
-            %28 = load %21 : s32i, align 4
-            %29 = and %27, %28 : s32i
-            %30 = cast(int_to_bool) %29 : bool
-            if %30 {
-                %31 = const 0 : s32i
-                store %31, %20
-                %32 = load %20 : s32i
-                return %32
-            }
-            yield
+                %27 = load %19 : s32i, align 4
+                %28 = load %21 : s32i, align 4
+                and
+                %30 = cast(int_to_bool) %29 : bool
+                if %30 {
+                        %31 = const 0 : s32i
+                        store %31, %20
+                        %32 = load %20 : s32i
+                        return %32
+                }
+                yield
         }
         %25 = const 5 : s32i
         store %25, %20
@@ -39,33 +39,33 @@ fn bar(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %4 = alloca s32i, "x", align 4
         store %arg0, %4
         scope {
-            %5 = load %4 : s32i, align 4
-            %6 = const 50 : s32i
-            %7 = sub %5, %6 : s32i [nsw]
-            %8 = load %4 : s32i, align 4
-            %9 = call @foo(%7, %8) : s32i [all]
-            %10 = load %4 : s32i, align 4
-            %11 = add %9, %10 : s32i [nsw]
-            %12 = load %4 : s32i, align 4
-            %13 = add %11, %12 : s32i [nsw]
-            %14 = const 1 : s32i
-            %15 = and %13, %14 : s32i
-            %16 = const 0 : s32i
-            %17 = cmp eq %15, %16 : bool
-            if %17 {
-                call @abort() [all]
+                %5 = load %4 : s32i, align 4
+                %6 = const 50 : s32i
+                sub
+                %8 = load %4 : s32i, align 4
+                %9 = call @foo(%7, %8) : s32i [all]
+                %10 = load %4 : s32i, align 4
+                %11 = add %9, %10 : s32i [nsw]
+                %12 = load %4 : s32i, align 4
+                %13 = add %11, %12 : s32i [nsw]
+                %14 = const 1 : s32i
+                and
+                %16 = const 0 : s32i
+                cmp
+                if %17 {
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 63 : s32i
-    call @bar(%2) [all]
-    %3 = load %0 : s32i
-    return %3
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 63 : s32i
+        call @bar(%2) [all]
+        %3 = load %0 : s32i
+        return %3
 }

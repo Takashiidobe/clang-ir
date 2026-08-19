@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/990128-1.c" (c, x86_64-unknown-linux-gnu)
-global count : s32i = 0 [external, default, align 4, dso_local]
-global ss : rec_s = zero [external, default, align 8, dso_local]
-global p : rec_s* = #cir.ptr<null> [external, default, align 8, dso_local]
-global sss : rec_s[10] = zero [external, default, align 16, dso_local]
+global count : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global ss : rec_s = Zero { ty: Named("rec_s") } [external, default, align 8, dso_local]
+global p : rec_s* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("rec_s"), addr_space: None }) } [external, default, align 8, dso_local]
+global sss : rec_s[10] = Zero { ty: Array { element_type: Named("rec_s"), size: 10 } } [external, default, align 16, dso_local]
 
 fn look(%arg2: rec_s*, %arg3: rec_s**) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg2: rec_s*, %arg3: rec_s**):
@@ -16,27 +16,27 @@ fn look(%arg2: rec_s*, %arg3: rec_s**) -> s32i [external, c, no_inline, dso_loca
         store %arg2, %50
         store %arg3, %51
         scope {
-            for cond: {
-                %63 = load %50 : rec_s*, align 8
-                %64 = cast(ptr_to_bool) %63 : bool
-                condition %64
-            } step: {
-                %60 = load %50 : rec_s*, align 8
-                %61 = get_member %60[0] "n" : rec_s**
-                %62 = load %61 : rec_s*, align 8
-                store %62, %50, align 8
+                for cond {
+                        %63 = load %50 : rec_s*, align 8
+                        %64 = cast(ptr_to_bool) %63 : bool
+                        condition %64
+                } step {
+                        %60 = load %50 : rec_s*, align 8
+                        get_member
+                        %62 = load %61 : rec_s*, align 8
+                        store %62, %50, align 8
+                        yield
+                } body {
+                        yield
+                }
                 yield
-            } do {
-                yield
-            }
-            yield
         }
         %53 = load %50 : rec_s*, align 8
         %54 = load %51 : rec_s**, align 8
         store %53, %54, align 8
         %55 = get_global @count : s32i*
         %56 = load %55 : s32i, align 4
-        %57 = inc %56 : s32i [nsw]
+        inc
         store %57, %55, align 4
         %58 = const 1 : s32i
         store %58, %52
@@ -50,109 +50,109 @@ fn sub(%arg0: rec_s*, %arg1: rec_s**) -> void [external, c, no_inline, dso_local
         store %arg0, %39
         store %arg1, %40
         scope {
-            for cond: {
-                %46 = load %39 : rec_s*, align 8
-                %47 = load %40 : rec_s**, align 8
-                %48 = call @look(%46, %47) : s32i [all]
-                %49 = cast(int_to_bool) %48 : bool
-                condition %49
-            } step: {
-                yield
-            } do {
-                scope {
-                    scope {
-                        %41 = load %39 : rec_s*, align 8
-                        %42 = cast(ptr_to_bool) %41 : bool
-                        if %42 {
-                            %43 = load %39 : rec_s*, align 8
-                            %44 = get_member %43[0] "n" : rec_s**
-                            %45 = load %44 : rec_s*, align 8
-                            store %45, %39, align 8
-                            yield
-                        } else {
-                            break
+                for cond {
+                        %46 = load %39 : rec_s*, align 8
+                        %47 = load %40 : rec_s**, align 8
+                        %48 = call @look(%46, %47) : s32i [all]
+                        %49 = cast(int_to_bool) %48 : bool
+                        condition %49
+                } step {
+                        yield
+                } body {
+                        scope {
+                                scope {
+                                        %41 = load %39 : rec_s*, align 8
+                                        %42 = cast(ptr_to_bool) %41 : bool
+                                        if %42 {
+                                                %43 = load %39 : rec_s*, align 8
+                                                get_member
+                                                %45 = load %44 : rec_s*, align 8
+                                                store %45, %39, align 8
+                                                yield
+                                        } else {
+                                                break
+                                        }
+                                        yield
+                                }
+                                yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_s*, "pp", align 8
-    %2 = alloca rec_s*, "next", align 8
-    %3 = alloca s32i, "i", align 4
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = get_global @ss : rec_s*
-    %6 = get_global @p : rec_s**
-    store %5, %6, align 8
-    %7 = get_global @p : rec_s**
-    %8 = load %7 : rec_s*, align 8
-    store %8, %2, align 8
-    scope {
-        %24 = const 0 : s32i
-        store %24, %3, align 4
-        for cond: {
-            %36 = load %3 : s32i, align 4
-            %37 = const 10 : s32i
-            %38 = cmp lt %36, %37 : bool
-            condition %38
-        } step: {
-            %25 = load %3 : s32i, align 4
-            %26 = inc %25 : s32i [nsw]
-            store %26, %3, align 4
-            yield
-        } do {
-            scope {
-                %27 = load %3 : s32i, align 4
-                %28 = cast(integral) %27 : s64i
-                %29 = get_global @sss : rec_s[10]*
-                %30 = get_element %29[%28] : rec_s*
-                %31 = load %2 : rec_s*, align 8
-                %32 = get_member %31[0] "n" : rec_s**
-                store %30, %32, align 8
-                %33 = load %2 : rec_s*, align 8
-                %34 = get_member %33[0] "n" : rec_s**
-                %35 = load %34 : rec_s*, align 8
-                store %35, %2, align 8
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_s*, "pp", align 8
+        %2 = alloca rec_s*, "next", align 8
+        %3 = alloca s32i, "i", align 4
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = get_global @ss : rec_s*
+        %6 = get_global @p : rec_s**
+        store %5, %6, align 8
+        %7 = get_global @p : rec_s**
+        %8 = load %7 : rec_s*, align 8
+        store %8, %2, align 8
+        scope {
+                %24 = const 0 : s32i
+                store %24, %3, align 4
+                for cond {
+                        %36 = load %3 : s32i, align 4
+                        %37 = const 10 : s32i
+                        cmp
+                        condition %38
+                } step {
+                        %25 = load %3 : s32i, align 4
+                        inc
+                        store %26, %3, align 4
+                        yield
+                } body {
+                        scope {
+                                %27 = load %3 : s32i, align 4
+                                %28 = cast(integral) %27 : s64i
+                                %29 = get_global @sss : rec_s[10]*
+                                get_element
+                                %31 = load %2 : rec_s*, align 8
+                                get_member
+                                store %30, %32, align 8
+                                %33 = load %2 : rec_s*, align 8
+                                get_member
+                                %35 = load %34 : rec_s*, align 8
+                                store %35, %2, align 8
+                                yield
+                        }
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %9 = const #cir.ptr<null> : rec_s*
-    %10 = load %2 : rec_s*, align 8
-    %11 = get_member %10[0] "n" : rec_s**
-    store %9, %11, align 8
-    %12 = get_global @p : rec_s**
-    %13 = load %12 : rec_s*, align 8
-    call @sub(%13, %1) [all]
-    scope {
-        %17 = get_global @count : s32i*
-        %18 = load %17 : s32i, align 4
-        %19 = const 10 : s32i
-        %20 = const 2 : s32i
-        %21 = add %19, %20 : s32i [nsw]
-        %22 = cmp ne %18, %21 : bool
-        if %22 {
-            %23 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %9 = const #cir.ptr<null> : rec_s*
+        %10 = load %2 : rec_s*, align 8
+        get_member
+        store %9, %11, align 8
+        %12 = get_global @p : rec_s**
+        %13 = load %12 : rec_s*, align 8
+        call @sub(%13, %1) [all]
+        scope {
+                %17 = get_global @count : s32i*
+                %18 = load %17 : s32i, align 4
+                %19 = const 10 : s32i
+                %20 = const 2 : s32i
+                %21 = add %19, %20 : s32i [nsw]
+                cmp
+                if %22 {
+                        %23 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %14 = get_global @exit : ((s32i) -> void)*
-    %15 = const 0 : s32i
-    call @exit(%15) [all]
-    %16 = load %0 : s32i
-    return %16
+        %14 = get_global @exit : (s32i) -> void*
+        %15 = const 0 : s32i
+        call @exit(%15) [all]
+        %16 = load %0 : s32i
+        return %16
 }

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20071018-1.c" (c, x86_64-unknown-linux-gnu)
@@ -31,13 +31,13 @@ fn foo(%arg0: s32i) -> rec_foo* [external, c, no_inline, dso_local, nothrow] {
         store %17, %12, align 8
         %18 = load %9 : s32i, align 4
         %19 = const 8 : s32i
-        %20 = mul %18, %19 : s32i [nsw]
+        mul
         %21 = const 5 : s32i
-        %22 = sub %20, %21 : s32i [nsw]
+        sub
         %23 = cast(integral) %22 : s64i
         %24 = load %12 : rec_mem*, align 8
-        %25 = get_member %24[0] "x" : rec_foo*[4]*
-        %26 = get_element %25[%23] : rec_foo**
+        get_member
+        get_element
         store %26, %13, align 8
         %27 = const #cir.ptr<null> : rec_foo*
         %28 = load %13 : rec_foo**, align 8
@@ -52,23 +52,23 @@ fn foo(%arg0: s32i) -> rec_foo* [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const 1 : s32i
-        %5 = call @foo(%4) : rec_foo* [all]
-        %6 = const #cir.ptr<null> : rec_foo*
-        %7 = cmp eq %5, %6 : bool
-        if %7 {
-            %8 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const 1 : s32i
+                %5 = call @foo(%4) : rec_foo* [all]
+                %6 = const #cir.ptr<null> : rec_foo*
+                cmp
+                if %7 {
+                        %8 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

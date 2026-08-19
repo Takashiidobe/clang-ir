@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr19689.c" (c, x86_64-unknown-linux-gnu)
-global f : rec_anon2E0 = zero [external, default, align 4, dso_local]
+global f : rec_anon2E0 = Zero { ty: Named("rec_anon2E0") } [external, default, align 4, dso_local]
 
 fn foo(%arg0: s16i) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s16i):
@@ -12,32 +12,32 @@ fn foo(%arg0: s16i) -> void [external, c, no_inline, dso_local, nothrow] {
         %12 = load %11 : s16i, align 2
         %13 = cast(integral) %12 : s32i
         %14 = get_global @f : rec_anon2E0*
-        %15 = get_member %14[0] "b" : u32i*
-        %16 = set_bitfield %15, %13, "b": 29 bits @0 in signed u32i : s32i, align 4
+        get_member
+        set_bitfield
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const -55 : s16i
-    call @foo(%2) [all]
-    scope {
-        %5 = get_global @f : rec_anon2E0*
-        %6 = get_member %5[0] "b" : u32i*
-        %7 = get_bitfield %6, "b": 29 bits @0 in signed u32i : s32i, align 4
-        %8 = const -55 : s32i
-        %9 = cmp ne %7, %8 : bool
-        if %9 {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const -55 : s16i
+        call @foo(%2) [all]
+        scope {
+                %5 = get_global @f : rec_anon2E0*
+                get_member
+                get_bitfield
+                %8 = const -55 : s32i
+                cmp
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = load %0 : s32i
-    return %4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = load %0 : s32i
+        return %4
 }

@@ -1,17 +1,17 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr15262-2.c" (c, x86_64-unknown-linux-gnu)
-global X : float = 0.000000e+00 [external, default, align 4, dso_local]
+global X : float = CirFloat { ty: Single, value: "0.000000e+00" } [external, default, align 4, dso_local]
 
 fn foo(%arg0: void*, %arg1: float, %arg2: rec_A*, %arg3: float*) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: void*, %arg1: float, %arg2: rec_A*, %arg3: float*):
         %20 = alloca rec_anon_struct, "coerce", align 8
         %21 = alloca rec_anon_struct, "coerce", align 8
-        %22 = get_member %21[0] "" : void**
+        get_member
         store %arg0, %22
-        %23 = get_member %21[1] "" : float*
+        get_member
         store %arg1, %23
         %24 = load %21 : rec_anon_struct
         store %24, %20
@@ -28,17 +28,17 @@ fn foo(%arg0: void*, %arg1: float, %arg2: rec_A*, %arg3: float*) -> s32i [extern
         %32 = load %31 : float, align 4
         %33 = get_global @X : float*
         %34 = load %33 : float, align 4
-        %35 = fadd %34, %32 : float
+        fadd
         store %35, %33, align 4
         %36 = const 3 : s32i
-        %37 = get_member %27[0] "p" : s32i**
+        get_member
         %38 = load %37 : s32i*, align 8
         store %36, %38, align 4
         %39 = const 2 : s32i
         %40 = load %28 : rec_A*, align 8
-        %41 = get_member %40[0] "t" : s32i*
+        get_member
         store %39, %41, align 4
-        %42 = get_member %27[0] "p" : s32i**
+        get_member
         %43 = load %42 : s32i*, align 8
         %44 = load %43 : s32i, align 4
         store %44, %30
@@ -47,36 +47,36 @@ fn foo(%arg0: void*, %arg1: float, %arg2: rec_A*, %arg3: float*) -> s32i [extern
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca rec_B, "coerce", align 8
-    %1 = alloca s32i, "__retval", align 4
-    %2 = alloca rec_A, "a", align 4
-    %3 = alloca rec_B, "b", align 8
-    %4 = const 0 : s32i
-    store %4, %1
-    %5 = get_member %2[0] "t" : s32i*
-    %6 = get_member %3[0] "p" : s32i**
-    store %5, %6, align 8
-    scope {
-        %9 = get_global @X : float*
-        %10 = load %3 : rec_B, align 8
-        store %10, %0
-        %11 = cast(bitcast) %0 : rec_anon_struct*
-        %12 = get_member %11[0] "" : void**
-        %13 = load %12 : void*
-        %14 = get_member %11[1] "" : float*
-        %15 = load %14 : float
-        %16 = call @foo(%13, %15, %2, %9) : s32i [all]
-        %17 = const 3 : s32i
-        %18 = cmp eq %16, %17 : bool
-        if %18 {
-            %19 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca rec_B, "coerce", align 8
+        %1 = alloca s32i, "__retval", align 4
+        %2 = alloca rec_A, "a", align 4
+        %3 = alloca rec_B, "b", align 8
+        %4 = const 0 : s32i
+        store %4, %1
+        get_member
+        get_member
+        store %5, %6, align 8
+        scope {
+                %9 = get_global @X : float*
+                %10 = load %3 : rec_B, align 8
+                store %10, %0
+                %11 = cast(bitcast) %0 : rec_anon_struct*
+                get_member
+                %13 = load %12 : void*
+                get_member
+                %15 = load %14 : float
+                %16 = call @foo(%13, %15, %2, %9) : s32i [all]
+                %17 = const 3 : s32i
+                cmp
+                if %18 {
+                        %19 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = const 0 : s32i
-    store %7, %1
-    %8 = load %1 : s32i
-    return %8
+        %7 = const 0 : s32i
+        store %7, %1
+        %8 = load %1 : s32i
+        return %8
 }

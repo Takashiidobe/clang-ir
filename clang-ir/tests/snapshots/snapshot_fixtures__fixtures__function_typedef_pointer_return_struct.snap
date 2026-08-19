@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/function_typedef_pointer_return_struct.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.callback : rec_Callback = zero [cir_private, default, dso_local, constant]
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global __const.main.callback : rec_Callback = Zero { ty: Named("rec_Callback") } [cir_private, default, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn add_one(%arg0: s32i*) -> s32i* [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i*):
@@ -23,26 +23,26 @@ fn add_one(%arg0: s32i*) -> s32i* [internal, c, no_inline, dso_local, nothrow] {
 }
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "value", align 4
-    %2 = alloca rec_Callback, "callback", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 41 : s32i
-    store %4, %1, align 4
-    %5 = get_global @__const.main.callback : rec_Callback*
-    copy %2, %5
-    %6 = get_global @add_one : ((s32i*) -> s32i*)*
-    %7 = get_member %2[0] "handler" : ((s32i*) -> s32i*)**
-    store %6, %7, align 8
-    %8 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %9 = get_global @.str : s8i[4]*
-    %10 = cast(array_to_ptrdecay) %9 : s8i*
-    %11 = get_member %2[0] "handler" : ((s32i*) -> s32i*)**
-    %12 = load %11 : ((s32i*) -> s32i*)*, align 8
-    %13 = call %12(%1) : s32i* [all]
-    %14 = load %13 : s32i, align 4
-    %15 = call @printf(%10, %14) : s32i [all]
-    %16 = load %0 : s32i
-    return %16
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "value", align 4
+        %2 = alloca rec_Callback, "callback", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 41 : s32i
+        store %4, %1, align 4
+        %5 = get_global @__const.main.callback : rec_Callback*
+        copy
+        %6 = get_global @add_one : (s32i*) -> s32i**
+        get_member
+        store %6, %7, align 8
+        %8 = get_global @printf : (s8i*, ...) -> s32i*
+        %9 = get_global @.str : s8i[4]*
+        %10 = cast(array_to_ptrdecay) %9 : s8i*
+        get_member
+        %12 = load %11 : (s32i*) -> s32i**, align 8
+        %13 = call (%1) : s32i* [all]
+        %14 = load %13 : s32i, align 4
+        %15 = call @printf(%10, %14) : s32i [all]
+        %16 = load %0 : s32i
+        return %16
 }

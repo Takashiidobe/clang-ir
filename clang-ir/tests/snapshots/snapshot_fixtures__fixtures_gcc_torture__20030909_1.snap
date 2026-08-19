@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20030909-1.c" (c, x86_64-unknown-linux-gnu)
@@ -11,15 +11,15 @@ fn test(%arg2: s32i, %arg3: s32i) -> void [external, c, no_inline, dso_local, no
         store %arg2, %20
         store %arg3, %21
         scope {
-            %22 = load %20 : s32i, align 4
-            %23 = load %21 : s32i, align 4
-            %24 = cmp eq %22, %23 : bool
-            if %24 {
-                %25 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %22 = load %20 : s32i, align 4
+                %23 = load %21 : s32i, align 4
+                cmp
+                if %24 {
+                        %25 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -30,58 +30,58 @@ fn foo(%arg0: s32i, %arg1: s32i) -> void [external, c, no_inline, dso_local, not
         store %arg0, %7
         store %arg1, %8
         scope {
-            %9 = load %7 : s32i, align 4
-            %10 = load %8 : s32i, align 4
-            %11 = cmp eq %9, %10 : bool
-            if %11 {
-                goto a
-            } else {
-                br ^bb1
-                ^bb1():
-                    label a:
-                    scope {
-                        %12 = load %7 : s32i, align 4
-                        %13 = load %8 : s32i, align 4
-                        %14 = cmp eq %12, %13 : bool
-                        if %14 {
-                            goto b
-                        } else {
-                            br ^bb1
-                            ^bb1():
-                                label b:
-                                scope {
-                                    %15 = load %7 : s32i, align 4
-                                    %16 = load %8 : s32i, align 4
-                                    %17 = cmp ne %15, %16 : bool
-                                    if %17 {
-                                        %18 = load %7 : s32i, align 4
-                                        %19 = load %8 : s32i, align 4
-                                        call @test(%18, %19) [all]
+                %9 = load %7 : s32i, align 4
+                %10 = load %8 : s32i, align 4
+                cmp
+                if %11 {
+                        goto a
+                } else {
+                        br ^bb1
+                    ^bb1:
+                        label a:
+                        scope {
+                                %12 = load %7 : s32i, align 4
+                                %13 = load %8 : s32i, align 4
+                                cmp
+                                if %14 {
+                                        goto b
+                                } else {
+                                        br ^bb1
+                                    ^bb1:
+                                        label b:
+                                        scope {
+                                                %15 = load %7 : s32i, align 4
+                                                %16 = load %8 : s32i, align 4
+                                                cmp
+                                                if %17 {
+                                                        %18 = load %7 : s32i, align 4
+                                                        %19 = load %8 : s32i, align 4
+                                                        call @test(%18, %19) [all]
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
                         }
                         yield
-                    }
-                    yield
-            }
-            yield
+                }
+                yield
         }
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 0 : s32i
-    %3 = const 0 : s32i
-    call @foo(%2, %3) [all]
-    %4 = get_global @exit : ((s32i) -> void)*
-    %5 = const 0 : s32i
-    call @exit(%5) [all]
-    %6 = load %0 : s32i
-    return %6
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 0 : s32i
+        %3 = const 0 : s32i
+        call @foo(%2, %3) [all]
+        %4 = get_global @exit : (s32i) -> void*
+        %5 = const 0 : s32i
+        call @exit(%5) [all]
+        %6 = load %0 : s32i
+        return %6
 }

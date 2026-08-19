@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr114396.c" (c, x86_64-unknown-linux-gnu)
-global a : s16i = 15 [external, default, align 2, dso_local]
-global ua : u16i = 15 [external, default, align 2, dso_local]
-global b : s16i[16] = zero [external, default, align 16, dso_local]
-global ub : u16i[16] = zero [external, default, align 16, dso_local]
+global a : s16i = CirInt { ty: Named("s16i"), value: "15" } [external, default, align 2, dso_local]
+global ua : u16i = CirInt { ty: Named("u16i"), value: "15" } [external, default, align 2, dso_local]
+global b : s16i[16] = Zero { ty: Array { element_type: Named("s16i"), size: 16 } } [external, default, align 16, dso_local]
+global ub : u16i[16] = Zero { ty: Array { element_type: Named("u16i"), size: 16 } } [external, default, align 16, dso_local]
 
 fn foo(%arg7: s16i) -> s16i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg7: s16i):
@@ -14,35 +14,35 @@ fn foo(%arg7: s16i) -> s16i [external, c, no_inline, dso_local, nothrow] {
         %204 = alloca s16i, "__retval", align 2
         store %arg7, %203
         scope {
-            %207 = alloca s32i, "e", align 4
-            %208 = const 0 : s32i
-            store %208, %207, align 4
-            for cond: {
-                %221 = load %207 : s32i, align 4
-                %222 = const 9 : s32i
-                %223 = cmp lt %221, %222 : bool
-                condition %223
-            } step: {
-                %209 = const 1 : s32i
-                %210 = load %207 : s32i, align 4
-                %211 = add %210, %209 : s32i [nsw]
-                store %211, %207, align 4
+                %207 = alloca s32i, "e", align 4
+                %208 = const 0 : s32i
+                store %208, %207, align 4
+                for cond {
+                        %221 = load %207 : s32i, align 4
+                        %222 = const 9 : s32i
+                        cmp
+                        condition %223
+                } step {
+                        %209 = const 1 : s32i
+                        %210 = load %207 : s32i, align 4
+                        %211 = add %210, %209 : s32i [nsw]
+                        store %211, %207, align 4
+                        yield
+                } body {
+                        %212 = const 5 : s32i
+                        %213 = load %203 : s16i, align 2
+                        %214 = cast(integral) %213 : s32i
+                        mul
+                        %216 = cast(integral) %215 : s16i
+                        store %216, %203, align 2
+                        %217 = load %207 : s32i, align 4
+                        %218 = cast(integral) %217 : s64i
+                        %219 = get_global @b : s16i[16]*
+                        get_element
+                        store %216, %220, align 2
+                        yield
+                }
                 yield
-            } do {
-                %212 = const 5 : s32i
-                %213 = load %203 : s16i, align 2
-                %214 = cast(integral) %213 : s32i
-                %215 = mul %214, %212 : s32i [nsw]
-                %216 = cast(integral) %215 : s16i
-                store %216, %203, align 2
-                %217 = load %207 : s32i, align 4
-                %218 = cast(integral) %217 : s64i
-                %219 = get_global @b : s16i[16]*
-                %220 = get_element %219[%218] : s16i*
-                store %216, %220, align 2
-                yield
-            }
-            yield
         }
         %205 = load %203 : s16i, align 2
         store %205, %204
@@ -55,35 +55,35 @@ fn foo1(%arg6: s16i) -> s16i [external, c, no_inline, dso_local, nothrow] {
         %183 = alloca s16i, "__retval", align 2
         store %arg6, %182
         scope {
-            %186 = alloca s32i, "e", align 4
-            %187 = const 0 : s32i
-            store %187, %186, align 4
-            for cond: {
-                %200 = load %186 : s32i, align 4
-                %201 = const 9 : s32i
-                %202 = cmp lt %200, %201 : bool
-                condition %202
-            } step: {
-                %188 = const 1 : s32i
-                %189 = load %186 : s32i, align 4
-                %190 = add %189, %188 : s32i [nsw]
-                store %190, %186, align 4
+                %186 = alloca s32i, "e", align 4
+                %187 = const 0 : s32i
+                store %187, %186, align 4
+                for cond {
+                        %200 = load %186 : s32i, align 4
+                        %201 = const 9 : s32i
+                        cmp
+                        condition %202
+                } step {
+                        %188 = const 1 : s32i
+                        %189 = load %186 : s32i, align 4
+                        %190 = add %189, %188 : s32i [nsw]
+                        store %190, %186, align 4
+                        yield
+                } body {
+                        %191 = const -5 : s32i
+                        %192 = load %182 : s16i, align 2
+                        %193 = cast(integral) %192 : s32i
+                        mul
+                        %195 = cast(integral) %194 : s16i
+                        store %195, %182, align 2
+                        %196 = load %186 : s32i, align 4
+                        %197 = cast(integral) %196 : s64i
+                        %198 = get_global @b : s16i[16]*
+                        get_element
+                        store %195, %199, align 2
+                        yield
+                }
                 yield
-            } do {
-                %191 = const -5 : s32i
-                %192 = load %182 : s16i, align 2
-                %193 = cast(integral) %192 : s32i
-                %194 = mul %193, %191 : s32i [nsw]
-                %195 = cast(integral) %194 : s16i
-                store %195, %182, align 2
-                %196 = load %186 : s32i, align 4
-                %197 = cast(integral) %196 : s64i
-                %198 = get_global @b : s16i[16]*
-                %199 = get_element %198[%197] : s16i*
-                store %195, %199, align 2
-                yield
-            }
-            yield
         }
         %184 = load %182 : s16i, align 2
         store %184, %183
@@ -96,35 +96,35 @@ fn foou(%arg5: u16i) -> u16i [external, c, no_inline, dso_local, nothrow] {
         %162 = alloca u16i, "__retval", align 2
         store %arg5, %161
         scope {
-            %165 = alloca s32i, "e", align 4
-            %166 = const 0 : s32i
-            store %166, %165, align 4
-            for cond: {
-                %179 = load %165 : s32i, align 4
-                %180 = const 9 : s32i
-                %181 = cmp lt %179, %180 : bool
-                condition %181
-            } step: {
-                %167 = const 1 : s32i
-                %168 = load %165 : s32i, align 4
-                %169 = add %168, %167 : s32i [nsw]
-                store %169, %165, align 4
+                %165 = alloca s32i, "e", align 4
+                %166 = const 0 : s32i
+                store %166, %165, align 4
+                for cond {
+                        %179 = load %165 : s32i, align 4
+                        %180 = const 9 : s32i
+                        cmp
+                        condition %181
+                } step {
+                        %167 = const 1 : s32i
+                        %168 = load %165 : s32i, align 4
+                        %169 = add %168, %167 : s32i [nsw]
+                        store %169, %165, align 4
+                        yield
+                } body {
+                        %170 = const -5 : s32i
+                        %171 = load %161 : u16i, align 2
+                        %172 = cast(integral) %171 : s32i
+                        mul
+                        %174 = cast(integral) %173 : u16i
+                        store %174, %161, align 2
+                        %175 = load %165 : s32i, align 4
+                        %176 = cast(integral) %175 : s64i
+                        %177 = get_global @ub : u16i[16]*
+                        get_element
+                        store %174, %178, align 2
+                        yield
+                }
                 yield
-            } do {
-                %170 = const -5 : s32i
-                %171 = load %161 : u16i, align 2
-                %172 = cast(integral) %171 : s32i
-                %173 = mul %172, %170 : s32i [nsw]
-                %174 = cast(integral) %173 : u16i
-                store %174, %161, align 2
-                %175 = load %165 : s32i, align 4
-                %176 = cast(integral) %175 : s64i
-                %177 = get_global @ub : u16i[16]*
-                %178 = get_element %177[%176] : u16i*
-                store %174, %178, align 2
-                yield
-            }
-            yield
         }
         %163 = load %161 : u16i, align 2
         store %163, %162
@@ -137,35 +137,35 @@ fn foou1(%arg4: u16i) -> u16i [external, c, no_inline, dso_local, nothrow] {
         %141 = alloca u16i, "__retval", align 2
         store %arg4, %140
         scope {
-            %144 = alloca s32i, "e", align 4
-            %145 = const 0 : s32i
-            store %145, %144, align 4
-            for cond: {
-                %158 = load %144 : s32i, align 4
-                %159 = const 9 : s32i
-                %160 = cmp lt %158, %159 : bool
-                condition %160
-            } step: {
-                %146 = const 1 : s32i
-                %147 = load %144 : s32i, align 4
-                %148 = add %147, %146 : s32i [nsw]
-                store %148, %144, align 4
+                %144 = alloca s32i, "e", align 4
+                %145 = const 0 : s32i
+                store %145, %144, align 4
+                for cond {
+                        %158 = load %144 : s32i, align 4
+                        %159 = const 9 : s32i
+                        cmp
+                        condition %160
+                } step {
+                        %146 = const 1 : s32i
+                        %147 = load %144 : s32i, align 4
+                        %148 = add %147, %146 : s32i [nsw]
+                        store %148, %144, align 4
+                        yield
+                } body {
+                        %149 = const 5 : s32i
+                        %150 = load %140 : u16i, align 2
+                        %151 = cast(integral) %150 : s32i
+                        mul
+                        %153 = cast(integral) %152 : u16i
+                        store %153, %140, align 2
+                        %154 = load %144 : s32i, align 4
+                        %155 = cast(integral) %154 : s64i
+                        %156 = get_global @ub : u16i[16]*
+                        get_element
+                        store %153, %157, align 2
+                        yield
+                }
                 yield
-            } do {
-                %149 = const 5 : s32i
-                %150 = load %140 : u16i, align 2
-                %151 = cast(integral) %150 : s32i
-                %152 = mul %151, %149 : s32i [nsw]
-                %153 = cast(integral) %152 : u16i
-                store %153, %140, align 2
-                %154 = load %144 : s32i, align 4
-                %155 = cast(integral) %154 : s64i
-                %156 = get_global @ub : u16i[16]*
-                %157 = get_element %156[%155] : u16i*
-                store %153, %157, align 2
-                yield
-            }
-            yield
         }
         %142 = load %140 : u16i, align 2
         store %142, %141
@@ -178,35 +178,35 @@ fn foo_o3(%arg3: s16i) -> s16i [external, c, no_inline, dso_local, nothrow] {
         %120 = alloca s16i, "__retval", align 2
         store %arg3, %119
         scope {
-            %123 = alloca s32i, "e", align 4
-            %124 = const 0 : s32i
-            store %124, %123, align 4
-            for cond: {
-                %137 = load %123 : s32i, align 4
-                %138 = const 9 : s32i
-                %139 = cmp lt %137, %138 : bool
-                condition %139
-            } step: {
-                %125 = const 1 : s32i
-                %126 = load %123 : s32i, align 4
-                %127 = add %126, %125 : s32i [nsw]
-                store %127, %123, align 4
+                %123 = alloca s32i, "e", align 4
+                %124 = const 0 : s32i
+                store %124, %123, align 4
+                for cond {
+                        %137 = load %123 : s32i, align 4
+                        %138 = const 9 : s32i
+                        cmp
+                        condition %139
+                } step {
+                        %125 = const 1 : s32i
+                        %126 = load %123 : s32i, align 4
+                        %127 = add %126, %125 : s32i [nsw]
+                        store %127, %123, align 4
+                        yield
+                } body {
+                        %128 = const 5 : s32i
+                        %129 = load %119 : s16i, align 2
+                        %130 = cast(integral) %129 : s32i
+                        mul
+                        %132 = cast(integral) %131 : s16i
+                        store %132, %119, align 2
+                        %133 = load %123 : s32i, align 4
+                        %134 = cast(integral) %133 : s64i
+                        %135 = get_global @b : s16i[16]*
+                        get_element
+                        store %132, %136, align 2
+                        yield
+                }
                 yield
-            } do {
-                %128 = const 5 : s32i
-                %129 = load %119 : s16i, align 2
-                %130 = cast(integral) %129 : s32i
-                %131 = mul %130, %128 : s32i [nsw]
-                %132 = cast(integral) %131 : s16i
-                store %132, %119, align 2
-                %133 = load %123 : s32i, align 4
-                %134 = cast(integral) %133 : s64i
-                %135 = get_global @b : s16i[16]*
-                %136 = get_element %135[%134] : s16i*
-                store %132, %136, align 2
-                yield
-            }
-            yield
         }
         %121 = load %119 : s16i, align 2
         store %121, %120
@@ -219,35 +219,35 @@ fn foo1_o3(%arg2: s16i) -> s16i [external, c, no_inline, dso_local, nothrow] {
         %99 = alloca s16i, "__retval", align 2
         store %arg2, %98
         scope {
-            %102 = alloca s32i, "e", align 4
-            %103 = const 0 : s32i
-            store %103, %102, align 4
-            for cond: {
-                %116 = load %102 : s32i, align 4
-                %117 = const 9 : s32i
-                %118 = cmp lt %116, %117 : bool
-                condition %118
-            } step: {
-                %104 = const 1 : s32i
-                %105 = load %102 : s32i, align 4
-                %106 = add %105, %104 : s32i [nsw]
-                store %106, %102, align 4
+                %102 = alloca s32i, "e", align 4
+                %103 = const 0 : s32i
+                store %103, %102, align 4
+                for cond {
+                        %116 = load %102 : s32i, align 4
+                        %117 = const 9 : s32i
+                        cmp
+                        condition %118
+                } step {
+                        %104 = const 1 : s32i
+                        %105 = load %102 : s32i, align 4
+                        %106 = add %105, %104 : s32i [nsw]
+                        store %106, %102, align 4
+                        yield
+                } body {
+                        %107 = const -5 : s32i
+                        %108 = load %98 : s16i, align 2
+                        %109 = cast(integral) %108 : s32i
+                        mul
+                        %111 = cast(integral) %110 : s16i
+                        store %111, %98, align 2
+                        %112 = load %102 : s32i, align 4
+                        %113 = cast(integral) %112 : s64i
+                        %114 = get_global @b : s16i[16]*
+                        get_element
+                        store %111, %115, align 2
+                        yield
+                }
                 yield
-            } do {
-                %107 = const -5 : s32i
-                %108 = load %98 : s16i, align 2
-                %109 = cast(integral) %108 : s32i
-                %110 = mul %109, %107 : s32i [nsw]
-                %111 = cast(integral) %110 : s16i
-                store %111, %98, align 2
-                %112 = load %102 : s32i, align 4
-                %113 = cast(integral) %112 : s64i
-                %114 = get_global @b : s16i[16]*
-                %115 = get_element %114[%113] : s16i*
-                store %111, %115, align 2
-                yield
-            }
-            yield
         }
         %100 = load %98 : s16i, align 2
         store %100, %99
@@ -260,35 +260,35 @@ fn foou_o3(%arg1: u16i) -> u16i [external, c, no_inline, dso_local, nothrow] {
         %78 = alloca u16i, "__retval", align 2
         store %arg1, %77
         scope {
-            %81 = alloca s32i, "e", align 4
-            %82 = const 0 : s32i
-            store %82, %81, align 4
-            for cond: {
-                %95 = load %81 : s32i, align 4
-                %96 = const 9 : s32i
-                %97 = cmp lt %95, %96 : bool
-                condition %97
-            } step: {
-                %83 = const 1 : s32i
-                %84 = load %81 : s32i, align 4
-                %85 = add %84, %83 : s32i [nsw]
-                store %85, %81, align 4
+                %81 = alloca s32i, "e", align 4
+                %82 = const 0 : s32i
+                store %82, %81, align 4
+                for cond {
+                        %95 = load %81 : s32i, align 4
+                        %96 = const 9 : s32i
+                        cmp
+                        condition %97
+                } step {
+                        %83 = const 1 : s32i
+                        %84 = load %81 : s32i, align 4
+                        %85 = add %84, %83 : s32i [nsw]
+                        store %85, %81, align 4
+                        yield
+                } body {
+                        %86 = const -5 : s32i
+                        %87 = load %77 : u16i, align 2
+                        %88 = cast(integral) %87 : s32i
+                        mul
+                        %90 = cast(integral) %89 : u16i
+                        store %90, %77, align 2
+                        %91 = load %81 : s32i, align 4
+                        %92 = cast(integral) %91 : s64i
+                        %93 = get_global @ub : u16i[16]*
+                        get_element
+                        store %90, %94, align 2
+                        yield
+                }
                 yield
-            } do {
-                %86 = const -5 : s32i
-                %87 = load %77 : u16i, align 2
-                %88 = cast(integral) %87 : s32i
-                %89 = mul %88, %86 : s32i [nsw]
-                %90 = cast(integral) %89 : u16i
-                store %90, %77, align 2
-                %91 = load %81 : s32i, align 4
-                %92 = cast(integral) %91 : s64i
-                %93 = get_global @ub : u16i[16]*
-                %94 = get_element %93[%92] : u16i*
-                store %90, %94, align 2
-                yield
-            }
-            yield
         }
         %79 = load %77 : u16i, align 2
         store %79, %78
@@ -301,35 +301,35 @@ fn foou1_o3(%arg0: u16i) -> u16i [external, c, no_inline, dso_local, nothrow] {
         %57 = alloca u16i, "__retval", align 2
         store %arg0, %56
         scope {
-            %60 = alloca s32i, "e", align 4
-            %61 = const 0 : s32i
-            store %61, %60, align 4
-            for cond: {
-                %74 = load %60 : s32i, align 4
-                %75 = const 9 : s32i
-                %76 = cmp lt %74, %75 : bool
-                condition %76
-            } step: {
-                %62 = const 1 : s32i
-                %63 = load %60 : s32i, align 4
-                %64 = add %63, %62 : s32i [nsw]
-                store %64, %60, align 4
+                %60 = alloca s32i, "e", align 4
+                %61 = const 0 : s32i
+                store %61, %60, align 4
+                for cond {
+                        %74 = load %60 : s32i, align 4
+                        %75 = const 9 : s32i
+                        cmp
+                        condition %76
+                } step {
+                        %62 = const 1 : s32i
+                        %63 = load %60 : s32i, align 4
+                        %64 = add %63, %62 : s32i [nsw]
+                        store %64, %60, align 4
+                        yield
+                } body {
+                        %65 = const 5 : s32i
+                        %66 = load %56 : u16i, align 2
+                        %67 = cast(integral) %66 : s32i
+                        mul
+                        %69 = cast(integral) %68 : u16i
+                        store %69, %56, align 2
+                        %70 = load %60 : s32i, align 4
+                        %71 = cast(integral) %70 : s64i
+                        %72 = get_global @ub : u16i[16]*
+                        get_element
+                        store %69, %73, align 2
+                        yield
+                }
                 yield
-            } do {
-                %65 = const 5 : s32i
-                %66 = load %56 : u16i, align 2
-                %67 = cast(integral) %66 : s32i
-                %68 = mul %67, %65 : s32i [nsw]
-                %69 = cast(integral) %68 : u16i
-                store %69, %56, align 2
-                %70 = load %60 : s32i, align 4
-                %71 = cast(integral) %70 : s64i
-                %72 = get_global @ub : u16i[16]*
-                %73 = get_element %72[%71] : u16i*
-                store %69, %73, align 2
-                yield
-            }
-            yield
         }
         %58 = load %56 : u16i, align 2
         store %58, %57
@@ -338,99 +338,99 @@ fn foou1_o3(%arg0: u16i) -> u16i [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u16i, "uexp", align 2
-    %2 = alloca u16i, "ures", align 2
-    %3 = alloca s16i, "exp", align 2
-    %4 = alloca s16i, "res", align 2
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = get_global @a : s16i*
-    %7 = load %6 : s16i, align 2
-    %8 = call @foo(%7) : s16i [all]
-    store %8, %3, align 2
-    %9 = get_global @a : s16i*
-    %10 = load %9 : s16i, align 2
-    %11 = call @foo_o3(%10) : s16i [all]
-    store %11, %4, align 2
-    scope {
-        %51 = load %3 : s16i, align 2
-        %52 = cast(integral) %51 : s32i
-        %53 = load %4 : s16i, align 2
-        %54 = cast(integral) %53 : s32i
-        %55 = cmp ne %52, %54 : bool
-        if %55 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u16i, "uexp", align 2
+        %2 = alloca u16i, "ures", align 2
+        %3 = alloca s16i, "exp", align 2
+        %4 = alloca s16i, "res", align 2
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = get_global @a : s16i*
+        %7 = load %6 : s16i, align 2
+        %8 = call @foo(%7) : s16i [all]
+        store %8, %3, align 2
+        %9 = get_global @a : s16i*
+        %10 = load %9 : s16i, align 2
+        %11 = call @foo_o3(%10) : s16i [all]
+        store %11, %4, align 2
+        scope {
+                %51 = load %3 : s16i, align 2
+                %52 = cast(integral) %51 : s32i
+                %53 = load %4 : s16i, align 2
+                %54 = cast(integral) %53 : s32i
+                cmp
+                if %55 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %12 = get_global @a : s16i*
-    %13 = load %12 : s16i, align 2
-    %14 = call @foo1(%13) : s16i [all]
-    store %14, %3, align 2
-    %15 = get_global @a : s16i*
-    %16 = load %15 : s16i, align 2
-    %17 = call @foo1_o3(%16) : s16i [all]
-    store %17, %4, align 2
-    scope {
-        %46 = load %3 : s16i, align 2
-        %47 = cast(integral) %46 : s32i
-        %48 = load %4 : s16i, align 2
-        %49 = cast(integral) %48 : s32i
-        %50 = cmp ne %47, %49 : bool
-        if %50 {
-            call @abort() [all]
-            yield
+        %12 = get_global @a : s16i*
+        %13 = load %12 : s16i, align 2
+        %14 = call @foo1(%13) : s16i [all]
+        store %14, %3, align 2
+        %15 = get_global @a : s16i*
+        %16 = load %15 : s16i, align 2
+        %17 = call @foo1_o3(%16) : s16i [all]
+        store %17, %4, align 2
+        scope {
+                %46 = load %3 : s16i, align 2
+                %47 = cast(integral) %46 : s32i
+                %48 = load %4 : s16i, align 2
+                %49 = cast(integral) %48 : s32i
+                cmp
+                if %50 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %18 = get_global @a : s16i*
-    %19 = load %18 : s16i, align 2
-    %20 = cast(integral) %19 : u16i
-    %21 = call @foou(%20) : u16i [all]
-    store %21, %1, align 2
-    %22 = get_global @a : s16i*
-    %23 = load %22 : s16i, align 2
-    %24 = cast(integral) %23 : u16i
-    %25 = call @foou_o3(%24) : u16i [all]
-    store %25, %2, align 2
-    scope {
-        %41 = load %1 : u16i, align 2
-        %42 = cast(integral) %41 : s32i
-        %43 = load %2 : u16i, align 2
-        %44 = cast(integral) %43 : s32i
-        %45 = cmp ne %42, %44 : bool
-        if %45 {
-            call @abort() [all]
-            yield
+        %18 = get_global @a : s16i*
+        %19 = load %18 : s16i, align 2
+        %20 = cast(integral) %19 : u16i
+        %21 = call @foou(%20) : u16i [all]
+        store %21, %1, align 2
+        %22 = get_global @a : s16i*
+        %23 = load %22 : s16i, align 2
+        %24 = cast(integral) %23 : u16i
+        %25 = call @foou_o3(%24) : u16i [all]
+        store %25, %2, align 2
+        scope {
+                %41 = load %1 : u16i, align 2
+                %42 = cast(integral) %41 : s32i
+                %43 = load %2 : u16i, align 2
+                %44 = cast(integral) %43 : s32i
+                cmp
+                if %45 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %26 = get_global @a : s16i*
-    %27 = load %26 : s16i, align 2
-    %28 = cast(integral) %27 : u16i
-    %29 = call @foou1(%28) : u16i [all]
-    store %29, %1, align 2
-    %30 = get_global @a : s16i*
-    %31 = load %30 : s16i, align 2
-    %32 = cast(integral) %31 : u16i
-    %33 = call @foou1_o3(%32) : u16i [all]
-    store %33, %2, align 2
-    scope {
-        %36 = load %1 : u16i, align 2
-        %37 = cast(integral) %36 : s32i
-        %38 = load %2 : u16i, align 2
-        %39 = cast(integral) %38 : s32i
-        %40 = cmp ne %37, %39 : bool
-        if %40 {
-            call @abort() [all]
-            yield
+        %26 = get_global @a : s16i*
+        %27 = load %26 : s16i, align 2
+        %28 = cast(integral) %27 : u16i
+        %29 = call @foou1(%28) : u16i [all]
+        store %29, %1, align 2
+        %30 = get_global @a : s16i*
+        %31 = load %30 : s16i, align 2
+        %32 = cast(integral) %31 : u16i
+        %33 = call @foou1_o3(%32) : u16i [all]
+        store %33, %2, align 2
+        scope {
+                %36 = load %1 : u16i, align 2
+                %37 = cast(integral) %36 : s32i
+                %38 = load %2 : u16i, align 2
+                %39 = cast(integral) %38 : s32i
+                cmp
+                if %40 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %34 = const 0 : s32i
-    store %34, %0
-    %35 = load %0 : s32i
-    return %35
+        %34 = const 0 : s32i
+        store %34, %0
+        %35 = load %0 : s32i
+        return %35
 }

@@ -1,56 +1,56 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/time/gmtime.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[45] = "%d-%02d-%02d %02d:%02d:%02d wday=%d yday=%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[45] = ConstArray { ty: Array { element_type: Named("s8i"), size: 45 }, elts: Str("%d-%02d-%02d %02d:%02d:%02d wday=%d yday=%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn gmtime(%arg0: s64i*) -> rec_tm* [external, c, nothrow];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s64i, "t", align 8
-    %2 = alloca rec_tm*, "g", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 1000000000 : s64i
-    store %4, %1, align 8
-    %5 = call @gmtime(%1) : rec_tm* [all]
-    store %5, %2, align 8
-    %6 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %7 = get_global @.str : s8i[45]*
-    %8 = cast(array_to_ptrdecay) %7 : s8i*
-    %9 = load %2 : rec_tm*, align 8
-    %10 = get_member %9[5] "tm_year" : s32i*
-    %11 = load %10 : s32i, align 4
-    %12 = const 1900 : s32i
-    %13 = add %11, %12 : s32i [nsw]
-    %14 = load %2 : rec_tm*, align 8
-    %15 = get_member %14[4] "tm_mon" : s32i*
-    %16 = load %15 : s32i, align 8
-    %17 = const 1 : s32i
-    %18 = add %16, %17 : s32i [nsw]
-    %19 = load %2 : rec_tm*, align 8
-    %20 = get_member %19[3] "tm_mday" : s32i*
-    %21 = load %20 : s32i, align 4
-    %22 = load %2 : rec_tm*, align 8
-    %23 = get_member %22[2] "tm_hour" : s32i*
-    %24 = load %23 : s32i, align 8
-    %25 = load %2 : rec_tm*, align 8
-    %26 = get_member %25[1] "tm_min" : s32i*
-    %27 = load %26 : s32i, align 4
-    %28 = load %2 : rec_tm*, align 8
-    %29 = get_member %28[0] "tm_sec" : s32i*
-    %30 = load %29 : s32i, align 8
-    %31 = load %2 : rec_tm*, align 8
-    %32 = get_member %31[6] "tm_wday" : s32i*
-    %33 = load %32 : s32i, align 8
-    %34 = load %2 : rec_tm*, align 8
-    %35 = get_member %34[7] "tm_yday" : s32i*
-    %36 = load %35 : s32i, align 4
-    %37 = call @printf(%8, %13, %18, %21, %24, %27, %30, %33, %36) : s32i [all]
-    %38 = const 0 : s32i
-    store %38, %0
-    %39 = load %0 : s32i
-    return %39
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s64i, "t", align 8
+        %2 = alloca rec_tm*, "g", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 1000000000 : s64i
+        store %4, %1, align 8
+        %5 = call @gmtime(%1) : rec_tm* [all]
+        store %5, %2, align 8
+        %6 = get_global @printf : (s8i*, ...) -> s32i*
+        %7 = get_global @.str : s8i[45]*
+        %8 = cast(array_to_ptrdecay) %7 : s8i*
+        %9 = load %2 : rec_tm*, align 8
+        get_member
+        %11 = load %10 : s32i, align 4
+        %12 = const 1900 : s32i
+        %13 = add %11, %12 : s32i [nsw]
+        %14 = load %2 : rec_tm*, align 8
+        get_member
+        %16 = load %15 : s32i, align 8
+        %17 = const 1 : s32i
+        %18 = add %16, %17 : s32i [nsw]
+        %19 = load %2 : rec_tm*, align 8
+        get_member
+        %21 = load %20 : s32i, align 4
+        %22 = load %2 : rec_tm*, align 8
+        get_member
+        %24 = load %23 : s32i, align 8
+        %25 = load %2 : rec_tm*, align 8
+        get_member
+        %27 = load %26 : s32i, align 4
+        %28 = load %2 : rec_tm*, align 8
+        get_member
+        %30 = load %29 : s32i, align 8
+        %31 = load %2 : rec_tm*, align 8
+        get_member
+        %33 = load %32 : s32i, align 8
+        %34 = load %2 : rec_tm*, align 8
+        get_member
+        %36 = load %35 : s32i, align 4
+        %37 = call @printf(%8, %13, %18, %21, %24, %27, %30, %33, %36) : s32i [all]
+        %38 = const 0 : s32i
+        store %38, %0
+        %39 = load %0 : s32i
+        return %39
 }

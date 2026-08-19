@@ -1,44 +1,44 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/packed-1.c" (c, x86_64-unknown-linux-gnu)
-global x1 : s16i = 17 [external, default, align 2, dso_local]
-global t : rec_anon2E0 = zero [external, default, align 1, dso_local]
+global x1 : s16i = CirInt { ty: Named("s16i"), value: "17" } [external, default, align 2, dso_local]
+global t : rec_anon2E0 = Zero { ty: Named("rec_anon2E0") } [external, default, align 1, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn f() -> void [external, c, no_inline, dso_local, nothrow] {
-    %6 = get_global @x1 : s16i*
-    %7 = load %6 : s16i, align 2
-    %8 = get_global @t : rec_anon2E0*
-    %9 = get_member %8[0] "i" : s16i*
-    store %7, %9, align 1
-    scope {
-        %10 = get_global @t : rec_anon2E0*
-        %11 = get_member %10[0] "i" : s16i*
-        %12 = load %11 : s16i, align 1
-        %13 = cast(integral) %12 : s32i
-        %14 = const 17 : s32i
-        %15 = cmp ne %13, %14 : bool
-        if %15 {
-            %16 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %6 = get_global @x1 : s16i*
+        %7 = load %6 : s16i, align 2
+        %8 = get_global @t : rec_anon2E0*
+        get_member
+        store %7, %9, align 1
+        scope {
+                %10 = get_global @t : rec_anon2E0*
+                get_member
+                %12 = load %11 : s16i, align 1
+                %13 = cast(integral) %12 : s32i
+                %14 = const 17 : s32i
+                cmp
+                if %15 {
+                        %16 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    return
+        return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @f : (() -> void)*
-    call @f() [all]
-    %3 = get_global @exit : ((s32i) -> void)*
-    %4 = const 0 : s32i
-    call @exit(%4) [all]
-    %5 = load %0 : s32i
-    return %5
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @f : () -> void*
+        call @f() [all]
+        %3 = get_global @exit : (s32i) -> void*
+        %4 = const 0 : s32i
+        call @exit(%4) [all]
+        %5 = load %0 : s32i
+        return %5
 }

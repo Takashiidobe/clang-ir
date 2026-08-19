@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/951204-1.c" (c, x86_64-unknown-linux-gnu)
@@ -15,50 +15,50 @@ fn f(%arg0: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = alloca s8i, "x", align 1
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 0 : s8i
-    store %4, %2, align 1
-    scope {
-        %8 = const 0 : s32i
-        store %8, %1, align 4
-        for cond: {
-            %16 = load %1 : s32i, align 4
-            %17 = const 100 : s32i
-            %18 = cmp lt %16, %17 : bool
-            condition %18
-        } step: {
-            %9 = load %1 : s32i, align 4
-            %10 = inc %9 : s32i [nsw]
-            store %10, %1, align 4
-            yield
-        } do {
-            scope {
-                call @f(%2) [all]
-                scope {
-                    %11 = load %2 : s8i, align 1
-                    %12 = cast(integral) %11 : s32i
-                    %13 = const 120 : s32i
-                    %14 = cmp ne %12, %13 : bool
-                    if %14 {
-                        %15 = get_global @abort : (() -> void)*
-                        call @abort() [all]
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = alloca s8i, "x", align 1
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 0 : s8i
+        store %4, %2, align 1
+        scope {
+                %8 = const 0 : s32i
+                store %8, %1, align 4
+                for cond {
+                        %16 = load %1 : s32i, align 4
+                        %17 = const 100 : s32i
+                        cmp
+                        condition %18
+                } step {
+                        %9 = load %1 : s32i, align 4
+                        inc
+                        store %10, %1, align 4
                         yield
-                    }
-                    yield
+                } body {
+                        scope {
+                                call @f(%2) [all]
+                                scope {
+                                        %11 = load %2 : s8i, align 1
+                                        %12 = cast(integral) %11 : s32i
+                                        %13 = const 120 : s32i
+                                        cmp
+                                        if %14 {
+                                                %15 = get_global @abort : () -> void*
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %5 = get_global @exit : ((s32i) -> void)*
-    %6 = const 0 : s32i
-    call @exit(%6) [all]
-    %7 = load %0 : s32i
-    return %7
+        %5 = get_global @exit : (s32i) -> void*
+        %6 = const 0 : s32i
+        call @exit(%6) [all]
+        %7 = load %0 : s32i
+        return %7
 }

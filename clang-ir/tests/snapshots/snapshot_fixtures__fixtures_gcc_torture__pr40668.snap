@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr40668.c" (c, x86_64-unknown-linux-gnu)
@@ -23,58 +23,59 @@ fn bar(%arg0: s32i, %arg1: void*) -> void [external, c, no_inline, dso_local, no
         store %arg0, %10
         store %arg1, %11
         scope {
-            %12 = load %10 : s32i, align 4
-            switch %12 {
-                case equal 1 {
-                    %19 = const 305419896 : u32i
-                    %20 = load %11 : void*, align 8
-                    call @foo(%19, %20) [all]
-                    break
+                %12 = load %10 : s32i, align 4
+                switch %12 {
+                        case equal [1] {
+                                %19 = const 305419896 : u32i
+                                %20 = load %11 : void*, align 8
+                                call @foo(%19, %20) [all]
+                                break
+                        }
+                        case equal [7] {
+                                %17 = const 0 : u32i
+                                %18 = load %11 : void*, align 8
+                                call @foo(%17, %18) [all]
+                                break
+                        }
+                        case equal [8] {
+                                %15 = const 0 : u32i
+                                %16 = load %11 : void*, align 8
+                                call @foo(%15, %16) [all]
+                                break
+                        }
+                        case equal [9] {
+                                %13 = const 0 : u32i
+                                %14 = load %11 : void*, align 8
+                                call @foo(%13, %14) [all]
+                                break
+                        }
+                        yield
                 }
-                case equal 7 {
-                    %17 = const 0 : u32i
-                    %18 = load %11 : void*, align 8
-                    call @foo(%17, %18) [all]
-                    break
-                }
-                case equal 8 {
-                    %15 = const 0 : u32i
-                    %16 = load %11 : void*, align 8
-                    call @foo(%15, %16) [all]
-                    break
-                }
-                case equal 9 {
-                    %13 = const 0 : u32i
-                    %14 = load %11 : void*, align 8
-                    call @foo(%13, %14) [all]
-                    break
-                }
-            }
-            yield
+                yield
         }
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u32i, "x", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 1 : s32i
-    %4 = cast(bitcast) %1 : void*
-    call @bar(%3, %4) [all]
-    scope {
-        %7 = load %1 : u32i, align 4
-        %8 = const 305419896 : u32i
-        %9 = cmp ne %7, %8 : bool
-        if %9 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u32i, "x", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 1 : s32i
+        %4 = cast(bitcast) %1 : void*
+        call @bar(%3, %4) [all]
+        scope {
+                %7 = load %1 : u32i, align 4
+                %8 = const 305419896 : u32i
+                cmp
+                if %9 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = load %0 : s32i
-    return %6
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = load %0 : s32i
+        return %6
 }

@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/setjmp/setjmp.c" (c, x86_64-unknown-linux-gnu)
-global buf : rec___jmp_buf_tag[1] = zero [internal, default, align 16, dso_local]
-global .str : s8i[8] = "before\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[13] = "unreachable\n" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[12] = "after r=%d\n" [cir_private, default, align 1, dso_local, constant]
+global buf : rec___jmp_buf_tag[1] = Zero { ty: Array { element_type: Named("rec___jmp_buf_tag"), size: 1 } } [internal, default, align 16, dso_local]
+global .str : s8i[8] = ConstArray { ty: Array { element_type: Named("s8i"), size: 8 }, elts: Str("before\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[13] = ConstArray { ty: Array { element_type: Named("s8i"), size: 13 }, elts: Str("unreachable\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[12] = ConstArray { ty: Array { element_type: Named("s8i"), size: 12 }, elts: Str("after r=%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn _setjmp(%arg0: rec___jmp_buf_tag*) -> s32i [external, c, nothrow];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
@@ -15,7 +15,7 @@ fn jump(%arg0: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i):
         %26 = alloca s32i, "n", align 4
         store %arg0, %26
-        %27 = get_global @longjmp : ((rec___jmp_buf_tag*, s32i) -> void)*
+        %27 = get_global @longjmp : (rec___jmp_buf_tag*, s32i) -> void*
         %28 = get_global @buf : rec___jmp_buf_tag[1]*
         %29 = cast(array_to_ptrdecay) %28 : rec___jmp_buf_tag*
         %30 = load %26 : s32i, align 4
@@ -23,41 +23,41 @@ fn jump(%arg0: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "r", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @_setjmp : ((rec___jmp_buf_tag*) -> s32i)*
-    %4 = get_global @buf : rec___jmp_buf_tag[1]*
-    %5 = cast(array_to_ptrdecay) %4 : rec___jmp_buf_tag*
-    %6 = call @_setjmp(%5) : s32i [all]
-    store %6, %1, align 4
-    scope {
-        %14 = load %1 : s32i, align 4
-        %15 = const 0 : s32i
-        %16 = cmp eq %14, %15 : bool
-        if %16 {
-            %17 = get_global @printf : ((s8i*, ...) -> s32i)*
-            %18 = get_global @.str : s8i[8]*
-            %19 = cast(array_to_ptrdecay) %18 : s8i*
-            %20 = call @printf(%19) : s32i [all]
-            %21 = const 42 : s32i
-            call @jump(%21) [all]
-            %22 = get_global @printf : ((s8i*, ...) -> s32i)*
-            %23 = get_global @.str.1 : s8i[13]*
-            %24 = cast(array_to_ptrdecay) %23 : s8i*
-            %25 = call @printf(%24) : s32i [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "r", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @_setjmp : (rec___jmp_buf_tag*) -> s32i*
+        %4 = get_global @buf : rec___jmp_buf_tag[1]*
+        %5 = cast(array_to_ptrdecay) %4 : rec___jmp_buf_tag*
+        %6 = call @_setjmp(%5) : s32i [all]
+        store %6, %1, align 4
+        scope {
+                %14 = load %1 : s32i, align 4
+                %15 = const 0 : s32i
+                cmp
+                if %16 {
+                        %17 = get_global @printf : (s8i*, ...) -> s32i*
+                        %18 = get_global @.str : s8i[8]*
+                        %19 = cast(array_to_ptrdecay) %18 : s8i*
+                        %20 = call @printf(%19) : s32i [all]
+                        %21 = const 42 : s32i
+                        call @jump(%21) [all]
+                        %22 = get_global @printf : (s8i*, ...) -> s32i*
+                        %23 = get_global @.str.1 : s8i[13]*
+                        %24 = cast(array_to_ptrdecay) %23 : s8i*
+                        %25 = call @printf(%24) : s32i [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %8 = get_global @.str.2 : s8i[12]*
-    %9 = cast(array_to_ptrdecay) %8 : s8i*
-    %10 = load %1 : s32i, align 4
-    %11 = call @printf(%9, %10) : s32i [all]
-    %12 = const 0 : s32i
-    store %12, %0
-    %13 = load %0 : s32i
-    return %13
+        %7 = get_global @printf : (s8i*, ...) -> s32i*
+        %8 = get_global @.str.2 : s8i[12]*
+        %9 = cast(array_to_ptrdecay) %8 : s8i*
+        %10 = load %1 : s32i, align 4
+        %11 = call @printf(%9, %10) : s32i [all]
+        %12 = const 0 : s32i
+        store %12, %0
+        %13 = load %0 : s32i
+        return %13
 }

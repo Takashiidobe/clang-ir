@@ -1,67 +1,67 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000314-2.c" (c, x86_64-unknown-linux-gnu)
-global bigconst : u64i = 17179869184 [external, default, align 8, dso_local, constant]
-global a : s32i = 1 [external, default, align 4, dso_local]
+global bigconst : u64i = CirInt { ty: Named("u64i"), value: "17179869184" } [external, default, align 8, dso_local, constant]
+global a : s32i = CirInt { ty: Named("s32i"), value: "1" } [external, default, align 4, dso_local]
 
 fn getmask() -> u64i [internal, c, no_inline, dso_local, nothrow] {
-    %17 = alloca u64i, "__retval", align 8
-    scope {
-        %19 = get_global @a : s32i*
-        %20 = load %19 : s32i, align 4
-        %21 = cast(int_to_bool) %20 : bool
-        if %21 {
-            %24 = get_global @bigconst : u64i*
-            %25 = load %24 : u64i, align 8
-            store %25, %17
-            %26 = load %17 : u64i
-            return %26
-        } else {
-            %22 = const 0 : u64i
-            store %22, %17
-            %23 = load %17 : u64i
-            return %23
+        %17 = alloca u64i, "__retval", align 8
+        scope {
+                %19 = get_global @a : s32i*
+                %20 = load %19 : s32i, align 4
+                %21 = cast(int_to_bool) %20 : bool
+                if %21 {
+                        %24 = get_global @bigconst : u64i*
+                        %25 = load %24 : u64i, align 8
+                        store %25, %17
+                        %26 = load %17 : u64i
+                        return %26
+                } else {
+                        %22 = const 0 : u64i
+                        store %22, %17
+                        %23 = load %17 : u64i
+                        return %23
+                }
+                yield
         }
-        yield
-    }
-    %18 = load %17 : u64i
-    return %18
+        %18 = load %17 : u64i
+        return %18
 }
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u64i, "f", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = call @getmask() : u64i [all]
-    store %3, %1, align 8
-    scope {
-        %7 = const 8 : u64i
-        %8 = const 8 : u64i
-        %9 = cmp eq %7, %8 : bool
-        %10 = ternary %9 ? { : bool
-            %13 = load %1 : u64i, align 8
-            %14 = get_global @bigconst : u64i*
-            %15 = load %14 : u64i, align 8
-            %16 = cmp ne %13, %15 : bool
-            yield %16
-        } : {
-            %12 = const false : bool
-            yield %12
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u64i, "f", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = call @getmask() : u64i [all]
+        store %3, %1, align 8
+        scope {
+                %7 = const 8 : u64i
+                %8 = const 8 : u64i
+                cmp
+                %10 = ternary %9 ? { : bool
+                        %13 = load %1 : u64i, align 8
+                        %14 = get_global @bigconst : u64i*
+                        %15 = load %14 : u64i, align 8
+                        cmp
+                        yield %16
+                } : {
+                        %12 = const false : bool
+                        yield %12
+                }
+                if %10 {
+                        %11 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %10 {
-            %11 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %4 = get_global @exit : ((s32i) -> void)*
-    %5 = const 0 : s32i
-    call @exit(%5) [all]
-    %6 = load %0 : s32i
-    return %6
+        %4 = get_global @exit : (s32i) -> void*
+        %5 = const 0 : s32i
+        call @exit(%5) [all]
+        %6 = load %0 : s32i
+        return %6
 }

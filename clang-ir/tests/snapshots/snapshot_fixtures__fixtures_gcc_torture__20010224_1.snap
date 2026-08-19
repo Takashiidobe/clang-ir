@@ -1,11 +1,11 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20010224-1.c" (c, x86_64-unknown-linux-gnu)
-global masktab : s16i[6] = [1, 2, 3, 4, 5] [external, default, align 2, dso_local]
-global psd : s16i[6] = [50, 40, 30, 20, 10] [external, default, align 2, dso_local]
-global bndpsd : s16i[6] = [1, 2, 3, 4, 5] [external, default, align 2, dso_local]
+global masktab : s16i[6] = ConstArray { ty: Array { element_type: Named("s16i"), size: 6 }, elts: Array([CirInt { ty: Named("s16i"), value: "1" }, CirInt { ty: Named("s16i"), value: "2" }, CirInt { ty: Named("s16i"), value: "3" }, CirInt { ty: Named("s16i"), value: "4" }, CirInt { ty: Named("s16i"), value: "5" }]), trailing_zeros_num: 1 } [external, default, align 2, dso_local]
+global psd : s16i[6] = ConstArray { ty: Array { element_type: Named("s16i"), size: 6 }, elts: Array([CirInt { ty: Named("s16i"), value: "50" }, CirInt { ty: Named("s16i"), value: "40" }, CirInt { ty: Named("s16i"), value: "30" }, CirInt { ty: Named("s16i"), value: "20" }, CirInt { ty: Named("s16i"), value: "10" }]), trailing_zeros_num: 1 } [external, default, align 2, dso_local]
+global bndpsd : s16i[6] = ConstArray { ty: Array { element_type: Named("s16i"), size: 6 }, elts: Array([CirInt { ty: Named("s16i"), value: "1" }, CirInt { ty: Named("s16i"), value: "2" }, CirInt { ty: Named("s16i"), value: "3" }, CirInt { ty: Named("s16i"), value: "4" }, CirInt { ty: Named("s16i"), value: "5" }]), trailing_zeros_num: 1 } [external, default, align 2, dso_local]
 
 fn logadd(%arg1: s16i*, %arg2: s16i*) -> s16i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: s16i*, %arg2: s16i*):
@@ -42,89 +42,89 @@ fn ba_compute_psd(%arg0: s16i) -> void [external, c, no_inline, dso_local, nothr
         %22 = load %14 : s16i, align 2
         %23 = cast(integral) %22 : s64i
         %24 = get_global @masktab : s16i[6]*
-        %25 = get_element %24[%23] : s16i*
+        get_element
         %26 = load %25 : s16i, align 2
         %27 = cast(integral) %26 : s32i
         store %27, %17, align 4
         %28 = load %16 : s32i, align 4
         %29 = cast(integral) %28 : s64i
         %30 = get_global @psd : s16i[6]*
-        %31 = get_element %30[%29] : s16i*
+        get_element
         %32 = load %31 : s16i, align 2
         %33 = load %17 : s32i, align 4
         %34 = cast(integral) %33 : s64i
         %35 = get_global @bndpsd : s16i[6]*
-        %36 = get_element %35[%34] : s16i*
+        get_element
         store %32, %36, align 2
         %37 = load %16 : s32i, align 4
-        %38 = inc %37 : s32i [nsw]
+        inc
         store %38, %16, align 4
         scope {
-            %39 = load %16 : s32i, align 4
-            store %39, %15, align 4
-            for cond: {
-                %57 = load %15 : s32i, align 4
-                %58 = load %18 : s16i, align 2
-                %59 = cast(integral) %58 : s32i
-                %60 = cmp lt %57, %59 : bool
-                condition %60
-            } step: {
-                %40 = load %15 : s32i, align 4
-                %41 = inc %40 : s32i [nsw]
-                store %41, %15, align 4
-                yield
-            } do {
-                scope {
-                    %42 = load %17 : s32i, align 4
-                    %43 = cast(integral) %42 : s64i
-                    %44 = get_global @bndpsd : s16i[6]*
-                    %45 = get_element %44[%43] : s16i*
-                    %46 = load %16 : s32i, align 4
-                    %47 = cast(integral) %46 : s64i
-                    %48 = get_global @psd : s16i[6]*
-                    %49 = get_element %48[%47] : s16i*
-                    %50 = call @logadd(%45, %49) : s16i [all]
-                    %51 = load %17 : s32i, align 4
-                    %52 = cast(integral) %51 : s64i
-                    %53 = get_global @bndpsd : s16i[6]*
-                    %54 = get_element %53[%52] : s16i*
-                    store %50, %54, align 2
-                    %55 = load %16 : s32i, align 4
-                    %56 = inc %55 : s32i [nsw]
-                    store %56, %16, align 4
-                    yield
+                %39 = load %16 : s32i, align 4
+                store %39, %15, align 4
+                for cond {
+                        %57 = load %15 : s32i, align 4
+                        %58 = load %18 : s16i, align 2
+                        %59 = cast(integral) %58 : s32i
+                        cmp
+                        condition %60
+                } step {
+                        %40 = load %15 : s32i, align 4
+                        inc
+                        store %41, %15, align 4
+                        yield
+                } body {
+                        scope {
+                                %42 = load %17 : s32i, align 4
+                                %43 = cast(integral) %42 : s64i
+                                %44 = get_global @bndpsd : s16i[6]*
+                                get_element
+                                %46 = load %16 : s32i, align 4
+                                %47 = cast(integral) %46 : s64i
+                                %48 = get_global @psd : s16i[6]*
+                                get_element
+                                %50 = call @logadd(%45, %49) : s16i [all]
+                                %51 = load %17 : s32i, align 4
+                                %52 = cast(integral) %51 : s64i
+                                %53 = get_global @bndpsd : s16i[6]*
+                                get_element
+                                store %50, %54, align 2
+                                %55 = load %16 : s32i, align 4
+                                inc
+                                store %56, %16, align 4
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 0 : s16i
-    call @ba_compute_psd(%3) [all]
-    scope {
-        %6 = const 1 : s64i
-        %7 = get_global @bndpsd : s16i[6]*
-        %8 = get_element %7[%6] : s16i*
-        %9 = load %8 : s16i, align 2
-        %10 = cast(integral) %9 : s32i
-        %11 = const 140 : s32i
-        %12 = cmp ne %10, %11 : bool
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 0 : s16i
+        call @ba_compute_psd(%3) [all]
+        scope {
+                %6 = const 1 : s64i
+                %7 = get_global @bndpsd : s16i[6]*
+                get_element
+                %9 = load %8 : s16i, align 2
+                %10 = cast(integral) %9 : s32i
+                %11 = const 140 : s32i
+                cmp
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

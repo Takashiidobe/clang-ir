@@ -1,90 +1,90 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.c-testsuite/case_00169.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[10] = "%d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[10] = ConstArray { ty: Array { element_type: Named("s8i"), size: 10 }, elts: Str("%d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "x", align 4
-    %2 = alloca s32i, "y", align 4
-    %3 = alloca s32i, "z", align 4
-    %4 = const 0 : s32i
-    store %4, %0
-    scope {
-        %7 = const 0 : s32i
-        store %7, %1, align 4
-        for cond: {
-            %29 = load %1 : s32i, align 4
-            %30 = const 2 : s32i
-            %31 = cmp lt %29, %30 : bool
-            condition %31
-        } step: {
-            %8 = load %1 : s32i, align 4
-            %9 = inc %8 : s32i [nsw]
-            store %9, %1, align 4
-            yield
-        } do {
-            scope {
-                scope {
-                    %10 = const 0 : s32i
-                    store %10, %2, align 4
-                    for cond: {
-                        %26 = load %2 : s32i, align 4
-                        %27 = const 3 : s32i
-                        %28 = cmp lt %26, %27 : bool
-                        condition %28
-                    } step: {
-                        %11 = load %2 : s32i, align 4
-                        %12 = inc %11 : s32i [nsw]
-                        store %12, %2, align 4
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "x", align 4
+        %2 = alloca s32i, "y", align 4
+        %3 = alloca s32i, "z", align 4
+        %4 = const 0 : s32i
+        store %4, %0
+        scope {
+                %7 = const 0 : s32i
+                store %7, %1, align 4
+                for cond {
+                        %29 = load %1 : s32i, align 4
+                        %30 = const 2 : s32i
+                        cmp
+                        condition %31
+                } step {
+                        %8 = load %1 : s32i, align 4
+                        inc
+                        store %9, %1, align 4
                         yield
-                    } do {
+                } body {
                         scope {
-                            scope {
-                                %13 = const 0 : s32i
-                                store %13, %3, align 4
-                                for cond: {
-                                    %23 = load %3 : s32i, align 4
-                                    %24 = const 3 : s32i
-                                    %25 = cmp lt %23, %24 : bool
-                                    condition %25
-                                } step: {
-                                    %14 = load %3 : s32i, align 4
-                                    %15 = inc %14 : s32i [nsw]
-                                    store %15, %3, align 4
-                                    yield
-                                } do {
-                                    scope {
-                                        %16 = get_global @printf : ((s8i*, ...) -> s32i)*
-                                        %17 = get_global @.str : s8i[10]*
-                                        %18 = cast(array_to_ptrdecay) %17 : s8i*
-                                        %19 = load %1 : s32i, align 4
-                                        %20 = load %2 : s32i, align 4
-                                        %21 = load %3 : s32i, align 4
-                                        %22 = call @printf(%18, %19, %20, %21) : s32i [all]
+                                scope {
+                                        %10 = const 0 : s32i
+                                        store %10, %2, align 4
+                                        for cond {
+                                                %26 = load %2 : s32i, align 4
+                                                %27 = const 3 : s32i
+                                                cmp
+                                                condition %28
+                                        } step {
+                                                %11 = load %2 : s32i, align 4
+                                                inc
+                                                store %12, %2, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %13 = const 0 : s32i
+                                                                store %13, %3, align 4
+                                                                for cond {
+                                                                        %23 = load %3 : s32i, align 4
+                                                                        %24 = const 3 : s32i
+                                                                        cmp
+                                                                        condition %25
+                                                                } step {
+                                                                        %14 = load %3 : s32i, align 4
+                                                                        inc
+                                                                        store %15, %3, align 4
+                                                                        yield
+                                                                } body {
+                                                                        scope {
+                                                                                %16 = get_global @printf : (s8i*, ...) -> s32i*
+                                                                                %17 = get_global @.str : s8i[10]*
+                                                                                %18 = cast(array_to_ptrdecay) %17 : s8i*
+                                                                                %19 = load %1 : s32i, align 4
+                                                                                %20 = load %2 : s32i, align 4
+                                                                                %21 = load %3 : s32i, align 4
+                                                                                %22 = call @printf(%18, %19, %20, %21) : s32i [all]
+                                                                                yield
+                                                                        }
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = load %0 : s32i
-    return %6
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = load %0 : s32i
+        return %6
 }

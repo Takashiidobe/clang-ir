@@ -1,13 +1,13 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/nested_aggregate_const_record_field_alignment.c" (c, x86_64-unknown-linux-gnu)
-global g : rec_Outer = {{[@add1, @add2, @add3], 42}, [1, 2, 3, 4, 5, 6, 7, 8], @mul5, @mul7, 99} [external, default, align 8, dso_local]
-global .str : s8i[13] = "%d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[4] = "%d " [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[2] = "\n" [cir_private, default, align 1, dso_local, constant]
-global .str.3 : s8i[10] = "%d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global g : rec_Outer = ConstRecord { ty: Named("rec_Outer"), members: Array([ConstRecord { ty: Named("rec_Inner"), members: Array([ConstArray { ty: Array { element_type: Pointer { pointee: Func { inputs: [Named("s32i")], optional_return_type: Some(Named("s32i")), var_arg: false }, addr_space: None }, size: 3 }, elts: Array([GlobalView { ty: Pointer { pointee: Func { inputs: [Named("s32i")], optional_return_type: Some(Named("s32i")), var_arg: false }, addr_space: None }, symbol: "add1", indices: None }, GlobalView { ty: Pointer { pointee: Func { inputs: [Named("s32i")], optional_return_type: Some(Named("s32i")), var_arg: false }, addr_space: None }, symbol: "add2", indices: None }, GlobalView { ty: Pointer { pointee: Func { inputs: [Named("s32i")], optional_return_type: Some(Named("s32i")), var_arg: false }, addr_space: None }, symbol: "add3", indices: None }]), trailing_zeros_num: 0 }, CirInt { ty: Named("s32i"), value: "42" }]) }, ConstArray { ty: Array { element_type: Named("u8i"), size: 8 }, elts: Array([CirInt { ty: Named("u8i"), value: "1" }, CirInt { ty: Named("u8i"), value: "2" }, CirInt { ty: Named("u8i"), value: "3" }, CirInt { ty: Named("u8i"), value: "4" }, CirInt { ty: Named("u8i"), value: "5" }, CirInt { ty: Named("u8i"), value: "6" }, CirInt { ty: Named("u8i"), value: "7" }, CirInt { ty: Named("u8i"), value: "8" }]), trailing_zeros_num: 0 }, GlobalView { ty: Pointer { pointee: Func { inputs: [Named("s32i")], optional_return_type: Some(Named("s32i")), var_arg: false }, addr_space: None }, symbol: "mul5", indices: None }, GlobalView { ty: Pointer { pointee: Func { inputs: [Named("s32i")], optional_return_type: Some(Named("s32i")), var_arg: false }, addr_space: None }, symbol: "mul7", indices: None }, CirInt { ty: Named("s32i"), value: "99" }]) } [external, default, align 8, dso_local]
+global .str : s8i[13] = ConstArray { ty: Array { element_type: Named("s8i"), size: 13 }, elts: Str("%d %d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d "), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[2] = ConstArray { ty: Array { element_type: Named("s8i"), size: 2 }, elts: Str("\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[10] = ConstArray { ty: Array { element_type: Named("s8i"), size: 10 }, elts: Str("%d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn add1(%arg4: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg4: s32i):
@@ -52,7 +52,7 @@ fn mul5(%arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %arg1, %81
         %83 = load %81 : s32i, align 4
         %84 = const 5 : s32i
-        %85 = mul %83, %84 : s32i [nsw]
+        mul
         store %85, %82
         %86 = load %82 : s32i
         return %86
@@ -64,104 +64,104 @@ fn mul7(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %75
         %77 = load %75 : s32i, align 4
         %78 = const 7 : s32i
-        %79 = mul %77, %78 : s32i [nsw]
+        mul
         store %79, %76
         %80 = load %76 : s32i
         return %80
 }
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[13]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = const 0 : s64i
-    %6 = get_global @g : rec_Outer*
-    %7 = get_member %6[0] "inner" : rec_Inner*
-    %8 = get_member %7[0] "scanners" : ((s32i) -> s32i)*[3]*
-    %9 = get_element %8[%5] : ((s32i) -> s32i)**
-    %10 = load %9 : ((s32i) -> s32i)*, align 8
-    %11 = const 10 : s32i
-    %12 = call %10(%11) : s32i [all]
-    %13 = const 1 : s64i
-    %14 = get_global @g : rec_Outer*
-    %15 = get_member %14[0] "inner" : rec_Inner*
-    %16 = get_member %15[0] "scanners" : ((s32i) -> s32i)*[3]*
-    %17 = get_element %16[%13] : ((s32i) -> s32i)**
-    %18 = load %17 : ((s32i) -> s32i)*, align 8
-    %19 = const 10 : s32i
-    %20 = call %18(%19) : s32i [all]
-    %21 = const 2 : s64i
-    %22 = get_global @g : rec_Outer*
-    %23 = get_member %22[0] "inner" : rec_Inner*
-    %24 = get_member %23[0] "scanners" : ((s32i) -> s32i)*[3]*
-    %25 = get_element %24[%21] : ((s32i) -> s32i)**
-    %26 = load %25 : ((s32i) -> s32i)*, align 8
-    %27 = const 10 : s32i
-    %28 = call %26(%27) : s32i [all]
-    %29 = get_global @g : rec_Outer*
-    %30 = get_member %29[0] "inner" : rec_Inner*
-    %31 = get_member %30[1] "tag" : s32i*
-    %32 = load %31 : s32i, align 8
-    %33 = call @printf(%4, %12, %20, %28, %32) : s32i [all]
-    scope {
-        %57 = alloca s32i, "i", align 4
-        %58 = const 0 : s32i
-        store %58, %57, align 4
-        for cond: {
-            %72 = load %57 : s32i, align 4
-            %73 = const 8 : s32i
-            %74 = cmp lt %72, %73 : bool
-            condition %74
-        } step: {
-            %59 = load %57 : s32i, align 4
-            %60 = inc %59 : s32i [nsw]
-            store %60, %57, align 4
-            yield
-        } do {
-            scope {
-                %61 = get_global @printf : ((s8i*, ...) -> s32i)*
-                %62 = get_global @.str.1 : s8i[4]*
-                %63 = cast(array_to_ptrdecay) %62 : s8i*
-                %64 = load %57 : s32i, align 4
-                %65 = cast(integral) %64 : s64i
-                %66 = get_global @g : rec_Outer*
-                %67 = get_member %66[1] "bytes" : u8i[8]*
-                %68 = get_element %67[%65] : u8i*
-                %69 = load %68 : u8i, align 1
-                %70 = cast(integral) %69 : s32i
-                %71 = call @printf(%63, %70) : s32i [all]
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[13]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = const 0 : s64i
+        %6 = get_global @g : rec_Outer*
+        get_member
+        get_member
+        get_element
+        %10 = load %9 : (s32i) -> s32i*, align 8
+        %11 = const 10 : s32i
+        %12 = call (%11) : s32i [all]
+        %13 = const 1 : s64i
+        %14 = get_global @g : rec_Outer*
+        get_member
+        get_member
+        get_element
+        %18 = load %17 : (s32i) -> s32i*, align 8
+        %19 = const 10 : s32i
+        %20 = call (%19) : s32i [all]
+        %21 = const 2 : s64i
+        %22 = get_global @g : rec_Outer*
+        get_member
+        get_member
+        get_element
+        %26 = load %25 : (s32i) -> s32i*, align 8
+        %27 = const 10 : s32i
+        %28 = call (%27) : s32i [all]
+        %29 = get_global @g : rec_Outer*
+        get_member
+        get_member
+        %32 = load %31 : s32i, align 8
+        %33 = call @printf(%4, %12, %20, %28, %32) : s32i [all]
+        scope {
+                %57 = alloca s32i, "i", align 4
+                %58 = const 0 : s32i
+                store %58, %57, align 4
+                for cond {
+                        %72 = load %57 : s32i, align 4
+                        %73 = const 8 : s32i
+                        cmp
+                        condition %74
+                } step {
+                        %59 = load %57 : s32i, align 4
+                        inc
+                        store %60, %57, align 4
+                        yield
+                } body {
+                        scope {
+                                %61 = get_global @printf : (s8i*, ...) -> s32i*
+                                %62 = get_global @.str.1 : s8i[4]*
+                                %63 = cast(array_to_ptrdecay) %62 : s8i*
+                                %64 = load %57 : s32i, align 4
+                                %65 = cast(integral) %64 : s64i
+                                %66 = get_global @g : rec_Outer*
+                                get_member
+                                get_element
+                                %69 = load %68 : u8i, align 1
+                                %70 = cast(integral) %69 : s32i
+                                %71 = call @printf(%63, %70) : s32i [all]
+                                yield
+                        }
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %34 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %35 = get_global @.str.2 : s8i[2]*
-    %36 = cast(array_to_ptrdecay) %35 : s8i*
-    %37 = call @printf(%36) : s32i [all]
-    %38 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %39 = get_global @.str.3 : s8i[10]*
-    %40 = cast(array_to_ptrdecay) %39 : s8i*
-    %41 = get_global @g : rec_Outer*
-    %42 = get_member %41[2] "trailing1" : ((s32i) -> s32i)**
-    %43 = load %42 : ((s32i) -> s32i)*, align 8
-    %44 = const 10 : s32i
-    %45 = call %43(%44) : s32i [all]
-    %46 = get_global @g : rec_Outer*
-    %47 = get_member %46[3] "trailing2" : ((s32i) -> s32i)**
-    %48 = load %47 : ((s32i) -> s32i)*, align 8
-    %49 = const 10 : s32i
-    %50 = call %48(%49) : s32i [all]
-    %51 = get_global @g : rec_Outer*
-    %52 = get_member %51[4] "trailing3" : s32i*
-    %53 = load %52 : s32i, align 8
-    %54 = call @printf(%40, %45, %50, %53) : s32i [all]
-    %55 = const 0 : s32i
-    store %55, %0
-    %56 = load %0 : s32i
-    return %56
+        %34 = get_global @printf : (s8i*, ...) -> s32i*
+        %35 = get_global @.str.2 : s8i[2]*
+        %36 = cast(array_to_ptrdecay) %35 : s8i*
+        %37 = call @printf(%36) : s32i [all]
+        %38 = get_global @printf : (s8i*, ...) -> s32i*
+        %39 = get_global @.str.3 : s8i[10]*
+        %40 = cast(array_to_ptrdecay) %39 : s8i*
+        %41 = get_global @g : rec_Outer*
+        get_member
+        %43 = load %42 : (s32i) -> s32i*, align 8
+        %44 = const 10 : s32i
+        %45 = call (%44) : s32i [all]
+        %46 = get_global @g : rec_Outer*
+        get_member
+        %48 = load %47 : (s32i) -> s32i*, align 8
+        %49 = const 10 : s32i
+        %50 = call (%49) : s32i [all]
+        %51 = get_global @g : rec_Outer*
+        get_member
+        %53 = load %52 : s32i, align 8
+        %54 = call @printf(%40, %45, %50, %53) : s32i [all]
+        %55 = const 0 : s32i
+        store %55, %0
+        %56 = load %0 : s32i
+        return %56
 }

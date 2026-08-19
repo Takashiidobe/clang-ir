@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20030120-1.c" (c, x86_64-unknown-linux-gnu)
@@ -9,28 +9,28 @@ fn test1(%arg2: u16i) -> u16i [external, c, no_inline, dso_local, nothrow] {
         %51 = alloca u16i, "__retval", align 2
         store %arg2, %50
         scope {
-            %54 = load %50 : u16i, align 2
-            %55 = cast(integral) %54 : s32i
-            %56 = const 65280 : s32i
-            %57 = and %55, %56 : s32i
-            %58 = const 0 : s32i
-            %59 = cmp eq %57, %58 : bool
-            if %59 {
-                scope {
-                    %60 = load %50 : u16i, align 2
-                    %61 = cast(integral) %60 : s32i
-                    %62 = const 0 : s32i
-                    %63 = cmp eq %61, %62 : bool
-                    if %63 {
-                        %64 = const 2 : u16i
-                        store %64, %50, align 2
+                %54 = load %50 : u16i, align 2
+                %55 = cast(integral) %54 : s32i
+                %56 = const 65280 : s32i
+                and
+                %58 = const 0 : s32i
+                cmp
+                if %59 {
+                        scope {
+                                %60 = load %50 : u16i, align 2
+                                %61 = cast(integral) %60 : s32i
+                                %62 = const 0 : s32i
+                                cmp
+                                if %63 {
+                                        %64 = const 2 : u16i
+                                        store %64, %50, align 2
+                                        yield
+                                }
+                                yield
+                        }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         %52 = load %50 : u16i, align 2
         store %52, %51
@@ -43,26 +43,26 @@ fn test2(%arg1: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
         %38 = alloca u64i, "__retval", align 8
         store %arg1, %37
         scope {
-            %41 = load %37 : u64i, align 8
-            %42 = const 4294901760 : u64i
-            %43 = and %41, %42 : u64i
-            %44 = const 0 : u64i
-            %45 = cmp eq %43, %44 : bool
-            if %45 {
-                scope {
-                    %46 = load %37 : u64i, align 8
-                    %47 = const 0 : u64i
-                    %48 = cmp eq %46, %47 : bool
-                    if %48 {
-                        %49 = const 2 : u64i
-                        store %49, %37, align 8
+                %41 = load %37 : u64i, align 8
+                %42 = const 4294901760 : u64i
+                and
+                %44 = const 0 : u64i
+                cmp
+                if %45 {
+                        scope {
+                                %46 = load %37 : u64i, align 8
+                                %47 = const 0 : u64i
+                                cmp
+                                if %48 {
+                                        %49 = const 2 : u64i
+                                        store %49, %37, align 8
+                                        yield
+                                }
+                                yield
+                        }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         %39 = load %37 : u64i, align 8
         store %39, %38
@@ -75,36 +75,36 @@ fn test3(%arg0: u16i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %22 = alloca s32i, "__retval", align 4
         store %arg0, %21
         scope {
-            %24 = load %21 : u16i, align 2
-            %25 = cast(integral) %24 : s32i
-            %26 = const 1 : s32i
-            %27 = and %25, %26 : s32i
-            %28 = cast(int_to_bool) %27 : bool
-            if %28 {
-                %35 = const 1 : s32i
-                store %35, %22
-                %36 = load %22 : s32i
-                return %36
-            } else {
-                scope {
-                    %29 = load %21 : u16i, align 2
-                    %30 = cast(int_to_bool) %29 : bool
-                    if %30 {
-                        %33 = const 1 : s32i
-                        store %33, %22
-                        %34 = load %22 : s32i
-                        return %34
-                    } else {
-                        %31 = const 0 : s32i
-                        store %31, %22
-                        %32 = load %22 : s32i
-                        return %32
-                    }
-                    yield
+                %24 = load %21 : u16i, align 2
+                %25 = cast(integral) %24 : s32i
+                %26 = const 1 : s32i
+                and
+                %28 = cast(int_to_bool) %27 : bool
+                if %28 {
+                        %35 = const 1 : s32i
+                        store %35, %22
+                        %36 = load %22 : s32i
+                        return %36
+                } else {
+                        scope {
+                                %29 = load %21 : u16i, align 2
+                                %30 = cast(int_to_bool) %29 : bool
+                                if %30 {
+                                        %33 = const 1 : s32i
+                                        store %33, %22
+                                        %34 = load %22 : s32i
+                                        return %34
+                                } else {
+                                        %31 = const 0 : s32i
+                                        store %31, %22
+                                        %32 = load %22 : s32i
+                                        return %32
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %23 = load %22 : s32i
         return %23
@@ -112,49 +112,49 @@ fn test3(%arg0: u16i) -> s32i [external, c, no_inline, dso_local, nothrow] {
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %15 = const 1 : u16i
-        %16 = call @test1(%15) : u16i [all]
-        %17 = cast(integral) %16 : s32i
-        %18 = const 1 : s32i
-        %19 = cmp ne %17, %18 : bool
-        if %19 {
-            %20 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %15 = const 1 : u16i
+                %16 = call @test1(%15) : u16i [all]
+                %17 = cast(integral) %16 : s32i
+                %18 = const 1 : s32i
+                cmp
+                if %19 {
+                        %20 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %10 = const 1 : u64i
-        %11 = call @test2(%10) : u64i [all]
-        %12 = const 1 : u64i
-        %13 = cmp ne %11, %12 : bool
-        if %13 {
-            %14 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %10 = const 1 : u64i
+                %11 = call @test2(%10) : u64i [all]
+                %12 = const 1 : u64i
+                cmp
+                if %13 {
+                        %14 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %5 = const 2 : u16i
-        %6 = call @test3(%5) : s32i [all]
-        %7 = const 1 : s32i
-        %8 = cmp ne %6, %7 : bool
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %5 = const 2 : u16i
+                %6 = call @test3(%5) : s32i [all]
+                %7 = const 1 : s32i
+                cmp
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

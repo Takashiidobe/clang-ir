@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr29156.c" (c, x86_64-unknown-linux-gnu)
-global global : s32i = 0 [external, default, align 4, dso_local]
+global global : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn bla(%arg0: rec_test1*, %arg1: rec_test2*) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: rec_test1*, %arg1: rec_test2*):
@@ -17,16 +17,16 @@ fn bla(%arg0: rec_test1*, %arg1: rec_test2*) -> s32i [external, c, no_inline, ds
         store %13, %14, align 4
         %15 = const 1 : s32i
         %16 = load %11 : rec_test2*, align 8
-        %17 = get_member %16[1] "sub" : rec_test1*
-        %18 = get_member %17[0] "a" : s32i*
+        get_member
+        get_member
         store %15, %18, align 4
         %19 = const 8 : s32i
         %20 = load %10 : rec_test1*, align 8
-        %21 = get_member %20[0] "a" : s32i*
+        get_member
         store %19, %21, align 4
         %22 = load %11 : rec_test2*, align 8
-        %23 = get_member %22[1] "sub" : rec_test1*
-        %24 = get_member %23[0] "a" : s32i*
+        get_member
+        get_member
         %25 = load %24 : s32i, align 4
         store %25, %12
         %26 = load %12 : s32i
@@ -34,24 +34,24 @@ fn bla(%arg0: rec_test1*, %arg1: rec_test2*) -> s32i [external, c, no_inline, ds
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_test2, "pom", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    scope {
-        %5 = get_member %1[1] "sub" : rec_test1*
-        %6 = call @bla(%5, %1) : s32i [all]
-        %7 = const 8 : s32i
-        %8 = cmp ne %6, %7 : bool
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_test2, "pom", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        scope {
+                get_member
+                %6 = call @bla(%5, %1) : s32i [all]
+                %7 = const 8 : s32i
+                cmp
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = load %0 : s32i
-    return %4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = load %0 : s32i
+        return %4
 }

@@ -1,34 +1,34 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.multi/globals/main.c" (c, x86_64-unknown-linux-gnu)
 global counter : s32i [external, default, align 4, dso_local]
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn bump(%arg0: s32i) -> void [external, c];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 3 : s32i
-    call @bump(%2) [all]
-    %3 = const 4 : s32i
-    call @bump(%3) [all]
-    %4 = const 1 : s32i
-    %5 = get_global @counter : s32i*
-    %6 = load %5 : s32i, align 4
-    %7 = add %6, %4 : s32i [nsw]
-    store %7, %5, align 4
-    %8 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %9 = get_global @.str : s8i[4]*
-    %10 = cast(array_to_ptrdecay) %9 : s8i*
-    %11 = get_global @counter : s32i*
-    %12 = load %11 : s32i, align 4
-    %13 = call @printf(%10, %12) : s32i [all]
-    %14 = const 0 : s32i
-    store %14, %0
-    %15 = load %0 : s32i
-    return %15
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 3 : s32i
+        call @bump(%2) [all]
+        %3 = const 4 : s32i
+        call @bump(%3) [all]
+        %4 = const 1 : s32i
+        %5 = get_global @counter : s32i*
+        %6 = load %5 : s32i, align 4
+        %7 = add %6, %4 : s32i [nsw]
+        store %7, %5, align 4
+        %8 = get_global @printf : (s8i*, ...) -> s32i*
+        %9 = get_global @.str : s8i[4]*
+        %10 = cast(array_to_ptrdecay) %9 : s8i*
+        %11 = get_global @counter : s32i*
+        %12 = load %11 : s32i, align 4
+        %13 = call @printf(%10, %12) : s32i [all]
+        %14 = const 0 : s32i
+        store %14, %0
+        %15 = load %0 : s32i
+        return %15
 }

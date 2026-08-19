@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr25125.c" (c, x86_64-unknown-linux-gnu)
@@ -10,17 +10,17 @@ fn f(%arg0: s16i) -> u16i [external, c, no_inline, dso_local, nothrow] {
         %23 = alloca s16i, "b", align 2
         store %arg0, %21
         scope {
-            %32 = load %21 : s16i, align 2
-            %33 = cast(integral) %32 : s32i
-            %34 = const 0 : s32i
-            %35 = cmp gt %33, %34 : bool
-            if %35 {
-                %36 = const 0 : u16i
-                store %36, %22
-                %37 = load %22 : u16i
-                return %37
-            }
-            yield
+                %32 = load %21 : s16i, align 2
+                %33 = cast(integral) %32 : s32i
+                %34 = const 0 : s32i
+                cmp
+                if %35 {
+                        %36 = const 0 : u16i
+                        store %36, %22
+                        %37 = load %22 : u16i
+                        return %37
+                }
+                yield
         }
         %24 = load %21 : s16i, align 2
         %25 = cast(integral) %24 : s32i
@@ -37,46 +37,46 @@ fn f(%arg0: s16i) -> u16i [external, c, no_inline, dso_local, nothrow] {
 fn exit(%arg0: s32i) -> void [external, c];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %11 = const 2 : u64i
-        %12 = const 2 : u64i
-        %13 = cmp lt %11, %12 : bool
-        %14 = ternary %13 ? { : bool
-            %20 = const true : bool
-            yield %20
-        } : {
-            %17 = const 2 : u64i
-            %18 = const 4 : u64i
-            %19 = cmp ge %17, %18 : bool
-            yield %19
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %11 = const 2 : u64i
+                %12 = const 2 : u64i
+                cmp
+                %14 = ternary %13 ? { : bool
+                        %20 = const true : bool
+                        yield %20
+                } : {
+                        %17 = const 2 : u64i
+                        %18 = const 4 : u64i
+                        cmp
+                        yield %19
+                }
+                if %14 {
+                        %15 = get_global @exit : (s32i) -> void*
+                        %16 = const 0 : s32i
+                        call @exit(%16) [all]
+                        yield
+                }
+                yield
         }
-        if %14 {
-            %15 = get_global @exit : ((s32i) -> void)*
-            %16 = const 0 : s32i
-            call @exit(%16) [all]
-            yield
+        scope {
+                %5 = const -32767 : s16i
+                %6 = call @f(%5) : u16i [all]
+                %7 = cast(integral) %6 : s32i
+                %8 = const 1 : s32i
+                cmp
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %5 = const -32767 : s16i
-        %6 = call @f(%5) : u16i [all]
-        %7 = cast(integral) %6 : s32i
-        %8 = const 1 : s32i
-        %9 = cmp ne %7, %8 : bool
-        if %9 {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

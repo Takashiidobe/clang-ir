@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000717-2.c" (c, x86_64-unknown-linux-gnu)
@@ -9,28 +9,28 @@ fn compare(%arg0: s64i) -> void [internal, c, no_inline, dso_local, nothrow] {
         %6 = alloca s64i, "foo", align 8
         store %arg0, %6
         scope {
-            %7 = load %6 : s64i, align 8
-            %8 = const 4294967297 : s64i
-            %9 = cmp lt %7, %8 : bool
-            if %9 {
-                %10 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %7 = load %6 : s64i, align 8
+                %8 = const 4294967297 : s64i
+                cmp
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 8589934591 : s64i
-    call @compare(%2) [all]
-    %3 = get_global @exit : ((s32i) -> void)*
-    %4 = const 0 : s32i
-    call @exit(%4) [all]
-    %5 = load %0 : s32i
-    return %5
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 8589934591 : s64i
+        call @compare(%2) [all]
+        %3 = get_global @exit : (s32i) -> void*
+        %4 = const 0 : s32i
+        call @exit(%4) [all]
+        %5 = load %0 : s32i
+        return %5
 }

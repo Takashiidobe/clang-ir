@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/strct-pack-1.c" (c, x86_64-unknown-linux-gnu)
@@ -9,30 +9,30 @@ fn check(%arg0: rec_TRIAL*) -> s32i [external, c, no_inline, dso_local, nothrow]
         %15 = alloca s32i, "__retval", align 4
         store %arg0, %14
         scope {
-            %18 = load %14 : rec_TRIAL*, align 8
-            %19 = get_member %18[0] "s" : s16i*
-            %20 = load %19 : s16i, align 2
-            %21 = cast(integral) %20 : s32i
-            %22 = const 1 : s32i
-            %23 = cmp ne %21, %22 : bool
-            %24 = ternary %23 ? { : bool
-                %32 = const true : bool
-                yield %32
-            } : {
-                %27 = load %14 : rec_TRIAL*, align 8
-                %28 = get_member %27[1] "d" : double*
-                %29 = load %28 : double, align 2
-                %30 = const 1.600000e+01 : double
-                %31 = cmp ne %29, %30 : bool
-                yield %31
-            }
-            if %24 {
-                %25 = const 1 : s32i
-                store %25, %15
-                %26 = load %15 : s32i
-                return %26
-            }
-            yield
+                %18 = load %14 : rec_TRIAL*, align 8
+                get_member
+                %20 = load %19 : s16i, align 2
+                %21 = cast(integral) %20 : s32i
+                %22 = const 1 : s32i
+                cmp
+                %24 = ternary %23 ? { : bool
+                        %32 = const true : bool
+                        yield %32
+                } : {
+                        %27 = load %14 : rec_TRIAL*, align 8
+                        get_member
+                        %29 = load %28 : double, align 2
+                        %30 = const 1.600000e+01 : double
+                        cmp
+                        yield %31
+                }
+                if %24 {
+                        %25 = const 1 : s32i
+                        store %25, %15
+                        %26 = load %15 : s32i
+                        return %26
+                }
+                yield
         }
         %16 = const 0 : s32i
         store %16, %15
@@ -42,30 +42,30 @@ fn check(%arg0: rec_TRIAL*) -> s32i [external, c, no_inline, dso_local, nothrow]
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_TRIAL, "trial", align 2
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 1 : s16i
-    %4 = get_member %1[0] "s" : s16i*
-    store %3, %4, align 2
-    %5 = const 1.600000e+01 : double
-    %6 = get_member %1[1] "d" : double*
-    store %5, %6, align 2
-    scope {
-        %10 = call @check(%1) : s32i [all]
-        %11 = const 0 : s32i
-        %12 = cmp ne %10, %11 : bool
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_TRIAL, "trial", align 2
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 1 : s16i
+        get_member
+        store %3, %4, align 2
+        %5 = const 1.600000e+01 : double
+        get_member
+        store %5, %6, align 2
+        scope {
+                %10 = call @check(%1) : s32i [all]
+                %11 = const 0 : s32i
+                cmp
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = get_global @exit : ((s32i) -> void)*
-    %8 = const 0 : s32i
-    call @exit(%8) [all]
-    %9 = load %0 : s32i
-    return %9
+        %7 = get_global @exit : (s32i) -> void*
+        %8 = const 0 : s32i
+        call @exit(%8) [all]
+        %9 = load %0 : s32i
+        return %9
 }

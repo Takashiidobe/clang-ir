@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/c_string_literal.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[12] = "write error" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[12] = ConstArray { ty: Array { element_type: Named("s8i"), size: 12 }, elts: Str("write error"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn first_plus_last(%arg0: s8i*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
@@ -14,12 +14,12 @@ fn first_plus_last(%arg0: s8i*) -> s32i [internal, c, no_inline, dso_local, noth
         store %arg0, %13
         %15 = const 0 : s64i
         %16 = load %13 : s8i*, align 8
-        %17 = ptr_stride %16, %15 : s8i*
+        ptr_stride
         %18 = load %17 : s8i, align 1
         %19 = cast(integral) %18 : s32i
         %20 = const 10 : s64i
         %21 = load %13 : s8i*, align 8
-        %22 = ptr_stride %21, %20 : s8i*
+        ptr_stride
         %23 = load %22 : s8i, align 1
         %24 = cast(integral) %23 : s32i
         %25 = add %19, %24 : s32i [nsw]
@@ -28,21 +28,21 @@ fn first_plus_last(%arg0: s8i*) -> s32i [internal, c, no_inline, dso_local, noth
         return %26
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s8i*, "message", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @.str : s8i[12]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    store %4, %1, align 8
-    %5 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %6 = get_global @.str.1 : s8i[4]*
-    %7 = cast(array_to_ptrdecay) %6 : s8i*
-    %8 = load %1 : s8i*, align 8
-    %9 = call @first_plus_last(%8) : s32i [all]
-    %10 = call @printf(%7, %9) : s32i [all]
-    %11 = const 0 : s32i
-    store %11, %0
-    %12 = load %0 : s32i
-    return %12
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s8i*, "message", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @.str : s8i[12]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        store %4, %1, align 8
+        %5 = get_global @printf : (s8i*, ...) -> s32i*
+        %6 = get_global @.str.1 : s8i[4]*
+        %7 = cast(array_to_ptrdecay) %6 : s8i*
+        %8 = load %1 : s8i*, align 8
+        %9 = call @first_plus_last(%8) : s32i [all]
+        %10 = call @printf(%7, %9) : s32i [all]
+        %11 = const 0 : s32i
+        store %11, %0
+        %12 = load %0 : s32i
+        return %12
 }

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/920711-1.c" (c, x86_64-unknown-linux-gnu)
@@ -9,10 +9,10 @@ fn f(%arg0: s64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %11 = alloca s32i, "__retval", align 4
         store %arg0, %10
         %12 = load %10 : s64i, align 8
-        %13 = dec %12 : s64i [nsw]
+        dec
         store %13, %10, align 8
         %14 = const 0 : s64i
-        %15 = cmp gt %13, %14 : bool
+        cmp
         %16 = cast(bool_to_int) %15 : s32i
         store %16, %11
         %17 = load %11 : s32i
@@ -21,24 +21,24 @@ fn f(%arg0: s64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %5 = const 2147483648 : s64i
-        %6 = call @f(%5) : s32i [all]
-        %7 = const 0 : s32i
-        %8 = cmp eq %6, %7 : bool
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %5 = const 2147483648 : s64i
+                %6 = call @f(%5) : s32i [all]
+                %7 = const 0 : s32i
+                cmp
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

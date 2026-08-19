@@ -1,41 +1,41 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/time/time_now.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn time(%arg0: s64i*) -> s64i [external, c, nothrow];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s64i, "t", align 8
-    %2 = alloca s64i, "t2", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const #cir.ptr<null> : s64i*
-    %5 = call @time(%4) : s64i [all]
-    store %5, %1, align 8
-    %6 = call @time(%2) : s64i [all]
-    %7 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %8 = get_global @.str : s8i[4]*
-    %9 = cast(array_to_ptrdecay) %8 : s8i*
-    %10 = load %1 : s64i, align 8
-    %11 = const 1000000000 : s64i
-    %12 = cmp gt %10, %11 : bool
-    %13 = ternary %12 ? { : bool
-        %19 = load %2 : s64i, align 8
-        %20 = load %1 : s64i, align 8
-        %21 = cmp ge %19, %20 : bool
-        yield %21
-    } : {
-        %18 = const false : bool
-        yield %18
-    }
-    %14 = cast(bool_to_int) %13 : s32i
-    %15 = call @printf(%9, %14) : s32i [all]
-    %16 = const 0 : s32i
-    store %16, %0
-    %17 = load %0 : s32i
-    return %17
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s64i, "t", align 8
+        %2 = alloca s64i, "t2", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const #cir.ptr<null> : s64i*
+        %5 = call @time(%4) : s64i [all]
+        store %5, %1, align 8
+        %6 = call @time(%2) : s64i [all]
+        %7 = get_global @printf : (s8i*, ...) -> s32i*
+        %8 = get_global @.str : s8i[4]*
+        %9 = cast(array_to_ptrdecay) %8 : s8i*
+        %10 = load %1 : s64i, align 8
+        %11 = const 1000000000 : s64i
+        cmp
+        %13 = ternary %12 ? { : bool
+                %19 = load %2 : s64i, align 8
+                %20 = load %1 : s64i, align 8
+                cmp
+                yield %21
+        } : {
+                %18 = const false : bool
+                yield %18
+        }
+        %14 = cast(bool_to_int) %13 : s32i
+        %15 = call @printf(%9, %14) : s32i [all]
+        %16 = const 0 : s32i
+        store %16, %0
+        %17 = load %0 : s32i
+        return %17
 }

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.c-testsuite/case_00124.c" (c, x86_64-unknown-linux-gnu)
@@ -12,50 +12,50 @@ fn f2(%arg2: s32i, %arg3: s32i) -> s32i [external, c, no_inline, dso_local, noth
         store %arg3, %23
         %25 = load %22 : s32i, align 4
         %26 = load %23 : s32i, align 4
-        %27 = sub %25, %26 : s32i [nsw]
+        sub
         store %27, %24
         %28 = load %24 : s32i
         return %28
 }
-fn f1(%arg0: s32i, %arg1: s32i) -> ((s32i, s32i) -> s32i)* [external, c, no_inline, dso_local, nothrow] {
+fn f1(%arg0: s32i, %arg1: s32i) -> (s32i, s32i) -> s32i* [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i, %arg1: s32i):
         %12 = alloca s32i, "a", align 4
         %13 = alloca s32i, "b", align 4
-        %14 = alloca ((s32i, s32i) -> s32i)*, "__retval", align 8
+        %14 = alloca (s32i, s32i) -> s32i*, "__retval", align 8
         store %arg0, %12
         store %arg1, %13
         scope {
-            %17 = load %12 : s32i, align 4
-            %18 = load %13 : s32i, align 4
-            %19 = cmp ne %17, %18 : bool
-            if %19 {
-                %20 = get_global @f2 : ((s32i, s32i) -> s32i)*
-                store %20, %14
-                %21 = load %14 : ((s32i, s32i) -> s32i)*
-                return %21
-            }
-            yield
+                %17 = load %12 : s32i, align 4
+                %18 = load %13 : s32i, align 4
+                cmp
+                if %19 {
+                        %20 = get_global @f2 : (s32i, s32i) -> s32i*
+                        store %20, %14
+                        %21 = load %14 : (s32i, s32i) -> s32i*
+                        return %21
+                }
+                yield
         }
-        %15 = const #cir.ptr<null> : ((s32i, s32i) -> s32i)*
+        %15 = const #cir.ptr<null> : (s32i, s32i) -> s32i*
         store %15, %14
-        %16 = load %14 : ((s32i, s32i) -> s32i)*
+        %16 = load %14 : (s32i, s32i) -> s32i*
         return %16
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca ((s32i, s32i) -> ((s32i, s32i) -> s32i)*)*, "p", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @f1 : ((s32i, s32i) -> ((s32i, s32i) -> s32i)*)*
-    store %3, %1, align 8
-    %4 = load %1 : ((s32i, s32i) -> ((s32i, s32i) -> s32i)*)*, align 8
-    %5 = const 0 : s32i
-    %6 = const 2 : s32i
-    %7 = call %4(%5, %6) : ((s32i, s32i) -> s32i)* [all]
-    %8 = const 2 : s32i
-    %9 = const 2 : s32i
-    %10 = call %7(%8, %9) : s32i [all]
-    store %10, %0
-    %11 = load %0 : s32i
-    return %11
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca (s32i, s32i) -> (s32i, s32i) -> s32i**, "p", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @f1 : (s32i, s32i) -> (s32i, s32i) -> s32i**
+        store %3, %1, align 8
+        %4 = load %1 : (s32i, s32i) -> (s32i, s32i) -> s32i**, align 8
+        %5 = const 0 : s32i
+        %6 = const 2 : s32i
+        %7 = call (%5, %6) : (s32i, s32i) -> s32i* [all]
+        %8 = const 2 : s32i
+        %9 = const 2 : s32i
+        %10 = call (%8, %9) : s32i [all]
+        store %10, %0
+        %11 = load %0 : s32i
+        return %11
 }

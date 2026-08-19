@@ -1,88 +1,89 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/switch_loop_control.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn run() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %9 = alloca s32i, "__retval", align 4
-    %10 = alloca s32i, "out", align 4
-    %11 = const 0 : s32i
-    store %11, %10, align 4
-    scope {
-        %14 = alloca s32i, "i", align 4
-        %15 = const 0 : s32i
-        store %15, %14, align 4
-        for cond: {
-            %31 = load %14 : s32i, align 4
-            %32 = const 3 : s32i
-            %33 = cmp le %31, %32 : bool
-            condition %33
-        } step: {
-            %16 = load %14 : s32i, align 4
-            %17 = inc %16 : s32i [nsw]
-            store %17, %14, align 4
-            yield
-        } do {
-            scope {
-                scope {
-                    %21 = load %14 : s32i, align 4
-                    switch %21 {
-                        case equal 0 {
-                            %28 = const 1 : s32i
-                            %29 = load %10 : s32i, align 4
-                            %30 = add %29, %28 : s32i [nsw]
-                            store %30, %10, align 4
-                            break
+        %9 = alloca s32i, "__retval", align 4
+        %10 = alloca s32i, "out", align 4
+        %11 = const 0 : s32i
+        store %11, %10, align 4
+        scope {
+                %14 = alloca s32i, "i", align 4
+                %15 = const 0 : s32i
+                store %15, %14, align 4
+                for cond {
+                        %31 = load %14 : s32i, align 4
+                        %32 = const 3 : s32i
+                        cmp
+                        condition %33
+                } step {
+                        %16 = load %14 : s32i, align 4
+                        inc
+                        store %17, %14, align 4
+                        yield
+                } body {
+                        scope {
+                                scope {
+                                        %21 = load %14 : s32i, align 4
+                                        switch %21 {
+                                                case equal [0] {
+                                                        %28 = const 1 : s32i
+                                                        %29 = load %10 : s32i, align 4
+                                                        %30 = add %29, %28 : s32i [nsw]
+                                                        store %30, %10, align 4
+                                                        break
+                                                }
+                                                case equal [1] {
+                                                        continue
+                                                }
+                                                case equal [2] {
+                                                        %25 = const 20 : s32i
+                                                        %26 = load %10 : s32i, align 4
+                                                        %27 = add %26, %25 : s32i [nsw]
+                                                        store %27, %10, align 4
+                                                        break
+                                                }
+                                                case default [] {
+                                                        %22 = const 100 : s32i
+                                                        %23 = load %10 : s32i, align 4
+                                                        %24 = add %23, %22 : s32i [nsw]
+                                                        store %24, %10, align 4
+                                                        break
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
+                                %18 = const 3 : s32i
+                                %19 = load %10 : s32i, align 4
+                                %20 = add %19, %18 : s32i [nsw]
+                                store %20, %10, align 4
+                                yield
                         }
-                        case equal 1 {
-                            continue
-                        }
-                        case equal 2 {
-                            %25 = const 20 : s32i
-                            %26 = load %10 : s32i, align 4
-                            %27 = add %26, %25 : s32i [nsw]
-                            store %27, %10, align 4
-                            break
-                        }
-                        case default {
-                            %22 = const 100 : s32i
-                            %23 = load %10 : s32i, align 4
-                            %24 = add %23, %22 : s32i [nsw]
-                            store %24, %10, align 4
-                            break
-                        }
-                    }
-                    yield
+                        yield
                 }
-                %18 = const 3 : s32i
-                %19 = load %10 : s32i, align 4
-                %20 = add %19, %18 : s32i [nsw]
-                store %20, %10, align 4
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %12 = load %10 : s32i, align 4
-    store %12, %9
-    %13 = load %9 : s32i
-    return %13
+        %12 = load %10 : s32i, align 4
+        store %12, %9
+        %13 = load %9 : s32i
+        return %13
 }
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[4]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = call @run() : s32i [all]
-    %6 = call @printf(%4, %5) : s32i [all]
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = load %0 : s32i
-    return %8
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[4]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = call @run() : s32i [all]
+        %6 = call @printf(%4, %5) : s32i [all]
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = load %0 : s32i
+        return %8
 }

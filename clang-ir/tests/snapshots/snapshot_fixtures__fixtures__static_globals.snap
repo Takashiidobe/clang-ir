@@ -1,42 +1,42 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/static_globals.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
-global counter : s32i = 2 [internal, default, align 4, dso_local]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global counter : s32i = CirInt { ty: Named("s32i"), value: "2" } [internal, default, align 4, dso_local]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn bump_counter() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %14 = alloca s32i, "__retval", align 4
-    %15 = get_global @counter : s32i*
-    %16 = load %15 : s32i, align 4
-    %17 = const 1 : s32i
-    %18 = add %16, %17 : s32i [nsw]
-    %19 = get_global @counter : s32i*
-    store %18, %19, align 4
-    %20 = get_global @counter : s32i*
-    %21 = load %20 : s32i, align 4
-    store %21, %14
-    %22 = load %14 : s32i
-    return %22
+        %14 = alloca s32i, "__retval", align 4
+        %15 = get_global @counter : s32i*
+        %16 = load %15 : s32i, align 4
+        %17 = const 1 : s32i
+        %18 = add %16, %17 : s32i [nsw]
+        %19 = get_global @counter : s32i*
+        store %18, %19, align 4
+        %20 = get_global @counter : s32i*
+        %21 = load %20 : s32i, align 4
+        store %21, %14
+        %22 = load %14 : s32i
+        return %22
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[4]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = call @bump_counter() : s32i [all]
-    %6 = call @printf(%4, %5) : s32i [all]
-    %7 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %8 = get_global @.str : s8i[4]*
-    %9 = cast(array_to_ptrdecay) %8 : s8i*
-    %10 = call @bump_counter() : s32i [all]
-    %11 = call @printf(%9, %10) : s32i [all]
-    %12 = const 0 : s32i
-    store %12, %0
-    %13 = load %0 : s32i
-    return %13
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[4]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = call @bump_counter() : s32i [all]
+        %6 = call @printf(%4, %5) : s32i [all]
+        %7 = get_global @printf : (s8i*, ...) -> s32i*
+        %8 = get_global @.str : s8i[4]*
+        %9 = cast(array_to_ptrdecay) %8 : s8i*
+        %10 = call @bump_counter() : s32i [all]
+        %11 = call @printf(%9, %10) : s32i [all]
+        %12 = const 0 : s32i
+        store %12, %0
+        %13 = load %0 : s32i
+        return %13
 }

@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20080719-1.c" (c, x86_64-unknown-linux-gnu)
-global deadfish : u32i = 3735941461 [internal, default, align 4, dso_local, constant]
-global cfb_tab8_be : u32i[16] = [0, 255, 65280, 65535, 16711680, 16711935, 16776960, 16777215, 4278190080, 4278190335, 4278255360, 4278255615, 4294901760, 4294902015, 4294967040, 4294967295] [internal, default, align 16, dso_local, constant]
-global cfb_tab16_be : u32i[4] = [0, 65535, 4294901760, 4294967295] [internal, default, align 16, dso_local, constant]
-global cfb_tab32 : u32i[2] = [0, 4294967295] [internal, default, align 4, dso_local, constant]
+global deadfish : u32i = CirInt { ty: Named("u32i"), value: "3735941461" } [internal, default, align 4, dso_local, constant]
+global cfb_tab8_be : u32i[16] = ConstArray { ty: Array { element_type: Named("u32i"), size: 16 }, elts: Array([CirInt { ty: Named("u32i"), value: "0" }, CirInt { ty: Named("u32i"), value: "255" }, CirInt { ty: Named("u32i"), value: "65280" }, CirInt { ty: Named("u32i"), value: "65535" }, CirInt { ty: Named("u32i"), value: "16711680" }, CirInt { ty: Named("u32i"), value: "16711935" }, CirInt { ty: Named("u32i"), value: "16776960" }, CirInt { ty: Named("u32i"), value: "16777215" }, CirInt { ty: Named("u32i"), value: "4278190080" }, CirInt { ty: Named("u32i"), value: "4278190335" }, CirInt { ty: Named("u32i"), value: "4278255360" }, CirInt { ty: Named("u32i"), value: "4278255615" }, CirInt { ty: Named("u32i"), value: "4294901760" }, CirInt { ty: Named("u32i"), value: "4294902015" }, CirInt { ty: Named("u32i"), value: "4294967040" }, CirInt { ty: Named("u32i"), value: "4294967295" }]), trailing_zeros_num: 0 } [internal, default, align 16, dso_local, constant]
+global cfb_tab16_be : u32i[4] = ConstArray { ty: Array { element_type: Named("u32i"), size: 4 }, elts: Array([CirInt { ty: Named("u32i"), value: "0" }, CirInt { ty: Named("u32i"), value: "65535" }, CirInt { ty: Named("u32i"), value: "4294901760" }, CirInt { ty: Named("u32i"), value: "4294967295" }]), trailing_zeros_num: 0 } [internal, default, align 16, dso_local, constant]
+global cfb_tab32 : u32i[2] = ConstArray { ty: Array { element_type: Named("u32i"), size: 2 }, elts: Array([CirInt { ty: Named("u32i"), value: "0" }, CirInt { ty: Named("u32i"), value: "4294967295" }]), trailing_zeros_num: 0 } [internal, default, align 4, dso_local, constant]
 
 fn xxx(%arg0: s32i) -> u32i* [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i):
@@ -15,42 +15,43 @@ fn xxx(%arg0: s32i) -> u32i* [external, c, no_inline, dso_local, nothrow] {
         %22 = alloca u32i*, "tab", align 8
         store %arg0, %20
         scope {
-            %32 = const 0 : s32i
-            %33 = cast(int_to_bool) %32 : bool
-            if %33 {
-                %34 = get_global @deadfish : u32i*
-                store %34, %21
-                %35 = load %21 : u32i*
-                return %35
-            }
-            yield
+                %32 = const 0 : s32i
+                %33 = cast(int_to_bool) %32 : bool
+                if %33 {
+                        %34 = get_global @deadfish : u32i*
+                        store %34, %21
+                        %35 = load %21 : u32i*
+                        return %35
+                }
+                yield
         }
         scope {
-            %25 = load %20 : s32i, align 4
-            switch %25 {
-                case equal 8 {
-                    %30 = get_global @cfb_tab8_be : u32i[16]*
-                    %31 = cast(array_to_ptrdecay) %30 : u32i*
-                    store %31, %22, align 8
-                    break
+                %25 = load %20 : s32i, align 4
+                switch %25 {
+                        case equal [8] {
+                                %30 = get_global @cfb_tab8_be : u32i[16]*
+                                %31 = cast(array_to_ptrdecay) %30 : u32i*
+                                store %31, %22, align 8
+                                break
+                        }
+                        case equal [16] {
+                                %28 = get_global @cfb_tab16_be : u32i[4]*
+                                %29 = cast(array_to_ptrdecay) %28 : u32i*
+                                store %29, %22, align 8
+                                break
+                        }
+                        case equal [32] {
+                                yield
+                        }
+                        case default [] {
+                                %26 = get_global @cfb_tab32 : u32i[2]*
+                                %27 = cast(array_to_ptrdecay) %26 : u32i*
+                                store %27, %22, align 8
+                                break
+                        }
+                        yield
                 }
-                case equal 16 {
-                    %28 = get_global @cfb_tab16_be : u32i[4]*
-                    %29 = cast(array_to_ptrdecay) %28 : u32i*
-                    store %29, %22, align 8
-                    break
-                }
-                case equal 32 {
-                    yield
-                }
-                case default {
-                    %26 = get_global @cfb_tab32 : u32i[2]*
-                    %27 = cast(array_to_ptrdecay) %26 : u32i*
-                    store %27, %22, align 8
-                    break
-                }
-            }
-            yield
+                yield
         }
         %23 = load %22 : u32i*, align 8
         store %23, %21
@@ -59,36 +60,36 @@ fn xxx(%arg0: s32i) -> u32i* [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u32i*, "a", align 8
-    %2 = alloca s32i, "b", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 8 : s32i
-    %5 = call @xxx(%4) : u32i* [all]
-    store %5, %1, align 8
-    %6 = const 0 : s64i
-    %7 = load %1 : u32i*, align 8
-    %8 = ptr_stride %7, %6 : u32i*
-    %9 = load %8 : u32i, align 4
-    %10 = cast(integral) %9 : s32i
-    store %10, %2, align 4
-    scope {
-        %13 = load %2 : s32i, align 4
-        %14 = cast(integral) %13 : u32i
-        %15 = const 0 : s64i
-        %16 = get_global @cfb_tab8_be : u32i[16]*
-        %17 = get_element %16[%15] : u32i*
-        %18 = load %17 : u32i, align 16
-        %19 = cmp ne %14, %18 : bool
-        if %19 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u32i*, "a", align 8
+        %2 = alloca s32i, "b", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 8 : s32i
+        %5 = call @xxx(%4) : u32i* [all]
+        store %5, %1, align 8
+        %6 = const 0 : s64i
+        %7 = load %1 : u32i*, align 8
+        ptr_stride
+        %9 = load %8 : u32i, align 4
+        %10 = cast(integral) %9 : s32i
+        store %10, %2, align 4
+        scope {
+                %13 = load %2 : s32i, align 4
+                %14 = cast(integral) %13 : u32i
+                %15 = const 0 : s64i
+                %16 = get_global @cfb_tab8_be : u32i[16]*
+                get_element
+                %18 = load %17 : u32i, align 16
+                cmp
+                if %19 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %11 = const 0 : s32i
-    store %11, %0
-    %12 = load %0 : s32i
-    return %12
+        %11 = const 0 : s32i
+        store %11, %0
+        %12 = load %0 : s32i
+        return %12
 }

@@ -1,38 +1,38 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/over_aligned_local.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.object : rec_OverAligned = {7, zero} [cir_private, default, dso_local, constant]
-global .str : s8i[19] = "%zu %zu %zu %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global __const.main.object : rec_OverAligned = ConstRecord { ty: Named("rec_OverAligned"), members: Array([CirInt { ty: Named("s32i"), value: "7" }, Zero { ty: Array { element_type: Named("u8i"), size: 28 } }]) } [cir_private, default, dso_local, constant]
+global .str : s8i[19] = ConstArray { ty: Array { element_type: Named("s8i"), size: 19 }, elts: Str("%zu %zu %zu %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_OverAligned, "object", align 32
-    %2 = alloca s32i, "local", align 64
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = get_global @__const.main.object : rec_OverAligned*
-    copy %1, %4
-    %5 = const 11 : s32i
-    store %5, %2, align 64
-    %6 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %7 = get_global @.str : s8i[19]*
-    %8 = cast(array_to_ptrdecay) %7 : s8i*
-    %9 = const 32 : u64i
-    %10 = cast(ptr_to_int) %1 : u64i
-    %11 = const 32 : u64i
-    %12 = rem %10, %11 : u64i
-    %13 = cast(ptr_to_int) %2 : u64i
-    %14 = const 64 : u64i
-    %15 = rem %13, %14 : u64i
-    %16 = get_member %1[0] "value" : s32i*
-    %17 = load %16 : s32i, align 32
-    %18 = load %2 : s32i, align 64
-    %19 = call @printf(%8, %9, %12, %15, %17, %18) : s32i [all]
-    %20 = const 0 : s32i
-    store %20, %0
-    %21 = load %0 : s32i
-    return %21
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_OverAligned, "object", align 32
+        %2 = alloca s32i, "local", align 64
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = get_global @__const.main.object : rec_OverAligned*
+        copy
+        %5 = const 11 : s32i
+        store %5, %2, align 64
+        %6 = get_global @printf : (s8i*, ...) -> s32i*
+        %7 = get_global @.str : s8i[19]*
+        %8 = cast(array_to_ptrdecay) %7 : s8i*
+        %9 = const 32 : u64i
+        %10 = cast(ptr_to_int) %1 : u64i
+        %11 = const 32 : u64i
+        rem
+        %13 = cast(ptr_to_int) %2 : u64i
+        %14 = const 64 : u64i
+        rem
+        get_member
+        %17 = load %16 : s32i, align 32
+        %18 = load %2 : s32i, align 64
+        %19 = call @printf(%8, %9, %12, %15, %17, %18) : s32i [all]
+        %20 = const 0 : s32i
+        store %20, %0
+        %21 = load %0 : s32i
+        return %21
 }

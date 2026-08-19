@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/x86_instruction_intrinsics.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[12] = "%d %d %llu\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[12] = ConstArray { ty: Array { element_type: Named("s8i"), size: 12 }, elts: Str("%d %d %llu\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn _mm_crc32_u8(%arg6: u32i, %arg7: u8i) -> u32i [internal, c, always_inline, dso_local, nothrow] {
@@ -15,7 +15,7 @@ fn _mm_crc32_u8(%arg6: u32i, %arg7: u8i) -> u32i [internal, c, always_inline, ds
         store %arg7, %67
         %69 = load %66 : u32i, align 4
         %70 = load %67 : u8i, align 1
-        %71 = call_llvm_intrinsic x86.sse42.crc32.32.8(%69, %70) : u32i
+        call_llvm_intrinsic
         store %71, %68
         %72 = load %68 : u32i
         return %72
@@ -29,7 +29,7 @@ fn _mm_crc32_u16(%arg4: u32i, %arg5: u16i) -> u32i [internal, c, always_inline, 
         store %arg5, %60
         %62 = load %59 : u32i, align 4
         %63 = load %60 : u16i, align 2
-        %64 = call_llvm_intrinsic x86.sse42.crc32.32.16(%62, %63) : u32i
+        call_llvm_intrinsic
         store %64, %61
         %65 = load %61 : u32i
         return %65
@@ -43,7 +43,7 @@ fn _mm_crc32_u32(%arg2: u32i, %arg3: u32i) -> u32i [internal, c, always_inline, 
         store %arg3, %53
         %55 = load %52 : u32i, align 4
         %56 = load %53 : u32i, align 4
-        %57 = call_llvm_intrinsic x86.sse42.crc32.32.32(%55, %56) : u32i
+        call_llvm_intrinsic
         store %57, %54
         %58 = load %54 : u32i
         return %58
@@ -57,69 +57,69 @@ fn _mm_crc32_u64(%arg0: u64i, %arg1: u64i) -> u64i [internal, c, always_inline, 
         store %arg1, %46
         %48 = load %45 : u64i, align 8
         %49 = load %46 : u64i, align 8
-        %50 = call_llvm_intrinsic x86.sse42.crc32.64.64(%48, %49) : u64i
+        call_llvm_intrinsic
         store %50, %47
         %51 = load %47 : u64i
         return %51
 }
 fn crc32_probe() -> u64i [internal, c, no_inline, dso_local, nothrow] {
-    %29 = alloca u64i, "__retval", align 8
-    %30 = alloca u32i, "crc", align 4
-    %31 = const 0 : u32i
-    %32 = const 18 : u8i
-    %33 = call @_mm_crc32_u8(%31, %32) : u32i [all]
-    store %33, %30, align 4
-    %34 = load %30 : u32i, align 4
-    %35 = const 13398 : u16i
-    %36 = call @_mm_crc32_u16(%34, %35) : u32i [all]
-    store %36, %30, align 4
-    %37 = load %30 : u32i, align 4
-    %38 = const 2023406814 : u32i
-    %39 = call @_mm_crc32_u32(%37, %38) : u32i [all]
-    store %39, %30, align 4
-    %40 = load %30 : u32i, align 4
-    %41 = cast(integral) %40 : u64i
-    %42 = const 1311768467463790320 : u64i
-    %43 = call @_mm_crc32_u64(%41, %42) : u64i [all]
-    store %43, %29
-    %44 = load %29 : u64i
-    return %44
+        %29 = alloca u64i, "__retval", align 8
+        %30 = alloca u32i, "crc", align 4
+        %31 = const 0 : u32i
+        %32 = const 18 : u8i
+        %33 = call @_mm_crc32_u8(%31, %32) : u32i [all]
+        store %33, %30, align 4
+        %34 = load %30 : u32i, align 4
+        %35 = const 13398 : u16i
+        %36 = call @_mm_crc32_u16(%34, %35) : u32i [all]
+        store %36, %30, align 4
+        %37 = load %30 : u32i, align 4
+        %38 = const 2023406814 : u32i
+        %39 = call @_mm_crc32_u32(%37, %38) : u32i [all]
+        store %39, %30, align 4
+        %40 = load %30 : u32i, align 4
+        %41 = cast(integral) %40 : u64i
+        %42 = const 1311768467463790320 : u64i
+        %43 = call @_mm_crc32_u64(%41, %42) : u64i [all]
+        store %43, %29
+        %44 = load %29 : u64i
+        return %44
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u32i, "auxiliary", align 4
-    %2 = alloca u64i, "first", align 8
-    %3 = alloca u64i, "second", align 8
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = const 0 : u32i
-    store %5, %1, align 4
-    %6 = call_llvm_intrinsic x86.sse2.pause() : void
-    %7 = call_llvm_intrinsic x86.sse2.lfence() : void
-    %8 = call_llvm_intrinsic x86.rdtsc() : u64i
-    store %8, %2, align 8
-    %9 = call_llvm_intrinsic x86.sse2.mfence() : void
-    %10 = call_llvm_intrinsic x86.rdtscp() : rec_anon_struct
-    %11 = extract_member %10[1] : u32i
-    store %11, %1, align 1
-    %12 = extract_member %10[0] : u64i
-    store %12, %3, align 8
-    %13 = call_llvm_intrinsic x86.sse.sfence() : void
-    %14 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %15 = get_global @.str : s8i[12]*
-    %16 = cast(array_to_ptrdecay) %15 : s8i*
-    %17 = load %2 : u64i, align 8
-    %18 = const 0 : u64i
-    %19 = cmp ne %17, %18 : bool
-    %20 = cast(bool_to_int) %19 : s32i
-    %21 = load %3 : u64i, align 8
-    %22 = load %2 : u64i, align 8
-    %23 = cmp ge %21, %22 : bool
-    %24 = cast(bool_to_int) %23 : s32i
-    %25 = call @crc32_probe() : u64i [all]
-    %26 = call @printf(%16, %20, %24, %25) : s32i [all]
-    %27 = const 0 : s32i
-    store %27, %0
-    %28 = load %0 : s32i
-    return %28
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u32i, "auxiliary", align 4
+        %2 = alloca u64i, "first", align 8
+        %3 = alloca u64i, "second", align 8
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = const 0 : u32i
+        store %5, %1, align 4
+        call_llvm_intrinsic
+        call_llvm_intrinsic
+        call_llvm_intrinsic
+        store %8, %2, align 8
+        call_llvm_intrinsic
+        call_llvm_intrinsic
+        extract_member
+        store %11, %1, align 1
+        extract_member
+        store %12, %3, align 8
+        call_llvm_intrinsic
+        %14 = get_global @printf : (s8i*, ...) -> s32i*
+        %15 = get_global @.str : s8i[12]*
+        %16 = cast(array_to_ptrdecay) %15 : s8i*
+        %17 = load %2 : u64i, align 8
+        %18 = const 0 : u64i
+        cmp
+        %20 = cast(bool_to_int) %19 : s32i
+        %21 = load %3 : u64i, align 8
+        %22 = load %2 : u64i, align 8
+        cmp
+        %24 = cast(bool_to_int) %23 : s32i
+        %25 = call @crc32_probe() : u64i [all]
+        %26 = call @printf(%16, %20, %24, %25) : s32i [all]
+        %27 = const 0 : s32i
+        store %27, %0
+        %28 = load %0 : s32i
+        return %28
 }

@@ -1,55 +1,56 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/goto_switch_forward.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "x", align 4
-    %2 = alloca s32i, "r", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 2 : s32i
-    store %4, %1, align 4
-    %5 = const 0 : s32i
-    store %5, %2, align 4
-    scope {
-        %16 = load %1 : s32i, align 4
-        switch %16 {
-            case equal 1 {
-                goto one
-            }
-            case equal 2 {
-                goto two
-            }
-            case default {
-                goto other
-            }
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "x", align 4
+        %2 = alloca s32i, "r", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 2 : s32i
+        store %4, %1, align 4
+        %5 = const 0 : s32i
+        store %5, %2, align 4
+        scope {
+                %16 = load %1 : s32i, align 4
+                switch %16 {
+                        case equal [1] {
+                                goto one
+                        }
+                        case equal [2] {
+                                goto two
+                        }
+                        case default [] {
+                                goto other
+                        }
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    br ^bb1
-    ^bb1():
+        br ^bb1
+    ^bb1:
         label one:
         %6 = const 10 : s32i
         store %6, %2, align 4
         goto done
-    ^bb2():
+    ^bb2:
         label two:
         %7 = const 20 : s32i
         store %7, %2, align 4
         goto done
-    ^bb3():
+    ^bb3:
         label other:
         %8 = const 30 : s32i
         store %8, %2, align 4
         goto done
-    ^bb4():
+    ^bb4:
         label done:
-        %9 = get_global @printf : ((s8i*, ...) -> s32i)*
+        %9 = get_global @printf : (s8i*, ...) -> s32i*
         %10 = get_global @.str : s8i[4]*
         %11 = cast(array_to_ptrdecay) %10 : s8i*
         %12 = load %2 : s32i, align 4

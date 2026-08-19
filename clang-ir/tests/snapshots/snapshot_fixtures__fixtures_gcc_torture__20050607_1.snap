@@ -1,31 +1,31 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20050607-1.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = alloca vector<2 x s32i>, ".compoundliteral", align 8
-        %5 = const [2, 2] : vector<2 x s32i>
-        store %5, %4, align 8
-        %6 = load %4 : vector<2 x s32i>, align 8
-        %7 = cast(bitcast) %6 : s64i
-        %8 = cast(integral) %7 : s32i
-        %9 = const 2 : s32i
-        %10 = cmp ne %8, %9 : bool
-        if %10 {
-            %11 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = alloca vector<2 x s32i>, ".compoundliteral", align 8
+                %5 = const [[2, 2]] : vector<2 x s32i>
+                store %5, %4, align 8
+                %6 = load %4 : vector<2 x s32i>, align 8
+                %7 = cast(bitcast) %6 : s64i
+                %8 = cast(integral) %7 : s32i
+                %9 = const 2 : s32i
+                cmp
+                if %10 {
+                        %11 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

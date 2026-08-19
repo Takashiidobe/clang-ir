@@ -1,20 +1,20 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20040703-1.c" (c, x86_64-unknown-linux-gnu)
-global precision : u32i = 64 [external, default, align 4, dso_local]
-global n : u32i = 16 [external, default, align 4, dso_local]
-global num : rec_cpp_num = {0, 3, 0, 0} [external, default, align 4, dso_local]
+global precision : u32i = CirInt { ty: Named("u32i"), value: "64" } [external, default, align 4, dso_local]
+global n : u32i = CirInt { ty: Named("u32i"), value: "16" } [external, default, align 4, dso_local]
+global num : rec_cpp_num = ConstRecord { ty: Named("rec_cpp_num"), members: Array([CirInt { ty: Named("u32i"), value: "0" }, CirInt { ty: Named("u32i"), value: "3" }, CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "0" }]) } [external, default, align 4, dso_local]
 
 fn num_trim(%arg11: u64i, %arg12: u64i, %arg13: u32i) -> rec_anon_struct [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg11: u64i, %arg12: u64i, %arg13: u32i):
         %345 = alloca rec_cpp_num, "coerce", align 8
         %346 = alloca rec_anon_struct, "coerce", align 8
         %347 = alloca rec_anon_struct, "coerce", align 8
-        %348 = get_member %347[0] "" : u64i*
+        get_member
         store %arg11, %348
-        %349 = get_member %347[1] "" : u64i*
+        get_member
         store %arg12, %349
         %350 = load %347 : rec_anon_struct
         store %350, %346
@@ -26,73 +26,73 @@ fn num_trim(%arg11: u64i, %arg12: u64i, %arg13: u32i) -> rec_anon_struct [intern
         store %352, %353
         store %arg13, %354
         scope {
-            %359 = load %354 : u32i, align 4
-            %360 = cast(integral) %359 : u64i
-            %361 = const 4 : u64i
-            %362 = const 8 : u64i
-            %363 = mul %361, %362 : u64i
-            %364 = cmp gt %360, %363 : bool
-            if %364 {
-                %381 = const 4 : u64i
-                %382 = const 8 : u64i
-                %383 = mul %381, %382 : u64i
-                %384 = load %354 : u32i, align 4
-                %385 = cast(integral) %384 : u64i
-                %386 = sub %385, %383 : u64i
-                %387 = cast(integral) %386 : u32i
-                store %387, %354, align 4
-                scope {
-                    %388 = load %354 : u32i, align 4
-                    %389 = cast(integral) %388 : u64i
-                    %390 = const 4 : u64i
-                    %391 = const 8 : u64i
-                    %392 = mul %390, %391 : u64i
-                    %393 = cmp lt %389, %392 : bool
-                    if %393 {
-                        %394 = const 1 : u32i
-                        %395 = load %354 : u32i, align 4
-                        %396 = shift left %394, %395 : u32i
-                        %397 = const 1 : u32i
-                        %398 = sub %396, %397 : u32i
-                        %399 = get_member %353[0] "high" : u32i*
-                        %400 = load %399 : u32i, align 4
-                        %401 = and %400, %398 : u32i
-                        store %401, %399, align 4
+                %359 = load %354 : u32i, align 4
+                %360 = cast(integral) %359 : u64i
+                %361 = const 4 : u64i
+                %362 = const 8 : u64i
+                mul
+                cmp
+                if %364 {
+                        %381 = const 4 : u64i
+                        %382 = const 8 : u64i
+                        mul
+                        %384 = load %354 : u32i, align 4
+                        %385 = cast(integral) %384 : u64i
+                        sub
+                        %387 = cast(integral) %386 : u32i
+                        store %387, %354, align 4
+                        scope {
+                                %388 = load %354 : u32i, align 4
+                                %389 = cast(integral) %388 : u64i
+                                %390 = const 4 : u64i
+                                %391 = const 8 : u64i
+                                mul
+                                cmp
+                                if %393 {
+                                        %394 = const 1 : u32i
+                                        %395 = load %354 : u32i, align 4
+                                        shift
+                                        %397 = const 1 : u32i
+                                        sub
+                                        get_member
+                                        %400 = load %399 : u32i, align 4
+                                        and
+                                        store %401, %399, align 4
+                                        yield
+                                }
+                                yield
+                        }
                         yield
-                    }
-                    yield
+                } else {
+                        scope {
+                                %367 = load %354 : u32i, align 4
+                                %368 = cast(integral) %367 : u64i
+                                %369 = const 4 : u64i
+                                %370 = const 8 : u64i
+                                mul
+                                cmp
+                                if %372 {
+                                        %373 = const 1 : u32i
+                                        %374 = load %354 : u32i, align 4
+                                        shift
+                                        %376 = const 1 : u32i
+                                        sub
+                                        get_member
+                                        %379 = load %378 : u32i, align 4
+                                        and
+                                        store %380, %378, align 4
+                                        yield
+                                }
+                                yield
+                        }
+                        %365 = const 0 : u32i
+                        get_member
+                        store %365, %366, align 4
+                        yield
                 }
                 yield
-            } else {
-                scope {
-                    %367 = load %354 : u32i, align 4
-                    %368 = cast(integral) %367 : u64i
-                    %369 = const 4 : u64i
-                    %370 = const 8 : u64i
-                    %371 = mul %369, %370 : u64i
-                    %372 = cmp lt %368, %371 : bool
-                    if %372 {
-                        %373 = const 1 : u32i
-                        %374 = load %354 : u32i, align 4
-                        %375 = shift left %373, %374 : u32i
-                        %376 = const 1 : u32i
-                        %377 = sub %375, %376 : u32i
-                        %378 = get_member %353[1] "low" : u32i*
-                        %379 = load %378 : u32i, align 4
-                        %380 = and %379, %377 : u32i
-                        store %380, %378, align 4
-                        yield
-                    }
-                    yield
-                }
-                %365 = const 0 : u32i
-                %366 = get_member %353[0] "high" : u32i*
-                store %365, %366, align 4
-                yield
-            }
-            yield
         }
-        copy %355, %353
+        copy
         %356 = load %355 : rec_cpp_num
         store %356, %345
         %357 = cast(bitcast) %345 : rec_anon_struct*
@@ -103,9 +103,9 @@ fn num_positive(%arg8: u64i, %arg9: u64i, %arg10: u32i) -> s32i [internal, c, no
     ^bb0(%arg8: u64i, %arg9: u64i, %arg10: u32i):
         %298 = alloca rec_anon_struct, "coerce", align 8
         %299 = alloca rec_anon_struct, "coerce", align 8
-        %300 = get_member %299[0] "" : u64i*
+        get_member
         store %arg8, %300
-        %301 = get_member %299[1] "" : u64i*
+        get_member
         store %arg9, %301
         %302 = load %299 : rec_anon_struct
         store %302, %298
@@ -117,48 +117,48 @@ fn num_positive(%arg8: u64i, %arg9: u64i, %arg10: u32i) -> s32i [internal, c, no
         store %304, %305
         store %arg10, %306
         scope {
-            %320 = load %306 : u32i, align 4
-            %321 = cast(integral) %320 : u64i
-            %322 = const 4 : u64i
-            %323 = const 8 : u64i
-            %324 = mul %322, %323 : u64i
-            %325 = cmp gt %321, %324 : bool
-            if %325 {
-                %326 = const 4 : u64i
-                %327 = const 8 : u64i
-                %328 = mul %326, %327 : u64i
-                %329 = load %306 : u32i, align 4
-                %330 = cast(integral) %329 : u64i
-                %331 = sub %330, %328 : u64i
-                %332 = cast(integral) %331 : u32i
-                store %332, %306, align 4
-                %333 = get_member %305[0] "high" : u32i*
-                %334 = load %333 : u32i, align 4
-                %335 = const 1 : u32i
-                %336 = load %306 : u32i, align 4
-                %337 = const 1 : u32i
-                %338 = sub %336, %337 : u32i
-                %339 = shift left %335, %338 : u32i
-                %340 = and %334, %339 : u32i
-                %341 = const 0 : u32i
-                %342 = cmp eq %340, %341 : bool
-                %343 = cast(bool_to_int) %342 : s32i
-                store %343, %307
-                %344 = load %307 : s32i
-                return %344
-            }
-            yield
+                %320 = load %306 : u32i, align 4
+                %321 = cast(integral) %320 : u64i
+                %322 = const 4 : u64i
+                %323 = const 8 : u64i
+                mul
+                cmp
+                if %325 {
+                        %326 = const 4 : u64i
+                        %327 = const 8 : u64i
+                        mul
+                        %329 = load %306 : u32i, align 4
+                        %330 = cast(integral) %329 : u64i
+                        sub
+                        %332 = cast(integral) %331 : u32i
+                        store %332, %306, align 4
+                        get_member
+                        %334 = load %333 : u32i, align 4
+                        %335 = const 1 : u32i
+                        %336 = load %306 : u32i, align 4
+                        %337 = const 1 : u32i
+                        sub
+                        shift
+                        and
+                        %341 = const 0 : u32i
+                        cmp
+                        %343 = cast(bool_to_int) %342 : s32i
+                        store %343, %307
+                        %344 = load %307 : s32i
+                        return %344
+                }
+                yield
         }
-        %308 = get_member %305[1] "low" : u32i*
+        get_member
         %309 = load %308 : u32i, align 4
         %310 = const 1 : u32i
         %311 = load %306 : u32i, align 4
         %312 = const 1 : u32i
-        %313 = sub %311, %312 : u32i
-        %314 = shift left %310, %313 : u32i
-        %315 = and %309, %314 : u32i
+        sub
+        shift
+        and
         %316 = const 0 : u32i
-        %317 = cmp eq %315, %316 : bool
+        cmp
         %318 = cast(bool_to_int) %317 : s32i
         store %318, %307
         %319 = load %307 : s32i
@@ -169,9 +169,9 @@ fn num_rshift(%arg4: u64i, %arg5: u64i, %arg6: u32i, %arg7: u32i) -> rec_anon_st
         %161 = alloca rec_cpp_num, "coerce", align 8
         %162 = alloca rec_anon_struct, "coerce", align 8
         %163 = alloca rec_anon_struct, "coerce", align 8
-        %164 = get_member %163[0] "" : u64i*
+        get_member
         store %arg4, %164
-        %165 = get_member %163[1] "" : u64i*
+        get_member
         store %arg5, %165
         %166 = load %163 : rec_anon_struct
         store %166, %162
@@ -193,174 +193,174 @@ fn num_rshift(%arg4: u64i, %arg5: u64i, %arg6: u32i, %arg7: u32i) -> rec_anon_st
         %179 = load %172 : rec_cpp_num, align 4
         store %179, %169
         %180 = cast(bitcast) %169 : rec_anon_struct*
-        %181 = get_member %180[0] "" : u64i*
+        get_member
         %182 = load %181 : u64i
-        %183 = get_member %180[1] "" : u64i*
+        get_member
         %184 = load %183 : u64i
         %185 = call @num_positive(%182, %184, %178) : s32i [all]
         store %185, %177, align 4
         scope {
-            %289 = get_member %172[2] "unsignedp" : s32i*
-            %290 = load %289 : s32i, align 4
-            %291 = cast(int_to_bool) %290 : bool
-            %292 = ternary %291 ? { : bool
-                %297 = const true : bool
-                yield %297
-            } : {
-                %295 = load %177 : s32i, align 4
-                %296 = cast(int_to_bool) %295 : bool
-                yield %296
-            }
-            if %292 {
-                %294 = const 0 : u32i
-                store %294, %176, align 4
+                get_member
+                %290 = load %289 : s32i, align 4
+                %291 = cast(int_to_bool) %290 : bool
+                %292 = ternary %291 ? { : bool
+                        %297 = const true : bool
+                        yield %297
+                } : {
+                        %295 = load %177 : s32i, align 4
+                        %296 = cast(int_to_bool) %295 : bool
+                        yield %296
+                }
+                if %292 {
+                        %294 = const 0 : u32i
+                        store %294, %176, align 4
+                        yield
+                } else {
+                        %293 = const 4294967295 : u32i
+                        store %293, %176, align 4
+                        yield
+                }
                 yield
-            } else {
-                %293 = const 4294967295 : u32i
-                store %293, %176, align 4
-                yield
-            }
-            yield
         }
         scope {
-            %201 = load %174 : u32i, align 4
-            %202 = load %173 : u32i, align 4
-            %203 = cmp ge %201, %202 : bool
-            if %203 {
-                %286 = load %176 : u32i, align 4
-                %287 = get_member %172[1] "low" : u32i*
-                store %286, %287, align 4
-                %288 = get_member %172[0] "high" : u32i*
-                store %286, %288, align 4
-                yield
-            } else {
-                scope {
-                    %253 = load %173 : u32i, align 4
-                    %254 = cast(integral) %253 : u64i
-                    %255 = const 4 : u64i
-                    %256 = const 8 : u64i
-                    %257 = mul %255, %256 : u64i
-                    %258 = cmp lt %254, %257 : bool
-                    if %258 {
-                        %278 = load %176 : u32i, align 4
-                        %279 = get_member %172[0] "high" : u32i*
-                        store %278, %279, align 4
-                        %280 = load %176 : u32i, align 4
-                        %281 = load %173 : u32i, align 4
-                        %282 = shift left %280, %281 : u32i
-                        %283 = get_member %172[1] "low" : u32i*
-                        %284 = load %283 : u32i, align 4
-                        %285 = or %284, %282 : u32i
-                        store %285, %283, align 4
+                %201 = load %174 : u32i, align 4
+                %202 = load %173 : u32i, align 4
+                cmp
+                if %203 {
+                        %286 = load %176 : u32i, align 4
+                        get_member
+                        store %286, %287, align 4
+                        get_member
+                        store %286, %288, align 4
                         yield
-                    } else {
+                } else {
                         scope {
-                            %259 = load %173 : u32i, align 4
-                            %260 = cast(integral) %259 : u64i
-                            %261 = const 2 : u64i
-                            %262 = const 4 : u64i
-                            %263 = const 8 : u64i
-                            %264 = mul %262, %263 : u64i
-                            %265 = mul %261, %264 : u64i
-                            %266 = cmp lt %260, %265 : bool
-                            if %266 {
-                                %267 = load %176 : u32i, align 4
-                                %268 = load %173 : u32i, align 4
-                                %269 = cast(integral) %268 : u64i
-                                %270 = const 4 : u64i
-                                %271 = const 8 : u64i
-                                %272 = mul %270, %271 : u64i
-                                %273 = sub %269, %272 : u64i
-                                %274 = shift left %267, %273 : u32i
-                                %275 = get_member %172[0] "high" : u32i*
-                                %276 = load %275 : u32i, align 4
-                                %277 = or %276, %274 : u32i
-                                store %277, %275, align 4
+                                %253 = load %173 : u32i, align 4
+                                %254 = cast(integral) %253 : u64i
+                                %255 = const 4 : u64i
+                                %256 = const 8 : u64i
+                                mul
+                                cmp
+                                if %258 {
+                                        %278 = load %176 : u32i, align 4
+                                        get_member
+                                        store %278, %279, align 4
+                                        %280 = load %176 : u32i, align 4
+                                        %281 = load %173 : u32i, align 4
+                                        shift
+                                        get_member
+                                        %284 = load %283 : u32i, align 4
+                                        or
+                                        store %285, %283, align 4
+                                        yield
+                                } else {
+                                        scope {
+                                                %259 = load %173 : u32i, align 4
+                                                %260 = cast(integral) %259 : u64i
+                                                %261 = const 2 : u64i
+                                                %262 = const 4 : u64i
+                                                %263 = const 8 : u64i
+                                                mul
+                                                mul
+                                                cmp
+                                                if %266 {
+                                                        %267 = load %176 : u32i, align 4
+                                                        %268 = load %173 : u32i, align 4
+                                                        %269 = cast(integral) %268 : u64i
+                                                        %270 = const 4 : u64i
+                                                        %271 = const 8 : u64i
+                                                        mul
+                                                        sub
+                                                        shift
+                                                        get_member
+                                                        %276 = load %275 : u32i, align 4
+                                                        or
+                                                        store %277, %275, align 4
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
                                 yield
-                            }
-                            yield
+                        }
+                        scope {
+                                %235 = load %174 : u32i, align 4
+                                %236 = cast(integral) %235 : u64i
+                                %237 = const 4 : u64i
+                                %238 = const 8 : u64i
+                                mul
+                                cmp
+                                if %240 {
+                                        %241 = const 4 : u64i
+                                        %242 = const 8 : u64i
+                                        mul
+                                        %244 = load %174 : u32i, align 4
+                                        %245 = cast(integral) %244 : u64i
+                                        sub
+                                        %247 = cast(integral) %246 : u32i
+                                        store %247, %174, align 4
+                                        get_member
+                                        %249 = load %248 : u32i, align 4
+                                        get_member
+                                        store %249, %250, align 4
+                                        %251 = load %176 : u32i, align 4
+                                        get_member
+                                        store %251, %252, align 4
+                                        yield
+                                }
+                                yield
+                        }
+                        scope {
+                                %204 = load %174 : u32i, align 4
+                                %205 = cast(int_to_bool) %204 : bool
+                                if %205 {
+                                        get_member
+                                        %207 = load %206 : u32i, align 4
+                                        %208 = load %174 : u32i, align 4
+                                        shift
+                                        get_member
+                                        %211 = load %210 : u32i, align 4
+                                        %212 = const 4 : u64i
+                                        %213 = const 8 : u64i
+                                        mul
+                                        %215 = load %174 : u32i, align 4
+                                        %216 = cast(integral) %215 : u64i
+                                        sub
+                                        shift
+                                        or
+                                        get_member
+                                        store %219, %220, align 4
+                                        get_member
+                                        %222 = load %221 : u32i, align 4
+                                        %223 = load %174 : u32i, align 4
+                                        shift
+                                        %225 = load %176 : u32i, align 4
+                                        %226 = const 4 : u64i
+                                        %227 = const 8 : u64i
+                                        mul
+                                        %229 = load %174 : u32i, align 4
+                                        %230 = cast(integral) %229 : u64i
+                                        sub
+                                        shift
+                                        or
+                                        get_member
+                                        store %233, %234, align 4
+                                        yield
+                                }
+                                yield
                         }
                         yield
-                    }
-                    yield
-                }
-                scope {
-                    %235 = load %174 : u32i, align 4
-                    %236 = cast(integral) %235 : u64i
-                    %237 = const 4 : u64i
-                    %238 = const 8 : u64i
-                    %239 = mul %237, %238 : u64i
-                    %240 = cmp ge %236, %239 : bool
-                    if %240 {
-                        %241 = const 4 : u64i
-                        %242 = const 8 : u64i
-                        %243 = mul %241, %242 : u64i
-                        %244 = load %174 : u32i, align 4
-                        %245 = cast(integral) %244 : u64i
-                        %246 = sub %245, %243 : u64i
-                        %247 = cast(integral) %246 : u32i
-                        store %247, %174, align 4
-                        %248 = get_member %172[0] "high" : u32i*
-                        %249 = load %248 : u32i, align 4
-                        %250 = get_member %172[1] "low" : u32i*
-                        store %249, %250, align 4
-                        %251 = load %176 : u32i, align 4
-                        %252 = get_member %172[0] "high" : u32i*
-                        store %251, %252, align 4
-                        yield
-                    }
-                    yield
-                }
-                scope {
-                    %204 = load %174 : u32i, align 4
-                    %205 = cast(int_to_bool) %204 : bool
-                    if %205 {
-                        %206 = get_member %172[1] "low" : u32i*
-                        %207 = load %206 : u32i, align 4
-                        %208 = load %174 : u32i, align 4
-                        %209 = shift right %207, %208 : u32i
-                        %210 = get_member %172[0] "high" : u32i*
-                        %211 = load %210 : u32i, align 4
-                        %212 = const 4 : u64i
-                        %213 = const 8 : u64i
-                        %214 = mul %212, %213 : u64i
-                        %215 = load %174 : u32i, align 4
-                        %216 = cast(integral) %215 : u64i
-                        %217 = sub %214, %216 : u64i
-                        %218 = shift left %211, %217 : u32i
-                        %219 = or %209, %218 : u32i
-                        %220 = get_member %172[1] "low" : u32i*
-                        store %219, %220, align 4
-                        %221 = get_member %172[0] "high" : u32i*
-                        %222 = load %221 : u32i, align 4
-                        %223 = load %174 : u32i, align 4
-                        %224 = shift right %222, %223 : u32i
-                        %225 = load %176 : u32i, align 4
-                        %226 = const 4 : u64i
-                        %227 = const 8 : u64i
-                        %228 = mul %226, %227 : u64i
-                        %229 = load %174 : u32i, align 4
-                        %230 = cast(integral) %229 : u64i
-                        %231 = sub %228, %230 : u64i
-                        %232 = shift left %225, %231 : u32i
-                        %233 = or %224, %232 : u32i
-                        %234 = get_member %172[0] "high" : u32i*
-                        store %233, %234, align 4
-                        yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         %186 = load %173 : u32i, align 4
         %187 = load %172 : rec_cpp_num, align 4
         store %187, %171
         %188 = cast(bitcast) %171 : rec_anon_struct*
-        %189 = get_member %188[0] "" : u64i*
+        get_member
         %190 = load %189 : u64i
-        %191 = get_member %188[1] "" : u64i*
+        get_member
         %192 = load %191 : u64i
         %193 = call @num_trim(%190, %192, %186) : rec_anon_struct [all]
         store %193, %170
@@ -368,9 +368,9 @@ fn num_rshift(%arg4: u64i, %arg5: u64i, %arg6: u32i, %arg7: u32i) -> rec_anon_st
         %195 = load %194 : rec_cpp_num
         store %195, %172, align 4
         %196 = const 0 : s32i
-        %197 = get_member %172[3] "overflow" : s32i*
+        get_member
         store %196, %197, align 4
-        copy %175, %172
+        copy
         %198 = load %175 : rec_cpp_num
         store %198, %161
         %199 = cast(bitcast) %161 : rec_anon_struct*
@@ -382,9 +382,9 @@ fn num_lshift(%arg0: u64i, %arg1: u64i, %arg2: u32i, %arg3: u32i) -> rec_anon_st
         %36 = alloca rec_cpp_num, "coerce", align 8
         %37 = alloca rec_anon_struct, "coerce", align 8
         %38 = alloca rec_anon_struct, "coerce", align 8
-        %39 = get_member %38[0] "" : u64i*
+        get_member
         store %arg0, %39
-        %40 = get_member %38[1] "" : u64i*
+        get_member
         store %arg1, %40
         %41 = load %38 : rec_anon_struct
         store %41, %37
@@ -402,166 +402,166 @@ fn num_lshift(%arg0: u64i, %arg1: u64i, %arg2: u32i, %arg3: u32i) -> rec_anon_st
         store %arg2, %49
         store %arg3, %50
         scope {
-            %55 = load %50 : u32i, align 4
-            %56 = load %49 : u32i, align 4
-            %57 = cmp ge %55, %56 : bool
-            if %57 {
-                %142 = get_member %48[2] "unsignedp" : s32i*
-                %143 = load %142 : s32i, align 4
-                %144 = cast(int_to_bool) %143 : bool
-                %145 = not %144 : bool
-                %146 = ternary %145 ? { : bool
-                    %153 = get_member %48[1] "low" : u32i*
-                    %154 = load %153 : u32i, align 4
-                    %155 = get_member %48[0] "high" : u32i*
-                    %156 = load %155 : u32i, align 4
-                    %157 = or %154, %156 : u32i
-                    %158 = const 0 : u32i
-                    %159 = cmp eq %157, %158 : bool
-                    %160 = not %159 : bool
-                    yield %160
-                } : {
-                    %152 = const false : bool
-                    yield %152
-                }
-                %147 = cast(bool_to_int) %146 : s32i
-                %148 = get_member %48[3] "overflow" : s32i*
-                store %147, %148, align 4
-                %149 = const 0 : u32i
-                %150 = get_member %48[1] "low" : u32i*
-                store %149, %150, align 4
-                %151 = get_member %48[0] "high" : u32i*
-                store %149, %151, align 4
-                yield
-            } else {
-                %58 = alloca rec_cpp_num, "orig", align 4
-                %59 = alloca u32i, "m", align 4
-                %60 = load %50 : u32i, align 4
-                store %60, %59, align 4
-                copy %58, %48
-                scope {
-                    %124 = load %59 : u32i, align 4
-                    %125 = cast(integral) %124 : u64i
-                    %126 = const 4 : u64i
-                    %127 = const 8 : u64i
-                    %128 = mul %126, %127 : u64i
-                    %129 = cmp ge %125, %128 : bool
-                    if %129 {
-                        %130 = const 4 : u64i
-                        %131 = const 8 : u64i
-                        %132 = mul %130, %131 : u64i
-                        %133 = load %59 : u32i, align 4
-                        %134 = cast(integral) %133 : u64i
-                        %135 = sub %134, %132 : u64i
-                        %136 = cast(integral) %135 : u32i
-                        store %136, %59, align 4
-                        %137 = get_member %48[1] "low" : u32i*
-                        %138 = load %137 : u32i, align 4
-                        %139 = get_member %48[0] "high" : u32i*
-                        store %138, %139, align 4
-                        %140 = const 0 : u32i
-                        %141 = get_member %48[1] "low" : u32i*
-                        store %140, %141, align 4
-                        yield
-                    }
-                    yield
-                }
-                scope {
-                    %103 = load %59 : u32i, align 4
-                    %104 = cast(int_to_bool) %103 : bool
-                    if %104 {
-                        %105 = get_member %48[0] "high" : u32i*
-                        %106 = load %105 : u32i, align 4
-                        %107 = load %59 : u32i, align 4
-                        %108 = shift left %106, %107 : u32i
-                        %109 = get_member %48[1] "low" : u32i*
-                        %110 = load %109 : u32i, align 4
-                        %111 = const 4 : u64i
-                        %112 = const 8 : u64i
-                        %113 = mul %111, %112 : u64i
-                        %114 = load %59 : u32i, align 4
-                        %115 = cast(integral) %114 : u64i
-                        %116 = sub %113, %115 : u64i
-                        %117 = shift right %110, %116 : u32i
-                        %118 = or %108, %117 : u32i
-                        %119 = get_member %48[0] "high" : u32i*
-                        store %118, %119, align 4
-                        %120 = load %59 : u32i, align 4
-                        %121 = get_member %48[1] "low" : u32i*
-                        %122 = load %121 : u32i, align 4
-                        %123 = shift left %122, %120 : u32i
-                        store %123, %121, align 4
-                        yield
-                    }
-                    yield
-                }
-                %61 = load %49 : u32i, align 4
-                %62 = load %48 : rec_cpp_num, align 4
-                store %62, %47
-                %63 = cast(bitcast) %47 : rec_anon_struct*
-                %64 = get_member %63[0] "" : u64i*
-                %65 = load %64 : u64i
-                %66 = get_member %63[1] "" : u64i*
-                %67 = load %66 : u64i
-                %68 = call @num_trim(%65, %67, %61) : rec_anon_struct [all]
-                store %68, %46
-                %69 = cast(bitcast) %46 : rec_cpp_num*
-                %70 = load %69 : rec_cpp_num
-                store %70, %48, align 4
-                scope {
-                    %71 = get_member %48[2] "unsignedp" : s32i*
-                    %72 = load %71 : s32i, align 4
-                    %73 = cast(int_to_bool) %72 : bool
-                    if %73 {
-                        %101 = const 0 : s32i
-                        %102 = get_member %48[3] "overflow" : s32i*
-                        store %101, %102, align 4
-                        yield
-                    } else {
-                        %74 = alloca rec_cpp_num, "maybe_orig", align 4
-                        %75 = load %49 : u32i, align 4
-                        %76 = load %50 : u32i, align 4
-                        %77 = load %48 : rec_cpp_num, align 4
-                        store %77, %45
-                        %78 = cast(bitcast) %45 : rec_anon_struct*
-                        %79 = get_member %78[0] "" : u64i*
-                        %80 = load %79 : u64i
-                        %81 = get_member %78[1] "" : u64i*
-                        %82 = load %81 : u64i
-                        %83 = call @num_rshift(%80, %82, %75, %76) : rec_anon_struct [all]
-                        store %83, %44
-                        %84 = cast(bitcast) %44 : rec_cpp_num*
-                        %85 = load %84 : rec_cpp_num
-                        store %85, %74, align 4
-                        %86 = get_member %58[1] "low" : u32i*
-                        %87 = load %86 : u32i, align 4
-                        %88 = get_member %74[1] "low" : u32i*
-                        %89 = load %88 : u32i, align 4
-                        %90 = cmp eq %87, %89 : bool
-                        %91 = ternary %90 ? { : bool
-                            %96 = get_member %58[0] "high" : u32i*
-                            %97 = load %96 : u32i, align 4
-                            %98 = get_member %74[0] "high" : u32i*
-                            %99 = load %98 : u32i, align 4
-                            %100 = cmp eq %97, %99 : bool
-                            yield %100
+                %55 = load %50 : u32i, align 4
+                %56 = load %49 : u32i, align 4
+                cmp
+                if %57 {
+                        get_member
+                        %143 = load %142 : s32i, align 4
+                        %144 = cast(int_to_bool) %143 : bool
+                        not
+                        %146 = ternary %145 ? { : bool
+                                get_member
+                                %154 = load %153 : u32i, align 4
+                                get_member
+                                %156 = load %155 : u32i, align 4
+                                or
+                                %158 = const 0 : u32i
+                                cmp
+                                not
+                                yield %160
                         } : {
-                            %95 = const false : bool
-                            yield %95
+                                %152 = const false : bool
+                                yield %152
                         }
-                        %92 = not %91 : bool
-                        %93 = cast(bool_to_int) %92 : s32i
-                        %94 = get_member %48[3] "overflow" : s32i*
-                        store %93, %94, align 4
+                        %147 = cast(bool_to_int) %146 : s32i
+                        get_member
+                        store %147, %148, align 4
+                        %149 = const 0 : u32i
+                        get_member
+                        store %149, %150, align 4
+                        get_member
+                        store %149, %151, align 4
                         yield
-                    }
-                    yield
+                } else {
+                        %58 = alloca rec_cpp_num, "orig", align 4
+                        %59 = alloca u32i, "m", align 4
+                        %60 = load %50 : u32i, align 4
+                        store %60, %59, align 4
+                        copy
+                        scope {
+                                %124 = load %59 : u32i, align 4
+                                %125 = cast(integral) %124 : u64i
+                                %126 = const 4 : u64i
+                                %127 = const 8 : u64i
+                                mul
+                                cmp
+                                if %129 {
+                                        %130 = const 4 : u64i
+                                        %131 = const 8 : u64i
+                                        mul
+                                        %133 = load %59 : u32i, align 4
+                                        %134 = cast(integral) %133 : u64i
+                                        sub
+                                        %136 = cast(integral) %135 : u32i
+                                        store %136, %59, align 4
+                                        get_member
+                                        %138 = load %137 : u32i, align 4
+                                        get_member
+                                        store %138, %139, align 4
+                                        %140 = const 0 : u32i
+                                        get_member
+                                        store %140, %141, align 4
+                                        yield
+                                }
+                                yield
+                        }
+                        scope {
+                                %103 = load %59 : u32i, align 4
+                                %104 = cast(int_to_bool) %103 : bool
+                                if %104 {
+                                        get_member
+                                        %106 = load %105 : u32i, align 4
+                                        %107 = load %59 : u32i, align 4
+                                        shift
+                                        get_member
+                                        %110 = load %109 : u32i, align 4
+                                        %111 = const 4 : u64i
+                                        %112 = const 8 : u64i
+                                        mul
+                                        %114 = load %59 : u32i, align 4
+                                        %115 = cast(integral) %114 : u64i
+                                        sub
+                                        shift
+                                        or
+                                        get_member
+                                        store %118, %119, align 4
+                                        %120 = load %59 : u32i, align 4
+                                        get_member
+                                        %122 = load %121 : u32i, align 4
+                                        shift
+                                        store %123, %121, align 4
+                                        yield
+                                }
+                                yield
+                        }
+                        %61 = load %49 : u32i, align 4
+                        %62 = load %48 : rec_cpp_num, align 4
+                        store %62, %47
+                        %63 = cast(bitcast) %47 : rec_anon_struct*
+                        get_member
+                        %65 = load %64 : u64i
+                        get_member
+                        %67 = load %66 : u64i
+                        %68 = call @num_trim(%65, %67, %61) : rec_anon_struct [all]
+                        store %68, %46
+                        %69 = cast(bitcast) %46 : rec_cpp_num*
+                        %70 = load %69 : rec_cpp_num
+                        store %70, %48, align 4
+                        scope {
+                                get_member
+                                %72 = load %71 : s32i, align 4
+                                %73 = cast(int_to_bool) %72 : bool
+                                if %73 {
+                                        %101 = const 0 : s32i
+                                        get_member
+                                        store %101, %102, align 4
+                                        yield
+                                } else {
+                                        %74 = alloca rec_cpp_num, "maybe_orig", align 4
+                                        %75 = load %49 : u32i, align 4
+                                        %76 = load %50 : u32i, align 4
+                                        %77 = load %48 : rec_cpp_num, align 4
+                                        store %77, %45
+                                        %78 = cast(bitcast) %45 : rec_anon_struct*
+                                        get_member
+                                        %80 = load %79 : u64i
+                                        get_member
+                                        %82 = load %81 : u64i
+                                        %83 = call @num_rshift(%80, %82, %75, %76) : rec_anon_struct [all]
+                                        store %83, %44
+                                        %84 = cast(bitcast) %44 : rec_cpp_num*
+                                        %85 = load %84 : rec_cpp_num
+                                        store %85, %74, align 4
+                                        get_member
+                                        %87 = load %86 : u32i, align 4
+                                        get_member
+                                        %89 = load %88 : u32i, align 4
+                                        cmp
+                                        %91 = ternary %90 ? { : bool
+                                                get_member
+                                                %97 = load %96 : u32i, align 4
+                                                get_member
+                                                %99 = load %98 : u32i, align 4
+                                                cmp
+                                                yield %100
+                                        } : {
+                                                %95 = const false : bool
+                                                yield %95
+                                        }
+                                        not
+                                        %93 = cast(bool_to_int) %92 : s32i
+                                        get_member
+                                        store %93, %94, align 4
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        copy %51, %48
+        copy
         %52 = load %51 : rec_cpp_num
         store %52, %36
         %53 = cast(bitcast) %36 : rec_anon_struct*
@@ -571,67 +571,67 @@ fn num_lshift(%arg0: u64i, %arg1: u64i, %arg2: u32i, %arg3: u32i) -> rec_anon_st
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca rec_anon_struct, "coerce", align 8
-    %1 = alloca rec_cpp_num, "coerce", align 8
-    %2 = alloca s32i, "__retval", align 4
-    %3 = alloca rec_cpp_num, "res", align 4
-    %4 = const 0 : s32i
-    store %4, %2
-    %5 = get_global @num : rec_cpp_num*
-    %6 = const 64 : u32i
-    %7 = get_global @n : u32i*
-    %8 = load %7 : u32i, align 4
-    %9 = load %5 : rec_cpp_num, align 4
-    store %9, %1
-    %10 = cast(bitcast) %1 : rec_anon_struct*
-    %11 = get_member %10[0] "" : u64i*
-    %12 = load %11 : u64i
-    %13 = get_member %10[1] "" : u64i*
-    %14 = load %13 : u64i
-    %15 = call @num_lshift(%12, %14, %6, %8) : rec_anon_struct [all]
-    store %15, %0
-    %16 = cast(bitcast) %0 : rec_cpp_num*
-    %17 = load %16 : rec_cpp_num
-    store %17, %3, align 4
-    scope {
-        %31 = get_member %3[1] "low" : u32i*
-        %32 = load %31 : u32i, align 4
-        %33 = const 196608 : u32i
-        %34 = cmp ne %32, %33 : bool
-        if %34 {
-            %35 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca rec_anon_struct, "coerce", align 8
+        %1 = alloca rec_cpp_num, "coerce", align 8
+        %2 = alloca s32i, "__retval", align 4
+        %3 = alloca rec_cpp_num, "res", align 4
+        %4 = const 0 : s32i
+        store %4, %2
+        %5 = get_global @num : rec_cpp_num*
+        %6 = const 64 : u32i
+        %7 = get_global @n : u32i*
+        %8 = load %7 : u32i, align 4
+        %9 = load %5 : rec_cpp_num, align 4
+        store %9, %1
+        %10 = cast(bitcast) %1 : rec_anon_struct*
+        get_member
+        %12 = load %11 : u64i
+        get_member
+        %14 = load %13 : u64i
+        %15 = call @num_lshift(%12, %14, %6, %8) : rec_anon_struct [all]
+        store %15, %0
+        %16 = cast(bitcast) %0 : rec_cpp_num*
+        %17 = load %16 : rec_cpp_num
+        store %17, %3, align 4
+        scope {
+                get_member
+                %32 = load %31 : u32i, align 4
+                %33 = const 196608 : u32i
+                cmp
+                if %34 {
+                        %35 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %26 = get_member %3[0] "high" : u32i*
-        %27 = load %26 : u32i, align 4
-        %28 = const 0 : u32i
-        %29 = cmp ne %27, %28 : bool
-        if %29 {
-            %30 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                get_member
+                %27 = load %26 : u32i, align 4
+                %28 = const 0 : u32i
+                cmp
+                if %29 {
+                        %30 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %21 = get_member %3[3] "overflow" : s32i*
-        %22 = load %21 : s32i, align 4
-        %23 = const 0 : s32i
-        %24 = cmp ne %22, %23 : bool
-        if %24 {
-            %25 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                get_member
+                %22 = load %21 : s32i, align 4
+                %23 = const 0 : s32i
+                cmp
+                if %24 {
+                        %25 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %18 = get_global @exit : ((s32i) -> void)*
-    %19 = const 0 : s32i
-    call @exit(%19) [all]
-    %20 = load %2 : s32i
-    return %20
+        %18 = get_global @exit : (s32i) -> void*
+        %19 = const 0 : s32i
+        call @exit(%19) [all]
+        %20 = load %2 : s32i
+        return %20
 }

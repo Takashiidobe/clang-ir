@@ -1,61 +1,61 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/compndlit-1.c" (c, x86_64-unknown-linux-gnu)
-global x : rec_S = {25} [external, default, align 4, dso_local]
+global x : rec_S = ConstRecord { ty: Named("rec_S"), members: Array([CirInt { ty: Named("u32i"), value: "25" }]) } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_S, ".compoundliteral", align 4
-    %2 = alloca s32i, "tmp", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = get_global @x : rec_S*
-    %5 = get_member %1[0] "a" : u32i*
-    %6 = const 0 : s32i
-    %7 = set_bitfield %5, %6, "a": 3 bits @0 in signed u32i : s32i, align 4
-    %8 = get_member %1[0] "b" : u32i*
-    %9 = const 0 : u32i
-    %10 = set_bitfield %8, %9, "b": 1 bits @3 in u32i : u32i, align 4
-    %11 = get_member %1[0] "c" : u32i*
-    scope {
-        %25 = alloca rec_S, "o", align 4
-        %26 = get_global @x : rec_S*
-        copy %25, %26
-        %27 = get_member %25[0] "a" : u32i*
-        %28 = get_bitfield %27, "a": 3 bits @0 in signed u32i : s32i, align 4
-        %29 = const 1 : s32i
-        %30 = cmp eq %28, %29 : bool
-        %31 = const 10 : s32i
-        %32 = const 20 : s32i
-        %33 = select %30, %31, %32 : s32i
-        store %33, %2, align 4
-        yield
-    }
-    %12 = load %2 : s32i, align 4
-    %13 = cast(integral) %12 : u32i
-    %14 = set_bitfield %11, %13, "c": 28 bits @4 in u32i : u32i, align 4
-    copy %4, %1
-    scope {
-        %18 = get_global @x : rec_S*
-        %19 = get_member %18[0] "c" : u32i*
-        %20 = get_bitfield %19, "c": 28 bits @4 in u32i : u32i, align 4
-        %21 = cast(integral) %20 : s32i
-        %22 = const 10 : s32i
-        %23 = cmp ne %21, %22 : bool
-        if %23 {
-            %24 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_S, ".compoundliteral", align 4
+        %2 = alloca s32i, "tmp", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = get_global @x : rec_S*
+        get_member
+        %6 = const 0 : s32i
+        set_bitfield
+        get_member
+        %9 = const 0 : u32i
+        set_bitfield
+        get_member
+        scope {
+                %25 = alloca rec_S, "o", align 4
+                %26 = get_global @x : rec_S*
+                copy
+                get_member
+                get_bitfield
+                %29 = const 1 : s32i
+                cmp
+                %31 = const 10 : s32i
+                %32 = const 20 : s32i
+                select
+                store %33, %2, align 4
+                yield
         }
-        yield
-    }
-    %15 = get_global @exit : ((s32i) -> void)*
-    %16 = const 0 : s32i
-    call @exit(%16) [all]
-    %17 = load %0 : s32i
-    return %17
+        %12 = load %2 : s32i, align 4
+        %13 = cast(integral) %12 : u32i
+        set_bitfield
+        copy
+        scope {
+                %18 = get_global @x : rec_S*
+                get_member
+                get_bitfield
+                %21 = cast(integral) %20 : s32i
+                %22 = const 10 : s32i
+                cmp
+                if %23 {
+                        %24 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
+        }
+        %15 = get_global @exit : (s32i) -> void*
+        %16 = const 0 : s32i
+        call @exit(%16) [all]
+        %17 = load %0 : s32i
+        return %17
 }

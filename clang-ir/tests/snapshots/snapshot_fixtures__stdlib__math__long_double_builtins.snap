@@ -1,42 +1,42 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/math/long_double_builtins.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[26] = "%.6f %.6f %.6f %.6f %.6f\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[26] = ConstArray { ty: Array { element_type: Named("s8i"), size: 26 }, elts: Str("%.6f %.6f %.6f %.6f %.6f\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca long_double<f80>, "x", align 16
-    %2 = alloca long_double<f80>, "y", align 16
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const -3.750000e+00 : long_double<f80>
-    store %4, %1, align 16
-    %5 = const 2.500000e+00 : long_double<f80>
-    store %5, %2, align 16
-    %6 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %7 = get_global @.str : s8i[26]*
-    %8 = cast(array_to_ptrdecay) %7 : s8i*
-    %9 = load %1 : long_double<f80>, align 16
-    %10 = fabs %9 : long_double<f80>
-    %11 = cast(floating) %10 : double
-    %12 = load %1 : long_double<f80>, align 16
-    %13 = ceil %12 : long_double<f80>
-    %14 = cast(floating) %13 : double
-    %15 = load %1 : long_double<f80>, align 16
-    %16 = floor %15 : long_double<f80>
-    %17 = cast(floating) %16 : double
-    %18 = load %2 : long_double<f80>, align 16
-    %19 = round %18 : long_double<f80>
-    %20 = cast(floating) %19 : double
-    %21 = load %1 : long_double<f80>, align 16
-    %22 = trunc %21 : long_double<f80>
-    %23 = cast(floating) %22 : double
-    %24 = call @printf(%8, %11, %14, %17, %20, %23) : s32i [all]
-    %25 = const 0 : s32i
-    store %25, %0
-    %26 = load %0 : s32i
-    return %26
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca long_double<f80>, "x", align 16
+        %2 = alloca long_double<f80>, "y", align 16
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const -3.750000e+00 : long_double<f80>
+        store %4, %1, align 16
+        %5 = const 2.500000e+00 : long_double<f80>
+        store %5, %2, align 16
+        %6 = get_global @printf : (s8i*, ...) -> s32i*
+        %7 = get_global @.str : s8i[26]*
+        %8 = cast(array_to_ptrdecay) %7 : s8i*
+        %9 = load %1 : long_double<f80>, align 16
+        fabs
+        %11 = cast(floating) %10 : double
+        %12 = load %1 : long_double<f80>, align 16
+        ceil
+        %14 = cast(floating) %13 : double
+        %15 = load %1 : long_double<f80>, align 16
+        floor
+        %17 = cast(floating) %16 : double
+        %18 = load %2 : long_double<f80>, align 16
+        round
+        %20 = cast(floating) %19 : double
+        %21 = load %1 : long_double<f80>, align 16
+        trunc
+        %23 = cast(floating) %22 : double
+        %24 = call @printf(%8, %11, %14, %17, %20, %23) : s32i [all]
+        %25 = const 0 : s32i
+        store %25, %0
+        %26 = load %0 : s32i
+        return %26
 }

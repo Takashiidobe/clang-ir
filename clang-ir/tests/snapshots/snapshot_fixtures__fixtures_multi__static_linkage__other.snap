@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.multi/static_linkage/other.c" (c, x86_64-unknown-linux-gnu)
-global base : s32i = 100 [internal, default, align 4, dso_local]
+global base : s32i = CirInt { ty: Named("s32i"), value: "100" } [internal, default, align 4, dso_local]
 
 fn local(%arg1: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: s32i):
@@ -13,7 +13,7 @@ fn local(%arg1: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         %9 = load %7 : s32i, align 4
         %10 = get_global @base : s32i*
         %11 = load %10 : s32i, align 4
-        %12 = mul %9, %11 : s32i [nsw]
+        mul
         store %12, %8
         %13 = load %8 : s32i
         return %13

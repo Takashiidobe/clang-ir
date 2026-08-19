@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20010910-1.c" (c, x86_64-unknown-linux-gnu)
-global check_rx_ring : s32i[5] = [12, 14, 16, 18, 10] [internal, default, align 16, dso_local]
+global check_rx_ring : s32i[5] = ConstArray { ty: Array { element_type: Named("s32i"), size: 5 }, elts: Array([CirInt { ty: Named("s32i"), value: "12" }, CirInt { ty: Named("s32i"), value: "14" }, CirInt { ty: Named("s32i"), value: "16" }, CirInt { ty: Named("s32i"), value: "18" }, CirInt { ty: Named("s32i"), value: "10" }]), trailing_zeros_num: 0 } [internal, default, align 16, dso_local]
 
 fn epic_init_ring(%arg0: rec_epic_private*) -> void [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: rec_epic_private*):
@@ -11,165 +11,165 @@ fn epic_init_ring(%arg0: rec_epic_private*) -> void [internal, c, no_inline, dso
         %53 = alloca s32i, "i", align 4
         store %arg0, %52
         scope {
-            %64 = const 0 : s32i
-            store %64, %53, align 4
-            for cond: {
-                %88 = load %53 : s32i, align 4
-                %89 = const 5 : s32i
-                %90 = cmp lt %88, %89 : bool
-                condition %90
-            } step: {
-                %65 = load %53 : s32i, align 4
-                %66 = inc %65 : s32i [nsw]
-                store %66, %53, align 4
-                yield
-            } do {
-                scope {
-                    %67 = const 10 : s32i
-                    %68 = load %53 : s32i, align 4
-                    %69 = const 1 : s32i
-                    %70 = add %68, %69 : s32i [nsw]
-                    %71 = const 2 : s32i
-                    %72 = mul %70, %71 : s32i [nsw]
-                    %73 = add %67, %72 : s32i [nsw]
-                    %74 = cast(integral) %73 : u32i
-                    %75 = load %53 : s32i, align 4
-                    %76 = cast(integral) %75 : s64i
-                    %77 = load %52 : rec_epic_private*, align 8
-                    %78 = get_member %77[0] "rx_ring" : rec_epic_rx_desc**
-                    %79 = load %78 : rec_epic_rx_desc*, align 8
-                    %80 = ptr_stride %79, %76 : rec_epic_rx_desc*
-                    %81 = get_member %80[0] "next" : u32i*
-                    store %74, %81, align 4
-                    %82 = const 0 : u32i
-                    %83 = load %53 : s32i, align 4
-                    %84 = cast(integral) %83 : s64i
-                    %85 = load %52 : rec_epic_private*, align 8
-                    %86 = get_member %85[1] "rx_skbuff" : u32i[5]*
-                    %87 = get_element %86[%84] : u32i*
-                    store %82, %87, align 4
-                    yield
+                %64 = const 0 : s32i
+                store %64, %53, align 4
+                for cond {
+                        %88 = load %53 : s32i, align 4
+                        %89 = const 5 : s32i
+                        cmp
+                        condition %90
+                } step {
+                        %65 = load %53 : s32i, align 4
+                        inc
+                        store %66, %53, align 4
+                        yield
+                } body {
+                        scope {
+                                %67 = const 10 : s32i
+                                %68 = load %53 : s32i, align 4
+                                %69 = const 1 : s32i
+                                %70 = add %68, %69 : s32i [nsw]
+                                %71 = const 2 : s32i
+                                mul
+                                %73 = add %67, %72 : s32i [nsw]
+                                %74 = cast(integral) %73 : u32i
+                                %75 = load %53 : s32i, align 4
+                                %76 = cast(integral) %75 : s64i
+                                %77 = load %52 : rec_epic_private*, align 8
+                                get_member
+                                %79 = load %78 : rec_epic_rx_desc*, align 8
+                                ptr_stride
+                                get_member
+                                store %74, %81, align 4
+                                %82 = const 0 : u32i
+                                %83 = load %53 : s32i, align 4
+                                %84 = cast(integral) %83 : s64i
+                                %85 = load %52 : rec_epic_private*, align 8
+                                get_member
+                                get_element
+                                store %82, %87, align 4
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %54 = const 10 : u32i
         %55 = load %53 : s32i, align 4
         %56 = const 1 : s32i
-        %57 = sub %55, %56 : s32i [nsw]
+        sub
         %58 = cast(integral) %57 : s64i
         %59 = load %52 : rec_epic_private*, align 8
-        %60 = get_member %59[0] "rx_ring" : rec_epic_rx_desc**
+        get_member
         %61 = load %60 : rec_epic_rx_desc*, align 8
-        %62 = ptr_stride %61, %58 : rec_epic_rx_desc*
-        %63 = get_member %62[0] "next" : u32i*
+        ptr_stride
+        get_member
         store %54, %63, align 4
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_epic_private, "ep", align 8
-    %2 = alloca rec_epic_rx_desc[5], "rx_ring", align 16
-    %3 = alloca s32i, "i", align 4
-    %4 = const 0 : s32i
-    store %4, %0
-    scope {
-        %36 = const 0 : s32i
-        store %36, %3, align 4
-        for cond: {
-            %49 = load %3 : s32i, align 4
-            %50 = const 5 : s32i
-            %51 = cmp lt %49, %50 : bool
-            condition %51
-        } step: {
-            %37 = load %3 : s32i, align 4
-            %38 = inc %37 : s32i [nsw]
-            store %38, %3, align 4
-            yield
-        } do {
-            scope {
-                %39 = const 0 : u32i
-                %40 = load %3 : s32i, align 4
-                %41 = cast(integral) %40 : s64i
-                %42 = get_element %2[%41] : rec_epic_rx_desc*
-                %43 = get_member %42[0] "next" : u32i*
-                store %39, %43, align 4
-                %44 = const 5 : u32i
-                %45 = load %3 : s32i, align 4
-                %46 = cast(integral) %45 : s64i
-                %47 = get_member %1[1] "rx_skbuff" : u32i[5]*
-                %48 = get_element %47[%46] : u32i*
-                store %44, %48, align 4
-                yield
-            }
-            yield
-        }
-        yield
-    }
-    %5 = cast(array_to_ptrdecay) %2 : rec_epic_rx_desc*
-    %6 = get_member %1[0] "rx_ring" : rec_epic_rx_desc**
-    store %5, %6, align 8
-    call @epic_init_ring(%1) [all]
-    scope {
-        %9 = const 0 : s32i
-        store %9, %3, align 4
-        for cond: {
-            %33 = load %3 : s32i, align 4
-            %34 = const 5 : s32i
-            %35 = cmp lt %33, %34 : bool
-            condition %35
-        } step: {
-            %10 = load %3 : s32i, align 4
-            %11 = inc %10 : s32i [nsw]
-            store %11, %3, align 4
-            yield
-        } do {
-            scope {
-                scope {
-                    %20 = load %3 : s32i, align 4
-                    %21 = cast(integral) %20 : s64i
-                    %22 = get_element %2[%21] : rec_epic_rx_desc*
-                    %23 = get_member %22[0] "next" : u32i*
-                    %24 = load %23 : u32i, align 4
-                    %25 = load %3 : s32i, align 4
-                    %26 = cast(integral) %25 : s64i
-                    %27 = get_global @check_rx_ring : s32i[5]*
-                    %28 = get_element %27[%26] : s32i*
-                    %29 = load %28 : s32i, align 4
-                    %30 = cast(integral) %29 : u32i
-                    %31 = cmp ne %24, %30 : bool
-                    if %31 {
-                        %32 = get_global @abort : (() -> void)*
-                        call @abort() [all]
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_epic_private, "ep", align 8
+        %2 = alloca rec_epic_rx_desc[5], "rx_ring", align 16
+        %3 = alloca s32i, "i", align 4
+        %4 = const 0 : s32i
+        store %4, %0
+        scope {
+                %36 = const 0 : s32i
+                store %36, %3, align 4
+                for cond {
+                        %49 = load %3 : s32i, align 4
+                        %50 = const 5 : s32i
+                        cmp
+                        condition %51
+                } step {
+                        %37 = load %3 : s32i, align 4
+                        inc
+                        store %38, %3, align 4
                         yield
-                    }
-                    yield
-                }
-                scope {
-                    %12 = load %3 : s32i, align 4
-                    %13 = cast(integral) %12 : s64i
-                    %14 = get_member %1[1] "rx_skbuff" : u32i[5]*
-                    %15 = get_element %14[%13] : u32i*
-                    %16 = load %15 : u32i, align 4
-                    %17 = const 0 : u32i
-                    %18 = cmp ne %16, %17 : bool
-                    if %18 {
-                        %19 = get_global @abort : (() -> void)*
-                        call @abort() [all]
+                } body {
+                        scope {
+                                %39 = const 0 : u32i
+                                %40 = load %3 : s32i, align 4
+                                %41 = cast(integral) %40 : s64i
+                                get_element
+                                get_member
+                                store %39, %43, align 4
+                                %44 = const 5 : u32i
+                                %45 = load %3 : s32i, align 4
+                                %46 = cast(integral) %45 : s64i
+                                get_member
+                                get_element
+                                store %44, %48, align 4
+                                yield
+                        }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = load %0 : s32i
-    return %8
+        %5 = cast(array_to_ptrdecay) %2 : rec_epic_rx_desc*
+        get_member
+        store %5, %6, align 8
+        call @epic_init_ring(%1) [all]
+        scope {
+                %9 = const 0 : s32i
+                store %9, %3, align 4
+                for cond {
+                        %33 = load %3 : s32i, align 4
+                        %34 = const 5 : s32i
+                        cmp
+                        condition %35
+                } step {
+                        %10 = load %3 : s32i, align 4
+                        inc
+                        store %11, %3, align 4
+                        yield
+                } body {
+                        scope {
+                                scope {
+                                        %20 = load %3 : s32i, align 4
+                                        %21 = cast(integral) %20 : s64i
+                                        get_element
+                                        get_member
+                                        %24 = load %23 : u32i, align 4
+                                        %25 = load %3 : s32i, align 4
+                                        %26 = cast(integral) %25 : s64i
+                                        %27 = get_global @check_rx_ring : s32i[5]*
+                                        get_element
+                                        %29 = load %28 : s32i, align 4
+                                        %30 = cast(integral) %29 : u32i
+                                        cmp
+                                        if %31 {
+                                                %32 = get_global @abort : () -> void*
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                scope {
+                                        %12 = load %3 : s32i, align 4
+                                        %13 = cast(integral) %12 : s64i
+                                        get_member
+                                        get_element
+                                        %16 = load %15 : u32i, align 4
+                                        %17 = const 0 : u32i
+                                        cmp
+                                        if %18 {
+                                                %19 = get_global @abort : () -> void*
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
+                }
+                yield
+        }
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = load %0 : s32i
+        return %8
 }

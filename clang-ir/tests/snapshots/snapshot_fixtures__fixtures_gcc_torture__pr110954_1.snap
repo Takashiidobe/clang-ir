@@ -1,40 +1,40 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr110954-1.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "f", align 4
-    %2 = alloca s32i, "d", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 0 : s32i
-    store %4, %1, align 4
-    %5 = load %1 : s32i, align 4
-    %6 = const 0 : s32i
-    %7 = cmp lt %5, %6 : bool
-    %8 = cast(bool_to_int) %7 : s32i
-    %9 = load %1 : s32i, align 4
-    %10 = const 0 : s32i
-    %11 = cmp lt %9, %10 : bool
-    %12 = not %11 : bool
-    %13 = cast(bool_to_int) %12 : s32i
-    %14 = or %8, %13 : s32i
-    store %14, %2, align 4
-    scope {
-        %17 = load %2 : s32i, align 4
-        %18 = const 1 : s32i
-        %19 = cmp ne %17, %18 : bool
-        if %19 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "f", align 4
+        %2 = alloca s32i, "d", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 0 : s32i
+        store %4, %1, align 4
+        %5 = load %1 : s32i, align 4
+        %6 = const 0 : s32i
+        cmp
+        %8 = cast(bool_to_int) %7 : s32i
+        %9 = load %1 : s32i, align 4
+        %10 = const 0 : s32i
+        cmp
+        not
+        %13 = cast(bool_to_int) %12 : s32i
+        or
+        store %14, %2, align 4
+        scope {
+                %17 = load %2 : s32i, align 4
+                %18 = const 1 : s32i
+                cmp
+                if %19 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %15 = const 0 : s32i
-    store %15, %0
-    %16 = load %0 : s32i
-    return %16
+        %15 = const 0 : s32i
+        store %15, %0
+        %16 = load %0 : s32i
+        return %16
 }

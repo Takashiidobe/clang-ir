@@ -1,15 +1,15 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/non_int_globals.c" (c, x86_64-unknown-linux-gnu)
-global small : s8i = 12 [internal, default, align 1, dso_local]
-global byte : u8i = 200 [internal, default, align 1, dso_local]
-global ratio : float = 1.500000e+00 [internal, default, align 4, dso_local]
-global total : double = 2.250000e+00 [internal, default, align 8, dso_local]
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[4] = "%u\n" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[4] = "%f\n" [cir_private, default, align 1, dso_local, constant]
+global small : s8i = CirInt { ty: Named("s8i"), value: "12" } [internal, default, align 1, dso_local]
+global byte : u8i = CirInt { ty: Named("u8i"), value: "200" } [internal, default, align 1, dso_local]
+global ratio : float = CirFloat { ty: Single, value: "1.500000e+00" } [internal, default, align 4, dso_local]
+global total : double = CirFloat { ty: Double, value: "2.250000e+00" } [internal, default, align 8, dso_local]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%u\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%f\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn add_char(%arg4: s8i, %arg5: s8i) -> s8i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg4: s8i, %arg5: s8i):
@@ -37,7 +37,7 @@ fn scale(%arg2: float, %arg3: float) -> float [internal, c, no_inline, dso_local
         store %arg3, %63
         %65 = load %62 : float, align 4
         %66 = load %63 : float, align 4
-        %67 = fmul %65, %66 : float
+        fmul
         store %67, %64
         %68 = load %64 : float
         return %68
@@ -51,73 +51,73 @@ fn add_double(%arg0: double, %arg1: double) -> double [internal, c, no_inline, d
         store %arg1, %56
         %58 = load %55 : double, align 8
         %59 = load %56 : double, align 8
-        %60 = fadd %58, %59 : double
+        fadd
         store %60, %57
         %61 = load %57 : double
         return %61
 }
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @small : s8i*
-    %3 = load %2 : s8i, align 1
-    %4 = const 3 : s8i
-    %5 = call @add_char(%3, %4) : s8i [all]
-    %6 = get_global @small : s8i*
-    store %5, %6, align 1
-    %7 = get_global @byte : u8i*
-    %8 = load %7 : u8i, align 1
-    %9 = cast(integral) %8 : s32i
-    %10 = const 1 : s32i
-    %11 = add %9, %10 : s32i [nsw]
-    %12 = cast(integral) %11 : u8i
-    %13 = get_global @byte : u8i*
-    store %12, %13, align 1
-    %14 = get_global @ratio : float*
-    %15 = load %14 : float, align 4
-    %16 = const 2.000000e+00 : float
-    %17 = call @scale(%15, %16) : float [all]
-    %18 = get_global @ratio : float*
-    store %17, %18, align 4
-    %19 = get_global @total : double*
-    %20 = load %19 : double, align 8
-    %21 = get_global @ratio : float*
-    %22 = load %21 : float, align 4
-    %23 = cast(floating) %22 : double
-    %24 = call @add_double(%20, %23) : double [all]
-    %25 = get_global @total : double*
-    store %24, %25, align 8
-    %26 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %27 = get_global @.str : s8i[4]*
-    %28 = cast(array_to_ptrdecay) %27 : s8i*
-    %29 = get_global @small : s8i*
-    %30 = load %29 : s8i, align 1
-    %31 = cast(integral) %30 : s32i
-    %32 = call @printf(%28, %31) : s32i [all]
-    %33 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %34 = get_global @.str.1 : s8i[4]*
-    %35 = cast(array_to_ptrdecay) %34 : s8i*
-    %36 = get_global @byte : u8i*
-    %37 = load %36 : u8i, align 1
-    %38 = cast(integral) %37 : s32i
-    %39 = call @printf(%35, %38) : s32i [all]
-    %40 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %41 = get_global @.str.2 : s8i[4]*
-    %42 = cast(array_to_ptrdecay) %41 : s8i*
-    %43 = get_global @ratio : float*
-    %44 = load %43 : float, align 4
-    %45 = cast(floating) %44 : double
-    %46 = call @printf(%42, %45) : s32i [all]
-    %47 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %48 = get_global @.str.2 : s8i[4]*
-    %49 = cast(array_to_ptrdecay) %48 : s8i*
-    %50 = get_global @total : double*
-    %51 = load %50 : double, align 8
-    %52 = call @printf(%49, %51) : s32i [all]
-    %53 = const 0 : s32i
-    store %53, %0
-    %54 = load %0 : s32i
-    return %54
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @small : s8i*
+        %3 = load %2 : s8i, align 1
+        %4 = const 3 : s8i
+        %5 = call @add_char(%3, %4) : s8i [all]
+        %6 = get_global @small : s8i*
+        store %5, %6, align 1
+        %7 = get_global @byte : u8i*
+        %8 = load %7 : u8i, align 1
+        %9 = cast(integral) %8 : s32i
+        %10 = const 1 : s32i
+        %11 = add %9, %10 : s32i [nsw]
+        %12 = cast(integral) %11 : u8i
+        %13 = get_global @byte : u8i*
+        store %12, %13, align 1
+        %14 = get_global @ratio : float*
+        %15 = load %14 : float, align 4
+        %16 = const 2.000000e+00 : float
+        %17 = call @scale(%15, %16) : float [all]
+        %18 = get_global @ratio : float*
+        store %17, %18, align 4
+        %19 = get_global @total : double*
+        %20 = load %19 : double, align 8
+        %21 = get_global @ratio : float*
+        %22 = load %21 : float, align 4
+        %23 = cast(floating) %22 : double
+        %24 = call @add_double(%20, %23) : double [all]
+        %25 = get_global @total : double*
+        store %24, %25, align 8
+        %26 = get_global @printf : (s8i*, ...) -> s32i*
+        %27 = get_global @.str : s8i[4]*
+        %28 = cast(array_to_ptrdecay) %27 : s8i*
+        %29 = get_global @small : s8i*
+        %30 = load %29 : s8i, align 1
+        %31 = cast(integral) %30 : s32i
+        %32 = call @printf(%28, %31) : s32i [all]
+        %33 = get_global @printf : (s8i*, ...) -> s32i*
+        %34 = get_global @.str.1 : s8i[4]*
+        %35 = cast(array_to_ptrdecay) %34 : s8i*
+        %36 = get_global @byte : u8i*
+        %37 = load %36 : u8i, align 1
+        %38 = cast(integral) %37 : s32i
+        %39 = call @printf(%35, %38) : s32i [all]
+        %40 = get_global @printf : (s8i*, ...) -> s32i*
+        %41 = get_global @.str.2 : s8i[4]*
+        %42 = cast(array_to_ptrdecay) %41 : s8i*
+        %43 = get_global @ratio : float*
+        %44 = load %43 : float, align 4
+        %45 = cast(floating) %44 : double
+        %46 = call @printf(%42, %45) : s32i [all]
+        %47 = get_global @printf : (s8i*, ...) -> s32i*
+        %48 = get_global @.str.2 : s8i[4]*
+        %49 = cast(array_to_ptrdecay) %48 : s8i*
+        %50 = get_global @total : double*
+        %51 = load %50 : double, align 8
+        %52 = call @printf(%49, %51) : s32i [all]
+        %53 = const 0 : s32i
+        store %53, %0
+        %54 = load %0 : s32i
+        return %54
 }

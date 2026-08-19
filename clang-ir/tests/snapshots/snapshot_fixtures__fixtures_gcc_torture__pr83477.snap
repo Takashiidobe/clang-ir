@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr83477.c" (c, x86_64-unknown-linux-gnu)
-global yf : s32i = 0 [external, default, align 4, dso_local]
+global yf : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn pl(%arg0: s32i, %arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i, %arg1: s32i):
@@ -18,33 +18,33 @@ fn pl(%arg0: s32i, %arg1: s32i) -> void [external, c, no_inline, dso_local, noth
         store %19, %16, align 4
         %20 = load %14 : s32i, align 4
         %21 = const 0 : s32i
-        %22 = cmp eq %20, %21 : bool
+        cmp
         %23 = ternary %22 ? { : u32i
-            %41 = load %16 : u32i, align 4
-            yield %41
+                %41 = load %16 : u32i, align 4
+                yield %41
         } : {
-            %37 = load %16 : u32i, align 4
-            %38 = load %14 : s32i, align 4
-            %39 = cast(integral) %38 : u32i
-            %40 = div %37, %39 : u32i
-            yield %40
+                %37 = load %16 : u32i, align 4
+                %38 = load %14 : s32i, align 4
+                %39 = cast(integral) %38 : u32i
+                div
+                yield %40
         }
         %24 = cast(integral) %23 : s32i
         store %24, %17, align 4
         %25 = load %15 : s32i, align 4
         %26 = const 2 : s32i
-        %27 = cmp lt %25, %26 : bool
+        cmp
         %28 = cast(bool_to_int) %27 : s32i
         %29 = load %17 : s32i, align 4
-        %30 = mul %28, %29 : s32i [nsw]
+        mul
         %31 = const 0 : s32i
-        %32 = cmp ne %30, %31 : bool
+        cmp
         %33 = ternary %32 ? { : s32i
-            %36 = load %15 : s32i, align 4
-            yield %36
+                %36 = load %15 : s32i, align 4
+                yield %36
         } : {
-            %35 = const 0 : s32i
-            yield %35
+                %35 = const 0 : s32i
+                yield %35
         }
         %34 = get_global @yf : s32i*
         store %33, %34, align 4
@@ -52,29 +52,29 @@ fn pl(%arg0: s32i, %arg1: s32i) -> void [external, c, no_inline, dso_local, noth
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : s32i
-    %3 = get_global @yf : s32i*
-    %4 = load %3 : s32i, align 4
-    %5 = cast(int_to_bool) %4 : bool
-    %6 = not %5 : bool
-    %7 = cast(bool_to_int) %6 : s32i
-    call @pl(%2, %7) [all]
-    scope {
-        %10 = get_global @yf : s32i*
-        %11 = load %10 : s32i, align 4
-        %12 = const 1 : s32i
-        %13 = cmp ne %11, %12 : bool
-        if %13 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : s32i
+        %3 = get_global @yf : s32i*
+        %4 = load %3 : s32i, align 4
+        %5 = cast(int_to_bool) %4 : bool
+        not
+        %7 = cast(bool_to_int) %6 : s32i
+        call @pl(%2, %7) [all]
+        scope {
+                %10 = get_global @yf : s32i*
+                %11 = load %10 : s32i, align 4
+                %12 = const 1 : s32i
+                cmp
+                if %13 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %8 = const 0 : s32i
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        %8 = const 0 : s32i
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

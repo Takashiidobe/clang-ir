@@ -1,45 +1,45 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20040917-1.c" (c, x86_64-unknown-linux-gnu)
-global test_var : s32i = 0 [internal, default, align 4, dso_local]
+global test_var : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
 
 fn not_inlinable() -> void [external, c, no_inline, dso_local, nothrow] {
-    %14 = get_global @inlinable : (() -> void)*
-    call %14() [all]
-    return
+        %14 = get_global @inlinable : () -> void*
+        call () [all]
+        return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %2 = alloca s32i, "__retval", align 4
-    %3 = const 0 : s32i
-    store %3, %2
-    %4 = const 10 : s32i
-    %5 = get_global @test_var : s32i*
-    store %4, %5, align 4
-    %6 = get_global @not_inlinable : (() -> void)*
-    call @not_inlinable() [all]
-    scope {
-        %9 = get_global @test_var : s32i*
-        %10 = load %9 : s32i, align 4
-        %11 = const 10 : s32i
-        %12 = cmp eq %10, %11 : bool
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %2 = alloca s32i, "__retval", align 4
+        %3 = const 0 : s32i
+        store %3, %2
+        %4 = const 10 : s32i
+        %5 = get_global @test_var : s32i*
+        store %4, %5, align 4
+        %6 = get_global @not_inlinable : () -> void*
+        call @not_inlinable() [all]
+        scope {
+                %9 = get_global @test_var : s32i*
+                %10 = load %9 : s32i, align 4
+                %11 = const 10 : s32i
+                cmp
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = const 0 : s32i
-    store %7, %2
-    %8 = load %2 : s32i
-    return %8
+        %7 = const 0 : s32i
+        store %7, %2
+        %8 = load %2 : s32i
+        return %8
 }
 fn inlinable() -> void [internal, c, no_inline, dso_local, nothrow] {
-    %0 = const -10 : s32i
-    %1 = get_global @test_var : s32i*
-    store %0, %1, align 4
-    return
+        %0 = const -10 : s32i
+        %1 = get_global @test_var : s32i*
+        store %0, %1, align 4
+        return
 }

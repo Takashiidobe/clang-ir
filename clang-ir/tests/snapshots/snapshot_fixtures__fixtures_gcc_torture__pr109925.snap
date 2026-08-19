@@ -1,155 +1,155 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr109925.c" (c, x86_64-unknown-linux-gnu)
-global c : s32i = 0 [external, default, align 4, dso_local]
-global f : s32i = 0 [external, default, align 4, dso_local]
-global a : s32i = 0 [external, default, align 4, dso_local]
+global c : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global f : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global a : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i[2], "g", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    scope {
-        %21 = const 0 : s32i
-        %22 = get_global @c : s32i*
-        store %21, %22, align 4
-        for cond: {
-            %61 = get_global @c : s32i*
-            %62 = load %61 : s32i, align 4
-            %63 = const 2 : s32i
-            %64 = cmp lt %62, %63 : bool
-            condition %64
-        } step: {
-            %23 = get_global @c : s32i*
-            %24 = load %23 : s32i, align 4
-            %25 = inc %24 : s32i [nsw]
-            store %25, %23, align 4
-            yield
-        } do {
-            scope {
-                scope {
-                    %36 = alloca s8i[20], "h", align 16
-                    %37 = alloca s8i*, "b", align 8
-                    %38 = alloca s32i, "d", align 4
-                    %39 = alloca s32i, "e", align 4
-                    %40 = cast(array_to_ptrdecay) %36 : s8i*
-                    store %40, %37, align 8
-                    %41 = const 48 : s32i
-                    store %41, %38, align 4
-                    %42 = const 0 : s32i
-                    store %42, %39, align 4
-                    scope {
-                        while {
-                            %54 = load %38 : s32i, align 4
-                            %55 = cast(int_to_bool) %54 : bool
-                            %56 = ternary %55 ? { : bool
-                                %58 = load %39 : s32i, align 4
-                                %59 = const 5 : s32i
-                                %60 = cmp lt %58, %59 : bool
-                                yield %60
-                            } : {
-                                %57 = const false : bool
-                                yield %57
-                            }
-                            condition %56
-                        } do {
-                            %45 = const 10 : s32i
-                            %46 = load %38 : s32i, align 4
-                            %47 = div %46, %45 : s32i
-                            store %47, %38, align 4
-                            %48 = cast(integral) %47 : s8i
-                            %49 = load %39 : s32i, align 4
-                            %50 = inc %49 : s32i [nsw]
-                            store %50, %39, align 4
-                            %51 = cast(integral) %49 : s64i
-                            %52 = load %37 : s8i*, align 8
-                            %53 = ptr_stride %52, %51 : s8i*
-                            store %48, %53, align 1
-                            yield
-                        }
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i[2], "g", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        scope {
+                %21 = const 0 : s32i
+                %22 = get_global @c : s32i*
+                store %21, %22, align 4
+                for cond {
+                        %61 = get_global @c : s32i*
+                        %62 = load %61 : s32i, align 4
+                        %63 = const 2 : s32i
+                        cmp
+                        condition %64
+                } step {
+                        %23 = get_global @c : s32i*
+                        %24 = load %23 : s32i, align 4
+                        inc
+                        store %25, %23, align 4
                         yield
-                    }
-                    %43 = load %39 : s32i, align 4
-                    %44 = get_global @f : s32i*
-                    store %43, %44, align 4
-                    yield
-                }
-                %26 = const 0 : s32i
-                %27 = get_global @f : s32i*
-                %28 = load %27 : s32i, align 4
-                %29 = const 2 : s32i
-                %30 = sub %28, %29 : s32i [nsw]
-                %31 = get_global @c : s32i*
-                %32 = load %31 : s32i, align 4
-                %33 = add %30, %32 : s32i [nsw]
-                %34 = cast(integral) %33 : s64i
-                %35 = get_element %1[%34] : s32i*
-                store %26, %35, align 4
-                yield
-            }
-            yield
-        }
-        yield
-    }
-    scope {
-        for cond: {
-            %20 = const true : bool
-            condition %20
-        } step: {
-            yield
-        } do {
-            scope {
-                scope {
-                    for cond: {
-                        %16 = get_global @a : s32i*
-                        %17 = load %16 : s32i, align 4
-                        %18 = const 4 : s32i
-                        %19 = cmp le %17, %18 : bool
-                        condition %19
-                    } step: {
-                        %9 = get_global @a : s32i*
-                        %10 = load %9 : s32i, align 4
-                        %11 = inc %10 : s32i [nsw]
-                        store %11, %9, align 4
-                        yield
-                    } do {
+                } body {
                         scope {
-                            %12 = const 0 : s64i
-                            %13 = get_element %1[%12] : s32i*
-                            %14 = load %13 : s32i, align 4
-                            %15 = cast(int_to_bool) %14 : bool
-                            if %15 {
-                                break
-                            }
-                            yield
+                                scope {
+                                        %36 = alloca s8i[20], "h", align 16
+                                        %37 = alloca s8i*, "b", align 8
+                                        %38 = alloca s32i, "d", align 4
+                                        %39 = alloca s32i, "e", align 4
+                                        %40 = cast(array_to_ptrdecay) %36 : s8i*
+                                        store %40, %37, align 8
+                                        %41 = const 48 : s32i
+                                        store %41, %38, align 4
+                                        %42 = const 0 : s32i
+                                        store %42, %39, align 4
+                                        scope {
+                                                while {
+                                                        %54 = load %38 : s32i, align 4
+                                                        %55 = cast(int_to_bool) %54 : bool
+                                                        %56 = ternary %55 ? { : bool
+                                                                %58 = load %39 : s32i, align 4
+                                                                %59 = const 5 : s32i
+                                                                cmp
+                                                                yield %60
+                                                        } : {
+                                                                %57 = const false : bool
+                                                                yield %57
+                                                        }
+                                                        condition %56
+                                                } do {
+                                                        %45 = const 10 : s32i
+                                                        %46 = load %38 : s32i, align 4
+                                                        div
+                                                        store %47, %38, align 4
+                                                        %48 = cast(integral) %47 : s8i
+                                                        %49 = load %39 : s32i, align 4
+                                                        inc
+                                                        store %50, %39, align 4
+                                                        %51 = cast(integral) %49 : s64i
+                                                        %52 = load %37 : s8i*, align 8
+                                                        ptr_stride
+                                                        store %48, %53, align 1
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        %43 = load %39 : s32i, align 4
+                                        %44 = get_global @f : s32i*
+                                        store %43, %44, align 4
+                                        yield
+                                }
+                                %26 = const 0 : s32i
+                                %27 = get_global @f : s32i*
+                                %28 = load %27 : s32i, align 4
+                                %29 = const 2 : s32i
+                                sub
+                                %31 = get_global @c : s32i*
+                                %32 = load %31 : s32i, align 4
+                                %33 = add %30, %32 : s32i [nsw]
+                                %34 = cast(integral) %33 : s64i
+                                get_element
+                                store %26, %35, align 4
+                                yield
                         }
                         yield
-                    }
-                    yield
                 }
-                break
-            }
-            yield
+                yield
         }
-        yield
-    }
-    scope {
-        %5 = get_global @a : s32i*
-        %6 = load %5 : s32i, align 4
-        %7 = const 5 : s32i
-        %8 = cmp ne %6, %7 : bool
-        if %8 {
-            call @abort() [all]
-            yield
+        scope {
+                for cond {
+                        %20 = const true : bool
+                        condition %20
+                } step {
+                        yield
+                } body {
+                        scope {
+                                scope {
+                                        for cond {
+                                                %16 = get_global @a : s32i*
+                                                %17 = load %16 : s32i, align 4
+                                                %18 = const 4 : s32i
+                                                cmp
+                                                condition %19
+                                        } step {
+                                                %9 = get_global @a : s32i*
+                                                %10 = load %9 : s32i, align 4
+                                                inc
+                                                store %11, %9, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        %12 = const 0 : s64i
+                                                        get_element
+                                                        %14 = load %13 : s32i, align 4
+                                                        %15 = cast(int_to_bool) %14 : bool
+                                                        if %15 {
+                                                                break
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
+                                break
+                        }
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = load %0 : s32i
-    return %4
+        scope {
+                %5 = get_global @a : s32i*
+                %6 = load %5 : s32i, align 4
+                %7 = const 5 : s32i
+                cmp
+                if %8 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
+        }
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = load %0 : s32i
+        return %4
 }

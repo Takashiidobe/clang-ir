@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/ieee__compare-fp-2.c" (c, x86_64-unknown-linux-gnu)
@@ -12,17 +12,17 @@ fn foo(%arg0: double, %arg1: double) -> s32i [external, c, no_inline, dso_local,
         store %arg1, %11
         %13 = load %10 : double, align 8
         %14 = load %11 : double, align 8
-        %15 = cmp gt %13, %14 : bool
+        cmp
         %16 = ternary %15 ? { : bool
-            %20 = load %10 : double, align 8
-            %21 = cast(float_to_int) %20 : s32i
-            %22 = load %11 : double, align 8
-            %23 = cast(float_to_int) %22 : s32i
-            %24 = cmp eq %21, %23 : bool
-            yield %24
+                %20 = load %10 : double, align 8
+                %21 = cast(float_to_int) %20 : s32i
+                %22 = load %11 : double, align 8
+                %23 = cast(float_to_int) %22 : s32i
+                cmp
+                yield %24
         } : {
-            %19 = const false : bool
-            yield %19
+                %19 = const false : bool
+                yield %19
         }
         %17 = cast(bool_to_int) %16 : s32i
         store %17, %12
@@ -31,24 +31,24 @@ fn foo(%arg0: double, %arg1: double) -> s32i [external, c, no_inline, dso_local,
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const 1.300000e+00 : double
-        %5 = const 1.000000e+00 : double
-        %6 = call @foo(%4, %5) : s32i [all]
-        %7 = cast(int_to_bool) %6 : bool
-        %8 = not %7 : bool
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const 1.300000e+00 : double
+                %5 = const 1.000000e+00 : double
+                %6 = call @foo(%4, %5) : s32i [all]
+                %7 = cast(int_to_bool) %6 : bool
+                not
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

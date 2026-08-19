@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr85169.c" (c, x86_64-unknown-linux-gnu)
@@ -14,7 +14,7 @@ fn foo(%arg0: vector<64 x s8i>*) -> void [internal, c, no_inline, dso_local, not
         %26 = const 1 : s8i
         %27 = const 63 : s32i
         %28 = load %23 : vector<64 x s8i>, align 64
-        %29 = vec.insert %26, %28[%27] : vector<64 x s8i>
+        vec.insert
         store %29, %23, align 64
         %30 = load %23 : vector<64 x s8i>, align 64
         %31 = load %22 : vector<64 x s8i>*, align 8
@@ -23,50 +23,50 @@ fn foo(%arg0: vector<64 x s8i>*) -> void [internal, c, no_inline, dso_local, not
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca vector<64 x s8i>, "v", align 64
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : vector<64 x s8i>
-    store %3, %1, align 64
-    call @foo(%1) [all]
-    scope {
-        %6 = alloca u32i, "i", align 4
-        %7 = const 0 : u32i
-        store %7, %6, align 4
-        for cond: {
-            %19 = load %6 : u32i, align 4
-            %20 = const 64 : u32i
-            %21 = cmp lt %19, %20 : bool
-            condition %21
-        } step: {
-            %8 = load %6 : u32i, align 4
-            %9 = inc %8 : u32i
-            store %9, %6, align 4
-            yield
-        } do {
-            scope {
-                %10 = load %1 : vector<64 x s8i>, align 64
-                %11 = load %6 : u32i, align 4
-                %12 = vec.extract %10[%11] : s8i
-                %13 = cast(integral) %12 : s32i
-                %14 = load %6 : u32i, align 4
-                %15 = const 63 : u32i
-                %16 = cmp eq %14, %15 : bool
-                %17 = cast(bool_to_int) %16 : s32i
-                %18 = cmp ne %13, %17 : bool
-                if %18 {
-                    call @abort() [all]
-                    yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca vector<64 x s8i>, "v", align 64
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]] : vector<64 x s8i>
+        store %3, %1, align 64
+        call @foo(%1) [all]
+        scope {
+                %6 = alloca u32i, "i", align 4
+                %7 = const 0 : u32i
+                store %7, %6, align 4
+                for cond {
+                        %19 = load %6 : u32i, align 4
+                        %20 = const 64 : u32i
+                        cmp
+                        condition %21
+                } step {
+                        %8 = load %6 : u32i, align 4
+                        inc
+                        store %9, %6, align 4
+                        yield
+                } body {
+                        scope {
+                                %10 = load %1 : vector<64 x s8i>, align 64
+                                %11 = load %6 : u32i, align 4
+                                vec.extract
+                                %13 = cast(integral) %12 : s32i
+                                %14 = load %6 : u32i, align 4
+                                %15 = const 63 : u32i
+                                cmp
+                                %17 = cast(bool_to_int) %16 : s32i
+                                cmp
+                                if %18 {
+                                        call @abort() [all]
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

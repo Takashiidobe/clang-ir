@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr23604.c" (c, x86_64-unknown-linux-gnu)
@@ -11,43 +11,43 @@ fn g(%arg0: s32i, %arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothr
         store %arg0, %10
         store %arg1, %11
         scope {
-            %15 = load %10 : s32i, align 4
-            %16 = const -1 : s32i
-            %17 = cmp gt %15, %16 : bool
-            if %17 {
-                scope {
-                    %18 = load %10 : s32i, align 4
-                    %19 = const 2 : s32i
-                    %20 = cmp lt %18, %19 : bool
-                    if %20 {
+                %15 = load %10 : s32i, align 4
+                %16 = const -1 : s32i
+                cmp
+                if %17 {
                         scope {
-                            %21 = load %10 : s32i, align 4
-                            %22 = load %11 : s32i, align 4
-                            %23 = cmp ne %21, %22 : bool
-                            if %23 {
-                                scope {
-                                    %24 = load %11 : s32i, align 4
-                                    %25 = const 0 : s32i
-                                    %26 = cmp ne %24, %25 : bool
-                                    if %26 {
-                                        %27 = const 0 : s32i
-                                        store %27, %12
-                                        %28 = load %12 : s32i
-                                        return %28
-                                    }
-                                    yield
+                                %18 = load %10 : s32i, align 4
+                                %19 = const 2 : s32i
+                                cmp
+                                if %20 {
+                                        scope {
+                                                %21 = load %10 : s32i, align 4
+                                                %22 = load %11 : s32i, align 4
+                                                cmp
+                                                if %23 {
+                                                        scope {
+                                                                %24 = load %11 : s32i, align 4
+                                                                %25 = const 0 : s32i
+                                                                cmp
+                                                                if %26 {
+                                                                        %27 = const 0 : s32i
+                                                                        store %27, %12
+                                                                        %28 = load %12 : s32i
+                                                                        return %28
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         %13 = const 1 : s32i
         store %13, %12
@@ -56,24 +56,24 @@ fn g(%arg0: s32i, %arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothr
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const 1 : s32i
-        %5 = const 0 : s32i
-        %6 = call @g(%4, %5) : s32i [all]
-        %7 = cast(int_to_bool) %6 : bool
-        %8 = not %7 : bool
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const 1 : s32i
+                %5 = const 0 : s32i
+                %6 = call @g(%4, %5) : s32i [all]
+                %7 = cast(int_to_bool) %6 : bool
+                not
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

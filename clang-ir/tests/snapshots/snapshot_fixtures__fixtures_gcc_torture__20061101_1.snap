@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20061101-1.c" (c, x86_64-unknown-linux-gnu)
@@ -10,15 +10,15 @@ fn tar(%arg2: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %30 = alloca s32i, "__retval", align 4
         store %arg2, %29
         scope {
-            %33 = load %29 : s32i, align 4
-            %34 = const 36863 : s32i
-            %35 = cmp ne %33, %34 : bool
-            if %35 {
-                %36 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %33 = load %29 : s32i, align 4
+                %34 = const 36863 : s32i
+                cmp
+                if %35 {
+                        %36 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %31 = const -1 : s32i
         store %31, %30
@@ -38,53 +38,53 @@ fn bug(%arg0: s32i, %arg1: s32i) -> void [external, c, no_inline, dso_local, not
         %11 = const 0 : s32i
         store %11, %9, align 4
         scope {
-            while {
-                %26 = load %8 : s32i, align 4
-                %27 = const -1 : s32i
-                %28 = cmp ne %26, %27 : bool
-                condition %28
-            } do {
-                scope {
-                    %12 = load %9 : s32i, align 4
-                    %13 = inc %12 : s32i [nsw]
-                    store %13, %9, align 4
-                    scope {
-                        %18 = load %9 : s32i, align 4
-                        %19 = load %6 : s32i, align 4
-                        %20 = const 1 : s32i
-                        %21 = sub %19, %20 : s32i [nsw]
-                        %22 = cmp gt %18, %21 : bool
-                        if %22 {
-                            %23 = load %6 : s32i, align 4
-                            %24 = const 1 : s32i
-                            %25 = sub %23, %24 : s32i [nsw]
-                            store %25, %9, align 4
-                            yield
+                while {
+                        %26 = load %8 : s32i, align 4
+                        %27 = const -1 : s32i
+                        cmp
+                        condition %28
+                } do {
+                        scope {
+                                %12 = load %9 : s32i, align 4
+                                inc
+                                store %13, %9, align 4
+                                scope {
+                                        %18 = load %9 : s32i, align 4
+                                        %19 = load %6 : s32i, align 4
+                                        %20 = const 1 : s32i
+                                        sub
+                                        cmp
+                                        if %22 {
+                                                %23 = load %6 : s32i, align 4
+                                                %24 = const 1 : s32i
+                                                sub
+                                                store %25, %9, align 4
+                                                yield
+                                        }
+                                        yield
+                                }
+                                %14 = load %9 : s32i, align 4
+                                %15 = load %7 : s32i, align 4
+                                mul
+                                %17 = call @tar(%16) : s32i [all]
+                                store %17, %8, align 4
+                                yield
                         }
                         yield
-                    }
-                    %14 = load %9 : s32i, align 4
-                    %15 = load %7 : s32i, align 4
-                    %16 = mul %14, %15 : s32i [nsw]
-                    %17 = call @tar(%16) : s32i [all]
-                    store %17, %8, align 4
-                    yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 5 : s32i
-    %3 = const 36863 : s32i
-    call @bug(%2, %3) [all]
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 5 : s32i
+        %3 = const 36863 : s32i
+        call @bug(%2, %3) [all]
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

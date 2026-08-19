@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.libc-test/functional/supported/clock_gettime.c" (c, x86_64-unknown-linux-gnu)
-global t_status : s32i = 0 [external, default, align 4, dso_local]
-global .str : s8i[164] = "tests/fixtures.libc-test/functional/supported/clock_gettime.c:69: clock_gettime(CLOCK_REALTIME, &ts) == 0 && errno == 0 failed: %s\n" [cir_private, default, align 1, dso_local, constant]
+global t_status : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global .str : s8i[173] = ConstArray { ty: Array { element_type: Named("s8i"), size: 173 }, elts: Str("tests/fixtures.libc-test/functional/supported/clock_gettime.c:69: clock_gettime(CLOCK_REALTIME, &ts) == 0 && errno == 0 failed: %s\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn vsnprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec___va_list_tag*) -> s32i [external, c, nothrow];
 fn write(%arg0: s32i, %arg1: void*, %arg2: u64i) -> s64i [external, c];
@@ -18,10 +18,10 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         store %arg0, %27
         %32 = const 1 : s32i
         %33 = get_global @t_status : s32i*
-        store %32, %33, align 4, volatile
+        store %32, %33, align 4
         %34 = cast(array_to_ptrdecay) %29 : rec___va_list_tag*
-        va_start %34
-        %35 = get_global @vsnprintf : ((s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i)*
+        va_start
+        %35 = get_global @vsnprintf : (s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i*
         %36 = cast(array_to_ptrdecay) %30 : s8i*
         %37 = const 512 : u64i
         %38 = load %27 : s8i*, align 8
@@ -29,59 +29,59 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %40 = call @vsnprintf(%36, %37, %38, %39) : s32i [all]
         store %40, %31, align 4
         %41 = cast(array_to_ptrdecay) %29 : rec___va_list_tag*
-        va_end %41
+        va_end
         scope {
-            %50 = load %31 : s32i, align 4
-            %51 = const 0 : s32i
-            %52 = cmp lt %50, %51 : bool
-            if %52 {
-                %82 = const 0 : s32i
-                store %82, %31, align 4
-                yield
-            } else {
-                scope {
-                    %53 = load %31 : s32i, align 4
-                    %54 = cast(integral) %53 : u64i
-                    %55 = const 512 : u64i
-                    %56 = cmp ge %54, %55 : bool
-                    if %56 {
-                        %57 = const 512 : s32i
-                        store %57, %31, align 4
-                        %58 = const 10 : s8i
-                        %59 = load %31 : s32i, align 4
-                        %60 = const 1 : s32i
-                        %61 = sub %59, %60 : s32i [nsw]
-                        %62 = cast(integral) %61 : s64i
-                        %63 = get_element %30[%62] : s8i*
-                        store %58, %63, align 1
-                        %64 = const 46 : s8i
-                        %65 = load %31 : s32i, align 4
-                        %66 = const 2 : s32i
-                        %67 = sub %65, %66 : s32i [nsw]
-                        %68 = cast(integral) %67 : s64i
-                        %69 = get_element %30[%68] : s8i*
-                        store %64, %69, align 1
-                        %70 = const 46 : s8i
-                        %71 = load %31 : s32i, align 4
-                        %72 = const 3 : s32i
-                        %73 = sub %71, %72 : s32i [nsw]
-                        %74 = cast(integral) %73 : s64i
-                        %75 = get_element %30[%74] : s8i*
-                        store %70, %75, align 1
-                        %76 = const 46 : s8i
-                        %77 = load %31 : s32i, align 4
-                        %78 = const 4 : s32i
-                        %79 = sub %77, %78 : s32i [nsw]
-                        %80 = cast(integral) %79 : s64i
-                        %81 = get_element %30[%80] : s8i*
-                        store %76, %81, align 1
+                %50 = load %31 : s32i, align 4
+                %51 = const 0 : s32i
+                cmp
+                if %52 {
+                        %82 = const 0 : s32i
+                        store %82, %31, align 4
                         yield
-                    }
-                    yield
+                } else {
+                        scope {
+                                %53 = load %31 : s32i, align 4
+                                %54 = cast(integral) %53 : u64i
+                                %55 = const 512 : u64i
+                                cmp
+                                if %56 {
+                                        %57 = const 512 : s32i
+                                        store %57, %31, align 4
+                                        %58 = const 10 : s8i
+                                        %59 = load %31 : s32i, align 4
+                                        %60 = const 1 : s32i
+                                        sub
+                                        %62 = cast(integral) %61 : s64i
+                                        get_element
+                                        store %58, %63, align 1
+                                        %64 = const 46 : s8i
+                                        %65 = load %31 : s32i, align 4
+                                        %66 = const 2 : s32i
+                                        sub
+                                        %68 = cast(integral) %67 : s64i
+                                        get_element
+                                        store %64, %69, align 1
+                                        %70 = const 46 : s8i
+                                        %71 = load %31 : s32i, align 4
+                                        %72 = const 3 : s32i
+                                        sub
+                                        %74 = cast(integral) %73 : s64i
+                                        get_element
+                                        store %70, %75, align 1
+                                        %76 = const 46 : s8i
+                                        %77 = load %31 : s32i, align 4
+                                        %78 = const 4 : s32i
+                                        sub
+                                        %80 = cast(integral) %79 : s64i
+                                        get_element
+                                        store %76, %81, align 1
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %42 = const 1 : s32i
         %43 = cast(array_to_ptrdecay) %30 : s8i*
@@ -98,42 +98,42 @@ fn clock_gettime(%arg0: s32i, %arg1: rec_timespec*) -> s32i [external, c, nothro
 fn __errno_location() -> s32i* [external, c, const, nothrow];
 fn strerror(%arg0: s32i) -> s8i* [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_timespec, "ts", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 0 : s32i
-    %4 = call @clock_gettime(%3, %1) : s32i [all]
-    %5 = const 0 : s32i
-    %6 = cmp eq %4, %5 : bool
-    %7 = ternary %6 ? { : bool
-        %23 = call @__errno_location() : s32i* [const]
-        %24 = load %23 : s32i, align 4
-        %25 = const 0 : s32i
-        %26 = cmp eq %24, %25 : bool
-        yield %26
-    } : {
-        %22 = const false : bool
-        yield %22
-    }
-    %8 = ternary %7 ? { : bool
-        %21 = const true : bool
-        yield %21
-    } : {
-        %12 = get_global @.str : s8i[164]*
-        %13 = cast(array_to_ptrdecay) %12 : s8i*
-        %14 = get_global @strerror : ((s32i) -> s8i*)*
-        %15 = call @__errno_location() : s32i* [const]
-        %16 = load %15 : s32i, align 4
-        %17 = call @strerror(%16) : s8i* [all]
-        %18 = call @t_printf(%13, %17) : s32i [all]
-        %19 = const 0 : s32i
-        %20 = cast(int_to_bool) %19 : bool
-        yield %20
-    }
-    %9 = get_global @t_status : s32i*
-    %10 = load %9 : s32i, align 4, volatile
-    store %10, %0
-    %11 = load %0 : s32i
-    return %11
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_timespec, "ts", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 0 : s32i
+        %4 = call @clock_gettime(%3, %1) : s32i [all]
+        %5 = const 0 : s32i
+        cmp
+        %7 = ternary %6 ? { : bool
+                %23 = call @__errno_location() : s32i* [const]
+                %24 = load %23 : s32i, align 4
+                %25 = const 0 : s32i
+                cmp
+                yield %26
+        } : {
+                %22 = const false : bool
+                yield %22
+        }
+        %8 = ternary %7 ? { : bool
+                %21 = const true : bool
+                yield %21
+        } : {
+                %12 = get_global @.str : s8i[173]*
+                %13 = cast(array_to_ptrdecay) %12 : s8i*
+                %14 = get_global @strerror : (s32i) -> s8i**
+                %15 = call @__errno_location() : s32i* [const]
+                %16 = load %15 : s32i, align 4
+                %17 = call @strerror(%16) : s8i* [all]
+                %18 = call @t_printf(%13, %17) : s32i [all]
+                %19 = const 0 : s32i
+                %20 = cast(int_to_bool) %19 : bool
+                yield %20
+        }
+        %9 = get_global @t_status : s32i*
+        %10 = load %9 : s32i, align 4
+        store %10, %0
+        %11 = load %0 : s32i
+        return %11
 }

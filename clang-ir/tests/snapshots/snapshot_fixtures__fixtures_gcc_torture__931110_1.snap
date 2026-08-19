@@ -1,45 +1,45 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/931110-1.c" (c, x86_64-unknown-linux-gnu)
-global x : rec_anon2E0 = zero [external, default, align 4, dso_local]
+global x : rec_anon2E0 = Zero { ty: Named("rec_anon2E0") } [external, default, align 4, dso_local]
 
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    scope {
-        %6 = const 0 : s32i
-        store %6, %1, align 4
-        for cond: {
-            %17 = load %1 : s32i, align 4
-            %18 = const 10 : s32i
-            %19 = cmp lt %17, %18 : bool
-            condition %19
-        } step: {
-            %7 = load %1 : s32i, align 4
-            %8 = inc %7 : s32i [nsw]
-            store %8, %1, align 4
-            yield
-        } do {
-            %9 = const 0 : s16i
-            %10 = load %1 : s32i, align 4
-            %11 = cast(integral) %10 : s64i
-            %12 = get_global @x : rec_anon2E0*
-            %13 = get_member %12[1] "s" : rec_small[10]*
-            %14 = get_element %13[%11] : rec_small*
-            %15 = get_member %14[0] "f" : u16i*
-            %16 = set_bitfield %15, %9, "f": 3 bits @0 in signed u16i : s16i, align 2
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        scope {
+                %6 = const 0 : s32i
+                store %6, %1, align 4
+                for cond {
+                        %17 = load %1 : s32i, align 4
+                        %18 = const 10 : s32i
+                        cmp
+                        condition %19
+                } step {
+                        %7 = load %1 : s32i, align 4
+                        inc
+                        store %8, %1, align 4
+                        yield
+                } body {
+                        %9 = const 0 : s16i
+                        %10 = load %1 : s32i, align 4
+                        %11 = cast(integral) %10 : s64i
+                        %12 = get_global @x : rec_anon2E0*
+                        get_member
+                        get_element
+                        get_member
+                        set_bitfield
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %3 = get_global @exit : ((s32i) -> void)*
-    %4 = const 0 : s32i
-    call @exit(%4) [all]
-    %5 = load %0 : s32i
-    return %5
+        %3 = get_global @exit : (s32i) -> void*
+        %4 = const 0 : s32i
+        call @exit(%4) [all]
+        %5 = load %0 : s32i
+        return %5
 }

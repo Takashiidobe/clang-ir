@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/structs.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn sum_pair(%arg2: s32i, %arg3: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
@@ -15,14 +15,14 @@ fn sum_pair(%arg2: s32i, %arg3: s32i) -> s32i [internal, c, no_inline, dso_local
         store %arg2, %34
         store %arg3, %35
         %38 = load %34 : s32i, align 4
-        %39 = get_member %37[0] "left" : s32i*
+        get_member
         store %38, %39, align 4
         %40 = load %35 : s32i, align 4
-        %41 = get_member %37[1] "right" : s32i*
+        get_member
         store %40, %41, align 4
-        %42 = get_member %37[0] "left" : s32i*
+        get_member
         %43 = load %42 : s32i, align 4
-        %44 = get_member %37[1] "right" : s32i*
+        get_member
         %45 = load %44 : s32i, align 4
         %46 = add %43, %45 : s32i [nsw]
         store %46, %36
@@ -38,43 +38,43 @@ fn overwrite_left(%arg0: s32i, %arg1: s32i) -> s32i [internal, c, no_inline, dso
         store %arg0, %18
         store %arg1, %19
         %22 = load %18 : s32i, align 4
-        %23 = get_member %21[0] "left" : s32i*
+        get_member
         store %22, %23, align 4
         %24 = load %19 : s32i, align 4
-        %25 = get_member %21[1] "right" : s32i*
+        get_member
         store %24, %25, align 4
-        %26 = get_member %21[1] "right" : s32i*
+        get_member
         %27 = load %26 : s32i, align 4
         %28 = const 2 : s32i
         %29 = add %27, %28 : s32i [nsw]
-        %30 = get_member %21[0] "left" : s32i*
+        get_member
         store %29, %30, align 4
-        %31 = get_member %21[0] "left" : s32i*
+        get_member
         %32 = load %31 : s32i, align 4
         store %32, %20
         %33 = load %20 : s32i
         return %33
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[4]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = const 4 : s32i
-    %6 = const 5 : s32i
-    %7 = call @sum_pair(%5, %6) : s32i [all]
-    %8 = call @printf(%4, %7) : s32i [all]
-    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %10 = get_global @.str : s8i[4]*
-    %11 = cast(array_to_ptrdecay) %10 : s8i*
-    %12 = const 3 : s32i
-    %13 = const 8 : s32i
-    %14 = call @overwrite_left(%12, %13) : s32i [all]
-    %15 = call @printf(%11, %14) : s32i [all]
-    %16 = const 0 : s32i
-    store %16, %0
-    %17 = load %0 : s32i
-    return %17
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[4]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = const 4 : s32i
+        %6 = const 5 : s32i
+        %7 = call @sum_pair(%5, %6) : s32i [all]
+        %8 = call @printf(%4, %7) : s32i [all]
+        %9 = get_global @printf : (s8i*, ...) -> s32i*
+        %10 = get_global @.str : s8i[4]*
+        %11 = cast(array_to_ptrdecay) %10 : s8i*
+        %12 = const 3 : s32i
+        %13 = const 8 : s32i
+        %14 = call @overwrite_left(%12, %13) : s32i [all]
+        %15 = call @printf(%11, %14) : s32i [all]
+        %16 = const 0 : s32i
+        store %16, %0
+        %17 = load %0 : s32i
+        return %17
 }

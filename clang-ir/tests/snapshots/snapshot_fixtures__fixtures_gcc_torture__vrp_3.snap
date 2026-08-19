@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/vrp-3.c" (c, x86_64-unknown-linux-gnu)
@@ -9,49 +9,49 @@ fn f(%arg2: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %12 = alloca s32i, "__retval", align 4
         store %arg2, %11
         scope {
-            %15 = load %11 : s32i, align 4
-            %16 = const 12 : s32i
-            %17 = cmp lt %15, %16 : bool
-            if %17 {
-                scope {
-                    %18 = load %11 : s32i, align 4
-                    %19 = const -15 : s32i
-                    %20 = cmp gt %18, %19 : bool
-                    if %20 {
-                        %21 = load %11 : s32i, align 4
-                        %22 = const 0 : s32i
-                        %23 = cmp gt %21, %22 : bool
-                        %24 = ternary %23 ? { : s32i
-                            %34 = load %11 : s32i, align 4
-                            yield %34
-                        } : {
-                            %32 = load %11 : s32i, align 4
-                            %33 = minus %32 : s32i [nsw]
-                            yield %33
-                        }
-                        store %24, %11, align 4
+                %15 = load %11 : s32i, align 4
+                %16 = const 12 : s32i
+                cmp
+                if %17 {
                         scope {
-                            %27 = load %11 : s32i, align 4
-                            %28 = const 2 : s32i
-                            %29 = cmp eq %27, %28 : bool
-                            if %29 {
-                                %30 = const 0 : s32i
-                                store %30, %12
-                                %31 = load %12 : s32i
-                                return %31
-                            }
-                            yield
+                                %18 = load %11 : s32i, align 4
+                                %19 = const -15 : s32i
+                                cmp
+                                if %20 {
+                                        %21 = load %11 : s32i, align 4
+                                        %22 = const 0 : s32i
+                                        cmp
+                                        %24 = ternary %23 ? { : s32i
+                                                %34 = load %11 : s32i, align 4
+                                                yield %34
+                                        } : {
+                                                %32 = load %11 : s32i, align 4
+                                                minus
+                                                yield %33
+                                        }
+                                        store %24, %11, align 4
+                                        scope {
+                                                %27 = load %11 : s32i, align 4
+                                                %28 = const 2 : s32i
+                                                cmp
+                                                if %29 {
+                                                        %30 = const 0 : s32i
+                                                        store %30, %12
+                                                        %31 = load %12 : s32i
+                                                        return %31
+                                                }
+                                                yield
+                                        }
+                                        %25 = const 1 : s32i
+                                        store %25, %12
+                                        %26 = load %12 : s32i
+                                        return %26
+                                }
+                                yield
                         }
-                        %25 = const 1 : s32i
-                        store %25, %12
-                        %26 = load %12 : s32i
-                        return %26
-                    }
-                    yield
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %13 = const 1 : s32i
         store %13, %12
@@ -70,17 +70,17 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         %3 = const 0 : s32i
         store %3, %2
         scope {
-            %7 = const -2 : s32i
-            %8 = call @f(%7) : s32i [all]
-            %9 = cast(int_to_bool) %8 : bool
-            if %9 {
-                %10 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %7 = const -2 : s32i
+                %8 = call @f(%7) : s32i [all]
+                %9 = cast(int_to_bool) %8 : bool
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        %4 = get_global @exit : ((s32i) -> void)*
+        %4 = get_global @exit : (s32i) -> void*
         %5 = const 0 : s32i
         call @exit(%5) [all]
         %6 = load %2 : s32i

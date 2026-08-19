@@ -1,47 +1,47 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/stddef/ptrdiff.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.arr : s32i[5] = [0, 1, 2, 3, 4] [cir_private, default, dso_local, constant]
-global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+global __const.main.arr : s32i[5] = ConstArray { ty: Array { element_type: Named("s32i"), size: 5 }, elts: Array([CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "1" }, CirInt { ty: Named("s32i"), value: "2" }, CirInt { ty: Named("s32i"), value: "3" }, CirInt { ty: Named("s32i"), value: "4" }]), trailing_zeros_num: 0 } [cir_private, default, dso_local, constant]
+global .str : s8i[7] = ConstArray { ty: Array { element_type: Named("s8i"), size: 7 }, elts: Str("%d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i[5], "arr", align 16
-    %2 = alloca s32i*, "p", align 8
-    %3 = alloca s32i*, "q", align 8
-    %4 = alloca s64i, "d", align 8
-    %5 = alloca u64i, "n", align 8
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = get_global @__const.main.arr : s32i[5]*
-    copy %1, %7
-    %8 = const 1 : s64i
-    %9 = get_element %1[%8] : s32i*
-    store %9, %2, align 8
-    %10 = const 4 : s64i
-    %11 = get_element %1[%10] : s32i*
-    store %11, %3, align 8
-    %12 = load %3 : s32i*, align 8
-    %13 = load %2 : s32i*, align 8
-    %14 = ptr_diff %12, %13 : s64i
-    store %14, %4, align 8
-    %15 = const 20 : u64i
-    %16 = const 4 : u64i
-    %17 = div %15, %16 : u64i
-    store %17, %5, align 8
-    %18 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %19 = get_global @.str : s8i[7]*
-    %20 = cast(array_to_ptrdecay) %19 : s8i*
-    %21 = load %4 : s64i, align 8
-    %22 = cast(integral) %21 : s32i
-    %23 = load %5 : u64i, align 8
-    %24 = cast(integral) %23 : s32i
-    %25 = call @printf(%20, %22, %24) : s32i [all]
-    %26 = const 0 : s32i
-    store %26, %0
-    %27 = load %0 : s32i
-    return %27
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i[5], "arr", align 16
+        %2 = alloca s32i*, "p", align 8
+        %3 = alloca s32i*, "q", align 8
+        %4 = alloca s64i, "d", align 8
+        %5 = alloca u64i, "n", align 8
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = get_global @__const.main.arr : s32i[5]*
+        copy
+        %8 = const 1 : s64i
+        get_element
+        store %9, %2, align 8
+        %10 = const 4 : s64i
+        get_element
+        store %11, %3, align 8
+        %12 = load %3 : s32i*, align 8
+        %13 = load %2 : s32i*, align 8
+        ptr_diff
+        store %14, %4, align 8
+        %15 = const 20 : u64i
+        %16 = const 4 : u64i
+        div
+        store %17, %5, align 8
+        %18 = get_global @printf : (s8i*, ...) -> s32i*
+        %19 = get_global @.str : s8i[7]*
+        %20 = cast(array_to_ptrdecay) %19 : s8i*
+        %21 = load %4 : s64i, align 8
+        %22 = cast(integral) %21 : s32i
+        %23 = load %5 : u64i, align 8
+        %24 = cast(integral) %23 : s32i
+        %25 = call @printf(%20, %22, %24) : s32i [all]
+        %26 = const 0 : s32i
+        store %26, %0
+        %27 = load %0 : s32i
+        return %27
 }

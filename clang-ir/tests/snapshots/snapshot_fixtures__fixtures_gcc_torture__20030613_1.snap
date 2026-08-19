@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20030613-1.c" (c, x86_64-unknown-linux-gnu)
@@ -10,9 +10,9 @@ fn CPOW(%arg4: s64i, %arg5: s64i, %arg6: s32i) -> rec_anon_struct [internal, c, 
         %95 = alloca rec_CS, "coerce", align 8
         %96 = alloca rec_anon_struct, "coerce", align 8
         %97 = alloca rec_anon_struct, "coerce", align 8
-        %98 = get_member %97[0] "" : s64i*
+        get_member
         store %arg4, %98
-        %99 = get_member %97[1] "" : s64i*
+        get_member
         store %arg5, %99
         %100 = load %97 : rec_anon_struct
         store %100, %96
@@ -23,31 +23,31 @@ fn CPOW(%arg4: s64i, %arg5: s64i, %arg6: s32i) -> rec_anon_struct [internal, c, 
         %105 = alloca rec_CS, "__retval", align 8
         store %102, %103
         store %arg6, %104
-        copy %105, %103
+        copy
         scope {
-            while {
-                %118 = load %104 : s32i, align 4
-                %119 = dec %118 : s32i [nsw]
-                store %119, %104, align 4
-                %120 = const 0 : s32i
-                %121 = cmp gt %119, %120 : bool
-                condition %121
-            } do {
-                %109 = load %105 : rec_CS, align 8
-                store %109, %94
-                %110 = cast(bitcast) %94 : rec_anon_struct*
-                %111 = get_member %110[0] "" : s64i*
-                %112 = load %111 : s64i
-                %113 = get_member %110[1] "" : s64i*
-                %114 = load %113 : s64i
-                %115 = call @CCID(%112, %114) : rec_anon_struct [all]
-                store %115, %93
-                %116 = cast(bitcast) %93 : rec_CS*
-                %117 = load %116 : rec_CS
-                store %117, %105, align 8
+                while {
+                        %118 = load %104 : s32i, align 4
+                        dec
+                        store %119, %104, align 4
+                        %120 = const 0 : s32i
+                        cmp
+                        condition %121
+                } do {
+                        %109 = load %105 : rec_CS, align 8
+                        store %109, %94
+                        %110 = cast(bitcast) %94 : rec_anon_struct*
+                        get_member
+                        %112 = load %111 : s64i
+                        get_member
+                        %114 = load %113 : s64i
+                        %115 = call @CCID(%112, %114) : rec_anon_struct [all]
+                        store %115, %93
+                        %116 = cast(bitcast) %93 : rec_CS*
+                        %117 = load %116 : rec_CS
+                        store %117, %105, align 8
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %106 = load %105 : rec_CS
         store %106, %95
@@ -60,9 +60,9 @@ fn CCID(%arg2: s64i, %arg3: s64i) -> rec_anon_struct [internal, c, no_inline, ds
         %74 = alloca rec_CS, "coerce", align 8
         %75 = alloca rec_anon_struct, "coerce", align 8
         %76 = alloca rec_anon_struct, "coerce", align 8
-        %77 = get_member %76[0] "" : s64i*
+        get_member
         store %arg2, %77
-        %78 = get_member %76[1] "" : s64i*
+        get_member
         store %arg3, %78
         %79 = load %76 : rec_anon_struct
         store %79, %75
@@ -71,13 +71,13 @@ fn CCID(%arg2: s64i, %arg3: s64i) -> rec_anon_struct [internal, c, no_inline, ds
         %82 = alloca rec_CS, "x", align 8
         %83 = alloca rec_CS, "__retval", align 8
         store %81, %82
-        %84 = get_member %82[0] "x" : s64i*
+        get_member
         %85 = load %84 : s64i, align 8
-        %86 = get_member %83[0] "x" : s64i*
+        get_member
         store %85, %86, align 8
-        %87 = get_member %82[1] "y" : s64i*
+        get_member
         %88 = load %87 : s64i, align 8
-        %89 = get_member %83[1] "y" : s64i*
+        get_member
         store %88, %89, align 8
         %90 = load %83 : rec_CS
         store %90, %74
@@ -89,9 +89,9 @@ fn c5p(%arg0: s64i, %arg1: s64i) -> s32i [internal, c, no_inline, dso_local, not
     ^bb0(%arg0: s64i, %arg1: s64i):
         %20 = alloca rec_anon_struct, "coerce", align 8
         %21 = alloca rec_anon_struct, "coerce", align 8
-        %22 = get_member %21[0] "" : s64i*
+        get_member
         store %arg0, %22
-        %23 = get_member %21[1] "" : s64i*
+        get_member
         store %arg1, %23
         %24 = load %21 : rec_anon_struct
         store %24, %20
@@ -113,9 +113,9 @@ fn c5p(%arg0: s64i, %arg1: s64i) -> s32i [internal, c, no_inline, dso_local, not
         %39 = load %33 : rec_CS, align 8
         store %39, %32
         %40 = cast(bitcast) %32 : rec_anon_struct*
-        %41 = get_member %40[0] "" : s64i*
+        get_member
         %42 = load %41 : s64i
-        %43 = get_member %40[1] "" : s64i*
+        get_member
         %44 = load %43 : s64i
         %45 = call @CPOW(%42, %44, %38) : rec_anon_struct [all]
         store %45, %31
@@ -126,9 +126,9 @@ fn c5p(%arg0: s64i, %arg1: s64i) -> s32i [internal, c, no_inline, dso_local, not
         %49 = load %35 : rec_CS, align 8
         store %49, %30
         %50 = cast(bitcast) %30 : rec_anon_struct*
-        %51 = get_member %50[0] "" : s64i*
+        get_member
         %52 = load %51 : s64i
-        %53 = get_member %50[1] "" : s64i*
+        get_member
         %54 = load %53 : s64i
         %55 = call @CPOW(%52, %54, %48) : rec_anon_struct [all]
         store %55, %29
@@ -138,20 +138,20 @@ fn c5p(%arg0: s64i, %arg1: s64i) -> s32i [internal, c, no_inline, dso_local, not
         %58 = load %37 : rec_CS, align 8
         store %58, %28
         %59 = cast(bitcast) %28 : rec_anon_struct*
-        %60 = get_member %59[0] "" : s64i*
+        get_member
         %61 = load %60 : s64i
-        %62 = get_member %59[1] "" : s64i*
+        get_member
         %63 = load %62 : s64i
         %64 = call @CCID(%61, %63) : rec_anon_struct [all]
         store %64, %27
         %65 = cast(bitcast) %27 : rec_CS*
         %66 = load %65 : rec_CS
         store %66, %36, align 8
-        %67 = get_member %36[0] "x" : s64i*
+        get_member
         %68 = load %67 : s64i, align 8
-        %69 = get_member %36[1] "y" : s64i*
+        get_member
         %70 = load %69 : s64i, align 8
-        %71 = cmp eq %68, %70 : bool
+        cmp
         %72 = cast(bool_to_int) %71 : s32i
         store %72, %34
         %73 = load %34 : s32i
@@ -159,37 +159,37 @@ fn c5p(%arg0: s64i, %arg1: s64i) -> s32i [internal, c, no_inline, dso_local, not
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca rec_CS, "coerce", align 8
-    %1 = alloca s32i, "__retval", align 4
-    %2 = alloca rec_CS, "x", align 8
-    %3 = const 0 : s32i
-    store %3, %1
-    %4 = const -7 : s64i
-    %5 = get_member %2[0] "x" : s64i*
-    store %4, %5, align 8
-    %6 = const -7 : s64i
-    %7 = get_member %2[1] "y" : s64i*
-    store %6, %7, align 8
-    scope {
-        %10 = load %2 : rec_CS, align 8
-        store %10, %0
-        %11 = cast(bitcast) %0 : rec_anon_struct*
-        %12 = get_member %11[0] "" : s64i*
-        %13 = load %12 : s64i
-        %14 = get_member %11[1] "" : s64i*
-        %15 = load %14 : s64i
-        %16 = call @c5p(%13, %15) : s32i [all]
-        %17 = cast(int_to_bool) %16 : bool
-        %18 = not %17 : bool
-        if %18 {
-            %19 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca rec_CS, "coerce", align 8
+        %1 = alloca s32i, "__retval", align 4
+        %2 = alloca rec_CS, "x", align 8
+        %3 = const 0 : s32i
+        store %3, %1
+        %4 = const -7 : s64i
+        get_member
+        store %4, %5, align 8
+        %6 = const -7 : s64i
+        get_member
+        store %6, %7, align 8
+        scope {
+                %10 = load %2 : rec_CS, align 8
+                store %10, %0
+                %11 = cast(bitcast) %0 : rec_anon_struct*
+                get_member
+                %13 = load %12 : s64i
+                get_member
+                %15 = load %14 : s64i
+                %16 = call @c5p(%13, %15) : s32i [all]
+                %17 = cast(int_to_bool) %16 : bool
+                not
+                if %18 {
+                        %19 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %8 = const 0 : s32i
-    store %8, %1
-    %9 = load %1 : s32i
-    return %9
+        %8 = const 0 : s32i
+        store %8, %1
+        %9 = load %1 : s32i
+        return %9
 }

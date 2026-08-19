@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr20527-1.c" (c, x86_64-unknown-linux-gnu)
-global b : s64i[4] = [1, 5, 11, 23] [external, default, align 16, dso_local]
+global b : s64i[4] = ConstArray { ty: Array { element_type: Named("s64i"), size: 4 }, elts: Array([CirInt { ty: Named("s64i"), value: "1" }, CirInt { ty: Named("s64i"), value: "5" }, CirInt { ty: Named("s64i"), value: "11" }, CirInt { ty: Named("s64i"), value: "23" }]), trailing_zeros_num: 0 } [external, default, align 16, dso_local]
 
 fn f(%arg0: s64i*, %arg1: s64i*, %arg2: s64i, %arg3: s64i) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s64i*, %arg1: s64i*, %arg2: s64i, %arg3: s64i):
@@ -20,100 +20,100 @@ fn f(%arg0: s64i*, %arg1: s64i*, %arg2: s64i, %arg3: s64i) -> void [external, c,
         %37 = const 0 : s64i
         store %37, %36, align 8
         scope {
-            %38 = load %33 : s64i, align 8
-            store %38, %35, align 8
-            for cond: {
-                %60 = load %35 : s64i, align 8
-                %61 = load %34 : s64i, align 8
-                %62 = cmp le %60, %61 : bool
-                condition %62
-            } step: {
-                %39 = load %35 : s64i, align 8
-                %40 = inc %39 : s64i [nsw]
-                store %40, %35, align 8
-                yield
-            } do {
-                scope {
-                    %41 = load %35 : s64i, align 8
-                    %42 = const 1 : s64i
-                    %43 = add %41, %42 : s64i [nsw]
-                    %44 = load %32 : s64i*, align 8
-                    %45 = ptr_stride %44, %43 : s64i*
-                    %46 = load %45 : s64i, align 8
-                    %47 = load %35 : s64i, align 8
-                    %48 = load %32 : s64i*, align 8
-                    %49 = ptr_stride %48, %47 : s64i*
-                    %50 = load %49 : s64i, align 8
-                    %51 = sub %46, %50 : s64i [nsw]
-                    %52 = load %36 : s64i, align 8
-                    %53 = add %52, %51 : s64i [nsw]
-                    store %53, %36, align 8
-                    %54 = load %36 : s64i, align 8
-                    %55 = const 1 : s64i
-                    %56 = sub %54, %55 : s64i [nsw]
-                    %57 = load %35 : s64i, align 8
-                    %58 = load %31 : s64i*, align 8
-                    %59 = ptr_stride %58, %57 : s64i*
-                    store %56, %59, align 8
-                    yield
+                %38 = load %33 : s64i, align 8
+                store %38, %35, align 8
+                for cond {
+                        %60 = load %35 : s64i, align 8
+                        %61 = load %34 : s64i, align 8
+                        cmp
+                        condition %62
+                } step {
+                        %39 = load %35 : s64i, align 8
+                        inc
+                        store %40, %35, align 8
+                        yield
+                } body {
+                        scope {
+                                %41 = load %35 : s64i, align 8
+                                %42 = const 1 : s64i
+                                %43 = add %41, %42 : s64i [nsw]
+                                %44 = load %32 : s64i*, align 8
+                                ptr_stride
+                                %46 = load %45 : s64i, align 8
+                                %47 = load %35 : s64i, align 8
+                                %48 = load %32 : s64i*, align 8
+                                ptr_stride
+                                %50 = load %49 : s64i, align 8
+                                sub
+                                %52 = load %36 : s64i, align 8
+                                %53 = add %52, %51 : s64i [nsw]
+                                store %53, %36, align 8
+                                %54 = load %36 : s64i, align 8
+                                %55 = const 1 : s64i
+                                sub
+                                %57 = load %35 : s64i, align 8
+                                %58 = load %31 : s64i*, align 8
+                                ptr_stride
+                                store %56, %59, align 8
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s64i[3], "l", align 16
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = cast(array_to_ptrdecay) %1 : s64i*
-    %4 = get_global @b : s64i[4]*
-    %5 = cast(array_to_ptrdecay) %4 : s64i*
-    %6 = const 0 : s64i
-    %7 = const 2 : s64i
-    call @f(%3, %5, %6, %7) [all]
-    scope {
-        %11 = const 0 : s64i
-        %12 = get_element %1[%11] : s64i*
-        %13 = load %12 : s64i, align 16
-        %14 = const 3 : s64i
-        %15 = cmp ne %13, %14 : bool
-        %16 = ternary %15 ? { : bool
-            %30 = const true : bool
-            yield %30
-        } : {
-            %25 = const 1 : s64i
-            %26 = get_element %1[%25] : s64i*
-            %27 = load %26 : s64i, align 8
-            %28 = const 9 : s64i
-            %29 = cmp ne %27, %28 : bool
-            yield %29
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s64i[3], "l", align 16
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = cast(array_to_ptrdecay) %1 : s64i*
+        %4 = get_global @b : s64i[4]*
+        %5 = cast(array_to_ptrdecay) %4 : s64i*
+        %6 = const 0 : s64i
+        %7 = const 2 : s64i
+        call @f(%3, %5, %6, %7) [all]
+        scope {
+                %11 = const 0 : s64i
+                get_element
+                %13 = load %12 : s64i, align 16
+                %14 = const 3 : s64i
+                cmp
+                %16 = ternary %15 ? { : bool
+                        %30 = const true : bool
+                        yield %30
+                } : {
+                        %25 = const 1 : s64i
+                        get_element
+                        %27 = load %26 : s64i, align 8
+                        %28 = const 9 : s64i
+                        cmp
+                        yield %29
+                }
+                %17 = ternary %16 ? { : bool
+                        %24 = const true : bool
+                        yield %24
+                } : {
+                        %19 = const 2 : s64i
+                        get_element
+                        %21 = load %20 : s64i, align 16
+                        %22 = const 21 : s64i
+                        cmp
+                        yield %23
+                }
+                if %17 {
+                        %18 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        %17 = ternary %16 ? { : bool
-            %24 = const true : bool
-            yield %24
-        } : {
-            %19 = const 2 : s64i
-            %20 = get_element %1[%19] : s64i*
-            %21 = load %20 : s64i, align 16
-            %22 = const 21 : s64i
-            %23 = cmp ne %21, %22 : bool
-            yield %23
-        }
-        if %17 {
-            %18 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %8 = get_global @exit : ((s32i) -> void)*
-    %9 = const 0 : s32i
-    call @exit(%9) [all]
-    %10 = load %0 : s32i
-    return %10
+        %8 = get_global @exit : (s32i) -> void*
+        %9 = const 0 : s32i
+        call @exit(%9) [all]
+        %10 = load %0 : s32i
+        return %10
 }

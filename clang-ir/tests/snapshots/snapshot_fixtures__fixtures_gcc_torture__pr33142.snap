@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr33142.c" (c, x86_64-unknown-linux-gnu)
@@ -11,32 +11,32 @@ fn lisp_atan2(%arg0: s64i, %arg1: s64i) -> s32i [external, c, no_inline, dso_loc
         store %arg0, %13
         store %arg1, %14
         scope {
-            %18 = load %14 : s64i, align 8
-            %19 = const 0 : s64i
-            %20 = cmp le %18, %19 : bool
-            if %20 {
-                scope {
-                    %21 = load %13 : s64i, align 8
-                    %22 = const 0 : s64i
-                    %23 = cmp gt %21, %22 : bool
-                    if %23 {
-                        %24 = load %14 : s64i, align 8
-                        %25 = cast(integral) %24 : s32i
-                        %26 = abs %25 : s32i [poison]
-                        %27 = load %13 : s64i, align 8
-                        %28 = cast(integral) %27 : s32i
-                        %29 = abs %28 : s32i [poison]
-                        %30 = cmp le %26, %29 : bool
-                        %31 = cast(bool_to_int) %30 : s32i
-                        store %31, %15
-                        %32 = load %15 : s32i
-                        return %32
-                    }
-                    yield
+                %18 = load %14 : s64i, align 8
+                %19 = const 0 : s64i
+                cmp
+                if %20 {
+                        scope {
+                                %21 = load %13 : s64i, align 8
+                                %22 = const 0 : s64i
+                                cmp
+                                if %23 {
+                                        %24 = load %14 : s64i, align 8
+                                        %25 = cast(integral) %24 : s32i
+                                        abs
+                                        %27 = load %13 : s64i, align 8
+                                        %28 = cast(integral) %27 : s32i
+                                        abs
+                                        cmp
+                                        %31 = cast(bool_to_int) %30 : s32i
+                                        store %31, %15
+                                        %32 = load %15 : s32i
+                                        return %32
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %16 = const 0 : s32i
         store %16, %15
@@ -45,29 +45,29 @@ fn lisp_atan2(%arg0: s64i, %arg1: s64i) -> s32i [external, c, no_inline, dso_loc
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s64i, "dy", align 8
-    %2 = alloca s64i, "dx", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 63 : s64i
-    store %4, %1, align 8, volatile
-    %5 = const -77 : s64i
-    store %5, %2, align 8, volatile
-    scope {
-        %8 = load %1 : s64i, align 8, volatile
-        %9 = load %2 : s64i, align 8, volatile
-        %10 = call @lisp_atan2(%8, %9) : s32i [all]
-        %11 = cast(int_to_bool) %10 : bool
-        if %11 {
-            %12 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s64i, "dy", align 8
+        %2 = alloca s64i, "dx", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 63 : s64i
+        store %4, %1, align 8
+        %5 = const -77 : s64i
+        store %5, %2, align 8
+        scope {
+                %8 = load %1 : s64i, align 8
+                %9 = load %2 : s64i, align 8
+                %10 = call @lisp_atan2(%8, %9) : s32i [all]
+                %11 = cast(int_to_bool) %10 : bool
+                if %11 {
+                        %12 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

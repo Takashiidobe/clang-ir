@@ -1,44 +1,44 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr38422.c" (c, x86_64-unknown-linux-gnu)
-global s : rec_S = zero [external, default, align 4, dso_local]
+global s : rec_S = Zero { ty: Named("rec_S") } [external, default, align 4, dso_local]
 
 fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
-    %14 = const 2 : s32i
-    %15 = get_global @s : rec_S*
-    %16 = get_member %15[0] "s" : u32i*
-    %17 = get_bitfield %16, "s": 30 bits @0 in signed u32i : s32i, align 4
-    %18 = mul %17, %14 : s32i [nsw]
-    %19 = set_bitfield %16, %18, "s": 30 bits @0 in signed u32i : s32i, align 4
-    return
+        %14 = const 2 : s32i
+        %15 = get_global @s : rec_S*
+        get_member
+        get_bitfield
+        mul
+        set_bitfield
+        return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 24 : s32i
-    %3 = get_global @s : rec_S*
-    %4 = get_member %3[0] "s" : u32i*
-    %5 = set_bitfield %4, %2, "s": 30 bits @0 in signed u32i : s32i, align 4
-    call @foo() [all]
-    scope {
-        %8 = get_global @s : rec_S*
-        %9 = get_member %8[0] "s" : u32i*
-        %10 = get_bitfield %9, "s": 30 bits @0 in signed u32i : s32i, align 4
-        %11 = const 48 : s32i
-        %12 = cmp ne %10, %11 : bool
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 24 : s32i
+        %3 = get_global @s : rec_S*
+        get_member
+        set_bitfield
+        call @foo() [all]
+        scope {
+                %8 = get_global @s : rec_S*
+                get_member
+                get_bitfield
+                %11 = const 48 : s32i
+                cmp
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

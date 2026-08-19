@@ -1,224 +1,225 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20191023-1.c" (c, x86_64-unknown-linux-gnu)
-global j : s8i = 0 [external, default, align 1, dso_local]
-global k : s8i = 0 [external, default, align 1, dso_local]
-global i : s64i = 0 [external, default, align 8, dso_local]
-global g : s8i = 0 [external, default, align 1, dso_local]
-global h : s8i = 0 [external, default, align 1, dso_local]
-global e : s64i = 0 [external, default, align 8, dso_local]
-global b : s64i = 0 [external, default, align 8, dso_local]
-global c : s64i = 0 [external, default, align 8, dso_local]
-global d : s64i = 0 [external, default, align 8, dso_local]
-global f : s64i = 0 [external, default, align 8, dso_local]
-global aa : s32i* = #cir.ptr<null> [external, default, align 8, dso_local]
+global j : s8i = CirInt { ty: Named("s8i"), value: "0" } [external, default, align 1, dso_local]
+global k : s8i = CirInt { ty: Named("s8i"), value: "0" } [external, default, align 1, dso_local]
+global i : s64i = CirInt { ty: Named("s64i"), value: "0" } [external, default, align 8, dso_local]
+global g : s8i = CirInt { ty: Named("s8i"), value: "0" } [external, default, align 1, dso_local]
+global h : s8i = CirInt { ty: Named("s8i"), value: "0" } [external, default, align 1, dso_local]
+global e : s64i = CirInt { ty: Named("s64i"), value: "0" } [external, default, align 8, dso_local]
+global b : s64i = CirInt { ty: Named("s64i"), value: "0" } [external, default, align 8, dso_local]
+global c : s64i = CirInt { ty: Named("s64i"), value: "0" } [external, default, align 8, dso_local]
+global d : s64i = CirInt { ty: Named("s64i"), value: "0" } [external, default, align 8, dso_local]
+global f : s64i = CirInt { ty: Named("s64i"), value: "0" } [external, default, align 8, dso_local]
+global aa : s32i* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("s32i"), addr_space: None }) } [external, default, align 8, dso_local]
 
 fn aaa() -> void [internal, c, no_inline, dso_local, nothrow] {
-    return
+        return
 }
 fn see_me_here() -> void [internal, c, no_inline, dso_local, nothrow] {
-    return
+        return
 }
 fn abort() -> void [external, c, nothrow];
 fn error() -> void [internal, c, no_inline, dso_local, nothrow] {
-    call @abort() [all]
-    return
+        call @abort() [all]
+        return
 }
 fn a() -> void [internal, c, no_inline, dso_local, nothrow] {
-    %21 = alloca s64i, "am", align 8
-    %22 = alloca s64i, "ao", align 8
-    scope {
-        %68 = get_global @aa : s32i**
-        %69 = load %68 : s32i*, align 8
-        %70 = const #cir.ptr<null> : s32i*
-        %71 = cmp eq %69, %70 : bool
-        if %71 {
-            call @aaa() [all]
-            scope {
-                %72 = get_global @j : s8i*
-                %73 = load %72 : s8i, align 1
-                %74 = cast(int_to_bool) %73 : bool
-                if %74 {
-                    goto ay
+        %21 = alloca s64i, "am", align 8
+        %22 = alloca s64i, "ao", align 8
+        scope {
+                %68 = get_global @aa : s32i**
+                %69 = load %68 : s32i*, align 8
+                %70 = const #cir.ptr<null> : s32i*
+                cmp
+                if %71 {
+                        call @aaa() [all]
+                        scope {
+                                %72 = get_global @j : s8i*
+                                %73 = load %72 : s8i, align 1
+                                %74 = cast(int_to_bool) %73 : bool
+                                if %74 {
+                                        goto ay
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    return
-    ^bb1():
+        return
+    ^bb1:
         label ay:
         call @aaa() [all]
         scope {
-            %65 = get_global @k : s8i*
-            %66 = load %65 : s8i, align 1
-            %67 = cast(int_to_bool) %66 : bool
-            if %67 {
-                call @aaa() [all]
-                goto az
-            }
-            yield
-        }
-        return
-    ^bb2():
-        label az:
-        scope {
-            %53 = get_global @i : s64i*
-            %54 = load %53 : s64i, align 8
-            %55 = cast(int_to_bool) %54 : bool
-            if %55 {
-                scope {
-                    %56 = get_global @g : s8i*
-                    %57 = load %56 : s8i, align 1
-                    %58 = cast(int_to_bool) %57 : bool
-                    if %58 {
-                        scope {
-                            %59 = get_global @h : s8i*
-                            %60 = load %59 : s8i, align 1
-                            %61 = cast(int_to_bool) %60 : bool
-                            if %61 {
-                                scope {
-                                    %62 = get_global @e : s64i*
-                                    %63 = load %62 : s64i, align 8
-                                    %64 = cast(int_to_bool) %63 : bool
-                                    if %64 {
-                                        goto bd
-                                    }
-                                    yield
-                                }
-                                yield
-                            }
-                            yield
-                        }
-                        yield
-                    }
-                    yield
+                %65 = get_global @k : s8i*
+                %66 = load %65 : s8i, align 1
+                %67 = cast(int_to_bool) %66 : bool
+                if %67 {
+                        call @aaa() [all]
+                        goto az
                 }
                 yield
-            }
-            yield
         }
         return
-    ^bb3():
+    ^bb2:
+        label az:
+        scope {
+                %53 = get_global @i : s64i*
+                %54 = load %53 : s64i, align 8
+                %55 = cast(int_to_bool) %54 : bool
+                if %55 {
+                        scope {
+                                %56 = get_global @g : s8i*
+                                %57 = load %56 : s8i, align 1
+                                %58 = cast(int_to_bool) %57 : bool
+                                if %58 {
+                                        scope {
+                                                %59 = get_global @h : s8i*
+                                                %60 = load %59 : s8i, align 1
+                                                %61 = cast(int_to_bool) %60 : bool
+                                                if %61 {
+                                                        scope {
+                                                                %62 = get_global @e : s64i*
+                                                                %63 = load %62 : s64i, align 8
+                                                                %64 = cast(int_to_bool) %63 : bool
+                                                                if %64 {
+                                                                        goto bd
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
+                }
+                yield
+        }
+        return
+    ^bb3:
         label bd:
         %23 = const 0 : s64i
         store %23, %21, align 8
         scope {
-            while {
-                %49 = load %21 : s64i, align 8
-                %50 = get_global @e : s64i*
-                %51 = load %50 : s64i, align 8
-                %52 = cmp lt %49, %51 : bool
-                condition %52
-            } do {
-                scope {
-                    scope {
-                        %47 = get_global @c : s64i*
-                        %48 = load %47 : s64i, align 8
-                        switch %48 {
-                            case equal 8 {
-                                goto bh
-                            }
-                            case equal 4 {
-                                return
-                            }
-                        }
-                        yield
-                    }
-                    br ^bb1
-                    ^bb1():
-                        label bh:
+                while {
+                        %49 = load %21 : s64i, align 8
+                        %50 = get_global @e : s64i*
+                        %51 = load %50 : s64i, align 8
+                        cmp
+                        condition %52
+                } do {
                         scope {
-                            %41 = load %21 : s64i, align 8
-                            %42 = const 0 : s64i
-                            %43 = cmp ge %41, %42 : bool
-                            if %43 {
-                                %44 = load %21 : s64i, align 8
-                                %45 = minus %44 : s64i [nsw]
-                                %46 = get_global @b : s64i*
-                                store %45, %46, align 8
+                                scope {
+                                        %47 = get_global @c : s64i*
+                                        %48 = load %47 : s64i, align 8
+                                        switch %48 {
+                                                case equal [8] {
+                                                        goto bh
+                                                }
+                                                case equal [4] {
+                                                        return
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
+                                br ^bb1
+                            ^bb1:
+                                label bh:
+                                scope {
+                                        %41 = load %21 : s64i, align 8
+                                        %42 = const 0 : s64i
+                                        cmp
+                                        if %43 {
+                                                %44 = load %21 : s64i, align 8
+                                                minus
+                                                %46 = get_global @b : s64i*
+                                                store %45, %46, align 8
+                                                yield
+                                        }
+                                        yield
+                                }
+                                %24 = load %21 : s64i, align 8
+                                %25 = get_global @b : s64i*
+                                %26 = load %25 : s64i, align 8
+                                %27 = add %24, %26 : s64i [nsw]
+                                store %27, %22, align 8
+                                %28 = load %22 : s64i, align 8
+                                %29 = const 7 : s64i
+                                and
+                                %31 = get_global @f : s64i*
+                                store %30, %31, align 8
+                                scope {
+                                        %37 = get_global @f : s64i*
+                                        %38 = load %37 : s64i, align 8
+                                        %39 = const 0 : s64i
+                                        cmp
+                                        if %40 {
+                                                call @see_me_here() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                scope {
+                                        %32 = load %22 : s64i, align 8
+                                        %33 = const 0 : s64i
+                                        cmp
+                                        if %34 {
+                                                %35 = load %21 : s64i, align 8
+                                                inc
+                                                store %36, %21, align 8
+                                                yield
+                                        } else {
+                                                call @error() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
                                 yield
-                            }
-                            yield
-                        }
-                        %24 = load %21 : s64i, align 8
-                        %25 = get_global @b : s64i*
-                        %26 = load %25 : s64i, align 8
-                        %27 = add %24, %26 : s64i [nsw]
-                        store %27, %22, align 8
-                        %28 = load %22 : s64i, align 8
-                        %29 = const 7 : s64i
-                        %30 = and %28, %29 : s64i
-                        %31 = get_global @f : s64i*
-                        store %30, %31, align 8
-                        scope {
-                            %37 = get_global @f : s64i*
-                            %38 = load %37 : s64i, align 8
-                            %39 = const 0 : s64i
-                            %40 = cmp eq %38, %39 : bool
-                            if %40 {
-                                call @see_me_here() [all]
-                                yield
-                            }
-                            yield
-                        }
-                        scope {
-                            %32 = load %22 : s64i, align 8
-                            %33 = const 0 : s64i
-                            %34 = cmp ge %32, %33 : bool
-                            if %34 {
-                                %35 = load %21 : s64i, align 8
-                                %36 = inc %35 : s64i [nsw]
-                                store %36, %21, align 8
-                                yield
-                            } else {
-                                call @error() [all]
-                                yield
-                            }
-                            yield
                         }
                         yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @j : s8i*
-    %3 = load %2 : s8i, align 1
-    %4 = inc %3 : s8i
-    store %4, %2, align 1
-    %5 = get_global @k : s8i*
-    %6 = load %5 : s8i, align 1
-    %7 = inc %6 : s8i
-    store %7, %5, align 1
-    %8 = get_global @i : s64i*
-    %9 = load %8 : s64i, align 8
-    %10 = inc %9 : s64i [nsw]
-    store %10, %8, align 8
-    %11 = get_global @g : s8i*
-    %12 = load %11 : s8i, align 1
-    %13 = inc %12 : s8i
-    store %13, %11, align 1
-    %14 = get_global @h : s8i*
-    %15 = load %14 : s8i, align 1
-    %16 = inc %15 : s8i
-    store %16, %14, align 1
-    %17 = const 1 : s64i
-    %18 = get_global @e : s64i*
-    store %17, %18, align 8
-    call @a() [all]
-    %19 = const 0 : s32i
-    store %19, %0
-    %20 = load %0 : s32i
-    return %20
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @j : s8i*
+        %3 = load %2 : s8i, align 1
+        inc
+        store %4, %2, align 1
+        %5 = get_global @k : s8i*
+        %6 = load %5 : s8i, align 1
+        inc
+        store %7, %5, align 1
+        %8 = get_global @i : s64i*
+        %9 = load %8 : s64i, align 8
+        inc
+        store %10, %8, align 8
+        %11 = get_global @g : s8i*
+        %12 = load %11 : s8i, align 1
+        inc
+        store %13, %11, align 1
+        %14 = get_global @h : s8i*
+        %15 = load %14 : s8i, align 1
+        inc
+        store %16, %14, align 1
+        %17 = const 1 : s64i
+        %18 = get_global @e : s64i*
+        store %17, %18, align 8
+        call @a() [all]
+        %19 = const 0 : s32i
+        store %19, %0
+        %20 = load %0 : s32i
+        return %20
 }

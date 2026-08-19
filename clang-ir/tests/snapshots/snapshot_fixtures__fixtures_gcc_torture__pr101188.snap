@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr101188.c" (c, x86_64-unknown-linux-gnu)
-global x : u16i = 0 [external, default, align 2, dso_local]
-global myfn2_called : u8i = 0 [internal, default, align 1, dso_local]
+global x : u16i = CirInt { ty: Named("u16i"), value: "0" } [external, default, align 2, dso_local]
+global myfn2_called : u8i = CirInt { ty: Named("u8i"), value: "0" } [internal, default, align 1, dso_local]
 
 fn foo(%arg4: u16i) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg4: u16i):
@@ -12,7 +12,7 @@ fn foo(%arg4: u16i) -> void [external, c, no_inline, dso_local, nothrow] {
         store %arg4, %50
         %51 = load %50 : u16i, align 2
         %52 = get_global @x : u16i*
-        store %51, %52, align 2, volatile
+        store %51, %52, align 2
         return
 }
 fn testfn(%arg3: rec_S*) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -21,32 +21,32 @@ fn testfn(%arg3: rec_S*) -> void [external, c, no_inline, dso_local, nothrow] {
         %25 = alloca s32i, "arg", align 4
         store %arg3, %24
         %26 = load %24 : rec_S*, align 8
-        %27 = get_member %26[1] "n" : u16i*
+        get_member
         %28 = load %27 : u16i, align 8
         call @foo(%28) [all]
         %29 = load %24 : rec_S*, align 8
-        %30 = get_member %29[1] "n" : u16i*
+        get_member
         %31 = load %30 : u16i, align 8
-        %32 = inc %31 : u16i
+        inc
         store %32, %30, align 8
         %33 = load %24 : rec_S*, align 8
-        %34 = get_member %33[2] "f2" : ((void*, s32i*) -> void)**
-        %35 = load %34 : ((void*, s32i*) -> void)*, align 8
+        get_member
+        %35 = load %34 : (void*, s32i*) -> void*, align 8
         %36 = load %24 : rec_S*, align 8
-        %37 = get_member %36[3] "a" : void**
+        get_member
         %38 = load %37 : void*, align 8
-        call %35(%38, %25) [all]
+        call (%38, %25) [all]
         %39 = load %24 : rec_S*, align 8
-        %40 = get_member %39[4] "f1" : ((void*) -> u8i)**
-        %41 = load %40 : ((void*) -> u8i)*, align 8
+        get_member
+        %41 = load %40 : (void*) -> u8i*, align 8
         %42 = load %24 : rec_S*, align 8
-        %43 = get_member %42[3] "a" : void**
+        get_member
         %44 = load %43 : void*, align 8
-        %45 = call %41(%44) : u8i [all]
+        %45 = call (%44) : u8i [all]
         %46 = const 0 : s64i
         %47 = load %24 : rec_S*, align 8
-        %48 = get_member %47[0] "buffer" : u8i[64]*
-        %49 = get_element %48[%46] : u8i*
+        get_member
+        get_element
         store %45, %49, align 8
         return
 }
@@ -73,34 +73,34 @@ fn myfn1(%arg0: void*) -> u8i [internal, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_S, "s", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 0 : u16i
-    %4 = get_member %1[1] "n" : u16i*
-    store %3, %4, align 8
-    %5 = get_global @myfn2 : ((void*, s32i*) -> void)*
-    %6 = get_member %1[2] "f2" : ((void*, s32i*) -> void)**
-    store %5, %6, align 8
-    %7 = get_global @myfn1 : ((void*) -> u8i)*
-    %8 = get_member %1[4] "f1" : ((void*) -> u8i)**
-    store %7, %8, align 8
-    call @testfn(%1) [all]
-    scope {
-        %11 = get_global @myfn2_called : u8i*
-        %12 = load %11 : u8i, align 1
-        %13 = cast(integral) %12 : s32i
-        %14 = const 1 : s32i
-        %15 = cmp ne %13, %14 : bool
-        if %15 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_S, "s", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 0 : u16i
+        get_member
+        store %3, %4, align 8
+        %5 = get_global @myfn2 : (void*, s32i*) -> void*
+        get_member
+        store %5, %6, align 8
+        %7 = get_global @myfn1 : (void*) -> u8i*
+        get_member
+        store %7, %8, align 8
+        call @testfn(%1) [all]
+        scope {
+                %11 = get_global @myfn2_called : u8i*
+                %12 = load %11 : u8i, align 1
+                %13 = cast(integral) %12 : s32i
+                %14 = const 1 : s32i
+                cmp
+                if %15 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %9 = const 0 : s32i
-    store %9, %0
-    %10 = load %0 : s32i
-    return %10
+        %9 = const 0 : s32i
+        store %9, %0
+        %10 = load %0 : s32i
+        return %10
 }

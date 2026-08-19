@@ -1,38 +1,38 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/math/hypot_copysign.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[16] = "%.6f %.6f %.6f\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[16] = ConstArray { ty: Array { element_type: Named("s8i"), size: 16 }, elts: Str("%.6f %.6f %.6f\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn hypot(%arg0: double, %arg1: double) -> double [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca double, "x", align 8
-    %2 = alloca double, "y", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const -3.000000e+00 : double
-    store %4, %1, align 8
-    %5 = const 4.000000e+00 : double
-    store %5, %2, align 8
-    %6 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %7 = get_global @.str : s8i[16]*
-    %8 = cast(array_to_ptrdecay) %7 : s8i*
-    %9 = get_global @hypot : ((double, double) -> double)*
-    %10 = load %1 : double, align 8
-    %11 = load %2 : double, align 8
-    %12 = call @hypot(%10, %11) : double [all]
-    %13 = load %1 : double, align 8
-    %14 = load %2 : double, align 8
-    %15 = copysign %13, %14 : double
-    %16 = load %2 : double, align 8
-    %17 = load %1 : double, align 8
-    %18 = copysign %16, %17 : double
-    %19 = call @printf(%8, %12, %15, %18) : s32i [all]
-    %20 = const 0 : s32i
-    store %20, %0
-    %21 = load %0 : s32i
-    return %21
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca double, "x", align 8
+        %2 = alloca double, "y", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const -3.000000e+00 : double
+        store %4, %1, align 8
+        %5 = const 4.000000e+00 : double
+        store %5, %2, align 8
+        %6 = get_global @printf : (s8i*, ...) -> s32i*
+        %7 = get_global @.str : s8i[16]*
+        %8 = cast(array_to_ptrdecay) %7 : s8i*
+        %9 = get_global @hypot : (double, double) -> double*
+        %10 = load %1 : double, align 8
+        %11 = load %2 : double, align 8
+        %12 = call @hypot(%10, %11) : double [all]
+        %13 = load %1 : double, align 8
+        %14 = load %2 : double, align 8
+        copysign
+        %16 = load %2 : double, align 8
+        %17 = load %1 : double, align 8
+        copysign
+        %19 = call @printf(%8, %12, %15, %18) : s32i [all]
+        %20 = const 0 : s32i
+        store %20, %0
+        %21 = load %0 : s32i
+        return %21
 }

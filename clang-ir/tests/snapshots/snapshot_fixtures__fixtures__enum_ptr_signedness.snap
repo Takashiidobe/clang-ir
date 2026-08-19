@@ -1,53 +1,53 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/enum_ptr_signedness.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.data : u32i[3] = [0, 1, 2] [cir_private, default, dso_local, constant]
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global __const.main.data : u32i[3] = ConstArray { ty: Array { element_type: Named("u32i"), size: 3 }, elts: Array([CirInt { ty: Named("u32i"), value: "0" }, CirInt { ty: Named("u32i"), value: "1" }, CirInt { ty: Named("u32i"), value: "2" }]), trailing_zeros_num: 0 } [cir_private, default, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u32i[3], "data", align 4
-    %2 = alloca rec_palette, "p", align 8
-    %3 = alloca u32i, "c", align 4
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = get_global @__const.main.data : u32i[3]*
-    copy %1, %5
-    %6 = cast(array_to_ptrdecay) %1 : u32i*
-    %7 = get_member %2[0] "start" : u32i**
-    store %6, %7, align 8
-    %8 = cast(array_to_ptrdecay) %1 : u32i*
-    %9 = const 3 : s32i
-    %10 = ptr_stride %8, %9 : u32i*
-    %11 = get_member %2[1] "top" : u32i**
-    store %10, %11, align 8
-    %12 = get_member %2[0] "start" : u32i**
-    %13 = load %12 : u32i*, align 8
-    %14 = const 1 : s32i
-    %15 = ptr_stride %13, %14 : u32i*
-    %16 = load %15 : u32i, align 4
-    store %16, %3, align 4
-    %17 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %18 = get_global @.str : s8i[4]*
-    %19 = cast(array_to_ptrdecay) %18 : s8i*
-    %20 = load %3 : u32i, align 4
-    %21 = cast(integral) %20 : s32i
-    %22 = call @printf(%19, %21) : s32i [all]
-    %23 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %24 = get_global @.str : s8i[4]*
-    %25 = cast(array_to_ptrdecay) %24 : s8i*
-    %26 = get_member %2[1] "top" : u32i**
-    %27 = load %26 : u32i*, align 8
-    %28 = get_member %2[0] "start" : u32i**
-    %29 = load %28 : u32i*, align 8
-    %30 = ptr_diff %27, %29 : s64i
-    %31 = cast(integral) %30 : s32i
-    %32 = call @printf(%25, %31) : s32i [all]
-    %33 = const 0 : s32i
-    store %33, %0
-    %34 = load %0 : s32i
-    return %34
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u32i[3], "data", align 4
+        %2 = alloca rec_palette, "p", align 8
+        %3 = alloca u32i, "c", align 4
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = get_global @__const.main.data : u32i[3]*
+        copy
+        %6 = cast(array_to_ptrdecay) %1 : u32i*
+        get_member
+        store %6, %7, align 8
+        %8 = cast(array_to_ptrdecay) %1 : u32i*
+        %9 = const 3 : s32i
+        ptr_stride
+        get_member
+        store %10, %11, align 8
+        get_member
+        %13 = load %12 : u32i*, align 8
+        %14 = const 1 : s32i
+        ptr_stride
+        %16 = load %15 : u32i, align 4
+        store %16, %3, align 4
+        %17 = get_global @printf : (s8i*, ...) -> s32i*
+        %18 = get_global @.str : s8i[4]*
+        %19 = cast(array_to_ptrdecay) %18 : s8i*
+        %20 = load %3 : u32i, align 4
+        %21 = cast(integral) %20 : s32i
+        %22 = call @printf(%19, %21) : s32i [all]
+        %23 = get_global @printf : (s8i*, ...) -> s32i*
+        %24 = get_global @.str : s8i[4]*
+        %25 = cast(array_to_ptrdecay) %24 : s8i*
+        get_member
+        %27 = load %26 : u32i*, align 8
+        get_member
+        %29 = load %28 : u32i*, align 8
+        ptr_diff
+        %31 = cast(integral) %30 : s32i
+        %32 = call @printf(%25, %31) : s32i [all]
+        %33 = const 0 : s32i
+        store %33, %0
+        %34 = load %0 : s32i
+        return %34
 }

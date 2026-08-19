@@ -1,27 +1,27 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/global_bool.c" (c, x86_64-unknown-linux-gnu)
-global enabled : bool = true [external, default, align 1, dso_local]
-global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
-global disabled : bool = false [internal, default, align 1, dso_local]
+global enabled : bool = CirBool { ty: Bool, value: true } [external, default, align 1, dso_local]
+global .str : s8i[7] = ConstArray { ty: Array { element_type: Named("s8i"), size: 7 }, elts: Str("%d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global disabled : bool = CirBool { ty: Bool, value: false } [internal, default, align 1, dso_local]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[7]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = get_global @enabled : bool*
-    %6 = load %5 : bool, align 1
-    %7 = cast(bool_to_int) %6 : s32i
-    %8 = get_global @disabled : bool*
-    %9 = load %8 : bool, align 1
-    %10 = cast(bool_to_int) %9 : s32i
-    %11 = call @printf(%4, %7, %10) : s32i [all]
-    %12 = load %0 : s32i
-    return %12
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[7]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = get_global @enabled : bool*
+        %6 = load %5 : bool, align 1
+        %7 = cast(bool_to_int) %6 : s32i
+        %8 = get_global @disabled : bool*
+        %9 = load %8 : bool, align 1
+        %10 = cast(bool_to_int) %9 : s32i
+        %11 = call @printf(%4, %7, %10) : s32i [all]
+        %12 = load %0 : s32i
+        return %12
 }

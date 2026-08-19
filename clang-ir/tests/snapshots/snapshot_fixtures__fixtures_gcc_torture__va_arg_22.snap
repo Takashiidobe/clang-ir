@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/va-arg-22.c" (c, x86_64-unknown-linux-gnu)
-global bar.lastc : s32i = -1 [internal, default, align 4, dso_local]
-global bar.lastn : s32i = -1 [internal, default, align 4, dso_local]
+global bar.lastc : s32i = CirInt { ty: Named("s32i"), value: "-1" } [internal, default, align 4, dso_local]
+global bar.lastn : s32i = CirInt { ty: Named("s32i"), value: "-1" } [internal, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn bar(%arg1: s32i, %arg2: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -16,48 +16,48 @@ fn bar(%arg1: s32i, %arg2: s32i) -> void [external, c, no_inline, dso_local, not
         %789 = get_global @bar.lastn : s32i*
         %790 = get_global @bar.lastc : s32i*
         scope {
-            %803 = load %789 : s32i, align 4
-            %804 = load %787 : s32i, align 4
-            %805 = cmp ne %803, %804 : bool
-            if %805 {
-                scope {
-                    %808 = load %790 : s32i, align 4
-                    %809 = load %789 : s32i, align 4
-                    %810 = cmp ne %808, %809 : bool
-                    if %810 {
-                        %811 = get_global @abort : (() -> void)*
-                        call @abort() [all]
+                %803 = load %789 : s32i, align 4
+                %804 = load %787 : s32i, align 4
+                cmp
+                if %805 {
+                        scope {
+                                %808 = load %790 : s32i, align 4
+                                %809 = load %789 : s32i, align 4
+                                cmp
+                                if %810 {
+                                        %811 = get_global @abort : () -> void*
+                                        call @abort() [all]
+                                        yield
+                                }
+                                yield
+                        }
+                        %806 = const 0 : s32i
+                        store %806, %790, align 4
+                        %807 = load %787 : s32i, align 4
+                        store %807, %789, align 4
                         yield
-                    }
-                    yield
                 }
-                %806 = const 0 : s32i
-                store %806, %790, align 4
-                %807 = load %787 : s32i, align 4
-                store %807, %789, align 4
                 yield
-            }
-            yield
         }
         scope {
-            %793 = load %788 : s32i, align 4
-            %794 = load %790 : s32i, align 4
-            %795 = load %787 : s32i, align 4
-            %796 = const 3 : s32i
-            %797 = shift left %795, %796 : s32i
-            %798 = xor %794, %797 : s32i
-            %799 = cast(integral) %798 : s8i
-            %800 = cast(integral) %799 : s32i
-            %801 = cmp ne %793, %800 : bool
-            if %801 {
-                %802 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %793 = load %788 : s32i, align 4
+                %794 = load %790 : s32i, align 4
+                %795 = load %787 : s32i, align 4
+                %796 = const 3 : s32i
+                shift
+                xor
+                %799 = cast(integral) %798 : s8i
+                %800 = cast(integral) %799 : s32i
+                cmp
+                if %801 {
+                        %802 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %791 = load %790 : s32i, align 4
-        %792 = inc %791 : s32i [nsw]
+        inc
         store %792, %790, align 4
         return
 }
@@ -110,1370 +110,1370 @@ fn foo(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %465 = alloca rec_A72, "vaarg.tmp", align 1
         store %arg0, %421
         scope {
-            %783 = load %421 : s32i, align 4
-            %784 = const 21 : s32i
-            %785 = cmp ne %783, %784 : bool
-            if %785 {
-                %786 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %783 = load %421 : s32i, align 4
+                %784 = const 21 : s32i
+                cmp
+                if %785 {
+                        %786 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %466 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        va_start %466
+        va_start
         %467 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %468 = va_arg %467 : rec_A0
+        va_arg
         store %468, %445, align 1
-        copy %422, %445
+        copy
         scope {
-            %770 = const 0 : s32i
-            store %770, %444, align 4
-            for cond: {
-                %780 = load %444 : s32i, align 4
-                %781 = const 0 : s32i
-                %782 = cmp lt %780, %781 : bool
-                condition %782
-            } step: {
-                %771 = load %444 : s32i, align 4
-                %772 = inc %771 : s32i [nsw]
-                store %772, %444, align 4
+                %770 = const 0 : s32i
+                store %770, %444, align 4
+                for cond {
+                        %780 = load %444 : s32i, align 4
+                        %781 = const 0 : s32i
+                        cmp
+                        condition %782
+                } step {
+                        %771 = load %444 : s32i, align 4
+                        inc
+                        store %772, %444, align 4
+                        yield
+                } body {
+                        %773 = const 0 : s32i
+                        %774 = load %444 : s32i, align 4
+                        %775 = cast(integral) %774 : s64i
+                        get_member
+                        get_element
+                        %778 = load %777 : s8i, align 1
+                        %779 = cast(integral) %778 : s32i
+                        call @bar(%773, %779) [all]
+                        yield
+                }
                 yield
-            } do {
-                %773 = const 0 : s32i
-                %774 = load %444 : s32i, align 4
-                %775 = cast(integral) %774 : s64i
-                %776 = get_member %422[0] "x" : s8i[0]*
-                %777 = get_element %776[%775] : s8i*
-                %778 = load %777 : s8i, align 1
-                %779 = cast(integral) %778 : s32i
-                call @bar(%773, %779) [all]
-                yield
-            }
-            yield
         }
         %469 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %470 = va_arg %469 : rec_A1
+        va_arg
         store %470, %446, align 1
-        copy %423, %446
+        copy
         scope {
-            %757 = const 0 : s32i
-            store %757, %444, align 4
-            for cond: {
-                %767 = load %444 : s32i, align 4
-                %768 = const 1 : s32i
-                %769 = cmp lt %767, %768 : bool
-                condition %769
-            } step: {
-                %758 = load %444 : s32i, align 4
-                %759 = inc %758 : s32i [nsw]
-                store %759, %444, align 4
+                %757 = const 0 : s32i
+                store %757, %444, align 4
+                for cond {
+                        %767 = load %444 : s32i, align 4
+                        %768 = const 1 : s32i
+                        cmp
+                        condition %769
+                } step {
+                        %758 = load %444 : s32i, align 4
+                        inc
+                        store %759, %444, align 4
+                        yield
+                } body {
+                        %760 = const 1 : s32i
+                        %761 = load %444 : s32i, align 4
+                        %762 = cast(integral) %761 : s64i
+                        get_member
+                        get_element
+                        %765 = load %764 : s8i, align 1
+                        %766 = cast(integral) %765 : s32i
+                        call @bar(%760, %766) [all]
+                        yield
+                }
                 yield
-            } do {
-                %760 = const 1 : s32i
-                %761 = load %444 : s32i, align 4
-                %762 = cast(integral) %761 : s64i
-                %763 = get_member %423[0] "x" : s8i[1]*
-                %764 = get_element %763[%762] : s8i*
-                %765 = load %764 : s8i, align 1
-                %766 = cast(integral) %765 : s32i
-                call @bar(%760, %766) [all]
-                yield
-            }
-            yield
         }
         %471 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %472 = va_arg %471 : rec_A2
+        va_arg
         store %472, %447, align 1
-        copy %424, %447
+        copy
         scope {
-            %744 = const 0 : s32i
-            store %744, %444, align 4
-            for cond: {
-                %754 = load %444 : s32i, align 4
-                %755 = const 2 : s32i
-                %756 = cmp lt %754, %755 : bool
-                condition %756
-            } step: {
-                %745 = load %444 : s32i, align 4
-                %746 = inc %745 : s32i [nsw]
-                store %746, %444, align 4
+                %744 = const 0 : s32i
+                store %744, %444, align 4
+                for cond {
+                        %754 = load %444 : s32i, align 4
+                        %755 = const 2 : s32i
+                        cmp
+                        condition %756
+                } step {
+                        %745 = load %444 : s32i, align 4
+                        inc
+                        store %746, %444, align 4
+                        yield
+                } body {
+                        %747 = const 2 : s32i
+                        %748 = load %444 : s32i, align 4
+                        %749 = cast(integral) %748 : s64i
+                        get_member
+                        get_element
+                        %752 = load %751 : s8i, align 1
+                        %753 = cast(integral) %752 : s32i
+                        call @bar(%747, %753) [all]
+                        yield
+                }
                 yield
-            } do {
-                %747 = const 2 : s32i
-                %748 = load %444 : s32i, align 4
-                %749 = cast(integral) %748 : s64i
-                %750 = get_member %424[0] "x" : s8i[2]*
-                %751 = get_element %750[%749] : s8i*
-                %752 = load %751 : s8i, align 1
-                %753 = cast(integral) %752 : s32i
-                call @bar(%747, %753) [all]
-                yield
-            }
-            yield
         }
         %473 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %474 = va_arg %473 : rec_A3
+        va_arg
         store %474, %448, align 1
-        copy %425, %448
+        copy
         scope {
-            %731 = const 0 : s32i
-            store %731, %444, align 4
-            for cond: {
-                %741 = load %444 : s32i, align 4
-                %742 = const 3 : s32i
-                %743 = cmp lt %741, %742 : bool
-                condition %743
-            } step: {
-                %732 = load %444 : s32i, align 4
-                %733 = inc %732 : s32i [nsw]
-                store %733, %444, align 4
+                %731 = const 0 : s32i
+                store %731, %444, align 4
+                for cond {
+                        %741 = load %444 : s32i, align 4
+                        %742 = const 3 : s32i
+                        cmp
+                        condition %743
+                } step {
+                        %732 = load %444 : s32i, align 4
+                        inc
+                        store %733, %444, align 4
+                        yield
+                } body {
+                        %734 = const 3 : s32i
+                        %735 = load %444 : s32i, align 4
+                        %736 = cast(integral) %735 : s64i
+                        get_member
+                        get_element
+                        %739 = load %738 : s8i, align 1
+                        %740 = cast(integral) %739 : s32i
+                        call @bar(%734, %740) [all]
+                        yield
+                }
                 yield
-            } do {
-                %734 = const 3 : s32i
-                %735 = load %444 : s32i, align 4
-                %736 = cast(integral) %735 : s64i
-                %737 = get_member %425[0] "x" : s8i[3]*
-                %738 = get_element %737[%736] : s8i*
-                %739 = load %738 : s8i, align 1
-                %740 = cast(integral) %739 : s32i
-                call @bar(%734, %740) [all]
-                yield
-            }
-            yield
         }
         %475 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %476 = va_arg %475 : rec_A4
+        va_arg
         store %476, %449, align 1
-        copy %426, %449
+        copy
         scope {
-            %718 = const 0 : s32i
-            store %718, %444, align 4
-            for cond: {
-                %728 = load %444 : s32i, align 4
-                %729 = const 4 : s32i
-                %730 = cmp lt %728, %729 : bool
-                condition %730
-            } step: {
-                %719 = load %444 : s32i, align 4
-                %720 = inc %719 : s32i [nsw]
-                store %720, %444, align 4
+                %718 = const 0 : s32i
+                store %718, %444, align 4
+                for cond {
+                        %728 = load %444 : s32i, align 4
+                        %729 = const 4 : s32i
+                        cmp
+                        condition %730
+                } step {
+                        %719 = load %444 : s32i, align 4
+                        inc
+                        store %720, %444, align 4
+                        yield
+                } body {
+                        %721 = const 4 : s32i
+                        %722 = load %444 : s32i, align 4
+                        %723 = cast(integral) %722 : s64i
+                        get_member
+                        get_element
+                        %726 = load %725 : s8i, align 1
+                        %727 = cast(integral) %726 : s32i
+                        call @bar(%721, %727) [all]
+                        yield
+                }
                 yield
-            } do {
-                %721 = const 4 : s32i
-                %722 = load %444 : s32i, align 4
-                %723 = cast(integral) %722 : s64i
-                %724 = get_member %426[0] "x" : s8i[4]*
-                %725 = get_element %724[%723] : s8i*
-                %726 = load %725 : s8i, align 1
-                %727 = cast(integral) %726 : s32i
-                call @bar(%721, %727) [all]
-                yield
-            }
-            yield
         }
         %477 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %478 = va_arg %477 : rec_A5
+        va_arg
         store %478, %450, align 1
-        copy %427, %450
+        copy
         scope {
-            %705 = const 0 : s32i
-            store %705, %444, align 4
-            for cond: {
-                %715 = load %444 : s32i, align 4
-                %716 = const 5 : s32i
-                %717 = cmp lt %715, %716 : bool
-                condition %717
-            } step: {
-                %706 = load %444 : s32i, align 4
-                %707 = inc %706 : s32i [nsw]
-                store %707, %444, align 4
+                %705 = const 0 : s32i
+                store %705, %444, align 4
+                for cond {
+                        %715 = load %444 : s32i, align 4
+                        %716 = const 5 : s32i
+                        cmp
+                        condition %717
+                } step {
+                        %706 = load %444 : s32i, align 4
+                        inc
+                        store %707, %444, align 4
+                        yield
+                } body {
+                        %708 = const 5 : s32i
+                        %709 = load %444 : s32i, align 4
+                        %710 = cast(integral) %709 : s64i
+                        get_member
+                        get_element
+                        %713 = load %712 : s8i, align 1
+                        %714 = cast(integral) %713 : s32i
+                        call @bar(%708, %714) [all]
+                        yield
+                }
                 yield
-            } do {
-                %708 = const 5 : s32i
-                %709 = load %444 : s32i, align 4
-                %710 = cast(integral) %709 : s64i
-                %711 = get_member %427[0] "x" : s8i[5]*
-                %712 = get_element %711[%710] : s8i*
-                %713 = load %712 : s8i, align 1
-                %714 = cast(integral) %713 : s32i
-                call @bar(%708, %714) [all]
-                yield
-            }
-            yield
         }
         %479 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %480 = va_arg %479 : rec_A6
+        va_arg
         store %480, %451, align 1
-        copy %428, %451
+        copy
         scope {
-            %692 = const 0 : s32i
-            store %692, %444, align 4
-            for cond: {
-                %702 = load %444 : s32i, align 4
-                %703 = const 6 : s32i
-                %704 = cmp lt %702, %703 : bool
-                condition %704
-            } step: {
-                %693 = load %444 : s32i, align 4
-                %694 = inc %693 : s32i [nsw]
-                store %694, %444, align 4
+                %692 = const 0 : s32i
+                store %692, %444, align 4
+                for cond {
+                        %702 = load %444 : s32i, align 4
+                        %703 = const 6 : s32i
+                        cmp
+                        condition %704
+                } step {
+                        %693 = load %444 : s32i, align 4
+                        inc
+                        store %694, %444, align 4
+                        yield
+                } body {
+                        %695 = const 6 : s32i
+                        %696 = load %444 : s32i, align 4
+                        %697 = cast(integral) %696 : s64i
+                        get_member
+                        get_element
+                        %700 = load %699 : s8i, align 1
+                        %701 = cast(integral) %700 : s32i
+                        call @bar(%695, %701) [all]
+                        yield
+                }
                 yield
-            } do {
-                %695 = const 6 : s32i
-                %696 = load %444 : s32i, align 4
-                %697 = cast(integral) %696 : s64i
-                %698 = get_member %428[0] "x" : s8i[6]*
-                %699 = get_element %698[%697] : s8i*
-                %700 = load %699 : s8i, align 1
-                %701 = cast(integral) %700 : s32i
-                call @bar(%695, %701) [all]
-                yield
-            }
-            yield
         }
         %481 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %482 = va_arg %481 : rec_A7
+        va_arg
         store %482, %452, align 1
-        copy %429, %452
+        copy
         scope {
-            %679 = const 0 : s32i
-            store %679, %444, align 4
-            for cond: {
-                %689 = load %444 : s32i, align 4
-                %690 = const 7 : s32i
-                %691 = cmp lt %689, %690 : bool
-                condition %691
-            } step: {
-                %680 = load %444 : s32i, align 4
-                %681 = inc %680 : s32i [nsw]
-                store %681, %444, align 4
+                %679 = const 0 : s32i
+                store %679, %444, align 4
+                for cond {
+                        %689 = load %444 : s32i, align 4
+                        %690 = const 7 : s32i
+                        cmp
+                        condition %691
+                } step {
+                        %680 = load %444 : s32i, align 4
+                        inc
+                        store %681, %444, align 4
+                        yield
+                } body {
+                        %682 = const 7 : s32i
+                        %683 = load %444 : s32i, align 4
+                        %684 = cast(integral) %683 : s64i
+                        get_member
+                        get_element
+                        %687 = load %686 : s8i, align 1
+                        %688 = cast(integral) %687 : s32i
+                        call @bar(%682, %688) [all]
+                        yield
+                }
                 yield
-            } do {
-                %682 = const 7 : s32i
-                %683 = load %444 : s32i, align 4
-                %684 = cast(integral) %683 : s64i
-                %685 = get_member %429[0] "x" : s8i[7]*
-                %686 = get_element %685[%684] : s8i*
-                %687 = load %686 : s8i, align 1
-                %688 = cast(integral) %687 : s32i
-                call @bar(%682, %688) [all]
-                yield
-            }
-            yield
         }
         %483 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %484 = va_arg %483 : rec_A8
+        va_arg
         store %484, %453, align 1
-        copy %430, %453
+        copy
         scope {
-            %666 = const 0 : s32i
-            store %666, %444, align 4
-            for cond: {
-                %676 = load %444 : s32i, align 4
-                %677 = const 8 : s32i
-                %678 = cmp lt %676, %677 : bool
-                condition %678
-            } step: {
-                %667 = load %444 : s32i, align 4
-                %668 = inc %667 : s32i [nsw]
-                store %668, %444, align 4
+                %666 = const 0 : s32i
+                store %666, %444, align 4
+                for cond {
+                        %676 = load %444 : s32i, align 4
+                        %677 = const 8 : s32i
+                        cmp
+                        condition %678
+                } step {
+                        %667 = load %444 : s32i, align 4
+                        inc
+                        store %668, %444, align 4
+                        yield
+                } body {
+                        %669 = const 8 : s32i
+                        %670 = load %444 : s32i, align 4
+                        %671 = cast(integral) %670 : s64i
+                        get_member
+                        get_element
+                        %674 = load %673 : s8i, align 1
+                        %675 = cast(integral) %674 : s32i
+                        call @bar(%669, %675) [all]
+                        yield
+                }
                 yield
-            } do {
-                %669 = const 8 : s32i
-                %670 = load %444 : s32i, align 4
-                %671 = cast(integral) %670 : s64i
-                %672 = get_member %430[0] "x" : s8i[8]*
-                %673 = get_element %672[%671] : s8i*
-                %674 = load %673 : s8i, align 1
-                %675 = cast(integral) %674 : s32i
-                call @bar(%669, %675) [all]
-                yield
-            }
-            yield
         }
         %485 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %486 = va_arg %485 : rec_A9
+        va_arg
         store %486, %454, align 1
-        copy %431, %454
+        copy
         scope {
-            %653 = const 0 : s32i
-            store %653, %444, align 4
-            for cond: {
-                %663 = load %444 : s32i, align 4
-                %664 = const 9 : s32i
-                %665 = cmp lt %663, %664 : bool
-                condition %665
-            } step: {
-                %654 = load %444 : s32i, align 4
-                %655 = inc %654 : s32i [nsw]
-                store %655, %444, align 4
+                %653 = const 0 : s32i
+                store %653, %444, align 4
+                for cond {
+                        %663 = load %444 : s32i, align 4
+                        %664 = const 9 : s32i
+                        cmp
+                        condition %665
+                } step {
+                        %654 = load %444 : s32i, align 4
+                        inc
+                        store %655, %444, align 4
+                        yield
+                } body {
+                        %656 = const 9 : s32i
+                        %657 = load %444 : s32i, align 4
+                        %658 = cast(integral) %657 : s64i
+                        get_member
+                        get_element
+                        %661 = load %660 : s8i, align 1
+                        %662 = cast(integral) %661 : s32i
+                        call @bar(%656, %662) [all]
+                        yield
+                }
                 yield
-            } do {
-                %656 = const 9 : s32i
-                %657 = load %444 : s32i, align 4
-                %658 = cast(integral) %657 : s64i
-                %659 = get_member %431[0] "x" : s8i[9]*
-                %660 = get_element %659[%658] : s8i*
-                %661 = load %660 : s8i, align 1
-                %662 = cast(integral) %661 : s32i
-                call @bar(%656, %662) [all]
-                yield
-            }
-            yield
         }
         %487 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %488 = va_arg %487 : rec_A10
+        va_arg
         store %488, %455, align 1
-        copy %432, %455
+        copy
         scope {
-            %640 = const 0 : s32i
-            store %640, %444, align 4
-            for cond: {
-                %650 = load %444 : s32i, align 4
-                %651 = const 10 : s32i
-                %652 = cmp lt %650, %651 : bool
-                condition %652
-            } step: {
-                %641 = load %444 : s32i, align 4
-                %642 = inc %641 : s32i [nsw]
-                store %642, %444, align 4
+                %640 = const 0 : s32i
+                store %640, %444, align 4
+                for cond {
+                        %650 = load %444 : s32i, align 4
+                        %651 = const 10 : s32i
+                        cmp
+                        condition %652
+                } step {
+                        %641 = load %444 : s32i, align 4
+                        inc
+                        store %642, %444, align 4
+                        yield
+                } body {
+                        %643 = const 10 : s32i
+                        %644 = load %444 : s32i, align 4
+                        %645 = cast(integral) %644 : s64i
+                        get_member
+                        get_element
+                        %648 = load %647 : s8i, align 1
+                        %649 = cast(integral) %648 : s32i
+                        call @bar(%643, %649) [all]
+                        yield
+                }
                 yield
-            } do {
-                %643 = const 10 : s32i
-                %644 = load %444 : s32i, align 4
-                %645 = cast(integral) %644 : s64i
-                %646 = get_member %432[0] "x" : s8i[10]*
-                %647 = get_element %646[%645] : s8i*
-                %648 = load %647 : s8i, align 1
-                %649 = cast(integral) %648 : s32i
-                call @bar(%643, %649) [all]
-                yield
-            }
-            yield
         }
         %489 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %490 = va_arg %489 : rec_A11
+        va_arg
         store %490, %456, align 1
-        copy %433, %456
+        copy
         scope {
-            %627 = const 0 : s32i
-            store %627, %444, align 4
-            for cond: {
-                %637 = load %444 : s32i, align 4
-                %638 = const 11 : s32i
-                %639 = cmp lt %637, %638 : bool
-                condition %639
-            } step: {
-                %628 = load %444 : s32i, align 4
-                %629 = inc %628 : s32i [nsw]
-                store %629, %444, align 4
+                %627 = const 0 : s32i
+                store %627, %444, align 4
+                for cond {
+                        %637 = load %444 : s32i, align 4
+                        %638 = const 11 : s32i
+                        cmp
+                        condition %639
+                } step {
+                        %628 = load %444 : s32i, align 4
+                        inc
+                        store %629, %444, align 4
+                        yield
+                } body {
+                        %630 = const 11 : s32i
+                        %631 = load %444 : s32i, align 4
+                        %632 = cast(integral) %631 : s64i
+                        get_member
+                        get_element
+                        %635 = load %634 : s8i, align 1
+                        %636 = cast(integral) %635 : s32i
+                        call @bar(%630, %636) [all]
+                        yield
+                }
                 yield
-            } do {
-                %630 = const 11 : s32i
-                %631 = load %444 : s32i, align 4
-                %632 = cast(integral) %631 : s64i
-                %633 = get_member %433[0] "x" : s8i[11]*
-                %634 = get_element %633[%632] : s8i*
-                %635 = load %634 : s8i, align 1
-                %636 = cast(integral) %635 : s32i
-                call @bar(%630, %636) [all]
-                yield
-            }
-            yield
         }
         %491 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %492 = va_arg %491 : rec_A12
+        va_arg
         store %492, %457, align 1
-        copy %434, %457
+        copy
         scope {
-            %614 = const 0 : s32i
-            store %614, %444, align 4
-            for cond: {
-                %624 = load %444 : s32i, align 4
-                %625 = const 12 : s32i
-                %626 = cmp lt %624, %625 : bool
-                condition %626
-            } step: {
-                %615 = load %444 : s32i, align 4
-                %616 = inc %615 : s32i [nsw]
-                store %616, %444, align 4
+                %614 = const 0 : s32i
+                store %614, %444, align 4
+                for cond {
+                        %624 = load %444 : s32i, align 4
+                        %625 = const 12 : s32i
+                        cmp
+                        condition %626
+                } step {
+                        %615 = load %444 : s32i, align 4
+                        inc
+                        store %616, %444, align 4
+                        yield
+                } body {
+                        %617 = const 12 : s32i
+                        %618 = load %444 : s32i, align 4
+                        %619 = cast(integral) %618 : s64i
+                        get_member
+                        get_element
+                        %622 = load %621 : s8i, align 1
+                        %623 = cast(integral) %622 : s32i
+                        call @bar(%617, %623) [all]
+                        yield
+                }
                 yield
-            } do {
-                %617 = const 12 : s32i
-                %618 = load %444 : s32i, align 4
-                %619 = cast(integral) %618 : s64i
-                %620 = get_member %434[0] "x" : s8i[12]*
-                %621 = get_element %620[%619] : s8i*
-                %622 = load %621 : s8i, align 1
-                %623 = cast(integral) %622 : s32i
-                call @bar(%617, %623) [all]
-                yield
-            }
-            yield
         }
         %493 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %494 = va_arg %493 : rec_A13
+        va_arg
         store %494, %458, align 1
-        copy %435, %458
+        copy
         scope {
-            %601 = const 0 : s32i
-            store %601, %444, align 4
-            for cond: {
-                %611 = load %444 : s32i, align 4
-                %612 = const 13 : s32i
-                %613 = cmp lt %611, %612 : bool
-                condition %613
-            } step: {
-                %602 = load %444 : s32i, align 4
-                %603 = inc %602 : s32i [nsw]
-                store %603, %444, align 4
+                %601 = const 0 : s32i
+                store %601, %444, align 4
+                for cond {
+                        %611 = load %444 : s32i, align 4
+                        %612 = const 13 : s32i
+                        cmp
+                        condition %613
+                } step {
+                        %602 = load %444 : s32i, align 4
+                        inc
+                        store %603, %444, align 4
+                        yield
+                } body {
+                        %604 = const 13 : s32i
+                        %605 = load %444 : s32i, align 4
+                        %606 = cast(integral) %605 : s64i
+                        get_member
+                        get_element
+                        %609 = load %608 : s8i, align 1
+                        %610 = cast(integral) %609 : s32i
+                        call @bar(%604, %610) [all]
+                        yield
+                }
                 yield
-            } do {
-                %604 = const 13 : s32i
-                %605 = load %444 : s32i, align 4
-                %606 = cast(integral) %605 : s64i
-                %607 = get_member %435[0] "x" : s8i[13]*
-                %608 = get_element %607[%606] : s8i*
-                %609 = load %608 : s8i, align 1
-                %610 = cast(integral) %609 : s32i
-                call @bar(%604, %610) [all]
-                yield
-            }
-            yield
         }
         %495 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %496 = va_arg %495 : rec_A14
+        va_arg
         store %496, %459, align 1
-        copy %436, %459
+        copy
         scope {
-            %588 = const 0 : s32i
-            store %588, %444, align 4
-            for cond: {
-                %598 = load %444 : s32i, align 4
-                %599 = const 14 : s32i
-                %600 = cmp lt %598, %599 : bool
-                condition %600
-            } step: {
-                %589 = load %444 : s32i, align 4
-                %590 = inc %589 : s32i [nsw]
-                store %590, %444, align 4
+                %588 = const 0 : s32i
+                store %588, %444, align 4
+                for cond {
+                        %598 = load %444 : s32i, align 4
+                        %599 = const 14 : s32i
+                        cmp
+                        condition %600
+                } step {
+                        %589 = load %444 : s32i, align 4
+                        inc
+                        store %590, %444, align 4
+                        yield
+                } body {
+                        %591 = const 14 : s32i
+                        %592 = load %444 : s32i, align 4
+                        %593 = cast(integral) %592 : s64i
+                        get_member
+                        get_element
+                        %596 = load %595 : s8i, align 1
+                        %597 = cast(integral) %596 : s32i
+                        call @bar(%591, %597) [all]
+                        yield
+                }
                 yield
-            } do {
-                %591 = const 14 : s32i
-                %592 = load %444 : s32i, align 4
-                %593 = cast(integral) %592 : s64i
-                %594 = get_member %436[0] "x" : s8i[14]*
-                %595 = get_element %594[%593] : s8i*
-                %596 = load %595 : s8i, align 1
-                %597 = cast(integral) %596 : s32i
-                call @bar(%591, %597) [all]
-                yield
-            }
-            yield
         }
         %497 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %498 = va_arg %497 : rec_A15
+        va_arg
         store %498, %460, align 1
-        copy %437, %460
+        copy
         scope {
-            %575 = const 0 : s32i
-            store %575, %444, align 4
-            for cond: {
-                %585 = load %444 : s32i, align 4
-                %586 = const 15 : s32i
-                %587 = cmp lt %585, %586 : bool
-                condition %587
-            } step: {
-                %576 = load %444 : s32i, align 4
-                %577 = inc %576 : s32i [nsw]
-                store %577, %444, align 4
+                %575 = const 0 : s32i
+                store %575, %444, align 4
+                for cond {
+                        %585 = load %444 : s32i, align 4
+                        %586 = const 15 : s32i
+                        cmp
+                        condition %587
+                } step {
+                        %576 = load %444 : s32i, align 4
+                        inc
+                        store %577, %444, align 4
+                        yield
+                } body {
+                        %578 = const 15 : s32i
+                        %579 = load %444 : s32i, align 4
+                        %580 = cast(integral) %579 : s64i
+                        get_member
+                        get_element
+                        %583 = load %582 : s8i, align 1
+                        %584 = cast(integral) %583 : s32i
+                        call @bar(%578, %584) [all]
+                        yield
+                }
                 yield
-            } do {
-                %578 = const 15 : s32i
-                %579 = load %444 : s32i, align 4
-                %580 = cast(integral) %579 : s64i
-                %581 = get_member %437[0] "x" : s8i[15]*
-                %582 = get_element %581[%580] : s8i*
-                %583 = load %582 : s8i, align 1
-                %584 = cast(integral) %583 : s32i
-                call @bar(%578, %584) [all]
-                yield
-            }
-            yield
         }
         %499 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %500 = va_arg %499 : rec_A16
+        va_arg
         store %500, %461, align 1
-        copy %438, %461
+        copy
         scope {
-            %562 = const 0 : s32i
-            store %562, %444, align 4
-            for cond: {
-                %572 = load %444 : s32i, align 4
-                %573 = const 16 : s32i
-                %574 = cmp lt %572, %573 : bool
-                condition %574
-            } step: {
-                %563 = load %444 : s32i, align 4
-                %564 = inc %563 : s32i [nsw]
-                store %564, %444, align 4
+                %562 = const 0 : s32i
+                store %562, %444, align 4
+                for cond {
+                        %572 = load %444 : s32i, align 4
+                        %573 = const 16 : s32i
+                        cmp
+                        condition %574
+                } step {
+                        %563 = load %444 : s32i, align 4
+                        inc
+                        store %564, %444, align 4
+                        yield
+                } body {
+                        %565 = const 16 : s32i
+                        %566 = load %444 : s32i, align 4
+                        %567 = cast(integral) %566 : s64i
+                        get_member
+                        get_element
+                        %570 = load %569 : s8i, align 1
+                        %571 = cast(integral) %570 : s32i
+                        call @bar(%565, %571) [all]
+                        yield
+                }
                 yield
-            } do {
-                %565 = const 16 : s32i
-                %566 = load %444 : s32i, align 4
-                %567 = cast(integral) %566 : s64i
-                %568 = get_member %438[0] "x" : s8i[16]*
-                %569 = get_element %568[%567] : s8i*
-                %570 = load %569 : s8i, align 1
-                %571 = cast(integral) %570 : s32i
-                call @bar(%565, %571) [all]
-                yield
-            }
-            yield
         }
         %501 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %502 = va_arg %501 : rec_A31
+        va_arg
         store %502, %462, align 1
-        copy %439, %462
+        copy
         scope {
-            %549 = const 0 : s32i
-            store %549, %444, align 4
-            for cond: {
-                %559 = load %444 : s32i, align 4
-                %560 = const 31 : s32i
-                %561 = cmp lt %559, %560 : bool
-                condition %561
-            } step: {
-                %550 = load %444 : s32i, align 4
-                %551 = inc %550 : s32i [nsw]
-                store %551, %444, align 4
+                %549 = const 0 : s32i
+                store %549, %444, align 4
+                for cond {
+                        %559 = load %444 : s32i, align 4
+                        %560 = const 31 : s32i
+                        cmp
+                        condition %561
+                } step {
+                        %550 = load %444 : s32i, align 4
+                        inc
+                        store %551, %444, align 4
+                        yield
+                } body {
+                        %552 = const 31 : s32i
+                        %553 = load %444 : s32i, align 4
+                        %554 = cast(integral) %553 : s64i
+                        get_member
+                        get_element
+                        %557 = load %556 : s8i, align 1
+                        %558 = cast(integral) %557 : s32i
+                        call @bar(%552, %558) [all]
+                        yield
+                }
                 yield
-            } do {
-                %552 = const 31 : s32i
-                %553 = load %444 : s32i, align 4
-                %554 = cast(integral) %553 : s64i
-                %555 = get_member %439[0] "x" : s8i[31]*
-                %556 = get_element %555[%554] : s8i*
-                %557 = load %556 : s8i, align 1
-                %558 = cast(integral) %557 : s32i
-                call @bar(%552, %558) [all]
-                yield
-            }
-            yield
         }
         %503 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %504 = va_arg %503 : rec_A32
+        va_arg
         store %504, %463, align 1
-        copy %440, %463
+        copy
         scope {
-            %536 = const 0 : s32i
-            store %536, %444, align 4
-            for cond: {
-                %546 = load %444 : s32i, align 4
-                %547 = const 32 : s32i
-                %548 = cmp lt %546, %547 : bool
-                condition %548
-            } step: {
-                %537 = load %444 : s32i, align 4
-                %538 = inc %537 : s32i [nsw]
-                store %538, %444, align 4
+                %536 = const 0 : s32i
+                store %536, %444, align 4
+                for cond {
+                        %546 = load %444 : s32i, align 4
+                        %547 = const 32 : s32i
+                        cmp
+                        condition %548
+                } step {
+                        %537 = load %444 : s32i, align 4
+                        inc
+                        store %538, %444, align 4
+                        yield
+                } body {
+                        %539 = const 32 : s32i
+                        %540 = load %444 : s32i, align 4
+                        %541 = cast(integral) %540 : s64i
+                        get_member
+                        get_element
+                        %544 = load %543 : s8i, align 1
+                        %545 = cast(integral) %544 : s32i
+                        call @bar(%539, %545) [all]
+                        yield
+                }
                 yield
-            } do {
-                %539 = const 32 : s32i
-                %540 = load %444 : s32i, align 4
-                %541 = cast(integral) %540 : s64i
-                %542 = get_member %440[0] "x" : s8i[32]*
-                %543 = get_element %542[%541] : s8i*
-                %544 = load %543 : s8i, align 1
-                %545 = cast(integral) %544 : s32i
-                call @bar(%539, %545) [all]
-                yield
-            }
-            yield
         }
         %505 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %506 = va_arg %505 : rec_A35
+        va_arg
         store %506, %464, align 1
-        copy %441, %464
+        copy
         scope {
-            %523 = const 0 : s32i
-            store %523, %444, align 4
-            for cond: {
-                %533 = load %444 : s32i, align 4
-                %534 = const 35 : s32i
-                %535 = cmp lt %533, %534 : bool
-                condition %535
-            } step: {
-                %524 = load %444 : s32i, align 4
-                %525 = inc %524 : s32i [nsw]
-                store %525, %444, align 4
+                %523 = const 0 : s32i
+                store %523, %444, align 4
+                for cond {
+                        %533 = load %444 : s32i, align 4
+                        %534 = const 35 : s32i
+                        cmp
+                        condition %535
+                } step {
+                        %524 = load %444 : s32i, align 4
+                        inc
+                        store %525, %444, align 4
+                        yield
+                } body {
+                        %526 = const 35 : s32i
+                        %527 = load %444 : s32i, align 4
+                        %528 = cast(integral) %527 : s64i
+                        get_member
+                        get_element
+                        %531 = load %530 : s8i, align 1
+                        %532 = cast(integral) %531 : s32i
+                        call @bar(%526, %532) [all]
+                        yield
+                }
                 yield
-            } do {
-                %526 = const 35 : s32i
-                %527 = load %444 : s32i, align 4
-                %528 = cast(integral) %527 : s64i
-                %529 = get_member %441[0] "x" : s8i[35]*
-                %530 = get_element %529[%528] : s8i*
-                %531 = load %530 : s8i, align 1
-                %532 = cast(integral) %531 : s32i
-                call @bar(%526, %532) [all]
-                yield
-            }
-            yield
         }
         %507 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        %508 = va_arg %507 : rec_A72
+        va_arg
         store %508, %465, align 1
-        copy %442, %465
+        copy
         scope {
-            %510 = const 0 : s32i
-            store %510, %444, align 4
-            for cond: {
-                %520 = load %444 : s32i, align 4
-                %521 = const 72 : s32i
-                %522 = cmp lt %520, %521 : bool
-                condition %522
-            } step: {
-                %511 = load %444 : s32i, align 4
-                %512 = inc %511 : s32i [nsw]
-                store %512, %444, align 4
+                %510 = const 0 : s32i
+                store %510, %444, align 4
+                for cond {
+                        %520 = load %444 : s32i, align 4
+                        %521 = const 72 : s32i
+                        cmp
+                        condition %522
+                } step {
+                        %511 = load %444 : s32i, align 4
+                        inc
+                        store %512, %444, align 4
+                        yield
+                } body {
+                        %513 = const 72 : s32i
+                        %514 = load %444 : s32i, align 4
+                        %515 = cast(integral) %514 : s64i
+                        get_member
+                        get_element
+                        %518 = load %517 : s8i, align 1
+                        %519 = cast(integral) %518 : s32i
+                        call @bar(%513, %519) [all]
+                        yield
+                }
                 yield
-            } do {
-                %513 = const 72 : s32i
-                %514 = load %444 : s32i, align 4
-                %515 = cast(integral) %514 : s64i
-                %516 = get_member %442[0] "x" : s8i[72]*
-                %517 = get_element %516[%515] : s8i*
-                %518 = load %517 : s8i, align 1
-                %519 = cast(integral) %518 : s32i
-                call @bar(%513, %519) [all]
-                yield
-            }
-            yield
         }
         %509 = cast(array_to_ptrdecay) %443 : rec___va_list_tag*
-        va_end %509
+        va_end
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca rec_A8, "coerce", align 8
-    %1 = alloca rec_A7, "coerce", align 8
-    %2 = alloca rec_A6, "coerce", align 8
-    %3 = alloca rec_A5, "coerce", align 8
-    %4 = alloca rec_A4, "coerce", align 4
-    %5 = alloca rec_A3, "coerce", align 4
-    %6 = alloca rec_A2, "coerce", align 2
-    %7 = alloca rec_A1, "coerce", align 1
-    %8 = alloca s32i, "__retval", align 4
-    %9 = alloca rec_A0, "a0", align 1
-    %10 = alloca rec_A1, "a1", align 1
-    %11 = alloca rec_A2, "a2", align 1
-    %12 = alloca rec_A3, "a3", align 1
-    %13 = alloca rec_A4, "a4", align 1
-    %14 = alloca rec_A5, "a5", align 1
-    %15 = alloca rec_A6, "a6", align 1
-    %16 = alloca rec_A7, "a7", align 1
-    %17 = alloca rec_A8, "a8", align 1
-    %18 = alloca rec_A9, "a9", align 1
-    %19 = alloca rec_A10, "a10", align 1
-    %20 = alloca rec_A11, "a11", align 1
-    %21 = alloca rec_A12, "a12", align 1
-    %22 = alloca rec_A13, "a13", align 1
-    %23 = alloca rec_A14, "a14", align 1
-    %24 = alloca rec_A15, "a15", align 1
-    %25 = alloca rec_A16, "a16", align 1
-    %26 = alloca rec_A31, "a31", align 1
-    %27 = alloca rec_A32, "a32", align 1
-    %28 = alloca rec_A35, "a35", align 1
-    %29 = alloca rec_A72, "a72", align 1
-    %30 = alloca s32i, "i", align 4
-    %31 = const 0 : s32i
-    store %31, %8
-    scope {
-        %405 = const 0 : s32i
-        store %405, %30, align 4
-        for cond: {
-            %418 = load %30 : s32i, align 4
-            %419 = const 0 : s32i
-            %420 = cmp lt %418, %419 : bool
-            condition %420
-        } step: {
-            %406 = load %30 : s32i, align 4
-            %407 = inc %406 : s32i [nsw]
-            store %407, %30, align 4
-            yield
-        } do {
-            %408 = load %30 : s32i, align 4
-            %409 = const 0 : s32i
-            %410 = const 3 : s32i
-            %411 = shift left %409, %410 : s32i
-            %412 = xor %408, %411 : s32i
-            %413 = cast(integral) %412 : s8i
-            %414 = load %30 : s32i, align 4
-            %415 = cast(integral) %414 : s64i
-            %416 = get_member %9[0] "x" : s8i[0]*
-            %417 = get_element %416[%415] : s8i*
-            store %413, %417, align 1
-            yield
+        %0 = alloca rec_A8, "coerce", align 8
+        %1 = alloca rec_A7, "coerce", align 8
+        %2 = alloca rec_A6, "coerce", align 8
+        %3 = alloca rec_A5, "coerce", align 8
+        %4 = alloca rec_A4, "coerce", align 4
+        %5 = alloca rec_A3, "coerce", align 4
+        %6 = alloca rec_A2, "coerce", align 2
+        %7 = alloca rec_A1, "coerce", align 1
+        %8 = alloca s32i, "__retval", align 4
+        %9 = alloca rec_A0, "a0", align 1
+        %10 = alloca rec_A1, "a1", align 1
+        %11 = alloca rec_A2, "a2", align 1
+        %12 = alloca rec_A3, "a3", align 1
+        %13 = alloca rec_A4, "a4", align 1
+        %14 = alloca rec_A5, "a5", align 1
+        %15 = alloca rec_A6, "a6", align 1
+        %16 = alloca rec_A7, "a7", align 1
+        %17 = alloca rec_A8, "a8", align 1
+        %18 = alloca rec_A9, "a9", align 1
+        %19 = alloca rec_A10, "a10", align 1
+        %20 = alloca rec_A11, "a11", align 1
+        %21 = alloca rec_A12, "a12", align 1
+        %22 = alloca rec_A13, "a13", align 1
+        %23 = alloca rec_A14, "a14", align 1
+        %24 = alloca rec_A15, "a15", align 1
+        %25 = alloca rec_A16, "a16", align 1
+        %26 = alloca rec_A31, "a31", align 1
+        %27 = alloca rec_A32, "a32", align 1
+        %28 = alloca rec_A35, "a35", align 1
+        %29 = alloca rec_A72, "a72", align 1
+        %30 = alloca s32i, "i", align 4
+        %31 = const 0 : s32i
+        store %31, %8
+        scope {
+                %405 = const 0 : s32i
+                store %405, %30, align 4
+                for cond {
+                        %418 = load %30 : s32i, align 4
+                        %419 = const 0 : s32i
+                        cmp
+                        condition %420
+                } step {
+                        %406 = load %30 : s32i, align 4
+                        inc
+                        store %407, %30, align 4
+                        yield
+                } body {
+                        %408 = load %30 : s32i, align 4
+                        %409 = const 0 : s32i
+                        %410 = const 3 : s32i
+                        shift
+                        xor
+                        %413 = cast(integral) %412 : s8i
+                        %414 = load %30 : s32i, align 4
+                        %415 = cast(integral) %414 : s64i
+                        get_member
+                        get_element
+                        store %413, %417, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %389 = const 0 : s32i
-        store %389, %30, align 4
-        for cond: {
-            %402 = load %30 : s32i, align 4
-            %403 = const 1 : s32i
-            %404 = cmp lt %402, %403 : bool
-            condition %404
-        } step: {
-            %390 = load %30 : s32i, align 4
-            %391 = inc %390 : s32i [nsw]
-            store %391, %30, align 4
-            yield
-        } do {
-            %392 = load %30 : s32i, align 4
-            %393 = const 1 : s32i
-            %394 = const 3 : s32i
-            %395 = shift left %393, %394 : s32i
-            %396 = xor %392, %395 : s32i
-            %397 = cast(integral) %396 : s8i
-            %398 = load %30 : s32i, align 4
-            %399 = cast(integral) %398 : s64i
-            %400 = get_member %10[0] "x" : s8i[1]*
-            %401 = get_element %400[%399] : s8i*
-            store %397, %401, align 1
-            yield
+        scope {
+                %389 = const 0 : s32i
+                store %389, %30, align 4
+                for cond {
+                        %402 = load %30 : s32i, align 4
+                        %403 = const 1 : s32i
+                        cmp
+                        condition %404
+                } step {
+                        %390 = load %30 : s32i, align 4
+                        inc
+                        store %391, %30, align 4
+                        yield
+                } body {
+                        %392 = load %30 : s32i, align 4
+                        %393 = const 1 : s32i
+                        %394 = const 3 : s32i
+                        shift
+                        xor
+                        %397 = cast(integral) %396 : s8i
+                        %398 = load %30 : s32i, align 4
+                        %399 = cast(integral) %398 : s64i
+                        get_member
+                        get_element
+                        store %397, %401, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %373 = const 0 : s32i
-        store %373, %30, align 4
-        for cond: {
-            %386 = load %30 : s32i, align 4
-            %387 = const 2 : s32i
-            %388 = cmp lt %386, %387 : bool
-            condition %388
-        } step: {
-            %374 = load %30 : s32i, align 4
-            %375 = inc %374 : s32i [nsw]
-            store %375, %30, align 4
-            yield
-        } do {
-            %376 = load %30 : s32i, align 4
-            %377 = const 2 : s32i
-            %378 = const 3 : s32i
-            %379 = shift left %377, %378 : s32i
-            %380 = xor %376, %379 : s32i
-            %381 = cast(integral) %380 : s8i
-            %382 = load %30 : s32i, align 4
-            %383 = cast(integral) %382 : s64i
-            %384 = get_member %11[0] "x" : s8i[2]*
-            %385 = get_element %384[%383] : s8i*
-            store %381, %385, align 1
-            yield
+        scope {
+                %373 = const 0 : s32i
+                store %373, %30, align 4
+                for cond {
+                        %386 = load %30 : s32i, align 4
+                        %387 = const 2 : s32i
+                        cmp
+                        condition %388
+                } step {
+                        %374 = load %30 : s32i, align 4
+                        inc
+                        store %375, %30, align 4
+                        yield
+                } body {
+                        %376 = load %30 : s32i, align 4
+                        %377 = const 2 : s32i
+                        %378 = const 3 : s32i
+                        shift
+                        xor
+                        %381 = cast(integral) %380 : s8i
+                        %382 = load %30 : s32i, align 4
+                        %383 = cast(integral) %382 : s64i
+                        get_member
+                        get_element
+                        store %381, %385, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %357 = const 0 : s32i
-        store %357, %30, align 4
-        for cond: {
-            %370 = load %30 : s32i, align 4
-            %371 = const 3 : s32i
-            %372 = cmp lt %370, %371 : bool
-            condition %372
-        } step: {
-            %358 = load %30 : s32i, align 4
-            %359 = inc %358 : s32i [nsw]
-            store %359, %30, align 4
-            yield
-        } do {
-            %360 = load %30 : s32i, align 4
-            %361 = const 3 : s32i
-            %362 = const 3 : s32i
-            %363 = shift left %361, %362 : s32i
-            %364 = xor %360, %363 : s32i
-            %365 = cast(integral) %364 : s8i
-            %366 = load %30 : s32i, align 4
-            %367 = cast(integral) %366 : s64i
-            %368 = get_member %12[0] "x" : s8i[3]*
-            %369 = get_element %368[%367] : s8i*
-            store %365, %369, align 1
-            yield
+        scope {
+                %357 = const 0 : s32i
+                store %357, %30, align 4
+                for cond {
+                        %370 = load %30 : s32i, align 4
+                        %371 = const 3 : s32i
+                        cmp
+                        condition %372
+                } step {
+                        %358 = load %30 : s32i, align 4
+                        inc
+                        store %359, %30, align 4
+                        yield
+                } body {
+                        %360 = load %30 : s32i, align 4
+                        %361 = const 3 : s32i
+                        %362 = const 3 : s32i
+                        shift
+                        xor
+                        %365 = cast(integral) %364 : s8i
+                        %366 = load %30 : s32i, align 4
+                        %367 = cast(integral) %366 : s64i
+                        get_member
+                        get_element
+                        store %365, %369, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %341 = const 0 : s32i
-        store %341, %30, align 4
-        for cond: {
-            %354 = load %30 : s32i, align 4
-            %355 = const 4 : s32i
-            %356 = cmp lt %354, %355 : bool
-            condition %356
-        } step: {
-            %342 = load %30 : s32i, align 4
-            %343 = inc %342 : s32i [nsw]
-            store %343, %30, align 4
-            yield
-        } do {
-            %344 = load %30 : s32i, align 4
-            %345 = const 4 : s32i
-            %346 = const 3 : s32i
-            %347 = shift left %345, %346 : s32i
-            %348 = xor %344, %347 : s32i
-            %349 = cast(integral) %348 : s8i
-            %350 = load %30 : s32i, align 4
-            %351 = cast(integral) %350 : s64i
-            %352 = get_member %13[0] "x" : s8i[4]*
-            %353 = get_element %352[%351] : s8i*
-            store %349, %353, align 1
-            yield
+        scope {
+                %341 = const 0 : s32i
+                store %341, %30, align 4
+                for cond {
+                        %354 = load %30 : s32i, align 4
+                        %355 = const 4 : s32i
+                        cmp
+                        condition %356
+                } step {
+                        %342 = load %30 : s32i, align 4
+                        inc
+                        store %343, %30, align 4
+                        yield
+                } body {
+                        %344 = load %30 : s32i, align 4
+                        %345 = const 4 : s32i
+                        %346 = const 3 : s32i
+                        shift
+                        xor
+                        %349 = cast(integral) %348 : s8i
+                        %350 = load %30 : s32i, align 4
+                        %351 = cast(integral) %350 : s64i
+                        get_member
+                        get_element
+                        store %349, %353, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %325 = const 0 : s32i
-        store %325, %30, align 4
-        for cond: {
-            %338 = load %30 : s32i, align 4
-            %339 = const 5 : s32i
-            %340 = cmp lt %338, %339 : bool
-            condition %340
-        } step: {
-            %326 = load %30 : s32i, align 4
-            %327 = inc %326 : s32i [nsw]
-            store %327, %30, align 4
-            yield
-        } do {
-            %328 = load %30 : s32i, align 4
-            %329 = const 5 : s32i
-            %330 = const 3 : s32i
-            %331 = shift left %329, %330 : s32i
-            %332 = xor %328, %331 : s32i
-            %333 = cast(integral) %332 : s8i
-            %334 = load %30 : s32i, align 4
-            %335 = cast(integral) %334 : s64i
-            %336 = get_member %14[0] "x" : s8i[5]*
-            %337 = get_element %336[%335] : s8i*
-            store %333, %337, align 1
-            yield
+        scope {
+                %325 = const 0 : s32i
+                store %325, %30, align 4
+                for cond {
+                        %338 = load %30 : s32i, align 4
+                        %339 = const 5 : s32i
+                        cmp
+                        condition %340
+                } step {
+                        %326 = load %30 : s32i, align 4
+                        inc
+                        store %327, %30, align 4
+                        yield
+                } body {
+                        %328 = load %30 : s32i, align 4
+                        %329 = const 5 : s32i
+                        %330 = const 3 : s32i
+                        shift
+                        xor
+                        %333 = cast(integral) %332 : s8i
+                        %334 = load %30 : s32i, align 4
+                        %335 = cast(integral) %334 : s64i
+                        get_member
+                        get_element
+                        store %333, %337, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %309 = const 0 : s32i
-        store %309, %30, align 4
-        for cond: {
-            %322 = load %30 : s32i, align 4
-            %323 = const 6 : s32i
-            %324 = cmp lt %322, %323 : bool
-            condition %324
-        } step: {
-            %310 = load %30 : s32i, align 4
-            %311 = inc %310 : s32i [nsw]
-            store %311, %30, align 4
-            yield
-        } do {
-            %312 = load %30 : s32i, align 4
-            %313 = const 6 : s32i
-            %314 = const 3 : s32i
-            %315 = shift left %313, %314 : s32i
-            %316 = xor %312, %315 : s32i
-            %317 = cast(integral) %316 : s8i
-            %318 = load %30 : s32i, align 4
-            %319 = cast(integral) %318 : s64i
-            %320 = get_member %15[0] "x" : s8i[6]*
-            %321 = get_element %320[%319] : s8i*
-            store %317, %321, align 1
-            yield
+        scope {
+                %309 = const 0 : s32i
+                store %309, %30, align 4
+                for cond {
+                        %322 = load %30 : s32i, align 4
+                        %323 = const 6 : s32i
+                        cmp
+                        condition %324
+                } step {
+                        %310 = load %30 : s32i, align 4
+                        inc
+                        store %311, %30, align 4
+                        yield
+                } body {
+                        %312 = load %30 : s32i, align 4
+                        %313 = const 6 : s32i
+                        %314 = const 3 : s32i
+                        shift
+                        xor
+                        %317 = cast(integral) %316 : s8i
+                        %318 = load %30 : s32i, align 4
+                        %319 = cast(integral) %318 : s64i
+                        get_member
+                        get_element
+                        store %317, %321, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %293 = const 0 : s32i
-        store %293, %30, align 4
-        for cond: {
-            %306 = load %30 : s32i, align 4
-            %307 = const 7 : s32i
-            %308 = cmp lt %306, %307 : bool
-            condition %308
-        } step: {
-            %294 = load %30 : s32i, align 4
-            %295 = inc %294 : s32i [nsw]
-            store %295, %30, align 4
-            yield
-        } do {
-            %296 = load %30 : s32i, align 4
-            %297 = const 7 : s32i
-            %298 = const 3 : s32i
-            %299 = shift left %297, %298 : s32i
-            %300 = xor %296, %299 : s32i
-            %301 = cast(integral) %300 : s8i
-            %302 = load %30 : s32i, align 4
-            %303 = cast(integral) %302 : s64i
-            %304 = get_member %16[0] "x" : s8i[7]*
-            %305 = get_element %304[%303] : s8i*
-            store %301, %305, align 1
-            yield
+        scope {
+                %293 = const 0 : s32i
+                store %293, %30, align 4
+                for cond {
+                        %306 = load %30 : s32i, align 4
+                        %307 = const 7 : s32i
+                        cmp
+                        condition %308
+                } step {
+                        %294 = load %30 : s32i, align 4
+                        inc
+                        store %295, %30, align 4
+                        yield
+                } body {
+                        %296 = load %30 : s32i, align 4
+                        %297 = const 7 : s32i
+                        %298 = const 3 : s32i
+                        shift
+                        xor
+                        %301 = cast(integral) %300 : s8i
+                        %302 = load %30 : s32i, align 4
+                        %303 = cast(integral) %302 : s64i
+                        get_member
+                        get_element
+                        store %301, %305, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %277 = const 0 : s32i
-        store %277, %30, align 4
-        for cond: {
-            %290 = load %30 : s32i, align 4
-            %291 = const 8 : s32i
-            %292 = cmp lt %290, %291 : bool
-            condition %292
-        } step: {
-            %278 = load %30 : s32i, align 4
-            %279 = inc %278 : s32i [nsw]
-            store %279, %30, align 4
-            yield
-        } do {
-            %280 = load %30 : s32i, align 4
-            %281 = const 8 : s32i
-            %282 = const 3 : s32i
-            %283 = shift left %281, %282 : s32i
-            %284 = xor %280, %283 : s32i
-            %285 = cast(integral) %284 : s8i
-            %286 = load %30 : s32i, align 4
-            %287 = cast(integral) %286 : s64i
-            %288 = get_member %17[0] "x" : s8i[8]*
-            %289 = get_element %288[%287] : s8i*
-            store %285, %289, align 1
-            yield
+        scope {
+                %277 = const 0 : s32i
+                store %277, %30, align 4
+                for cond {
+                        %290 = load %30 : s32i, align 4
+                        %291 = const 8 : s32i
+                        cmp
+                        condition %292
+                } step {
+                        %278 = load %30 : s32i, align 4
+                        inc
+                        store %279, %30, align 4
+                        yield
+                } body {
+                        %280 = load %30 : s32i, align 4
+                        %281 = const 8 : s32i
+                        %282 = const 3 : s32i
+                        shift
+                        xor
+                        %285 = cast(integral) %284 : s8i
+                        %286 = load %30 : s32i, align 4
+                        %287 = cast(integral) %286 : s64i
+                        get_member
+                        get_element
+                        store %285, %289, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %261 = const 0 : s32i
-        store %261, %30, align 4
-        for cond: {
-            %274 = load %30 : s32i, align 4
-            %275 = const 9 : s32i
-            %276 = cmp lt %274, %275 : bool
-            condition %276
-        } step: {
-            %262 = load %30 : s32i, align 4
-            %263 = inc %262 : s32i [nsw]
-            store %263, %30, align 4
-            yield
-        } do {
-            %264 = load %30 : s32i, align 4
-            %265 = const 9 : s32i
-            %266 = const 3 : s32i
-            %267 = shift left %265, %266 : s32i
-            %268 = xor %264, %267 : s32i
-            %269 = cast(integral) %268 : s8i
-            %270 = load %30 : s32i, align 4
-            %271 = cast(integral) %270 : s64i
-            %272 = get_member %18[0] "x" : s8i[9]*
-            %273 = get_element %272[%271] : s8i*
-            store %269, %273, align 1
-            yield
+        scope {
+                %261 = const 0 : s32i
+                store %261, %30, align 4
+                for cond {
+                        %274 = load %30 : s32i, align 4
+                        %275 = const 9 : s32i
+                        cmp
+                        condition %276
+                } step {
+                        %262 = load %30 : s32i, align 4
+                        inc
+                        store %263, %30, align 4
+                        yield
+                } body {
+                        %264 = load %30 : s32i, align 4
+                        %265 = const 9 : s32i
+                        %266 = const 3 : s32i
+                        shift
+                        xor
+                        %269 = cast(integral) %268 : s8i
+                        %270 = load %30 : s32i, align 4
+                        %271 = cast(integral) %270 : s64i
+                        get_member
+                        get_element
+                        store %269, %273, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %245 = const 0 : s32i
-        store %245, %30, align 4
-        for cond: {
-            %258 = load %30 : s32i, align 4
-            %259 = const 10 : s32i
-            %260 = cmp lt %258, %259 : bool
-            condition %260
-        } step: {
-            %246 = load %30 : s32i, align 4
-            %247 = inc %246 : s32i [nsw]
-            store %247, %30, align 4
-            yield
-        } do {
-            %248 = load %30 : s32i, align 4
-            %249 = const 10 : s32i
-            %250 = const 3 : s32i
-            %251 = shift left %249, %250 : s32i
-            %252 = xor %248, %251 : s32i
-            %253 = cast(integral) %252 : s8i
-            %254 = load %30 : s32i, align 4
-            %255 = cast(integral) %254 : s64i
-            %256 = get_member %19[0] "x" : s8i[10]*
-            %257 = get_element %256[%255] : s8i*
-            store %253, %257, align 1
-            yield
+        scope {
+                %245 = const 0 : s32i
+                store %245, %30, align 4
+                for cond {
+                        %258 = load %30 : s32i, align 4
+                        %259 = const 10 : s32i
+                        cmp
+                        condition %260
+                } step {
+                        %246 = load %30 : s32i, align 4
+                        inc
+                        store %247, %30, align 4
+                        yield
+                } body {
+                        %248 = load %30 : s32i, align 4
+                        %249 = const 10 : s32i
+                        %250 = const 3 : s32i
+                        shift
+                        xor
+                        %253 = cast(integral) %252 : s8i
+                        %254 = load %30 : s32i, align 4
+                        %255 = cast(integral) %254 : s64i
+                        get_member
+                        get_element
+                        store %253, %257, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %229 = const 0 : s32i
-        store %229, %30, align 4
-        for cond: {
-            %242 = load %30 : s32i, align 4
-            %243 = const 11 : s32i
-            %244 = cmp lt %242, %243 : bool
-            condition %244
-        } step: {
-            %230 = load %30 : s32i, align 4
-            %231 = inc %230 : s32i [nsw]
-            store %231, %30, align 4
-            yield
-        } do {
-            %232 = load %30 : s32i, align 4
-            %233 = const 11 : s32i
-            %234 = const 3 : s32i
-            %235 = shift left %233, %234 : s32i
-            %236 = xor %232, %235 : s32i
-            %237 = cast(integral) %236 : s8i
-            %238 = load %30 : s32i, align 4
-            %239 = cast(integral) %238 : s64i
-            %240 = get_member %20[0] "x" : s8i[11]*
-            %241 = get_element %240[%239] : s8i*
-            store %237, %241, align 1
-            yield
+        scope {
+                %229 = const 0 : s32i
+                store %229, %30, align 4
+                for cond {
+                        %242 = load %30 : s32i, align 4
+                        %243 = const 11 : s32i
+                        cmp
+                        condition %244
+                } step {
+                        %230 = load %30 : s32i, align 4
+                        inc
+                        store %231, %30, align 4
+                        yield
+                } body {
+                        %232 = load %30 : s32i, align 4
+                        %233 = const 11 : s32i
+                        %234 = const 3 : s32i
+                        shift
+                        xor
+                        %237 = cast(integral) %236 : s8i
+                        %238 = load %30 : s32i, align 4
+                        %239 = cast(integral) %238 : s64i
+                        get_member
+                        get_element
+                        store %237, %241, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %213 = const 0 : s32i
-        store %213, %30, align 4
-        for cond: {
-            %226 = load %30 : s32i, align 4
-            %227 = const 12 : s32i
-            %228 = cmp lt %226, %227 : bool
-            condition %228
-        } step: {
-            %214 = load %30 : s32i, align 4
-            %215 = inc %214 : s32i [nsw]
-            store %215, %30, align 4
-            yield
-        } do {
-            %216 = load %30 : s32i, align 4
-            %217 = const 12 : s32i
-            %218 = const 3 : s32i
-            %219 = shift left %217, %218 : s32i
-            %220 = xor %216, %219 : s32i
-            %221 = cast(integral) %220 : s8i
-            %222 = load %30 : s32i, align 4
-            %223 = cast(integral) %222 : s64i
-            %224 = get_member %21[0] "x" : s8i[12]*
-            %225 = get_element %224[%223] : s8i*
-            store %221, %225, align 1
-            yield
+        scope {
+                %213 = const 0 : s32i
+                store %213, %30, align 4
+                for cond {
+                        %226 = load %30 : s32i, align 4
+                        %227 = const 12 : s32i
+                        cmp
+                        condition %228
+                } step {
+                        %214 = load %30 : s32i, align 4
+                        inc
+                        store %215, %30, align 4
+                        yield
+                } body {
+                        %216 = load %30 : s32i, align 4
+                        %217 = const 12 : s32i
+                        %218 = const 3 : s32i
+                        shift
+                        xor
+                        %221 = cast(integral) %220 : s8i
+                        %222 = load %30 : s32i, align 4
+                        %223 = cast(integral) %222 : s64i
+                        get_member
+                        get_element
+                        store %221, %225, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %197 = const 0 : s32i
-        store %197, %30, align 4
-        for cond: {
-            %210 = load %30 : s32i, align 4
-            %211 = const 13 : s32i
-            %212 = cmp lt %210, %211 : bool
-            condition %212
-        } step: {
-            %198 = load %30 : s32i, align 4
-            %199 = inc %198 : s32i [nsw]
-            store %199, %30, align 4
-            yield
-        } do {
-            %200 = load %30 : s32i, align 4
-            %201 = const 13 : s32i
-            %202 = const 3 : s32i
-            %203 = shift left %201, %202 : s32i
-            %204 = xor %200, %203 : s32i
-            %205 = cast(integral) %204 : s8i
-            %206 = load %30 : s32i, align 4
-            %207 = cast(integral) %206 : s64i
-            %208 = get_member %22[0] "x" : s8i[13]*
-            %209 = get_element %208[%207] : s8i*
-            store %205, %209, align 1
-            yield
+        scope {
+                %197 = const 0 : s32i
+                store %197, %30, align 4
+                for cond {
+                        %210 = load %30 : s32i, align 4
+                        %211 = const 13 : s32i
+                        cmp
+                        condition %212
+                } step {
+                        %198 = load %30 : s32i, align 4
+                        inc
+                        store %199, %30, align 4
+                        yield
+                } body {
+                        %200 = load %30 : s32i, align 4
+                        %201 = const 13 : s32i
+                        %202 = const 3 : s32i
+                        shift
+                        xor
+                        %205 = cast(integral) %204 : s8i
+                        %206 = load %30 : s32i, align 4
+                        %207 = cast(integral) %206 : s64i
+                        get_member
+                        get_element
+                        store %205, %209, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %181 = const 0 : s32i
-        store %181, %30, align 4
-        for cond: {
-            %194 = load %30 : s32i, align 4
-            %195 = const 14 : s32i
-            %196 = cmp lt %194, %195 : bool
-            condition %196
-        } step: {
-            %182 = load %30 : s32i, align 4
-            %183 = inc %182 : s32i [nsw]
-            store %183, %30, align 4
-            yield
-        } do {
-            %184 = load %30 : s32i, align 4
-            %185 = const 14 : s32i
-            %186 = const 3 : s32i
-            %187 = shift left %185, %186 : s32i
-            %188 = xor %184, %187 : s32i
-            %189 = cast(integral) %188 : s8i
-            %190 = load %30 : s32i, align 4
-            %191 = cast(integral) %190 : s64i
-            %192 = get_member %23[0] "x" : s8i[14]*
-            %193 = get_element %192[%191] : s8i*
-            store %189, %193, align 1
-            yield
+        scope {
+                %181 = const 0 : s32i
+                store %181, %30, align 4
+                for cond {
+                        %194 = load %30 : s32i, align 4
+                        %195 = const 14 : s32i
+                        cmp
+                        condition %196
+                } step {
+                        %182 = load %30 : s32i, align 4
+                        inc
+                        store %183, %30, align 4
+                        yield
+                } body {
+                        %184 = load %30 : s32i, align 4
+                        %185 = const 14 : s32i
+                        %186 = const 3 : s32i
+                        shift
+                        xor
+                        %189 = cast(integral) %188 : s8i
+                        %190 = load %30 : s32i, align 4
+                        %191 = cast(integral) %190 : s64i
+                        get_member
+                        get_element
+                        store %189, %193, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %165 = const 0 : s32i
-        store %165, %30, align 4
-        for cond: {
-            %178 = load %30 : s32i, align 4
-            %179 = const 15 : s32i
-            %180 = cmp lt %178, %179 : bool
-            condition %180
-        } step: {
-            %166 = load %30 : s32i, align 4
-            %167 = inc %166 : s32i [nsw]
-            store %167, %30, align 4
-            yield
-        } do {
-            %168 = load %30 : s32i, align 4
-            %169 = const 15 : s32i
-            %170 = const 3 : s32i
-            %171 = shift left %169, %170 : s32i
-            %172 = xor %168, %171 : s32i
-            %173 = cast(integral) %172 : s8i
-            %174 = load %30 : s32i, align 4
-            %175 = cast(integral) %174 : s64i
-            %176 = get_member %24[0] "x" : s8i[15]*
-            %177 = get_element %176[%175] : s8i*
-            store %173, %177, align 1
-            yield
+        scope {
+                %165 = const 0 : s32i
+                store %165, %30, align 4
+                for cond {
+                        %178 = load %30 : s32i, align 4
+                        %179 = const 15 : s32i
+                        cmp
+                        condition %180
+                } step {
+                        %166 = load %30 : s32i, align 4
+                        inc
+                        store %167, %30, align 4
+                        yield
+                } body {
+                        %168 = load %30 : s32i, align 4
+                        %169 = const 15 : s32i
+                        %170 = const 3 : s32i
+                        shift
+                        xor
+                        %173 = cast(integral) %172 : s8i
+                        %174 = load %30 : s32i, align 4
+                        %175 = cast(integral) %174 : s64i
+                        get_member
+                        get_element
+                        store %173, %177, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %149 = const 0 : s32i
-        store %149, %30, align 4
-        for cond: {
-            %162 = load %30 : s32i, align 4
-            %163 = const 16 : s32i
-            %164 = cmp lt %162, %163 : bool
-            condition %164
-        } step: {
-            %150 = load %30 : s32i, align 4
-            %151 = inc %150 : s32i [nsw]
-            store %151, %30, align 4
-            yield
-        } do {
-            %152 = load %30 : s32i, align 4
-            %153 = const 16 : s32i
-            %154 = const 3 : s32i
-            %155 = shift left %153, %154 : s32i
-            %156 = xor %152, %155 : s32i
-            %157 = cast(integral) %156 : s8i
-            %158 = load %30 : s32i, align 4
-            %159 = cast(integral) %158 : s64i
-            %160 = get_member %25[0] "x" : s8i[16]*
-            %161 = get_element %160[%159] : s8i*
-            store %157, %161, align 1
-            yield
+        scope {
+                %149 = const 0 : s32i
+                store %149, %30, align 4
+                for cond {
+                        %162 = load %30 : s32i, align 4
+                        %163 = const 16 : s32i
+                        cmp
+                        condition %164
+                } step {
+                        %150 = load %30 : s32i, align 4
+                        inc
+                        store %151, %30, align 4
+                        yield
+                } body {
+                        %152 = load %30 : s32i, align 4
+                        %153 = const 16 : s32i
+                        %154 = const 3 : s32i
+                        shift
+                        xor
+                        %157 = cast(integral) %156 : s8i
+                        %158 = load %30 : s32i, align 4
+                        %159 = cast(integral) %158 : s64i
+                        get_member
+                        get_element
+                        store %157, %161, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %133 = const 0 : s32i
-        store %133, %30, align 4
-        for cond: {
-            %146 = load %30 : s32i, align 4
-            %147 = const 31 : s32i
-            %148 = cmp lt %146, %147 : bool
-            condition %148
-        } step: {
-            %134 = load %30 : s32i, align 4
-            %135 = inc %134 : s32i [nsw]
-            store %135, %30, align 4
-            yield
-        } do {
-            %136 = load %30 : s32i, align 4
-            %137 = const 31 : s32i
-            %138 = const 3 : s32i
-            %139 = shift left %137, %138 : s32i
-            %140 = xor %136, %139 : s32i
-            %141 = cast(integral) %140 : s8i
-            %142 = load %30 : s32i, align 4
-            %143 = cast(integral) %142 : s64i
-            %144 = get_member %26[0] "x" : s8i[31]*
-            %145 = get_element %144[%143] : s8i*
-            store %141, %145, align 1
-            yield
+        scope {
+                %133 = const 0 : s32i
+                store %133, %30, align 4
+                for cond {
+                        %146 = load %30 : s32i, align 4
+                        %147 = const 31 : s32i
+                        cmp
+                        condition %148
+                } step {
+                        %134 = load %30 : s32i, align 4
+                        inc
+                        store %135, %30, align 4
+                        yield
+                } body {
+                        %136 = load %30 : s32i, align 4
+                        %137 = const 31 : s32i
+                        %138 = const 3 : s32i
+                        shift
+                        xor
+                        %141 = cast(integral) %140 : s8i
+                        %142 = load %30 : s32i, align 4
+                        %143 = cast(integral) %142 : s64i
+                        get_member
+                        get_element
+                        store %141, %145, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %117 = const 0 : s32i
-        store %117, %30, align 4
-        for cond: {
-            %130 = load %30 : s32i, align 4
-            %131 = const 32 : s32i
-            %132 = cmp lt %130, %131 : bool
-            condition %132
-        } step: {
-            %118 = load %30 : s32i, align 4
-            %119 = inc %118 : s32i [nsw]
-            store %119, %30, align 4
-            yield
-        } do {
-            %120 = load %30 : s32i, align 4
-            %121 = const 32 : s32i
-            %122 = const 3 : s32i
-            %123 = shift left %121, %122 : s32i
-            %124 = xor %120, %123 : s32i
-            %125 = cast(integral) %124 : s8i
-            %126 = load %30 : s32i, align 4
-            %127 = cast(integral) %126 : s64i
-            %128 = get_member %27[0] "x" : s8i[32]*
-            %129 = get_element %128[%127] : s8i*
-            store %125, %129, align 1
-            yield
+        scope {
+                %117 = const 0 : s32i
+                store %117, %30, align 4
+                for cond {
+                        %130 = load %30 : s32i, align 4
+                        %131 = const 32 : s32i
+                        cmp
+                        condition %132
+                } step {
+                        %118 = load %30 : s32i, align 4
+                        inc
+                        store %119, %30, align 4
+                        yield
+                } body {
+                        %120 = load %30 : s32i, align 4
+                        %121 = const 32 : s32i
+                        %122 = const 3 : s32i
+                        shift
+                        xor
+                        %125 = cast(integral) %124 : s8i
+                        %126 = load %30 : s32i, align 4
+                        %127 = cast(integral) %126 : s64i
+                        get_member
+                        get_element
+                        store %125, %129, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %101 = const 0 : s32i
-        store %101, %30, align 4
-        for cond: {
-            %114 = load %30 : s32i, align 4
-            %115 = const 35 : s32i
-            %116 = cmp lt %114, %115 : bool
-            condition %116
-        } step: {
-            %102 = load %30 : s32i, align 4
-            %103 = inc %102 : s32i [nsw]
-            store %103, %30, align 4
-            yield
-        } do {
-            %104 = load %30 : s32i, align 4
-            %105 = const 35 : s32i
-            %106 = const 3 : s32i
-            %107 = shift left %105, %106 : s32i
-            %108 = xor %104, %107 : s32i
-            %109 = cast(integral) %108 : s8i
-            %110 = load %30 : s32i, align 4
-            %111 = cast(integral) %110 : s64i
-            %112 = get_member %28[0] "x" : s8i[35]*
-            %113 = get_element %112[%111] : s8i*
-            store %109, %113, align 1
-            yield
+        scope {
+                %101 = const 0 : s32i
+                store %101, %30, align 4
+                for cond {
+                        %114 = load %30 : s32i, align 4
+                        %115 = const 35 : s32i
+                        cmp
+                        condition %116
+                } step {
+                        %102 = load %30 : s32i, align 4
+                        inc
+                        store %103, %30, align 4
+                        yield
+                } body {
+                        %104 = load %30 : s32i, align 4
+                        %105 = const 35 : s32i
+                        %106 = const 3 : s32i
+                        shift
+                        xor
+                        %109 = cast(integral) %108 : s8i
+                        %110 = load %30 : s32i, align 4
+                        %111 = cast(integral) %110 : s64i
+                        get_member
+                        get_element
+                        store %109, %113, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %85 = const 0 : s32i
-        store %85, %30, align 4
-        for cond: {
-            %98 = load %30 : s32i, align 4
-            %99 = const 72 : s32i
-            %100 = cmp lt %98, %99 : bool
-            condition %100
-        } step: {
-            %86 = load %30 : s32i, align 4
-            %87 = inc %86 : s32i [nsw]
-            store %87, %30, align 4
-            yield
-        } do {
-            %88 = load %30 : s32i, align 4
-            %89 = const 72 : s32i
-            %90 = const 3 : s32i
-            %91 = shift left %89, %90 : s32i
-            %92 = xor %88, %91 : s32i
-            %93 = cast(integral) %92 : s8i
-            %94 = load %30 : s32i, align 4
-            %95 = cast(integral) %94 : s64i
-            %96 = get_member %29[0] "x" : s8i[72]*
-            %97 = get_element %96[%95] : s8i*
-            store %93, %97, align 1
-            yield
+        scope {
+                %85 = const 0 : s32i
+                store %85, %30, align 4
+                for cond {
+                        %98 = load %30 : s32i, align 4
+                        %99 = const 72 : s32i
+                        cmp
+                        condition %100
+                } step {
+                        %86 = load %30 : s32i, align 4
+                        inc
+                        store %87, %30, align 4
+                        yield
+                } body {
+                        %88 = load %30 : s32i, align 4
+                        %89 = const 72 : s32i
+                        %90 = const 3 : s32i
+                        shift
+                        xor
+                        %93 = cast(integral) %92 : s8i
+                        %94 = load %30 : s32i, align 4
+                        %95 = cast(integral) %94 : s64i
+                        get_member
+                        get_element
+                        store %93, %97, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %32 = const 21 : s32i
-    %33 = load %9 : rec_A0, align 1
-    %34 = load %10 : rec_A1, align 1
-    %35 = load %11 : rec_A2, align 1
-    %36 = load %12 : rec_A3, align 1
-    %37 = load %13 : rec_A4, align 1
-    %38 = load %14 : rec_A5, align 1
-    %39 = load %15 : rec_A6, align 1
-    %40 = load %16 : rec_A7, align 1
-    %41 = load %17 : rec_A8, align 1
-    %42 = load %18 : rec_A9, align 1
-    %43 = load %19 : rec_A10, align 1
-    %44 = load %20 : rec_A11, align 1
-    %45 = load %21 : rec_A12, align 1
-    %46 = load %22 : rec_A13, align 1
-    %47 = load %23 : rec_A14, align 1
-    %48 = load %24 : rec_A15, align 1
-    %49 = load %25 : rec_A16, align 1
-    %50 = load %26 : rec_A31, align 1
-    %51 = load %27 : rec_A32, align 1
-    %52 = load %28 : rec_A35, align 1
-    %53 = load %29 : rec_A72, align 1
-    store %34, %7
-    %54 = cast(bitcast) %7 : s8i*
-    %55 = load %54 : s8i
-    store %35, %6
-    %56 = cast(bitcast) %6 : u16i*
-    %57 = load %56 : u16i
-    store %36, %5
-    %58 = cast(bitcast) %5 : u24*
-    %59 = load %58 : u24
-    store %37, %4
-    %60 = cast(bitcast) %4 : u32i*
-    %61 = load %60 : u32i
-    store %38, %3
-    %62 = cast(bitcast) %3 : u40*
-    %63 = load %62 : u40
-    store %39, %2
-    %64 = cast(bitcast) %2 : u48*
-    %65 = load %64 : u48
-    store %40, %1
-    %66 = cast(bitcast) %1 : u56*
-    %67 = load %66 : u56
-    store %41, %0
-    %68 = cast(bitcast) %0 : u64i*
-    %69 = load %68 : u64i
-    %70 = alloca rec_A9, "byval", align 8
-    store %42, %70
-    %71 = alloca rec_A10, "byval", align 8
-    store %43, %71
-    %72 = alloca rec_A11, "byval", align 8
-    store %44, %72
-    %73 = alloca rec_A12, "byval", align 8
-    store %45, %73
-    %74 = alloca rec_A13, "byval", align 8
-    store %46, %74
-    %75 = alloca rec_A14, "byval", align 8
-    store %47, %75
-    %76 = alloca rec_A15, "byval", align 8
-    store %48, %76
-    %77 = alloca rec_A16, "byval", align 8
-    store %49, %77
-    %78 = alloca rec_A31, "byval", align 8
-    store %50, %78
-    %79 = alloca rec_A32, "byval", align 8
-    store %51, %79
-    %80 = alloca rec_A35, "byval", align 8
-    store %52, %80
-    %81 = alloca rec_A72, "byval", align 8
-    store %53, %81
-    call @foo(%32, %55, %57, %59, %61, %63, %65, %67, %69, %70, %71, %72, %73, %74, %75, %76, %77, %78, %79, %80, %81) [all]
-    %82 = get_global @exit : ((s32i) -> void)*
-    %83 = const 0 : s32i
-    call @exit(%83) [all]
-    %84 = load %8 : s32i
-    return %84
+        %32 = const 21 : s32i
+        %33 = load %9 : rec_A0, align 1
+        %34 = load %10 : rec_A1, align 1
+        %35 = load %11 : rec_A2, align 1
+        %36 = load %12 : rec_A3, align 1
+        %37 = load %13 : rec_A4, align 1
+        %38 = load %14 : rec_A5, align 1
+        %39 = load %15 : rec_A6, align 1
+        %40 = load %16 : rec_A7, align 1
+        %41 = load %17 : rec_A8, align 1
+        %42 = load %18 : rec_A9, align 1
+        %43 = load %19 : rec_A10, align 1
+        %44 = load %20 : rec_A11, align 1
+        %45 = load %21 : rec_A12, align 1
+        %46 = load %22 : rec_A13, align 1
+        %47 = load %23 : rec_A14, align 1
+        %48 = load %24 : rec_A15, align 1
+        %49 = load %25 : rec_A16, align 1
+        %50 = load %26 : rec_A31, align 1
+        %51 = load %27 : rec_A32, align 1
+        %52 = load %28 : rec_A35, align 1
+        %53 = load %29 : rec_A72, align 1
+        store %34, %7
+        %54 = cast(bitcast) %7 : s8i*
+        %55 = load %54 : s8i
+        store %35, %6
+        %56 = cast(bitcast) %6 : u16i*
+        %57 = load %56 : u16i
+        store %36, %5
+        %58 = cast(bitcast) %5 : u24*
+        %59 = load %58 : u24
+        store %37, %4
+        %60 = cast(bitcast) %4 : u32i*
+        %61 = load %60 : u32i
+        store %38, %3
+        %62 = cast(bitcast) %3 : u40*
+        %63 = load %62 : u40
+        store %39, %2
+        %64 = cast(bitcast) %2 : u48*
+        %65 = load %64 : u48
+        store %40, %1
+        %66 = cast(bitcast) %1 : u56*
+        %67 = load %66 : u56
+        store %41, %0
+        %68 = cast(bitcast) %0 : u64i*
+        %69 = load %68 : u64i
+        %70 = alloca rec_A9, "byval", align 8
+        store %42, %70
+        %71 = alloca rec_A10, "byval", align 8
+        store %43, %71
+        %72 = alloca rec_A11, "byval", align 8
+        store %44, %72
+        %73 = alloca rec_A12, "byval", align 8
+        store %45, %73
+        %74 = alloca rec_A13, "byval", align 8
+        store %46, %74
+        %75 = alloca rec_A14, "byval", align 8
+        store %47, %75
+        %76 = alloca rec_A15, "byval", align 8
+        store %48, %76
+        %77 = alloca rec_A16, "byval", align 8
+        store %49, %77
+        %78 = alloca rec_A31, "byval", align 8
+        store %50, %78
+        %79 = alloca rec_A32, "byval", align 8
+        store %51, %79
+        %80 = alloca rec_A35, "byval", align 8
+        store %52, %80
+        %81 = alloca rec_A72, "byval", align 8
+        store %53, %81
+        call @foo(%32, %55, %57, %59, %61, %63, %65, %67, %69, %70, %71, %72, %73, %74, %75, %76, %77, %78, %79, %80, %81) [all]
+        %82 = get_global @exit : (s32i) -> void*
+        %83 = const 0 : s32i
+        call @exit(%83) [all]
+        %84 = load %8 : s32i
+        return %84
 }

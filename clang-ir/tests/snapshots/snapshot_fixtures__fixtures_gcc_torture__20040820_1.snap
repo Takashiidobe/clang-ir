@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20040820-1.c" (c, x86_64-unknown-linux-gnu)
@@ -9,15 +9,15 @@ fn check(%arg2: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %20 = alloca s32i, "a", align 4
         store %arg2, %20
         scope {
-            %21 = load %20 : s32i, align 4
-            %22 = const 1 : s32i
-            %23 = cmp ne %21, %22 : bool
-            if %23 {
-                %24 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %21 = load %20 : s32i, align 4
+                %22 = const 1 : s32i
+                cmp
+                if %23 {
+                        %24 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -31,27 +31,27 @@ fn test(%arg0: s32i, %arg1: s32i) -> void [external, c, no_inline, dso_local, no
         %10 = cast(int_to_bool) %9 : bool
         %11 = const 1 : s32i
         %12 = const 0 : s32i
-        %13 = select %10, %11, %12 : s32i
+        select
         %14 = load %8 : s32i, align 4
         %15 = cast(int_to_bool) %14 : bool
         %16 = const 2 : s32i
         %17 = const 0 : s32i
-        %18 = select %15, %16, %17 : s32i
-        %19 = or %13, %18 : s32i
+        select
+        or
         call @check(%19) [all]
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : s32i
-    %3 = const 0 : s32i
-    call @test(%2, %3) [all]
-    %4 = get_global @exit : ((s32i) -> void)*
-    %5 = const 0 : s32i
-    call @exit(%5) [all]
-    %6 = load %0 : s32i
-    return %6
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : s32i
+        %3 = const 0 : s32i
+        call @test(%2, %3) [all]
+        %4 = get_global @exit : (s32i) -> void*
+        %5 = const 0 : s32i
+        call @exit(%5) [all]
+        %6 = load %0 : s32i
+        return %6
 }

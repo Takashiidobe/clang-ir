@@ -1,33 +1,33 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/961017-1.c" (c, x86_64-unknown-linux-gnu)
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u8i, "z", align 1
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 0 : u8i
-    store %3, %1, align 1
-    scope {
-        do {
-            yield
-        } while {
-            %7 = load %1 : u8i, align 1
-            %8 = dec %7 : u8i
-            store %8, %1, align 1
-            %9 = cast(integral) %8 : s32i
-            %10 = const 0 : s32i
-            %11 = cmp gt %9, %10 : bool
-            condition %11
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u8i, "z", align 1
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 0 : u8i
+        store %3, %1, align 1
+        scope {
+                do {
+                        yield
+                } while {
+                        %7 = load %1 : u8i, align 1
+                        dec
+                        store %8, %1, align 1
+                        %9 = cast(integral) %8 : s32i
+                        %10 = const 0 : s32i
+                        cmp
+                        condition %11
+                }
+                yield
         }
-        yield
-    }
-    %4 = get_global @exit : ((s32i) -> void)*
-    %5 = const 0 : s32i
-    call @exit(%5) [all]
-    %6 = load %0 : s32i
-    return %6
+        %4 = get_global @exit : (s32i) -> void*
+        %5 = const 0 : s32i
+        call @exit(%5) [all]
+        %6 = load %0 : s32i
+        return %6
 }

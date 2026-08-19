@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/goto_into_later_switch_case_i128.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn classify(%arg0: s128i_bitint) -> s32i [internal, c, no_inline, dso_local, nothrow] {
@@ -12,118 +12,120 @@ fn classify(%arg0: s128i_bitint) -> s32i [internal, c, no_inline, dso_local, not
         %41 = alloca s32i, "__retval", align 4
         store %arg0, %40
         scope {
-            %51 = load %40 : s128i_bitint, align 8
-            switch %51 {
-                case equal 1 {
-                    yield
-                }
-                case equal 2 {
-                    break
-                }
-                case equal 99999999999999999999999999999 {
-                    goto low
-                }
-                case equal 4 {
-                    goto high
-                }
-                case default {
-                    %52 = const -1 : s32i
-                    store %52, %41
-                    %53 = load %41 : s32i
-                    return %53
-                }
-            }
-            yield
-        }
-        scope {
-            for cond: {
-                %50 = const true : bool
-                condition %50
-            } step: {
-                yield
-            } do {
-                scope {
-                    scope {
-                        %43 = load %40 : s128i_bitint, align 8
-                        switch %43 {
-                            case equal 5 {
-                                br ^bb1
-                                ^bb1():
-                                    label low:
-                                    %48 = const 100 : s32i
-                                    store %48, %41
-                                    %49 = load %41 : s32i
-                                    return %49
-                            }
-                            case equal 6 {
-                                br ^bb1
-                                ^bb1():
-                                    label high:
-                                    %46 = const 200 : s32i
-                                    store %46, %41
-                                    %47 = load %41 : s32i
-                                    return %47
-                            }
-                            case default {
-                                %44 = const -2 : s32i
-                                store %44, %41
-                                %45 = load %41 : s32i
-                                return %45
-                            }
+                %51 = load %40 : s128i_bitint, align 8
+                switch %51 {
+                        case equal [1] {
+                                yield
+                        }
+                        case equal [2] {
+                                break
+                        }
+                        case equal [99999999999999999999999999999] {
+                                goto low
+                        }
+                        case equal [4] {
+                                goto high
+                        }
+                        case default [] {
+                                %52 = const -1 : s32i
+                                store %52, %41
+                                %53 = load %41 : s32i
+                                return %53
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
+        }
+        scope {
+                for cond {
+                        %50 = const true : bool
+                        condition %50
+                } step {
+                        yield
+                } body {
+                        scope {
+                                scope {
+                                        %43 = load %40 : s128i_bitint, align 8
+                                        switch %43 {
+                                                case equal [5] {
+                                                        br ^bb1
+                                                    ^bb1:
+                                                        label low:
+                                                        %48 = const 100 : s32i
+                                                        store %48, %41
+                                                        %49 = load %41 : s32i
+                                                        return %49
+                                                }
+                                                case equal [6] {
+                                                        br ^bb1
+                                                    ^bb1:
+                                                        label high:
+                                                        %46 = const 200 : s32i
+                                                        store %46, %41
+                                                        %47 = load %41 : s32i
+                                                        return %47
+                                                }
+                                                case default [] {
+                                                        %44 = const -2 : s32i
+                                                        store %44, %41
+                                                        %45 = load %41 : s32i
+                                                        return %45
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
+                }
+                yield
         }
         %42 = load %41 : s32i
         return %42
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[4]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = const 1 : s128i_bitint
-    %6 = call @classify(%5) : s32i [all]
-    %7 = call @printf(%4, %6) : s32i [all]
-    %8 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %9 = get_global @.str : s8i[4]*
-    %10 = cast(array_to_ptrdecay) %9 : s8i*
-    %11 = const 99999999999999999999999999999 : s128i_bitint
-    %12 = call @classify(%11) : s32i [all]
-    %13 = call @printf(%10, %12) : s32i [all]
-    %14 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %15 = get_global @.str : s8i[4]*
-    %16 = cast(array_to_ptrdecay) %15 : s8i*
-    %17 = const 4 : s128i_bitint
-    %18 = call @classify(%17) : s32i [all]
-    %19 = call @printf(%16, %18) : s32i [all]
-    %20 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %21 = get_global @.str : s8i[4]*
-    %22 = cast(array_to_ptrdecay) %21 : s8i*
-    %23 = const 5 : s128i_bitint
-    %24 = call @classify(%23) : s32i [all]
-    %25 = call @printf(%22, %24) : s32i [all]
-    %26 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %27 = get_global @.str : s8i[4]*
-    %28 = cast(array_to_ptrdecay) %27 : s8i*
-    %29 = const 6 : s128i_bitint
-    %30 = call @classify(%29) : s32i [all]
-    %31 = call @printf(%28, %30) : s32i [all]
-    %32 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %33 = get_global @.str : s8i[4]*
-    %34 = cast(array_to_ptrdecay) %33 : s8i*
-    %35 = const 9 : s128i_bitint
-    %36 = call @classify(%35) : s32i [all]
-    %37 = call @printf(%34, %36) : s32i [all]
-    %38 = const 0 : s32i
-    store %38, %0
-    %39 = load %0 : s32i
-    return %39
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[4]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = const 1 : s128i_bitint
+        %6 = call @classify(%5) : s32i [all]
+        %7 = call @printf(%4, %6) : s32i [all]
+        %8 = get_global @printf : (s8i*, ...) -> s32i*
+        %9 = get_global @.str : s8i[4]*
+        %10 = cast(array_to_ptrdecay) %9 : s8i*
+        %11 = const 99999999999999999999999999999 : s128i_bitint
+        %12 = call @classify(%11) : s32i [all]
+        %13 = call @printf(%10, %12) : s32i [all]
+        %14 = get_global @printf : (s8i*, ...) -> s32i*
+        %15 = get_global @.str : s8i[4]*
+        %16 = cast(array_to_ptrdecay) %15 : s8i*
+        %17 = const 4 : s128i_bitint
+        %18 = call @classify(%17) : s32i [all]
+        %19 = call @printf(%16, %18) : s32i [all]
+        %20 = get_global @printf : (s8i*, ...) -> s32i*
+        %21 = get_global @.str : s8i[4]*
+        %22 = cast(array_to_ptrdecay) %21 : s8i*
+        %23 = const 5 : s128i_bitint
+        %24 = call @classify(%23) : s32i [all]
+        %25 = call @printf(%22, %24) : s32i [all]
+        %26 = get_global @printf : (s8i*, ...) -> s32i*
+        %27 = get_global @.str : s8i[4]*
+        %28 = cast(array_to_ptrdecay) %27 : s8i*
+        %29 = const 6 : s128i_bitint
+        %30 = call @classify(%29) : s32i [all]
+        %31 = call @printf(%28, %30) : s32i [all]
+        %32 = get_global @printf : (s8i*, ...) -> s32i*
+        %33 = get_global @.str : s8i[4]*
+        %34 = cast(array_to_ptrdecay) %33 : s8i*
+        %35 = const 9 : s128i_bitint
+        %36 = call @classify(%35) : s32i [all]
+        %37 = call @printf(%34, %36) : s32i [all]
+        %38 = const 0 : s32i
+        store %38, %0
+        %39 = load %0 : s32i
+        return %39
 }

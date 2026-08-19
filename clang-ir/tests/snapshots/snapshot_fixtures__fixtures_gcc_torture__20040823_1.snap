@@ -1,47 +1,47 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20040823-1.c" (c, x86_64-unknown-linux-gnu)
-global pwarn : s32i* = #cir.ptr<null> [external, default, align 8, dso_local]
+global pwarn : s32i* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("s32i"), addr_space: None }) } [external, default, align 8, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c, nothrow];
 fn bla() -> void [external, c, no_inline, dso_local, nothrow] {
-    scope {
-        %13 = get_global @pwarn : s32i**
-        %14 = load %13 : s32i*, align 8
-        %15 = load %14 : s32i, align 4
-        %16 = cast(int_to_bool) %15 : bool
-        %17 = not %16 : bool
-        if %17 {
-            %18 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %13 = get_global @pwarn : s32i**
+                %14 = load %13 : s32i*, align 8
+                %15 = load %14 : s32i, align 4
+                %16 = cast(int_to_bool) %15 : bool
+                not
+                if %17 {
+                        %18 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %11 = get_global @exit : ((s32i) -> void)*
-    %12 = const 0 : s32i
-    call @exit(%12) [all]
-    return
+        %11 = get_global @exit : (s32i) -> void*
+        %12 = const 0 : s32i
+        call @exit(%12) [all]
+        return
 }
 fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "warn", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @memset : ((void*, s32i, u64i) -> void*)*
-    %4 = cast(bitcast) %1 : void*
-    %5 = const 0 : s32i
-    %6 = const 4 : u64i
-    %7 = call @memset(%4, %5, %6) : void* [all]
-    %8 = get_global @pwarn : s32i**
-    store %1, %8, align 8
-    %9 = const 1 : s32i
-    store %9, %1, align 4
-    call @bla() [all]
-    %10 = load %0 : s32i
-    return %10
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "warn", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @memset : (void*, s32i, u64i) -> void**
+        %4 = cast(bitcast) %1 : void*
+        %5 = const 0 : s32i
+        %6 = const 4 : u64i
+        %7 = call @memset(%4, %5, %6) : void* [all]
+        %8 = get_global @pwarn : s32i**
+        store %1, %8, align 8
+        %9 = const 1 : s32i
+        store %9, %1, align 4
+        call @bla() [all]
+        %10 = load %0 : s32i
+        return %10
 }

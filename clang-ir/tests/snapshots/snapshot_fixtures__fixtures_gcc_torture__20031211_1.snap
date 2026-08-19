@@ -1,45 +1,45 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20031211-1.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.a : rec_a = zero [cir_private, default, dso_local, constant]
-global x : u32i = 0 [external, default, align 4, dso_local]
+global __const.main.a : rec_a = Zero { ty: Named("rec_a") } [cir_private, default, dso_local, constant]
+global x : u32i = CirInt { ty: Named("u32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_a, "a", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @__const.main.a : rec_a*
-    copy %1, %3
-    %4 = const 48879 : u32i
-    %5 = get_global @x : u32i*
-    store %4, %5, align 4
-    %6 = get_global @x : u32i*
-    %7 = load %6 : u32i, align 4
-    %8 = get_member %1[0] "bitfield" : u8i*
-    %9 = get_bitfield %8, "bitfield": 1 bits @0 in u8i : u32i, align 4
-    %10 = or %9, %7 : u32i
-    %11 = set_bitfield %8, %10, "bitfield": 1 bits @0 in u8i : u32i, align 4
-    scope {
-        %15 = get_member %1[0] "bitfield" : u8i*
-        %16 = get_bitfield %15, "bitfield": 1 bits @0 in u8i : u32i, align 4
-        %17 = cast(integral) %16 : s32i
-        %18 = const 1 : s32i
-        %19 = cmp ne %17, %18 : bool
-        if %19 {
-            %20 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_a, "a", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @__const.main.a : rec_a*
+        copy
+        %4 = const 48879 : u32i
+        %5 = get_global @x : u32i*
+        store %4, %5, align 4
+        %6 = get_global @x : u32i*
+        %7 = load %6 : u32i, align 4
+        get_member
+        get_bitfield
+        or
+        set_bitfield
+        scope {
+                get_member
+                get_bitfield
+                %17 = cast(integral) %16 : s32i
+                %18 = const 1 : s32i
+                cmp
+                if %19 {
+                        %20 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %12 = get_global @exit : ((s32i) -> void)*
-    %13 = const 0 : s32i
-    call @exit(%13) [all]
-    %14 = load %0 : s32i
-    return %14
+        %12 = get_global @exit : (s32i) -> void*
+        %13 = const 0 : s32i
+        call @exit(%13) [all]
+        %14 = load %0 : s32i
+        return %14
 }

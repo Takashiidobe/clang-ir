@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/930614-1.c" (c, x86_64-unknown-linux-gnu)
@@ -15,54 +15,54 @@ fn f(%arg0: double*) -> void [external, c, no_inline, dso_local, nothrow] {
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca double[6], "foo", align 16
-    %2 = alloca double, "tx", align 8
-    %3 = alloca double, "ty", align 8
-    %4 = alloca double, "d", align 8
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = const 0.000000e+00 : double
-    store %6, %2, align 8
-    call @f(%3) [all]
-    scope {
-        %20 = load %3 : double, align 8
-        %21 = const 0 : s32i
-        %22 = cast(int_to_float) %21 : double
-        %23 = cmp lt %20, %22 : bool
-        if %23 {
-            %24 = load %3 : double, align 8
-            %25 = fneg %24 : double
-            store %25, %3, align 8
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca double[6], "foo", align 16
+        %2 = alloca double, "tx", align 8
+        %3 = alloca double, "ty", align 8
+        %4 = alloca double, "d", align 8
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = const 0.000000e+00 : double
+        store %6, %2, align 8
+        call @f(%3) [all]
+        scope {
+                %20 = load %3 : double, align 8
+                %21 = const 0 : s32i
+                %22 = cast(int_to_float) %21 : double
+                cmp
+                if %23 {
+                        %24 = load %3 : double, align 8
+                        fneg
+                        store %25, %3, align 8
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = load %2 : double, align 8
-    %8 = load %3 : double, align 8
-    %9 = cmp gt %7, %8 : bool
-    %10 = ternary %9 ? { : double
-        %19 = load %2 : double, align 8
-        yield %19
-    } : {
-        %18 = load %3 : double, align 8
-        yield %18
-    }
-    store %10, %4, align 8
-    scope {
-        %14 = load %3 : double, align 8
-        %15 = load %4 : double, align 8
-        %16 = cmp ne %14, %15 : bool
-        if %16 {
-            %17 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %7 = load %2 : double, align 8
+        %8 = load %3 : double, align 8
+        cmp
+        %10 = ternary %9 ? { : double
+                %19 = load %2 : double, align 8
+                yield %19
+        } : {
+                %18 = load %3 : double, align 8
+                yield %18
         }
-        yield
-    }
-    %11 = get_global @exit : ((s32i) -> void)*
-    %12 = const 0 : s32i
-    call @exit(%12) [all]
-    %13 = load %0 : s32i
-    return %13
+        store %10, %4, align 8
+        scope {
+                %14 = load %3 : double, align 8
+                %15 = load %4 : double, align 8
+                cmp
+                if %16 {
+                        %17 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
+        }
+        %11 = get_global @exit : (s32i) -> void*
+        %12 = const 0 : s32i
+        call @exit(%12) [all]
+        %13 = load %0 : s32i
+        return %13
 }

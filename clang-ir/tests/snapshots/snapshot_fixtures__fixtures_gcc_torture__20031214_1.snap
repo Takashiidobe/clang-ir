@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20031214-1.c" (c, x86_64-unknown-linux-gnu)
-global g : rec_anon2E0 = {0.000000e+00, [1, 2]} [external, default, align 8, dso_local]
-global k : s32i = 0 [external, default, align 4, dso_local]
+global g : rec_anon2E0 = ConstRecord { ty: Named("rec_anon2E0"), members: Array([CirFloat { ty: Double, value: "0.000000e+00" }, ConstArray { ty: Array { element_type: Named("s32i"), size: 2 }, elts: Array([CirInt { ty: Named("s32i"), value: "1" }, CirInt { ty: Named("s32i"), value: "2" }]), trailing_zeros_num: 0 }]) } [external, default, align 8, dso_local]
+global k : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn b(%arg0: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i*):
@@ -13,59 +13,59 @@ fn b(%arg0: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "j", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    scope {
-        %8 = const 0 : s32i
-        store %8, %1, align 4
-        for cond: {
-            %30 = load %1 : s32i, align 4
-            %31 = const 2 : s32i
-            %32 = cmp lt %30, %31 : bool
-            condition %32
-        } step: {
-            %9 = load %1 : s32i, align 4
-            %10 = inc %9 : s32i [nsw]
-            store %10, %1, align 4
-            yield
-        } do {
-            %11 = get_global @k : s32i*
-            %12 = load %11 : s32i, align 4
-            %13 = load %1 : s32i, align 4
-            %14 = cast(integral) %13 : s64i
-            %15 = get_global @g : rec_anon2E0*
-            %16 = get_member %15[1] "n" : s32i[2]*
-            %17 = get_element %16[%14] : s32i*
-            %18 = load %17 : s32i, align 4
-            %19 = cmp gt %12, %18 : bool
-            %20 = ternary %19 ? { : s32i
-                %28 = get_global @k : s32i*
-                %29 = load %28 : s32i, align 4
-                yield %29
-            } : {
-                %22 = load %1 : s32i, align 4
-                %23 = cast(integral) %22 : s64i
-                %24 = get_global @g : rec_anon2E0*
-                %25 = get_member %24[1] "n" : s32i[2]*
-                %26 = get_element %25[%23] : s32i*
-                %27 = load %26 : s32i, align 4
-                yield %27
-            }
-            %21 = get_global @k : s32i*
-            store %20, %21, align 4
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "j", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        scope {
+                %8 = const 0 : s32i
+                store %8, %1, align 4
+                for cond {
+                        %30 = load %1 : s32i, align 4
+                        %31 = const 2 : s32i
+                        cmp
+                        condition %32
+                } step {
+                        %9 = load %1 : s32i, align 4
+                        inc
+                        store %10, %1, align 4
+                        yield
+                } body {
+                        %11 = get_global @k : s32i*
+                        %12 = load %11 : s32i, align 4
+                        %13 = load %1 : s32i, align 4
+                        %14 = cast(integral) %13 : s64i
+                        %15 = get_global @g : rec_anon2E0*
+                        get_member
+                        get_element
+                        %18 = load %17 : s32i, align 4
+                        cmp
+                        %20 = ternary %19 ? { : s32i
+                                %28 = get_global @k : s32i*
+                                %29 = load %28 : s32i, align 4
+                                yield %29
+                        } : {
+                                %22 = load %1 : s32i, align 4
+                                %23 = cast(integral) %22 : s64i
+                                %24 = get_global @g : rec_anon2E0*
+                                get_member
+                                get_element
+                                %27 = load %26 : s32i, align 4
+                                yield %27
+                        }
+                        %21 = get_global @k : s32i*
+                        store %20, %21, align 4
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %3 = get_global @k : s32i*
-    %4 = load %3 : s32i, align 4
-    %5 = inc %4 : s32i [nsw]
-    store %5, %3, align 4
-    call @b(%1) [all]
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %3 = get_global @k : s32i*
+        %4 = load %3 : s32i, align 4
+        inc
+        store %5, %3, align 4
+        call @b(%1) [all]
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

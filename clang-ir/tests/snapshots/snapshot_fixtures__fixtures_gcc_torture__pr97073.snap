@@ -1,51 +1,51 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr97073.c" (c, x86_64-unknown-linux-gnu)
-global u : rec_U = zero [external, default, align 8, dso_local]
+global u : rec_U = Zero { ty: Named("rec_U") } [external, default, align 8, dso_local]
 
 fn foo(%arg0: u64i) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: u64i):
         %14 = alloca u64i, "x", align 8
         store %arg0, %14
         %15 = get_global @u : rec_U*
-        %16 = get_member %15[0] "i" : u64i*
+        get_member
         %17 = load %16 : u64i, align 8
         %18 = load %14 : u64i, align 8
-        %19 = and %17, %18 : u64i
+        and
         %20 = get_global @u : rec_U*
-        %21 = get_member %20[1] "j" : rec_T*
-        %22 = get_member %21[1] "l" : u64i*
+        get_member
+        get_member
         store %19, %22, align 8
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 5 : u64i
-    %3 = get_global @u : rec_U*
-    %4 = get_member %3[0] "i" : u64i*
-    store %2, %4, align 8
-    %5 = const 18446744073709551615 : u64i
-    call @foo(%5) [all]
-    scope {
-        %8 = get_global @u : rec_U*
-        %9 = get_member %8[1] "j" : rec_T*
-        %10 = get_member %9[1] "l" : u64i*
-        %11 = load %10 : u64i, align 8
-        %12 = const 5 : u64i
-        %13 = cmp ne %11, %12 : bool
-        if %13 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 5 : u64i
+        %3 = get_global @u : rec_U*
+        get_member
+        store %2, %4, align 8
+        %5 = const 18446744073709551615 : u64i
+        call @foo(%5) [all]
+        scope {
+                %8 = get_global @u : rec_U*
+                get_member
+                get_member
+                %11 = load %10 : u64i, align 8
+                %12 = const 5 : u64i
+                cmp
+                if %13 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

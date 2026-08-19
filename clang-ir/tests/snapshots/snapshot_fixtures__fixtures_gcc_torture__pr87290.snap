@@ -1,16 +1,16 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr87290.c" (c, x86_64-unknown-linux-gnu)
-global c : s32i = 0 [external, default, align 4, dso_local]
+global c : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn f0() -> void [external, c, no_inline, dso_local, nothrow] {
-    %143 = get_global @c : s32i*
-    %144 = load %143 : s32i, align 4
-    %145 = inc %144 : s32i [nsw]
-    store %145, %143, align 4
-    return
+        %143 = get_global @c : s32i*
+        %144 = load %143 : s32i, align 4
+        inc
+        store %145, %143, align 4
+        return
 }
 fn f1(%arg3: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg3: s32i):
@@ -19,9 +19,9 @@ fn f1(%arg3: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %arg3, %134
         %136 = load %134 : s32i, align 4
         %137 = const 16 : s32i
-        %138 = rem %136, %137 : s32i
+        rem
         %139 = const 13 : s32i
-        %140 = cmp eq %138, %139 : bool
+        cmp
         %141 = cast(bool_to_int) %140 : s32i
         store %141, %135
         %142 = load %135 : s32i
@@ -34,9 +34,9 @@ fn f2(%arg2: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %arg2, %125
         %127 = load %125 : s32i, align 4
         %128 = const 16 : s32i
-        %129 = rem %127, %128 : s32i
+        rem
         %130 = const -13 : s32i
-        %131 = cmp eq %129, %130 : bool
+        cmp
         %132 = cast(bool_to_int) %131 : s32i
         store %132, %126
         %133 = load %126 : s32i
@@ -47,16 +47,16 @@ fn f3(%arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %119 = alloca s32i, "x", align 4
         store %arg1, %119
         scope {
-            %120 = load %119 : s32i, align 4
-            %121 = const 16 : s32i
-            %122 = rem %120, %121 : s32i
-            %123 = const 13 : s32i
-            %124 = cmp eq %122, %123 : bool
-            if %124 {
-                call @f0() [all]
+                %120 = load %119 : s32i, align 4
+                %121 = const 16 : s32i
+                rem
+                %123 = const 13 : s32i
+                cmp
+                if %124 {
+                        call @f0() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -65,213 +65,213 @@ fn f4(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %113 = alloca s32i, "x", align 4
         store %arg0, %113
         scope {
-            %114 = load %113 : s32i, align 4
-            %115 = const 16 : s32i
-            %116 = rem %114, %115 : s32i
-            %117 = const -13 : s32i
-            %118 = cmp eq %116, %117 : bool
-            if %118 {
-                call @f0() [all]
+                %114 = load %113 : s32i, align 4
+                %115 = const 16 : s32i
+                rem
+                %117 = const -13 : s32i
+                cmp
+                if %118 {
+                        call @f0() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = alloca s32i, "j", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    scope {
-        %6 = const -30 : s32i
-        store %6, %1, align 4
-        for cond: {
-            %110 = load %1 : s32i, align 4
-            %111 = const 30 : s32i
-            %112 = cmp lt %110, %111 : bool
-            condition %112
-        } step: {
-            %7 = load %1 : s32i, align 4
-            %8 = inc %7 : s32i [nsw]
-            store %8, %1, align 4
-            yield
-        } do {
-            scope {
-                scope {
-                    %86 = const 13 : s32i
-                    %87 = load %1 : s32i, align 4
-                    %88 = const 16 : s32i
-                    %89 = mul %87, %88 : s32i [nsw]
-                    %90 = add %86, %89 : s32i [nsw]
-                    %91 = call @f1(%90) : s32i [all]
-                    %92 = load %1 : s32i, align 4
-                    %93 = const 0 : s32i
-                    %94 = cmp ge %92, %93 : bool
-                    %95 = cast(bool_to_int) %94 : s32i
-                    %96 = cmp ne %91, %95 : bool
-                    %97 = ternary %96 ? { : bool
-                        %109 = const true : bool
-                        yield %109
-                    } : {
-                        %98 = const -13 : s32i
-                        %99 = load %1 : s32i, align 4
-                        %100 = const 16 : s32i
-                        %101 = mul %99, %100 : s32i [nsw]
-                        %102 = add %98, %101 : s32i [nsw]
-                        %103 = call @f2(%102) : s32i [all]
-                        %104 = load %1 : s32i, align 4
-                        %105 = const 0 : s32i
-                        %106 = cmp le %104, %105 : bool
-                        %107 = cast(bool_to_int) %106 : s32i
-                        %108 = cmp ne %103, %107 : bool
-                        yield %108
-                    }
-                    if %97 {
-                        call @abort() [all]
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = alloca s32i, "j", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        scope {
+                %6 = const -30 : s32i
+                store %6, %1, align 4
+                for cond {
+                        %110 = load %1 : s32i, align 4
+                        %111 = const 30 : s32i
+                        cmp
+                        condition %112
+                } step {
+                        %7 = load %1 : s32i, align 4
+                        inc
+                        store %8, %1, align 4
                         yield
-                    }
-                    yield
-                }
-                %9 = const 13 : s32i
-                %10 = load %1 : s32i, align 4
-                %11 = const 16 : s32i
-                %12 = mul %10, %11 : s32i [nsw]
-                %13 = add %9, %12 : s32i [nsw]
-                call @f3(%13) [all]
-                scope {
-                    %79 = get_global @c : s32i*
-                    %80 = load %79 : s32i, align 4
-                    %81 = load %1 : s32i, align 4
-                    %82 = const 0 : s32i
-                    %83 = cmp ge %81, %82 : bool
-                    %84 = cast(bool_to_int) %83 : s32i
-                    %85 = cmp ne %80, %84 : bool
-                    if %85 {
-                        call @abort() [all]
-                        yield
-                    }
-                    yield
-                }
-                %14 = const -13 : s32i
-                %15 = load %1 : s32i, align 4
-                %16 = const 16 : s32i
-                %17 = mul %15, %16 : s32i [nsw]
-                %18 = add %14, %17 : s32i [nsw]
-                call @f4(%18) [all]
-                scope {
-                    %70 = get_global @c : s32i*
-                    %71 = load %70 : s32i, align 4
-                    %72 = const 1 : s32i
-                    %73 = load %1 : s32i, align 4
-                    %74 = const 0 : s32i
-                    %75 = cmp eq %73, %74 : bool
-                    %76 = cast(bool_to_int) %75 : s32i
-                    %77 = add %72, %76 : s32i [nsw]
-                    %78 = cmp ne %71, %77 : bool
-                    if %78 {
-                        call @abort() [all]
-                        yield
-                    }
-                    yield
-                }
-                scope {
-                    %30 = const 1 : s32i
-                    store %30, %2, align 4
-                    for cond: {
-                        %67 = load %2 : s32i, align 4
-                        %68 = const 16 : s32i
-                        %69 = cmp lt %67, %68 : bool
-                        condition %69
-                    } step: {
-                        %31 = load %2 : s32i, align 4
-                        %32 = inc %31 : s32i [nsw]
-                        store %32, %2, align 4
-                        yield
-                    } do {
+                } body {
                         scope {
-                            scope {
-                                %47 = const 13 : s32i
-                                %48 = load %1 : s32i, align 4
-                                %49 = const 16 : s32i
-                                %50 = mul %48, %49 : s32i [nsw]
-                                %51 = add %47, %50 : s32i [nsw]
-                                %52 = load %2 : s32i, align 4
-                                %53 = add %51, %52 : s32i [nsw]
-                                %54 = call @f1(%53) : s32i [all]
-                                %55 = cast(int_to_bool) %54 : bool
-                                %56 = ternary %55 ? { : bool
-                                    %66 = const true : bool
-                                    yield %66
-                                } : {
-                                    %57 = const -13 : s32i
-                                    %58 = load %1 : s32i, align 4
-                                    %59 = const 16 : s32i
-                                    %60 = mul %58, %59 : s32i [nsw]
-                                    %61 = add %57, %60 : s32i [nsw]
-                                    %62 = load %2 : s32i, align 4
-                                    %63 = add %61, %62 : s32i [nsw]
-                                    %64 = call @f2(%63) : s32i [all]
-                                    %65 = cast(int_to_bool) %64 : bool
-                                    yield %65
+                                scope {
+                                        %86 = const 13 : s32i
+                                        %87 = load %1 : s32i, align 4
+                                        %88 = const 16 : s32i
+                                        mul
+                                        %90 = add %86, %89 : s32i [nsw]
+                                        %91 = call @f1(%90) : s32i [all]
+                                        %92 = load %1 : s32i, align 4
+                                        %93 = const 0 : s32i
+                                        cmp
+                                        %95 = cast(bool_to_int) %94 : s32i
+                                        cmp
+                                        %97 = ternary %96 ? { : bool
+                                                %109 = const true : bool
+                                                yield %109
+                                        } : {
+                                                %98 = const -13 : s32i
+                                                %99 = load %1 : s32i, align 4
+                                                %100 = const 16 : s32i
+                                                mul
+                                                %102 = add %98, %101 : s32i [nsw]
+                                                %103 = call @f2(%102) : s32i [all]
+                                                %104 = load %1 : s32i, align 4
+                                                %105 = const 0 : s32i
+                                                cmp
+                                                %107 = cast(bool_to_int) %106 : s32i
+                                                cmp
+                                                yield %108
+                                        }
+                                        if %97 {
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
                                 }
-                                if %56 {
-                                    call @abort() [all]
-                                    yield
+                                %9 = const 13 : s32i
+                                %10 = load %1 : s32i, align 4
+                                %11 = const 16 : s32i
+                                mul
+                                %13 = add %9, %12 : s32i [nsw]
+                                call @f3(%13) [all]
+                                scope {
+                                        %79 = get_global @c : s32i*
+                                        %80 = load %79 : s32i, align 4
+                                        %81 = load %1 : s32i, align 4
+                                        %82 = const 0 : s32i
+                                        cmp
+                                        %84 = cast(bool_to_int) %83 : s32i
+                                        cmp
+                                        if %85 {
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
                                 }
+                                %14 = const -13 : s32i
+                                %15 = load %1 : s32i, align 4
+                                %16 = const 16 : s32i
+                                mul
+                                %18 = add %14, %17 : s32i [nsw]
+                                call @f4(%18) [all]
+                                scope {
+                                        %70 = get_global @c : s32i*
+                                        %71 = load %70 : s32i, align 4
+                                        %72 = const 1 : s32i
+                                        %73 = load %1 : s32i, align 4
+                                        %74 = const 0 : s32i
+                                        cmp
+                                        %76 = cast(bool_to_int) %75 : s32i
+                                        %77 = add %72, %76 : s32i [nsw]
+                                        cmp
+                                        if %78 {
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                scope {
+                                        %30 = const 1 : s32i
+                                        store %30, %2, align 4
+                                        for cond {
+                                                %67 = load %2 : s32i, align 4
+                                                %68 = const 16 : s32i
+                                                cmp
+                                                condition %69
+                                        } step {
+                                                %31 = load %2 : s32i, align 4
+                                                inc
+                                                store %32, %2, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %47 = const 13 : s32i
+                                                                %48 = load %1 : s32i, align 4
+                                                                %49 = const 16 : s32i
+                                                                mul
+                                                                %51 = add %47, %50 : s32i [nsw]
+                                                                %52 = load %2 : s32i, align 4
+                                                                %53 = add %51, %52 : s32i [nsw]
+                                                                %54 = call @f1(%53) : s32i [all]
+                                                                %55 = cast(int_to_bool) %54 : bool
+                                                                %56 = ternary %55 ? { : bool
+                                                                        %66 = const true : bool
+                                                                        yield %66
+                                                                } : {
+                                                                        %57 = const -13 : s32i
+                                                                        %58 = load %1 : s32i, align 4
+                                                                        %59 = const 16 : s32i
+                                                                        mul
+                                                                        %61 = add %57, %60 : s32i [nsw]
+                                                                        %62 = load %2 : s32i, align 4
+                                                                        %63 = add %61, %62 : s32i [nsw]
+                                                                        %64 = call @f2(%63) : s32i [all]
+                                                                        %65 = cast(int_to_bool) %64 : bool
+                                                                        yield %65
+                                                                }
+                                                                if %56 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        %33 = const 13 : s32i
+                                                        %34 = load %1 : s32i, align 4
+                                                        %35 = const 16 : s32i
+                                                        mul
+                                                        %37 = add %33, %36 : s32i [nsw]
+                                                        %38 = load %2 : s32i, align 4
+                                                        %39 = add %37, %38 : s32i [nsw]
+                                                        call @f3(%39) [all]
+                                                        %40 = const -13 : s32i
+                                                        %41 = load %1 : s32i, align 4
+                                                        %42 = const 16 : s32i
+                                                        mul
+                                                        %44 = add %40, %43 : s32i [nsw]
+                                                        %45 = load %2 : s32i, align 4
+                                                        %46 = add %44, %45 : s32i [nsw]
+                                                        call @f4(%46) [all]
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
+                                scope {
+                                        %21 = get_global @c : s32i*
+                                        %22 = load %21 : s32i, align 4
+                                        %23 = const 1 : s32i
+                                        %24 = load %1 : s32i, align 4
+                                        %25 = const 0 : s32i
+                                        cmp
+                                        %27 = cast(bool_to_int) %26 : s32i
+                                        %28 = add %23, %27 : s32i [nsw]
+                                        cmp
+                                        if %29 {
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                %19 = const 0 : s32i
+                                %20 = get_global @c : s32i*
+                                store %19, %20, align 4
                                 yield
-                            }
-                            %33 = const 13 : s32i
-                            %34 = load %1 : s32i, align 4
-                            %35 = const 16 : s32i
-                            %36 = mul %34, %35 : s32i [nsw]
-                            %37 = add %33, %36 : s32i [nsw]
-                            %38 = load %2 : s32i, align 4
-                            %39 = add %37, %38 : s32i [nsw]
-                            call @f3(%39) [all]
-                            %40 = const -13 : s32i
-                            %41 = load %1 : s32i, align 4
-                            %42 = const 16 : s32i
-                            %43 = mul %41, %42 : s32i [nsw]
-                            %44 = add %40, %43 : s32i [nsw]
-                            %45 = load %2 : s32i, align 4
-                            %46 = add %44, %45 : s32i [nsw]
-                            call @f4(%46) [all]
-                            yield
                         }
                         yield
-                    }
-                    yield
                 }
-                scope {
-                    %21 = get_global @c : s32i*
-                    %22 = load %21 : s32i, align 4
-                    %23 = const 1 : s32i
-                    %24 = load %1 : s32i, align 4
-                    %25 = const 0 : s32i
-                    %26 = cmp eq %24, %25 : bool
-                    %27 = cast(bool_to_int) %26 : s32i
-                    %28 = add %23, %27 : s32i [nsw]
-                    %29 = cmp ne %22, %28 : bool
-                    if %29 {
-                        call @abort() [all]
-                        yield
-                    }
-                    yield
-                }
-                %19 = const 0 : s32i
-                %20 = get_global @c : s32i*
-                store %19, %20, align 4
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

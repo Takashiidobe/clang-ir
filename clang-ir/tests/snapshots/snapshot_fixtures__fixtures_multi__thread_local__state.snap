@@ -1,15 +1,15 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.multi/thread_local/state.c" (c, x86_64-unknown-linux-gnu)
-global shared_value : s32i = 5 [external, default, tls_dyn, align 4, dso_local]
+global shared_value : s32i = CirInt { ty: Named("s32i"), value: "5" } [external, default, tls_dyn, align 4, dso_local]
 
 fn read_shared_value() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = get_global @shared_value : s32i*
-    %2 = load %1 : s32i, align 4
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %0 = alloca s32i, "__retval", align 4
+        %1 = get_global @shared_value : s32i*
+        %2 = load %1 : s32i, align 4
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

@@ -1,129 +1,129 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/saturating_arith.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[4] = "%u\n" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[13] = "%d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%u\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[13] = ConstArray { ty: Array { element_type: Named("s8i"), size: 13 }, elts: Str("%d %d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "add_i", align 4
-    %2 = alloca s32i, "add_i_no_sat", align 4
-    %3 = alloca s16i, "sub_s", align 2
-    %4 = alloca u32i, "sub_u", align 4
-    %5 = alloca u128i, "u128a", align 16
-    %6 = alloca u128i, "add_u128", align 16
-    %7 = alloca s200_bitint, "s200a", align 8
-    %8 = alloca s200_bitint, "add_s200", align 8
-    %9 = alloca u200_bitint, "u200a", align 8
-    %10 = alloca u200_bitint, "sub_u200", align 8
-    %11 = alloca vector<4 x s32i>, "va", align 16
-    %12 = alloca vector<4 x s32i>, "vb", align 16
-    %13 = alloca vector<4 x s32i>, "vr", align 16
-    %14 = const 0 : s32i
-    store %14, %0
-    %15 = const 2147483647 : s32i
-    store %15, %1, align 4
-    %16 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %17 = get_global @.str : s8i[4]*
-    %18 = cast(array_to_ptrdecay) %17 : s8i*
-    %19 = load %1 : s32i, align 4
-    %20 = call @printf(%18, %19) : s32i [all]
-    %21 = const 5 : s32i
-    store %21, %2, align 4
-    %22 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %23 = get_global @.str : s8i[4]*
-    %24 = cast(array_to_ptrdecay) %23 : s8i*
-    %25 = load %2 : s32i, align 4
-    %26 = call @printf(%24, %25) : s32i [all]
-    %27 = const -32768 : s16i
-    store %27, %3, align 2
-    %28 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %29 = get_global @.str : s8i[4]*
-    %30 = cast(array_to_ptrdecay) %29 : s8i*
-    %31 = load %3 : s16i, align 2
-    %32 = cast(integral) %31 : s32i
-    %33 = call @printf(%30, %32) : s32i [all]
-    %34 = const 0 : u32i
-    store %34, %4, align 4
-    %35 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %36 = get_global @.str.1 : s8i[4]*
-    %37 = cast(array_to_ptrdecay) %36 : s8i*
-    %38 = load %4 : u32i, align 4
-    %39 = call @printf(%37, %38) : s32i [all]
-    %40 = const 0 : u128i
-    %41 = const 1 : u128i
-    %42 = sub %40, %41 : u128i
-    store %42, %5, align 16
-    %43 = load %5 : u128i, align 16
-    %44 = const 5 : u128i
-    %45 = add %43, %44 : u128i [sat]
-    store %45, %6, align 16
-    %46 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %47 = get_global @.str : s8i[4]*
-    %48 = cast(array_to_ptrdecay) %47 : s8i*
-    %49 = load %6 : u128i, align 16
-    %50 = const 0 : u128i
-    %51 = const 1 : u128i
-    %52 = sub %50, %51 : u128i
-    %53 = cmp eq %49, %52 : bool
-    %54 = cast(bool_to_int) %53 : s32i
-    %55 = call @printf(%48, %54) : s32i [all]
-    %56 = const -1 : s200_bitint
-    store %56, %7, align 8
-    %57 = load %7 : s200_bitint, align 8
-    %58 = const 5 : s200_bitint
-    %59 = add %57, %58 : s200_bitint [sat]
-    store %59, %8, align 8
-    %60 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %61 = get_global @.str : s8i[4]*
-    %62 = cast(array_to_ptrdecay) %61 : s8i*
-    %63 = load %8 : s200_bitint, align 8
-    %64 = cast(integral) %63 : s32i
-    %65 = call @printf(%62, %64) : s32i [all]
-    %66 = const 3 : u200_bitint
-    store %66, %9, align 8
-    %67 = load %9 : u200_bitint, align 8
-    %68 = const 10 : u200_bitint
-    %69 = sub %67, %68 : u200_bitint [sat]
-    store %69, %10, align 8
-    %70 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %71 = get_global @.str : s8i[4]*
-    %72 = cast(array_to_ptrdecay) %71 : s8i*
-    %73 = load %10 : u200_bitint, align 8
-    %74 = const 0 : u200_bitint
-    %75 = cmp eq %73, %74 : bool
-    %76 = cast(bool_to_int) %75 : s32i
-    %77 = call @printf(%72, %76) : s32i [all]
-    %78 = const [2147483647, 1, -2147483648, 0] : vector<4 x s32i>
-    store %78, %11, align 16
-    %79 = const [10, 1, -10, 0] : vector<4 x s32i>
-    store %79, %12, align 16
-    %80 = load %11 : vector<4 x s32i>, align 16
-    %81 = load %12 : vector<4 x s32i>, align 16
-    %82 = add %80, %81 : vector<4 x s32i> [sat]
-    store %82, %13, align 16
-    %83 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %84 = get_global @.str.2 : s8i[13]*
-    %85 = cast(array_to_ptrdecay) %84 : s8i*
-    %86 = load %13 : vector<4 x s32i>, align 16
-    %87 = const 0 : s32i
-    %88 = vec.extract %86[%87] : s32i
-    %89 = load %13 : vector<4 x s32i>, align 16
-    %90 = const 1 : s32i
-    %91 = vec.extract %89[%90] : s32i
-    %92 = load %13 : vector<4 x s32i>, align 16
-    %93 = const 2 : s32i
-    %94 = vec.extract %92[%93] : s32i
-    %95 = load %13 : vector<4 x s32i>, align 16
-    %96 = const 3 : s32i
-    %97 = vec.extract %95[%96] : s32i
-    %98 = call @printf(%85, %88, %91, %94, %97) : s32i [all]
-    %99 = const 0 : s32i
-    store %99, %0
-    %100 = load %0 : s32i
-    return %100
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "add_i", align 4
+        %2 = alloca s32i, "add_i_no_sat", align 4
+        %3 = alloca s16i, "sub_s", align 2
+        %4 = alloca u32i, "sub_u", align 4
+        %5 = alloca u128i, "u128a", align 16
+        %6 = alloca u128i, "add_u128", align 16
+        %7 = alloca s200_bitint, "s200a", align 8
+        %8 = alloca s200_bitint, "add_s200", align 8
+        %9 = alloca u200_bitint, "u200a", align 8
+        %10 = alloca u200_bitint, "sub_u200", align 8
+        %11 = alloca vector<4 x s32i>, "va", align 16
+        %12 = alloca vector<4 x s32i>, "vb", align 16
+        %13 = alloca vector<4 x s32i>, "vr", align 16
+        %14 = const 0 : s32i
+        store %14, %0
+        %15 = const 2147483647 : s32i
+        store %15, %1, align 4
+        %16 = get_global @printf : (s8i*, ...) -> s32i*
+        %17 = get_global @.str : s8i[4]*
+        %18 = cast(array_to_ptrdecay) %17 : s8i*
+        %19 = load %1 : s32i, align 4
+        %20 = call @printf(%18, %19) : s32i [all]
+        %21 = const 5 : s32i
+        store %21, %2, align 4
+        %22 = get_global @printf : (s8i*, ...) -> s32i*
+        %23 = get_global @.str : s8i[4]*
+        %24 = cast(array_to_ptrdecay) %23 : s8i*
+        %25 = load %2 : s32i, align 4
+        %26 = call @printf(%24, %25) : s32i [all]
+        %27 = const -32768 : s16i
+        store %27, %3, align 2
+        %28 = get_global @printf : (s8i*, ...) -> s32i*
+        %29 = get_global @.str : s8i[4]*
+        %30 = cast(array_to_ptrdecay) %29 : s8i*
+        %31 = load %3 : s16i, align 2
+        %32 = cast(integral) %31 : s32i
+        %33 = call @printf(%30, %32) : s32i [all]
+        %34 = const 0 : u32i
+        store %34, %4, align 4
+        %35 = get_global @printf : (s8i*, ...) -> s32i*
+        %36 = get_global @.str.1 : s8i[4]*
+        %37 = cast(array_to_ptrdecay) %36 : s8i*
+        %38 = load %4 : u32i, align 4
+        %39 = call @printf(%37, %38) : s32i [all]
+        %40 = const 0 : u128i
+        %41 = const 1 : u128i
+        sub
+        store %42, %5, align 16
+        %43 = load %5 : u128i, align 16
+        %44 = const 5 : u128i
+        %45 = add %43, %44 : u128i [sat]
+        store %45, %6, align 16
+        %46 = get_global @printf : (s8i*, ...) -> s32i*
+        %47 = get_global @.str : s8i[4]*
+        %48 = cast(array_to_ptrdecay) %47 : s8i*
+        %49 = load %6 : u128i, align 16
+        %50 = const 0 : u128i
+        %51 = const 1 : u128i
+        sub
+        cmp
+        %54 = cast(bool_to_int) %53 : s32i
+        %55 = call @printf(%48, %54) : s32i [all]
+        %56 = const -1 : s200_bitint
+        store %56, %7, align 8
+        %57 = load %7 : s200_bitint, align 8
+        %58 = const 5 : s200_bitint
+        %59 = add %57, %58 : s200_bitint [sat]
+        store %59, %8, align 8
+        %60 = get_global @printf : (s8i*, ...) -> s32i*
+        %61 = get_global @.str : s8i[4]*
+        %62 = cast(array_to_ptrdecay) %61 : s8i*
+        %63 = load %8 : s200_bitint, align 8
+        %64 = cast(integral) %63 : s32i
+        %65 = call @printf(%62, %64) : s32i [all]
+        %66 = const 3 : u200_bitint
+        store %66, %9, align 8
+        %67 = load %9 : u200_bitint, align 8
+        %68 = const 10 : u200_bitint
+        sub
+        store %69, %10, align 8
+        %70 = get_global @printf : (s8i*, ...) -> s32i*
+        %71 = get_global @.str : s8i[4]*
+        %72 = cast(array_to_ptrdecay) %71 : s8i*
+        %73 = load %10 : u200_bitint, align 8
+        %74 = const 0 : u200_bitint
+        cmp
+        %76 = cast(bool_to_int) %75 : s32i
+        %77 = call @printf(%72, %76) : s32i [all]
+        %78 = const [[2147483647, 1, -2147483648, 0]] : vector<4 x s32i>
+        store %78, %11, align 16
+        %79 = const [[10, 1, -10, 0]] : vector<4 x s32i>
+        store %79, %12, align 16
+        %80 = load %11 : vector<4 x s32i>, align 16
+        %81 = load %12 : vector<4 x s32i>, align 16
+        %82 = add %80, %81 : vector<4 x s32i> [sat]
+        store %82, %13, align 16
+        %83 = get_global @printf : (s8i*, ...) -> s32i*
+        %84 = get_global @.str.2 : s8i[13]*
+        %85 = cast(array_to_ptrdecay) %84 : s8i*
+        %86 = load %13 : vector<4 x s32i>, align 16
+        %87 = const 0 : s32i
+        vec.extract
+        %89 = load %13 : vector<4 x s32i>, align 16
+        %90 = const 1 : s32i
+        vec.extract
+        %92 = load %13 : vector<4 x s32i>, align 16
+        %93 = const 2 : s32i
+        vec.extract
+        %95 = load %13 : vector<4 x s32i>, align 16
+        %96 = const 3 : s32i
+        vec.extract
+        %98 = call @printf(%85, %88, %91, %94, %97) : s32i [all]
+        %99 = const 0 : s32i
+        store %99, %0
+        %100 = load %0 : s32i
+        return %100
 }

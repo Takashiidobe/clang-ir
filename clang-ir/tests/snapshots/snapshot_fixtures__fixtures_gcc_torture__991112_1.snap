@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/991112-1.c" (c, x86_64-unknown-linux-gnu)
@@ -21,55 +21,55 @@ fn rl_character_len(%arg0: s32i, %arg1: s32i) -> s32i [external, c, no_inline, d
         %22 = alloca s32i, "__retval", align 4
         store %arg0, %20
         store %arg1, %21
-        %23 = get_global @isprint : ((s32i) -> s32i)*
+        %23 = get_global @isprint : (s32i) -> s32i*
         %24 = load %20 : s32i, align 4
         %25 = call @isprint(%24) : s32i [pure]
         %26 = cast(int_to_bool) %25 : bool
         %27 = const 1 : s32i
         %28 = const 2 : s32i
-        %29 = select %26, %27, %28 : s32i
+        select
         store %29, %22
         %30 = load %22 : s32i
         return %30
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca ((s32i, s32i) -> s32i)*, "x", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @rl_character_len : ((s32i, s32i) -> s32i)*
-    store %3, %1, align 8
-    scope {
-        %13 = load %1 : ((s32i, s32i) -> s32i)*, align 8
-        %14 = const 97 : s32i
-        %15 = const 1 : s32i
-        %16 = call %13(%14, %15) : s32i [all]
-        %17 = const 1 : s32i
-        %18 = cmp ne %16, %17 : bool
-        if %18 {
-            %19 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca (s32i, s32i) -> s32i*, "x", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @rl_character_len : (s32i, s32i) -> s32i*
+        store %3, %1, align 8
+        scope {
+                %13 = load %1 : (s32i, s32i) -> s32i*, align 8
+                %14 = const 97 : s32i
+                %15 = const 1 : s32i
+                %16 = call (%14, %15) : s32i [all]
+                %17 = const 1 : s32i
+                cmp
+                if %18 {
+                        %19 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %6 = load %1 : ((s32i, s32i) -> s32i)*, align 8
-        %7 = const 2 : s32i
-        %8 = const 1 : s32i
-        %9 = call %6(%7, %8) : s32i [all]
-        %10 = const 2 : s32i
-        %11 = cmp ne %9, %10 : bool
-        if %11 {
-            %12 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %6 = load %1 : (s32i, s32i) -> s32i*, align 8
+                %7 = const 2 : s32i
+                %8 = const 1 : s32i
+                %9 = call (%7, %8) : s32i [all]
+                %10 = const 2 : s32i
+                cmp
+                if %11 {
+                        %12 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

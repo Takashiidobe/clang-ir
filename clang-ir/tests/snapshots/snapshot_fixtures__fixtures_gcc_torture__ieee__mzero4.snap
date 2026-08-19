@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/ieee__mzero4.c" (c, x86_64-unknown-linux-gnu)
@@ -12,28 +12,28 @@ fn expectd(%arg2: double, %arg3: double) -> void [external, c, no_inline, dso_lo
         store %arg2, %67
         store %arg3, %68
         scope {
-            %69 = load %67 : double, align 8
-            %70 = load %68 : double, align 8
-            %71 = cmp ne %69, %70 : bool
-            %72 = ternary %71 ? { : bool
-                %81 = const true : bool
-                yield %81
-            } : {
-                %74 = get_global @memcmp : ((void*, void*, u64i) -> s32i)*
-                %75 = cast(bitcast) %67 : void*
-                %76 = cast(bitcast) %68 : void*
-                %77 = const 8 : u64i
-                %78 = call @memcmp(%75, %76, %77) : s32i [all]
-                %79 = const 0 : s32i
-                %80 = cmp ne %78, %79 : bool
-                yield %80
-            }
-            if %72 {
-                %73 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %69 = load %67 : double, align 8
+                %70 = load %68 : double, align 8
+                cmp
+                %72 = ternary %71 ? { : bool
+                        %81 = const true : bool
+                        yield %81
+                } : {
+                        %74 = get_global @memcmp : (void*, void*, u64i) -> s32i*
+                        %75 = cast(bitcast) %67 : void*
+                        %76 = cast(bitcast) %68 : void*
+                        %77 = const 8 : u64i
+                        %78 = call @memcmp(%75, %76, %77) : s32i [all]
+                        %79 = const 0 : s32i
+                        cmp
+                        yield %80
+                }
+                if %72 {
+                        %73 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -44,28 +44,28 @@ fn expectf(%arg0: float, %arg1: float) -> void [external, c, no_inline, dso_loca
         store %arg0, %52
         store %arg1, %53
         scope {
-            %54 = load %52 : float, align 4
-            %55 = load %53 : float, align 4
-            %56 = cmp ne %54, %55 : bool
-            %57 = ternary %56 ? { : bool
-                %66 = const true : bool
-                yield %66
-            } : {
-                %59 = get_global @memcmp : ((void*, void*, u64i) -> s32i)*
-                %60 = cast(bitcast) %52 : void*
-                %61 = cast(bitcast) %53 : void*
-                %62 = const 4 : u64i
-                %63 = call @memcmp(%60, %61, %62) : s32i [all]
-                %64 = const 0 : s32i
-                %65 = cmp ne %63, %64 : bool
-                yield %65
-            }
-            if %57 {
-                %58 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %54 = load %52 : float, align 4
+                %55 = load %53 : float, align 4
+                cmp
+                %57 = ternary %56 ? { : bool
+                        %66 = const true : bool
+                        yield %66
+                } : {
+                        %59 = get_global @memcmp : (void*, void*, u64i) -> s32i*
+                        %60 = cast(bitcast) %52 : void*
+                        %61 = cast(bitcast) %53 : void*
+                        %62 = const 4 : u64i
+                        %63 = call @memcmp(%60, %61, %62) : s32i [all]
+                        %64 = const 0 : s32i
+                        cmp
+                        yield %65
+                }
+                if %57 {
+                        %58 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -76,71 +76,71 @@ fn sinf(%arg0: float) -> float [external, c, nothrow];
 fn tanf(%arg0: float) -> float [external, c, nothrow];
 fn atanf(%arg0: float) -> float [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @sin : ((double) -> double)*
-    %3 = const 0.000000e+00 : double
-    %4 = call @sin(%3) : double [all]
-    %5 = const 0.000000e+00 : double
-    call @expectd(%4, %5) [all]
-    %6 = get_global @tan : ((double) -> double)*
-    %7 = const 0.000000e+00 : double
-    %8 = call @tan(%7) : double [all]
-    %9 = const 0.000000e+00 : double
-    call @expectd(%8, %9) [all]
-    %10 = get_global @atan : ((double) -> double)*
-    %11 = const 0.000000e+00 : double
-    %12 = call @atan(%11) : double [all]
-    %13 = const 0.000000e+00 : double
-    call @expectd(%12, %13) [all]
-    %14 = get_global @sin : ((double) -> double)*
-    %15 = const -0.000000e+00 : double
-    %16 = call @sin(%15) : double [all]
-    %17 = const -0.000000e+00 : double
-    call @expectd(%16, %17) [all]
-    %18 = get_global @tan : ((double) -> double)*
-    %19 = const -0.000000e+00 : double
-    %20 = call @tan(%19) : double [all]
-    %21 = const -0.000000e+00 : double
-    call @expectd(%20, %21) [all]
-    %22 = get_global @atan : ((double) -> double)*
-    %23 = const -0.000000e+00 : double
-    %24 = call @atan(%23) : double [all]
-    %25 = const -0.000000e+00 : double
-    call @expectd(%24, %25) [all]
-    %26 = get_global @sinf : ((float) -> float)*
-    %27 = const 0.000000e+00 : float
-    %28 = call @sinf(%27) : float [all]
-    %29 = const 0.000000e+00 : float
-    call @expectf(%28, %29) [all]
-    %30 = get_global @tanf : ((float) -> float)*
-    %31 = const 0.000000e+00 : float
-    %32 = call @tanf(%31) : float [all]
-    %33 = const 0.000000e+00 : float
-    call @expectf(%32, %33) [all]
-    %34 = get_global @atanf : ((float) -> float)*
-    %35 = const 0.000000e+00 : float
-    %36 = call @atanf(%35) : float [all]
-    %37 = const 0.000000e+00 : float
-    call @expectf(%36, %37) [all]
-    %38 = get_global @sinf : ((float) -> float)*
-    %39 = const -0.000000e+00 : float
-    %40 = call @sinf(%39) : float [all]
-    %41 = const -0.000000e+00 : float
-    call @expectf(%40, %41) [all]
-    %42 = get_global @tanf : ((float) -> float)*
-    %43 = const -0.000000e+00 : float
-    %44 = call @tanf(%43) : float [all]
-    %45 = const -0.000000e+00 : float
-    call @expectf(%44, %45) [all]
-    %46 = get_global @atanf : ((float) -> float)*
-    %47 = const -0.000000e+00 : float
-    %48 = call @atanf(%47) : float [all]
-    %49 = const -0.000000e+00 : float
-    call @expectf(%48, %49) [all]
-    %50 = const 0 : s32i
-    store %50, %0
-    %51 = load %0 : s32i
-    return %51
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @sin : (double) -> double*
+        %3 = const 0.000000e+00 : double
+        %4 = call @sin(%3) : double [all]
+        %5 = const 0.000000e+00 : double
+        call @expectd(%4, %5) [all]
+        %6 = get_global @tan : (double) -> double*
+        %7 = const 0.000000e+00 : double
+        %8 = call @tan(%7) : double [all]
+        %9 = const 0.000000e+00 : double
+        call @expectd(%8, %9) [all]
+        %10 = get_global @atan : (double) -> double*
+        %11 = const 0.000000e+00 : double
+        %12 = call @atan(%11) : double [all]
+        %13 = const 0.000000e+00 : double
+        call @expectd(%12, %13) [all]
+        %14 = get_global @sin : (double) -> double*
+        %15 = const -0.000000e+00 : double
+        %16 = call @sin(%15) : double [all]
+        %17 = const -0.000000e+00 : double
+        call @expectd(%16, %17) [all]
+        %18 = get_global @tan : (double) -> double*
+        %19 = const -0.000000e+00 : double
+        %20 = call @tan(%19) : double [all]
+        %21 = const -0.000000e+00 : double
+        call @expectd(%20, %21) [all]
+        %22 = get_global @atan : (double) -> double*
+        %23 = const -0.000000e+00 : double
+        %24 = call @atan(%23) : double [all]
+        %25 = const -0.000000e+00 : double
+        call @expectd(%24, %25) [all]
+        %26 = get_global @sinf : (float) -> float*
+        %27 = const 0.000000e+00 : float
+        %28 = call @sinf(%27) : float [all]
+        %29 = const 0.000000e+00 : float
+        call @expectf(%28, %29) [all]
+        %30 = get_global @tanf : (float) -> float*
+        %31 = const 0.000000e+00 : float
+        %32 = call @tanf(%31) : float [all]
+        %33 = const 0.000000e+00 : float
+        call @expectf(%32, %33) [all]
+        %34 = get_global @atanf : (float) -> float*
+        %35 = const 0.000000e+00 : float
+        %36 = call @atanf(%35) : float [all]
+        %37 = const 0.000000e+00 : float
+        call @expectf(%36, %37) [all]
+        %38 = get_global @sinf : (float) -> float*
+        %39 = const -0.000000e+00 : float
+        %40 = call @sinf(%39) : float [all]
+        %41 = const -0.000000e+00 : float
+        call @expectf(%40, %41) [all]
+        %42 = get_global @tanf : (float) -> float*
+        %43 = const -0.000000e+00 : float
+        %44 = call @tanf(%43) : float [all]
+        %45 = const -0.000000e+00 : float
+        call @expectf(%44, %45) [all]
+        %46 = get_global @atanf : (float) -> float*
+        %47 = const -0.000000e+00 : float
+        %48 = call @atanf(%47) : float [all]
+        %49 = const -0.000000e+00 : float
+        call @expectf(%48, %49) [all]
+        %50 = const 0 : s32i
+        store %50, %0
+        %51 = load %0 : s32i
+        return %51
 }

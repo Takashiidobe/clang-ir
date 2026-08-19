@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/941014-1.c" (c, x86_64-unknown-linux-gnu)
@@ -16,37 +16,37 @@ fn f(%arg0: s32i, %arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothr
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u64i, "addr1", align 8
-    %2 = alloca u64i, "addr2", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = get_global @f : ((s32i, s32i) -> s32i)*
-    %5 = cast(ptr_to_int) %4 : u64i
-    store %5, %1, align 8
-    %6 = const 5 : u64i
-    %7 = load %1 : u64i, align 8
-    %8 = add %7, %6 : u64i
-    store %8, %1, align 8
-    %9 = const 5 : u64i
-    %10 = get_global @f : ((s32i, s32i) -> s32i)*
-    %11 = cast(ptr_to_int) %10 : u64i
-    %12 = add %9, %11 : u64i
-    store %12, %2, align 8
-    scope {
-        %16 = load %1 : u64i, align 8
-        %17 = load %2 : u64i, align 8
-        %18 = cmp ne %16, %17 : bool
-        if %18 {
-            %19 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u64i, "addr1", align 8
+        %2 = alloca u64i, "addr2", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = get_global @f : (s32i, s32i) -> s32i*
+        %5 = cast(ptr_to_int) %4 : u64i
+        store %5, %1, align 8
+        %6 = const 5 : u64i
+        %7 = load %1 : u64i, align 8
+        %8 = add %7, %6 : u64i
+        store %8, %1, align 8
+        %9 = const 5 : u64i
+        %10 = get_global @f : (s32i, s32i) -> s32i*
+        %11 = cast(ptr_to_int) %10 : u64i
+        %12 = add %9, %11 : u64i
+        store %12, %2, align 8
+        scope {
+                %16 = load %1 : u64i, align 8
+                %17 = load %2 : u64i, align 8
+                cmp
+                if %18 {
+                        %19 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %13 = get_global @exit : ((s32i) -> void)*
-    %14 = const 0 : s32i
-    call @exit(%14) [all]
-    %15 = load %0 : s32i
-    return %15
+        %13 = get_global @exit : (s32i) -> void*
+        %14 = const 0 : s32i
+        call @exit(%14) [all]
+        %15 = load %0 : s32i
+        return %15
 }

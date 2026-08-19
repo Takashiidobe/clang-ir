@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr108064.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.a : s16i[4] = [255] [cir_private, default, dso_local, constant]
+global __const.main.a : s16i[4] = ConstArray { ty: Array { element_type: Named("s16i"), size: 4 }, elts: Array([CirInt { ty: Named("s16i"), value: "255" }]), trailing_zeros_num: 1 } [cir_private, default, dso_local, constant]
 
 fn foo(%arg2: s16i) -> s16i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg2: s16i):
@@ -13,16 +13,16 @@ fn foo(%arg2: s16i) -> s16i [internal, c, no_inline, dso_local, nothrow] {
         %39 = load %37 : s16i, align 2
         %40 = cast(integral) %39 : s32i
         %41 = const 8 : s32i
-        %42 = shift right %40, %41 : s32i
+        shift
         %43 = const 255 : s32i
-        %44 = and %42, %43 : s32i
+        and
         %45 = load %37 : s16i, align 2
         %46 = cast(integral) %45 : s32i
         %47 = const 255 : s32i
-        %48 = and %46, %47 : s32i
+        and
         %49 = const 8 : s32i
-        %50 = shift left %48, %49 : s32i
-        %51 = or %44, %50 : s32i
+        shift
+        or
         %52 = cast(integral) %51 : s16i
         store %52, %38
         %53 = load %38 : s16i
@@ -35,67 +35,67 @@ fn bar(%arg0: s16i*, %arg1: s16i*) -> void [external, c, no_inline, dso_local, n
         store %arg0, %20
         store %arg1, %21
         scope {
-            %22 = alloca u64i, "i", align 8
-            %23 = const 0 : u64i
-            store %23, %22, align 8
-            for cond: {
-                %34 = load %22 : u64i, align 8
-                %35 = const 4 : u64i
-                %36 = cmp lt %34, %35 : bool
-                condition %36
-            } step: {
-                %24 = load %22 : u64i, align 8
-                %25 = inc %24 : u64i
-                store %25, %22, align 8
+                %22 = alloca u64i, "i", align 8
+                %23 = const 0 : u64i
+                store %23, %22, align 8
+                for cond {
+                        %34 = load %22 : u64i, align 8
+                        %35 = const 4 : u64i
+                        cmp
+                        condition %36
+                } step {
+                        %24 = load %22 : u64i, align 8
+                        inc
+                        store %25, %22, align 8
+                        yield
+                } body {
+                        %26 = load %22 : u64i, align 8
+                        %27 = load %21 : s16i*, align 8
+                        ptr_stride
+                        %29 = load %28 : s16i, align 2
+                        %30 = call @foo(%29) : s16i [all]
+                        %31 = load %22 : u64i, align 8
+                        %32 = load %20 : s16i*, align 8
+                        ptr_stride
+                        store %30, %33, align 2
+                        yield
+                }
                 yield
-            } do {
-                %26 = load %22 : u64i, align 8
-                %27 = load %21 : s16i*, align 8
-                %28 = ptr_stride %27, %26 : s16i*
-                %29 = load %28 : s16i, align 2
-                %30 = call @foo(%29) : s16i [all]
-                %31 = load %22 : u64i, align 8
-                %32 = load %20 : s16i*, align 8
-                %33 = ptr_stride %32, %31 : s16i*
-                store %30, %33, align 2
-                yield
-            }
-            yield
         }
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s16i[4], "a", align 16
-    %2 = alloca s16i[4], "b", align 16
-    %3 = alloca s16i[4], "c", align 16
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = get_global @__const.main.a : s16i[4]*
-    copy %1, %5
-    %6 = cast(array_to_ptrdecay) %2 : s16i*
-    %7 = cast(array_to_ptrdecay) %1 : s16i*
-    call @bar(%6, %7) [all]
-    %8 = cast(array_to_ptrdecay) %3 : s16i*
-    %9 = cast(array_to_ptrdecay) %2 : s16i*
-    call @bar(%8, %9) [all]
-    scope {
-        %11 = const 0 : s64i
-        %12 = get_element %1[%11] : s16i*
-        %13 = load %12 : s16i, align 16
-        %14 = cast(integral) %13 : s32i
-        %15 = const 0 : s64i
-        %16 = get_element %3[%15] : s16i*
-        %17 = load %16 : s16i, align 16
-        %18 = cast(integral) %17 : s32i
-        %19 = cmp ne %14, %18 : bool
-        if %19 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s16i[4], "a", align 16
+        %2 = alloca s16i[4], "b", align 16
+        %3 = alloca s16i[4], "c", align 16
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = get_global @__const.main.a : s16i[4]*
+        copy
+        %6 = cast(array_to_ptrdecay) %2 : s16i*
+        %7 = cast(array_to_ptrdecay) %1 : s16i*
+        call @bar(%6, %7) [all]
+        %8 = cast(array_to_ptrdecay) %3 : s16i*
+        %9 = cast(array_to_ptrdecay) %2 : s16i*
+        call @bar(%8, %9) [all]
+        scope {
+                %11 = const 0 : s64i
+                get_element
+                %13 = load %12 : s16i, align 16
+                %14 = cast(integral) %13 : s32i
+                %15 = const 0 : s64i
+                get_element
+                %17 = load %16 : s16i, align 16
+                %18 = cast(integral) %17 : s32i
+                cmp
+                if %19 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %10 = load %0 : s32i
-    return %10
+        %10 = load %0 : s32i
+        return %10
 }

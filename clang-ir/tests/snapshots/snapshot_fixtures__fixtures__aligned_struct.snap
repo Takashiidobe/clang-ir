@@ -1,156 +1,156 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/aligned_struct.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[9] = "%zu %zu\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[7] = "%d %x\n" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[13] = "%d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
-global counter : s32i = 0 [internal, default, align 4, dso_local]
+global .str : s8i[9] = ConstArray { ty: Array { element_type: Named("s8i"), size: 9 }, elts: Str("%zu %zu\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[7] = ConstArray { ty: Array { element_type: Named("s8i"), size: 7 }, elts: Str("%d %x\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[13] = ConstArray { ty: Array { element_type: Named("s8i"), size: 13 }, elts: Str("%d %d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global counter : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn next_value() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %101 = alloca s32i, "__retval", align 4
-    %102 = const 9 : s32i
-    store %102, %101
-    %103 = load %101 : s32i
-    return %103
+        %101 = alloca s32i, "__retval", align 4
+        %102 = const 9 : s32i
+        store %102, %101
+        %103 = load %101 : s32i
+        return %103
 }
 fn effectful_case() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %87 = alloca s32i, "__retval", align 4
-    %88 = alloca rec_Aligned, "effectful", align 16
-    %89 = call @next_value() : s32i [all]
-    %90 = cast(integral) %89 : s8i
-    %91 = get_member %88[0] "a" : s8i*
-    store %90, %91, align 16
-    %92 = const 7 : s32i
-    %93 = get_member %88[1] "b" : s32i*
-    store %92, %93, align 4
-    %94 = get_member %88[0] "a" : s8i*
-    %95 = load %94 : s8i, align 16
-    %96 = cast(integral) %95 : s32i
-    %97 = get_member %88[1] "b" : s32i*
-    %98 = load %97 : s32i, align 4
-    %99 = add %96, %98 : s32i [nsw]
-    store %99, %87
-    %100 = load %87 : s32i
-    return %100
+        %87 = alloca s32i, "__retval", align 4
+        %88 = alloca rec_Aligned, "effectful", align 16
+        %89 = call @next_value() : s32i [all]
+        %90 = cast(integral) %89 : s8i
+        get_member
+        store %90, %91, align 16
+        %92 = const 7 : s32i
+        get_member
+        store %92, %93, align 4
+        get_member
+        %95 = load %94 : s8i, align 16
+        %96 = cast(integral) %95 : s32i
+        get_member
+        %98 = load %97 : s32i, align 4
+        %99 = add %96, %98 : s32i [nsw]
+        store %99, %87
+        %100 = load %87 : s32i
+        return %100
 }
 fn repeated_case() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %72 = alloca s32i, "__retval", align 4
-    %73 = alloca rec_Aligned, "repeated", align 16
-    %74 = const 1 : s8i
-    %75 = get_member %73[0] "a" : s8i*
-    store %74, %75, align 16
-    %76 = const 2 : s8i
-    %77 = get_member %73[0] "a" : s8i*
-    store %76, %77, align 16
-    %78 = const 3 : s32i
-    %79 = get_member %73[1] "b" : s32i*
-    store %78, %79, align 4
-    %80 = get_member %73[0] "a" : s8i*
-    %81 = load %80 : s8i, align 16
-    %82 = cast(integral) %81 : s32i
-    %83 = get_member %73[1] "b" : s32i*
-    %84 = load %83 : s32i, align 4
-    %85 = add %82, %84 : s32i [nsw]
-    store %85, %72
-    %86 = load %72 : s32i
-    return %86
+        %72 = alloca s32i, "__retval", align 4
+        %73 = alloca rec_Aligned, "repeated", align 16
+        %74 = const 1 : s8i
+        get_member
+        store %74, %75, align 16
+        %76 = const 2 : s8i
+        get_member
+        store %76, %77, align 16
+        %78 = const 3 : s32i
+        get_member
+        store %78, %79, align 4
+        get_member
+        %81 = load %80 : s8i, align 16
+        %82 = cast(integral) %81 : s32i
+        get_member
+        %84 = load %83 : s32i, align 4
+        %85 = add %82, %84 : s32i [nsw]
+        store %85, %72
+        %86 = load %72 : s32i
+        return %86
 }
 fn dependent_case() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %57 = alloca s32i, "__retval", align 4
-    %58 = alloca rec_Aligned, "dependent", align 16
-    %59 = const 8 : s32i
-    %60 = get_member %58[1] "b" : s32i*
-    store %59, %60, align 4
-    %61 = get_member %58[1] "b" : s32i*
-    %62 = load %61 : s32i, align 4
-    %63 = cast(integral) %62 : s8i
-    %64 = get_member %58[0] "a" : s8i*
-    store %63, %64, align 16
-    %65 = get_member %58[0] "a" : s8i*
-    %66 = load %65 : s8i, align 16
-    %67 = cast(integral) %66 : s32i
-    %68 = get_member %58[1] "b" : s32i*
-    %69 = load %68 : s32i, align 4
-    %70 = add %67, %69 : s32i [nsw]
-    store %70, %57
-    %71 = load %57 : s32i
-    return %71
+        %57 = alloca s32i, "__retval", align 4
+        %58 = alloca rec_Aligned, "dependent", align 16
+        %59 = const 8 : s32i
+        get_member
+        store %59, %60, align 4
+        get_member
+        %62 = load %61 : s32i, align 4
+        %63 = cast(integral) %62 : s8i
+        get_member
+        store %63, %64, align 16
+        get_member
+        %66 = load %65 : s8i, align 16
+        %67 = cast(integral) %66 : s32i
+        get_member
+        %69 = load %68 : s32i, align 4
+        %70 = add %67, %69 : s32i [nsw]
+        store %70, %57
+        %71 = load %57 : s32i
+        return %71
 }
 fn touch() -> void [internal, c, no_inline, dso_local, nothrow] {
-    %54 = get_global @counter : s32i*
-    %55 = load %54 : s32i, align 4
-    %56 = inc %55 : s32i [nsw]
-    store %56, %54, align 4
-    return
+        %54 = get_global @counter : s32i*
+        %55 = load %54 : s32i, align 4
+        inc
+        store %56, %54, align 4
+        return
 }
 fn interrupted_case() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %38 = alloca s32i, "__retval", align 4
-    %39 = alloca rec_Aligned, "interrupted", align 16
-    %40 = const 4 : s8i
-    %41 = get_member %39[0] "a" : s8i*
-    store %40, %41, align 16
-    call @touch() [all]
-    %42 = const 6 : s32i
-    %43 = get_member %39[1] "b" : s32i*
-    store %42, %43, align 4
-    %44 = get_member %39[0] "a" : s8i*
-    %45 = load %44 : s8i, align 16
-    %46 = cast(integral) %45 : s32i
-    %47 = get_member %39[1] "b" : s32i*
-    %48 = load %47 : s32i, align 4
-    %49 = add %46, %48 : s32i [nsw]
-    %50 = get_global @counter : s32i*
-    %51 = load %50 : s32i, align 4
-    %52 = add %49, %51 : s32i [nsw]
-    store %52, %38
-    %53 = load %38 : s32i
-    return %53
+        %38 = alloca s32i, "__retval", align 4
+        %39 = alloca rec_Aligned, "interrupted", align 16
+        %40 = const 4 : s8i
+        get_member
+        store %40, %41, align 16
+        call @touch() [all]
+        %42 = const 6 : s32i
+        get_member
+        store %42, %43, align 4
+        get_member
+        %45 = load %44 : s8i, align 16
+        %46 = cast(integral) %45 : s32i
+        get_member
+        %48 = load %47 : s32i, align 4
+        %49 = add %46, %48 : s32i [nsw]
+        %50 = get_global @counter : s32i*
+        %51 = load %50 : s32i, align 4
+        %52 = add %49, %51 : s32i [nsw]
+        store %52, %38
+        %53 = load %38 : s32i
+        return %53
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_Aligned, "s", align 16
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 5 : s8i
-    %4 = get_member %1[0] "a" : s8i*
-    store %3, %4, align 16
-    %5 = const 4660 : s32i
-    %6 = get_member %1[1] "b" : s32i*
-    store %5, %6, align 4
-    %7 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %8 = get_global @.str : s8i[9]*
-    %9 = cast(array_to_ptrdecay) %8 : s8i*
-    %10 = const 16 : u64i
-    %11 = const 16 : u64i
-    %12 = call @printf(%9, %10, %11) : s32i [all]
-    %13 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %14 = get_global @.str : s8i[9]*
-    %15 = cast(array_to_ptrdecay) %14 : s8i*
-    %16 = const 0 : u64i
-    %17 = const 4 : u64i
-    %18 = call @printf(%15, %16, %17) : s32i [all]
-    %19 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %20 = get_global @.str.1 : s8i[7]*
-    %21 = cast(array_to_ptrdecay) %20 : s8i*
-    %22 = get_member %1[0] "a" : s8i*
-    %23 = load %22 : s8i, align 16
-    %24 = cast(integral) %23 : s32i
-    %25 = get_member %1[1] "b" : s32i*
-    %26 = load %25 : s32i, align 4
-    %27 = call @printf(%21, %24, %26) : s32i [all]
-    %28 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %29 = get_global @.str.2 : s8i[13]*
-    %30 = cast(array_to_ptrdecay) %29 : s8i*
-    %31 = call @effectful_case() : s32i [all]
-    %32 = call @repeated_case() : s32i [all]
-    %33 = call @dependent_case() : s32i [all]
-    %34 = call @interrupted_case() : s32i [all]
-    %35 = call @printf(%30, %31, %32, %33, %34) : s32i [all]
-    %36 = const 0 : s32i
-    store %36, %0
-    %37 = load %0 : s32i
-    return %37
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_Aligned, "s", align 16
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 5 : s8i
+        get_member
+        store %3, %4, align 16
+        %5 = const 4660 : s32i
+        get_member
+        store %5, %6, align 4
+        %7 = get_global @printf : (s8i*, ...) -> s32i*
+        %8 = get_global @.str : s8i[9]*
+        %9 = cast(array_to_ptrdecay) %8 : s8i*
+        %10 = const 16 : u64i
+        %11 = const 16 : u64i
+        %12 = call @printf(%9, %10, %11) : s32i [all]
+        %13 = get_global @printf : (s8i*, ...) -> s32i*
+        %14 = get_global @.str : s8i[9]*
+        %15 = cast(array_to_ptrdecay) %14 : s8i*
+        %16 = const 0 : u64i
+        %17 = const 4 : u64i
+        %18 = call @printf(%15, %16, %17) : s32i [all]
+        %19 = get_global @printf : (s8i*, ...) -> s32i*
+        %20 = get_global @.str.1 : s8i[7]*
+        %21 = cast(array_to_ptrdecay) %20 : s8i*
+        get_member
+        %23 = load %22 : s8i, align 16
+        %24 = cast(integral) %23 : s32i
+        get_member
+        %26 = load %25 : s32i, align 4
+        %27 = call @printf(%21, %24, %26) : s32i [all]
+        %28 = get_global @printf : (s8i*, ...) -> s32i*
+        %29 = get_global @.str.2 : s8i[13]*
+        %30 = cast(array_to_ptrdecay) %29 : s8i*
+        %31 = call @effectful_case() : s32i [all]
+        %32 = call @repeated_case() : s32i [all]
+        %33 = call @dependent_case() : s32i [all]
+        %34 = call @interrupted_case() : s32i [all]
+        %35 = call @printf(%30, %31, %32, %33, %34) : s32i [all]
+        %36 = const 0 : s32i
+        store %36, %0
+        %37 = load %0 : s32i
+        return %37
 }

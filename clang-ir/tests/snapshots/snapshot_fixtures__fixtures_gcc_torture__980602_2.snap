@@ -1,36 +1,36 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/980602-2.c" (c, x86_64-unknown-linux-gnu)
-global t : rec_anon2E0 = zero [external, default, align 4, dso_local]
+global t : rec_anon2E0 = Zero { ty: Named("rec_anon2E0") } [external, default, align 4, dso_local]
 
 fn exit(%arg0: s32i) -> void [external, c];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %3 = get_global @t : rec_anon2E0*
-        %4 = get_member %3[0] "bit" : u32i*
-        %5 = get_bitfield %4, "bit": 30 bits @0 in u32i : u32i, align 4
-        %6 = inc %5 : u32i
-        %7 = set_bitfield %4, %6, "bit": 30 bits @0 in u32i : u32i, align 4
-        %8 = cast(int_to_bool) %5 : bool
-        %9 = not %8 : bool
-        if %9 {
-            %11 = get_global @exit : ((s32i) -> void)*
-            %12 = const 0 : s32i
-            call @exit(%12) [all]
-            yield
-        } else {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %3 = get_global @t : rec_anon2E0*
+                get_member
+                get_bitfield
+                inc
+                set_bitfield
+                %8 = cast(int_to_bool) %5 : bool
+                not
+                if %9 {
+                        %11 = get_global @exit : (s32i) -> void*
+                        %12 = const 0 : s32i
+                        call @exit(%12) [all]
+                        yield
+                } else {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = load %0 : s32i
-    return %2
+        %2 = load %0 : s32i
+        return %2
 }

@@ -1,11 +1,11 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20050613-1.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.d : rec_D = {{0, 5, 0, 0}, zero} [cir_private, default, dso_local, constant]
-global __const.main.c : rec_C = {{0, 5, 0, 0}, zero} [cir_private, default, dso_local, constant]
-global __const.main.b : rec_B = {{0, 5, 0, 0}, zero} [cir_private, default, dso_local, constant]
+global __const.main.d : rec_D = ConstRecord { ty: Named("rec_D"), members: Array([ConstRecord { ty: Named("rec_A"), members: Array([CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "5" }, CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "0" }]) }, Zero { ty: Array { element_type: Named("s32i"), size: 0 } }]) } [cir_private, default, dso_local, constant]
+global __const.main.c : rec_C = ConstRecord { ty: Named("rec_C"), members: Array([ConstRecord { ty: Named("rec_A"), members: Array([CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "5" }, CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "0" }]) }, Zero { ty: Array { element_type: Named("s32i"), size: 0 } }]) } [cir_private, default, dso_local, constant]
+global __const.main.b : rec_B = ConstRecord { ty: Named("rec_B"), members: Array([ConstRecord { ty: Named("rec_A"), members: Array([CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "5" }, CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "0" }]) }, Zero { ty: Array { element_type: Named("s32i"), size: 1 } }]) } [cir_private, default, dso_local, constant]
 
 fn abort() -> void [external, c, nothrow];
 fn foo(%arg0: rec_A*) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -13,74 +13,74 @@ fn foo(%arg0: rec_A*) -> void [external, c, no_inline, dso_local, nothrow] {
         %13 = alloca rec_A*, "x", align 8
         store %arg0, %13
         scope {
-            %14 = load %13 : rec_A*, align 8
-            %15 = get_member %14[0] "i" : s32i*
-            %16 = load %15 : s32i, align 4
-            %17 = const 0 : s32i
-            %18 = cmp ne %16, %17 : bool
-            %19 = ternary %18 ? { : bool
-                %40 = const true : bool
-                yield %40
-            } : {
-                %35 = load %13 : rec_A*, align 8
-                %36 = get_member %35[1] "j" : s32i*
-                %37 = load %36 : s32i, align 4
-                %38 = const 5 : s32i
-                %39 = cmp ne %37, %38 : bool
-                yield %39
-            }
-            %20 = ternary %19 ? { : bool
-                %34 = const true : bool
-                yield %34
-            } : {
-                %29 = load %13 : rec_A*, align 8
-                %30 = get_member %29[2] "k" : s32i*
-                %31 = load %30 : s32i, align 4
-                %32 = const 0 : s32i
-                %33 = cmp ne %31, %32 : bool
-                yield %33
-            }
-            %21 = ternary %20 ? { : bool
-                %28 = const true : bool
-                yield %28
-            } : {
-                %23 = load %13 : rec_A*, align 8
-                %24 = get_member %23[3] "l" : s32i*
-                %25 = load %24 : s32i, align 4
-                %26 = const 0 : s32i
-                %27 = cmp ne %25, %26 : bool
-                yield %27
-            }
-            if %21 {
-                %22 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %14 = load %13 : rec_A*, align 8
+                get_member
+                %16 = load %15 : s32i, align 4
+                %17 = const 0 : s32i
+                cmp
+                %19 = ternary %18 ? { : bool
+                        %40 = const true : bool
+                        yield %40
+                } : {
+                        %35 = load %13 : rec_A*, align 8
+                        get_member
+                        %37 = load %36 : s32i, align 4
+                        %38 = const 5 : s32i
+                        cmp
+                        yield %39
+                }
+                %20 = ternary %19 ? { : bool
+                        %34 = const true : bool
+                        yield %34
+                } : {
+                        %29 = load %13 : rec_A*, align 8
+                        get_member
+                        %31 = load %30 : s32i, align 4
+                        %32 = const 0 : s32i
+                        cmp
+                        yield %33
+                }
+                %21 = ternary %20 ? { : bool
+                        %28 = const true : bool
+                        yield %28
+                } : {
+                        %23 = load %13 : rec_A*, align 8
+                        get_member
+                        %25 = load %24 : s32i, align 4
+                        %26 = const 0 : s32i
+                        cmp
+                        yield %27
+                }
+                if %21 {
+                        %22 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_B, "b", align 4
-    %2 = alloca rec_C, "c", align 4
-    %3 = alloca rec_D, "d", align 4
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = get_global @__const.main.b : rec_B*
-    copy %1, %5
-    %6 = get_global @__const.main.c : rec_C*
-    copy %2, %6
-    %7 = get_global @__const.main.d : rec_D*
-    copy %3, %7
-    %8 = get_member %1[0] "a" : rec_A*
-    call @foo(%8) [all]
-    %9 = get_member %2[0] "a" : rec_A*
-    call @foo(%9) [all]
-    %10 = get_member %3[0] "a" : rec_A*
-    call @foo(%10) [all]
-    %11 = const 0 : s32i
-    store %11, %0
-    %12 = load %0 : s32i
-    return %12
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_B, "b", align 4
+        %2 = alloca rec_C, "c", align 4
+        %3 = alloca rec_D, "d", align 4
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = get_global @__const.main.b : rec_B*
+        copy
+        %6 = get_global @__const.main.c : rec_C*
+        copy
+        %7 = get_global @__const.main.d : rec_D*
+        copy
+        get_member
+        call @foo(%8) [all]
+        get_member
+        call @foo(%9) [all]
+        get_member
+        call @foo(%10) [all]
+        %11 = const 0 : s32i
+        store %11, %0
+        %12 = load %0 : s32i
+        return %12
 }

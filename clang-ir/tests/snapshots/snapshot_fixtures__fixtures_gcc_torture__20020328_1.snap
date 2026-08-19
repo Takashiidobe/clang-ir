@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20020328-1.c" (c, x86_64-unknown-linux-gnu)
-global b : s32i = 0 [external, default, align 4, dso_local]
+global b : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn func() -> void [external, c, no_inline, dso_local, nothrow] {
-    return
+        return
 }
 fn abort() -> void [external, c, nothrow];
 fn testit(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -14,47 +14,47 @@ fn testit(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %17 = alloca s32i, "x", align 4
         store %arg0, %17
         scope {
-            %18 = load %17 : s32i, align 4
-            %19 = const 20 : s32i
-            %20 = cmp ne %18, %19 : bool
-            if %20 {
-                %21 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %18 = load %17 : s32i, align 4
+                %19 = const 20 : s32i
+                cmp
+                if %20 {
+                        %21 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "a", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 0 : s32i
-    store %3, %1, align 4
-    scope {
-        %14 = get_global @b : s32i*
-        %15 = load %14 : s32i, align 4
-        %16 = cast(int_to_bool) %15 : bool
-        if %16 {
-            call @func() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "a", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 0 : s32i
+        store %3, %1, align 4
+        scope {
+                %14 = get_global @b : s32i*
+                %15 = load %14 : s32i, align 4
+                %16 = cast(int_to_bool) %15 : bool
+                if %16 {
+                        call @func() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %4 = load %1 : s32i, align 4
-    %5 = const 23 : s32i
-    %6 = add %4, %5 : s32i [nsw]
-    %7 = cast(integral) %6 : u32i
-    %8 = const 4294967292 : u32i
-    %9 = and %7, %8 : u32i
-    %10 = cast(integral) %9 : s32i
-    call @testit(%10) [all]
-    %11 = get_global @exit : ((s32i) -> void)*
-    %12 = const 0 : s32i
-    call @exit(%12) [all]
-    %13 = load %0 : s32i
-    return %13
+        %4 = load %1 : s32i, align 4
+        %5 = const 23 : s32i
+        %6 = add %4, %5 : s32i [nsw]
+        %7 = cast(integral) %6 : u32i
+        %8 = const 4294967292 : u32i
+        and
+        %10 = cast(integral) %9 : s32i
+        call @testit(%10) [all]
+        %11 = get_global @exit : (s32i) -> void*
+        %12 = const 0 : s32i
+        call @exit(%12) [all]
+        %13 = load %0 : s32i
+        return %13
 }

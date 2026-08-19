@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr29006.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.s : rec_s = {1, 18446744073709551615} [cir_private, default, dso_local, constant]
+global __const.main.s : rec_s = ConstRecord { ty: Named("rec_s"), members: Array([CirInt { ty: Named("s8i"), value: "1" }, CirInt { ty: Named("u64i"), value: "18446744073709551615" }]) } [cir_private, default, dso_local, constant]
 
 fn foo(%arg0: rec_s*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: rec_s*):
@@ -11,24 +11,24 @@ fn foo(%arg0: rec_s*) -> void [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %10
         %11 = const 0 : u64i
         %12 = load %10 : rec_s*, align 8
-        %13 = get_member %12[1] "x" : u64i*
+        get_member
         store %11, %13, align 1
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_s, "s", align 1
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @__const.main.s : rec_s*
-    copy %1, %3
-    call @foo(%1) [all]
-    %4 = get_member %1[1] "x" : u64i*
-    %5 = load %4 : u64i, align 1
-    %6 = const 0 : u64i
-    %7 = cmp ne %5, %6 : bool
-    %8 = cast(bool_to_int) %7 : s32i
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_s, "s", align 1
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @__const.main.s : rec_s*
+        copy
+        call @foo(%1) [all]
+        get_member
+        %5 = load %4 : u64i, align 1
+        %6 = const 0 : u64i
+        cmp
+        %8 = cast(bool_to_int) %7 : s32i
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

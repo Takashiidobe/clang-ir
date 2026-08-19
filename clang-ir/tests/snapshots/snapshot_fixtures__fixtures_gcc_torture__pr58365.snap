@@ -1,64 +1,64 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr58365.c" (c, x86_64-unknown-linux-gnu)
-global i : s32i = 1 [external, default, align 4, dso_local]
-global h : rec_S = zero [internal, default, align 4, dso_local]
-global f : rec_S = zero [external, default, align 4, dso_local]
-global g : rec_S = zero [internal, default, align 4, dso_local]
+global i : s32i = CirInt { ty: Named("s32i"), value: "1" } [external, default, align 4, dso_local]
+global h : rec_S = Zero { ty: Named("rec_S") } [internal, default, align 4, dso_local]
+global f : rec_S = Zero { ty: Named("rec_S") } [external, default, align 4, dso_local]
+global g : rec_S = Zero { ty: Named("rec_S") } [internal, default, align 4, dso_local]
 
 fn foo() -> s8i [external, c, no_inline, dso_local, nothrow] {
-    %18 = alloca s8i, "__retval", align 1
-    %19 = get_global @i : s32i*
-    %20 = load %19 : s32i, align 4
-    %21 = cast(integral) %20 : s8i
-    store %21, %18
-    %22 = load %18 : s8i
-    return %22
+        %18 = alloca s8i, "__retval", align 1
+        %19 = get_global @i : s32i*
+        %20 = load %19 : s32i, align 4
+        %21 = cast(integral) %20 : s8i
+        store %21, %18
+        %22 = load %18 : s8i
+        return %22
 }
 fn bar(%arg0: rec_S*) -> void [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: rec_S*):
         scope {
-            %15 = call @foo() : s8i [all]
-            %16 = cast(int_to_bool) %15 : bool
-            if %16 {
-                %17 = get_global @f : rec_S*
-                copy %arg0, %17
-                return
-            }
-            yield
+                %15 = call @foo() : s8i [all]
+                %16 = cast(int_to_bool) %15 : bool
+                if %16 {
+                        %17 = get_global @f : rec_S*
+                        copy
+                        return
+                }
+                yield
         }
         %14 = get_global @g : rec_S*
-        copy %arg0, %14
+        copy
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @h : rec_S*
-    call @bar(%2) [all]
-    %3 = const 1 : s32i
-    %4 = get_global @f : rec_S*
-    %5 = get_member %4[1] "b" : s32i*
-    store %3, %5, align 4
-    scope {
-        %8 = get_global @h : rec_S*
-        %9 = get_member %8[1] "b" : s32i*
-        %10 = load %9 : s32i, align 4
-        %11 = const 0 : s32i
-        %12 = cmp ne %10, %11 : bool
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @h : rec_S*
+        call @bar(%2) [all]
+        %3 = const 1 : s32i
+        %4 = get_global @f : rec_S*
+        get_member
+        store %3, %5, align 4
+        scope {
+                %8 = get_global @h : rec_S*
+                get_member
+                %10 = load %9 : s32i, align 4
+                %11 = const 0 : s32i
+                cmp
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

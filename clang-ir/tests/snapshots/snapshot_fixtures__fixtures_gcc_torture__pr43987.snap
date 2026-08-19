@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr43987.c" (c, x86_64-unknown-linux-gnu)
-global B : s8i[2048] = zero [external, default, align 16, dso_local]
+global B : s8i[2048] = Zero { ty: Array { element_type: Named("s8i"), size: 2048 } } [external, default, align 16, dso_local]
 
 fn add_input_file(%arg0: void**) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: void**):
@@ -14,46 +14,46 @@ fn add_input_file(%arg0: void**) -> void [external, c, no_inline, dso_local, not
         %25 = const 0 : s64i
         %26 = get_global @B : s8i[2048]*
         %27 = cast(bitcast) %26 : rec_globals*
-        %28 = get_member %27[1] "l" : void***
+        get_member
         %29 = load %28 : void**, align 8
-        %30 = ptr_stride %29, %25 : void**
+        ptr_stride
         store %24, %30, align 8
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca void*, "x", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @B : s8i[2048]*
-    %4 = cast(bitcast) %3 : rec_globals*
-    %5 = get_member %4[1] "l" : void***
-    store %1, %5, align 8
-    %6 = const 18446744073709551615 : u64i
-    %7 = cast(int_to_ptr) %6 : void*
-    %8 = cast(bitcast) %7 : void**
-    call @add_input_file(%8) [all]
-    scope {
-        %11 = const 0 : s64i
-        %12 = get_global @B : s8i[2048]*
-        %13 = cast(bitcast) %12 : rec_globals*
-        %14 = get_member %13[1] "l" : void***
-        %15 = load %14 : void**, align 8
-        %16 = ptr_stride %15, %11 : void**
-        %17 = load %16 : void*, align 8
-        %18 = const 18446744073709551615 : u64i
-        %19 = cast(int_to_ptr) %18 : void*
-        %20 = cmp ne %17, %19 : bool
-        if %20 {
-            %21 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca void*, "x", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @B : s8i[2048]*
+        %4 = cast(bitcast) %3 : rec_globals*
+        get_member
+        store %1, %5, align 8
+        %6 = const 18446744073709551615 : u64i
+        %7 = cast(int_to_ptr) %6 : void*
+        %8 = cast(bitcast) %7 : void**
+        call @add_input_file(%8) [all]
+        scope {
+                %11 = const 0 : s64i
+                %12 = get_global @B : s8i[2048]*
+                %13 = cast(bitcast) %12 : rec_globals*
+                get_member
+                %15 = load %14 : void**, align 8
+                ptr_stride
+                %17 = load %16 : void*, align 8
+                %18 = const 18446744073709551615 : u64i
+                %19 = cast(int_to_ptr) %18 : void*
+                cmp
+                if %20 {
+                        %21 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %9 = const 0 : s32i
-    store %9, %0
-    %10 = load %0 : s32i
-    return %10
+        %9 = const 0 : s32i
+        store %9, %0
+        %10 = load %0 : s32i
+        return %10
 }

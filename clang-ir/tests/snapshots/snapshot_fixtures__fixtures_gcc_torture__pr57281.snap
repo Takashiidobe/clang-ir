@@ -1,15 +1,15 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr57281.c" (c, x86_64-unknown-linux-gnu)
-global a : s32i = 1 [external, default, align 4, dso_local]
-global d : s32i = 0 [external, default, align 4, dso_local]
-global e : s32i* = @d [external, default, align 8, dso_local]
-global c : s64i = 0 [external, default, align 8, dso_local]
-global g : s64i* = @c [external, default, align 8, dso_local]
-global b : s32i = 0 [external, default, align 4, dso_local]
-global f : s64i = 0 [external, default, align 8, dso_local]
+global a : s32i = CirInt { ty: Named("s32i"), value: "1" } [external, default, align 4, dso_local]
+global d : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global e : s32i* = GlobalView { ty: Pointer { pointee: Named("s32i"), addr_space: None }, symbol: "d", indices: None } [external, default, align 8, dso_local]
+global c : s64i = CirInt { ty: Named("s64i"), value: "0" } [external, default, align 8, dso_local]
+global g : s64i* = GlobalView { ty: Pointer { pointee: Named("s64i"), addr_space: None }, symbol: "c", indices: None } [external, default, align 8, dso_local]
+global b : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global f : s64i = CirInt { ty: Named("s64i"), value: "0" } [external, default, align 8, dso_local]
 
 fn foo(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i):
@@ -27,58 +27,58 @@ fn foo(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %29, %23, align 4
         %30 = load %21 : s32i, align 4
         %31 = const 0 : s32i
-        %32 = cmp eq %30, %31 : bool
+        cmp
         %33 = ternary %32 ? { : s32i
-            %36 = load %23 : s32i, align 4
-            yield %36
+                %36 = load %23 : s32i, align 4
+                yield %36
         } : {
-            %35 = const 0 : s32i
-            yield %35
+                %35 = const 0 : s32i
+                yield %35
         }
         store %33, %22
         %34 = load %22 : s32i
         return %34
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "h", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @a : s32i*
-    %4 = load %3 : s32i, align 4
-    store %4, %1, align 4
-    scope {
-        for cond: {
-            %17 = get_global @b : s32i*
-            %18 = load %17 : s32i, align 4
-            %19 = const -20 : s32i
-            %20 = cmp ne %18, %19 : bool
-            condition %20
-        } step: {
-            %7 = get_global @b : s32i*
-            %8 = load %7 : s32i, align 4
-            %9 = dec %8 : s32i [nsw]
-            store %9, %7, align 4
-            yield
-        } do {
-            scope {
-                %10 = const 0 : s32i
-                %11 = get_global @e : s32i**
-                %12 = load %11 : s32i*, align 8
-                store %10, %12, align 4
-                %13 = load %1 : s32i, align 4
-                %14 = call @foo(%13) : s32i [all]
-                %15 = get_global @e : s32i**
-                %16 = load %15 : s32i*, align 8
-                store %14, %16, align 4
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "h", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @a : s32i*
+        %4 = load %3 : s32i, align 4
+        store %4, %1, align 4
+        scope {
+                for cond {
+                        %17 = get_global @b : s32i*
+                        %18 = load %17 : s32i, align 4
+                        %19 = const -20 : s32i
+                        cmp
+                        condition %20
+                } step {
+                        %7 = get_global @b : s32i*
+                        %8 = load %7 : s32i, align 4
+                        dec
+                        store %9, %7, align 4
+                        yield
+                } body {
+                        scope {
+                                %10 = const 0 : s32i
+                                %11 = get_global @e : s32i**
+                                %12 = load %11 : s32i*, align 8
+                                store %10, %12, align 4
+                                %13 = load %1 : s32i, align 4
+                                %14 = call @foo(%13) : s32i [all]
+                                %15 = get_global @e : s32i**
+                                %16 = load %15 : s32i*, align 8
+                                store %14, %16, align 4
+                                yield
+                        }
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = load %0 : s32i
-    return %6
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = load %0 : s32i
+        return %6
 }

@@ -1,24 +1,24 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20071108-1.c" (c, x86_64-unknown-linux-gnu)
-global foo.s : rec_S = zero [internal, default, align 8, dso_local]
+global foo.s : rec_S = Zero { ty: Named("rec_S") } [internal, default, align 8, dso_local]
 
 fn foo() -> void* [external, c, no_inline, dso_local, nothrow] {
-    %71 = alloca void*, "__retval", align 8
-    %72 = get_global @foo.s : rec_S*
-    %73 = cast(bitcast) %72 : void*
-    store %73, %71
-    %74 = load %71 : void*
-    return %74
+        %71 = alloca void*, "__retval", align 8
+        %72 = get_global @foo.s : rec_S*
+        %73 = cast(bitcast) %72 : void*
+        store %73, %71
+        %74 = load %71 : void*
+        return %74
 }
 fn bar() -> void* [external, c, no_inline, dso_local, nothrow] {
-    %68 = alloca void*, "__retval", align 8
-    %69 = const #cir.ptr<null> : void*
-    store %69, %68
-    %70 = load %68 : void*
-    return %70
+        %68 = alloca void*, "__retval", align 8
+        %69 = const #cir.ptr<null> : void*
+        store %69, %68
+        %70 = load %68 : void*
+        return %70
 }
 fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
 fn test(%arg0: void*, %arg1: void*) -> rec_S* [external, c, no_inline, dso_local, nothrow] {
@@ -34,37 +34,37 @@ fn test(%arg0: void*, %arg1: void*) -> rec_S* [external, c, no_inline, dso_local
         %48 = cast(bitcast) %47 : rec_S*
         store %48, %45, align 8
         scope {
-            %60 = load %45 : rec_S*, align 8
-            %61 = const #cir.ptr<null> : rec_S*
-            %62 = cmp eq %60, %61 : bool
-            if %62 {
-                store %46, %45, align 8
-                %63 = load %45 : rec_S*, align 8
-                %64 = cast(bitcast) %63 : void*
-                %65 = const 0 : s32i
-                %66 = const 24 : u64i
-                %67 = call @memset(%64, %65, %66) : void* [all]
+                %60 = load %45 : rec_S*, align 8
+                %61 = const #cir.ptr<null> : rec_S*
+                cmp
+                if %62 {
+                        store %46, %45, align 8
+                        %63 = load %45 : rec_S*, align 8
+                        %64 = cast(bitcast) %63 : void*
+                        %65 = const 0 : s32i
+                        %66 = const 24 : u64i
+                        %67 = call @memset(%64, %65, %66) : void* [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %49 = load %42 : void*, align 8
         %50 = load %45 : rec_S*, align 8
-        %51 = get_member %50[0] "s1" : void**
+        get_member
         store %49, %51, align 8
         %52 = load %43 : void*, align 8
         %53 = load %45 : rec_S*, align 8
-        %54 = get_member %53[1] "s2" : void**
+        get_member
         store %52, %54, align 8
         scope {
-            %57 = load %45 : rec_S*, align 8
-            %58 = cmp eq %57, %46 : bool
-            if %58 {
-                %59 = const #cir.ptr<null> : rec_S*
-                store %59, %45, align 8
+                %57 = load %45 : rec_S*, align 8
+                cmp
+                if %58 {
+                        %59 = const #cir.ptr<null> : rec_S*
+                        store %59, %45, align 8
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %55 = load %45 : rec_S*, align 8
         store %55, %44
@@ -73,73 +73,73 @@ fn test(%arg0: void*, %arg1: void*) -> rec_S* [external, c, no_inline, dso_local
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "a", align 4
-    %2 = alloca s32i, "b", align 4
-    %3 = alloca rec_S*, "z", align 8
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = cast(bitcast) %1 : void*
-    %6 = cast(bitcast) %2 : void*
-    %7 = call @test(%5, %6) : rec_S* [all]
-    store %7, %3, align 8
-    scope {
-        %10 = load %3 : rec_S*, align 8
-        %11 = const #cir.ptr<null> : rec_S*
-        %12 = cmp eq %10, %11 : bool
-        %13 = ternary %12 ? { : bool
-            %41 = const true : bool
-            yield %41
-        } : {
-            %36 = load %3 : rec_S*, align 8
-            %37 = get_member %36[0] "s1" : void**
-            %38 = load %37 : void*, align 8
-            %39 = cast(bitcast) %1 : void*
-            %40 = cmp ne %38, %39 : bool
-            yield %40
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "a", align 4
+        %2 = alloca s32i, "b", align 4
+        %3 = alloca rec_S*, "z", align 8
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = cast(bitcast) %1 : void*
+        %6 = cast(bitcast) %2 : void*
+        %7 = call @test(%5, %6) : rec_S* [all]
+        store %7, %3, align 8
+        scope {
+                %10 = load %3 : rec_S*, align 8
+                %11 = const #cir.ptr<null> : rec_S*
+                cmp
+                %13 = ternary %12 ? { : bool
+                        %41 = const true : bool
+                        yield %41
+                } : {
+                        %36 = load %3 : rec_S*, align 8
+                        get_member
+                        %38 = load %37 : void*, align 8
+                        %39 = cast(bitcast) %1 : void*
+                        cmp
+                        yield %40
+                }
+                %14 = ternary %13 ? { : bool
+                        %35 = const true : bool
+                        yield %35
+                } : {
+                        %30 = load %3 : rec_S*, align 8
+                        get_member
+                        %32 = load %31 : void*, align 8
+                        %33 = cast(bitcast) %2 : void*
+                        cmp
+                        yield %34
+                }
+                %15 = ternary %14 ? { : bool
+                        %29 = const true : bool
+                        yield %29
+                } : {
+                        %24 = load %3 : rec_S*, align 8
+                        get_member
+                        %26 = load %25 : u8i, align 8
+                        %27 = cast(integral) %26 : s32i
+                        %28 = cast(int_to_bool) %27 : bool
+                        yield %28
+                }
+                %16 = ternary %15 ? { : bool
+                        %23 = const true : bool
+                        yield %23
+                } : {
+                        %18 = load %3 : rec_S*, align 8
+                        get_member
+                        %20 = load %19 : u8i, align 1
+                        %21 = cast(integral) %20 : s32i
+                        %22 = cast(int_to_bool) %21 : bool
+                        yield %22
+                }
+                if %16 {
+                        %17 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        %14 = ternary %13 ? { : bool
-            %35 = const true : bool
-            yield %35
-        } : {
-            %30 = load %3 : rec_S*, align 8
-            %31 = get_member %30[1] "s2" : void**
-            %32 = load %31 : void*, align 8
-            %33 = cast(bitcast) %2 : void*
-            %34 = cmp ne %32, %33 : bool
-            yield %34
-        }
-        %15 = ternary %14 ? { : bool
-            %29 = const true : bool
-            yield %29
-        } : {
-            %24 = load %3 : rec_S*, align 8
-            %25 = get_member %24[2] "s3" : u8i*
-            %26 = load %25 : u8i, align 8
-            %27 = cast(integral) %26 : s32i
-            %28 = cast(int_to_bool) %27 : bool
-            yield %28
-        }
-        %16 = ternary %15 ? { : bool
-            %23 = const true : bool
-            yield %23
-        } : {
-            %18 = load %3 : rec_S*, align 8
-            %19 = get_member %18[3] "s4" : u8i*
-            %20 = load %19 : u8i, align 1
-            %21 = cast(integral) %20 : s32i
-            %22 = cast(int_to_bool) %21 : bool
-            yield %22
-        }
-        if %16 {
-            %17 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %8 = const 0 : s32i
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        %8 = const 0 : s32i
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

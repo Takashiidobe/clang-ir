@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.library/uart/src/uart.c" (c, x86_64-unknown-linux-gnu)
@@ -8,24 +8,24 @@ fn send_byte(%arg0: u8i) -> void [external, c, no_inline, dso_local, nothrow] {
         %0 = alloca u8i, "byte", align 1
         store %arg0, %0
         scope {
-            while {
-                %5 = const 1073745920 : u64i
-                %6 = cast(int_to_ptr) %5 : u32i*
-                %7 = load %6 : u32i, align 4, volatile
-                %8 = const 1 : u32i
-                %9 = and %7, %8 : u32i
-                %10 = const 0 : u32i
-                %11 = cmp eq %9, %10 : bool
-                condition %11
-            } do {
+                while {
+                        %5 = const 1073745920 : u64i
+                        %6 = cast(int_to_ptr) %5 : u32i*
+                        %7 = load %6 : u32i, align 4
+                        %8 = const 1 : u32i
+                        and
+                        %10 = const 0 : u32i
+                        cmp
+                        condition %11
+                } do {
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %1 = load %0 : u8i, align 1
         %2 = cast(integral) %1 : u32i
         %3 = const 1073745924 : u64i
         %4 = cast(int_to_ptr) %3 : u32i*
-        store %2, %4, align 4, volatile
+        store %2, %4, align 4
         return
 }

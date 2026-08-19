@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20040409-1w.c" (c, x86_64-unknown-linux-gnu)
@@ -11,7 +11,7 @@ fn test2(%arg5: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %68 = load %66 : s32i, align 4
         %69 = const -2147483647 : s32i
         %70 = const 1 : s32i
-        %71 = sub %69, %70 : s32i [nsw]
+        sub
         %72 = add %68, %71 : s32i [nsw]
         store %72, %67
         %73 = load %67 : s32i
@@ -25,8 +25,8 @@ fn test3(%arg4: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %60 = load %58 : s32i, align 4
         %61 = const -2147483647 : s32i
         %62 = const 1 : s32i
-        %63 = sub %61, %62 : s32i [nsw]
-        %64 = sub %60, %63 : s32i [nsw]
+        sub
+        sub
         store %64, %59
         %65 = load %59 : s32i
         return %65
@@ -39,7 +39,7 @@ fn test5(%arg3: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %arg3, %48
         %51 = const -2147483647 : s32i
         %52 = const 1 : s32i
-        %53 = sub %51, %52 : s32i [nsw]
+        sub
         store %53, %50, align 4
         %54 = load %48 : s32i, align 4
         %55 = load %50 : s32i, align 4
@@ -56,11 +56,11 @@ fn test6(%arg2: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %arg2, %38
         %41 = const -2147483647 : s32i
         %42 = const 1 : s32i
-        %43 = sub %41, %42 : s32i [nsw]
+        sub
         store %43, %40, align 4
         %44 = load %38 : s32i, align 4
         %45 = load %40 : s32i, align 4
-        %46 = sub %44, %45 : s32i [nsw]
+        sub
         store %46, %39
         %47 = load %39 : s32i
         return %47
@@ -73,79 +73,79 @@ fn test(%arg0: s32i, %arg1: s32i) -> void [external, c, no_inline, dso_local, no
         store %arg0, %16
         store %arg1, %17
         scope {
-            %33 = load %16 : s32i, align 4
-            %34 = call @test2(%33) : s32i [all]
-            %35 = load %17 : s32i, align 4
-            %36 = cmp ne %34, %35 : bool
-            if %36 {
-                %37 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %33 = load %16 : s32i, align 4
+                %34 = call @test2(%33) : s32i [all]
+                %35 = load %17 : s32i, align 4
+                cmp
+                if %36 {
+                        %37 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %28 = load %16 : s32i, align 4
-            %29 = call @test3(%28) : s32i [all]
-            %30 = load %17 : s32i, align 4
-            %31 = cmp ne %29, %30 : bool
-            if %31 {
-                %32 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %28 = load %16 : s32i, align 4
+                %29 = call @test3(%28) : s32i [all]
+                %30 = load %17 : s32i, align 4
+                cmp
+                if %31 {
+                        %32 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %23 = load %16 : s32i, align 4
-            %24 = call @test5(%23) : s32i [all]
-            %25 = load %17 : s32i, align 4
-            %26 = cmp ne %24, %25 : bool
-            if %26 {
-                %27 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %23 = load %16 : s32i, align 4
+                %24 = call @test5(%23) : s32i [all]
+                %25 = load %17 : s32i, align 4
+                cmp
+                if %26 {
+                        %27 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %18 = load %16 : s32i, align 4
-            %19 = call @test6(%18) : s32i [all]
-            %20 = load %17 : s32i, align 4
-            %21 = cmp ne %19, %20 : bool
-            if %21 {
-                %22 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %18 = load %16 : s32i, align 4
+                %19 = call @test6(%18) : s32i [all]
+                %20 = load %17 : s32i, align 4
+                cmp
+                if %21 {
+                        %22 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 0 : s32i
-    %3 = const -2147483648 : s32i
-    call @test(%2, %3) [all]
-    %4 = const -2147483648 : s32i
-    %5 = const 0 : s32i
-    call @test(%4, %5) [all]
-    %6 = const 305419896 : s32i
-    %7 = const -1842063752 : s32i
-    call @test(%6, %7) [all]
-    %8 = const -1842063752 : s32i
-    %9 = const 305419896 : s32i
-    call @test(%8, %9) [all]
-    %10 = const 2147483647 : s32i
-    %11 = const -1 : s32i
-    call @test(%10, %11) [all]
-    %12 = const -1 : s32i
-    %13 = const 2147483647 : s32i
-    call @test(%12, %13) [all]
-    %14 = const 0 : s32i
-    store %14, %0
-    %15 = load %0 : s32i
-    return %15
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 0 : s32i
+        %3 = const -2147483648 : s32i
+        call @test(%2, %3) [all]
+        %4 = const -2147483648 : s32i
+        %5 = const 0 : s32i
+        call @test(%4, %5) [all]
+        %6 = const 305419896 : s32i
+        %7 = const -1842063752 : s32i
+        call @test(%6, %7) [all]
+        %8 = const -1842063752 : s32i
+        %9 = const 305419896 : s32i
+        call @test(%8, %9) [all]
+        %10 = const 2147483647 : s32i
+        %11 = const -1 : s32i
+        call @test(%10, %11) [all]
+        %12 = const -1 : s32i
+        %13 = const 2147483647 : s32i
+        call @test(%12, %13) [all]
+        %14 = const 0 : s32i
+        store %14, %0
+        %15 = load %0 : s32i
+        return %15
 }

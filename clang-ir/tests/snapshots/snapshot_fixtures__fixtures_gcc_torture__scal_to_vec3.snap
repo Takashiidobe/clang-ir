@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/scal-to-vec3.c" (c, x86_64-unknown-linux-gnu)
@@ -35,15 +35,15 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         store %arg1, %1
         %25 = const 0 : s32i
         store %25, %2
-        %26 = const [1.000000e+00, 2.000000e+00, 3.000000e+00, 4.000000e+00] : vector<4 x float>
+        %26 = const [[1.000000e+00, 2.000000e+00, 3.000000e+00, 4.000000e+00]] : vector<4 x float>
         store %26, %3, align 16
-        %27 = const [1.000000e+00, 2.000000e+00] : vector<2 x double>
+        %27 = const [[1.000000e+00, 2.000000e+00]] : vector<2 x double>
         store %27, %6, align 16
         %28 = const 2 : s32i
         %29 = cast(int_to_float) %28 : float
-        %30 = vec.splat %29 : vector<4 x float>
+        vec.splat
         %31 = load %3 : vector<4 x float>, align 16
-        %32 = fadd %30, %31 : vector<4 x float>
+        fadd
         store %32, %4, align 16
         %33 = const 2.000000e+00 : double
         %34 = cast(floating) %33 : float
@@ -53,68 +53,68 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         %38 = cast(floating) %37 : float
         %39 = const 2.000000e+00 : double
         %40 = cast(floating) %39 : float
-        %41 = vec.create(%34, %36, %38, %40) : vector<4 x float>
+        vec.create
         store %41, %9, align 16
         %42 = load %9 : vector<4 x float>, align 16
         %43 = load %3 : vector<4 x float>, align 16
-        %44 = fadd %42, %43 : vector<4 x float>
+        fadd
         store %44, %5, align 16
         scope {
-            do {
-                scope {
-                    %510 = alloca s32i, "__i", align 4
-                    scope {
-                        %511 = const 0 : s32i
-                        store %511, %510, align 4
-                        for cond: {
-                            %523 = load %510 : s32i, align 4
-                            %524 = const 4 : s32i
-                            %525 = cmp lt %523, %524 : bool
-                            condition %525
-                        } step: {
-                            %512 = load %510 : s32i, align 4
-                            %513 = inc %512 : s32i [nsw]
-                            store %513, %510, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %510 = alloca s32i, "__i", align 4
                                 scope {
-                                    %514 = cast(bitcast) %4 : float*
-                                    %515 = load %510 : s32i, align 4
-                                    %516 = ptr_stride %514, %515 : float*
-                                    %517 = load %516 : float, align 4
-                                    %518 = cast(bitcast) %5 : float*
-                                    %519 = load %510 : s32i, align 4
-                                    %520 = ptr_stride %518, %519 : float*
-                                    %521 = load %520 : float, align 4
-                                    %522 = cmp ne %517, %521 : bool
-                                    if %522 {
-                                        call @abort() [all]
+                                        %511 = const 0 : s32i
+                                        store %511, %510, align 4
+                                        for cond {
+                                                %523 = load %510 : s32i, align 4
+                                                %524 = const 4 : s32i
+                                                cmp
+                                                condition %525
+                                        } step {
+                                                %512 = load %510 : s32i, align 4
+                                                inc
+                                                store %513, %510, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %514 = cast(bitcast) %4 : float*
+                                                                %515 = load %510 : s32i, align 4
+                                                                ptr_stride
+                                                                %517 = load %516 : float, align 4
+                                                                %518 = cast(bitcast) %5 : float*
+                                                                %519 = load %510 : s32i, align 4
+                                                                ptr_stride
+                                                                %521 = load %520 : float, align 4
+                                                                cmp
+                                                                if %522 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %508 = const 0 : s32i
+                        %509 = cast(int_to_bool) %508 : bool
+                        condition %509
                 }
                 yield
-            } while {
-                %508 = const 0 : s32i
-                %509 = cast(int_to_bool) %508 : bool
-                condition %509
-            }
-            yield
         }
         %45 = const 2 : s32i
         %46 = cast(int_to_float) %45 : float
-        %47 = vec.splat %46 : vector<4 x float>
+        vec.splat
         %48 = load %3 : vector<4 x float>, align 16
-        %49 = fsub %47, %48 : vector<4 x float>
+        fsub
         store %49, %4, align 16
         %50 = const 2.000000e+00 : double
         %51 = cast(floating) %50 : float
@@ -124,68 +124,68 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         %55 = cast(floating) %54 : float
         %56 = const 2.000000e+00 : double
         %57 = cast(floating) %56 : float
-        %58 = vec.create(%51, %53, %55, %57) : vector<4 x float>
+        vec.create
         store %58, %10, align 16
         %59 = load %10 : vector<4 x float>, align 16
         %60 = load %3 : vector<4 x float>, align 16
-        %61 = fsub %59, %60 : vector<4 x float>
+        fsub
         store %61, %5, align 16
         scope {
-            do {
-                scope {
-                    %492 = alloca s32i, "__i", align 4
-                    scope {
-                        %493 = const 0 : s32i
-                        store %493, %492, align 4
-                        for cond: {
-                            %505 = load %492 : s32i, align 4
-                            %506 = const 4 : s32i
-                            %507 = cmp lt %505, %506 : bool
-                            condition %507
-                        } step: {
-                            %494 = load %492 : s32i, align 4
-                            %495 = inc %494 : s32i [nsw]
-                            store %495, %492, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %492 = alloca s32i, "__i", align 4
                                 scope {
-                                    %496 = cast(bitcast) %4 : float*
-                                    %497 = load %492 : s32i, align 4
-                                    %498 = ptr_stride %496, %497 : float*
-                                    %499 = load %498 : float, align 4
-                                    %500 = cast(bitcast) %5 : float*
-                                    %501 = load %492 : s32i, align 4
-                                    %502 = ptr_stride %500, %501 : float*
-                                    %503 = load %502 : float, align 4
-                                    %504 = cmp ne %499, %503 : bool
-                                    if %504 {
-                                        call @abort() [all]
+                                        %493 = const 0 : s32i
+                                        store %493, %492, align 4
+                                        for cond {
+                                                %505 = load %492 : s32i, align 4
+                                                %506 = const 4 : s32i
+                                                cmp
+                                                condition %507
+                                        } step {
+                                                %494 = load %492 : s32i, align 4
+                                                inc
+                                                store %495, %492, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %496 = cast(bitcast) %4 : float*
+                                                                %497 = load %492 : s32i, align 4
+                                                                ptr_stride
+                                                                %499 = load %498 : float, align 4
+                                                                %500 = cast(bitcast) %5 : float*
+                                                                %501 = load %492 : s32i, align 4
+                                                                ptr_stride
+                                                                %503 = load %502 : float, align 4
+                                                                cmp
+                                                                if %504 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %490 = const 0 : s32i
+                        %491 = cast(int_to_bool) %490 : bool
+                        condition %491
                 }
                 yield
-            } while {
-                %490 = const 0 : s32i
-                %491 = cast(int_to_bool) %490 : bool
-                condition %491
-            }
-            yield
         }
         %62 = const 2 : s32i
         %63 = cast(int_to_float) %62 : float
-        %64 = vec.splat %63 : vector<4 x float>
+        vec.splat
         %65 = load %3 : vector<4 x float>, align 16
-        %66 = fmul %64, %65 : vector<4 x float>
+        fmul
         store %66, %4, align 16
         %67 = const 2.000000e+00 : double
         %68 = cast(floating) %67 : float
@@ -195,68 +195,68 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         %72 = cast(floating) %71 : float
         %73 = const 2.000000e+00 : double
         %74 = cast(floating) %73 : float
-        %75 = vec.create(%68, %70, %72, %74) : vector<4 x float>
+        vec.create
         store %75, %11, align 16
         %76 = load %11 : vector<4 x float>, align 16
         %77 = load %3 : vector<4 x float>, align 16
-        %78 = fmul %76, %77 : vector<4 x float>
+        fmul
         store %78, %5, align 16
         scope {
-            do {
-                scope {
-                    %474 = alloca s32i, "__i", align 4
-                    scope {
-                        %475 = const 0 : s32i
-                        store %475, %474, align 4
-                        for cond: {
-                            %487 = load %474 : s32i, align 4
-                            %488 = const 4 : s32i
-                            %489 = cmp lt %487, %488 : bool
-                            condition %489
-                        } step: {
-                            %476 = load %474 : s32i, align 4
-                            %477 = inc %476 : s32i [nsw]
-                            store %477, %474, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %474 = alloca s32i, "__i", align 4
                                 scope {
-                                    %478 = cast(bitcast) %4 : float*
-                                    %479 = load %474 : s32i, align 4
-                                    %480 = ptr_stride %478, %479 : float*
-                                    %481 = load %480 : float, align 4
-                                    %482 = cast(bitcast) %5 : float*
-                                    %483 = load %474 : s32i, align 4
-                                    %484 = ptr_stride %482, %483 : float*
-                                    %485 = load %484 : float, align 4
-                                    %486 = cmp ne %481, %485 : bool
-                                    if %486 {
-                                        call @abort() [all]
+                                        %475 = const 0 : s32i
+                                        store %475, %474, align 4
+                                        for cond {
+                                                %487 = load %474 : s32i, align 4
+                                                %488 = const 4 : s32i
+                                                cmp
+                                                condition %489
+                                        } step {
+                                                %476 = load %474 : s32i, align 4
+                                                inc
+                                                store %477, %474, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %478 = cast(bitcast) %4 : float*
+                                                                %479 = load %474 : s32i, align 4
+                                                                ptr_stride
+                                                                %481 = load %480 : float, align 4
+                                                                %482 = cast(bitcast) %5 : float*
+                                                                %483 = load %474 : s32i, align 4
+                                                                ptr_stride
+                                                                %485 = load %484 : float, align 4
+                                                                cmp
+                                                                if %486 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %472 = const 0 : s32i
+                        %473 = cast(int_to_bool) %472 : bool
+                        condition %473
                 }
                 yield
-            } while {
-                %472 = const 0 : s32i
-                %473 = cast(int_to_bool) %472 : bool
-                condition %473
-            }
-            yield
         }
         %79 = const 2 : s32i
         %80 = cast(int_to_float) %79 : float
-        %81 = vec.splat %80 : vector<4 x float>
+        vec.splat
         %82 = load %3 : vector<4 x float>, align 16
-        %83 = fdiv %81, %82 : vector<4 x float>
+        fdiv
         store %83, %4, align 16
         %84 = const 2.000000e+00 : double
         %85 = cast(floating) %84 : float
@@ -266,68 +266,68 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         %89 = cast(floating) %88 : float
         %90 = const 2.000000e+00 : double
         %91 = cast(floating) %90 : float
-        %92 = vec.create(%85, %87, %89, %91) : vector<4 x float>
+        vec.create
         store %92, %12, align 16
         %93 = load %12 : vector<4 x float>, align 16
         %94 = load %3 : vector<4 x float>, align 16
-        %95 = fdiv %93, %94 : vector<4 x float>
+        fdiv
         store %95, %5, align 16
         scope {
-            do {
-                scope {
-                    %456 = alloca s32i, "__i", align 4
-                    scope {
-                        %457 = const 0 : s32i
-                        store %457, %456, align 4
-                        for cond: {
-                            %469 = load %456 : s32i, align 4
-                            %470 = const 4 : s32i
-                            %471 = cmp lt %469, %470 : bool
-                            condition %471
-                        } step: {
-                            %458 = load %456 : s32i, align 4
-                            %459 = inc %458 : s32i [nsw]
-                            store %459, %456, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %456 = alloca s32i, "__i", align 4
                                 scope {
-                                    %460 = cast(bitcast) %4 : float*
-                                    %461 = load %456 : s32i, align 4
-                                    %462 = ptr_stride %460, %461 : float*
-                                    %463 = load %462 : float, align 4
-                                    %464 = cast(bitcast) %5 : float*
-                                    %465 = load %456 : s32i, align 4
-                                    %466 = ptr_stride %464, %465 : float*
-                                    %467 = load %466 : float, align 4
-                                    %468 = cmp ne %463, %467 : bool
-                                    if %468 {
-                                        call @abort() [all]
+                                        %457 = const 0 : s32i
+                                        store %457, %456, align 4
+                                        for cond {
+                                                %469 = load %456 : s32i, align 4
+                                                %470 = const 4 : s32i
+                                                cmp
+                                                condition %471
+                                        } step {
+                                                %458 = load %456 : s32i, align 4
+                                                inc
+                                                store %459, %456, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %460 = cast(bitcast) %4 : float*
+                                                                %461 = load %456 : s32i, align 4
+                                                                ptr_stride
+                                                                %463 = load %462 : float, align 4
+                                                                %464 = cast(bitcast) %5 : float*
+                                                                %465 = load %456 : s32i, align 4
+                                                                ptr_stride
+                                                                %467 = load %466 : float, align 4
+                                                                cmp
+                                                                if %468 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %454 = const 0 : s32i
+                        %455 = cast(int_to_bool) %454 : bool
+                        condition %455
                 }
                 yield
-            } while {
-                %454 = const 0 : s32i
-                %455 = cast(int_to_bool) %454 : bool
-                condition %455
-            }
-            yield
         }
         %96 = load %3 : vector<4 x float>, align 16
         %97 = const 2 : s32i
         %98 = cast(int_to_float) %97 : float
-        %99 = vec.splat %98 : vector<4 x float>
-        %100 = fadd %96, %99 : vector<4 x float>
+        vec.splat
+        fadd
         store %100, %4, align 16
         %101 = load %3 : vector<4 x float>, align 16
         %102 = const 2.000000e+00 : double
@@ -338,67 +338,67 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         %107 = cast(floating) %106 : float
         %108 = const 2.000000e+00 : double
         %109 = cast(floating) %108 : float
-        %110 = vec.create(%103, %105, %107, %109) : vector<4 x float>
+        vec.create
         store %110, %13, align 16
         %111 = load %13 : vector<4 x float>, align 16
-        %112 = fadd %101, %111 : vector<4 x float>
+        fadd
         store %112, %5, align 16
         scope {
-            do {
-                scope {
-                    %438 = alloca s32i, "__i", align 4
-                    scope {
-                        %439 = const 0 : s32i
-                        store %439, %438, align 4
-                        for cond: {
-                            %451 = load %438 : s32i, align 4
-                            %452 = const 4 : s32i
-                            %453 = cmp lt %451, %452 : bool
-                            condition %453
-                        } step: {
-                            %440 = load %438 : s32i, align 4
-                            %441 = inc %440 : s32i [nsw]
-                            store %441, %438, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %438 = alloca s32i, "__i", align 4
                                 scope {
-                                    %442 = cast(bitcast) %4 : float*
-                                    %443 = load %438 : s32i, align 4
-                                    %444 = ptr_stride %442, %443 : float*
-                                    %445 = load %444 : float, align 4
-                                    %446 = cast(bitcast) %5 : float*
-                                    %447 = load %438 : s32i, align 4
-                                    %448 = ptr_stride %446, %447 : float*
-                                    %449 = load %448 : float, align 4
-                                    %450 = cmp ne %445, %449 : bool
-                                    if %450 {
-                                        call @abort() [all]
+                                        %439 = const 0 : s32i
+                                        store %439, %438, align 4
+                                        for cond {
+                                                %451 = load %438 : s32i, align 4
+                                                %452 = const 4 : s32i
+                                                cmp
+                                                condition %453
+                                        } step {
+                                                %440 = load %438 : s32i, align 4
+                                                inc
+                                                store %441, %438, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %442 = cast(bitcast) %4 : float*
+                                                                %443 = load %438 : s32i, align 4
+                                                                ptr_stride
+                                                                %445 = load %444 : float, align 4
+                                                                %446 = cast(bitcast) %5 : float*
+                                                                %447 = load %438 : s32i, align 4
+                                                                ptr_stride
+                                                                %449 = load %448 : float, align 4
+                                                                cmp
+                                                                if %450 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %436 = const 0 : s32i
+                        %437 = cast(int_to_bool) %436 : bool
+                        condition %437
                 }
                 yield
-            } while {
-                %436 = const 0 : s32i
-                %437 = cast(int_to_bool) %436 : bool
-                condition %437
-            }
-            yield
         }
         %113 = load %3 : vector<4 x float>, align 16
         %114 = const 2 : s32i
         %115 = cast(int_to_float) %114 : float
-        %116 = vec.splat %115 : vector<4 x float>
-        %117 = fsub %113, %116 : vector<4 x float>
+        vec.splat
+        fsub
         store %117, %4, align 16
         %118 = load %3 : vector<4 x float>, align 16
         %119 = const 2.000000e+00 : double
@@ -409,67 +409,67 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         %124 = cast(floating) %123 : float
         %125 = const 2.000000e+00 : double
         %126 = cast(floating) %125 : float
-        %127 = vec.create(%120, %122, %124, %126) : vector<4 x float>
+        vec.create
         store %127, %14, align 16
         %128 = load %14 : vector<4 x float>, align 16
-        %129 = fsub %118, %128 : vector<4 x float>
+        fsub
         store %129, %5, align 16
         scope {
-            do {
-                scope {
-                    %420 = alloca s32i, "__i", align 4
-                    scope {
-                        %421 = const 0 : s32i
-                        store %421, %420, align 4
-                        for cond: {
-                            %433 = load %420 : s32i, align 4
-                            %434 = const 4 : s32i
-                            %435 = cmp lt %433, %434 : bool
-                            condition %435
-                        } step: {
-                            %422 = load %420 : s32i, align 4
-                            %423 = inc %422 : s32i [nsw]
-                            store %423, %420, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %420 = alloca s32i, "__i", align 4
                                 scope {
-                                    %424 = cast(bitcast) %4 : float*
-                                    %425 = load %420 : s32i, align 4
-                                    %426 = ptr_stride %424, %425 : float*
-                                    %427 = load %426 : float, align 4
-                                    %428 = cast(bitcast) %5 : float*
-                                    %429 = load %420 : s32i, align 4
-                                    %430 = ptr_stride %428, %429 : float*
-                                    %431 = load %430 : float, align 4
-                                    %432 = cmp ne %427, %431 : bool
-                                    if %432 {
-                                        call @abort() [all]
+                                        %421 = const 0 : s32i
+                                        store %421, %420, align 4
+                                        for cond {
+                                                %433 = load %420 : s32i, align 4
+                                                %434 = const 4 : s32i
+                                                cmp
+                                                condition %435
+                                        } step {
+                                                %422 = load %420 : s32i, align 4
+                                                inc
+                                                store %423, %420, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %424 = cast(bitcast) %4 : float*
+                                                                %425 = load %420 : s32i, align 4
+                                                                ptr_stride
+                                                                %427 = load %426 : float, align 4
+                                                                %428 = cast(bitcast) %5 : float*
+                                                                %429 = load %420 : s32i, align 4
+                                                                ptr_stride
+                                                                %431 = load %430 : float, align 4
+                                                                cmp
+                                                                if %432 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %418 = const 0 : s32i
+                        %419 = cast(int_to_bool) %418 : bool
+                        condition %419
                 }
                 yield
-            } while {
-                %418 = const 0 : s32i
-                %419 = cast(int_to_bool) %418 : bool
-                condition %419
-            }
-            yield
         }
         %130 = load %3 : vector<4 x float>, align 16
         %131 = const 2 : s32i
         %132 = cast(int_to_float) %131 : float
-        %133 = vec.splat %132 : vector<4 x float>
-        %134 = fmul %130, %133 : vector<4 x float>
+        vec.splat
+        fmul
         store %134, %4, align 16
         %135 = load %3 : vector<4 x float>, align 16
         %136 = const 2.000000e+00 : double
@@ -480,67 +480,67 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         %141 = cast(floating) %140 : float
         %142 = const 2.000000e+00 : double
         %143 = cast(floating) %142 : float
-        %144 = vec.create(%137, %139, %141, %143) : vector<4 x float>
+        vec.create
         store %144, %15, align 16
         %145 = load %15 : vector<4 x float>, align 16
-        %146 = fmul %135, %145 : vector<4 x float>
+        fmul
         store %146, %5, align 16
         scope {
-            do {
-                scope {
-                    %402 = alloca s32i, "__i", align 4
-                    scope {
-                        %403 = const 0 : s32i
-                        store %403, %402, align 4
-                        for cond: {
-                            %415 = load %402 : s32i, align 4
-                            %416 = const 4 : s32i
-                            %417 = cmp lt %415, %416 : bool
-                            condition %417
-                        } step: {
-                            %404 = load %402 : s32i, align 4
-                            %405 = inc %404 : s32i [nsw]
-                            store %405, %402, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %402 = alloca s32i, "__i", align 4
                                 scope {
-                                    %406 = cast(bitcast) %4 : float*
-                                    %407 = load %402 : s32i, align 4
-                                    %408 = ptr_stride %406, %407 : float*
-                                    %409 = load %408 : float, align 4
-                                    %410 = cast(bitcast) %5 : float*
-                                    %411 = load %402 : s32i, align 4
-                                    %412 = ptr_stride %410, %411 : float*
-                                    %413 = load %412 : float, align 4
-                                    %414 = cmp ne %409, %413 : bool
-                                    if %414 {
-                                        call @abort() [all]
+                                        %403 = const 0 : s32i
+                                        store %403, %402, align 4
+                                        for cond {
+                                                %415 = load %402 : s32i, align 4
+                                                %416 = const 4 : s32i
+                                                cmp
+                                                condition %417
+                                        } step {
+                                                %404 = load %402 : s32i, align 4
+                                                inc
+                                                store %405, %402, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %406 = cast(bitcast) %4 : float*
+                                                                %407 = load %402 : s32i, align 4
+                                                                ptr_stride
+                                                                %409 = load %408 : float, align 4
+                                                                %410 = cast(bitcast) %5 : float*
+                                                                %411 = load %402 : s32i, align 4
+                                                                ptr_stride
+                                                                %413 = load %412 : float, align 4
+                                                                cmp
+                                                                if %414 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %400 = const 0 : s32i
+                        %401 = cast(int_to_bool) %400 : bool
+                        condition %401
                 }
                 yield
-            } while {
-                %400 = const 0 : s32i
-                %401 = cast(int_to_bool) %400 : bool
-                condition %401
-            }
-            yield
         }
         %147 = load %3 : vector<4 x float>, align 16
         %148 = const 2 : s32i
         %149 = cast(int_to_float) %148 : float
-        %150 = vec.splat %149 : vector<4 x float>
-        %151 = fdiv %147, %150 : vector<4 x float>
+        vec.splat
+        fdiv
         store %151, %4, align 16
         %152 = load %3 : vector<4 x float>, align 16
         %153 = const 2.000000e+00 : double
@@ -551,565 +551,565 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         %158 = cast(floating) %157 : float
         %159 = const 2.000000e+00 : double
         %160 = cast(floating) %159 : float
-        %161 = vec.create(%154, %156, %158, %160) : vector<4 x float>
+        vec.create
         store %161, %16, align 16
         %162 = load %16 : vector<4 x float>, align 16
-        %163 = fdiv %152, %162 : vector<4 x float>
+        fdiv
         store %163, %5, align 16
         scope {
-            do {
-                scope {
-                    %384 = alloca s32i, "__i", align 4
-                    scope {
-                        %385 = const 0 : s32i
-                        store %385, %384, align 4
-                        for cond: {
-                            %397 = load %384 : s32i, align 4
-                            %398 = const 4 : s32i
-                            %399 = cmp lt %397, %398 : bool
-                            condition %399
-                        } step: {
-                            %386 = load %384 : s32i, align 4
-                            %387 = inc %386 : s32i [nsw]
-                            store %387, %384, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %384 = alloca s32i, "__i", align 4
                                 scope {
-                                    %388 = cast(bitcast) %4 : float*
-                                    %389 = load %384 : s32i, align 4
-                                    %390 = ptr_stride %388, %389 : float*
-                                    %391 = load %390 : float, align 4
-                                    %392 = cast(bitcast) %5 : float*
-                                    %393 = load %384 : s32i, align 4
-                                    %394 = ptr_stride %392, %393 : float*
-                                    %395 = load %394 : float, align 4
-                                    %396 = cmp ne %391, %395 : bool
-                                    if %396 {
-                                        call @abort() [all]
+                                        %385 = const 0 : s32i
+                                        store %385, %384, align 4
+                                        for cond {
+                                                %397 = load %384 : s32i, align 4
+                                                %398 = const 4 : s32i
+                                                cmp
+                                                condition %399
+                                        } step {
+                                                %386 = load %384 : s32i, align 4
+                                                inc
+                                                store %387, %384, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %388 = cast(bitcast) %4 : float*
+                                                                %389 = load %384 : s32i, align 4
+                                                                ptr_stride
+                                                                %391 = load %390 : float, align 4
+                                                                %392 = cast(bitcast) %5 : float*
+                                                                %393 = load %384 : s32i, align 4
+                                                                ptr_stride
+                                                                %395 = load %394 : float, align 4
+                                                                cmp
+                                                                if %396 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %382 = const 0 : s32i
+                        %383 = cast(int_to_bool) %382 : bool
+                        condition %383
                 }
                 yield
-            } while {
-                %382 = const 0 : s32i
-                %383 = cast(int_to_bool) %382 : bool
-                condition %383
-            }
-            yield
         }
         %164 = const 2 : s32i
         %165 = cast(int_to_float) %164 : double
-        %166 = vec.splat %165 : vector<2 x double>
+        vec.splat
         %167 = load %6 : vector<2 x double>, align 16
-        %168 = fadd %166, %167 : vector<2 x double>
+        fadd
         store %168, %7, align 16
-        %169 = const [2.000000e+00, 2.000000e+00] : vector<2 x double>
+        %169 = const [[2.000000e+00, 2.000000e+00]] : vector<2 x double>
         store %169, %17, align 16
         %170 = load %17 : vector<2 x double>, align 16
         %171 = load %6 : vector<2 x double>, align 16
-        %172 = fadd %170, %171 : vector<2 x double>
+        fadd
         store %172, %8, align 16
         scope {
-            do {
-                scope {
-                    %366 = alloca s32i, "__i", align 4
-                    scope {
-                        %367 = const 0 : s32i
-                        store %367, %366, align 4
-                        for cond: {
-                            %379 = load %366 : s32i, align 4
-                            %380 = const 2 : s32i
-                            %381 = cmp lt %379, %380 : bool
-                            condition %381
-                        } step: {
-                            %368 = load %366 : s32i, align 4
-                            %369 = inc %368 : s32i [nsw]
-                            store %369, %366, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %366 = alloca s32i, "__i", align 4
                                 scope {
-                                    %370 = cast(bitcast) %7 : double*
-                                    %371 = load %366 : s32i, align 4
-                                    %372 = ptr_stride %370, %371 : double*
-                                    %373 = load %372 : double, align 8
-                                    %374 = cast(bitcast) %8 : double*
-                                    %375 = load %366 : s32i, align 4
-                                    %376 = ptr_stride %374, %375 : double*
-                                    %377 = load %376 : double, align 8
-                                    %378 = cmp ne %373, %377 : bool
-                                    if %378 {
-                                        call @abort() [all]
+                                        %367 = const 0 : s32i
+                                        store %367, %366, align 4
+                                        for cond {
+                                                %379 = load %366 : s32i, align 4
+                                                %380 = const 2 : s32i
+                                                cmp
+                                                condition %381
+                                        } step {
+                                                %368 = load %366 : s32i, align 4
+                                                inc
+                                                store %369, %366, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %370 = cast(bitcast) %7 : double*
+                                                                %371 = load %366 : s32i, align 4
+                                                                ptr_stride
+                                                                %373 = load %372 : double, align 8
+                                                                %374 = cast(bitcast) %8 : double*
+                                                                %375 = load %366 : s32i, align 4
+                                                                ptr_stride
+                                                                %377 = load %376 : double, align 8
+                                                                cmp
+                                                                if %378 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %364 = const 0 : s32i
+                        %365 = cast(int_to_bool) %364 : bool
+                        condition %365
                 }
                 yield
-            } while {
-                %364 = const 0 : s32i
-                %365 = cast(int_to_bool) %364 : bool
-                condition %365
-            }
-            yield
         }
         %173 = const 2 : s32i
         %174 = cast(int_to_float) %173 : double
-        %175 = vec.splat %174 : vector<2 x double>
+        vec.splat
         %176 = load %6 : vector<2 x double>, align 16
-        %177 = fsub %175, %176 : vector<2 x double>
+        fsub
         store %177, %7, align 16
-        %178 = const [2.000000e+00, 2.000000e+00] : vector<2 x double>
+        %178 = const [[2.000000e+00, 2.000000e+00]] : vector<2 x double>
         store %178, %18, align 16
         %179 = load %18 : vector<2 x double>, align 16
         %180 = load %6 : vector<2 x double>, align 16
-        %181 = fsub %179, %180 : vector<2 x double>
+        fsub
         store %181, %8, align 16
         scope {
-            do {
-                scope {
-                    %348 = alloca s32i, "__i", align 4
-                    scope {
-                        %349 = const 0 : s32i
-                        store %349, %348, align 4
-                        for cond: {
-                            %361 = load %348 : s32i, align 4
-                            %362 = const 2 : s32i
-                            %363 = cmp lt %361, %362 : bool
-                            condition %363
-                        } step: {
-                            %350 = load %348 : s32i, align 4
-                            %351 = inc %350 : s32i [nsw]
-                            store %351, %348, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %348 = alloca s32i, "__i", align 4
                                 scope {
-                                    %352 = cast(bitcast) %7 : double*
-                                    %353 = load %348 : s32i, align 4
-                                    %354 = ptr_stride %352, %353 : double*
-                                    %355 = load %354 : double, align 8
-                                    %356 = cast(bitcast) %8 : double*
-                                    %357 = load %348 : s32i, align 4
-                                    %358 = ptr_stride %356, %357 : double*
-                                    %359 = load %358 : double, align 8
-                                    %360 = cmp ne %355, %359 : bool
-                                    if %360 {
-                                        call @abort() [all]
+                                        %349 = const 0 : s32i
+                                        store %349, %348, align 4
+                                        for cond {
+                                                %361 = load %348 : s32i, align 4
+                                                %362 = const 2 : s32i
+                                                cmp
+                                                condition %363
+                                        } step {
+                                                %350 = load %348 : s32i, align 4
+                                                inc
+                                                store %351, %348, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %352 = cast(bitcast) %7 : double*
+                                                                %353 = load %348 : s32i, align 4
+                                                                ptr_stride
+                                                                %355 = load %354 : double, align 8
+                                                                %356 = cast(bitcast) %8 : double*
+                                                                %357 = load %348 : s32i, align 4
+                                                                ptr_stride
+                                                                %359 = load %358 : double, align 8
+                                                                cmp
+                                                                if %360 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %346 = const 0 : s32i
+                        %347 = cast(int_to_bool) %346 : bool
+                        condition %347
                 }
                 yield
-            } while {
-                %346 = const 0 : s32i
-                %347 = cast(int_to_bool) %346 : bool
-                condition %347
-            }
-            yield
         }
         %182 = const 2 : s32i
         %183 = cast(int_to_float) %182 : double
-        %184 = vec.splat %183 : vector<2 x double>
+        vec.splat
         %185 = load %6 : vector<2 x double>, align 16
-        %186 = fmul %184, %185 : vector<2 x double>
+        fmul
         store %186, %7, align 16
-        %187 = const [2.000000e+00, 2.000000e+00] : vector<2 x double>
+        %187 = const [[2.000000e+00, 2.000000e+00]] : vector<2 x double>
         store %187, %19, align 16
         %188 = load %19 : vector<2 x double>, align 16
         %189 = load %6 : vector<2 x double>, align 16
-        %190 = fmul %188, %189 : vector<2 x double>
+        fmul
         store %190, %8, align 16
         scope {
-            do {
-                scope {
-                    %330 = alloca s32i, "__i", align 4
-                    scope {
-                        %331 = const 0 : s32i
-                        store %331, %330, align 4
-                        for cond: {
-                            %343 = load %330 : s32i, align 4
-                            %344 = const 2 : s32i
-                            %345 = cmp lt %343, %344 : bool
-                            condition %345
-                        } step: {
-                            %332 = load %330 : s32i, align 4
-                            %333 = inc %332 : s32i [nsw]
-                            store %333, %330, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %330 = alloca s32i, "__i", align 4
                                 scope {
-                                    %334 = cast(bitcast) %7 : double*
-                                    %335 = load %330 : s32i, align 4
-                                    %336 = ptr_stride %334, %335 : double*
-                                    %337 = load %336 : double, align 8
-                                    %338 = cast(bitcast) %8 : double*
-                                    %339 = load %330 : s32i, align 4
-                                    %340 = ptr_stride %338, %339 : double*
-                                    %341 = load %340 : double, align 8
-                                    %342 = cmp ne %337, %341 : bool
-                                    if %342 {
-                                        call @abort() [all]
+                                        %331 = const 0 : s32i
+                                        store %331, %330, align 4
+                                        for cond {
+                                                %343 = load %330 : s32i, align 4
+                                                %344 = const 2 : s32i
+                                                cmp
+                                                condition %345
+                                        } step {
+                                                %332 = load %330 : s32i, align 4
+                                                inc
+                                                store %333, %330, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %334 = cast(bitcast) %7 : double*
+                                                                %335 = load %330 : s32i, align 4
+                                                                ptr_stride
+                                                                %337 = load %336 : double, align 8
+                                                                %338 = cast(bitcast) %8 : double*
+                                                                %339 = load %330 : s32i, align 4
+                                                                ptr_stride
+                                                                %341 = load %340 : double, align 8
+                                                                cmp
+                                                                if %342 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %328 = const 0 : s32i
+                        %329 = cast(int_to_bool) %328 : bool
+                        condition %329
                 }
                 yield
-            } while {
-                %328 = const 0 : s32i
-                %329 = cast(int_to_bool) %328 : bool
-                condition %329
-            }
-            yield
         }
         %191 = const 2 : s32i
         %192 = cast(int_to_float) %191 : double
-        %193 = vec.splat %192 : vector<2 x double>
+        vec.splat
         %194 = load %6 : vector<2 x double>, align 16
-        %195 = fdiv %193, %194 : vector<2 x double>
+        fdiv
         store %195, %7, align 16
-        %196 = const [2.000000e+00, 2.000000e+00] : vector<2 x double>
+        %196 = const [[2.000000e+00, 2.000000e+00]] : vector<2 x double>
         store %196, %20, align 16
         %197 = load %20 : vector<2 x double>, align 16
         %198 = load %6 : vector<2 x double>, align 16
-        %199 = fdiv %197, %198 : vector<2 x double>
+        fdiv
         store %199, %8, align 16
         scope {
-            do {
-                scope {
-                    %312 = alloca s32i, "__i", align 4
-                    scope {
-                        %313 = const 0 : s32i
-                        store %313, %312, align 4
-                        for cond: {
-                            %325 = load %312 : s32i, align 4
-                            %326 = const 2 : s32i
-                            %327 = cmp lt %325, %326 : bool
-                            condition %327
-                        } step: {
-                            %314 = load %312 : s32i, align 4
-                            %315 = inc %314 : s32i [nsw]
-                            store %315, %312, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %312 = alloca s32i, "__i", align 4
                                 scope {
-                                    %316 = cast(bitcast) %7 : double*
-                                    %317 = load %312 : s32i, align 4
-                                    %318 = ptr_stride %316, %317 : double*
-                                    %319 = load %318 : double, align 8
-                                    %320 = cast(bitcast) %8 : double*
-                                    %321 = load %312 : s32i, align 4
-                                    %322 = ptr_stride %320, %321 : double*
-                                    %323 = load %322 : double, align 8
-                                    %324 = cmp ne %319, %323 : bool
-                                    if %324 {
-                                        call @abort() [all]
+                                        %313 = const 0 : s32i
+                                        store %313, %312, align 4
+                                        for cond {
+                                                %325 = load %312 : s32i, align 4
+                                                %326 = const 2 : s32i
+                                                cmp
+                                                condition %327
+                                        } step {
+                                                %314 = load %312 : s32i, align 4
+                                                inc
+                                                store %315, %312, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %316 = cast(bitcast) %7 : double*
+                                                                %317 = load %312 : s32i, align 4
+                                                                ptr_stride
+                                                                %319 = load %318 : double, align 8
+                                                                %320 = cast(bitcast) %8 : double*
+                                                                %321 = load %312 : s32i, align 4
+                                                                ptr_stride
+                                                                %323 = load %322 : double, align 8
+                                                                cmp
+                                                                if %324 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %310 = const 0 : s32i
+                        %311 = cast(int_to_bool) %310 : bool
+                        condition %311
                 }
                 yield
-            } while {
-                %310 = const 0 : s32i
-                %311 = cast(int_to_bool) %310 : bool
-                condition %311
-            }
-            yield
         }
         %200 = load %6 : vector<2 x double>, align 16
         %201 = const 2 : s32i
         %202 = cast(int_to_float) %201 : double
-        %203 = vec.splat %202 : vector<2 x double>
-        %204 = fadd %200, %203 : vector<2 x double>
+        vec.splat
+        fadd
         store %204, %7, align 16
         %205 = load %6 : vector<2 x double>, align 16
-        %206 = const [2.000000e+00, 2.000000e+00] : vector<2 x double>
+        %206 = const [[2.000000e+00, 2.000000e+00]] : vector<2 x double>
         store %206, %21, align 16
         %207 = load %21 : vector<2 x double>, align 16
-        %208 = fadd %205, %207 : vector<2 x double>
+        fadd
         store %208, %8, align 16
         scope {
-            do {
-                scope {
-                    %294 = alloca s32i, "__i", align 4
-                    scope {
-                        %295 = const 0 : s32i
-                        store %295, %294, align 4
-                        for cond: {
-                            %307 = load %294 : s32i, align 4
-                            %308 = const 2 : s32i
-                            %309 = cmp lt %307, %308 : bool
-                            condition %309
-                        } step: {
-                            %296 = load %294 : s32i, align 4
-                            %297 = inc %296 : s32i [nsw]
-                            store %297, %294, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %294 = alloca s32i, "__i", align 4
                                 scope {
-                                    %298 = cast(bitcast) %7 : double*
-                                    %299 = load %294 : s32i, align 4
-                                    %300 = ptr_stride %298, %299 : double*
-                                    %301 = load %300 : double, align 8
-                                    %302 = cast(bitcast) %8 : double*
-                                    %303 = load %294 : s32i, align 4
-                                    %304 = ptr_stride %302, %303 : double*
-                                    %305 = load %304 : double, align 8
-                                    %306 = cmp ne %301, %305 : bool
-                                    if %306 {
-                                        call @abort() [all]
+                                        %295 = const 0 : s32i
+                                        store %295, %294, align 4
+                                        for cond {
+                                                %307 = load %294 : s32i, align 4
+                                                %308 = const 2 : s32i
+                                                cmp
+                                                condition %309
+                                        } step {
+                                                %296 = load %294 : s32i, align 4
+                                                inc
+                                                store %297, %294, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %298 = cast(bitcast) %7 : double*
+                                                                %299 = load %294 : s32i, align 4
+                                                                ptr_stride
+                                                                %301 = load %300 : double, align 8
+                                                                %302 = cast(bitcast) %8 : double*
+                                                                %303 = load %294 : s32i, align 4
+                                                                ptr_stride
+                                                                %305 = load %304 : double, align 8
+                                                                cmp
+                                                                if %306 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %292 = const 0 : s32i
+                        %293 = cast(int_to_bool) %292 : bool
+                        condition %293
                 }
                 yield
-            } while {
-                %292 = const 0 : s32i
-                %293 = cast(int_to_bool) %292 : bool
-                condition %293
-            }
-            yield
         }
         %209 = load %6 : vector<2 x double>, align 16
         %210 = const 2 : s32i
         %211 = cast(int_to_float) %210 : double
-        %212 = vec.splat %211 : vector<2 x double>
-        %213 = fsub %209, %212 : vector<2 x double>
+        vec.splat
+        fsub
         store %213, %7, align 16
         %214 = load %6 : vector<2 x double>, align 16
-        %215 = const [2.000000e+00, 2.000000e+00] : vector<2 x double>
+        %215 = const [[2.000000e+00, 2.000000e+00]] : vector<2 x double>
         store %215, %22, align 16
         %216 = load %22 : vector<2 x double>, align 16
-        %217 = fsub %214, %216 : vector<2 x double>
+        fsub
         store %217, %8, align 16
         scope {
-            do {
-                scope {
-                    %276 = alloca s32i, "__i", align 4
-                    scope {
-                        %277 = const 0 : s32i
-                        store %277, %276, align 4
-                        for cond: {
-                            %289 = load %276 : s32i, align 4
-                            %290 = const 2 : s32i
-                            %291 = cmp lt %289, %290 : bool
-                            condition %291
-                        } step: {
-                            %278 = load %276 : s32i, align 4
-                            %279 = inc %278 : s32i [nsw]
-                            store %279, %276, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %276 = alloca s32i, "__i", align 4
                                 scope {
-                                    %280 = cast(bitcast) %7 : double*
-                                    %281 = load %276 : s32i, align 4
-                                    %282 = ptr_stride %280, %281 : double*
-                                    %283 = load %282 : double, align 8
-                                    %284 = cast(bitcast) %8 : double*
-                                    %285 = load %276 : s32i, align 4
-                                    %286 = ptr_stride %284, %285 : double*
-                                    %287 = load %286 : double, align 8
-                                    %288 = cmp ne %283, %287 : bool
-                                    if %288 {
-                                        call @abort() [all]
+                                        %277 = const 0 : s32i
+                                        store %277, %276, align 4
+                                        for cond {
+                                                %289 = load %276 : s32i, align 4
+                                                %290 = const 2 : s32i
+                                                cmp
+                                                condition %291
+                                        } step {
+                                                %278 = load %276 : s32i, align 4
+                                                inc
+                                                store %279, %276, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %280 = cast(bitcast) %7 : double*
+                                                                %281 = load %276 : s32i, align 4
+                                                                ptr_stride
+                                                                %283 = load %282 : double, align 8
+                                                                %284 = cast(bitcast) %8 : double*
+                                                                %285 = load %276 : s32i, align 4
+                                                                ptr_stride
+                                                                %287 = load %286 : double, align 8
+                                                                cmp
+                                                                if %288 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %274 = const 0 : s32i
+                        %275 = cast(int_to_bool) %274 : bool
+                        condition %275
                 }
                 yield
-            } while {
-                %274 = const 0 : s32i
-                %275 = cast(int_to_bool) %274 : bool
-                condition %275
-            }
-            yield
         }
         %218 = load %6 : vector<2 x double>, align 16
         %219 = const 2 : s32i
         %220 = cast(int_to_float) %219 : double
-        %221 = vec.splat %220 : vector<2 x double>
-        %222 = fmul %218, %221 : vector<2 x double>
+        vec.splat
+        fmul
         store %222, %7, align 16
         %223 = load %6 : vector<2 x double>, align 16
-        %224 = const [2.000000e+00, 2.000000e+00] : vector<2 x double>
+        %224 = const [[2.000000e+00, 2.000000e+00]] : vector<2 x double>
         store %224, %23, align 16
         %225 = load %23 : vector<2 x double>, align 16
-        %226 = fmul %223, %225 : vector<2 x double>
+        fmul
         store %226, %8, align 16
         scope {
-            do {
-                scope {
-                    %258 = alloca s32i, "__i", align 4
-                    scope {
-                        %259 = const 0 : s32i
-                        store %259, %258, align 4
-                        for cond: {
-                            %271 = load %258 : s32i, align 4
-                            %272 = const 2 : s32i
-                            %273 = cmp lt %271, %272 : bool
-                            condition %273
-                        } step: {
-                            %260 = load %258 : s32i, align 4
-                            %261 = inc %260 : s32i [nsw]
-                            store %261, %258, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %258 = alloca s32i, "__i", align 4
                                 scope {
-                                    %262 = cast(bitcast) %7 : double*
-                                    %263 = load %258 : s32i, align 4
-                                    %264 = ptr_stride %262, %263 : double*
-                                    %265 = load %264 : double, align 8
-                                    %266 = cast(bitcast) %8 : double*
-                                    %267 = load %258 : s32i, align 4
-                                    %268 = ptr_stride %266, %267 : double*
-                                    %269 = load %268 : double, align 8
-                                    %270 = cmp ne %265, %269 : bool
-                                    if %270 {
-                                        call @abort() [all]
+                                        %259 = const 0 : s32i
+                                        store %259, %258, align 4
+                                        for cond {
+                                                %271 = load %258 : s32i, align 4
+                                                %272 = const 2 : s32i
+                                                cmp
+                                                condition %273
+                                        } step {
+                                                %260 = load %258 : s32i, align 4
+                                                inc
+                                                store %261, %258, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %262 = cast(bitcast) %7 : double*
+                                                                %263 = load %258 : s32i, align 4
+                                                                ptr_stride
+                                                                %265 = load %264 : double, align 8
+                                                                %266 = cast(bitcast) %8 : double*
+                                                                %267 = load %258 : s32i, align 4
+                                                                ptr_stride
+                                                                %269 = load %268 : double, align 8
+                                                                cmp
+                                                                if %270 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %256 = const 0 : s32i
+                        %257 = cast(int_to_bool) %256 : bool
+                        condition %257
                 }
                 yield
-            } while {
-                %256 = const 0 : s32i
-                %257 = cast(int_to_bool) %256 : bool
-                condition %257
-            }
-            yield
         }
         %227 = load %6 : vector<2 x double>, align 16
         %228 = const 2 : s32i
         %229 = cast(int_to_float) %228 : double
-        %230 = vec.splat %229 : vector<2 x double>
-        %231 = fdiv %227, %230 : vector<2 x double>
+        vec.splat
+        fdiv
         store %231, %7, align 16
         %232 = load %6 : vector<2 x double>, align 16
-        %233 = const [2.000000e+00, 2.000000e+00] : vector<2 x double>
+        %233 = const [[2.000000e+00, 2.000000e+00]] : vector<2 x double>
         store %233, %24, align 16
         %234 = load %24 : vector<2 x double>, align 16
-        %235 = fdiv %232, %234 : vector<2 x double>
+        fdiv
         store %235, %8, align 16
         scope {
-            do {
-                scope {
-                    %240 = alloca s32i, "__i", align 4
-                    scope {
-                        %241 = const 0 : s32i
-                        store %241, %240, align 4
-                        for cond: {
-                            %253 = load %240 : s32i, align 4
-                            %254 = const 2 : s32i
-                            %255 = cmp lt %253, %254 : bool
-                            condition %255
-                        } step: {
-                            %242 = load %240 : s32i, align 4
-                            %243 = inc %242 : s32i [nsw]
-                            store %243, %240, align 4
-                            yield
-                        } do {
-                            scope {
+                do {
+                        scope {
+                                %240 = alloca s32i, "__i", align 4
                                 scope {
-                                    %244 = cast(bitcast) %7 : double*
-                                    %245 = load %240 : s32i, align 4
-                                    %246 = ptr_stride %244, %245 : double*
-                                    %247 = load %246 : double, align 8
-                                    %248 = cast(bitcast) %8 : double*
-                                    %249 = load %240 : s32i, align 4
-                                    %250 = ptr_stride %248, %249 : double*
-                                    %251 = load %250 : double, align 8
-                                    %252 = cmp ne %247, %251 : bool
-                                    if %252 {
-                                        call @abort() [all]
+                                        %241 = const 0 : s32i
+                                        store %241, %240, align 4
+                                        for cond {
+                                                %253 = load %240 : s32i, align 4
+                                                %254 = const 2 : s32i
+                                                cmp
+                                                condition %255
+                                        } step {
+                                                %242 = load %240 : s32i, align 4
+                                                inc
+                                                store %243, %240, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %244 = cast(bitcast) %7 : double*
+                                                                %245 = load %240 : s32i, align 4
+                                                                ptr_stride
+                                                                %247 = load %246 : double, align 8
+                                                                %248 = cast(bitcast) %8 : double*
+                                                                %249 = load %240 : s32i, align 4
+                                                                ptr_stride
+                                                                %251 = load %250 : double, align 8
+                                                                cmp
+                                                                if %252 {
+                                                                        call @abort() [all]
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
+                } while {
+                        %238 = const 0 : s32i
+                        %239 = cast(int_to_bool) %238 : bool
+                        condition %239
                 }
                 yield
-            } while {
-                %238 = const 0 : s32i
-                %239 = cast(int_to_bool) %238 : bool
-                condition %239
-            }
-            yield
         }
         %236 = const 0 : s32i
         store %236, %2

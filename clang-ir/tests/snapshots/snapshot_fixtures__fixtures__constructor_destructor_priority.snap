@@ -1,69 +1,69 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/constructor_destructor_priority.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[18] = "ctor: late (200)\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[19] = "ctor: early (101)\n" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[15] = "ctor: default\n" [cir_private, default, align 1, dso_local, constant]
-global .str.3 : s8i[18] = "dtor: late (200)\n" [cir_private, default, align 1, dso_local, constant]
-global .str.4 : s8i[19] = "dtor: early (101)\n" [cir_private, default, align 1, dso_local, constant]
-global .str.5 : s8i[15] = "dtor: default\n" [cir_private, default, align 1, dso_local, constant]
-global .str.6 : s8i[6] = "main\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[18] = ConstArray { ty: Array { element_type: Named("s8i"), size: 18 }, elts: Str("ctor: late (200)\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[19] = ConstArray { ty: Array { element_type: Named("s8i"), size: 19 }, elts: Str("ctor: early (101)\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[15] = ConstArray { ty: Array { element_type: Named("s8i"), size: 15 }, elts: Str("ctor: default\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[18] = ConstArray { ty: Array { element_type: Named("s8i"), size: 18 }, elts: Str("dtor: late (200)\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[19] = ConstArray { ty: Array { element_type: Named("s8i"), size: 19 }, elts: Str("dtor: early (101)\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[15] = ConstArray { ty: Array { element_type: Named("s8i"), size: 15 }, elts: Str("dtor: default\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[6] = ConstArray { ty: Array { element_type: Named("s8i"), size: 6 }, elts: Str("main\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn init_late() -> void [internal, c, no_inline, dso_local, nothrow] {
-    %28 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %29 = get_global @.str : s8i[18]*
-    %30 = cast(array_to_ptrdecay) %29 : s8i*
-    %31 = call @printf(%30) : s32i [all]
-    return
+        %28 = get_global @printf : (s8i*, ...) -> s32i*
+        %29 = get_global @.str : s8i[18]*
+        %30 = cast(array_to_ptrdecay) %29 : s8i*
+        %31 = call @printf(%30) : s32i [all]
+        return
 }
 fn init_early() -> void [internal, c, no_inline, dso_local, nothrow] {
-    %24 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %25 = get_global @.str.1 : s8i[19]*
-    %26 = cast(array_to_ptrdecay) %25 : s8i*
-    %27 = call @printf(%26) : s32i [all]
-    return
+        %24 = get_global @printf : (s8i*, ...) -> s32i*
+        %25 = get_global @.str.1 : s8i[19]*
+        %26 = cast(array_to_ptrdecay) %25 : s8i*
+        %27 = call @printf(%26) : s32i [all]
+        return
 }
 fn init_default() -> void [internal, c, no_inline, dso_local, nothrow] {
-    %20 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %21 = get_global @.str.2 : s8i[15]*
-    %22 = cast(array_to_ptrdecay) %21 : s8i*
-    %23 = call @printf(%22) : s32i [all]
-    return
+        %20 = get_global @printf : (s8i*, ...) -> s32i*
+        %21 = get_global @.str.2 : s8i[15]*
+        %22 = cast(array_to_ptrdecay) %21 : s8i*
+        %23 = call @printf(%22) : s32i [all]
+        return
 }
 fn fini_late() -> void [internal, c, no_inline, dso_local, nothrow] {
-    %16 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %17 = get_global @.str.3 : s8i[18]*
-    %18 = cast(array_to_ptrdecay) %17 : s8i*
-    %19 = call @printf(%18) : s32i [all]
-    return
+        %16 = get_global @printf : (s8i*, ...) -> s32i*
+        %17 = get_global @.str.3 : s8i[18]*
+        %18 = cast(array_to_ptrdecay) %17 : s8i*
+        %19 = call @printf(%18) : s32i [all]
+        return
 }
 fn fini_early() -> void [internal, c, no_inline, dso_local, nothrow] {
-    %12 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %13 = get_global @.str.4 : s8i[19]*
-    %14 = cast(array_to_ptrdecay) %13 : s8i*
-    %15 = call @printf(%14) : s32i [all]
-    return
+        %12 = get_global @printf : (s8i*, ...) -> s32i*
+        %13 = get_global @.str.4 : s8i[19]*
+        %14 = cast(array_to_ptrdecay) %13 : s8i*
+        %15 = call @printf(%14) : s32i [all]
+        return
 }
 fn fini_default() -> void [internal, c, no_inline, dso_local, nothrow] {
-    %8 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %9 = get_global @.str.5 : s8i[15]*
-    %10 = cast(array_to_ptrdecay) %9 : s8i*
-    %11 = call @printf(%10) : s32i [all]
-    return
+        %8 = get_global @printf : (s8i*, ...) -> s32i*
+        %9 = get_global @.str.5 : s8i[15]*
+        %10 = cast(array_to_ptrdecay) %9 : s8i*
+        %11 = call @printf(%10) : s32i [all]
+        return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str.6 : s8i[6]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = call @printf(%4) : s32i [all]
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str.6 : s8i[6]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = call @printf(%4) : s32i [all]
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

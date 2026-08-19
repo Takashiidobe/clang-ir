@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20020406-1.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[40] = "DUPFFexgcd called on degrees %d and %d\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[41] = "calling DUPFFexgcd on degrees %d and %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[40] = ConstArray { ty: Array { element_type: Named("s8i"), size: 40 }, elts: Str("DUPFFexgcd called on degrees %d and %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[41] = ConstArray { ty: Array { element_type: Named("s8i"), size: 41 }, elts: Str("calling DUPFFexgcd on degrees %d and %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn FFmul(%arg14: u32i, %arg15: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg14: u32i, %arg15: u32i):
@@ -24,7 +24,7 @@ fn DUPFFdeg(%arg13: rec_DUPFFstruct*) -> s32i [external, c, no_inline, dso_local
         %265 = alloca s32i, "__retval", align 4
         store %arg13, %264
         %266 = load %264 : rec_DUPFFstruct*, align 8
-        %267 = get_member %266[1] "deg" : s32i*
+        get_member
         %268 = load %267 : s32i, align 4
         store %268, %265
         %269 = load %265 : s32i
@@ -38,42 +38,42 @@ fn DUPFFnew(%arg12: s32i) -> rec_DUPFFstruct* [external, c, no_inline, dso_local
         %234 = alloca rec_DUPFFstruct*, "__retval", align 8
         %235 = alloca rec_DUPFFstruct*, "ans", align 8
         store %arg12, %233
-        %236 = get_global @malloc : ((u64i) -> void*)*
+        %236 = get_global @malloc : (u64i) -> void**
         %237 = const 16 : u64i
         %238 = call @malloc(%237) : void* [all]
         %239 = cast(bitcast) %238 : rec_DUPFFstruct*
         store %239, %235, align 8
         %240 = const #cir.ptr<null> : u32i*
         %241 = load %235 : rec_DUPFFstruct*, align 8
-        %242 = get_member %241[2] "coeffs" : u32i**
+        get_member
         store %240, %242, align 8
         scope {
-            %251 = load %233 : s32i, align 4
-            %252 = const 0 : s32i
-            %253 = cmp ge %251, %252 : bool
-            if %253 {
-                %254 = get_global @calloc : ((u64i, u64i) -> void*)*
-                %255 = load %233 : s32i, align 4
-                %256 = const 1 : s32i
-                %257 = add %255, %256 : s32i [nsw]
-                %258 = cast(integral) %257 : u64i
-                %259 = const 4 : u64i
-                %260 = call @calloc(%258, %259) : void* [all]
-                %261 = cast(bitcast) %260 : u32i*
-                %262 = load %235 : rec_DUPFFstruct*, align 8
-                %263 = get_member %262[2] "coeffs" : u32i**
-                store %261, %263, align 8
+                %251 = load %233 : s32i, align 4
+                %252 = const 0 : s32i
+                cmp
+                if %253 {
+                        %254 = get_global @calloc : (u64i, u64i) -> void**
+                        %255 = load %233 : s32i, align 4
+                        %256 = const 1 : s32i
+                        %257 = add %255, %256 : s32i [nsw]
+                        %258 = cast(integral) %257 : u64i
+                        %259 = const 4 : u64i
+                        %260 = call @calloc(%258, %259) : void* [all]
+                        %261 = cast(bitcast) %260 : u32i*
+                        %262 = load %235 : rec_DUPFFstruct*, align 8
+                        get_member
+                        store %261, %263, align 8
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %243 = load %233 : s32i, align 4
         %244 = load %235 : rec_DUPFFstruct*, align 8
-        %245 = get_member %244[0] "maxdeg" : s32i*
+        get_member
         store %243, %245, align 8
         %246 = const -1 : s32i
         %247 = load %235 : rec_DUPFFstruct*, align 8
-        %248 = get_member %247[1] "deg" : s32i*
+        get_member
         store %246, %248, align 4
         %249 = load %235 : rec_DUPFFstruct*, align 8
         store %249, %234
@@ -151,61 +151,61 @@ fn DUPFFexgcd(%arg0: rec_DUPFFstruct**, %arg1: rec_DUPFFstruct**, %arg2: rec_DUP
         %65 = call @DUPFFdeg(%64) : s32i [all]
         %66 = call @printf(%61, %63, %65) : s32i [all]
         scope {
-            %211 = load %43 : rec_DUPFFstruct*, align 8
-            %212 = call @DUPFFdeg(%211) : s32i [all]
-            %213 = load %44 : rec_DUPFFstruct*, align 8
-            %214 = call @DUPFFdeg(%213) : s32i [all]
-            %215 = cmp lt %212, %214 : bool
-            if %215 {
-                %216 = load %42 : rec_DUPFFstruct**, align 8
-                %217 = load %41 : rec_DUPFFstruct**, align 8
-                %218 = load %44 : rec_DUPFFstruct*, align 8
-                %219 = load %43 : rec_DUPFFstruct*, align 8
-                %220 = call @DUPFFexgcd(%216, %217, %218, %219) : rec_DUPFFstruct* [all]
-                store %220, %45
-                %221 = load %45 : rec_DUPFFstruct*
-                return %221
-            }
-            yield
-        }
-        scope {
-            %200 = load %43 : rec_DUPFFstruct*, align 8
-            %201 = call @DUPFFdeg(%200) : s32i [all]
-            %202 = const 2 : s32i
-            %203 = cmp ne %201, %202 : bool
-            %204 = ternary %203 ? { : bool
-                %210 = const true : bool
-                yield %210
-            } : {
-                %206 = load %44 : rec_DUPFFstruct*, align 8
-                %207 = call @DUPFFdeg(%206) : s32i [all]
-                %208 = const 1 : s32i
-                %209 = cmp ne %207, %208 : bool
-                yield %209
-            }
-            if %204 {
-                %205 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %211 = load %43 : rec_DUPFFstruct*, align 8
+                %212 = call @DUPFFdeg(%211) : s32i [all]
+                %213 = load %44 : rec_DUPFFstruct*, align 8
+                %214 = call @DUPFFdeg(%213) : s32i [all]
+                cmp
+                if %215 {
+                        %216 = load %42 : rec_DUPFFstruct**, align 8
+                        %217 = load %41 : rec_DUPFFstruct**, align 8
+                        %218 = load %44 : rec_DUPFFstruct*, align 8
+                        %219 = load %43 : rec_DUPFFstruct*, align 8
+                        %220 = call @DUPFFexgcd(%216, %217, %218, %219) : rec_DUPFFstruct* [all]
+                        store %220, %45
+                        %221 = load %45 : rec_DUPFFstruct*
+                        return %221
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %190 = const 0 : s64i
-            %191 = load %43 : rec_DUPFFstruct*, align 8
-            %192 = get_member %191[2] "coeffs" : u32i**
-            %193 = load %192 : u32i*, align 8
-            %194 = ptr_stride %193, %190 : u32i*
-            %195 = load %194 : u32i, align 4
-            %196 = const 0 : u32i
-            %197 = cmp eq %195, %196 : bool
-            if %197 {
-                %198 = load %43 : rec_DUPFFstruct*, align 8
-                store %198, %45
-                %199 = load %45 : rec_DUPFFstruct*
-                return %199
-            }
-            yield
+                %200 = load %43 : rec_DUPFFstruct*, align 8
+                %201 = call @DUPFFdeg(%200) : s32i [all]
+                %202 = const 2 : s32i
+                cmp
+                %204 = ternary %203 ? { : bool
+                        %210 = const true : bool
+                        yield %210
+                } : {
+                        %206 = load %44 : rec_DUPFFstruct*, align 8
+                        %207 = call @DUPFFdeg(%206) : s32i [all]
+                        %208 = const 1 : s32i
+                        cmp
+                        yield %209
+                }
+                if %204 {
+                        %205 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
+        }
+        scope {
+                %190 = const 0 : s64i
+                %191 = load %43 : rec_DUPFFstruct*, align 8
+                get_member
+                %193 = load %192 : u32i*, align 8
+                ptr_stride
+                %195 = load %194 : u32i, align 4
+                %196 = const 0 : u32i
+                cmp
+                if %197 {
+                        %198 = load %43 : rec_DUPFFstruct*, align 8
+                        store %198, %45
+                        %199 = load %45 : rec_DUPFFstruct*
+                        return %199
+                }
+                yield
         }
         %67 = const 2 : u32i
         store %67, %55, align 4
@@ -213,29 +213,29 @@ fn DUPFFexgcd(%arg0: rec_DUPFFstruct**, %arg1: rec_DUPFFstruct**, %arg2: rec_DUP
         %69 = call @DUPFFdeg(%68) : s32i [all]
         store %69, %56, align 4
         scope {
-            %186 = load %56 : s32i, align 4
-            %187 = const 0 : s32i
-            %188 = cmp lt %186, %187 : bool
-            if %188 {
-                %189 = const 0 : s32i
-                store %189, %56, align 4
+                %186 = load %56 : s32i, align 4
+                %187 = const 0 : s32i
+                cmp
+                if %188 {
+                        %189 = const 0 : s32i
+                        store %189, %56, align 4
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %70 = load %44 : rec_DUPFFstruct*, align 8
         %71 = call @DUPFFdeg(%70) : s32i [all]
         store %71, %57, align 4
         scope {
-            %182 = load %57 : s32i, align 4
-            %183 = const 0 : s32i
-            %184 = cmp lt %182, %183 : bool
-            if %184 {
-                %185 = const 0 : s32i
-                store %185, %57, align 4
+                %182 = load %57 : s32i, align 4
+                %183 = const 0 : s32i
+                cmp
+                if %184 {
+                        %185 = const 0 : s32i
+                        store %185, %57, align 4
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %72 = load %43 : rec_DUPFFstruct*, align 8
         %73 = call @DUPFFcopy(%72) : rec_DUPFFstruct* [all]
@@ -249,13 +249,13 @@ fn DUPFFexgcd(%arg0: rec_DUPFFstruct**, %arg1: rec_DUPFFstruct**, %arg2: rec_DUP
         %78 = const 1 : u32i
         %79 = const 0 : s64i
         %80 = load %48 : rec_DUPFFstruct*, align 8
-        %81 = get_member %80[2] "coeffs" : u32i**
+        get_member
         %82 = load %81 : u32i*, align 8
-        %83 = ptr_stride %82, %79 : u32i*
+        ptr_stride
         store %78, %83, align 4
         %84 = const 0 : s32i
         %85 = load %48 : rec_DUPFFstruct*, align 8
-        %86 = get_member %85[1] "deg" : s32i*
+        get_member
         store %84, %86, align 4
         %87 = load %56 : s32i, align 4
         %88 = call @DUPFFnew(%87) : rec_DUPFFstruct* [all]
@@ -269,126 +269,126 @@ fn DUPFFexgcd(%arg0: rec_DUPFFstruct**, %arg1: rec_DUPFFstruct**, %arg2: rec_DUP
         %93 = const 1 : u32i
         %94 = const 0 : s64i
         %95 = load %51 : rec_DUPFFstruct*, align 8
-        %96 = get_member %95[2] "coeffs" : u32i**
+        get_member
         %97 = load %96 : u32i*, align 8
-        %98 = ptr_stride %97, %94 : u32i*
+        ptr_stride
         store %93, %98, align 4
         %99 = const 0 : s32i
         %100 = load %51 : rec_DUPFFstruct*, align 8
-        %101 = get_member %100[1] "deg" : s32i*
+        get_member
         store %99, %101, align 4
         scope {
-            while {
-                %178 = load %47 : rec_DUPFFstruct*, align 8
-                %179 = call @DUPFFdeg(%178) : s32i [all]
-                %180 = const 0 : s32i
-                %181 = cmp gt %179, %180 : bool
-                condition %181
-            } do {
-                scope {
-                    %121 = load %47 : rec_DUPFFstruct*, align 8
-                    %122 = call @DUPFFdeg(%121) : s32i [all]
-                    store %122, %59, align 4
-                    %123 = const 1 : u32i
-                    %124 = load %59 : s32i, align 4
-                    %125 = cast(integral) %124 : s64i
-                    %126 = load %47 : rec_DUPFFstruct*, align 8
-                    %127 = get_member %126[2] "coeffs" : u32i**
-                    %128 = load %127 : u32i*, align 8
-                    %129 = ptr_stride %128, %125 : u32i*
-                    %130 = load %129 : u32i, align 4
-                    %131 = call @FFmul(%123, %130) : u32i [all]
-                    store %131, %54, align 4
-                    scope {
-                        while {
-                            %174 = load %46 : rec_DUPFFstruct*, align 8
-                            %175 = call @DUPFFdeg(%174) : s32i [all]
-                            %176 = load %59 : s32i, align 4
-                            %177 = cmp ge %175, %176 : bool
-                            condition %177
-                        } do {
-                            scope {
-                                %138 = load %46 : rec_DUPFFstruct*, align 8
-                                %139 = call @DUPFFdeg(%138) : s32i [all]
-                                store %139, %58, align 4
-                                %140 = load %58 : s32i, align 4
-                                %141 = cast(integral) %140 : s64i
-                                %142 = load %46 : rec_DUPFFstruct*, align 8
-                                %143 = get_member %142[2] "coeffs" : u32i**
-                                %144 = load %143 : u32i*, align 8
-                                %145 = ptr_stride %144, %141 : u32i*
-                                %146 = load %145 : u32i, align 4
-                                store %146, %53, align 4
-                                %147 = load %53 : u32i, align 4
-                                %148 = load %54 : u32i, align 4
-                                %149 = call @FFmul(%147, %148) : u32i [all]
-                                store %149, %52, align 4
-                                %150 = load %46 : rec_DUPFFstruct*, align 8
-                                %151 = load %47 : rec_DUPFFstruct*, align 8
-                                %152 = load %58 : s32i, align 4
-                                %153 = load %59 : s32i, align 4
-                                %154 = sub %152, %153 : s32i [nsw]
-                                %155 = load %55 : u32i, align 4
-                                %156 = load %52 : u32i, align 4
-                                %157 = sub %155, %156 : u32i
-                                call @DUPFFshift_add(%150, %151, %154, %157) [all]
-                                %158 = load %48 : rec_DUPFFstruct*, align 8
-                                %159 = load %50 : rec_DUPFFstruct*, align 8
-                                %160 = load %58 : s32i, align 4
-                                %161 = load %59 : s32i, align 4
-                                %162 = sub %160, %161 : s32i [nsw]
-                                %163 = load %55 : u32i, align 4
-                                %164 = load %52 : u32i, align 4
-                                %165 = sub %163, %164 : u32i
-                                call @DUPFFshift_add(%158, %159, %162, %165) [all]
-                                %166 = load %49 : rec_DUPFFstruct*, align 8
-                                %167 = load %51 : rec_DUPFFstruct*, align 8
-                                %168 = load %58 : s32i, align 4
-                                %169 = load %59 : s32i, align 4
-                                %170 = sub %168, %169 : s32i [nsw]
-                                %171 = load %55 : u32i, align 4
-                                %172 = load %52 : u32i, align 4
-                                %173 = sub %171, %172 : u32i
-                                call @DUPFFshift_add(%166, %167, %170, %173) [all]
+                while {
+                        %178 = load %47 : rec_DUPFFstruct*, align 8
+                        %179 = call @DUPFFdeg(%178) : s32i [all]
+                        %180 = const 0 : s32i
+                        cmp
+                        condition %181
+                } do {
+                        scope {
+                                %121 = load %47 : rec_DUPFFstruct*, align 8
+                                %122 = call @DUPFFdeg(%121) : s32i [all]
+                                store %122, %59, align 4
+                                %123 = const 1 : u32i
+                                %124 = load %59 : s32i, align 4
+                                %125 = cast(integral) %124 : s64i
+                                %126 = load %47 : rec_DUPFFstruct*, align 8
+                                get_member
+                                %128 = load %127 : u32i*, align 8
+                                ptr_stride
+                                %130 = load %129 : u32i, align 4
+                                %131 = call @FFmul(%123, %130) : u32i [all]
+                                store %131, %54, align 4
+                                scope {
+                                        while {
+                                                %174 = load %46 : rec_DUPFFstruct*, align 8
+                                                %175 = call @DUPFFdeg(%174) : s32i [all]
+                                                %176 = load %59 : s32i, align 4
+                                                cmp
+                                                condition %177
+                                        } do {
+                                                scope {
+                                                        %138 = load %46 : rec_DUPFFstruct*, align 8
+                                                        %139 = call @DUPFFdeg(%138) : s32i [all]
+                                                        store %139, %58, align 4
+                                                        %140 = load %58 : s32i, align 4
+                                                        %141 = cast(integral) %140 : s64i
+                                                        %142 = load %46 : rec_DUPFFstruct*, align 8
+                                                        get_member
+                                                        %144 = load %143 : u32i*, align 8
+                                                        ptr_stride
+                                                        %146 = load %145 : u32i, align 4
+                                                        store %146, %53, align 4
+                                                        %147 = load %53 : u32i, align 4
+                                                        %148 = load %54 : u32i, align 4
+                                                        %149 = call @FFmul(%147, %148) : u32i [all]
+                                                        store %149, %52, align 4
+                                                        %150 = load %46 : rec_DUPFFstruct*, align 8
+                                                        %151 = load %47 : rec_DUPFFstruct*, align 8
+                                                        %152 = load %58 : s32i, align 4
+                                                        %153 = load %59 : s32i, align 4
+                                                        sub
+                                                        %155 = load %55 : u32i, align 4
+                                                        %156 = load %52 : u32i, align 4
+                                                        sub
+                                                        call @DUPFFshift_add(%150, %151, %154, %157) [all]
+                                                        %158 = load %48 : rec_DUPFFstruct*, align 8
+                                                        %159 = load %50 : rec_DUPFFstruct*, align 8
+                                                        %160 = load %58 : s32i, align 4
+                                                        %161 = load %59 : s32i, align 4
+                                                        sub
+                                                        %163 = load %55 : u32i, align 4
+                                                        %164 = load %52 : u32i, align 4
+                                                        sub
+                                                        call @DUPFFshift_add(%158, %159, %162, %165) [all]
+                                                        %166 = load %49 : rec_DUPFFstruct*, align 8
+                                                        %167 = load %51 : rec_DUPFFstruct*, align 8
+                                                        %168 = load %58 : s32i, align 4
+                                                        %169 = load %59 : s32i, align 4
+                                                        sub
+                                                        %171 = load %55 : u32i, align 4
+                                                        %172 = load %52 : u32i, align 4
+                                                        sub
+                                                        call @DUPFFshift_add(%166, %167, %170, %173) [all]
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
+                                %132 = load %46 : rec_DUPFFstruct*, align 8
+                                %133 = load %47 : rec_DUPFFstruct*, align 8
+                                call @DUPFFswap(%132, %133) [all]
+                                %134 = load %48 : rec_DUPFFstruct*, align 8
+                                %135 = load %50 : rec_DUPFFstruct*, align 8
+                                call @DUPFFswap(%134, %135) [all]
+                                %136 = load %49 : rec_DUPFFstruct*, align 8
+                                %137 = load %51 : rec_DUPFFstruct*, align 8
+                                call @DUPFFswap(%136, %137) [all]
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    %132 = load %46 : rec_DUPFFstruct*, align 8
-                    %133 = load %47 : rec_DUPFFstruct*, align 8
-                    call @DUPFFswap(%132, %133) [all]
-                    %134 = load %48 : rec_DUPFFstruct*, align 8
-                    %135 = load %50 : rec_DUPFFstruct*, align 8
-                    call @DUPFFswap(%134, %135) [all]
-                    %136 = load %49 : rec_DUPFFstruct*, align 8
-                    %137 = load %51 : rec_DUPFFstruct*, align 8
-                    call @DUPFFswap(%136, %137) [all]
-                    yield
                 }
                 yield
-            }
-            yield
         }
         scope {
-            %111 = load %47 : rec_DUPFFstruct*, align 8
-            %112 = call @DUPFFdeg(%111) : s32i [all]
-            %113 = const 0 : s32i
-            %114 = cmp eq %112, %113 : bool
-            if %114 {
-                %115 = load %46 : rec_DUPFFstruct*, align 8
-                %116 = load %47 : rec_DUPFFstruct*, align 8
-                call @DUPFFswap(%115, %116) [all]
-                %117 = load %48 : rec_DUPFFstruct*, align 8
-                %118 = load %50 : rec_DUPFFstruct*, align 8
-                call @DUPFFswap(%117, %118) [all]
-                %119 = load %49 : rec_DUPFFstruct*, align 8
-                %120 = load %51 : rec_DUPFFstruct*, align 8
-                call @DUPFFswap(%119, %120) [all]
+                %111 = load %47 : rec_DUPFFstruct*, align 8
+                %112 = call @DUPFFdeg(%111) : s32i [all]
+                %113 = const 0 : s32i
+                cmp
+                if %114 {
+                        %115 = load %46 : rec_DUPFFstruct*, align 8
+                        %116 = load %47 : rec_DUPFFstruct*, align 8
+                        call @DUPFFswap(%115, %116) [all]
+                        %117 = load %48 : rec_DUPFFstruct*, align 8
+                        %118 = load %50 : rec_DUPFFstruct*, align 8
+                        call @DUPFFswap(%117, %118) [all]
+                        %119 = load %49 : rec_DUPFFstruct*, align 8
+                        %120 = load %51 : rec_DUPFFstruct*, align 8
+                        call @DUPFFswap(%119, %120) [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %102 = load %50 : rec_DUPFFstruct*, align 8
         call @DUPFFfree(%102) [all]
@@ -408,55 +408,55 @@ fn DUPFFexgcd(%arg0: rec_DUPFFstruct**, %arg1: rec_DUPFFstruct**, %arg2: rec_DUP
         return %110
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_DUPFFstruct*, "f", align 8
-    %2 = alloca rec_DUPFFstruct*, "g", align 8
-    %3 = alloca rec_DUPFFstruct*, "cf", align 8
-    %4 = alloca rec_DUPFFstruct*, "cg", align 8
-    %5 = alloca rec_DUPFFstruct*, "h", align 8
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = const 1 : s32i
-    %8 = call @DUPFFnew(%7) : rec_DUPFFstruct* [all]
-    store %8, %1, align 8
-    %9 = const 1 : u32i
-    %10 = const 1 : s64i
-    %11 = load %1 : rec_DUPFFstruct*, align 8
-    %12 = get_member %11[2] "coeffs" : u32i**
-    %13 = load %12 : u32i*, align 8
-    %14 = ptr_stride %13, %10 : u32i*
-    store %9, %14, align 4
-    %15 = const 1 : s32i
-    %16 = load %1 : rec_DUPFFstruct*, align 8
-    %17 = get_member %16[1] "deg" : s32i*
-    store %15, %17, align 4
-    %18 = const 2 : s32i
-    %19 = call @DUPFFnew(%18) : rec_DUPFFstruct* [all]
-    store %19, %2, align 8
-    %20 = const 1 : u32i
-    %21 = const 2 : s64i
-    %22 = load %2 : rec_DUPFFstruct*, align 8
-    %23 = get_member %22[2] "coeffs" : u32i**
-    %24 = load %23 : u32i*, align 8
-    %25 = ptr_stride %24, %21 : u32i*
-    store %20, %25, align 4
-    %26 = const 2 : s32i
-    %27 = load %2 : rec_DUPFFstruct*, align 8
-    %28 = get_member %27[1] "deg" : s32i*
-    store %26, %28, align 4
-    %29 = get_global @.str.1 : s8i[41]*
-    %30 = cast(array_to_ptrdecay) %29 : s8i*
-    %31 = load %1 : rec_DUPFFstruct*, align 8
-    %32 = call @DUPFFdeg(%31) : s32i [all]
-    %33 = load %2 : rec_DUPFFstruct*, align 8
-    %34 = call @DUPFFdeg(%33) : s32i [all]
-    %35 = call @printf(%30, %32, %34) : s32i [all]
-    %36 = load %1 : rec_DUPFFstruct*, align 8
-    %37 = load %2 : rec_DUPFFstruct*, align 8
-    %38 = call @DUPFFexgcd(%3, %4, %36, %37) : rec_DUPFFstruct* [all]
-    store %38, %5, align 8
-    %39 = const 0 : s32i
-    store %39, %0
-    %40 = load %0 : s32i
-    return %40
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_DUPFFstruct*, "f", align 8
+        %2 = alloca rec_DUPFFstruct*, "g", align 8
+        %3 = alloca rec_DUPFFstruct*, "cf", align 8
+        %4 = alloca rec_DUPFFstruct*, "cg", align 8
+        %5 = alloca rec_DUPFFstruct*, "h", align 8
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = const 1 : s32i
+        %8 = call @DUPFFnew(%7) : rec_DUPFFstruct* [all]
+        store %8, %1, align 8
+        %9 = const 1 : u32i
+        %10 = const 1 : s64i
+        %11 = load %1 : rec_DUPFFstruct*, align 8
+        get_member
+        %13 = load %12 : u32i*, align 8
+        ptr_stride
+        store %9, %14, align 4
+        %15 = const 1 : s32i
+        %16 = load %1 : rec_DUPFFstruct*, align 8
+        get_member
+        store %15, %17, align 4
+        %18 = const 2 : s32i
+        %19 = call @DUPFFnew(%18) : rec_DUPFFstruct* [all]
+        store %19, %2, align 8
+        %20 = const 1 : u32i
+        %21 = const 2 : s64i
+        %22 = load %2 : rec_DUPFFstruct*, align 8
+        get_member
+        %24 = load %23 : u32i*, align 8
+        ptr_stride
+        store %20, %25, align 4
+        %26 = const 2 : s32i
+        %27 = load %2 : rec_DUPFFstruct*, align 8
+        get_member
+        store %26, %28, align 4
+        %29 = get_global @.str.1 : s8i[41]*
+        %30 = cast(array_to_ptrdecay) %29 : s8i*
+        %31 = load %1 : rec_DUPFFstruct*, align 8
+        %32 = call @DUPFFdeg(%31) : s32i [all]
+        %33 = load %2 : rec_DUPFFstruct*, align 8
+        %34 = call @DUPFFdeg(%33) : s32i [all]
+        %35 = call @printf(%30, %32, %34) : s32i [all]
+        %36 = load %1 : rec_DUPFFstruct*, align 8
+        %37 = load %2 : rec_DUPFFstruct*, align 8
+        %38 = call @DUPFFexgcd(%3, %4, %36, %37) : rec_DUPFFstruct* [all]
+        store %38, %5, align 8
+        %39 = const 0 : s32i
+        store %39, %0
+        %40 = load %0 : s32i
+        return %40
 }

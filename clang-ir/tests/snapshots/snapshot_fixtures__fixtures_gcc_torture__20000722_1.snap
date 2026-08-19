@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000722-1.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[3] = "hi" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[3] = ConstArray { ty: Array { element_type: Named("s8i"), size: 3 }, elts: Str("hi"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn abort() -> void [external, c, nothrow];
 fn foo(%arg0: rec_s*) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -11,46 +11,46 @@ fn foo(%arg0: rec_s*) -> void [external, c, no_inline, dso_local, nothrow] {
         %11 = alloca rec_s*, "p", align 8
         store %arg0, %11
         scope {
-            %15 = load %11 : rec_s*, align 8
-            %16 = get_member %15[1] "t" : s32i*
-            %17 = load %16 : s32i, align 8
-            %18 = const 1 : s32i
-            %19 = cmp ne %17, %18 : bool
-            if %19 {
-                %20 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %15 = load %11 : rec_s*, align 8
+                get_member
+                %17 = load %16 : s32i, align 8
+                %18 = const 1 : s32i
+                cmp
+                if %19 {
+                        %20 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %12 = const 2 : s32i
         %13 = load %11 : rec_s*, align 8
-        %14 = get_member %13[1] "t" : s32i*
+        get_member
         store %12, %14, align 8
         return
 }
 fn bar() -> void [external, c, no_inline, dso_local, nothrow] {
-    %5 = alloca rec_s, ".compoundliteral", align 8
-    %6 = get_member %5[0] "p" : s8i**
-    %7 = get_global @.str : s8i[3]*
-    %8 = cast(array_to_ptrdecay) %7 : s8i*
-    store %8, %6, align 8
-    %9 = get_member %5[1] "t" : s32i*
-    %10 = const 1 : s32i
-    store %10, %9, align 8
-    call @foo(%5) [all]
-    return
+        %5 = alloca rec_s, ".compoundliteral", align 8
+        get_member
+        %7 = get_global @.str : s8i[3]*
+        %8 = cast(array_to_ptrdecay) %7 : s8i*
+        store %8, %6, align 8
+        get_member
+        %10 = const 1 : s32i
+        store %10, %9, align 8
+        call @foo(%5) [all]
+        return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    call @bar() [all]
-    call @bar() [all]
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        call @bar() [all]
+        call @bar() [all]
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

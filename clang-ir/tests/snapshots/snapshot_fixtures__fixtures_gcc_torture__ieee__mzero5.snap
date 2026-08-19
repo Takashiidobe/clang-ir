@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/ieee__mzero5.c" (c, x86_64-unknown-linux-gnu)
-global zero : double = 0.000000e+00 [internal, default, align 8, dso_local]
+global zero : double = CirFloat { ty: Double, value: "0.000000e+00" } [internal, default, align 8, dso_local]
 
 fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c, nothrow];
 fn negzero_check(%arg2: double) -> s32i [external, c, no_inline, dso_local, nothrow] {
@@ -12,23 +12,23 @@ fn negzero_check(%arg2: double) -> s32i [external, c, no_inline, dso_local, noth
         %41 = alloca s32i, "__retval", align 4
         store %arg2, %40
         scope {
-            %44 = load %40 : double, align 8
-            %45 = const 0 : s32i
-            %46 = cast(int_to_float) %45 : double
-            %47 = cmp eq %44, %46 : bool
-            if %47 {
-                %48 = get_global @zero : double*
-                %49 = cast(bitcast) %48 : void*
-                %50 = cast(bitcast) %40 : void*
-                %51 = const 8 : u64i
-                %52 = call @memcmp(%49, %50, %51) : s32i [all]
-                %53 = cast(int_to_bool) %52 : bool
-                %54 = cast(bool_to_int) %53 : s32i
-                store %54, %41
-                %55 = load %41 : s32i
-                return %55
-            }
-            yield
+                %44 = load %40 : double, align 8
+                %45 = const 0 : s32i
+                %46 = cast(int_to_float) %45 : double
+                cmp
+                if %47 {
+                        %48 = get_global @zero : double*
+                        %49 = cast(bitcast) %48 : void*
+                        %50 = cast(bitcast) %40 : void*
+                        %51 = const 8 : u64i
+                        %52 = call @memcmp(%49, %50, %51) : s32i [all]
+                        %53 = cast(int_to_bool) %52 : bool
+                        %54 = cast(bool_to_int) %53 : s32i
+                        store %54, %41
+                        %55 = load %41 : s32i
+                        return %55
+                }
+                yield
         }
         %42 = const 0 : s32i
         store %42, %41
@@ -43,77 +43,77 @@ fn sub(%arg0: double, %arg1: double) -> s32i [external, c, no_inline, dso_local,
         store %arg0, %12
         store %arg1, %13
         scope {
-            %16 = load %12 : double, align 8
-            %17 = const 0.000000e+00 : double
-            %18 = cmp eq %16, %17 : bool
-            %19 = ternary %18 ? { : bool
-                %37 = load %13 : double, align 8
-                %38 = const 0.000000e+00 : double
-                %39 = cmp eq %37, %38 : bool
-                yield %39
-            } : {
-                %36 = const false : bool
-                yield %36
-            }
-            %20 = ternary %19 ? { : bool
-                %32 = load %12 : double, align 8
-                %33 = call @negzero_check(%32) : s32i [all]
-                %34 = const 0 : s32i
-                %35 = cmp eq %33, %34 : bool
-                yield %35
-            } : {
-                %31 = const false : bool
-                yield %31
-            }
-            %21 = ternary %20 ? { : bool
-                %27 = load %13 : double, align 8
-                %28 = call @negzero_check(%27) : s32i [all]
-                %29 = const 0 : s32i
-                %30 = cmp eq %28, %29 : bool
-                yield %30
-            } : {
-                %26 = const false : bool
-                yield %26
-            }
-            if %21 {
-                %24 = const 1 : s32i
-                store %24, %14
-                %25 = load %14 : s32i
-                return %25
-            } else {
-                %22 = const 0 : s32i
-                store %22, %14
-                %23 = load %14 : s32i
-                return %23
-            }
-            yield
+                %16 = load %12 : double, align 8
+                %17 = const 0.000000e+00 : double
+                cmp
+                %19 = ternary %18 ? { : bool
+                        %37 = load %13 : double, align 8
+                        %38 = const 0.000000e+00 : double
+                        cmp
+                        yield %39
+                } : {
+                        %36 = const false : bool
+                        yield %36
+                }
+                %20 = ternary %19 ? { : bool
+                        %32 = load %12 : double, align 8
+                        %33 = call @negzero_check(%32) : s32i [all]
+                        %34 = const 0 : s32i
+                        cmp
+                        yield %35
+                } : {
+                        %31 = const false : bool
+                        yield %31
+                }
+                %21 = ternary %20 ? { : bool
+                        %27 = load %13 : double, align 8
+                        %28 = call @negzero_check(%27) : s32i [all]
+                        %29 = const 0 : s32i
+                        cmp
+                        yield %30
+                } : {
+                        %26 = const false : bool
+                        yield %26
+                }
+                if %21 {
+                        %24 = const 1 : s32i
+                        store %24, %14
+                        %25 = load %14 : s32i
+                        return %25
+                } else {
+                        %22 = const 0 : s32i
+                        store %22, %14
+                        %23 = load %14 : s32i
+                        return %23
+                }
+                yield
         }
         %15 = load %14 : s32i
         return %15
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca double, "minus_zero", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const -0.000000e+00 : double
-    store %3, %1, align 8
-    scope {
-        %6 = load %1 : double, align 8
-        %7 = const 0 : s32i
-        %8 = cast(int_to_float) %7 : double
-        %9 = call @sub(%6, %8) : s32i [all]
-        %10 = cast(int_to_bool) %9 : bool
-        if %10 {
-            %11 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca double, "minus_zero", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const -0.000000e+00 : double
+        store %3, %1, align 8
+        scope {
+                %6 = load %1 : double, align 8
+                %7 = const 0 : s32i
+                %8 = cast(int_to_float) %7 : double
+                %9 = call @sub(%6, %8) : s32i [all]
+                %10 = cast(int_to_bool) %9 : bool
+                if %10 {
+                        %11 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr60072.c" (c, x86_64-unknown-linux-gnu)
-global c : s32i = 1 [external, default, align 4, dso_local]
+global c : s32i = CirInt { ty: Named("s32i"), value: "1" } [external, default, align 4, dso_local]
 
 fn foo(%arg0: s32i*) -> s32i* [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i*):
@@ -16,18 +16,18 @@ fn foo(%arg0: s32i*) -> s32i* [internal, c, no_inline, dso_local, nothrow] {
         return %13
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 2 : s32i
-    %3 = get_global @c : s32i*
-    %4 = call @foo(%3) : s32i* [all]
-    store %2, %4, align 4
-    %5 = get_global @c : s32i*
-    %6 = load %5 : s32i, align 4
-    %7 = const 2 : s32i
-    %8 = sub %6, %7 : s32i [nsw]
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 2 : s32i
+        %3 = get_global @c : s32i*
+        %4 = call @foo(%3) : s32i* [all]
+        store %2, %4, align 4
+        %5 = get_global @c : s32i*
+        %6 = load %5 : s32i, align 4
+        %7 = const 2 : s32i
+        sub
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

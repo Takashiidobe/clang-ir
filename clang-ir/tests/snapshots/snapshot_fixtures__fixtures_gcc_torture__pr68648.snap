@@ -1,52 +1,52 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr68648.c" (c, x86_64-unknown-linux-gnu)
 fn foo() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %22 = alloca s32i, "__retval", align 4
-    %23 = const 123 : s32i
-    store %23, %22
-    %24 = load %22 : s32i
-    return %24
+        %22 = alloca s32i, "__retval", align 4
+        %23 = const 123 : s32i
+        store %23, %22
+        %24 = load %22 : s32i
+        return %24
 }
 fn bar() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %7 = alloca s32i, "__retval", align 4
-    %8 = alloca s32i, "c", align 4
-    %9 = const 1 : s32i
-    store %9, %8, align 4
-    %10 = const 4294967295 : s64i
-    %11 = call @foo() : s32i [all]
-    %12 = cast(integral) %11 : s64i
-    %13 = const 4073709551608 : s64i
-    %14 = or %12, %13 : s64i
-    %15 = xor %14, %10 : s64i
-    %16 = load %8 : s32i, align 4
-    %17 = cast(integral) %16 : s64i
-    %18 = or %17, %15 : s64i
-    %19 = cast(integral) %18 : s32i
-    store %19, %8, align 4
-    %20 = load %8 : s32i, align 4
-    store %20, %7
-    %21 = load %7 : s32i
-    return %21
+        %7 = alloca s32i, "__retval", align 4
+        %8 = alloca s32i, "c", align 4
+        %9 = const 1 : s32i
+        store %9, %8, align 4
+        %10 = const 4294967295 : s64i
+        %11 = call @foo() : s32i [all]
+        %12 = cast(integral) %11 : s64i
+        %13 = const 4073709551608 : s64i
+        or
+        xor
+        %16 = load %8 : s32i, align 4
+        %17 = cast(integral) %16 : s64i
+        or
+        %19 = cast(integral) %18 : s32i
+        store %19, %8, align 4
+        %20 = load %8 : s32i, align 4
+        store %20, %7
+        %21 = load %7 : s32i
+        return %21
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %3 = call @bar() : s32i [all]
-        %4 = cast(integral) %3 : u32i
-        %5 = const 2214412293 : u32i
-        %6 = cmp ne %4, %5 : bool
-        if %6 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %3 = call @bar() : s32i [all]
+                %4 = cast(integral) %3 : u32i
+                %5 = const 2214412293 : u32i
+                cmp
+                if %6 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = load %0 : s32i
-    return %2
+        %2 = load %0 : s32i
+        return %2
 }

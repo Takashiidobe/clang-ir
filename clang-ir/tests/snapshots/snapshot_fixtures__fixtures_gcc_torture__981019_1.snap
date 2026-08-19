@@ -1,35 +1,35 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/981019-1.c" (c, x86_64-unknown-linux-gnu)
-global f3.x : s32i = 0 [internal, default, align 4, dso_local]
+global f3.x : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn f1() -> void [external, c, no_inline, dso_local, nothrow] {
-    %39 = get_global @abort : (() -> void)*
-    call @abort() [all]
-    return
+        %39 = get_global @abort : () -> void*
+        call @abort() [all]
+        return
 }
 fn f3() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %31 = alloca s32i, "__retval", align 4
-    %32 = get_global @f3.x : s32i*
-    %33 = load %32 : s32i, align 4
-    %34 = cast(int_to_bool) %33 : bool
-    %35 = not %34 : bool
-    %36 = cast(bool_to_int) %35 : s32i
-    store %36, %32, align 4
-    %37 = load %32 : s32i, align 4
-    store %37, %31
-    %38 = load %31 : s32i
-    return %38
+        %31 = alloca s32i, "__retval", align 4
+        %32 = get_global @f3.x : s32i*
+        %33 = load %32 : s32i, align 4
+        %34 = cast(int_to_bool) %33 : bool
+        not
+        %36 = cast(bool_to_int) %35 : s32i
+        store %36, %32, align 4
+        %37 = load %32 : s32i, align 4
+        store %37, %31
+        %38 = load %31 : s32i
+        return %38
 }
 fn f2() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %28 = alloca s32i, "__retval", align 4
-    %29 = get_global @abort : (() -> void)*
-    call @abort() [all]
-    %30 = load %28 : s32i
-    return %30
+        %28 = alloca s32i, "__retval", align 4
+        %29 = get_global @abort : () -> void*
+        call @abort() [all]
+        %30 = load %28 : s32i
+        return %30
 }
 fn ff(%arg0: s32i, %arg1: s32i, %arg2: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i, %arg1: s32i, %arg2: s32i):
@@ -40,89 +40,89 @@ fn ff(%arg0: s32i, %arg1: s32i, %arg2: s32i) -> void [external, c, no_inline, ds
         store %arg1, %8
         store %arg2, %9
         scope {
-            %23 = load %7 : s32i, align 4
-            %24 = cast(int_to_bool) %23 : bool
-            if %24 {
-                scope {
-                    %26 = load %9 : s32i, align 4
-                    %27 = cast(int_to_bool) %26 : bool
-                    if %27 {
-                        call @f1() [all]
-                        yield
-                    }
-                    yield
-                }
-                yield
-            } else {
-                %25 = const 2 : s32i
-                store %25, %7, align 4
-                yield
-            }
-            yield
-        }
-        scope {
-            while {
-                %21 = call @f3() : s32i [all]
-                %22 = cast(int_to_bool) %21 : bool
-                condition %22
-            } do {
-                scope {
-                    scope {
-                        %12 = load %9 : s32i, align 4
-                        %13 = cast(int_to_bool) %12 : bool
-                        %14 = ternary %13 ? { : bool
-                            %19 = call @f2() : s32i [all]
-                            %20 = cast(int_to_bool) %19 : bool
-                            yield %20
-                        } : {
-                            %18 = const false : bool
-                            yield %18
-                        }
-                        if %14 {
-                            call @f1() [all]
-                            %15 = load %8 : s32i, align 4
-                            store %15, %9, align 4
-                            scope {
-                                %16 = call @f3() : s32i [all]
-                                %17 = cast(int_to_bool) %16 : bool
-                                if %17 {
-                                    call @f1() [all]
-                                    yield
+                %23 = load %7 : s32i, align 4
+                %24 = cast(int_to_bool) %23 : bool
+                if %24 {
+                        scope {
+                                %26 = load %9 : s32i, align 4
+                                %27 = cast(int_to_bool) %26 : bool
+                                if %27 {
+                                        call @f1() [all]
+                                        yield
                                 }
                                 yield
-                            }
-                            call @f1() [all]
-                            break
                         }
                         yield
-                    }
-                    yield
+                } else {
+                        %25 = const 2 : s32i
+                        store %25, %7, align 4
+                        yield
                 }
                 yield
-            }
-            yield
         }
         scope {
-            %10 = load %9 : s32i, align 4
-            %11 = cast(int_to_bool) %10 : bool
-            if %11 {
-                call @f1() [all]
+                while {
+                        %21 = call @f3() : s32i [all]
+                        %22 = cast(int_to_bool) %21 : bool
+                        condition %22
+                } do {
+                        scope {
+                                scope {
+                                        %12 = load %9 : s32i, align 4
+                                        %13 = cast(int_to_bool) %12 : bool
+                                        %14 = ternary %13 ? { : bool
+                                                %19 = call @f2() : s32i [all]
+                                                %20 = cast(int_to_bool) %19 : bool
+                                                yield %20
+                                        } : {
+                                                %18 = const false : bool
+                                                yield %18
+                                        }
+                                        if %14 {
+                                                call @f1() [all]
+                                                %15 = load %8 : s32i, align 4
+                                                store %15, %9, align 4
+                                                scope {
+                                                        %16 = call @f3() : s32i [all]
+                                                        %17 = cast(int_to_bool) %16 : bool
+                                                        if %17 {
+                                                                call @f1() [all]
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                call @f1() [all]
+                                                break
+                                        }
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
+                }
                 yield
-            }
-            yield
+        }
+        scope {
+                %10 = load %9 : s32i, align 4
+                %11 = cast(int_to_bool) %10 : bool
+                if %11 {
+                        call @f1() [all]
+                        yield
+                }
+                yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 0 : s32i
-    %3 = const 1 : s32i
-    %4 = const 0 : s32i
-    call @ff(%2, %3, %4) [all]
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = load %0 : s32i
-    return %6
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 0 : s32i
+        %3 = const 1 : s32i
+        %4 = const 0 : s32i
+        call @ff(%2, %3, %4) [all]
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = load %0 : s32i
+        return %6
 }

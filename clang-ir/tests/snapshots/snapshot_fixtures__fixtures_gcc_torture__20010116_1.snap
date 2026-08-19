@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20010116-1.c" (c, x86_64-unknown-linux-gnu)
@@ -9,17 +9,17 @@ fn ok(%arg2: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %26 = alloca s32i, "i", align 4
         store %arg2, %26
         scope {
-            %29 = load %26 : s32i, align 4
-            %30 = const 1 : s32i
-            %31 = cmp ne %29, %30 : bool
-            if %31 {
-                %32 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %29 = load %26 : s32i, align 4
+                %30 = const 1 : s32i
+                cmp
+                if %31 {
+                        %32 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        %27 = get_global @exit : ((s32i) -> void)*
+        %27 = get_global @exit : (s32i) -> void*
         %28 = const 0 : s32i
         call @exit(%28) [all]
         return
@@ -33,46 +33,46 @@ fn find(%arg0: rec_Data*, %arg1: rec_Data*) -> void [external, c, no_inline, dso
         store %arg0, %10
         store %arg1, %11
         scope {
-            %14 = load %11 : rec_Data*, align 8
-            %15 = load %10 : rec_Data*, align 8
-            %16 = ptr_diff %14, %15 : s64i
-            %17 = const 2 : s32i
-            %18 = shift right %16, %17 : s64i
-            %19 = cast(integral) %18 : s32i
-            store %19, %12, align 4
-            for cond: {
-                %23 = load %12 : s32i, align 4
-                %24 = const 0 : s32i
-                %25 = cmp gt %23, %24 : bool
-                condition %25
-            } step: {
-                %20 = load %12 : s32i, align 4
-                %21 = dec %20 : s32i [nsw]
-                store %21, %12, align 4
+                %14 = load %11 : rec_Data*, align 8
+                %15 = load %10 : rec_Data*, align 8
+                ptr_diff
+                %17 = const 2 : s32i
+                shift
+                %19 = cast(integral) %18 : s32i
+                store %19, %12, align 4
+                for cond {
+                        %23 = load %12 : s32i, align 4
+                        %24 = const 0 : s32i
+                        cmp
+                        condition %25
+                } step {
+                        %20 = load %12 : s32i, align 4
+                        dec
+                        store %21, %12, align 4
+                        yield
+                } body {
+                        %22 = load %12 : s32i, align 4
+                        call @ok(%22) [all]
+                        yield
+                }
                 yield
-            } do {
-                %22 = load %12 : s32i, align 4
-                call @ok(%22) [all]
-                yield
-            }
-            yield
         }
-        %13 = get_global @abort : (() -> void)*
+        %13 = get_global @abort : () -> void*
         call @abort() [all]
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_Data[4], "DataList", align 16
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = cast(array_to_ptrdecay) %1 : rec_Data*
-    %4 = const 0 : s32i
-    %5 = ptr_stride %3, %4 : rec_Data*
-    %6 = cast(array_to_ptrdecay) %1 : rec_Data*
-    %7 = const 4 : s32i
-    %8 = ptr_stride %6, %7 : rec_Data*
-    call @find(%5, %8) [all]
-    %9 = load %0 : s32i
-    return %9
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_Data[4], "DataList", align 16
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = cast(array_to_ptrdecay) %1 : rec_Data*
+        %4 = const 0 : s32i
+        ptr_stride
+        %6 = cast(array_to_ptrdecay) %1 : rec_Data*
+        %7 = const 4 : s32i
+        ptr_stride
+        call @find(%5, %8) [all]
+        %9 = load %0 : s32i
+        return %9
 }

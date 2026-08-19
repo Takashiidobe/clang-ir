@@ -1,13 +1,13 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/960117-1.c" (c, x86_64-unknown-linux-gnu)
-global curval : rec_T_VAL = zero [external, default, align 2, dso_local]
-global idc : s16i = 0 [internal, default, align 2, dso_local]
-global id_space : s8i[33][2] = zero [internal, default, align 16, dso_local]
-global cur_line : s32i = 0 [internal, default, align 4, dso_local]
-global char_pos : s32i = 0 [internal, default, align 4, dso_local]
+global curval : rec_T_VAL = Zero { ty: Named("rec_T_VAL") } [external, default, align 2, dso_local]
+global idc : s16i = CirInt { ty: Named("s16i"), value: "0" } [internal, default, align 2, dso_local]
+global id_space : s8i[33][2] = Zero { ty: Array { element_type: Array { element_type: Named("s8i"), size: 33 }, size: 2 } } [internal, default, align 16, dso_local]
+global cur_line : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
+global char_pos : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
 
 fn get_id(%arg0: s8i) -> u16i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s8i):
@@ -17,56 +17,56 @@ fn get_id(%arg0: s8i) -> u16i [external, c, no_inline, dso_local, nothrow] {
         %34 = load %32 : s8i, align 1
         %35 = const 0 : s64i
         %36 = get_global @curval : rec_T_VAL*
-        %37 = get_member %36[1] "vals" : rec_T_VALS*
-        %38 = get_member %37[0] "id" : s8i**
+        get_member
+        get_member
         %39 = load %38 : s8i*, align 2
-        %40 = ptr_stride %39, %35 : s8i*
+        ptr_stride
         store %34, %40, align 1
         %41 = load %33 : u16i
         return %41
 }
 fn get_tok() -> u16i [external, c, no_inline, dso_local, nothrow] {
-    %7 = alloca u16i, "__retval", align 2
-    %8 = alloca s8i, "c", align 1
-    %9 = const 99 : s8i
-    store %9, %8, align 1
-    %10 = get_global @idc : s16i*
-    %11 = load %10 : s16i, align 2
-    %12 = cast(integral) %11 : s64i
-    %13 = get_global @id_space : s8i[33][2]*
-    %14 = get_element %13[%12] : s8i[33]*
-    %15 = cast(array_to_ptrdecay) %14 : s8i*
-    %16 = get_global @curval : rec_T_VAL*
-    %17 = get_member %16[1] "vals" : rec_T_VALS*
-    %18 = get_member %17[0] "id" : s8i**
-    store %15, %18, align 2
-    %19 = get_global @cur_line : s32i*
-    %20 = load %19 : s32i, align 4
-    %21 = const 10 : s32i
-    %22 = shift left %20, %21 : s32i
-    %23 = get_global @char_pos : s32i*
-    %24 = load %23 : s32i, align 4
-    %25 = or %22, %24 : s32i
-    %26 = cast(integral) %25 : s16i
-    %27 = get_global @curval : rec_T_VAL*
-    %28 = get_member %27[0] "pos" : s16i*
-    store %26, %28, align 2
-    %29 = load %8 : s8i, align 1
-    %30 = call @get_id(%29) : u16i [all]
-    store %30, %7
-    %31 = load %7 : u16i
-    return %31
+        %7 = alloca u16i, "__retval", align 2
+        %8 = alloca s8i, "c", align 1
+        %9 = const 99 : s8i
+        store %9, %8, align 1
+        %10 = get_global @idc : s16i*
+        %11 = load %10 : s16i, align 2
+        %12 = cast(integral) %11 : s64i
+        %13 = get_global @id_space : s8i[33][2]*
+        get_element
+        %15 = cast(array_to_ptrdecay) %14 : s8i*
+        %16 = get_global @curval : rec_T_VAL*
+        get_member
+        get_member
+        store %15, %18, align 2
+        %19 = get_global @cur_line : s32i*
+        %20 = load %19 : s32i, align 4
+        %21 = const 10 : s32i
+        shift
+        %23 = get_global @char_pos : s32i*
+        %24 = load %23 : s32i, align 4
+        or
+        %26 = cast(integral) %25 : s16i
+        %27 = get_global @curval : rec_T_VAL*
+        get_member
+        store %26, %28, align 2
+        %29 = load %8 : s8i, align 1
+        %30 = call @get_id(%29) : u16i [all]
+        store %30, %7
+        %31 = load %7 : u16i
+        return %31
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @get_tok : (() -> u16i)*
-    %3 = call @get_tok() : u16i [all]
-    %4 = get_global @exit : ((s32i) -> void)*
-    %5 = const 0 : s32i
-    call @exit(%5) [all]
-    %6 = load %0 : s32i
-    return %6
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @get_tok : () -> u16i*
+        %3 = call @get_tok() : u16i [all]
+        %4 = get_global @exit : (s32i) -> void*
+        %5 = const 0 : s32i
+        call @exit(%5) [all]
+        %6 = load %0 : s32i
+        return %6
 }

@@ -1,87 +1,87 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/990804-1.c" (c, x86_64-unknown-linux-gnu)
 fn gfbyte() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %32 = alloca s32i, "__retval", align 4
-    %33 = const 0 : s32i
-    store %33, %32
-    %34 = load %32 : s32i
-    return %34
+        %32 = alloca s32i, "__retval", align 4
+        %33 = const 0 : s32i
+        store %33, %32
+        %34 = load %32 : s32i
+        return %34
 }
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = alloca s32i, "j", align 4
-    %3 = alloca s32i, "k", align 4
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = call @gfbyte() : s32i [all]
-    store %5, %1, align 4
-    %6 = load %1 : s32i, align 4
-    %7 = const 1 : s32i
-    %8 = add %6, %7 : s32i [nsw]
-    store %8, %1, align 4
-    scope {
-        %25 = load %1 : s32i, align 4
-        %26 = const 0 : s32i
-        %27 = cmp eq %25, %26 : bool
-        if %27 {
-            %31 = const 0 : s32i
-            store %31, %3, align 4
-            yield
-        } else {
-            %28 = load %1 : s32i, align 4
-            %29 = const 0 : s32i
-            %30 = add %28, %29 : s32i [nsw]
-            store %30, %3, align 4
-            yield
-        }
-        yield
-    }
-    scope {
-        %21 = load %1 : s32i, align 4
-        %22 = const 1 : s32i
-        %23 = cmp ne %21, %22 : bool
-        if %23 {
-            %24 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %9 = const 1 : s32i
-    store %9, %3, align 4
-    scope {
-        %13 = load %3 : s32i, align 4
-        %14 = load %1 : s32i, align 4
-        %15 = cmp le %13, %14 : bool
-        if %15 {
-            scope {
-                do {
-                    %20 = call @gfbyte() : s32i [all]
-                    store %20, %2, align 4
-                    yield
-                } while {
-                    %16 = load %3 : s32i, align 4
-                    %17 = inc %16 : s32i [nsw]
-                    store %17, %3, align 4
-                    %18 = load %1 : s32i, align 4
-                    %19 = cmp lt %16, %18 : bool
-                    condition %19
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = alloca s32i, "j", align 4
+        %3 = alloca s32i, "k", align 4
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = call @gfbyte() : s32i [all]
+        store %5, %1, align 4
+        %6 = load %1 : s32i, align 4
+        %7 = const 1 : s32i
+        %8 = add %6, %7 : s32i [nsw]
+        store %8, %1, align 4
+        scope {
+                %25 = load %1 : s32i, align 4
+                %26 = const 0 : s32i
+                cmp
+                if %27 {
+                        %31 = const 0 : s32i
+                        store %31, %3, align 4
+                        yield
+                } else {
+                        %28 = load %1 : s32i, align 4
+                        %29 = const 0 : s32i
+                        %30 = add %28, %29 : s32i [nsw]
+                        store %30, %3, align 4
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %10 = get_global @exit : ((s32i) -> void)*
-    %11 = const 0 : s32i
-    call @exit(%11) [all]
-    %12 = load %0 : s32i
-    return %12
+        scope {
+                %21 = load %1 : s32i, align 4
+                %22 = const 1 : s32i
+                cmp
+                if %23 {
+                        %24 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
+        }
+        %9 = const 1 : s32i
+        store %9, %3, align 4
+        scope {
+                %13 = load %3 : s32i, align 4
+                %14 = load %1 : s32i, align 4
+                cmp
+                if %15 {
+                        scope {
+                                do {
+                                        %20 = call @gfbyte() : s32i [all]
+                                        store %20, %2, align 4
+                                        yield
+                                } while {
+                                        %16 = load %3 : s32i, align 4
+                                        inc
+                                        store %17, %3, align 4
+                                        %18 = load %1 : s32i, align 4
+                                        cmp
+                                        condition %19
+                                }
+                                yield
+                        }
+                        yield
+                }
+                yield
+        }
+        %10 = get_global @exit : (s32i) -> void*
+        %11 = const 0 : s32i
+        call @exit(%11) [all]
+        %12 = load %0 : s32i
+        return %12
 }

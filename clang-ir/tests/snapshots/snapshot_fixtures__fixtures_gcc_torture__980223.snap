@@ -1,13 +1,13 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/980223.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.y : rec_object = {@nil, 0} [cir_private, default, dso_local, constant]
-global __const.main.x : rec_object = {@cons2, 64} [cir_private, default, dso_local, constant]
-global nil : s32i = 0 [external, default, align 4, dso_local]
-global cons1 : rec_object[2] = [{@nil, 0}, {@nil, 0}] [external, default, align 16, dso_local]
-global cons2 : rec_object[2] = [{@cons1, 64}, {@nil, 0}] [external, default, align 16, dso_local]
+global __const.main.y : rec_object = ConstRecord { ty: Named("rec_object"), members: Array([GlobalView { ty: Pointer { pointee: Named("s8i"), addr_space: None }, symbol: "nil", indices: None }, CirInt { ty: Named("s64i"), value: "0" }]) } [cir_private, default, dso_local, constant]
+global __const.main.x : rec_object = ConstRecord { ty: Named("rec_object"), members: Array([GlobalView { ty: Pointer { pointee: Named("s8i"), addr_space: None }, symbol: "cons2", indices: None }, CirInt { ty: Named("s64i"), value: "64" }]) } [cir_private, default, dso_local, constant]
+global nil : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global cons1 : rec_object[2] = ConstArray { ty: Array { element_type: Named("rec_object"), size: 2 }, elts: Array([ConstRecord { ty: Named("rec_object"), members: Array([GlobalView { ty: Pointer { pointee: Named("s8i"), addr_space: None }, symbol: "nil", indices: None }, CirInt { ty: Named("s64i"), value: "0" }]) }, ConstRecord { ty: Named("rec_object"), members: Array([GlobalView { ty: Pointer { pointee: Named("s8i"), addr_space: None }, symbol: "nil", indices: None }, CirInt { ty: Named("s64i"), value: "0" }]) }]), trailing_zeros_num: 0 } [external, default, align 16, dso_local]
+global cons2 : rec_object[2] = ConstArray { ty: Array { element_type: Named("rec_object"), size: 2 }, elts: Array([ConstRecord { ty: Named("rec_object"), members: Array([GlobalView { ty: Pointer { pointee: Named("s8i"), addr_space: None }, symbol: "cons1", indices: None }, CirInt { ty: Named("s64i"), value: "64" }]) }, ConstRecord { ty: Named("rec_object"), members: Array([GlobalView { ty: Pointer { pointee: Named("s8i"), addr_space: None }, symbol: "nil", indices: None }, CirInt { ty: Named("s64i"), value: "0" }]) }]), trailing_zeros_num: 0 } [external, default, align 16, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn bar(%arg4: void*, %arg5: s64i) -> rec_anon_struct [external, c, no_inline, dso_local, nothrow] {
@@ -15,9 +15,9 @@ fn bar(%arg4: void*, %arg5: s64i) -> rec_anon_struct [external, c, no_inline, ds
         %81 = alloca rec_object, "coerce", align 8
         %82 = alloca rec_anon_struct, "coerce", align 8
         %83 = alloca rec_anon_struct, "coerce", align 8
-        %84 = get_member %83[0] "" : void**
+        get_member
         store %arg4, %84
-        %85 = get_member %83[1] "" : s64i*
+        get_member
         store %arg5, %85
         %86 = load %83 : rec_anon_struct
         store %86, %82
@@ -26,7 +26,7 @@ fn bar(%arg4: void*, %arg5: s64i) -> rec_anon_struct [external, c, no_inline, ds
         %89 = alloca rec_object, "blah", align 8
         %90 = alloca rec_object, "__retval", align 8
         store %88, %89
-        %91 = get_global @abort : (() -> void)*
+        %91 = get_global @abort : () -> void*
         call @abort() [all]
         %92 = load %90 : rec_object
         store %92, %81
@@ -39,9 +39,9 @@ fn foo(%arg0: void*, %arg1: s64i, %arg2: void*, %arg3: s64i) -> rec_anon_struct 
         %27 = alloca rec_object, "coerce", align 8
         %28 = alloca rec_anon_struct, "coerce", align 8
         %29 = alloca rec_anon_struct, "coerce", align 8
-        %30 = get_member %29[0] "" : void**
+        get_member
         store %arg2, %30
-        %31 = get_member %29[1] "" : s64i*
+        get_member
         store %arg3, %31
         %32 = load %29 : rec_anon_struct
         store %32, %28
@@ -49,9 +49,9 @@ fn foo(%arg0: void*, %arg1: s64i, %arg2: void*, %arg3: s64i) -> rec_anon_struct 
         %34 = load %33 : rec_object
         %35 = alloca rec_anon_struct, "coerce", align 8
         %36 = alloca rec_anon_struct, "coerce", align 8
-        %37 = get_member %36[0] "" : void**
+        get_member
         store %arg0, %37
-        %38 = get_member %36[1] "" : s64i*
+        get_member
         store %arg1, %38
         %39 = load %36 : rec_anon_struct
         store %39, %35
@@ -65,55 +65,55 @@ fn foo(%arg0: void*, %arg1: s64i, %arg2: void*, %arg3: s64i) -> rec_anon_struct 
         %47 = alloca rec_object, "z", align 8
         store %41, %44
         store %34, %45
-        %48 = get_member %44[0] "addr" : s8i**
+        get_member
         %49 = load %48 : s8i*, align 8
         %50 = cast(bitcast) %49 : rec_object*
-        copy %47, %50
+        copy
         scope {
-            %54 = get_member %47[1] "type" : s64i*
-            %55 = load %54 : s64i, align 8
-            %56 = const 64 : s64i
-            %57 = and %55, %56 : s64i
-            %58 = cast(int_to_bool) %57 : bool
-            if %58 {
-                %59 = get_member %47[0] "addr" : s8i**
-                %60 = load %59 : s8i*, align 8
-                %61 = const 16 : u64i
-                %62 = ptr_stride %60, %61 : s8i*
-                %63 = cast(bitcast) %62 : rec_object*
-                copy %45, %63
-                %64 = get_member %47[0] "addr" : s8i**
-                %65 = load %64 : s8i*, align 8
-                %66 = cast(bitcast) %65 : rec_object*
-                copy %47, %66
-                scope {
-                    %67 = get_member %47[1] "type" : s64i*
-                    %68 = load %67 : s64i, align 8
-                    %69 = const 64 : s64i
-                    %70 = and %68, %69 : s64i
-                    %71 = cast(int_to_bool) %70 : bool
-                    if %71 {
-                        %72 = load %45 : rec_object, align 8
-                        store %72, %43
-                        %73 = cast(bitcast) %43 : rec_anon_struct*
-                        %74 = get_member %73[0] "" : void**
-                        %75 = load %74 : void*
-                        %76 = get_member %73[1] "" : s64i*
-                        %77 = load %76 : s64i
-                        %78 = call @bar(%75, %77) : rec_anon_struct [all]
-                        store %78, %42
-                        %79 = cast(bitcast) %42 : rec_object*
-                        %80 = load %79 : rec_object
-                        store %80, %45, align 8
+                get_member
+                %55 = load %54 : s64i, align 8
+                %56 = const 64 : s64i
+                and
+                %58 = cast(int_to_bool) %57 : bool
+                if %58 {
+                        get_member
+                        %60 = load %59 : s8i*, align 8
+                        %61 = const 16 : u64i
+                        ptr_stride
+                        %63 = cast(bitcast) %62 : rec_object*
+                        copy
+                        get_member
+                        %65 = load %64 : s8i*, align 8
+                        %66 = cast(bitcast) %65 : rec_object*
+                        copy
+                        scope {
+                                get_member
+                                %68 = load %67 : s64i, align 8
+                                %69 = const 64 : s64i
+                                and
+                                %71 = cast(int_to_bool) %70 : bool
+                                if %71 {
+                                        %72 = load %45 : rec_object, align 8
+                                        store %72, %43
+                                        %73 = cast(bitcast) %43 : rec_anon_struct*
+                                        get_member
+                                        %75 = load %74 : void*
+                                        get_member
+                                        %77 = load %76 : s64i
+                                        %78 = call @bar(%75, %77) : rec_anon_struct [all]
+                                        store %78, %42
+                                        %79 = cast(bitcast) %42 : rec_object*
+                                        %80 = load %79 : rec_object
+                                        store %80, %45, align 8
+                                        yield
+                                }
+                                yield
+                        }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
-        copy %46, %45
+        copy
         %51 = load %46 : rec_object
         store %51, %27
         %52 = cast(bitcast) %27 : rec_anon_struct*
@@ -121,40 +121,40 @@ fn foo(%arg0: void*, %arg1: s64i, %arg2: void*, %arg3: s64i) -> rec_anon_struct 
         return %53
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca rec_anon_struct, "coerce", align 8
-    %1 = alloca rec_object, "coerce", align 8
-    %2 = alloca rec_object, "coerce", align 8
-    %3 = alloca s32i, "__retval", align 4
-    %4 = alloca rec_object, "x", align 8
-    %5 = alloca rec_object, "y", align 8
-    %6 = alloca rec_object, "three", align 8
-    %7 = const 0 : s32i
-    store %7, %3
-    %8 = get_global @__const.main.x : rec_object*
-    copy %4, %8
-    %9 = get_global @__const.main.y : rec_object*
-    copy %5, %9
-    %10 = load %4 : rec_object, align 8
-    %11 = load %5 : rec_object, align 8
-    store %10, %2
-    %12 = cast(bitcast) %2 : rec_anon_struct*
-    %13 = get_member %12[0] "" : void**
-    %14 = load %13 : void*
-    %15 = get_member %12[1] "" : s64i*
-    %16 = load %15 : s64i
-    store %11, %1
-    %17 = cast(bitcast) %1 : rec_anon_struct*
-    %18 = get_member %17[0] "" : void**
-    %19 = load %18 : void*
-    %20 = get_member %17[1] "" : s64i*
-    %21 = load %20 : s64i
-    %22 = call @foo(%14, %16, %19, %21) : rec_anon_struct [all]
-    store %22, %0
-    %23 = cast(bitcast) %0 : rec_object*
-    %24 = load %23 : rec_object
-    store %24, %6, align 8
-    %25 = const 0 : s32i
-    store %25, %3
-    %26 = load %3 : s32i
-    return %26
+        %0 = alloca rec_anon_struct, "coerce", align 8
+        %1 = alloca rec_object, "coerce", align 8
+        %2 = alloca rec_object, "coerce", align 8
+        %3 = alloca s32i, "__retval", align 4
+        %4 = alloca rec_object, "x", align 8
+        %5 = alloca rec_object, "y", align 8
+        %6 = alloca rec_object, "three", align 8
+        %7 = const 0 : s32i
+        store %7, %3
+        %8 = get_global @__const.main.x : rec_object*
+        copy
+        %9 = get_global @__const.main.y : rec_object*
+        copy
+        %10 = load %4 : rec_object, align 8
+        %11 = load %5 : rec_object, align 8
+        store %10, %2
+        %12 = cast(bitcast) %2 : rec_anon_struct*
+        get_member
+        %14 = load %13 : void*
+        get_member
+        %16 = load %15 : s64i
+        store %11, %1
+        %17 = cast(bitcast) %1 : rec_anon_struct*
+        get_member
+        %19 = load %18 : void*
+        get_member
+        %21 = load %20 : s64i
+        %22 = call @foo(%14, %16, %19, %21) : rec_anon_struct [all]
+        store %22, %0
+        %23 = cast(bitcast) %0 : rec_object*
+        %24 = load %23 : rec_object
+        store %24, %6, align 8
+        %25 = const 0 : s32i
+        store %25, %3
+        %26 = load %3 : s32i
+        return %26
 }

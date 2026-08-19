@@ -1,92 +1,92 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr103255.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_H*, "h", align 8
-    %2 = alloca u64i, "o", align 8
-    %3 = alloca s32i, "t", align 4
-    %4 = alloca u32i*, "tt", align 8
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = const #cir.ptr<null> : rec_H*
-    store %6, %1, align 8
-    %7 = const 1 : s32i
-    store %7, %3, align 4, volatile
-    scope {
-        %26 = const 32 : u64i
-        store %26, %2, align 8
-        for cond: {
-            %38 = load %2 : u64i, align 8
-            %39 = const 32 : u64i
-            %40 = cmp le %38, %39 : bool
-            condition %40
-        } step: {
-            %27 = const 4096 : u64i
-            %28 = load %2 : u64i, align 8
-            %29 = add %28, %27 : u64i
-            store %29, %2, align 8
-            yield
-        } do {
-            scope {
-                %30 = alloca rec_H*, "u", align 8
-                %31 = const 4194304 : u64i
-                %32 = load %2 : u64i, align 8
-                %33 = add %31, %32 : u64i
-                %34 = cast(int_to_ptr) %33 : rec_H*
-                store %34, %30, align 8
-                scope {
-                    %35 = load %3 : s32i, align 4, volatile
-                    %36 = cast(int_to_bool) %35 : bool
-                    if %36 {
-                        %37 = load %30 : rec_H*, align 8
-                        store %37, %1, align 8
-                        break
-                    }
-                    yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_H*, "h", align 8
+        %2 = alloca u64i, "o", align 8
+        %3 = alloca s32i, "t", align 4
+        %4 = alloca u32i*, "tt", align 8
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = const #cir.ptr<null> : rec_H*
+        store %6, %1, align 8
+        %7 = const 1 : s32i
+        store %7, %3, align 4
+        scope {
+                %26 = const 32 : u64i
+                store %26, %2, align 8
+                for cond {
+                        %38 = load %2 : u64i, align 8
+                        %39 = const 32 : u64i
+                        cmp
+                        condition %40
+                } step {
+                        %27 = const 4096 : u64i
+                        %28 = load %2 : u64i, align 8
+                        %29 = add %28, %27 : u64i
+                        store %29, %2, align 8
+                        yield
+                } body {
+                        scope {
+                                %30 = alloca rec_H*, "u", align 8
+                                %31 = const 4194304 : u64i
+                                %32 = load %2 : u64i, align 8
+                                %33 = add %31, %32 : u64i
+                                %34 = cast(int_to_ptr) %33 : rec_H*
+                                store %34, %30, align 8
+                                scope {
+                                        %35 = load %3 : s32i, align 4
+                                        %36 = cast(int_to_bool) %35 : bool
+                                        if %36 {
+                                                %37 = load %30 : rec_H*, align 8
+                                                store %37, %1, align 8
+                                                break
+                                        }
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    scope {
-        %21 = load %1 : rec_H*, align 8
-        %22 = const #cir.ptr<null> : rec_H*
-        %23 = cmp eq %21, %22 : bool
-        if %23 {
-            %24 = const 0 : s32i
-            store %24, %0
-            %25 = load %0 : s32i
-            return %25
+        scope {
+                %21 = load %1 : rec_H*, align 8
+                %22 = const #cir.ptr<null> : rec_H*
+                cmp
+                if %23 {
+                        %24 = const 0 : s32i
+                        store %24, %0
+                        %25 = load %0 : s32i
+                        return %25
+                }
+                yield
         }
-        yield
-    }
-    %8 = load %1 : rec_H*, align 8
-    %9 = get_member %8[1] "b" : u32i*
-    store %9, %4, align 8
-    scope {
-        %12 = load %4 : u32i*, align 8
-        %13 = cast(ptr_to_int) %12 : u64i
-        %14 = const 4194304 : s32i
-        %15 = const 32 : s32i
-        %16 = add %14, %15 : s32i [nsw]
-        %17 = cast(integral) %16 : u64i
-        %18 = const 4 : u64i
-        %19 = add %17, %18 : u64i
-        %20 = cmp ne %13, %19 : bool
-        if %20 {
-            call @abort() [all]
-            yield
+        %8 = load %1 : rec_H*, align 8
+        get_member
+        store %9, %4, align 8
+        scope {
+                %12 = load %4 : u32i*, align 8
+                %13 = cast(ptr_to_int) %12 : u64i
+                %14 = const 4194304 : s32i
+                %15 = const 32 : s32i
+                %16 = add %14, %15 : s32i [nsw]
+                %17 = cast(integral) %16 : u64i
+                %18 = const 4 : u64i
+                %19 = add %17, %18 : u64i
+                cmp
+                if %20 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %10 = const 0 : s32i
-    store %10, %0
-    %11 = load %0 : s32i
-    return %11
+        %10 = const 0 : s32i
+        store %10, %0
+        %11 = load %0 : s32i
+        return %11
 }

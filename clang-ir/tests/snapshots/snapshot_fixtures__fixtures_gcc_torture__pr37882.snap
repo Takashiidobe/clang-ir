@@ -1,46 +1,46 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr37882.c" (c, x86_64-unknown-linux-gnu)
-global s : rec_S = zero [external, default, align 1, dso_local]
+global s : rec_S = Zero { ty: Named("rec_S") } [external, default, align 1, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 4 : u8i
-    %3 = get_global @s : rec_S*
-    %4 = get_member %3[0] "b" : u8i*
-    %5 = set_bitfield %4, %2, "b": 3 bits @0 in u8i : u8i, align 1
-    scope {
-        %8 = get_global @s : rec_S*
-        %9 = get_member %8[0] "b" : u8i*
-        %10 = get_bitfield %9, "b": 3 bits @0 in u8i : u8i, align 1
-        %11 = cast(integral) %10 : s32i
-        %12 = const 0 : s32i
-        %13 = cmp gt %11, %12 : bool
-        %14 = ternary %13 ? { : bool
-            %16 = get_global @s : rec_S*
-            %17 = get_member %16[0] "b" : u8i*
-            %18 = get_bitfield %17, "b": 3 bits @0 in u8i : u8i, align 1
-            %19 = cast(integral) %18 : s32i
-            %20 = const 4 : s32i
-            %21 = cmp lt %19, %20 : bool
-            yield %21
-        } : {
-            %15 = const false : bool
-            yield %15
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 4 : u8i
+        %3 = get_global @s : rec_S*
+        get_member
+        set_bitfield
+        scope {
+                %8 = get_global @s : rec_S*
+                get_member
+                get_bitfield
+                %11 = cast(integral) %10 : s32i
+                %12 = const 0 : s32i
+                cmp
+                %14 = ternary %13 ? { : bool
+                        %16 = get_global @s : rec_S*
+                        get_member
+                        get_bitfield
+                        %19 = cast(integral) %18 : s32i
+                        %20 = const 4 : s32i
+                        cmp
+                        yield %21
+                } : {
+                        %15 = const false : bool
+                        yield %15
+                }
+                if %14 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %14 {
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

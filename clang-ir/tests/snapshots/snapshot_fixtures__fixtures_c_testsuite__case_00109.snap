@@ -1,58 +1,58 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.c-testsuite/case_00109.c" (c, x86_64-unknown-linux-gnu)
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "x", align 4
-    %2 = alloca s32i, "y", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 0 : s32i
-    store %4, %1, align 4
-    %5 = const 1 : s32i
-    store %5, %2, align 4
-    scope {
-        %16 = load %1 : s32i, align 4
-        %17 = cast(int_to_bool) %16 : bool
-        %18 = ternary %17 ? { : s32i
-            %23 = const 1 : s32i
-            yield %23
-        } : {
-            %22 = const 0 : s32i
-            yield %22
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "x", align 4
+        %2 = alloca s32i, "y", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 0 : s32i
+        store %4, %1, align 4
+        %5 = const 1 : s32i
+        store %5, %2, align 4
+        scope {
+                %16 = load %1 : s32i, align 4
+                %17 = cast(int_to_bool) %16 : bool
+                %18 = ternary %17 ? { : s32i
+                        %23 = const 1 : s32i
+                        yield %23
+                } : {
+                        %22 = const 0 : s32i
+                        yield %22
+                }
+                %19 = cast(int_to_bool) %18 : bool
+                if %19 {
+                        %20 = const 1 : s32i
+                        store %20, %0
+                        %21 = load %0 : s32i
+                        return %21
+                }
+                yield
         }
-        %19 = cast(int_to_bool) %18 : bool
-        if %19 {
-            %20 = const 1 : s32i
-            store %20, %0
-            %21 = load %0 : s32i
-            return %21
+        scope {
+                %8 = load %2 : s32i, align 4
+                %9 = cast(int_to_bool) %8 : bool
+                %10 = ternary %9 ? { : s32i
+                        %15 = const 0 : s32i
+                        yield %15
+                } : {
+                        %14 = const 1 : s32i
+                        yield %14
+                }
+                %11 = cast(int_to_bool) %10 : bool
+                if %11 {
+                        %12 = const 2 : s32i
+                        store %12, %0
+                        %13 = load %0 : s32i
+                        return %13
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %8 = load %2 : s32i, align 4
-        %9 = cast(int_to_bool) %8 : bool
-        %10 = ternary %9 ? { : s32i
-            %15 = const 0 : s32i
-            yield %15
-        } : {
-            %14 = const 1 : s32i
-            yield %14
-        }
-        %11 = cast(int_to_bool) %10 : bool
-        if %11 {
-            %12 = const 2 : s32i
-            store %12, %0
-            %13 = load %0 : s32i
-            return %13
-        }
-        yield
-    }
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

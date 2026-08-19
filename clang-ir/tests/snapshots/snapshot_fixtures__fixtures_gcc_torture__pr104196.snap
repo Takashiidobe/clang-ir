@@ -1,78 +1,78 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr104196.c" (c, x86_64-unknown-linux-gnu)
-global a : s32i = 6 [external, default, align 4, dso_local]
+global a : s32i = CirInt { ty: Named("s32i"), value: "6" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        while {
-            %30 = const 1 : s32i
-            %31 = cast(int_to_bool) %30 : bool
-            condition %31
-        } do {
-            scope {
-                %4 = alloca s32i, "b", align 4
-                %5 = get_global @a : s32i*
-                %6 = load %5 : s32i, align 4
-                %7 = const 0 : s32i
-                %8 = cmp lt %6, %7 : bool
-                %9 = ternary %8 ? { : bool
-                    %24 = const 0 : s32i
-                    %25 = const -2147483647 : s32i
-                    %26 = get_global @a : s32i*
-                    %27 = load %26 : s32i, align 4
-                    %28 = sub %25, %27 : s32i [nsw]
-                    %29 = cmp lt %24, %28 : bool
-                    yield %29
-                } : {
-                    %23 = const false : bool
-                    yield %23
-                }
-                %10 = ternary %9 ? { : s32i
-                    %22 = const 0 : s32i
-                    yield %22
-                } : {
-                    %20 = get_global @a : s32i*
-                    %21 = load %20 : s32i, align 4
-                    yield %21
-                }
-                store %10, %4, align 4
-                scope {
-                    %11 = load %4 : s32i, align 4
-                    %12 = const 4096 : s32i
-                    %13 = const 2147483647 : s32i
-                    %14 = sub %12, %13 : s32i [nsw]
-                    %15 = cmp ne %11, %14 : bool
-                    if %15 {
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                while {
+                        %30 = const 1 : s32i
+                        %31 = cast(int_to_bool) %30 : bool
+                        condition %31
+                } do {
                         scope {
-                            %16 = get_global @a : s32i*
-                            %17 = load %16 : s32i, align 4
-                            %18 = const 6 : s32i
-                            %19 = cmp lt %17, %18 : bool
-                            if %19 {
-                                call @abort() [all]
+                                %4 = alloca s32i, "b", align 4
+                                %5 = get_global @a : s32i*
+                                %6 = load %5 : s32i, align 4
+                                %7 = const 0 : s32i
+                                cmp
+                                %9 = ternary %8 ? { : bool
+                                        %24 = const 0 : s32i
+                                        %25 = const -2147483647 : s32i
+                                        %26 = get_global @a : s32i*
+                                        %27 = load %26 : s32i, align 4
+                                        sub
+                                        cmp
+                                        yield %29
+                                } : {
+                                        %23 = const false : bool
+                                        yield %23
+                                }
+                                %10 = ternary %9 ? { : s32i
+                                        %22 = const 0 : s32i
+                                        yield %22
+                                } : {
+                                        %20 = get_global @a : s32i*
+                                        %21 = load %20 : s32i, align 4
+                                        yield %21
+                                }
+                                store %10, %4, align 4
+                                scope {
+                                        %11 = load %4 : s32i, align 4
+                                        %12 = const 4096 : s32i
+                                        %13 = const 2147483647 : s32i
+                                        sub
+                                        cmp
+                                        if %15 {
+                                                scope {
+                                                        %16 = get_global @a : s32i*
+                                                        %17 = load %16 : s32i, align 4
+                                                        %18 = const 6 : s32i
+                                                        cmp
+                                                        if %19 {
+                                                                call @abort() [all]
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                break
+                                        }
+                                        yield
+                                }
                                 yield
-                            }
-                            yield
                         }
-                        break
-                    }
-                    yield
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

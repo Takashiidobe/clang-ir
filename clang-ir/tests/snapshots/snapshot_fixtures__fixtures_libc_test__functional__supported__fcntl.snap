@@ -1,14 +1,14 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.libc-test/functional/supported/fcntl.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.fl : rec_flock = zero [cir_private, default, dso_local, constant]
-global t_status : s32i = 0 [external, default, align 4, dso_local]
-global .str : s8i[124] = "tests/fixtures.libc-test/functional/supported/fcntl.c:77: f = tmpfile() failed: errno = %s\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[133] = "tests/fixtures.libc-test/functional/supported/fcntl.c:85: fcntl(fd, 6, &fl) == 0 failed: errno = %s\n" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[131] = "tests/fixtures.libc-test/functional/supported/fcntl.c:94: status == 0 failed: lock failed to work\n" [cir_private, default, align 1, dso_local, constant]
-global .str.3 : s8i[155] = "tests/fixtures.libc-test/functional/supported/fcntl.c:103: status == 0 failed: child failed to detect lock held by parent\n" [cir_private, default, align 1, dso_local, constant]
+global __const.main.fl : rec_flock = Zero { ty: Named("rec_flock") } [cir_private, default, dso_local, constant]
+global t_status : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global .str : s8i[133] = ConstArray { ty: Array { element_type: Named("s8i"), size: 133 }, elts: Str("tests/fixtures.libc-test/functional/supported/fcntl.c:77: f = tmpfile() failed: errno = %s\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[142] = ConstArray { ty: Array { element_type: Named("s8i"), size: 142 }, elts: Str("tests/fixtures.libc-test/functional/supported/fcntl.c:85: fcntl(fd, 6, &fl) == 0 failed: errno = %s\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[140] = ConstArray { ty: Array { element_type: Named("s8i"), size: 140 }, elts: Str("tests/fixtures.libc-test/functional/supported/fcntl.c:94: status == 0 failed: lock failed to work\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[164] = ConstArray { ty: Array { element_type: Named("s8i"), size: 164 }, elts: Str("tests/fixtures.libc-test/functional/supported/fcntl.c:103: status == 0 failed: child failed to detect lock held by parent\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn vsnprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec___va_list_tag*) -> s32i [external, c, nothrow];
 fn write(%arg0: s32i, %arg1: void*, %arg2: u64i) -> s64i [external, c];
@@ -22,10 +22,10 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         store %arg0, %142
         %147 = const 1 : s32i
         %148 = get_global @t_status : s32i*
-        store %147, %148, align 4, volatile
+        store %147, %148, align 4
         %149 = cast(array_to_ptrdecay) %144 : rec___va_list_tag*
-        va_start %149
-        %150 = get_global @vsnprintf : ((s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i)*
+        va_start
+        %150 = get_global @vsnprintf : (s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i*
         %151 = cast(array_to_ptrdecay) %145 : s8i*
         %152 = const 512 : u64i
         %153 = load %142 : s8i*, align 8
@@ -33,59 +33,59 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %155 = call @vsnprintf(%151, %152, %153, %154) : s32i [all]
         store %155, %146, align 4
         %156 = cast(array_to_ptrdecay) %144 : rec___va_list_tag*
-        va_end %156
+        va_end
         scope {
-            %165 = load %146 : s32i, align 4
-            %166 = const 0 : s32i
-            %167 = cmp lt %165, %166 : bool
-            if %167 {
-                %197 = const 0 : s32i
-                store %197, %146, align 4
-                yield
-            } else {
-                scope {
-                    %168 = load %146 : s32i, align 4
-                    %169 = cast(integral) %168 : u64i
-                    %170 = const 512 : u64i
-                    %171 = cmp ge %169, %170 : bool
-                    if %171 {
-                        %172 = const 512 : s32i
-                        store %172, %146, align 4
-                        %173 = const 10 : s8i
-                        %174 = load %146 : s32i, align 4
-                        %175 = const 1 : s32i
-                        %176 = sub %174, %175 : s32i [nsw]
-                        %177 = cast(integral) %176 : s64i
-                        %178 = get_element %145[%177] : s8i*
-                        store %173, %178, align 1
-                        %179 = const 46 : s8i
-                        %180 = load %146 : s32i, align 4
-                        %181 = const 2 : s32i
-                        %182 = sub %180, %181 : s32i [nsw]
-                        %183 = cast(integral) %182 : s64i
-                        %184 = get_element %145[%183] : s8i*
-                        store %179, %184, align 1
-                        %185 = const 46 : s8i
-                        %186 = load %146 : s32i, align 4
-                        %187 = const 3 : s32i
-                        %188 = sub %186, %187 : s32i [nsw]
-                        %189 = cast(integral) %188 : s64i
-                        %190 = get_element %145[%189] : s8i*
-                        store %185, %190, align 1
-                        %191 = const 46 : s8i
-                        %192 = load %146 : s32i, align 4
-                        %193 = const 4 : s32i
-                        %194 = sub %192, %193 : s32i [nsw]
-                        %195 = cast(integral) %194 : s64i
-                        %196 = get_element %145[%195] : s8i*
-                        store %191, %196, align 1
+                %165 = load %146 : s32i, align 4
+                %166 = const 0 : s32i
+                cmp
+                if %167 {
+                        %197 = const 0 : s32i
+                        store %197, %146, align 4
                         yield
-                    }
-                    yield
+                } else {
+                        scope {
+                                %168 = load %146 : s32i, align 4
+                                %169 = cast(integral) %168 : u64i
+                                %170 = const 512 : u64i
+                                cmp
+                                if %171 {
+                                        %172 = const 512 : s32i
+                                        store %172, %146, align 4
+                                        %173 = const 10 : s8i
+                                        %174 = load %146 : s32i, align 4
+                                        %175 = const 1 : s32i
+                                        sub
+                                        %177 = cast(integral) %176 : s64i
+                                        get_element
+                                        store %173, %178, align 1
+                                        %179 = const 46 : s8i
+                                        %180 = load %146 : s32i, align 4
+                                        %181 = const 2 : s32i
+                                        sub
+                                        %183 = cast(integral) %182 : s64i
+                                        get_element
+                                        store %179, %184, align 1
+                                        %185 = const 46 : s8i
+                                        %186 = load %146 : s32i, align 4
+                                        %187 = const 3 : s32i
+                                        sub
+                                        %189 = cast(integral) %188 : s64i
+                                        get_element
+                                        store %185, %190, align 1
+                                        %191 = const 46 : s8i
+                                        %192 = load %146 : s32i, align 4
+                                        %193 = const 4 : s32i
+                                        sub
+                                        %195 = cast(integral) %194 : s64i
+                                        get_element
+                                        store %191, %196, align 1
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %157 = const 1 : s32i
         %158 = cast(array_to_ptrdecay) %145 : s8i*
@@ -109,235 +109,235 @@ fn waitpid(%arg0: s32i, %arg1: s32i*, %arg2: s32i) -> s32i [external, c];
 fn getppid() -> s32i [external, c, nothrow];
 fn fclose(%arg0: rec__IO_FILE*) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_flock, "fl", align 8
-    %2 = alloca rec__IO_FILE*, "f", align 8
-    %3 = alloca s32i, "fd", align 4
-    %4 = alloca s32i, "pid", align 4
-    %5 = alloca s32i, "status", align 4
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = get_global @__const.main.fl : rec_flock*
-    copy %1, %7
-    scope {
-        %123 = const 0 : s32i
-        %124 = call @__errno_location() : s32i* [const]
-        store %123, %124, align 4
-        %125 = call @tmpfile() : rec__IO_FILE* [all]
-        store %125, %2, align 8
-        %126 = cast(ptr_to_bool) %125 : bool
-        %127 = ternary %126 ? { : s32i
-            %141 = const 1 : s32i
-            yield %141
-        } : {
-            %133 = get_global @.str : s8i[124]*
-            %134 = cast(array_to_ptrdecay) %133 : s8i*
-            %135 = get_global @strerror : ((s32i) -> s8i*)*
-            %136 = call @__errno_location() : s32i* [const]
-            %137 = load %136 : s32i, align 4
-            %138 = call @strerror(%137) : s8i* [all]
-            %139 = call @t_printf(%134, %138) : s32i [all]
-            %140 = const 0 : s32i
-            yield %140
-        }
-        %128 = cast(int_to_bool) %127 : bool
-        %129 = not %128 : bool
-        if %129 {
-            %130 = get_global @t_status : s32i*
-            %131 = load %130 : s32i, align 4, volatile
-            store %131, %0
-            %132 = load %0 : s32i
-            return %132
-        }
-        yield
-    }
-    %8 = load %2 : rec__IO_FILE*, align 8
-    %9 = call @fileno(%8) : s32i [all]
-    store %9, %3, align 4
-    %10 = const 1 : s16i
-    %11 = get_member %1[0] "l_type" : s16i*
-    store %10, %11, align 8
-    %12 = const 0 : s16i
-    %13 = get_member %1[1] "l_whence" : s16i*
-    store %12, %13, align 2
-    %14 = const 0 : s64i
-    %15 = get_member %1[2] "l_start" : s64i*
-    store %14, %15, align 8
-    %16 = const 0 : s64i
-    %17 = get_member %1[3] "l_len" : s64i*
-    store %16, %17, align 8
-    %18 = const 0 : s32i
-    %19 = call @__errno_location() : s32i* [const]
-    store %18, %19, align 4
-    %20 = load %3 : s32i, align 4
-    %21 = const 6 : s32i
-    %22 = call @fcntl(%20, %21, %1) : s32i [all]
-    %23 = const 0 : s32i
-    %24 = cmp eq %22, %23 : bool
-    %25 = ternary %24 ? { : s32i
-        %122 = const 1 : s32i
-        yield %122
-    } : {
-        %114 = get_global @.str.1 : s8i[133]*
-        %115 = cast(array_to_ptrdecay) %114 : s8i*
-        %116 = get_global @strerror : ((s32i) -> s8i*)*
-        %117 = call @__errno_location() : s32i* [const]
-        %118 = load %117 : s32i, align 4
-        %119 = call @strerror(%118) : s8i* [all]
-        %120 = call @t_printf(%115, %119) : s32i [all]
-        %121 = const 0 : s32i
-        yield %121
-    }
-    %26 = call @fork() : s32i [all]
-    store %26, %4, align 4
-    scope {
-        %90 = load %4 : s32i, align 4
-        %91 = cast(int_to_bool) %90 : bool
-        %92 = not %91 : bool
-        if %92 {
-            %93 = const 0 : s16i
-            %94 = get_member %1[0] "l_type" : s16i*
-            store %93, %94, align 8
-            %95 = get_global @_exit : ((s32i) -> void)*
-            %96 = load %3 : s32i, align 4
-            %97 = const 6 : s32i
-            %98 = call @fcntl(%96, %97, %1) : s32i [all]
-            %99 = const 0 : s32i
-            %100 = cmp eq %98, %99 : bool
-            %101 = ternary %100 ? { : bool
-                %113 = const true : bool
-                yield %113
-            } : {
-                %103 = call @__errno_location() : s32i* [const]
-                %104 = load %103 : s32i, align 4
-                %105 = const 11 : s32i
-                %106 = cmp ne %104, %105 : bool
-                %107 = ternary %106 ? { : bool
-                    %109 = call @__errno_location() : s32i* [const]
-                    %110 = load %109 : s32i, align 4
-                    %111 = const 13 : s32i
-                    %112 = cmp ne %110, %111 : bool
-                    yield %112
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_flock, "fl", align 8
+        %2 = alloca rec__IO_FILE*, "f", align 8
+        %3 = alloca s32i, "fd", align 4
+        %4 = alloca s32i, "pid", align 4
+        %5 = alloca s32i, "status", align 4
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = get_global @__const.main.fl : rec_flock*
+        copy
+        scope {
+                %123 = const 0 : s32i
+                %124 = call @__errno_location() : s32i* [const]
+                store %123, %124, align 4
+                %125 = call @tmpfile() : rec__IO_FILE* [all]
+                store %125, %2, align 8
+                %126 = cast(ptr_to_bool) %125 : bool
+                %127 = ternary %126 ? { : s32i
+                        %141 = const 1 : s32i
+                        yield %141
                 } : {
-                    %108 = const false : bool
-                    yield %108
+                        %133 = get_global @.str : s8i[133]*
+                        %134 = cast(array_to_ptrdecay) %133 : s8i*
+                        %135 = get_global @strerror : (s32i) -> s8i**
+                        %136 = call @__errno_location() : s32i* [const]
+                        %137 = load %136 : s32i, align 4
+                        %138 = call @strerror(%137) : s8i* [all]
+                        %139 = call @t_printf(%134, %138) : s32i [all]
+                        %140 = const 0 : s32i
+                        yield %140
                 }
-                yield %107
-            }
-            %102 = cast(bool_to_int) %101 : s32i
-            call @_exit(%102) [all]
-            yield
+                %128 = cast(int_to_bool) %127 : bool
+                not
+                if %129 {
+                        %130 = get_global @t_status : s32i*
+                        %131 = load %130 : s32i, align 4
+                        store %131, %0
+                        %132 = load %0 : s32i
+                        return %132
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        while {
-            %79 = load %4 : s32i, align 4
-            %80 = const 0 : s32i
-            %81 = call @waitpid(%79, %5, %80) : s32i [all]
-            %82 = const 0 : s32i
-            %83 = cmp lt %81, %82 : bool
-            %84 = ternary %83 ? { : bool
-                %86 = call @__errno_location() : s32i* [const]
-                %87 = load %86 : s32i, align 4
-                %88 = const 4 : s32i
-                %89 = cmp eq %87, %88 : bool
-                yield %89
-            } : {
-                %85 = const false : bool
-                yield %85
-            }
-            condition %84
-        } do {
-            yield
+        %8 = load %2 : rec__IO_FILE*, align 8
+        %9 = call @fileno(%8) : s32i [all]
+        store %9, %3, align 4
+        %10 = const 1 : s16i
+        get_member
+        store %10, %11, align 8
+        %12 = const 0 : s16i
+        get_member
+        store %12, %13, align 2
+        %14 = const 0 : s64i
+        get_member
+        store %14, %15, align 8
+        %16 = const 0 : s64i
+        get_member
+        store %16, %17, align 8
+        %18 = const 0 : s32i
+        %19 = call @__errno_location() : s32i* [const]
+        store %18, %19, align 4
+        %20 = load %3 : s32i, align 4
+        %21 = const 6 : s32i
+        %22 = call @fcntl(%20, %21, %1) : s32i [all]
+        %23 = const 0 : s32i
+        cmp
+        %25 = ternary %24 ? { : s32i
+                %122 = const 1 : s32i
+                yield %122
+        } : {
+                %114 = get_global @.str.1 : s8i[142]*
+                %115 = cast(array_to_ptrdecay) %114 : s8i*
+                %116 = get_global @strerror : (s32i) -> s8i**
+                %117 = call @__errno_location() : s32i* [const]
+                %118 = load %117 : s32i, align 4
+                %119 = call @strerror(%118) : s8i* [all]
+                %120 = call @t_printf(%115, %119) : s32i [all]
+                %121 = const 0 : s32i
+                yield %121
         }
-        yield
-    }
-    %27 = load %5 : s32i, align 4
-    %28 = const 0 : s32i
-    %29 = cmp eq %27, %28 : bool
-    %30 = ternary %29 ? { : s32i
-        %78 = const 1 : s32i
-        yield %78
-    } : {
-        %74 = get_global @.str.2 : s8i[131]*
-        %75 = cast(array_to_ptrdecay) %74 : s8i*
-        %76 = call @t_printf(%75) : s32i [all]
-        %77 = const 0 : s32i
-        yield %77
-    }
-    %31 = call @fork() : s32i [all]
-    store %31, %4, align 4
-    scope {
-        %57 = load %4 : s32i, align 4
-        %58 = cast(int_to_bool) %57 : bool
-        %59 = not %58 : bool
-        if %59 {
-            %60 = const 1 : s16i
-            %61 = get_member %1[0] "l_type" : s16i*
-            store %60, %61, align 8
-            %62 = get_global @_exit : ((s32i) -> void)*
-            %63 = load %3 : s32i, align 4
-            %64 = const 5 : s32i
-            %65 = call @fcntl(%63, %64, %1) : s32i [all]
-            %66 = cast(int_to_bool) %65 : bool
-            %67 = ternary %66 ? { : bool
-                %73 = const true : bool
-                yield %73
-            } : {
-                %69 = get_member %1[4] "l_pid" : s32i*
-                %70 = load %69 : s32i, align 8
-                %71 = call @getppid() : s32i [all]
-                %72 = cmp ne %70, %71 : bool
-                yield %72
-            }
-            %68 = cast(bool_to_int) %67 : s32i
-            call @_exit(%68) [all]
-            yield
+        %26 = call @fork() : s32i [all]
+        store %26, %4, align 4
+        scope {
+                %90 = load %4 : s32i, align 4
+                %91 = cast(int_to_bool) %90 : bool
+                not
+                if %92 {
+                        %93 = const 0 : s16i
+                        get_member
+                        store %93, %94, align 8
+                        %95 = get_global @_exit : (s32i) -> void*
+                        %96 = load %3 : s32i, align 4
+                        %97 = const 6 : s32i
+                        %98 = call @fcntl(%96, %97, %1) : s32i [all]
+                        %99 = const 0 : s32i
+                        cmp
+                        %101 = ternary %100 ? { : bool
+                                %113 = const true : bool
+                                yield %113
+                        } : {
+                                %103 = call @__errno_location() : s32i* [const]
+                                %104 = load %103 : s32i, align 4
+                                %105 = const 11 : s32i
+                                cmp
+                                %107 = ternary %106 ? { : bool
+                                        %109 = call @__errno_location() : s32i* [const]
+                                        %110 = load %109 : s32i, align 4
+                                        %111 = const 13 : s32i
+                                        cmp
+                                        yield %112
+                                } : {
+                                        %108 = const false : bool
+                                        yield %108
+                                }
+                                yield %107
+                        }
+                        %102 = cast(bool_to_int) %101 : s32i
+                        call @_exit(%102) [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        while {
-            %46 = load %4 : s32i, align 4
-            %47 = const 0 : s32i
-            %48 = call @waitpid(%46, %5, %47) : s32i [all]
-            %49 = const 0 : s32i
-            %50 = cmp lt %48, %49 : bool
-            %51 = ternary %50 ? { : bool
-                %53 = call @__errno_location() : s32i* [const]
-                %54 = load %53 : s32i, align 4
-                %55 = const 4 : s32i
-                %56 = cmp eq %54, %55 : bool
-                yield %56
-            } : {
-                %52 = const false : bool
-                yield %52
-            }
-            condition %51
-        } do {
-            yield
+        scope {
+                while {
+                        %79 = load %4 : s32i, align 4
+                        %80 = const 0 : s32i
+                        %81 = call @waitpid(%79, %5, %80) : s32i [all]
+                        %82 = const 0 : s32i
+                        cmp
+                        %84 = ternary %83 ? { : bool
+                                %86 = call @__errno_location() : s32i* [const]
+                                %87 = load %86 : s32i, align 4
+                                %88 = const 4 : s32i
+                                cmp
+                                yield %89
+                        } : {
+                                %85 = const false : bool
+                                yield %85
+                        }
+                        condition %84
+                } do {
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %32 = load %5 : s32i, align 4
-    %33 = const 0 : s32i
-    %34 = cmp eq %32, %33 : bool
-    %35 = ternary %34 ? { : s32i
-        %45 = const 1 : s32i
-        yield %45
-    } : {
-        %41 = get_global @.str.3 : s8i[155]*
-        %42 = cast(array_to_ptrdecay) %41 : s8i*
-        %43 = call @t_printf(%42) : s32i [all]
-        %44 = const 0 : s32i
-        yield %44
-    }
-    %36 = load %2 : rec__IO_FILE*, align 8
-    %37 = call @fclose(%36) : s32i [all]
-    %38 = get_global @t_status : s32i*
-    %39 = load %38 : s32i, align 4, volatile
-    store %39, %0
-    %40 = load %0 : s32i
-    return %40
+        %27 = load %5 : s32i, align 4
+        %28 = const 0 : s32i
+        cmp
+        %30 = ternary %29 ? { : s32i
+                %78 = const 1 : s32i
+                yield %78
+        } : {
+                %74 = get_global @.str.2 : s8i[140]*
+                %75 = cast(array_to_ptrdecay) %74 : s8i*
+                %76 = call @t_printf(%75) : s32i [all]
+                %77 = const 0 : s32i
+                yield %77
+        }
+        %31 = call @fork() : s32i [all]
+        store %31, %4, align 4
+        scope {
+                %57 = load %4 : s32i, align 4
+                %58 = cast(int_to_bool) %57 : bool
+                not
+                if %59 {
+                        %60 = const 1 : s16i
+                        get_member
+                        store %60, %61, align 8
+                        %62 = get_global @_exit : (s32i) -> void*
+                        %63 = load %3 : s32i, align 4
+                        %64 = const 5 : s32i
+                        %65 = call @fcntl(%63, %64, %1) : s32i [all]
+                        %66 = cast(int_to_bool) %65 : bool
+                        %67 = ternary %66 ? { : bool
+                                %73 = const true : bool
+                                yield %73
+                        } : {
+                                get_member
+                                %70 = load %69 : s32i, align 8
+                                %71 = call @getppid() : s32i [all]
+                                cmp
+                                yield %72
+                        }
+                        %68 = cast(bool_to_int) %67 : s32i
+                        call @_exit(%68) [all]
+                        yield
+                }
+                yield
+        }
+        scope {
+                while {
+                        %46 = load %4 : s32i, align 4
+                        %47 = const 0 : s32i
+                        %48 = call @waitpid(%46, %5, %47) : s32i [all]
+                        %49 = const 0 : s32i
+                        cmp
+                        %51 = ternary %50 ? { : bool
+                                %53 = call @__errno_location() : s32i* [const]
+                                %54 = load %53 : s32i, align 4
+                                %55 = const 4 : s32i
+                                cmp
+                                yield %56
+                        } : {
+                                %52 = const false : bool
+                                yield %52
+                        }
+                        condition %51
+                } do {
+                        yield
+                }
+                yield
+        }
+        %32 = load %5 : s32i, align 4
+        %33 = const 0 : s32i
+        cmp
+        %35 = ternary %34 ? { : s32i
+                %45 = const 1 : s32i
+                yield %45
+        } : {
+                %41 = get_global @.str.3 : s8i[164]*
+                %42 = cast(array_to_ptrdecay) %41 : s8i*
+                %43 = call @t_printf(%42) : s32i [all]
+                %44 = const 0 : s32i
+                yield %44
+        }
+        %36 = load %2 : rec__IO_FILE*, align 8
+        %37 = call @fclose(%36) : s32i [all]
+        %38 = get_global @t_status : s32i*
+        %39 = load %38 : s32i, align 4
+        store %39, %0
+        %40 = load %0 : s32i
+        return %40
 }

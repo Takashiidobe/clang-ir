@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/ipa-sra-1.c" (c, x86_64-unknown-linux-gnu)
@@ -12,21 +12,21 @@ fn ox(%arg2: s32i, %arg3: rec_bovid*) -> s32i [internal, c, no_inline, dso_local
         store %arg2, %13
         store %arg3, %14
         scope {
-            %19 = load %13 : s32i, align 4
-            %20 = cast(int_to_bool) %19 : bool
-            if %20 {
-                %22 = load %14 : rec_bovid*, align 8
-                %23 = get_member %22[0] "red" : float*
-                %24 = load %23 : float, align 8
-                %25 = cast(float_to_int) %24 : s32i
-                store %25, %16, align 4
+                %19 = load %13 : s32i, align 4
+                %20 = cast(int_to_bool) %19 : bool
+                if %20 {
+                        %22 = load %14 : rec_bovid*, align 8
+                        get_member
+                        %24 = load %23 : float, align 8
+                        %25 = cast(float_to_int) %24 : s32i
+                        store %25, %16, align 4
+                        yield
+                } else {
+                        %21 = const 0 : s32i
+                        store %21, %16, align 4
+                        yield
+                }
                 yield
-            } else {
-                %21 = const 0 : s32i
-                store %21, %16, align 4
-                yield
-            }
-            yield
         }
         %17 = load %16 : s32i, align 4
         store %17, %15
@@ -45,7 +45,7 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         store %4, %2
         %5 = load %0 : s32i, align 4
         %6 = const 2000 : s32i
-        %7 = cmp gt %5, %6 : bool
+        cmp
         %8 = cast(bool_to_int) %7 : s32i
         %9 = const #cir.ptr<null> : rec_bovid*
         %10 = call @ox(%8, %9) : s32i [all]

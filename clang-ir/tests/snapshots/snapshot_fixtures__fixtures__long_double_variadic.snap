@@ -1,54 +1,54 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/long_double_variadic.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[5] = "%La\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[8] = "%.21Lf\n" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[24] = "0x1.0000000000000001p+0" [cir_private, default, align 1, dso_local, constant]
-global .str.3 : s8i[4] = "%La" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[5] = ConstArray { ty: Array { element_type: Named("s8i"), size: 5 }, elts: Str("%La\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[8] = ConstArray { ty: Array { element_type: Named("s8i"), size: 8 }, elts: Str("%.21Lf\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[24] = ConstArray { ty: Array { element_type: Named("s8i"), size: 24 }, elts: Str("0x1.0000000000000001p+0"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%La"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn __isoc99_sscanf(%arg0: s8i*, %arg1: s8i*, ...) -> s32i [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca long_double<f80>, "x", align 16
-    %2 = alloca long_double<f80>, "y", align 16
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 1.000000e+00 : long_double<f80>
-    store %4, %1, align 16
-    %5 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %6 = get_global @.str : s8i[5]*
-    %7 = cast(array_to_ptrdecay) %6 : s8i*
-    %8 = load %1 : long_double<f80>, align 16
-    %9 = call @printf(%7, %8) : s32i [all]
-    %10 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %11 = get_global @.str.1 : s8i[8]*
-    %12 = cast(array_to_ptrdecay) %11 : s8i*
-    %13 = load %1 : long_double<f80>, align 16
-    %14 = call @printf(%12, %13) : s32i [all]
-    scope {
-        %17 = get_global @__isoc99_sscanf : ((s8i*, s8i*, ...) -> s32i)*
-        %18 = get_global @.str.2 : s8i[24]*
-        %19 = cast(array_to_ptrdecay) %18 : s8i*
-        %20 = get_global @.str.3 : s8i[4]*
-        %21 = cast(array_to_ptrdecay) %20 : s8i*
-        %22 = call @__isoc99_sscanf(%19, %21, %2) : s32i [all]
-        %23 = const 1 : s32i
-        %24 = cmp eq %22, %23 : bool
-        if %24 {
-            %25 = get_global @printf : ((s8i*, ...) -> s32i)*
-            %26 = get_global @.str : s8i[5]*
-            %27 = cast(array_to_ptrdecay) %26 : s8i*
-            %28 = load %2 : long_double<f80>, align 16
-            %29 = call @printf(%27, %28) : s32i [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca long_double<f80>, "x", align 16
+        %2 = alloca long_double<f80>, "y", align 16
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 1.000000e+00 : long_double<f80>
+        store %4, %1, align 16
+        %5 = get_global @printf : (s8i*, ...) -> s32i*
+        %6 = get_global @.str : s8i[5]*
+        %7 = cast(array_to_ptrdecay) %6 : s8i*
+        %8 = load %1 : long_double<f80>, align 16
+        %9 = call @printf(%7, %8) : s32i [all]
+        %10 = get_global @printf : (s8i*, ...) -> s32i*
+        %11 = get_global @.str.1 : s8i[8]*
+        %12 = cast(array_to_ptrdecay) %11 : s8i*
+        %13 = load %1 : long_double<f80>, align 16
+        %14 = call @printf(%12, %13) : s32i [all]
+        scope {
+                %17 = get_global @__isoc99_sscanf : (s8i*, s8i*, ...) -> s32i*
+                %18 = get_global @.str.2 : s8i[24]*
+                %19 = cast(array_to_ptrdecay) %18 : s8i*
+                %20 = get_global @.str.3 : s8i[4]*
+                %21 = cast(array_to_ptrdecay) %20 : s8i*
+                %22 = call @__isoc99_sscanf(%19, %21, %2) : s32i [all]
+                %23 = const 1 : s32i
+                cmp
+                if %24 {
+                        %25 = get_global @printf : (s8i*, ...) -> s32i*
+                        %26 = get_global @.str : s8i[5]*
+                        %27 = cast(array_to_ptrdecay) %26 : s8i*
+                        %28 = load %2 : long_double<f80>, align 16
+                        %29 = call @printf(%27, %28) : s32i [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %15 = const 0 : s32i
-    store %15, %0
-    %16 = load %0 : s32i
-    return %16
+        %15 = const 0 : s32i
+        store %15, %0
+        %16 = load %0 : s32i
+        return %16
 }

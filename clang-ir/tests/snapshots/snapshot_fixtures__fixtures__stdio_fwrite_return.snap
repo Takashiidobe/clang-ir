@@ -1,13 +1,13 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/stdio_fwrite_return.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.buf : s8i[16] = "0123456789abcde" [cir_private, default, dso_local, constant]
-global .str : s8i[30] = "slate_stdio_fwrite_return.tmp" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[2] = "w" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[10] = "open-fail" [cir_private, default, align 1, dso_local, constant]
-global .str.3 : s8i[5] = "%zu\n" [cir_private, default, align 1, dso_local, constant]
+global __const.main.buf : s8i[16] = ConstArray { ty: Array { element_type: Named("s8i"), size: 16 }, elts: Str("0123456789abcde"), trailing_zeros_num: 1 } [cir_private, default, dso_local, constant]
+global .str : s8i[30] = ConstArray { ty: Array { element_type: Named("s8i"), size: 30 }, elts: Str("slate_stdio_fwrite_return.tmp"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[2] = ConstArray { ty: Array { element_type: Named("s8i"), size: 2 }, elts: Str("w"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[10] = ConstArray { ty: Array { element_type: Named("s8i"), size: 10 }, elts: Str("open-fail"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[5] = ConstArray { ty: Array { element_type: Named("s8i"), size: 5 }, elts: Str("%zu\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn remove(%arg0: s8i*) -> s32i [external, c, nothrow];
 fn fopen(%arg0: s8i*, %arg1: s8i*) -> rec__IO_FILE* [external, c];
@@ -16,59 +16,59 @@ fn fwrite(%arg0: void*, %arg1: u64i, %arg2: u64i, %arg3: rec__IO_FILE*) -> u64i 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn fclose(%arg0: rec__IO_FILE*) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec__IO_FILE*, "f", align 8
-    %2 = alloca s8i[16], "buf", align 16
-    %3 = alloca u64i, "n", align 8
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = get_global @.str : s8i[30]*
-    %6 = cast(array_to_ptrdecay) %5 : s8i*
-    %7 = call @remove(%6) : s32i [all]
-    %8 = get_global @fopen : ((s8i*, s8i*) -> rec__IO_FILE*)*
-    %9 = get_global @.str : s8i[30]*
-    %10 = cast(array_to_ptrdecay) %9 : s8i*
-    %11 = get_global @.str.1 : s8i[2]*
-    %12 = cast(array_to_ptrdecay) %11 : s8i*
-    %13 = call @fopen(%10, %12) : rec__IO_FILE* [all]
-    store %13, %1, align 8
-    scope {
-        %34 = load %1 : rec__IO_FILE*, align 8
-        %35 = cast(ptr_to_bool) %34 : bool
-        %36 = not %35 : bool
-        if %36 {
-            %37 = get_global @.str.2 : s8i[10]*
-            %38 = cast(array_to_ptrdecay) %37 : s8i*
-            %39 = call @puts(%38) : s32i [all]
-            %40 = const 0 : s32i
-            store %40, %0
-            %41 = load %0 : s32i
-            return %41
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec__IO_FILE*, "f", align 8
+        %2 = alloca s8i[16], "buf", align 16
+        %3 = alloca u64i, "n", align 8
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = get_global @.str : s8i[30]*
+        %6 = cast(array_to_ptrdecay) %5 : s8i*
+        %7 = call @remove(%6) : s32i [all]
+        %8 = get_global @fopen : (s8i*, s8i*) -> rec__IO_FILE**
+        %9 = get_global @.str : s8i[30]*
+        %10 = cast(array_to_ptrdecay) %9 : s8i*
+        %11 = get_global @.str.1 : s8i[2]*
+        %12 = cast(array_to_ptrdecay) %11 : s8i*
+        %13 = call @fopen(%10, %12) : rec__IO_FILE* [all]
+        store %13, %1, align 8
+        scope {
+                %34 = load %1 : rec__IO_FILE*, align 8
+                %35 = cast(ptr_to_bool) %34 : bool
+                not
+                if %36 {
+                        %37 = get_global @.str.2 : s8i[10]*
+                        %38 = cast(array_to_ptrdecay) %37 : s8i*
+                        %39 = call @puts(%38) : s32i [all]
+                        %40 = const 0 : s32i
+                        store %40, %0
+                        %41 = load %0 : s32i
+                        return %41
+                }
+                yield
         }
-        yield
-    }
-    %14 = get_global @__const.main.buf : s8i[16]*
-    copy %2, %14
-    %15 = get_global @fwrite : ((void*, u64i, u64i, rec__IO_FILE*) -> u64i)*
-    %16 = cast(array_to_ptrdecay) %2 : s8i*
-    %17 = cast(bitcast) %16 : void*
-    %18 = const 1 : u64i
-    %19 = const 15 : u64i
-    %20 = load %1 : rec__IO_FILE*, align 8
-    %21 = call @fwrite(%17, %18, %19, %20) : u64i [all]
-    store %21, %3, align 8
-    %22 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %23 = get_global @.str.3 : s8i[5]*
-    %24 = cast(array_to_ptrdecay) %23 : s8i*
-    %25 = load %3 : u64i, align 8
-    %26 = call @printf(%24, %25) : s32i [all]
-    %27 = load %1 : rec__IO_FILE*, align 8
-    %28 = call @fclose(%27) : s32i [all]
-    %29 = get_global @.str : s8i[30]*
-    %30 = cast(array_to_ptrdecay) %29 : s8i*
-    %31 = call @remove(%30) : s32i [all]
-    %32 = const 0 : s32i
-    store %32, %0
-    %33 = load %0 : s32i
-    return %33
+        %14 = get_global @__const.main.buf : s8i[16]*
+        copy
+        %15 = get_global @fwrite : (void*, u64i, u64i, rec__IO_FILE*) -> u64i*
+        %16 = cast(array_to_ptrdecay) %2 : s8i*
+        %17 = cast(bitcast) %16 : void*
+        %18 = const 1 : u64i
+        %19 = const 15 : u64i
+        %20 = load %1 : rec__IO_FILE*, align 8
+        %21 = call @fwrite(%17, %18, %19, %20) : u64i [all]
+        store %21, %3, align 8
+        %22 = get_global @printf : (s8i*, ...) -> s32i*
+        %23 = get_global @.str.3 : s8i[5]*
+        %24 = cast(array_to_ptrdecay) %23 : s8i*
+        %25 = load %3 : u64i, align 8
+        %26 = call @printf(%24, %25) : s32i [all]
+        %27 = load %1 : rec__IO_FILE*, align 8
+        %28 = call @fclose(%27) : s32i [all]
+        %29 = get_global @.str : s8i[30]*
+        %30 = cast(array_to_ptrdecay) %29 : s8i*
+        %31 = call @remove(%30) : s32i [all]
+        %32 = const 0 : s32i
+        store %32, %0
+        %33 = load %0 : s32i
+        return %33
 }

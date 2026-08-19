@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pta-field-2.c" (c, x86_64-unknown-linux-gnu)
@@ -10,54 +10,54 @@ fn bar(%arg0: s32i**) -> void [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %19
         %21 = load %19 : s32i**, align 8
         %22 = const -1 : s32i
-        %23 = ptr_stride %21, %22 : s32i**
+        ptr_stride
         %24 = cast(bitcast) %23 : rec_Foo*
         store %24, %20, align 8
         %25 = const 0 : s32i
         %26 = load %20 : rec_Foo*, align 8
-        %27 = get_member %26[0] "p" : s32i**
+        get_member
         %28 = load %27 : s32i*, align 8
         store %25, %28, align 4
         return
 }
 fn foo() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %8 = alloca s32i, "__retval", align 4
-    %9 = alloca rec_Foo, "f", align 8
-    %10 = alloca s32i, "i", align 4
-    %11 = alloca s32i, "j", align 4
-    %12 = const 1 : s32i
-    store %12, %10, align 4
-    %13 = const 2 : s32i
-    store %13, %11, align 4
-    %14 = get_member %9[0] "p" : s32i**
-    store %10, %14, align 8
-    %15 = get_member %9[1] "q" : s32i**
-    store %11, %15, align 8
-    %16 = get_member %9[1] "q" : s32i**
-    call @bar(%16) [all]
-    %17 = load %10 : s32i, align 4
-    store %17, %8
-    %18 = load %8 : s32i
-    return %18
+        %8 = alloca s32i, "__retval", align 4
+        %9 = alloca rec_Foo, "f", align 8
+        %10 = alloca s32i, "i", align 4
+        %11 = alloca s32i, "j", align 4
+        %12 = const 1 : s32i
+        store %12, %10, align 4
+        %13 = const 2 : s32i
+        store %13, %11, align 4
+        get_member
+        store %10, %14, align 8
+        get_member
+        store %11, %15, align 8
+        get_member
+        call @bar(%16) [all]
+        %17 = load %10 : s32i, align 4
+        store %17, %8
+        %18 = load %8 : s32i
+        return %18
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = call @foo() : s32i [all]
-        %5 = const 0 : s32i
-        %6 = cmp ne %4, %5 : bool
-        if %6 {
-            %7 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = call @foo() : s32i [all]
+                %5 = const 0 : s32i
+                cmp
+                if %6 {
+                        %7 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

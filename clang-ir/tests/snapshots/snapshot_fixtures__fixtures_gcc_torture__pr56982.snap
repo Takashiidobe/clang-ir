@@ -1,13 +1,13 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr56982.c" (c, x86_64-unknown-linux-gnu)
-global env : rec___jmp_buf_tag[1] = zero [internal, default, align 16, dso_local]
+global env : rec___jmp_buf_tag[1] = Zero { ty: Array { element_type: Named("rec___jmp_buf_tag"), size: 1 } } [internal, default, align 16, dso_local]
 
 fn baz() -> void [external, c, no_inline, dso_local, nothrow] {
-    asm(x86_att, out = [], in = [], in_out = [], "", "~{memory},~{dirflag},~{fpsr},~{flags}" [side_effects]
-    return
+        asm
+        return
 }
 fn _setjmp(%arg0: rec___jmp_buf_tag*) -> s32i [external, c, nothrow];
 fn g(%arg3: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
@@ -16,22 +16,22 @@ fn g(%arg3: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         %37 = alloca s32i, "__retval", align 4
         store %arg3, %36
         scope {
-            %39 = load %36 : s32i, align 4
-            %40 = cast(int_to_bool) %39 : bool
-            if %40 {
-                call @baz() [all]
-                %43 = const 0 : s32i
-                store %43, %37
-                %44 = load %37 : s32i
-                return %44
-            } else {
-                call @baz() [all]
-                %41 = const 1 : s32i
-                store %41, %37
-                %42 = load %37 : s32i
-                return %42
-            }
-            yield
+                %39 = load %36 : s32i, align 4
+                %40 = cast(int_to_bool) %39 : bool
+                if %40 {
+                        call @baz() [all]
+                        %43 = const 0 : s32i
+                        store %43, %37
+                        %44 = load %37 : s32i
+                        return %44
+                } else {
+                        call @baz() [all]
+                        %41 = const 1 : s32i
+                        store %41, %37
+                        %42 = load %37 : s32i
+                        return %42
+                }
+                yield
         }
         %38 = load %37 : s32i
         return %38
@@ -47,18 +47,18 @@ fn f(%arg2: s32i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %11 = alloca s32i, "n", align 4
         store %arg2, %8
         scope {
-            %31 = load %8 : s32i*, align 8
-            %32 = load %31 : s32i, align 4
-            %33 = cast(int_to_bool) %32 : bool
-            if %33 {
-                %34 = const 1 : s32i
-                store %34, %9
-                %35 = load %9 : s32i
-                return %35
-            }
-            yield
+                %31 = load %8 : s32i*, align 8
+                %32 = load %31 : s32i, align 4
+                %33 = cast(int_to_bool) %32 : bool
+                if %33 {
+                        %34 = const 1 : s32i
+                        store %34, %9
+                        %35 = load %9 : s32i
+                        return %35
+                }
+                yield
         }
-        %12 = get_global @_setjmp : ((rec___jmp_buf_tag*) -> s32i)*
+        %12 = get_global @_setjmp : (rec___jmp_buf_tag*) -> s32i*
         %13 = get_global @env : rec___jmp_buf_tag[1]*
         %14 = cast(array_to_ptrdecay) %13 : rec___jmp_buf_tag*
         %15 = call @_setjmp(%14) : s32i [all]
@@ -67,28 +67,28 @@ fn f(%arg2: s32i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %17 = call @g(%16) : s32i [all]
         store %17, %11, align 4
         scope {
-            %26 = load %11 : s32i, align 4
-            %27 = const 0 : s32i
-            %28 = cmp eq %26, %27 : bool
-            if %28 {
-                %29 = get_global @exit : ((s32i) -> void)*
-                %30 = const 0 : s32i
-                call @exit(%30) [all]
+                %26 = load %11 : s32i, align 4
+                %27 = const 0 : s32i
+                cmp
+                if %28 {
+                        %29 = get_global @exit : (s32i) -> void*
+                        %30 = const 0 : s32i
+                        call @exit(%30) [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %23 = load %10 : s32i, align 4
-            %24 = cast(int_to_bool) %23 : bool
-            if %24 {
-                %25 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %23 = load %10 : s32i, align 4
+                %24 = cast(int_to_bool) %23 : bool
+                if %24 {
+                        %25 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        %18 = get_global @longjmp : ((rec___jmp_buf_tag*, s32i) -> void)*
+        %18 = get_global @longjmp : (rec___jmp_buf_tag*, s32i) -> void*
         %19 = get_global @env : rec___jmp_buf_tag[1]*
         %20 = cast(array_to_ptrdecay) %19 : rec___jmp_buf_tag*
         %21 = const 42 : s32i

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr55137.c" (c, x86_64-unknown-linux-gnu)
@@ -16,7 +16,7 @@ fn foo(%arg2: u32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %48 = add %46, %47 : s32i [nsw]
         %49 = load %41 : u32i, align 4
         %50 = cast(integral) %49 : s32i
-        %51 = cmp lt %48, %50 : bool
+        cmp
         %52 = cast(bool_to_int) %51 : s32i
         store %52, %42
         %53 = load %42 : s32i
@@ -52,43 +52,43 @@ fn baz(%arg0: u32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const 2147483647 : u32i
-        %5 = call @foo(%4) : s32i [all]
-        %6 = const 2147483647 : u32i
-        %7 = call @bar(%6) : s32i [all]
-        %8 = const 2147483647 : s32i
-        %9 = cmp lt %7, %8 : bool
-        %10 = cast(bool_to_int) %9 : s32i
-        %11 = cmp ne %5, %10 : bool
-        %12 = ternary %11 ? { : bool
-            %24 = const true : bool
-            yield %24
-        } : {
-            %14 = const 2147483647 : u32i
-            %15 = call @foo(%14) : s32i [all]
-            %16 = const 2147483647 : u32i
-            %17 = call @baz(%16) : s32i [all]
-            %18 = const 1 : s32i
-            %19 = add %17, %18 : s32i [nsw]
-            %20 = const 2147483647 : s32i
-            %21 = cmp lt %19, %20 : bool
-            %22 = cast(bool_to_int) %21 : s32i
-            %23 = cmp ne %15, %22 : bool
-            yield %23
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const 2147483647 : u32i
+                %5 = call @foo(%4) : s32i [all]
+                %6 = const 2147483647 : u32i
+                %7 = call @bar(%6) : s32i [all]
+                %8 = const 2147483647 : s32i
+                cmp
+                %10 = cast(bool_to_int) %9 : s32i
+                cmp
+                %12 = ternary %11 ? { : bool
+                        %24 = const true : bool
+                        yield %24
+                } : {
+                        %14 = const 2147483647 : u32i
+                        %15 = call @foo(%14) : s32i [all]
+                        %16 = const 2147483647 : u32i
+                        %17 = call @baz(%16) : s32i [all]
+                        %18 = const 1 : s32i
+                        %19 = add %17, %18 : s32i [nsw]
+                        %20 = const 2147483647 : s32i
+                        cmp
+                        %22 = cast(bool_to_int) %21 : s32i
+                        cmp
+                        yield %23
+                }
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/strncmp-1.c" (c, x86_64-unknown-linux-gnu)
-global u1 : rec_anon2E0 = zero [internal, default, align 16, dso_local]
-global u2 : rec_anon2E0 = zero [internal, default, align 16, dso_local]
+global u1 : rec_anon2E0 = Zero { ty: Named("rec_anon2E0") } [internal, default, align 16, dso_local]
+global u2 : rec_anon2E0 = Zero { ty: Named("rec_anon2E0") } [internal, default, align 16, dso_local]
 
 fn strncmp(%arg0: s8i*, %arg1: s8i*, %arg2: u64i) -> s32i [external, c, pure, nothrow];
 fn abort() -> void [external, c, nothrow];
@@ -19,7 +19,7 @@ fn test(%arg0: u8i*, %arg1: u8i*, %arg2: u64i, %arg3: s32i) -> void [external, c
         store %arg1, %360
         store %arg2, %361
         store %arg3, %362
-        %364 = get_global @strncmp : ((s8i*, s8i*, u64i) -> s32i)*
+        %364 = get_global @strncmp : (s8i*, s8i*, u64i) -> s32i*
         %365 = load %359 : u8i*, align 8
         %366 = cast(bitcast) %365 : s8i*
         %367 = load %360 : u8i*, align 8
@@ -28,612 +28,612 @@ fn test(%arg0: u8i*, %arg1: u8i*, %arg2: u64i, %arg3: s32i) -> void [external, c
         %370 = call @strncmp(%366, %368, %369) : s32i [pure]
         store %370, %363, align 4
         scope {
-            %371 = load %362 : s32i, align 4
-            %372 = const 0 : s32i
-            %373 = cmp lt %371, %372 : bool
-            %374 = ternary %373 ? { : bool
-                %395 = load %363 : s32i, align 4
-                %396 = const 0 : s32i
-                %397 = cmp ge %395, %396 : bool
-                yield %397
-            } : {
-                %394 = const false : bool
-                yield %394
-            }
-            if %374 {
-                %393 = get_global @abort : (() -> void)*
-                call @abort() [all]
-                yield
-            } else {
-                scope {
-                    %375 = load %362 : s32i, align 4
-                    %376 = const 0 : s32i
-                    %377 = cmp eq %375, %376 : bool
-                    %378 = ternary %377 ? { : bool
-                        %390 = load %363 : s32i, align 4
-                        %391 = const 0 : s32i
-                        %392 = cmp ne %390, %391 : bool
-                        yield %392
-                    } : {
-                        %389 = const false : bool
-                        yield %389
-                    }
-                    if %378 {
-                        %388 = get_global @abort : (() -> void)*
+                %371 = load %362 : s32i, align 4
+                %372 = const 0 : s32i
+                cmp
+                %374 = ternary %373 ? { : bool
+                        %395 = load %363 : s32i, align 4
+                        %396 = const 0 : s32i
+                        cmp
+                        yield %397
+                } : {
+                        %394 = const false : bool
+                        yield %394
+                }
+                if %374 {
+                        %393 = get_global @abort : () -> void*
                         call @abort() [all]
                         yield
-                    } else {
+                } else {
                         scope {
-                            %379 = load %362 : s32i, align 4
-                            %380 = const 0 : s32i
-                            %381 = cmp gt %379, %380 : bool
-                            %382 = ternary %381 ? { : bool
-                                %385 = load %363 : s32i, align 4
-                                %386 = const 0 : s32i
-                                %387 = cmp le %385, %386 : bool
-                                yield %387
-                            } : {
-                                %384 = const false : bool
-                                yield %384
-                            }
-                            if %382 {
-                                %383 = get_global @abort : (() -> void)*
-                                call @abort() [all]
+                                %375 = load %362 : s32i, align 4
+                                %376 = const 0 : s32i
+                                cmp
+                                %378 = ternary %377 ? { : bool
+                                        %390 = load %363 : s32i, align 4
+                                        %391 = const 0 : s32i
+                                        cmp
+                                        yield %392
+                                } : {
+                                        %389 = const false : bool
+                                        yield %389
+                                }
+                                if %378 {
+                                        %388 = get_global @abort : () -> void*
+                                        call @abort() [all]
+                                        yield
+                                } else {
+                                        scope {
+                                                %379 = load %362 : s32i, align 4
+                                                %380 = const 0 : s32i
+                                                cmp
+                                                %382 = ternary %381 ? { : bool
+                                                        %385 = load %363 : s32i, align 4
+                                                        %386 = const 0 : s32i
+                                                        cmp
+                                                        yield %387
+                                                } : {
+                                                        %384 = const false : bool
+                                                        yield %384
+                                                }
+                                                if %382 {
+                                                        %383 = get_global @abort : () -> void*
+                                                        call @abort() [all]
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u64i, "off1", align 8
-    %2 = alloca u64i, "off2", align 8
-    %3 = alloca u64i, "len", align 8
-    %4 = alloca u64i, "i", align 8
-    %5 = alloca u8i*, "buf1", align 8
-    %6 = alloca u8i*, "buf2", align 8
-    %7 = alloca u8i*, "mod1", align 8
-    %8 = alloca u8i*, "mod2", align 8
-    %9 = alloca u8i*, "p1", align 8
-    %10 = alloca u8i*, "p2", align 8
-    %11 = const 0 : s32i
-    store %11, %0
-    scope {
-        %15 = const 0 : u64i
-        store %15, %1, align 8
-        for cond: {
-            %356 = load %1 : u64i, align 8
-            %357 = const 8 : u64i
-            %358 = cmp lt %356, %357 : bool
-            condition %358
-        } step: {
-            %16 = load %1 : u64i, align 8
-            %17 = inc %16 : u64i
-            store %17, %1, align 8
-            yield
-        } do {
-            scope {
-                %18 = const 0 : u64i
-                store %18, %2, align 8
-                for cond: {
-                    %353 = load %2 : u64i, align 8
-                    %354 = const 8 : u64i
-                    %355 = cmp lt %353, %354 : bool
-                    condition %355
-                } step: {
-                    %19 = load %2 : u64i, align 8
-                    %20 = inc %19 : u64i
-                    store %20, %2, align 8
-                    yield
-                } do {
-                    scope {
-                        %21 = const 0 : u64i
-                        store %21, %3, align 8
-                        for cond: {
-                            %348 = load %3 : u64i, align 8
-                            %349 = const 8 : u64i
-                            %350 = const 8 : u64i
-                            %351 = mul %349, %350 : u64i
-                            %352 = cmp lt %348, %351 : bool
-                            condition %352
-                        } step: {
-                            %22 = load %3 : u64i, align 8
-                            %23 = inc %22 : u64i
-                            store %23, %3, align 8
-                            yield
-                        } do {
-                            scope {
-                                %24 = get_global @u1 : rec_anon2E0*
-                                %25 = get_member %24[0] "buf" : u8i[80]*
-                                %26 = cast(array_to_ptrdecay) %25 : u8i*
-                                store %26, %9, align 8
-                                scope {
-                                    %338 = const 0 : u64i
-                                    store %338, %4, align 8
-                                    for cond: {
-                                        %345 = load %4 : u64i, align 8
-                                        %346 = load %1 : u64i, align 8
-                                        %347 = cmp lt %345, %346 : bool
-                                        condition %347
-                                    } step: {
-                                        %339 = load %4 : u64i, align 8
-                                        %340 = inc %339 : u64i
-                                        store %340, %4, align 8
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u64i, "off1", align 8
+        %2 = alloca u64i, "off2", align 8
+        %3 = alloca u64i, "len", align 8
+        %4 = alloca u64i, "i", align 8
+        %5 = alloca u8i*, "buf1", align 8
+        %6 = alloca u8i*, "buf2", align 8
+        %7 = alloca u8i*, "mod1", align 8
+        %8 = alloca u8i*, "mod2", align 8
+        %9 = alloca u8i*, "p1", align 8
+        %10 = alloca u8i*, "p2", align 8
+        %11 = const 0 : s32i
+        store %11, %0
+        scope {
+                %15 = const 0 : u64i
+                store %15, %1, align 8
+                for cond {
+                        %356 = load %1 : u64i, align 8
+                        %357 = const 8 : u64i
+                        cmp
+                        condition %358
+                } step {
+                        %16 = load %1 : u64i, align 8
+                        inc
+                        store %17, %1, align 8
+                        yield
+                } body {
+                        scope {
+                                %18 = const 0 : u64i
+                                store %18, %2, align 8
+                                for cond {
+                                        %353 = load %2 : u64i, align 8
+                                        %354 = const 8 : u64i
+                                        cmp
+                                        condition %355
+                                } step {
+                                        %19 = load %2 : u64i, align 8
+                                        inc
+                                        store %20, %2, align 8
                                         yield
-                                    } do {
-                                        %341 = const 0 : u8i
-                                        %342 = load %9 : u8i*, align 8
-                                        %343 = const 1 : s32i
-                                        %344 = ptr_stride %342, %343 : u8i*
-                                        store %344, %9, align 8
-                                        store %341, %342, align 1
+                                } body {
+                                        scope {
+                                                %21 = const 0 : u64i
+                                                store %21, %3, align 8
+                                                for cond {
+                                                        %348 = load %3 : u64i, align 8
+                                                        %349 = const 8 : u64i
+                                                        %350 = const 8 : u64i
+                                                        mul
+                                                        cmp
+                                                        condition %352
+                                                } step {
+                                                        %22 = load %3 : u64i, align 8
+                                                        inc
+                                                        store %23, %3, align 8
+                                                        yield
+                                                } body {
+                                                        scope {
+                                                                %24 = get_global @u1 : rec_anon2E0*
+                                                                get_member
+                                                                %26 = cast(array_to_ptrdecay) %25 : u8i*
+                                                                store %26, %9, align 8
+                                                                scope {
+                                                                        %338 = const 0 : u64i
+                                                                        store %338, %4, align 8
+                                                                        for cond {
+                                                                                %345 = load %4 : u64i, align 8
+                                                                                %346 = load %1 : u64i, align 8
+                                                                                cmp
+                                                                                condition %347
+                                                                        } step {
+                                                                                %339 = load %4 : u64i, align 8
+                                                                                inc
+                                                                                store %340, %4, align 8
+                                                                                yield
+                                                                        } body {
+                                                                                %341 = const 0 : u8i
+                                                                                %342 = load %9 : u8i*, align 8
+                                                                                %343 = const 1 : s32i
+                                                                                ptr_stride
+                                                                                store %344, %9, align 8
+                                                                                store %341, %342, align 1
+                                                                                yield
+                                                                        }
+                                                                        yield
+                                                                }
+                                                                %27 = load %9 : u8i*, align 8
+                                                                store %27, %5, align 8
+                                                                scope {
+                                                                        %328 = const 0 : u64i
+                                                                        store %328, %4, align 8
+                                                                        for cond {
+                                                                                %335 = load %4 : u64i, align 8
+                                                                                %336 = load %3 : u64i, align 8
+                                                                                cmp
+                                                                                condition %337
+                                                                        } step {
+                                                                                %329 = load %4 : u64i, align 8
+                                                                                inc
+                                                                                store %330, %4, align 8
+                                                                                yield
+                                                                        } body {
+                                                                                %331 = const 97 : u8i
+                                                                                %332 = load %9 : u8i*, align 8
+                                                                                %333 = const 1 : s32i
+                                                                                ptr_stride
+                                                                                store %334, %9, align 8
+                                                                                store %331, %332, align 1
+                                                                                yield
+                                                                        }
+                                                                        yield
+                                                                }
+                                                                %28 = load %9 : u8i*, align 8
+                                                                store %28, %7, align 8
+                                                                scope {
+                                                                        %318 = const 0 : u64i
+                                                                        store %318, %4, align 8
+                                                                        for cond {
+                                                                                %325 = load %4 : u64i, align 8
+                                                                                %326 = const 8 : u64i
+                                                                                cmp
+                                                                                condition %327
+                                                                        } step {
+                                                                                %319 = load %4 : u64i, align 8
+                                                                                inc
+                                                                                store %320, %4, align 8
+                                                                                yield
+                                                                        } body {
+                                                                                %321 = const 120 : u8i
+                                                                                %322 = load %9 : u8i*, align 8
+                                                                                %323 = const 1 : s32i
+                                                                                ptr_stride
+                                                                                store %324, %9, align 8
+                                                                                store %321, %322, align 1
+                                                                                yield
+                                                                        }
+                                                                        yield
+                                                                }
+                                                                %29 = get_global @u2 : rec_anon2E0*
+                                                                get_member
+                                                                %31 = cast(array_to_ptrdecay) %30 : u8i*
+                                                                store %31, %10, align 8
+                                                                scope {
+                                                                        %308 = const 0 : u64i
+                                                                        store %308, %4, align 8
+                                                                        for cond {
+                                                                                %315 = load %4 : u64i, align 8
+                                                                                %316 = load %2 : u64i, align 8
+                                                                                cmp
+                                                                                condition %317
+                                                                        } step {
+                                                                                %309 = load %4 : u64i, align 8
+                                                                                inc
+                                                                                store %310, %4, align 8
+                                                                                yield
+                                                                        } body {
+                                                                                %311 = const 0 : u8i
+                                                                                %312 = load %10 : u8i*, align 8
+                                                                                %313 = const 1 : s32i
+                                                                                ptr_stride
+                                                                                store %314, %10, align 8
+                                                                                store %311, %312, align 1
+                                                                                yield
+                                                                        }
+                                                                        yield
+                                                                }
+                                                                %32 = load %10 : u8i*, align 8
+                                                                store %32, %6, align 8
+                                                                scope {
+                                                                        %298 = const 0 : u64i
+                                                                        store %298, %4, align 8
+                                                                        for cond {
+                                                                                %305 = load %4 : u64i, align 8
+                                                                                %306 = load %3 : u64i, align 8
+                                                                                cmp
+                                                                                condition %307
+                                                                        } step {
+                                                                                %299 = load %4 : u64i, align 8
+                                                                                inc
+                                                                                store %300, %4, align 8
+                                                                                yield
+                                                                        } body {
+                                                                                %301 = const 97 : u8i
+                                                                                %302 = load %10 : u8i*, align 8
+                                                                                %303 = const 1 : s32i
+                                                                                ptr_stride
+                                                                                store %304, %10, align 8
+                                                                                store %301, %302, align 1
+                                                                                yield
+                                                                        }
+                                                                        yield
+                                                                }
+                                                                %33 = load %10 : u8i*, align 8
+                                                                store %33, %8, align 8
+                                                                scope {
+                                                                        %288 = const 0 : u64i
+                                                                        store %288, %4, align 8
+                                                                        for cond {
+                                                                                %295 = load %4 : u64i, align 8
+                                                                                %296 = const 8 : u64i
+                                                                                cmp
+                                                                                condition %297
+                                                                        } step {
+                                                                                %289 = load %4 : u64i, align 8
+                                                                                inc
+                                                                                store %290, %4, align 8
+                                                                                yield
+                                                                        } body {
+                                                                                %291 = const 120 : u8i
+                                                                                %292 = load %10 : u8i*, align 8
+                                                                                %293 = const 1 : s32i
+                                                                                ptr_stride
+                                                                                store %294, %10, align 8
+                                                                                store %291, %292, align 1
+                                                                                yield
+                                                                        }
+                                                                        yield
+                                                                }
+                                                                %34 = const 0 : u8i
+                                                                %35 = const 0 : s64i
+                                                                %36 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %34, %37, align 1
+                                                                %38 = const 0 : u8i
+                                                                %39 = const 0 : s64i
+                                                                %40 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %38, %41, align 1
+                                                                %42 = load %5 : u8i*, align 8
+                                                                %43 = load %6 : u8i*, align 8
+                                                                %44 = const 8 : u64i
+                                                                %45 = const 8 : u64i
+                                                                %46 = const 8 : u64i
+                                                                mul
+                                                                %48 = add %44, %47 : u64i
+                                                                %49 = const 8 : u64i
+                                                                %50 = add %48, %49 : u64i
+                                                                %51 = const 0 : s32i
+                                                                call @test(%42, %43, %50, %51) [all]
+                                                                %52 = load %5 : u8i*, align 8
+                                                                %53 = load %6 : u8i*, align 8
+                                                                %54 = load %3 : u64i, align 8
+                                                                %55 = const 0 : s32i
+                                                                call @test(%52, %53, %54, %55) [all]
+                                                                %56 = const 97 : u8i
+                                                                %57 = const 0 : s64i
+                                                                %58 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %56, %59, align 1
+                                                                %60 = const 0 : u8i
+                                                                %61 = const 1 : s64i
+                                                                %62 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %60, %63, align 1
+                                                                %64 = const 0 : u8i
+                                                                %65 = const 0 : s64i
+                                                                %66 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %64, %67, align 1
+                                                                %68 = load %5 : u8i*, align 8
+                                                                %69 = load %6 : u8i*, align 8
+                                                                %70 = const 8 : u64i
+                                                                %71 = const 8 : u64i
+                                                                %72 = const 8 : u64i
+                                                                mul
+                                                                %74 = add %70, %73 : u64i
+                                                                %75 = const 8 : u64i
+                                                                %76 = add %74, %75 : u64i
+                                                                %77 = const 1 : s32i
+                                                                call @test(%68, %69, %76, %77) [all]
+                                                                %78 = load %5 : u8i*, align 8
+                                                                %79 = load %6 : u8i*, align 8
+                                                                %80 = load %3 : u64i, align 8
+                                                                %81 = const 0 : s32i
+                                                                call @test(%78, %79, %80, %81) [all]
+                                                                %82 = const 0 : u8i
+                                                                %83 = const 0 : s64i
+                                                                %84 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %82, %85, align 1
+                                                                %86 = const 97 : u8i
+                                                                %87 = const 0 : s64i
+                                                                %88 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %86, %89, align 1
+                                                                %90 = const 0 : u8i
+                                                                %91 = const 1 : s64i
+                                                                %92 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %90, %93, align 1
+                                                                %94 = load %5 : u8i*, align 8
+                                                                %95 = load %6 : u8i*, align 8
+                                                                %96 = const 8 : u64i
+                                                                %97 = const 8 : u64i
+                                                                %98 = const 8 : u64i
+                                                                mul
+                                                                %100 = add %96, %99 : u64i
+                                                                %101 = const 8 : u64i
+                                                                %102 = add %100, %101 : u64i
+                                                                %103 = const -1 : s32i
+                                                                call @test(%94, %95, %102, %103) [all]
+                                                                %104 = load %5 : u8i*, align 8
+                                                                %105 = load %6 : u8i*, align 8
+                                                                %106 = load %3 : u64i, align 8
+                                                                %107 = const 0 : s32i
+                                                                call @test(%104, %105, %106, %107) [all]
+                                                                %108 = const 98 : u8i
+                                                                %109 = const 0 : s64i
+                                                                %110 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %108, %111, align 1
+                                                                %112 = const 0 : u8i
+                                                                %113 = const 1 : s64i
+                                                                %114 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %112, %115, align 1
+                                                                %116 = const 99 : u8i
+                                                                %117 = const 0 : s64i
+                                                                %118 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %116, %119, align 1
+                                                                %120 = const 0 : u8i
+                                                                %121 = const 1 : s64i
+                                                                %122 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %120, %123, align 1
+                                                                %124 = load %5 : u8i*, align 8
+                                                                %125 = load %6 : u8i*, align 8
+                                                                %126 = const 8 : u64i
+                                                                %127 = const 8 : u64i
+                                                                %128 = const 8 : u64i
+                                                                mul
+                                                                %130 = add %126, %129 : u64i
+                                                                %131 = const 8 : u64i
+                                                                %132 = add %130, %131 : u64i
+                                                                %133 = const -1 : s32i
+                                                                call @test(%124, %125, %132, %133) [all]
+                                                                %134 = load %5 : u8i*, align 8
+                                                                %135 = load %6 : u8i*, align 8
+                                                                %136 = load %3 : u64i, align 8
+                                                                %137 = const 0 : s32i
+                                                                call @test(%134, %135, %136, %137) [all]
+                                                                %138 = const 99 : u8i
+                                                                %139 = const 0 : s64i
+                                                                %140 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %138, %141, align 1
+                                                                %142 = const 0 : u8i
+                                                                %143 = const 1 : s64i
+                                                                %144 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %142, %145, align 1
+                                                                %146 = const 98 : u8i
+                                                                %147 = const 0 : s64i
+                                                                %148 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %146, %149, align 1
+                                                                %150 = const 0 : u8i
+                                                                %151 = const 1 : s64i
+                                                                %152 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %150, %153, align 1
+                                                                %154 = load %5 : u8i*, align 8
+                                                                %155 = load %6 : u8i*, align 8
+                                                                %156 = const 8 : u64i
+                                                                %157 = const 8 : u64i
+                                                                %158 = const 8 : u64i
+                                                                mul
+                                                                %160 = add %156, %159 : u64i
+                                                                %161 = const 8 : u64i
+                                                                %162 = add %160, %161 : u64i
+                                                                %163 = const 1 : s32i
+                                                                call @test(%154, %155, %162, %163) [all]
+                                                                %164 = load %5 : u8i*, align 8
+                                                                %165 = load %6 : u8i*, align 8
+                                                                %166 = load %3 : u64i, align 8
+                                                                %167 = const 0 : s32i
+                                                                call @test(%164, %165, %166, %167) [all]
+                                                                %168 = const 98 : u8i
+                                                                %169 = const 0 : s64i
+                                                                %170 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %168, %171, align 1
+                                                                %172 = const 0 : u8i
+                                                                %173 = const 1 : s64i
+                                                                %174 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %172, %175, align 1
+                                                                %176 = const 169 : u8i
+                                                                %177 = const 0 : s64i
+                                                                %178 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %176, %179, align 1
+                                                                %180 = const 0 : u8i
+                                                                %181 = const 1 : s64i
+                                                                %182 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %180, %183, align 1
+                                                                %184 = load %5 : u8i*, align 8
+                                                                %185 = load %6 : u8i*, align 8
+                                                                %186 = const 8 : u64i
+                                                                %187 = const 8 : u64i
+                                                                %188 = const 8 : u64i
+                                                                mul
+                                                                %190 = add %186, %189 : u64i
+                                                                %191 = const 8 : u64i
+                                                                %192 = add %190, %191 : u64i
+                                                                %193 = const -1 : s32i
+                                                                call @test(%184, %185, %192, %193) [all]
+                                                                %194 = load %5 : u8i*, align 8
+                                                                %195 = load %6 : u8i*, align 8
+                                                                %196 = load %3 : u64i, align 8
+                                                                %197 = const 0 : s32i
+                                                                call @test(%194, %195, %196, %197) [all]
+                                                                %198 = const 169 : u8i
+                                                                %199 = const 0 : s64i
+                                                                %200 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %198, %201, align 1
+                                                                %202 = const 0 : u8i
+                                                                %203 = const 1 : s64i
+                                                                %204 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %202, %205, align 1
+                                                                %206 = const 98 : u8i
+                                                                %207 = const 0 : s64i
+                                                                %208 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %206, %209, align 1
+                                                                %210 = const 0 : u8i
+                                                                %211 = const 1 : s64i
+                                                                %212 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %210, %213, align 1
+                                                                %214 = load %5 : u8i*, align 8
+                                                                %215 = load %6 : u8i*, align 8
+                                                                %216 = const 8 : u64i
+                                                                %217 = const 8 : u64i
+                                                                %218 = const 8 : u64i
+                                                                mul
+                                                                %220 = add %216, %219 : u64i
+                                                                %221 = const 8 : u64i
+                                                                %222 = add %220, %221 : u64i
+                                                                %223 = const 1 : s32i
+                                                                call @test(%214, %215, %222, %223) [all]
+                                                                %224 = load %5 : u8i*, align 8
+                                                                %225 = load %6 : u8i*, align 8
+                                                                %226 = load %3 : u64i, align 8
+                                                                %227 = const 0 : s32i
+                                                                call @test(%224, %225, %226, %227) [all]
+                                                                %228 = const 169 : u8i
+                                                                %229 = const 0 : s64i
+                                                                %230 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %228, %231, align 1
+                                                                %232 = const 0 : u8i
+                                                                %233 = const 1 : s64i
+                                                                %234 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %232, %235, align 1
+                                                                %236 = const 170 : u8i
+                                                                %237 = const 0 : s64i
+                                                                %238 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %236, %239, align 1
+                                                                %240 = const 0 : u8i
+                                                                %241 = const 1 : s64i
+                                                                %242 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %240, %243, align 1
+                                                                %244 = load %5 : u8i*, align 8
+                                                                %245 = load %6 : u8i*, align 8
+                                                                %246 = const 8 : u64i
+                                                                %247 = const 8 : u64i
+                                                                %248 = const 8 : u64i
+                                                                mul
+                                                                %250 = add %246, %249 : u64i
+                                                                %251 = const 8 : u64i
+                                                                %252 = add %250, %251 : u64i
+                                                                %253 = const -1 : s32i
+                                                                call @test(%244, %245, %252, %253) [all]
+                                                                %254 = load %5 : u8i*, align 8
+                                                                %255 = load %6 : u8i*, align 8
+                                                                %256 = load %3 : u64i, align 8
+                                                                %257 = const 0 : s32i
+                                                                call @test(%254, %255, %256, %257) [all]
+                                                                %258 = const 170 : u8i
+                                                                %259 = const 0 : s64i
+                                                                %260 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %258, %261, align 1
+                                                                %262 = const 0 : u8i
+                                                                %263 = const 1 : s64i
+                                                                %264 = load %7 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %262, %265, align 1
+                                                                %266 = const 169 : u8i
+                                                                %267 = const 0 : s64i
+                                                                %268 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %266, %269, align 1
+                                                                %270 = const 0 : u8i
+                                                                %271 = const 1 : s64i
+                                                                %272 = load %8 : u8i*, align 8
+                                                                ptr_stride
+                                                                store %270, %273, align 1
+                                                                %274 = load %5 : u8i*, align 8
+                                                                %275 = load %6 : u8i*, align 8
+                                                                %276 = const 8 : u64i
+                                                                %277 = const 8 : u64i
+                                                                %278 = const 8 : u64i
+                                                                mul
+                                                                %280 = add %276, %279 : u64i
+                                                                %281 = const 8 : u64i
+                                                                %282 = add %280, %281 : u64i
+                                                                %283 = const 1 : s32i
+                                                                call @test(%274, %275, %282, %283) [all]
+                                                                %284 = load %5 : u8i*, align 8
+                                                                %285 = load %6 : u8i*, align 8
+                                                                %286 = load %3 : u64i, align 8
+                                                                %287 = const 0 : s32i
+                                                                call @test(%284, %285, %286, %287) [all]
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
-                                %27 = load %9 : u8i*, align 8
-                                store %27, %5, align 8
-                                scope {
-                                    %328 = const 0 : u64i
-                                    store %328, %4, align 8
-                                    for cond: {
-                                        %335 = load %4 : u64i, align 8
-                                        %336 = load %3 : u64i, align 8
-                                        %337 = cmp lt %335, %336 : bool
-                                        condition %337
-                                    } step: {
-                                        %329 = load %4 : u64i, align 8
-                                        %330 = inc %329 : u64i
-                                        store %330, %4, align 8
-                                        yield
-                                    } do {
-                                        %331 = const 97 : u8i
-                                        %332 = load %9 : u8i*, align 8
-                                        %333 = const 1 : s32i
-                                        %334 = ptr_stride %332, %333 : u8i*
-                                        store %334, %9, align 8
-                                        store %331, %332, align 1
-                                        yield
-                                    }
-                                    yield
-                                }
-                                %28 = load %9 : u8i*, align 8
-                                store %28, %7, align 8
-                                scope {
-                                    %318 = const 0 : u64i
-                                    store %318, %4, align 8
-                                    for cond: {
-                                        %325 = load %4 : u64i, align 8
-                                        %326 = const 8 : u64i
-                                        %327 = cmp lt %325, %326 : bool
-                                        condition %327
-                                    } step: {
-                                        %319 = load %4 : u64i, align 8
-                                        %320 = inc %319 : u64i
-                                        store %320, %4, align 8
-                                        yield
-                                    } do {
-                                        %321 = const 120 : u8i
-                                        %322 = load %9 : u8i*, align 8
-                                        %323 = const 1 : s32i
-                                        %324 = ptr_stride %322, %323 : u8i*
-                                        store %324, %9, align 8
-                                        store %321, %322, align 1
-                                        yield
-                                    }
-                                    yield
-                                }
-                                %29 = get_global @u2 : rec_anon2E0*
-                                %30 = get_member %29[0] "buf" : u8i[80]*
-                                %31 = cast(array_to_ptrdecay) %30 : u8i*
-                                store %31, %10, align 8
-                                scope {
-                                    %308 = const 0 : u64i
-                                    store %308, %4, align 8
-                                    for cond: {
-                                        %315 = load %4 : u64i, align 8
-                                        %316 = load %2 : u64i, align 8
-                                        %317 = cmp lt %315, %316 : bool
-                                        condition %317
-                                    } step: {
-                                        %309 = load %4 : u64i, align 8
-                                        %310 = inc %309 : u64i
-                                        store %310, %4, align 8
-                                        yield
-                                    } do {
-                                        %311 = const 0 : u8i
-                                        %312 = load %10 : u8i*, align 8
-                                        %313 = const 1 : s32i
-                                        %314 = ptr_stride %312, %313 : u8i*
-                                        store %314, %10, align 8
-                                        store %311, %312, align 1
-                                        yield
-                                    }
-                                    yield
-                                }
-                                %32 = load %10 : u8i*, align 8
-                                store %32, %6, align 8
-                                scope {
-                                    %298 = const 0 : u64i
-                                    store %298, %4, align 8
-                                    for cond: {
-                                        %305 = load %4 : u64i, align 8
-                                        %306 = load %3 : u64i, align 8
-                                        %307 = cmp lt %305, %306 : bool
-                                        condition %307
-                                    } step: {
-                                        %299 = load %4 : u64i, align 8
-                                        %300 = inc %299 : u64i
-                                        store %300, %4, align 8
-                                        yield
-                                    } do {
-                                        %301 = const 97 : u8i
-                                        %302 = load %10 : u8i*, align 8
-                                        %303 = const 1 : s32i
-                                        %304 = ptr_stride %302, %303 : u8i*
-                                        store %304, %10, align 8
-                                        store %301, %302, align 1
-                                        yield
-                                    }
-                                    yield
-                                }
-                                %33 = load %10 : u8i*, align 8
-                                store %33, %8, align 8
-                                scope {
-                                    %288 = const 0 : u64i
-                                    store %288, %4, align 8
-                                    for cond: {
-                                        %295 = load %4 : u64i, align 8
-                                        %296 = const 8 : u64i
-                                        %297 = cmp lt %295, %296 : bool
-                                        condition %297
-                                    } step: {
-                                        %289 = load %4 : u64i, align 8
-                                        %290 = inc %289 : u64i
-                                        store %290, %4, align 8
-                                        yield
-                                    } do {
-                                        %291 = const 120 : u8i
-                                        %292 = load %10 : u8i*, align 8
-                                        %293 = const 1 : s32i
-                                        %294 = ptr_stride %292, %293 : u8i*
-                                        store %294, %10, align 8
-                                        store %291, %292, align 1
-                                        yield
-                                    }
-                                    yield
-                                }
-                                %34 = const 0 : u8i
-                                %35 = const 0 : s64i
-                                %36 = load %7 : u8i*, align 8
-                                %37 = ptr_stride %36, %35 : u8i*
-                                store %34, %37, align 1
-                                %38 = const 0 : u8i
-                                %39 = const 0 : s64i
-                                %40 = load %8 : u8i*, align 8
-                                %41 = ptr_stride %40, %39 : u8i*
-                                store %38, %41, align 1
-                                %42 = load %5 : u8i*, align 8
-                                %43 = load %6 : u8i*, align 8
-                                %44 = const 8 : u64i
-                                %45 = const 8 : u64i
-                                %46 = const 8 : u64i
-                                %47 = mul %45, %46 : u64i
-                                %48 = add %44, %47 : u64i
-                                %49 = const 8 : u64i
-                                %50 = add %48, %49 : u64i
-                                %51 = const 0 : s32i
-                                call @test(%42, %43, %50, %51) [all]
-                                %52 = load %5 : u8i*, align 8
-                                %53 = load %6 : u8i*, align 8
-                                %54 = load %3 : u64i, align 8
-                                %55 = const 0 : s32i
-                                call @test(%52, %53, %54, %55) [all]
-                                %56 = const 97 : u8i
-                                %57 = const 0 : s64i
-                                %58 = load %7 : u8i*, align 8
-                                %59 = ptr_stride %58, %57 : u8i*
-                                store %56, %59, align 1
-                                %60 = const 0 : u8i
-                                %61 = const 1 : s64i
-                                %62 = load %7 : u8i*, align 8
-                                %63 = ptr_stride %62, %61 : u8i*
-                                store %60, %63, align 1
-                                %64 = const 0 : u8i
-                                %65 = const 0 : s64i
-                                %66 = load %8 : u8i*, align 8
-                                %67 = ptr_stride %66, %65 : u8i*
-                                store %64, %67, align 1
-                                %68 = load %5 : u8i*, align 8
-                                %69 = load %6 : u8i*, align 8
-                                %70 = const 8 : u64i
-                                %71 = const 8 : u64i
-                                %72 = const 8 : u64i
-                                %73 = mul %71, %72 : u64i
-                                %74 = add %70, %73 : u64i
-                                %75 = const 8 : u64i
-                                %76 = add %74, %75 : u64i
-                                %77 = const 1 : s32i
-                                call @test(%68, %69, %76, %77) [all]
-                                %78 = load %5 : u8i*, align 8
-                                %79 = load %6 : u8i*, align 8
-                                %80 = load %3 : u64i, align 8
-                                %81 = const 0 : s32i
-                                call @test(%78, %79, %80, %81) [all]
-                                %82 = const 0 : u8i
-                                %83 = const 0 : s64i
-                                %84 = load %7 : u8i*, align 8
-                                %85 = ptr_stride %84, %83 : u8i*
-                                store %82, %85, align 1
-                                %86 = const 97 : u8i
-                                %87 = const 0 : s64i
-                                %88 = load %8 : u8i*, align 8
-                                %89 = ptr_stride %88, %87 : u8i*
-                                store %86, %89, align 1
-                                %90 = const 0 : u8i
-                                %91 = const 1 : s64i
-                                %92 = load %8 : u8i*, align 8
-                                %93 = ptr_stride %92, %91 : u8i*
-                                store %90, %93, align 1
-                                %94 = load %5 : u8i*, align 8
-                                %95 = load %6 : u8i*, align 8
-                                %96 = const 8 : u64i
-                                %97 = const 8 : u64i
-                                %98 = const 8 : u64i
-                                %99 = mul %97, %98 : u64i
-                                %100 = add %96, %99 : u64i
-                                %101 = const 8 : u64i
-                                %102 = add %100, %101 : u64i
-                                %103 = const -1 : s32i
-                                call @test(%94, %95, %102, %103) [all]
-                                %104 = load %5 : u8i*, align 8
-                                %105 = load %6 : u8i*, align 8
-                                %106 = load %3 : u64i, align 8
-                                %107 = const 0 : s32i
-                                call @test(%104, %105, %106, %107) [all]
-                                %108 = const 98 : u8i
-                                %109 = const 0 : s64i
-                                %110 = load %7 : u8i*, align 8
-                                %111 = ptr_stride %110, %109 : u8i*
-                                store %108, %111, align 1
-                                %112 = const 0 : u8i
-                                %113 = const 1 : s64i
-                                %114 = load %7 : u8i*, align 8
-                                %115 = ptr_stride %114, %113 : u8i*
-                                store %112, %115, align 1
-                                %116 = const 99 : u8i
-                                %117 = const 0 : s64i
-                                %118 = load %8 : u8i*, align 8
-                                %119 = ptr_stride %118, %117 : u8i*
-                                store %116, %119, align 1
-                                %120 = const 0 : u8i
-                                %121 = const 1 : s64i
-                                %122 = load %8 : u8i*, align 8
-                                %123 = ptr_stride %122, %121 : u8i*
-                                store %120, %123, align 1
-                                %124 = load %5 : u8i*, align 8
-                                %125 = load %6 : u8i*, align 8
-                                %126 = const 8 : u64i
-                                %127 = const 8 : u64i
-                                %128 = const 8 : u64i
-                                %129 = mul %127, %128 : u64i
-                                %130 = add %126, %129 : u64i
-                                %131 = const 8 : u64i
-                                %132 = add %130, %131 : u64i
-                                %133 = const -1 : s32i
-                                call @test(%124, %125, %132, %133) [all]
-                                %134 = load %5 : u8i*, align 8
-                                %135 = load %6 : u8i*, align 8
-                                %136 = load %3 : u64i, align 8
-                                %137 = const 0 : s32i
-                                call @test(%134, %135, %136, %137) [all]
-                                %138 = const 99 : u8i
-                                %139 = const 0 : s64i
-                                %140 = load %7 : u8i*, align 8
-                                %141 = ptr_stride %140, %139 : u8i*
-                                store %138, %141, align 1
-                                %142 = const 0 : u8i
-                                %143 = const 1 : s64i
-                                %144 = load %7 : u8i*, align 8
-                                %145 = ptr_stride %144, %143 : u8i*
-                                store %142, %145, align 1
-                                %146 = const 98 : u8i
-                                %147 = const 0 : s64i
-                                %148 = load %8 : u8i*, align 8
-                                %149 = ptr_stride %148, %147 : u8i*
-                                store %146, %149, align 1
-                                %150 = const 0 : u8i
-                                %151 = const 1 : s64i
-                                %152 = load %8 : u8i*, align 8
-                                %153 = ptr_stride %152, %151 : u8i*
-                                store %150, %153, align 1
-                                %154 = load %5 : u8i*, align 8
-                                %155 = load %6 : u8i*, align 8
-                                %156 = const 8 : u64i
-                                %157 = const 8 : u64i
-                                %158 = const 8 : u64i
-                                %159 = mul %157, %158 : u64i
-                                %160 = add %156, %159 : u64i
-                                %161 = const 8 : u64i
-                                %162 = add %160, %161 : u64i
-                                %163 = const 1 : s32i
-                                call @test(%154, %155, %162, %163) [all]
-                                %164 = load %5 : u8i*, align 8
-                                %165 = load %6 : u8i*, align 8
-                                %166 = load %3 : u64i, align 8
-                                %167 = const 0 : s32i
-                                call @test(%164, %165, %166, %167) [all]
-                                %168 = const 98 : u8i
-                                %169 = const 0 : s64i
-                                %170 = load %7 : u8i*, align 8
-                                %171 = ptr_stride %170, %169 : u8i*
-                                store %168, %171, align 1
-                                %172 = const 0 : u8i
-                                %173 = const 1 : s64i
-                                %174 = load %7 : u8i*, align 8
-                                %175 = ptr_stride %174, %173 : u8i*
-                                store %172, %175, align 1
-                                %176 = const 169 : u8i
-                                %177 = const 0 : s64i
-                                %178 = load %8 : u8i*, align 8
-                                %179 = ptr_stride %178, %177 : u8i*
-                                store %176, %179, align 1
-                                %180 = const 0 : u8i
-                                %181 = const 1 : s64i
-                                %182 = load %8 : u8i*, align 8
-                                %183 = ptr_stride %182, %181 : u8i*
-                                store %180, %183, align 1
-                                %184 = load %5 : u8i*, align 8
-                                %185 = load %6 : u8i*, align 8
-                                %186 = const 8 : u64i
-                                %187 = const 8 : u64i
-                                %188 = const 8 : u64i
-                                %189 = mul %187, %188 : u64i
-                                %190 = add %186, %189 : u64i
-                                %191 = const 8 : u64i
-                                %192 = add %190, %191 : u64i
-                                %193 = const -1 : s32i
-                                call @test(%184, %185, %192, %193) [all]
-                                %194 = load %5 : u8i*, align 8
-                                %195 = load %6 : u8i*, align 8
-                                %196 = load %3 : u64i, align 8
-                                %197 = const 0 : s32i
-                                call @test(%194, %195, %196, %197) [all]
-                                %198 = const 169 : u8i
-                                %199 = const 0 : s64i
-                                %200 = load %7 : u8i*, align 8
-                                %201 = ptr_stride %200, %199 : u8i*
-                                store %198, %201, align 1
-                                %202 = const 0 : u8i
-                                %203 = const 1 : s64i
-                                %204 = load %7 : u8i*, align 8
-                                %205 = ptr_stride %204, %203 : u8i*
-                                store %202, %205, align 1
-                                %206 = const 98 : u8i
-                                %207 = const 0 : s64i
-                                %208 = load %8 : u8i*, align 8
-                                %209 = ptr_stride %208, %207 : u8i*
-                                store %206, %209, align 1
-                                %210 = const 0 : u8i
-                                %211 = const 1 : s64i
-                                %212 = load %8 : u8i*, align 8
-                                %213 = ptr_stride %212, %211 : u8i*
-                                store %210, %213, align 1
-                                %214 = load %5 : u8i*, align 8
-                                %215 = load %6 : u8i*, align 8
-                                %216 = const 8 : u64i
-                                %217 = const 8 : u64i
-                                %218 = const 8 : u64i
-                                %219 = mul %217, %218 : u64i
-                                %220 = add %216, %219 : u64i
-                                %221 = const 8 : u64i
-                                %222 = add %220, %221 : u64i
-                                %223 = const 1 : s32i
-                                call @test(%214, %215, %222, %223) [all]
-                                %224 = load %5 : u8i*, align 8
-                                %225 = load %6 : u8i*, align 8
-                                %226 = load %3 : u64i, align 8
-                                %227 = const 0 : s32i
-                                call @test(%224, %225, %226, %227) [all]
-                                %228 = const 169 : u8i
-                                %229 = const 0 : s64i
-                                %230 = load %7 : u8i*, align 8
-                                %231 = ptr_stride %230, %229 : u8i*
-                                store %228, %231, align 1
-                                %232 = const 0 : u8i
-                                %233 = const 1 : s64i
-                                %234 = load %7 : u8i*, align 8
-                                %235 = ptr_stride %234, %233 : u8i*
-                                store %232, %235, align 1
-                                %236 = const 170 : u8i
-                                %237 = const 0 : s64i
-                                %238 = load %8 : u8i*, align 8
-                                %239 = ptr_stride %238, %237 : u8i*
-                                store %236, %239, align 1
-                                %240 = const 0 : u8i
-                                %241 = const 1 : s64i
-                                %242 = load %8 : u8i*, align 8
-                                %243 = ptr_stride %242, %241 : u8i*
-                                store %240, %243, align 1
-                                %244 = load %5 : u8i*, align 8
-                                %245 = load %6 : u8i*, align 8
-                                %246 = const 8 : u64i
-                                %247 = const 8 : u64i
-                                %248 = const 8 : u64i
-                                %249 = mul %247, %248 : u64i
-                                %250 = add %246, %249 : u64i
-                                %251 = const 8 : u64i
-                                %252 = add %250, %251 : u64i
-                                %253 = const -1 : s32i
-                                call @test(%244, %245, %252, %253) [all]
-                                %254 = load %5 : u8i*, align 8
-                                %255 = load %6 : u8i*, align 8
-                                %256 = load %3 : u64i, align 8
-                                %257 = const 0 : s32i
-                                call @test(%254, %255, %256, %257) [all]
-                                %258 = const 170 : u8i
-                                %259 = const 0 : s64i
-                                %260 = load %7 : u8i*, align 8
-                                %261 = ptr_stride %260, %259 : u8i*
-                                store %258, %261, align 1
-                                %262 = const 0 : u8i
-                                %263 = const 1 : s64i
-                                %264 = load %7 : u8i*, align 8
-                                %265 = ptr_stride %264, %263 : u8i*
-                                store %262, %265, align 1
-                                %266 = const 169 : u8i
-                                %267 = const 0 : s64i
-                                %268 = load %8 : u8i*, align 8
-                                %269 = ptr_stride %268, %267 : u8i*
-                                store %266, %269, align 1
-                                %270 = const 0 : u8i
-                                %271 = const 1 : s64i
-                                %272 = load %8 : u8i*, align 8
-                                %273 = ptr_stride %272, %271 : u8i*
-                                store %270, %273, align 1
-                                %274 = load %5 : u8i*, align 8
-                                %275 = load %6 : u8i*, align 8
-                                %276 = const 8 : u64i
-                                %277 = const 8 : u64i
-                                %278 = const 8 : u64i
-                                %279 = mul %277, %278 : u64i
-                                %280 = add %276, %279 : u64i
-                                %281 = const 8 : u64i
-                                %282 = add %280, %281 : u64i
-                                %283 = const 1 : s32i
-                                call @test(%274, %275, %282, %283) [all]
-                                %284 = load %5 : u8i*, align 8
-                                %285 = load %6 : u8i*, align 8
-                                %286 = load %3 : u64i, align 8
-                                %287 = const 0 : s32i
-                                call @test(%284, %285, %286, %287) [all]
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %12 = get_global @exit : ((s32i) -> void)*
-    %13 = const 0 : s32i
-    call @exit(%13) [all]
-    %14 = load %0 : s32i
-    return %14
+        %12 = get_global @exit : (s32i) -> void*
+        %13 = const 0 : s32i
+        call @exit(%13) [all]
+        %14 = load %0 : s32i
+        return %14
 }

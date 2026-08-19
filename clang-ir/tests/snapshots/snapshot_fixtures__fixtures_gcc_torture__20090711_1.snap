@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20090711-1.c" (c, x86_64-unknown-linux-gnu)
@@ -10,36 +10,36 @@ fn div(%arg0: s64i) -> s64i [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %13
         %15 = load %13 : s64i, align 8
         %16 = const 32768 : s64i
-        %17 = div %15, %16 : s64i
+        div
         store %17, %14
         %18 = load %14 : s64i
         return %18
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s64i, "d1", align 8
-    %2 = alloca s64i, "d2", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const -990000000 : s64i
-    store %4, %1, align 8
-    %5 = load %1 : s64i, align 8
-    %6 = call @div(%5) : s64i [all]
-    store %6, %2, align 8
-    scope {
-        %9 = load %2 : s64i, align 8
-        %10 = const -30212 : s64i
-        %11 = cmp ne %9, %10 : bool
-        if %11 {
-            %12 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s64i, "d1", align 8
+        %2 = alloca s64i, "d2", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const -990000000 : s64i
+        store %4, %1, align 8
+        %5 = load %1 : s64i, align 8
+        %6 = call @div(%5) : s64i [all]
+        store %6, %2, align 8
+        scope {
+                %9 = load %2 : s64i, align 8
+                %10 = const -30212 : s64i
+                cmp
+                if %11 {
+                        %12 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = load %0 : s32i
-    return %8
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = load %0 : s32i
+        return %8
 }

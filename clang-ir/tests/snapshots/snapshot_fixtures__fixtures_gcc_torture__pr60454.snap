@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr60454.c" (c, x86_64-unknown-linux-gnu)
@@ -10,68 +10,68 @@ fn fake_swap32(%arg0: u32i) -> u32i [external, c, no_inline, dso_local, nothrow]
         store %arg0, %16
         %18 = load %16 : u32i, align 4
         %19 = const 255 : u32i
-        %20 = and %18, %19 : u32i
+        and
         %21 = const 24 : s32i
-        %22 = shift left %20, %21 : u32i
+        shift
         %23 = load %16 : u32i, align 4
         %24 = const 65280 : u32i
-        %25 = and %23, %24 : u32i
+        and
         %26 = const 8 : s32i
-        %27 = shift left %25, %26 : u32i
-        %28 = or %22, %27 : u32i
+        shift
+        or
         %29 = load %16 : u32i, align 4
         %30 = const 255 : u32i
-        %31 = and %29, %30 : u32i
+        and
         %32 = const 8 : s32i
-        %33 = shift left %31, %32 : u32i
-        %34 = or %28, %33 : u32i
+        shift
+        or
         %35 = load %16 : u32i, align 4
         %36 = const 65280 : u32i
-        %37 = and %35, %36 : u32i
-        %38 = or %34, %37 : u32i
+        and
+        or
         %39 = load %16 : u32i, align 4
         %40 = const 4278190080 : u32i
-        %41 = and %39, %40 : u32i
+        and
         %42 = const 24 : s32i
-        %43 = shift right %41, %42 : u32i
-        %44 = or %38, %43 : u32i
+        shift
+        or
         store %44, %17
         %45 = load %17 : u32i
         return %45
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %9 = const 4 : u64i
-        %10 = const 8 : u64i
-        %11 = mul %9, %10 : u64i
-        %12 = const 32 : u64i
-        %13 = cmp ne %11, %12 : bool
-        if %13 {
-            %14 = const 0 : s32i
-            store %14, %0
-            %15 = load %0 : s32i
-            return %15
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %9 = const 4 : u64i
+                %10 = const 8 : u64i
+                mul
+                %12 = const 32 : u64i
+                cmp
+                if %13 {
+                        %14 = const 0 : s32i
+                        store %14, %0
+                        %15 = load %0 : s32i
+                        return %15
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %4 = const 305419896 : u32i
-        %5 = call @fake_swap32(%4) : u32i [all]
-        %6 = cast(integral) %5 : u64i
-        %7 = const 2018934290 : u64i
-        %8 = cmp ne %6, %7 : bool
-        if %8 {
-            call @abort() [all]
-            yield
+        scope {
+                %4 = const 305419896 : u32i
+                %5 = call @fake_swap32(%4) : u32i [all]
+                %6 = cast(integral) %5 : u64i
+                %7 = const 2018934290 : u64i
+                cmp
+                if %8 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

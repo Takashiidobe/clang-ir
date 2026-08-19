@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr63302.c" (c, x86_64-unknown-linux-gnu)
@@ -12,24 +12,24 @@ fn foo(%arg1: s128i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %165 = load %162 : s128i, align 16
         %166 = const -1 : s128i
         %167 = const 63 : s32i
-        %168 = shift left %166, %167 : s128i
+        shift
         %169 = const 2047 : s128i
-        %170 = or %168, %169 : s128i
-        %171 = and %165, %170 : s128i
+        or
+        and
         store %171, %164, align 16
         %172 = load %164 : s128i, align 16
         %173 = const 0 : s128i
-        %174 = cmp eq %172, %173 : bool
+        cmp
         %175 = ternary %174 ? { : bool
-            %183 = const true : bool
-            yield %183
+                %183 = const true : bool
+                yield %183
         } : {
-            %178 = load %164 : s128i, align 16
-            %179 = const -1 : s128i
-            %180 = const 63 : s32i
-            %181 = shift left %179, %180 : s128i
-            %182 = cmp eq %178, %181 : bool
-            yield %182
+                %178 = load %164 : s128i, align 16
+                %179 = const -1 : s128i
+                %180 = const 63 : s32i
+                shift
+                cmp
+                yield %182
         }
         %176 = cast(bool_to_int) %175 : s32i
         store %176, %163
@@ -45,24 +45,24 @@ fn bar(%arg0: s64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %143 = load %140 : s64i, align 8
         %144 = const -1 : s64i
         %145 = const 31 : s32i
-        %146 = shift left %144, %145 : s64i
+        shift
         %147 = const 2047 : s64i
-        %148 = or %146, %147 : s64i
-        %149 = and %143, %148 : s64i
+        or
+        and
         store %149, %142, align 8
         %150 = load %142 : s64i, align 8
         %151 = const 0 : s64i
-        %152 = cmp eq %150, %151 : bool
+        cmp
         %153 = ternary %152 ? { : bool
-            %161 = const true : bool
-            yield %161
+                %161 = const true : bool
+                yield %161
         } : {
-            %156 = load %142 : s64i, align 8
-            %157 = const -1 : s64i
-            %158 = const 31 : s32i
-            %159 = shift left %157, %158 : s64i
-            %160 = cmp eq %156, %159 : bool
-            yield %160
+                %156 = load %142 : s64i, align 8
+                %157 = const -1 : s64i
+                %158 = const 31 : s32i
+                shift
+                cmp
+                yield %160
         }
         %154 = cast(bool_to_int) %153 : s32i
         store %154, %141
@@ -71,225 +71,225 @@ fn bar(%arg0: s64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %72 = const 0 : s128i
-        %73 = call @foo(%72) : s32i [all]
-        %74 = const 1 : s32i
-        %75 = cmp ne %73, %74 : bool
-        %76 = ternary %75 ? { : bool
-            %139 = const true : bool
-            yield %139
-        } : {
-            %135 = const 1 : s128i
-            %136 = call @foo(%135) : s32i [all]
-            %137 = const 0 : s32i
-            %138 = cmp ne %136, %137 : bool
-            yield %138
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %72 = const 0 : s128i
+                %73 = call @foo(%72) : s32i [all]
+                %74 = const 1 : s32i
+                cmp
+                %76 = ternary %75 ? { : bool
+                        %139 = const true : bool
+                        yield %139
+                } : {
+                        %135 = const 1 : s128i
+                        %136 = call @foo(%135) : s32i [all]
+                        %137 = const 0 : s32i
+                        cmp
+                        yield %138
+                }
+                %77 = ternary %76 ? { : bool
+                        %134 = const true : bool
+                        yield %134
+                } : {
+                        %130 = const 2048 : s128i
+                        %131 = call @foo(%130) : s32i [all]
+                        %132 = const 1 : s32i
+                        cmp
+                        yield %133
+                }
+                %78 = ternary %77 ? { : bool
+                        %129 = const true : bool
+                        yield %129
+                } : {
+                        %125 = const 2049 : s128i
+                        %126 = call @foo(%125) : s32i [all]
+                        %127 = const 0 : s32i
+                        cmp
+                        yield %128
+                }
+                %79 = ternary %78 ? { : bool
+                        %124 = const true : bool
+                        yield %124
+                } : {
+                        %118 = const 1 : s128i
+                        %119 = const 63 : s32i
+                        shift
+                        %121 = call @foo(%120) : s32i [all]
+                        %122 = const 0 : s32i
+                        cmp
+                        yield %123
+                }
+                %80 = ternary %79 ? { : bool
+                        %117 = const true : bool
+                        yield %117
+                } : {
+                        %111 = const -1 : s128i
+                        %112 = const 63 : s32i
+                        shift
+                        %114 = call @foo(%113) : s32i [all]
+                        %115 = const 1 : s32i
+                        cmp
+                        yield %116
+                }
+                %81 = ternary %80 ? { : bool
+                        %110 = const true : bool
+                        yield %110
+                } : {
+                        %102 = const -1 : s128i
+                        %103 = const 63 : s32i
+                        shift
+                        %105 = const 1 : s128i
+                        or
+                        %107 = call @foo(%106) : s32i [all]
+                        %108 = const 0 : s32i
+                        cmp
+                        yield %109
+                }
+                %82 = ternary %81 ? { : bool
+                        %101 = const true : bool
+                        yield %101
+                } : {
+                        %93 = const -1 : s128i
+                        %94 = const 63 : s32i
+                        shift
+                        %96 = const 2048 : s128i
+                        or
+                        %98 = call @foo(%97) : s32i [all]
+                        %99 = const 1 : s32i
+                        cmp
+                        yield %100
+                }
+                %83 = ternary %82 ? { : bool
+                        %92 = const true : bool
+                        yield %92
+                } : {
+                        %84 = const -1 : s128i
+                        %85 = const 63 : s32i
+                        shift
+                        %87 = const 2049 : s128i
+                        or
+                        %89 = call @foo(%88) : s32i [all]
+                        %90 = const 0 : s32i
+                        cmp
+                        yield %91
+                }
+                if %83 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        %77 = ternary %76 ? { : bool
-            %134 = const true : bool
-            yield %134
-        } : {
-            %130 = const 2048 : s128i
-            %131 = call @foo(%130) : s32i [all]
-            %132 = const 1 : s32i
-            %133 = cmp ne %131, %132 : bool
-            yield %133
+        scope {
+                %4 = const 0 : s64i
+                %5 = call @bar(%4) : s32i [all]
+                %6 = const 1 : s32i
+                cmp
+                %8 = ternary %7 ? { : bool
+                        %71 = const true : bool
+                        yield %71
+                } : {
+                        %67 = const 1 : s64i
+                        %68 = call @bar(%67) : s32i [all]
+                        %69 = const 0 : s32i
+                        cmp
+                        yield %70
+                }
+                %9 = ternary %8 ? { : bool
+                        %66 = const true : bool
+                        yield %66
+                } : {
+                        %62 = const 2048 : s64i
+                        %63 = call @bar(%62) : s32i [all]
+                        %64 = const 1 : s32i
+                        cmp
+                        yield %65
+                }
+                %10 = ternary %9 ? { : bool
+                        %61 = const true : bool
+                        yield %61
+                } : {
+                        %57 = const 2049 : s64i
+                        %58 = call @bar(%57) : s32i [all]
+                        %59 = const 0 : s32i
+                        cmp
+                        yield %60
+                }
+                %11 = ternary %10 ? { : bool
+                        %56 = const true : bool
+                        yield %56
+                } : {
+                        %50 = const 1 : s64i
+                        %51 = const 31 : s32i
+                        shift
+                        %53 = call @bar(%52) : s32i [all]
+                        %54 = const 0 : s32i
+                        cmp
+                        yield %55
+                }
+                %12 = ternary %11 ? { : bool
+                        %49 = const true : bool
+                        yield %49
+                } : {
+                        %43 = const -1 : s64i
+                        %44 = const 31 : s32i
+                        shift
+                        %46 = call @bar(%45) : s32i [all]
+                        %47 = const 1 : s32i
+                        cmp
+                        yield %48
+                }
+                %13 = ternary %12 ? { : bool
+                        %42 = const true : bool
+                        yield %42
+                } : {
+                        %34 = const -1 : s64i
+                        %35 = const 31 : s32i
+                        shift
+                        %37 = const 1 : s64i
+                        or
+                        %39 = call @bar(%38) : s32i [all]
+                        %40 = const 0 : s32i
+                        cmp
+                        yield %41
+                }
+                %14 = ternary %13 ? { : bool
+                        %33 = const true : bool
+                        yield %33
+                } : {
+                        %25 = const -1 : s64i
+                        %26 = const 31 : s32i
+                        shift
+                        %28 = const 2048 : s64i
+                        or
+                        %30 = call @bar(%29) : s32i [all]
+                        %31 = const 1 : s32i
+                        cmp
+                        yield %32
+                }
+                %15 = ternary %14 ? { : bool
+                        %24 = const true : bool
+                        yield %24
+                } : {
+                        %16 = const -1 : s64i
+                        %17 = const 31 : s32i
+                        shift
+                        %19 = const 2049 : s64i
+                        or
+                        %21 = call @bar(%20) : s32i [all]
+                        %22 = const 0 : s32i
+                        cmp
+                        yield %23
+                }
+                if %15 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        %78 = ternary %77 ? { : bool
-            %129 = const true : bool
-            yield %129
-        } : {
-            %125 = const 2049 : s128i
-            %126 = call @foo(%125) : s32i [all]
-            %127 = const 0 : s32i
-            %128 = cmp ne %126, %127 : bool
-            yield %128
-        }
-        %79 = ternary %78 ? { : bool
-            %124 = const true : bool
-            yield %124
-        } : {
-            %118 = const 1 : s128i
-            %119 = const 63 : s32i
-            %120 = shift left %118, %119 : s128i
-            %121 = call @foo(%120) : s32i [all]
-            %122 = const 0 : s32i
-            %123 = cmp ne %121, %122 : bool
-            yield %123
-        }
-        %80 = ternary %79 ? { : bool
-            %117 = const true : bool
-            yield %117
-        } : {
-            %111 = const -1 : s128i
-            %112 = const 63 : s32i
-            %113 = shift left %111, %112 : s128i
-            %114 = call @foo(%113) : s32i [all]
-            %115 = const 1 : s32i
-            %116 = cmp ne %114, %115 : bool
-            yield %116
-        }
-        %81 = ternary %80 ? { : bool
-            %110 = const true : bool
-            yield %110
-        } : {
-            %102 = const -1 : s128i
-            %103 = const 63 : s32i
-            %104 = shift left %102, %103 : s128i
-            %105 = const 1 : s128i
-            %106 = or %104, %105 : s128i
-            %107 = call @foo(%106) : s32i [all]
-            %108 = const 0 : s32i
-            %109 = cmp ne %107, %108 : bool
-            yield %109
-        }
-        %82 = ternary %81 ? { : bool
-            %101 = const true : bool
-            yield %101
-        } : {
-            %93 = const -1 : s128i
-            %94 = const 63 : s32i
-            %95 = shift left %93, %94 : s128i
-            %96 = const 2048 : s128i
-            %97 = or %95, %96 : s128i
-            %98 = call @foo(%97) : s32i [all]
-            %99 = const 1 : s32i
-            %100 = cmp ne %98, %99 : bool
-            yield %100
-        }
-        %83 = ternary %82 ? { : bool
-            %92 = const true : bool
-            yield %92
-        } : {
-            %84 = const -1 : s128i
-            %85 = const 63 : s32i
-            %86 = shift left %84, %85 : s128i
-            %87 = const 2049 : s128i
-            %88 = or %86, %87 : s128i
-            %89 = call @foo(%88) : s32i [all]
-            %90 = const 0 : s32i
-            %91 = cmp ne %89, %90 : bool
-            yield %91
-        }
-        if %83 {
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    scope {
-        %4 = const 0 : s64i
-        %5 = call @bar(%4) : s32i [all]
-        %6 = const 1 : s32i
-        %7 = cmp ne %5, %6 : bool
-        %8 = ternary %7 ? { : bool
-            %71 = const true : bool
-            yield %71
-        } : {
-            %67 = const 1 : s64i
-            %68 = call @bar(%67) : s32i [all]
-            %69 = const 0 : s32i
-            %70 = cmp ne %68, %69 : bool
-            yield %70
-        }
-        %9 = ternary %8 ? { : bool
-            %66 = const true : bool
-            yield %66
-        } : {
-            %62 = const 2048 : s64i
-            %63 = call @bar(%62) : s32i [all]
-            %64 = const 1 : s32i
-            %65 = cmp ne %63, %64 : bool
-            yield %65
-        }
-        %10 = ternary %9 ? { : bool
-            %61 = const true : bool
-            yield %61
-        } : {
-            %57 = const 2049 : s64i
-            %58 = call @bar(%57) : s32i [all]
-            %59 = const 0 : s32i
-            %60 = cmp ne %58, %59 : bool
-            yield %60
-        }
-        %11 = ternary %10 ? { : bool
-            %56 = const true : bool
-            yield %56
-        } : {
-            %50 = const 1 : s64i
-            %51 = const 31 : s32i
-            %52 = shift left %50, %51 : s64i
-            %53 = call @bar(%52) : s32i [all]
-            %54 = const 0 : s32i
-            %55 = cmp ne %53, %54 : bool
-            yield %55
-        }
-        %12 = ternary %11 ? { : bool
-            %49 = const true : bool
-            yield %49
-        } : {
-            %43 = const -1 : s64i
-            %44 = const 31 : s32i
-            %45 = shift left %43, %44 : s64i
-            %46 = call @bar(%45) : s32i [all]
-            %47 = const 1 : s32i
-            %48 = cmp ne %46, %47 : bool
-            yield %48
-        }
-        %13 = ternary %12 ? { : bool
-            %42 = const true : bool
-            yield %42
-        } : {
-            %34 = const -1 : s64i
-            %35 = const 31 : s32i
-            %36 = shift left %34, %35 : s64i
-            %37 = const 1 : s64i
-            %38 = or %36, %37 : s64i
-            %39 = call @bar(%38) : s32i [all]
-            %40 = const 0 : s32i
-            %41 = cmp ne %39, %40 : bool
-            yield %41
-        }
-        %14 = ternary %13 ? { : bool
-            %33 = const true : bool
-            yield %33
-        } : {
-            %25 = const -1 : s64i
-            %26 = const 31 : s32i
-            %27 = shift left %25, %26 : s64i
-            %28 = const 2048 : s64i
-            %29 = or %27, %28 : s64i
-            %30 = call @bar(%29) : s32i [all]
-            %31 = const 1 : s32i
-            %32 = cmp ne %30, %31 : bool
-            yield %32
-        }
-        %15 = ternary %14 ? { : bool
-            %24 = const true : bool
-            yield %24
-        } : {
-            %16 = const -1 : s64i
-            %17 = const 31 : s32i
-            %18 = shift left %16, %17 : s64i
-            %19 = const 2049 : s64i
-            %20 = or %18, %19 : s64i
-            %21 = call @bar(%20) : s32i [all]
-            %22 = const 0 : s32i
-            %23 = cmp ne %21, %22 : bool
-            yield %23
-        }
-        if %15 {
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

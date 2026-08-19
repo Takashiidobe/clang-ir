@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20010129-1.c" (c, x86_64-unknown-linux-gnu)
-global bar : void** = #cir.ptr<null> [external, default, align 8, dso_local]
-global baz1.l : s64i = 0 [internal, default, align 8, dso_local]
+global bar : void** = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Pointer { pointee: Named("void"), addr_space: None }, addr_space: None }) } [external, default, align 8, dso_local]
+global baz1.l : s64i = CirInt { ty: Named("s64i"), value: "0" } [internal, default, align 8, dso_local]
 
 fn baz1(%arg5: void*) -> s64i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg5: void*):
@@ -13,7 +13,7 @@ fn baz1(%arg5: void*) -> s64i [external, c, no_inline, dso_local, nothrow] {
         store %arg5, %148
         %150 = get_global @baz1.l : s64i*
         %151 = load %150 : s64i, align 8
-        %152 = inc %151 : s64i [nsw]
+        inc
         store %152, %150, align 8
         store %151, %149
         %153 = load %149 : s64i
@@ -36,15 +36,15 @@ fn baz3(%arg3: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %137 = alloca s32i, "__retval", align 4
         store %arg3, %136
         scope {
-            %140 = load %136 : s32i, align 4
-            %141 = cast(int_to_bool) %140 : bool
-            %142 = not %141 : bool
-            if %142 {
-                %143 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %140 = load %136 : s32i, align 4
+                %141 = cast(int_to_bool) %140 : bool
+                not
+                if %142 {
+                        %143 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %138 = const 1 : s32i
         store %138, %137
@@ -72,231 +72,231 @@ fn foo(%arg0: void*, %arg1: s64i, %arg2: s32i) -> s32i [external, c, no_inline, 
         store %23, %18, align 4
         %24 = const 10 : s8i
         %25 = const 0 : s64i
-        %26 = get_element %20[%25] : s8i*
+        get_element
         store %24, %26, align 16
         %27 = const 0 : s8i
         %28 = const 1 : s64i
-        %29 = get_element %20[%28] : s8i*
+        get_element
         store %27, %29, align 1
         scope {
-            while {
-                %132 = load %12 : void*, align 8
-                %133 = call @baz1(%132) : s64i [all]
-                %134 = load %13 : s64i, align 8
-                %135 = cmp lt %133, %134 : bool
-                condition %135
-            } do {
-                scope {
-                    scope {
-                        %32 = const 0 : s64i
-                        %33 = get_element %20[%32] : s8i*
-                        %34 = load %33 : s8i, align 16
-                        %35 = cast(integral) %34 : s32i
-                        %36 = const 32 : s32i
-                        %37 = cmp ne %35, %36 : bool
-                        %38 = ternary %37 ? { : bool
-                            %126 = const 0 : s64i
-                            %127 = get_element %20[%126] : s8i*
-                            %128 = load %127 : s8i, align 16
-                            %129 = cast(integral) %128 : s32i
-                            %130 = const 9 : s32i
-                            %131 = cmp ne %129, %130 : bool
-                            yield %131
-                        } : {
-                            %125 = const false : bool
-                            yield %125
-                        }
-                        if %38 {
-                            %39 = const 1 : s32i
-                            store %39, %18, align 4
-                            %40 = const 0 : s32i
-                            store %40, %17, align 4
-                            scope {
-                                %110 = load %16 : s32i, align 4
-                                %111 = cast(int_to_bool) %110 : bool
-                                %112 = not %111 : bool
-                                %113 = ternary %112 ? { : bool
-                                    %121 = cast(array_to_ptrdecay) %20 : s8i*
-                                    %122 = call @baz2(%121) : s32i [all]
-                                    %123 = const 0 : s32i
-                                    %124 = cmp eq %122, %123 : bool
-                                    yield %124
-                                } : {
-                                    %120 = const false : bool
-                                    yield %120
-                                }
-                                if %113 {
-                                    scope {
-                                        %115 = load %14 : s32i, align 4
-                                        %116 = const 16 : s32i
-                                        %117 = and %115, %116 : s32i
-                                        %118 = const 0 : s32i
-                                        %119 = cmp eq %117, %118 : bool
-                                        if %119 {
-                                            continue
+                while {
+                        %132 = load %12 : void*, align 8
+                        %133 = call @baz1(%132) : s64i [all]
+                        %134 = load %13 : s64i, align 8
+                        cmp
+                        condition %135
+                } do {
+                        scope {
+                                scope {
+                                        %32 = const 0 : s64i
+                                        get_element
+                                        %34 = load %33 : s8i, align 16
+                                        %35 = cast(integral) %34 : s32i
+                                        %36 = const 32 : s32i
+                                        cmp
+                                        %38 = ternary %37 ? { : bool
+                                                %126 = const 0 : s64i
+                                                get_element
+                                                %128 = load %127 : s8i, align 16
+                                                %129 = cast(integral) %128 : s32i
+                                                %130 = const 9 : s32i
+                                                cmp
+                                                yield %131
+                                        } : {
+                                                %125 = const false : bool
+                                                yield %125
                                         }
-                                        yield
-                                    }
-                                    %114 = const 1 : s32i
-                                    store %114, %16, align 4
-                                    store %114, %17, align 4
-                                    yield
-                                }
-                                yield
-                            }
-                            scope {
-                                %89 = load %14 : s32i, align 4
-                                %90 = const 16 : s32i
-                                %91 = and %89, %90 : s32i
-                                %92 = cast(int_to_bool) %91 : bool
-                                %93 = ternary %92 ? { : bool
-                                    %106 = load %14 : s32i, align 4
-                                    %107 = const 16384 : s32i
-                                    %108 = and %106, %107 : s32i
-                                    %109 = cast(int_to_bool) %108 : bool
-                                    yield %109
-                                } : {
-                                    %105 = const false : bool
-                                    yield %105
-                                }
-                                %94 = ternary %93 ? { : bool
-                                    %103 = load %17 : s32i, align 4
-                                    %104 = cast(int_to_bool) %103 : bool
-                                    yield %104
-                                } : {
-                                    %102 = const false : bool
-                                    yield %102
-                                }
-                                %95 = not %94 : bool
-                                %96 = ternary %95 ? { : bool
-                                    %98 = load %14 : s32i, align 4
-                                    %99 = const 2 : s32i
-                                    %100 = and %98, %99 : s32i
-                                    %101 = cast(int_to_bool) %100 : bool
-                                    yield %101
-                                } : {
-                                    %97 = const false : bool
-                                    yield %97
-                                }
-                                if %96 {
-                                    continue
-                                }
-                                yield
-                            }
-                            scope {
-                                %79 = load %14 : s32i, align 4
-                                %80 = const 8192 : s32i
-                                %81 = and %79, %80 : s32i
-                                %82 = cast(int_to_bool) %81 : bool
-                                %83 = ternary %82 ? { : bool
-                                    %85 = cast(array_to_ptrdecay) %20 : s8i*
-                                    %86 = call @baz2(%85) : s32i [all]
-                                    %87 = const 0 : s32i
-                                    %88 = cmp eq %86, %87 : bool
-                                    yield %88
-                                } : {
-                                    %84 = const false : bool
-                                    yield %84
-                                }
-                                if %83 {
-                                    continue
-                                }
-                                yield
-                            }
-                            scope {
-                                %69 = load %14 : s32i, align 4
-                                %70 = const 5128 : s32i
-                                %71 = and %69, %70 : s32i
-                                %72 = cast(int_to_bool) %71 : bool
-                                %73 = ternary %72 ? { : bool
-                                    %75 = cast(array_to_ptrdecay) %20 : s8i*
-                                    %76 = call @baz2(%75) : s32i [all]
-                                    %77 = const 0 : s32i
-                                    %78 = cmp eq %76, %77 : bool
-                                    yield %78
-                                } : {
-                                    %74 = const false : bool
-                                    yield %74
-                                }
-                                if %73 {
-                                    continue
-                                }
-                                yield
-                            }
-                            scope {
-                                %59 = load %14 : s32i, align 4
-                                %60 = const 512 : s32i
-                                %61 = and %59, %60 : s32i
-                                %62 = cast(int_to_bool) %61 : bool
-                                %63 = ternary %62 ? { : bool
-                                    %65 = cast(array_to_ptrdecay) %20 : s8i*
-                                    %66 = call @baz2(%65) : s32i [all]
-                                    %67 = const 0 : s32i
-                                    %68 = cmp eq %66, %67 : bool
-                                    yield %68
-                                } : {
-                                    %64 = const false : bool
-                                    yield %64
-                                }
-                                if %63 {
-                                    continue
-                                }
-                                yield
-                            }
-                            scope {
-                                %42 = load %14 : s32i, align 4
-                                %43 = const 128 : s32i
-                                %44 = and %42, %43 : s32i
-                                %45 = cast(int_to_bool) %44 : bool
-                                if %45 {
-                                    scope {
-                                        %46 = get_global @bar : void***
-                                        %47 = load %46 : void**, align 8
-                                        store %47, %21, align 8
-                                        %48 = const 0 : s32i
-                                        store %48, %19, align 4
-                                        for cond: {
-                                            %57 = load %21 : void**, align 8
-                                            %58 = cast(ptr_to_bool) %57 : bool
-                                            condition %58
-                                        } step: {
-                                            %49 = load %21 : void**, align 8
-                                            %50 = load %49 : void*, align 8
-                                            %51 = cast(bitcast) %50 : void**
-                                            store %51, %21, align 8
-                                            %52 = load %19 : s32i, align 4
-                                            %53 = inc %52 : s32i [nsw]
-                                            store %53, %19, align 4
-                                            yield
-                                        } do {
-                                            scope {
-                                                %54 = load %19 : s32i, align 4
-                                                %55 = call @baz3(%54) : s32i [all]
-                                                %56 = cast(int_to_bool) %55 : bool
-                                                if %56 {
-                                                    break
+                                        if %38 {
+                                                %39 = const 1 : s32i
+                                                store %39, %18, align 4
+                                                %40 = const 0 : s32i
+                                                store %40, %17, align 4
+                                                scope {
+                                                        %110 = load %16 : s32i, align 4
+                                                        %111 = cast(int_to_bool) %110 : bool
+                                                        not
+                                                        %113 = ternary %112 ? { : bool
+                                                                %121 = cast(array_to_ptrdecay) %20 : s8i*
+                                                                %122 = call @baz2(%121) : s32i [all]
+                                                                %123 = const 0 : s32i
+                                                                cmp
+                                                                yield %124
+                                                        } : {
+                                                                %120 = const false : bool
+                                                                yield %120
+                                                        }
+                                                        if %113 {
+                                                                scope {
+                                                                        %115 = load %14 : s32i, align 4
+                                                                        %116 = const 16 : s32i
+                                                                        and
+                                                                        %118 = const 0 : s32i
+                                                                        cmp
+                                                                        if %119 {
+                                                                                continue
+                                                                        }
+                                                                        yield
+                                                                }
+                                                                %114 = const 1 : s32i
+                                                                store %114, %16, align 4
+                                                                store %114, %17, align 4
+                                                                yield
+                                                        }
+                                                        yield
                                                 }
+                                                scope {
+                                                        %89 = load %14 : s32i, align 4
+                                                        %90 = const 16 : s32i
+                                                        and
+                                                        %92 = cast(int_to_bool) %91 : bool
+                                                        %93 = ternary %92 ? { : bool
+                                                                %106 = load %14 : s32i, align 4
+                                                                %107 = const 16384 : s32i
+                                                                and
+                                                                %109 = cast(int_to_bool) %108 : bool
+                                                                yield %109
+                                                        } : {
+                                                                %105 = const false : bool
+                                                                yield %105
+                                                        }
+                                                        %94 = ternary %93 ? { : bool
+                                                                %103 = load %17 : s32i, align 4
+                                                                %104 = cast(int_to_bool) %103 : bool
+                                                                yield %104
+                                                        } : {
+                                                                %102 = const false : bool
+                                                                yield %102
+                                                        }
+                                                        not
+                                                        %96 = ternary %95 ? { : bool
+                                                                %98 = load %14 : s32i, align 4
+                                                                %99 = const 2 : s32i
+                                                                and
+                                                                %101 = cast(int_to_bool) %100 : bool
+                                                                yield %101
+                                                        } : {
+                                                                %97 = const false : bool
+                                                                yield %97
+                                                        }
+                                                        if %96 {
+                                                                continue
+                                                        }
+                                                        yield
+                                                }
+                                                scope {
+                                                        %79 = load %14 : s32i, align 4
+                                                        %80 = const 8192 : s32i
+                                                        and
+                                                        %82 = cast(int_to_bool) %81 : bool
+                                                        %83 = ternary %82 ? { : bool
+                                                                %85 = cast(array_to_ptrdecay) %20 : s8i*
+                                                                %86 = call @baz2(%85) : s32i [all]
+                                                                %87 = const 0 : s32i
+                                                                cmp
+                                                                yield %88
+                                                        } : {
+                                                                %84 = const false : bool
+                                                                yield %84
+                                                        }
+                                                        if %83 {
+                                                                continue
+                                                        }
+                                                        yield
+                                                }
+                                                scope {
+                                                        %69 = load %14 : s32i, align 4
+                                                        %70 = const 5128 : s32i
+                                                        and
+                                                        %72 = cast(int_to_bool) %71 : bool
+                                                        %73 = ternary %72 ? { : bool
+                                                                %75 = cast(array_to_ptrdecay) %20 : s8i*
+                                                                %76 = call @baz2(%75) : s32i [all]
+                                                                %77 = const 0 : s32i
+                                                                cmp
+                                                                yield %78
+                                                        } : {
+                                                                %74 = const false : bool
+                                                                yield %74
+                                                        }
+                                                        if %73 {
+                                                                continue
+                                                        }
+                                                        yield
+                                                }
+                                                scope {
+                                                        %59 = load %14 : s32i, align 4
+                                                        %60 = const 512 : s32i
+                                                        and
+                                                        %62 = cast(int_to_bool) %61 : bool
+                                                        %63 = ternary %62 ? { : bool
+                                                                %65 = cast(array_to_ptrdecay) %20 : s8i*
+                                                                %66 = call @baz2(%65) : s32i [all]
+                                                                %67 = const 0 : s32i
+                                                                cmp
+                                                                yield %68
+                                                        } : {
+                                                                %64 = const false : bool
+                                                                yield %64
+                                                        }
+                                                        if %63 {
+                                                                continue
+                                                        }
+                                                        yield
+                                                }
+                                                scope {
+                                                        %42 = load %14 : s32i, align 4
+                                                        %43 = const 128 : s32i
+                                                        and
+                                                        %45 = cast(int_to_bool) %44 : bool
+                                                        if %45 {
+                                                                scope {
+                                                                        %46 = get_global @bar : void***
+                                                                        %47 = load %46 : void**, align 8
+                                                                        store %47, %21, align 8
+                                                                        %48 = const 0 : s32i
+                                                                        store %48, %19, align 4
+                                                                        for cond {
+                                                                                %57 = load %21 : void**, align 8
+                                                                                %58 = cast(ptr_to_bool) %57 : bool
+                                                                                condition %58
+                                                                        } step {
+                                                                                %49 = load %21 : void**, align 8
+                                                                                %50 = load %49 : void*, align 8
+                                                                                %51 = cast(bitcast) %50 : void**
+                                                                                store %51, %21, align 8
+                                                                                %52 = load %19 : s32i, align 4
+                                                                                inc
+                                                                                store %53, %19, align 4
+                                                                                yield
+                                                                        } body {
+                                                                                scope {
+                                                                                        %54 = load %19 : s32i, align 4
+                                                                                        %55 = call @baz3(%54) : s32i [all]
+                                                                                        %56 = cast(int_to_bool) %55 : bool
+                                                                                        if %56 {
+                                                                                                break
+                                                                                        }
+                                                                                        yield
+                                                                                }
+                                                                                yield
+                                                                        }
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                %41 = const 0 : s32i
+                                                store %41, %18, align 4
                                                 yield
-                                            }
-                                            yield
                                         }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            %41 = const 0 : s32i
-                            store %41, %18, align 4
-                            yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         %30 = const 0 : s32i
         store %30, %15
@@ -305,21 +305,21 @@ fn foo(%arg0: void*, %arg1: s64i, %arg2: s32i) -> s32i [external, c, no_inline, 
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca void*, "n", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const #cir.ptr<null> : void*
-    store %3, %1, align 8
-    %4 = get_global @bar : void***
-    store %1, %4, align 8
-    %5 = cast(bitcast) %1 : void*
-    %6 = const 1 : s64i
-    %7 = const 51217 : s32i
-    %8 = call @foo(%5, %6, %7) : s32i [all]
-    %9 = get_global @exit : ((s32i) -> void)*
-    %10 = const 0 : s32i
-    call @exit(%10) [all]
-    %11 = load %0 : s32i
-    return %11
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca void*, "n", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const #cir.ptr<null> : void*
+        store %3, %1, align 8
+        %4 = get_global @bar : void***
+        store %1, %4, align 8
+        %5 = cast(bitcast) %1 : void*
+        %6 = const 1 : s64i
+        %7 = const 51217 : s32i
+        %8 = call @foo(%5, %6, %7) : s32i [all]
+        %9 = get_global @exit : (s32i) -> void*
+        %10 = const 0 : s32i
+        call @exit(%10) [all]
+        %11 = load %0 : s32i
+        return %11
 }

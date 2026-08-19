@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20141107-1.c" (c, x86_64-unknown-linux-gnu)
@@ -11,16 +11,16 @@ fn f(%arg2: s32i, %arg3: bool) -> bool [external, c, no_inline, dso_local, nothr
         store %arg2, %39
         store %arg3, %40
         scope {
-            %44 = load %39 : s32i, align 4
-            %45 = cast(int_to_bool) %44 : bool
-            %46 = not %45 : bool
-            if %46 {
-                %47 = load %40 : bool, align 1
-                %48 = not %47 : bool
-                store %48, %40, align 1
+                %44 = load %39 : s32i, align 4
+                %45 = cast(int_to_bool) %44 : bool
+                not
+                if %46 {
+                        %47 = load %40 : bool, align 1
+                        not
+                        store %48, %40, align 1
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %42 = load %40 : bool, align 1
         store %42, %41
@@ -46,48 +46,48 @@ fn checkf(%arg0: s32i, %arg1: bool) -> void [external, c, no_inline, dso_local, 
         %25 = const 1 : u64i
         %26 = call @memcpy(%23, %24, %25) : void* [all]
         scope {
-            %27 = load %19 : s8i, align 1
-            %28 = cast(integral) %27 : s32i
-            %29 = load %16 : s32i, align 4
-            %30 = const 0 : s32i
-            %31 = cmp eq %29, %30 : bool
-            %32 = cast(bool_to_int) %31 : s32i
-            %33 = cmp ne %28, %32 : bool
-            %34 = cast(bool_to_int) %33 : s32i
-            %35 = load %17 : bool, align 1
-            %36 = cast(bool_to_int) %35 : s32i
-            %37 = xor %34, %36 : s32i
-            %38 = cast(int_to_bool) %37 : bool
-            if %38 {
-                call @abort() [all]
+                %27 = load %19 : s8i, align 1
+                %28 = cast(integral) %27 : s32i
+                %29 = load %16 : s32i, align 4
+                %30 = const 0 : s32i
+                cmp
+                %32 = cast(bool_to_int) %31 : s32i
+                cmp
+                %34 = cast(bool_to_int) %33 : s32i
+                %35 = load %17 : bool, align 1
+                %36 = cast(bool_to_int) %35 : s32i
+                xor
+                %38 = cast(int_to_bool) %37 : bool
+                if %38 {
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 0 : s32i
-    %3 = const 0 : s32i
-    %4 = cast(int_to_bool) %3 : bool
-    call @checkf(%2, %4) [all]
-    %5 = const 0 : s32i
-    %6 = const 1 : s32i
-    %7 = cast(int_to_bool) %6 : bool
-    call @checkf(%5, %7) [all]
-    %8 = const 1 : s32i
-    %9 = const 1 : s32i
-    %10 = cast(int_to_bool) %9 : bool
-    call @checkf(%8, %10) [all]
-    %11 = const 1 : s32i
-    %12 = const 0 : s32i
-    %13 = cast(int_to_bool) %12 : bool
-    call @checkf(%11, %13) [all]
-    %14 = const 0 : s32i
-    store %14, %0
-    %15 = load %0 : s32i
-    return %15
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 0 : s32i
+        %3 = const 0 : s32i
+        %4 = cast(int_to_bool) %3 : bool
+        call @checkf(%2, %4) [all]
+        %5 = const 0 : s32i
+        %6 = const 1 : s32i
+        %7 = cast(int_to_bool) %6 : bool
+        call @checkf(%5, %7) [all]
+        %8 = const 1 : s32i
+        %9 = const 1 : s32i
+        %10 = cast(int_to_bool) %9 : bool
+        call @checkf(%8, %10) [all]
+        %11 = const 1 : s32i
+        %12 = const 0 : s32i
+        %13 = cast(int_to_bool) %12 : bool
+        call @checkf(%11, %13) [all]
+        %14 = const 0 : s32i
+        store %14, %0
+        %15 = load %0 : s32i
+        return %15
 }

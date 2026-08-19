@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/stdio/tmpfile_fgets.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[5] = "abc\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[5] = ConstArray { ty: Array { element_type: Named("s8i"), size: 5 }, elts: Str("abc\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 global stdout : rec__IO_FILE* [external, default, align 8, dso_local]
 
 fn tmpfile() -> rec__IO_FILE* [external, c];
@@ -12,31 +12,31 @@ fn rewind(%arg0: rec__IO_FILE*) -> void [external, c];
 fn fgets(%arg0: s8i*, %arg1: s32i, %arg2: rec__IO_FILE*) -> s8i* [external, c];
 fn fclose(%arg0: rec__IO_FILE*) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec__IO_FILE*, "f", align 8
-    %2 = alloca s8i[8], "b", align 1
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = call @tmpfile() : rec__IO_FILE* [all]
-    store %4, %1, align 8
-    %5 = get_global @.str : s8i[5]*
-    %6 = cast(array_to_ptrdecay) %5 : s8i*
-    %7 = load %1 : rec__IO_FILE*, align 8
-    %8 = call @fputs(%6, %7) : s32i [all]
-    %9 = load %1 : rec__IO_FILE*, align 8
-    call @rewind(%9) [all]
-    %10 = cast(array_to_ptrdecay) %2 : s8i*
-    %11 = const 8 : s32i
-    %12 = load %1 : rec__IO_FILE*, align 8
-    %13 = call @fgets(%10, %11, %12) : s8i* [all]
-    %14 = cast(array_to_ptrdecay) %2 : s8i*
-    %15 = get_global @stdout : rec__IO_FILE**
-    %16 = load %15 : rec__IO_FILE*, align 8
-    %17 = call @fputs(%14, %16) : s32i [all]
-    %18 = load %1 : rec__IO_FILE*, align 8
-    %19 = call @fclose(%18) : s32i [all]
-    %20 = const 0 : s32i
-    store %20, %0
-    %21 = load %0 : s32i
-    return %21
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec__IO_FILE*, "f", align 8
+        %2 = alloca s8i[8], "b", align 1
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = call @tmpfile() : rec__IO_FILE* [all]
+        store %4, %1, align 8
+        %5 = get_global @.str : s8i[5]*
+        %6 = cast(array_to_ptrdecay) %5 : s8i*
+        %7 = load %1 : rec__IO_FILE*, align 8
+        %8 = call @fputs(%6, %7) : s32i [all]
+        %9 = load %1 : rec__IO_FILE*, align 8
+        call @rewind(%9) [all]
+        %10 = cast(array_to_ptrdecay) %2 : s8i*
+        %11 = const 8 : s32i
+        %12 = load %1 : rec__IO_FILE*, align 8
+        %13 = call @fgets(%10, %11, %12) : s8i* [all]
+        %14 = cast(array_to_ptrdecay) %2 : s8i*
+        %15 = get_global @stdout : rec__IO_FILE**
+        %16 = load %15 : rec__IO_FILE*, align 8
+        %17 = call @fputs(%14, %16) : s32i [all]
+        %18 = load %1 : rec__IO_FILE*, align 8
+        %19 = call @fclose(%18) : s32i [all]
+        %20 = const 0 : s32i
+        store %20, %0
+        %21 = load %0 : s32i
+        return %21
 }

@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr78791.c" (c, x86_64-unknown-linux-gnu)
-global llvm.compiler.used : void*[1] = [@foo] [appending, default, dso_local]
+global llvm.compiler.used : void*[1] = ConstArray { ty: Array { element_type: Pointer { pointee: Named("void"), addr_space: None }, size: 1 }, elts: Array([GlobalView { ty: Pointer { pointee: Named("void"), addr_space: None }, symbol: "foo", indices: None }]), trailing_zeros_num: 0 } [appending, default, dso_local]
 
 fn foo(%arg0: u64i, %arg1: u64i, %arg2: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: u64i, %arg1: u64i, %arg2: u64i):
@@ -18,19 +18,19 @@ fn foo(%arg0: u64i, %arg1: u64i, %arg2: u64i) -> u64i [external, c, no_inline, d
         store %arg2, %20
         %24 = load %18 : u64i, align 8
         %25 = load %19 : u64i, align 8
-        %26 = div %24, %25 : u64i
+        div
         store %26, %22, align 8
         %27 = load %18 : u64i, align 8
         %28 = load %19 : u64i, align 8
-        %29 = rem %27, %28 : u64i
+        rem
         store %29, %23, align 8
         %30 = load %20 : u64i, align 8
         %31 = load %22 : u64i, align 8
-        %32 = or %31, %30 : u64i
+        or
         store %32, %22, align 8
         %33 = load %20 : u64i, align 8
         %34 = load %23 : u64i, align 8
-        %35 = xor %34, %33 : u64i
+        xor
         store %35, %23, align 8
         %36 = load %22 : u64i, align 8
         %37 = load %23 : u64i, align 8
@@ -41,36 +41,36 @@ fn foo(%arg0: u64i, %arg1: u64i, %arg2: u64i) -> u64i [external, c, no_inline, d
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const 64 : u64i
-        %5 = const 7 : u64i
-        %6 = const 0 : u64i
-        %7 = call @foo(%4, %5, %6) : u64i [all]
-        %8 = const 10 : u64i
-        %9 = cmp ne %7, %8 : bool
-        %10 = ternary %9 ? { : bool
-            %17 = const true : bool
-            yield %17
-        } : {
-            %11 = const 28 : u64i
-            %12 = const 3 : u64i
-            %13 = const 2 : u64i
-            %14 = call @foo(%11, %12, %13) : u64i [all]
-            %15 = const 14 : u64i
-            %16 = cmp ne %14, %15 : bool
-            yield %16
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const 64 : u64i
+                %5 = const 7 : u64i
+                %6 = const 0 : u64i
+                %7 = call @foo(%4, %5, %6) : u64i [all]
+                %8 = const 10 : u64i
+                cmp
+                %10 = ternary %9 ? { : bool
+                        %17 = const true : bool
+                        yield %17
+                } : {
+                        %11 = const 28 : u64i
+                        %12 = const 3 : u64i
+                        %13 = const 2 : u64i
+                        %14 = call @foo(%11, %12, %13) : u64i [all]
+                        %15 = const 14 : u64i
+                        cmp
+                        yield %16
+                }
+                if %10 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %10 {
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

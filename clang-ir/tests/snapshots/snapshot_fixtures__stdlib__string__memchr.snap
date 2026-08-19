@@ -1,68 +1,68 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/string/memchr.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[7] = "abcdef" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[11] = "%ld %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[7] = ConstArray { ty: Array { element_type: Named("s8i"), size: 7 }, elts: Str("abcdef"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[11] = ConstArray { ty: Array { element_type: Named("s8i"), size: 11 }, elts: Str("%ld %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn memchr(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, pure, nothrow];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s8i*, "s", align 8
-    %2 = alloca s8i*, "base", align 8
-    %3 = alloca s8i*, "p", align 8
-    %4 = alloca s8i*, "z", align 8
-    %5 = alloca s8i*, "n", align 8
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = get_global @.str : s8i[7]*
-    %8 = cast(array_to_ptrdecay) %7 : s8i*
-    store %8, %1, align 8, volatile
-    %9 = load %1 : s8i*, align 8, volatile
-    store %9, %2, align 8
-    %10 = get_global @memchr : ((void*, s32i, u64i) -> void*)*
-    %11 = load %2 : s8i*, align 8
-    %12 = cast(bitcast) %11 : void*
-    %13 = const 100 : s32i
-    %14 = const 6 : u64i
-    %15 = call @memchr(%12, %13, %14) : void* [pure]
-    %16 = cast(bitcast) %15 : s8i*
-    store %16, %3, align 8
-    %17 = get_global @memchr : ((void*, s32i, u64i) -> void*)*
-    %18 = load %2 : s8i*, align 8
-    %19 = cast(bitcast) %18 : void*
-    %20 = const 97 : s32i
-    %21 = const 0 : u64i
-    %22 = call @memchr(%19, %20, %21) : void* [pure]
-    %23 = cast(bitcast) %22 : s8i*
-    store %23, %4, align 8
-    %24 = get_global @memchr : ((void*, s32i, u64i) -> void*)*
-    %25 = load %2 : s8i*, align 8
-    %26 = cast(bitcast) %25 : void*
-    %27 = const 120 : s32i
-    %28 = const 6 : u64i
-    %29 = call @memchr(%26, %27, %28) : void* [pure]
-    %30 = cast(bitcast) %29 : s8i*
-    store %30, %5, align 8
-    %31 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %32 = get_global @.str.1 : s8i[11]*
-    %33 = cast(array_to_ptrdecay) %32 : s8i*
-    %34 = load %3 : s8i*, align 8
-    %35 = load %2 : s8i*, align 8
-    %36 = ptr_diff %34, %35 : s64i
-    %37 = load %4 : s8i*, align 8
-    %38 = const #cir.ptr<null> : s8i*
-    %39 = cmp eq %37, %38 : bool
-    %40 = cast(bool_to_int) %39 : s32i
-    %41 = load %5 : s8i*, align 8
-    %42 = const #cir.ptr<null> : s8i*
-    %43 = cmp eq %41, %42 : bool
-    %44 = cast(bool_to_int) %43 : s32i
-    %45 = call @printf(%33, %36, %40, %44) : s32i [all]
-    %46 = const 0 : s32i
-    store %46, %0
-    %47 = load %0 : s32i
-    return %47
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s8i*, "s", align 8
+        %2 = alloca s8i*, "base", align 8
+        %3 = alloca s8i*, "p", align 8
+        %4 = alloca s8i*, "z", align 8
+        %5 = alloca s8i*, "n", align 8
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = get_global @.str : s8i[7]*
+        %8 = cast(array_to_ptrdecay) %7 : s8i*
+        store %8, %1, align 8
+        %9 = load %1 : s8i*, align 8
+        store %9, %2, align 8
+        %10 = get_global @memchr : (void*, s32i, u64i) -> void**
+        %11 = load %2 : s8i*, align 8
+        %12 = cast(bitcast) %11 : void*
+        %13 = const 100 : s32i
+        %14 = const 6 : u64i
+        %15 = call @memchr(%12, %13, %14) : void* [pure]
+        %16 = cast(bitcast) %15 : s8i*
+        store %16, %3, align 8
+        %17 = get_global @memchr : (void*, s32i, u64i) -> void**
+        %18 = load %2 : s8i*, align 8
+        %19 = cast(bitcast) %18 : void*
+        %20 = const 97 : s32i
+        %21 = const 0 : u64i
+        %22 = call @memchr(%19, %20, %21) : void* [pure]
+        %23 = cast(bitcast) %22 : s8i*
+        store %23, %4, align 8
+        %24 = get_global @memchr : (void*, s32i, u64i) -> void**
+        %25 = load %2 : s8i*, align 8
+        %26 = cast(bitcast) %25 : void*
+        %27 = const 120 : s32i
+        %28 = const 6 : u64i
+        %29 = call @memchr(%26, %27, %28) : void* [pure]
+        %30 = cast(bitcast) %29 : s8i*
+        store %30, %5, align 8
+        %31 = get_global @printf : (s8i*, ...) -> s32i*
+        %32 = get_global @.str.1 : s8i[11]*
+        %33 = cast(array_to_ptrdecay) %32 : s8i*
+        %34 = load %3 : s8i*, align 8
+        %35 = load %2 : s8i*, align 8
+        ptr_diff
+        %37 = load %4 : s8i*, align 8
+        %38 = const #cir.ptr<null> : s8i*
+        cmp
+        %40 = cast(bool_to_int) %39 : s32i
+        %41 = load %5 : s8i*, align 8
+        %42 = const #cir.ptr<null> : s8i*
+        cmp
+        %44 = cast(bool_to_int) %43 : s32i
+        %45 = call @printf(%33, %36, %40, %44) : s32i [all]
+        %46 = const 0 : s32i
+        store %46, %0
+        %47 = load %0 : s32i
+        return %47
 }

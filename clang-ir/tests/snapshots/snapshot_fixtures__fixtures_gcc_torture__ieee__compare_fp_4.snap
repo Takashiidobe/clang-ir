@@ -1,11 +1,11 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/ieee__compare-fp-4.c" (c, x86_64-unknown-linux-gnu)
-global pinf : float = 0.000000e+00 [external, default, align 4, dso_local]
-global ninf : float = 0.000000e+00 [external, default, align 4, dso_local]
-global NaN : float = 0.000000e+00 [external, default, align 4, dso_local]
+global pinf : float = CirFloat { ty: Single, value: "0.000000e+00" } [external, default, align 4, dso_local]
+global ninf : float = CirFloat { ty: Single, value: "0.000000e+00" } [external, default, align 4, dso_local]
+global NaN : float = CirFloat { ty: Single, value: "0.000000e+00" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn iuneq(%arg33: float, %arg34: float, %arg35: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
@@ -18,93 +18,93 @@ fn iuneq(%arg33: float, %arg34: float, %arg35: s32i) -> s32i [external, c, no_in
         store %arg34, %965
         store %arg35, %966
         scope {
-            %1004 = load %964 : float, align 4
-            %1005 = load %965 : float, align 4
-            %1006 = cmp lt %1004, %1005 : bool
-            %1007 = ternary %1006 ? { : bool
-                %1016 = const true : bool
-                yield %1016
-            } : {
-                %1013 = load %964 : float, align 4
-                %1014 = load %965 : float, align 4
-                %1015 = cmp gt %1013, %1014 : bool
-                yield %1015
-            }
-            %1008 = not %1007 : bool
-            %1009 = cast(bool_to_int) %1008 : s32i
-            %1010 = load %966 : s32i, align 4
-            %1011 = cmp ne %1009, %1010 : bool
-            if %1011 {
-                %1012 = get_global @abort : (() -> void)*
-                call @abort() [all]
-                yield
-            }
-            yield
-        }
-        scope {
-            %991 = load %964 : float, align 4
-            %992 = load %965 : float, align 4
-            %993 = cmp lt %991, %992 : bool
-            %994 = ternary %993 ? { : bool
-                %1003 = const true : bool
-                yield %1003
-            } : {
-                %1000 = load %964 : float, align 4
-                %1001 = load %965 : float, align 4
-                %1002 = cmp gt %1000, %1001 : bool
-                yield %1002
-            }
-            %995 = not %994 : bool
-            %996 = cast(bool_to_int) %995 : s32i
-            %997 = load %966 : s32i, align 4
-            %998 = cmp ne %996, %997 : bool
-            if %998 {
-                %999 = get_global @abort : (() -> void)*
-                call @abort() [all]
-                yield
-            }
-            yield
-        }
-        scope {
-            %969 = load %964 : float, align 4
-            %970 = load %965 : float, align 4
-            %971 = cmp le %969, %970 : bool
-            %972 = ternary %971 ? { : bool
-                %990 = const true : bool
-                yield %990
-            } : {
-                %987 = load %964 : float, align 4
-                %988 = load %965 : float, align 4
-                %989 = cmp uno %987, %988 : bool
-                yield %989
-            }
-            %973 = ternary %972 ? { : bool
-                %979 = load %964 : float, align 4
-                %980 = load %965 : float, align 4
-                %981 = cmp ge %979, %980 : bool
-                %982 = ternary %981 ? { : bool
-                    %986 = const true : bool
-                    yield %986
+                %1004 = load %964 : float, align 4
+                %1005 = load %965 : float, align 4
+                cmp
+                %1007 = ternary %1006 ? { : bool
+                        %1016 = const true : bool
+                        yield %1016
                 } : {
-                    %983 = load %964 : float, align 4
-                    %984 = load %965 : float, align 4
-                    %985 = cmp uno %983, %984 : bool
-                    yield %985
+                        %1013 = load %964 : float, align 4
+                        %1014 = load %965 : float, align 4
+                        cmp
+                        yield %1015
                 }
-                yield %982
-            } : {
-                %978 = const false : bool
-                yield %978
-            }
-            %974 = cast(bool_to_int) %973 : s32i
-            %975 = load %966 : s32i, align 4
-            %976 = cmp ne %974, %975 : bool
-            if %976 {
-                %977 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                not
+                %1009 = cast(bool_to_int) %1008 : s32i
+                %1010 = load %966 : s32i, align 4
+                cmp
+                if %1011 {
+                        %1012 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
+        }
+        scope {
+                %991 = load %964 : float, align 4
+                %992 = load %965 : float, align 4
+                cmp
+                %994 = ternary %993 ? { : bool
+                        %1003 = const true : bool
+                        yield %1003
+                } : {
+                        %1000 = load %964 : float, align 4
+                        %1001 = load %965 : float, align 4
+                        cmp
+                        yield %1002
+                }
+                not
+                %996 = cast(bool_to_int) %995 : s32i
+                %997 = load %966 : s32i, align 4
+                cmp
+                if %998 {
+                        %999 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
+        }
+        scope {
+                %969 = load %964 : float, align 4
+                %970 = load %965 : float, align 4
+                cmp
+                %972 = ternary %971 ? { : bool
+                        %990 = const true : bool
+                        yield %990
+                } : {
+                        %987 = load %964 : float, align 4
+                        %988 = load %965 : float, align 4
+                        cmp
+                        yield %989
+                }
+                %973 = ternary %972 ? { : bool
+                        %979 = load %964 : float, align 4
+                        %980 = load %965 : float, align 4
+                        cmp
+                        %982 = ternary %981 ? { : bool
+                                %986 = const true : bool
+                                yield %986
+                        } : {
+                                %983 = load %964 : float, align 4
+                                %984 = load %965 : float, align 4
+                                cmp
+                                yield %985
+                        }
+                        yield %982
+                } : {
+                        %978 = const false : bool
+                        yield %978
+                }
+                %974 = cast(bool_to_int) %973 : s32i
+                %975 = load %966 : s32i, align 4
+                cmp
+                if %976 {
+                        %977 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
         %968 = load %967 : s32i
         return %968
@@ -119,46 +119,46 @@ fn ieq(%arg30: float, %arg31: float, %arg32: s32i) -> s32i [external, c, no_inli
         store %arg31, %937
         store %arg32, %938
         scope {
-            %941 = load %936 : float, align 4
-            %942 = load %937 : float, align 4
-            %943 = cmp lt %941, %942 : bool
-            %944 = ternary %943 ? { : bool
-                %963 = const true : bool
-                yield %963
-            } : {
-                %960 = load %936 : float, align 4
-                %961 = load %937 : float, align 4
-                %962 = cmp ge %960, %961 : bool
-                yield %962
-            }
-            %945 = ternary %944 ? { : bool
-                %951 = load %936 : float, align 4
-                %952 = load %937 : float, align 4
-                %953 = cmp lt %951, %952 : bool
-                %954 = ternary %953 ? { : bool
-                    %959 = const true : bool
-                    yield %959
+                %941 = load %936 : float, align 4
+                %942 = load %937 : float, align 4
+                cmp
+                %944 = ternary %943 ? { : bool
+                        %963 = const true : bool
+                        yield %963
                 } : {
-                    %956 = load %936 : float, align 4
-                    %957 = load %937 : float, align 4
-                    %958 = cmp gt %956, %957 : bool
-                    yield %958
+                        %960 = load %936 : float, align 4
+                        %961 = load %937 : float, align 4
+                        cmp
+                        yield %962
                 }
-                %955 = not %954 : bool
-                yield %955
-            } : {
-                %950 = const false : bool
-                yield %950
-            }
-            %946 = cast(bool_to_int) %945 : s32i
-            %947 = load %938 : s32i, align 4
-            %948 = cmp ne %946, %947 : bool
-            if %948 {
-                %949 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %945 = ternary %944 ? { : bool
+                        %951 = load %936 : float, align 4
+                        %952 = load %937 : float, align 4
+                        cmp
+                        %954 = ternary %953 ? { : bool
+                                %959 = const true : bool
+                                yield %959
+                        } : {
+                                %956 = load %936 : float, align 4
+                                %957 = load %937 : float, align 4
+                                cmp
+                                yield %958
+                        }
+                        not
+                        yield %955
+                } : {
+                        %950 = const false : bool
+                        yield %950
+                }
+                %946 = cast(bool_to_int) %945 : s32i
+                %947 = load %938 : s32i, align 4
+                cmp
+                if %948 {
+                        %949 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %940 = load %939 : s32i
         return %940
@@ -173,109 +173,109 @@ fn iltgt(%arg27: float, %arg28: float, %arg29: s32i) -> s32i [external, c, no_in
         store %arg28, %876
         store %arg29, %877
         scope {
-            %924 = load %875 : float, align 4
-            %925 = load %876 : float, align 4
-            %926 = cmp lt %924, %925 : bool
-            %927 = ternary %926 ? { : bool
-                %935 = const true : bool
-                yield %935
-            } : {
-                %932 = load %875 : float, align 4
-                %933 = load %876 : float, align 4
-                %934 = cmp gt %932, %933 : bool
-                yield %934
-            }
-            %928 = cast(bool_to_int) %927 : s32i
-            %929 = load %877 : s32i, align 4
-            %930 = cmp ne %928, %929 : bool
-            if %930 {
-                %931 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %924 = load %875 : float, align 4
+                %925 = load %876 : float, align 4
+                cmp
+                %927 = ternary %926 ? { : bool
+                        %935 = const true : bool
+                        yield %935
+                } : {
+                        %932 = load %875 : float, align 4
+                        %933 = load %876 : float, align 4
+                        cmp
+                        yield %934
+                }
+                %928 = cast(bool_to_int) %927 : s32i
+                %929 = load %877 : s32i, align 4
+                cmp
+                if %930 {
+                        %931 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %912 = load %875 : float, align 4
-            %913 = load %876 : float, align 4
-            %914 = cmp lt %912, %913 : bool
-            %915 = ternary %914 ? { : bool
-                %923 = const true : bool
-                yield %923
-            } : {
-                %920 = load %875 : float, align 4
-                %921 = load %876 : float, align 4
-                %922 = cmp gt %920, %921 : bool
-                yield %922
-            }
-            %916 = cast(bool_to_int) %915 : s32i
-            %917 = load %877 : s32i, align 4
-            %918 = cmp ne %916, %917 : bool
-            if %918 {
-                %919 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %912 = load %875 : float, align 4
+                %913 = load %876 : float, align 4
+                cmp
+                %915 = ternary %914 ? { : bool
+                        %923 = const true : bool
+                        yield %923
+                } : {
+                        %920 = load %875 : float, align 4
+                        %921 = load %876 : float, align 4
+                        cmp
+                        yield %922
+                }
+                %916 = cast(bool_to_int) %915 : s32i
+                %917 = load %877 : s32i, align 4
+                cmp
+                if %918 {
+                        %919 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %880 = load %875 : float, align 4
-            %881 = load %876 : float, align 4
-            %882 = cmp lt %880, %881 : bool
-            %883 = ternary %882 ? { : bool
-                %911 = const true : bool
-                yield %911
-            } : {
-                %908 = load %875 : float, align 4
-                %909 = load %876 : float, align 4
-                %910 = cmp ge %908, %909 : bool
-                yield %910
-            }
-            %884 = ternary %883 ? { : bool
-                %890 = load %875 : float, align 4
-                %891 = load %876 : float, align 4
-                %892 = cmp lt %890, %891 : bool
-                %893 = ternary %892 ? { : bool
-                    %907 = const true : bool
-                    yield %907
+                %880 = load %875 : float, align 4
+                %881 = load %876 : float, align 4
+                cmp
+                %883 = ternary %882 ? { : bool
+                        %911 = const true : bool
+                        yield %911
                 } : {
-                    %904 = load %875 : float, align 4
-                    %905 = load %876 : float, align 4
-                    %906 = cmp uno %904, %905 : bool
-                    yield %906
+                        %908 = load %875 : float, align 4
+                        %909 = load %876 : float, align 4
+                        cmp
+                        yield %910
                 }
-                %894 = ternary %893 ? { : bool
-                    %903 = const true : bool
-                    yield %903
+                %884 = ternary %883 ? { : bool
+                        %890 = load %875 : float, align 4
+                        %891 = load %876 : float, align 4
+                        cmp
+                        %893 = ternary %892 ? { : bool
+                                %907 = const true : bool
+                                yield %907
+                        } : {
+                                %904 = load %875 : float, align 4
+                                %905 = load %876 : float, align 4
+                                cmp
+                                yield %906
+                        }
+                        %894 = ternary %893 ? { : bool
+                                %903 = const true : bool
+                                yield %903
+                        } : {
+                                %895 = load %875 : float, align 4
+                                %896 = load %876 : float, align 4
+                                cmp
+                                %898 = ternary %897 ? { : bool
+                                        %902 = const true : bool
+                                        yield %902
+                                } : {
+                                        %899 = load %875 : float, align 4
+                                        %900 = load %876 : float, align 4
+                                        cmp
+                                        yield %901
+                                }
+                                yield %898
+                        }
+                        yield %894
                 } : {
-                    %895 = load %875 : float, align 4
-                    %896 = load %876 : float, align 4
-                    %897 = cmp gt %895, %896 : bool
-                    %898 = ternary %897 ? { : bool
-                        %902 = const true : bool
-                        yield %902
-                    } : {
-                        %899 = load %875 : float, align 4
-                        %900 = load %876 : float, align 4
-                        %901 = cmp uno %899, %900 : bool
-                        yield %901
-                    }
-                    yield %898
+                        %889 = const false : bool
+                        yield %889
                 }
-                yield %894
-            } : {
-                %889 = const false : bool
-                yield %889
-            }
-            %885 = cast(bool_to_int) %884 : s32i
-            %886 = load %877 : s32i, align 4
-            %887 = cmp ne %885, %886 : bool
-            if %887 {
-                %888 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %885 = cast(bool_to_int) %884 : s32i
+                %886 = load %877 : s32i, align 4
+                cmp
+                if %887 {
+                        %888 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %879 = load %878 : s32i
         return %879
@@ -290,87 +290,87 @@ fn ine(%arg24: float, %arg25: float, %arg26: s32i) -> s32i [external, c, no_inli
         store %arg25, %826
         store %arg26, %827
         scope {
-            %853 = load %825 : float, align 4
-            %854 = load %826 : float, align 4
-            %855 = cmp lt %853, %854 : bool
-            %856 = ternary %855 ? { : bool
-                %874 = const true : bool
-                yield %874
-            } : {
-                %871 = load %825 : float, align 4
-                %872 = load %826 : float, align 4
-                %873 = cmp uno %871, %872 : bool
-                yield %873
-            }
-            %857 = ternary %856 ? { : bool
-                %870 = const true : bool
-                yield %870
-            } : {
-                %862 = load %825 : float, align 4
-                %863 = load %826 : float, align 4
-                %864 = cmp gt %862, %863 : bool
-                %865 = ternary %864 ? { : bool
-                    %869 = const true : bool
-                    yield %869
+                %853 = load %825 : float, align 4
+                %854 = load %826 : float, align 4
+                cmp
+                %856 = ternary %855 ? { : bool
+                        %874 = const true : bool
+                        yield %874
                 } : {
-                    %866 = load %825 : float, align 4
-                    %867 = load %826 : float, align 4
-                    %868 = cmp uno %866, %867 : bool
-                    yield %868
+                        %871 = load %825 : float, align 4
+                        %872 = load %826 : float, align 4
+                        cmp
+                        yield %873
                 }
-                yield %865
-            }
-            %858 = cast(bool_to_int) %857 : s32i
-            %859 = load %827 : s32i, align 4
-            %860 = cmp ne %858, %859 : bool
-            if %860 {
-                %861 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %857 = ternary %856 ? { : bool
+                        %870 = const true : bool
+                        yield %870
+                } : {
+                        %862 = load %825 : float, align 4
+                        %863 = load %826 : float, align 4
+                        cmp
+                        %865 = ternary %864 ? { : bool
+                                %869 = const true : bool
+                                yield %869
+                        } : {
+                                %866 = load %825 : float, align 4
+                                %867 = load %826 : float, align 4
+                                cmp
+                                yield %868
+                        }
+                        yield %865
+                }
+                %858 = cast(bool_to_int) %857 : s32i
+                %859 = load %827 : s32i, align 4
+                cmp
+                if %860 {
+                        %861 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %830 = load %825 : float, align 4
-            %831 = load %826 : float, align 4
-            %832 = cmp lt %830, %831 : bool
-            %833 = ternary %832 ? { : bool
-                %852 = const true : bool
-                yield %852
-            } : {
-                %849 = load %825 : float, align 4
-                %850 = load %826 : float, align 4
-                %851 = cmp gt %849, %850 : bool
-                yield %851
-            }
-            %834 = ternary %833 ? { : bool
-                %848 = const true : bool
-                yield %848
-            } : {
-                %839 = load %825 : float, align 4
-                %840 = load %826 : float, align 4
-                %841 = cmp lt %839, %840 : bool
-                %842 = ternary %841 ? { : bool
-                    %847 = const true : bool
-                    yield %847
+                %830 = load %825 : float, align 4
+                %831 = load %826 : float, align 4
+                cmp
+                %833 = ternary %832 ? { : bool
+                        %852 = const true : bool
+                        yield %852
                 } : {
-                    %844 = load %825 : float, align 4
-                    %845 = load %826 : float, align 4
-                    %846 = cmp ge %844, %845 : bool
-                    yield %846
+                        %849 = load %825 : float, align 4
+                        %850 = load %826 : float, align 4
+                        cmp
+                        yield %851
                 }
-                %843 = not %842 : bool
-                yield %843
-            }
-            %835 = cast(bool_to_int) %834 : s32i
-            %836 = load %827 : s32i, align 4
-            %837 = cmp ne %835, %836 : bool
-            if %837 {
-                %838 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %834 = ternary %833 ? { : bool
+                        %848 = const true : bool
+                        yield %848
+                } : {
+                        %839 = load %825 : float, align 4
+                        %840 = load %826 : float, align 4
+                        cmp
+                        %842 = ternary %841 ? { : bool
+                                %847 = const true : bool
+                                yield %847
+                        } : {
+                                %844 = load %825 : float, align 4
+                                %845 = load %826 : float, align 4
+                                cmp
+                                yield %846
+                        }
+                        not
+                        yield %843
+                }
+                %835 = cast(bool_to_int) %834 : s32i
+                %836 = load %827 : s32i, align 4
+                cmp
+                if %837 {
+                        %838 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %829 = load %828 : s32i
         return %829
@@ -385,60 +385,60 @@ fn iunlt(%arg21: float, %arg22: float, %arg23: s32i) -> s32i [external, c, no_in
         store %arg22, %791
         store %arg23, %792
         scope {
-            %813 = load %790 : float, align 4
-            %814 = load %791 : float, align 4
-            %815 = cmp lt %813, %814 : bool
-            %816 = ternary %815 ? { : bool
-                %824 = const true : bool
-                yield %824
-            } : {
-                %821 = load %790 : float, align 4
-                %822 = load %791 : float, align 4
-                %823 = cmp uno %821, %822 : bool
-                yield %823
-            }
-            %817 = cast(bool_to_int) %816 : s32i
-            %818 = load %792 : s32i, align 4
-            %819 = cmp ne %817, %818 : bool
-            if %819 {
-                %820 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %813 = load %790 : float, align 4
+                %814 = load %791 : float, align 4
+                cmp
+                %816 = ternary %815 ? { : bool
+                        %824 = const true : bool
+                        yield %824
+                } : {
+                        %821 = load %790 : float, align 4
+                        %822 = load %791 : float, align 4
+                        cmp
+                        yield %823
+                }
+                %817 = cast(bool_to_int) %816 : s32i
+                %818 = load %792 : s32i, align 4
+                cmp
+                if %819 {
+                        %820 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %795 = load %790 : float, align 4
-            %796 = load %791 : float, align 4
-            %797 = cmp lt %795, %796 : bool
-            %798 = ternary %797 ? { : bool
-                %812 = const true : bool
-                yield %812
-            } : {
-                %809 = load %790 : float, align 4
-                %810 = load %791 : float, align 4
-                %811 = cmp ge %809, %810 : bool
-                yield %811
-            }
-            %799 = not %798 : bool
-            %800 = ternary %799 ? { : bool
-                %808 = const true : bool
-                yield %808
-            } : {
-                %805 = load %790 : float, align 4
-                %806 = load %791 : float, align 4
-                %807 = cmp lt %805, %806 : bool
-                yield %807
-            }
-            %801 = cast(bool_to_int) %800 : s32i
-            %802 = load %792 : s32i, align 4
-            %803 = cmp ne %801, %802 : bool
-            if %803 {
-                %804 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %795 = load %790 : float, align 4
+                %796 = load %791 : float, align 4
+                cmp
+                %798 = ternary %797 ? { : bool
+                        %812 = const true : bool
+                        yield %812
+                } : {
+                        %809 = load %790 : float, align 4
+                        %810 = load %791 : float, align 4
+                        cmp
+                        yield %811
+                }
+                not
+                %800 = ternary %799 ? { : bool
+                        %808 = const true : bool
+                        yield %808
+                } : {
+                        %805 = load %790 : float, align 4
+                        %806 = load %791 : float, align 4
+                        cmp
+                        yield %807
+                }
+                %801 = cast(bool_to_int) %800 : s32i
+                %802 = load %792 : s32i, align 4
+                cmp
+                if %803 {
+                        %804 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %794 = load %793 : s32i
         return %794
@@ -453,137 +453,137 @@ fn ilt(%arg18: float, %arg19: float, %arg20: s32i) -> s32i [external, c, no_inli
         store %arg19, %716
         store %arg20, %717
         scope {
-            %768 = load %715 : float, align 4
-            %769 = load %716 : float, align 4
-            %770 = cmp lt %768, %769 : bool
-            %771 = ternary %770 ? { : bool
-                %789 = const true : bool
-                yield %789
-            } : {
-                %786 = load %715 : float, align 4
-                %787 = load %716 : float, align 4
-                %788 = cmp ge %786, %787 : bool
-                yield %788
-            }
-            %772 = ternary %771 ? { : bool
-                %778 = load %715 : float, align 4
-                %779 = load %716 : float, align 4
-                %780 = cmp lt %778, %779 : bool
-                %781 = ternary %780 ? { : bool
-                    %785 = const true : bool
-                    yield %785
+                %768 = load %715 : float, align 4
+                %769 = load %716 : float, align 4
+                cmp
+                %771 = ternary %770 ? { : bool
+                        %789 = const true : bool
+                        yield %789
                 } : {
-                    %782 = load %715 : float, align 4
-                    %783 = load %716 : float, align 4
-                    %784 = cmp uno %782, %783 : bool
-                    yield %784
+                        %786 = load %715 : float, align 4
+                        %787 = load %716 : float, align 4
+                        cmp
+                        yield %788
                 }
-                yield %781
-            } : {
-                %777 = const false : bool
-                yield %777
-            }
-            %773 = cast(bool_to_int) %772 : s32i
-            %774 = load %717 : s32i, align 4
-            %775 = cmp ne %773, %774 : bool
-            if %775 {
-                %776 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %772 = ternary %771 ? { : bool
+                        %778 = load %715 : float, align 4
+                        %779 = load %716 : float, align 4
+                        cmp
+                        %781 = ternary %780 ? { : bool
+                                %785 = const true : bool
+                                yield %785
+                        } : {
+                                %782 = load %715 : float, align 4
+                                %783 = load %716 : float, align 4
+                                cmp
+                                yield %784
+                        }
+                        yield %781
+                } : {
+                        %777 = const false : bool
+                        yield %777
+                }
+                %773 = cast(bool_to_int) %772 : s32i
+                %774 = load %717 : s32i, align 4
+                cmp
+                if %775 {
+                        %776 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %756 = load %715 : float, align 4
-            %757 = load %716 : float, align 4
-            %758 = cmp le %756, %757 : bool
-            %759 = ternary %758 ? { : bool
-                %765 = load %715 : float, align 4
-                %766 = load %716 : float, align 4
-                %767 = cmp ne %765, %766 : bool
-                yield %767
-            } : {
-                %764 = const false : bool
-                yield %764
-            }
-            %760 = cast(bool_to_int) %759 : s32i
-            %761 = load %717 : s32i, align 4
-            %762 = cmp ne %760, %761 : bool
-            if %762 {
-                %763 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %756 = load %715 : float, align 4
+                %757 = load %716 : float, align 4
+                cmp
+                %759 = ternary %758 ? { : bool
+                        %765 = load %715 : float, align 4
+                        %766 = load %716 : float, align 4
+                        cmp
+                        yield %767
+                } : {
+                        %764 = const false : bool
+                        yield %764
+                }
+                %760 = cast(bool_to_int) %759 : s32i
+                %761 = load %717 : s32i, align 4
+                cmp
+                if %762 {
+                        %763 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %744 = load %715 : float, align 4
-            %745 = load %716 : float, align 4
-            %746 = cmp le %744, %745 : bool
-            %747 = ternary %746 ? { : bool
-                %753 = load %716 : float, align 4
-                %754 = load %715 : float, align 4
-                %755 = cmp ne %753, %754 : bool
-                yield %755
-            } : {
-                %752 = const false : bool
-                yield %752
-            }
-            %748 = cast(bool_to_int) %747 : s32i
-            %749 = load %717 : s32i, align 4
-            %750 = cmp ne %748, %749 : bool
-            if %750 {
-                %751 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %744 = load %715 : float, align 4
+                %745 = load %716 : float, align 4
+                cmp
+                %747 = ternary %746 ? { : bool
+                        %753 = load %716 : float, align 4
+                        %754 = load %715 : float, align 4
+                        cmp
+                        yield %755
+                } : {
+                        %752 = const false : bool
+                        yield %752
+                }
+                %748 = cast(bool_to_int) %747 : s32i
+                %749 = load %717 : s32i, align 4
+                cmp
+                if %750 {
+                        %751 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %732 = load %715 : float, align 4
-            %733 = load %716 : float, align 4
-            %734 = cmp ne %732, %733 : bool
-            %735 = ternary %734 ? { : bool
-                %741 = load %715 : float, align 4
-                %742 = load %716 : float, align 4
-                %743 = cmp le %741, %742 : bool
-                yield %743
-            } : {
-                %740 = const false : bool
-                yield %740
-            }
-            %736 = cast(bool_to_int) %735 : s32i
-            %737 = load %717 : s32i, align 4
-            %738 = cmp ne %736, %737 : bool
-            if %738 {
-                %739 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %732 = load %715 : float, align 4
+                %733 = load %716 : float, align 4
+                cmp
+                %735 = ternary %734 ? { : bool
+                        %741 = load %715 : float, align 4
+                        %742 = load %716 : float, align 4
+                        cmp
+                        yield %743
+                } : {
+                        %740 = const false : bool
+                        yield %740
+                }
+                %736 = cast(bool_to_int) %735 : s32i
+                %737 = load %717 : s32i, align 4
+                cmp
+                if %738 {
+                        %739 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %720 = load %716 : float, align 4
-            %721 = load %715 : float, align 4
-            %722 = cmp ne %720, %721 : bool
-            %723 = ternary %722 ? { : bool
-                %729 = load %715 : float, align 4
-                %730 = load %716 : float, align 4
-                %731 = cmp le %729, %730 : bool
-                yield %731
-            } : {
-                %728 = const false : bool
-                yield %728
-            }
-            %724 = cast(bool_to_int) %723 : s32i
-            %725 = load %717 : s32i, align 4
-            %726 = cmp ne %724, %725 : bool
-            if %726 {
-                %727 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %720 = load %716 : float, align 4
+                %721 = load %715 : float, align 4
+                cmp
+                %723 = ternary %722 ? { : bool
+                        %729 = load %715 : float, align 4
+                        %730 = load %716 : float, align 4
+                        cmp
+                        yield %731
+                } : {
+                        %728 = const false : bool
+                        yield %728
+                }
+                %724 = cast(bool_to_int) %723 : s32i
+                %725 = load %717 : s32i, align 4
+                cmp
+                if %726 {
+                        %727 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %719 = load %718 : s32i
         return %719
@@ -598,60 +598,60 @@ fn iunle(%arg15: float, %arg16: float, %arg17: s32i) -> s32i [external, c, no_in
         store %arg16, %681
         store %arg17, %682
         scope {
-            %703 = load %680 : float, align 4
-            %704 = load %681 : float, align 4
-            %705 = cmp le %703, %704 : bool
-            %706 = ternary %705 ? { : bool
-                %714 = const true : bool
-                yield %714
-            } : {
-                %711 = load %680 : float, align 4
-                %712 = load %681 : float, align 4
-                %713 = cmp uno %711, %712 : bool
-                yield %713
-            }
-            %707 = cast(bool_to_int) %706 : s32i
-            %708 = load %682 : s32i, align 4
-            %709 = cmp ne %707, %708 : bool
-            if %709 {
-                %710 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %703 = load %680 : float, align 4
+                %704 = load %681 : float, align 4
+                cmp
+                %706 = ternary %705 ? { : bool
+                        %714 = const true : bool
+                        yield %714
+                } : {
+                        %711 = load %680 : float, align 4
+                        %712 = load %681 : float, align 4
+                        cmp
+                        yield %713
+                }
+                %707 = cast(bool_to_int) %706 : s32i
+                %708 = load %682 : s32i, align 4
+                cmp
+                if %709 {
+                        %710 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %685 = load %680 : float, align 4
-            %686 = load %681 : float, align 4
-            %687 = cmp lt %685, %686 : bool
-            %688 = ternary %687 ? { : bool
-                %702 = const true : bool
-                yield %702
-            } : {
-                %699 = load %680 : float, align 4
-                %700 = load %681 : float, align 4
-                %701 = cmp ge %699, %700 : bool
-                yield %701
-            }
-            %689 = not %688 : bool
-            %690 = ternary %689 ? { : bool
-                %698 = const true : bool
-                yield %698
-            } : {
-                %695 = load %680 : float, align 4
-                %696 = load %681 : float, align 4
-                %697 = cmp le %695, %696 : bool
-                yield %697
-            }
-            %691 = cast(bool_to_int) %690 : s32i
-            %692 = load %682 : s32i, align 4
-            %693 = cmp ne %691, %692 : bool
-            if %693 {
-                %694 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %685 = load %680 : float, align 4
+                %686 = load %681 : float, align 4
+                cmp
+                %688 = ternary %687 ? { : bool
+                        %702 = const true : bool
+                        yield %702
+                } : {
+                        %699 = load %680 : float, align 4
+                        %700 = load %681 : float, align 4
+                        cmp
+                        yield %701
+                }
+                not
+                %690 = ternary %689 ? { : bool
+                        %698 = const true : bool
+                        yield %698
+                } : {
+                        %695 = load %680 : float, align 4
+                        %696 = load %681 : float, align 4
+                        cmp
+                        yield %697
+                }
+                %691 = cast(bool_to_int) %690 : s32i
+                %692 = load %682 : s32i, align 4
+                cmp
+                if %693 {
+                        %694 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %684 = load %683 : s32i
         return %684
@@ -666,137 +666,137 @@ fn ile(%arg12: float, %arg13: float, %arg14: s32i) -> s32i [external, c, no_inli
         store %arg13, %606
         store %arg14, %607
         scope {
-            %658 = load %605 : float, align 4
-            %659 = load %606 : float, align 4
-            %660 = cmp lt %658, %659 : bool
-            %661 = ternary %660 ? { : bool
-                %679 = const true : bool
-                yield %679
-            } : {
-                %676 = load %605 : float, align 4
-                %677 = load %606 : float, align 4
-                %678 = cmp ge %676, %677 : bool
-                yield %678
-            }
-            %662 = ternary %661 ? { : bool
-                %668 = load %605 : float, align 4
-                %669 = load %606 : float, align 4
-                %670 = cmp le %668, %669 : bool
-                %671 = ternary %670 ? { : bool
-                    %675 = const true : bool
-                    yield %675
+                %658 = load %605 : float, align 4
+                %659 = load %606 : float, align 4
+                cmp
+                %661 = ternary %660 ? { : bool
+                        %679 = const true : bool
+                        yield %679
                 } : {
-                    %672 = load %605 : float, align 4
-                    %673 = load %606 : float, align 4
-                    %674 = cmp uno %672, %673 : bool
-                    yield %674
+                        %676 = load %605 : float, align 4
+                        %677 = load %606 : float, align 4
+                        cmp
+                        yield %678
                 }
-                yield %671
-            } : {
-                %667 = const false : bool
-                yield %667
-            }
-            %663 = cast(bool_to_int) %662 : s32i
-            %664 = load %607 : s32i, align 4
-            %665 = cmp ne %663, %664 : bool
-            if %665 {
-                %666 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %662 = ternary %661 ? { : bool
+                        %668 = load %605 : float, align 4
+                        %669 = load %606 : float, align 4
+                        cmp
+                        %671 = ternary %670 ? { : bool
+                                %675 = const true : bool
+                                yield %675
+                        } : {
+                                %672 = load %605 : float, align 4
+                                %673 = load %606 : float, align 4
+                                cmp
+                                yield %674
+                        }
+                        yield %671
+                } : {
+                        %667 = const false : bool
+                        yield %667
+                }
+                %663 = cast(bool_to_int) %662 : s32i
+                %664 = load %607 : s32i, align 4
+                cmp
+                if %665 {
+                        %666 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %646 = load %605 : float, align 4
-            %647 = load %606 : float, align 4
-            %648 = cmp lt %646, %647 : bool
-            %649 = ternary %648 ? { : bool
-                %657 = const true : bool
-                yield %657
-            } : {
-                %654 = load %605 : float, align 4
-                %655 = load %606 : float, align 4
-                %656 = cmp eq %654, %655 : bool
-                yield %656
-            }
-            %650 = cast(bool_to_int) %649 : s32i
-            %651 = load %607 : s32i, align 4
-            %652 = cmp ne %650, %651 : bool
-            if %652 {
-                %653 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %646 = load %605 : float, align 4
+                %647 = load %606 : float, align 4
+                cmp
+                %649 = ternary %648 ? { : bool
+                        %657 = const true : bool
+                        yield %657
+                } : {
+                        %654 = load %605 : float, align 4
+                        %655 = load %606 : float, align 4
+                        cmp
+                        yield %656
+                }
+                %650 = cast(bool_to_int) %649 : s32i
+                %651 = load %607 : s32i, align 4
+                cmp
+                if %652 {
+                        %653 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %634 = load %606 : float, align 4
-            %635 = load %605 : float, align 4
-            %636 = cmp gt %634, %635 : bool
-            %637 = ternary %636 ? { : bool
-                %645 = const true : bool
-                yield %645
-            } : {
-                %642 = load %605 : float, align 4
-                %643 = load %606 : float, align 4
-                %644 = cmp eq %642, %643 : bool
-                yield %644
-            }
-            %638 = cast(bool_to_int) %637 : s32i
-            %639 = load %607 : s32i, align 4
-            %640 = cmp ne %638, %639 : bool
-            if %640 {
-                %641 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %634 = load %606 : float, align 4
+                %635 = load %605 : float, align 4
+                cmp
+                %637 = ternary %636 ? { : bool
+                        %645 = const true : bool
+                        yield %645
+                } : {
+                        %642 = load %605 : float, align 4
+                        %643 = load %606 : float, align 4
+                        cmp
+                        yield %644
+                }
+                %638 = cast(bool_to_int) %637 : s32i
+                %639 = load %607 : s32i, align 4
+                cmp
+                if %640 {
+                        %641 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %622 = load %605 : float, align 4
-            %623 = load %606 : float, align 4
-            %624 = cmp eq %622, %623 : bool
-            %625 = ternary %624 ? { : bool
-                %633 = const true : bool
-                yield %633
-            } : {
-                %630 = load %605 : float, align 4
-                %631 = load %606 : float, align 4
-                %632 = cmp lt %630, %631 : bool
-                yield %632
-            }
-            %626 = cast(bool_to_int) %625 : s32i
-            %627 = load %607 : s32i, align 4
-            %628 = cmp ne %626, %627 : bool
-            if %628 {
-                %629 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %622 = load %605 : float, align 4
+                %623 = load %606 : float, align 4
+                cmp
+                %625 = ternary %624 ? { : bool
+                        %633 = const true : bool
+                        yield %633
+                } : {
+                        %630 = load %605 : float, align 4
+                        %631 = load %606 : float, align 4
+                        cmp
+                        yield %632
+                }
+                %626 = cast(bool_to_int) %625 : s32i
+                %627 = load %607 : s32i, align 4
+                cmp
+                if %628 {
+                        %629 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %610 = load %606 : float, align 4
-            %611 = load %605 : float, align 4
-            %612 = cmp eq %610, %611 : bool
-            %613 = ternary %612 ? { : bool
-                %621 = const true : bool
-                yield %621
-            } : {
-                %618 = load %605 : float, align 4
-                %619 = load %606 : float, align 4
-                %620 = cmp lt %618, %619 : bool
-                yield %620
-            }
-            %614 = cast(bool_to_int) %613 : s32i
-            %615 = load %607 : s32i, align 4
-            %616 = cmp ne %614, %615 : bool
-            if %616 {
-                %617 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %610 = load %606 : float, align 4
+                %611 = load %605 : float, align 4
+                cmp
+                %613 = ternary %612 ? { : bool
+                        %621 = const true : bool
+                        yield %621
+                } : {
+                        %618 = load %605 : float, align 4
+                        %619 = load %606 : float, align 4
+                        cmp
+                        yield %620
+                }
+                %614 = cast(bool_to_int) %613 : s32i
+                %615 = load %607 : s32i, align 4
+                cmp
+                if %616 {
+                        %617 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %609 = load %608 : s32i
         return %609
@@ -811,60 +811,60 @@ fn iungt(%arg9: float, %arg10: float, %arg11: s32i) -> s32i [external, c, no_inl
         store %arg10, %571
         store %arg11, %572
         scope {
-            %593 = load %570 : float, align 4
-            %594 = load %571 : float, align 4
-            %595 = cmp gt %593, %594 : bool
-            %596 = ternary %595 ? { : bool
-                %604 = const true : bool
-                yield %604
-            } : {
-                %601 = load %570 : float, align 4
-                %602 = load %571 : float, align 4
-                %603 = cmp uno %601, %602 : bool
-                yield %603
-            }
-            %597 = cast(bool_to_int) %596 : s32i
-            %598 = load %572 : s32i, align 4
-            %599 = cmp ne %597, %598 : bool
-            if %599 {
-                %600 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %593 = load %570 : float, align 4
+                %594 = load %571 : float, align 4
+                cmp
+                %596 = ternary %595 ? { : bool
+                        %604 = const true : bool
+                        yield %604
+                } : {
+                        %601 = load %570 : float, align 4
+                        %602 = load %571 : float, align 4
+                        cmp
+                        yield %603
+                }
+                %597 = cast(bool_to_int) %596 : s32i
+                %598 = load %572 : s32i, align 4
+                cmp
+                if %599 {
+                        %600 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %575 = load %570 : float, align 4
-            %576 = load %571 : float, align 4
-            %577 = cmp lt %575, %576 : bool
-            %578 = ternary %577 ? { : bool
-                %592 = const true : bool
-                yield %592
-            } : {
-                %589 = load %570 : float, align 4
-                %590 = load %571 : float, align 4
-                %591 = cmp ge %589, %590 : bool
-                yield %591
-            }
-            %579 = not %578 : bool
-            %580 = ternary %579 ? { : bool
-                %588 = const true : bool
-                yield %588
-            } : {
-                %585 = load %570 : float, align 4
-                %586 = load %571 : float, align 4
-                %587 = cmp gt %585, %586 : bool
-                yield %587
-            }
-            %581 = cast(bool_to_int) %580 : s32i
-            %582 = load %572 : s32i, align 4
-            %583 = cmp ne %581, %582 : bool
-            if %583 {
-                %584 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %575 = load %570 : float, align 4
+                %576 = load %571 : float, align 4
+                cmp
+                %578 = ternary %577 ? { : bool
+                        %592 = const true : bool
+                        yield %592
+                } : {
+                        %589 = load %570 : float, align 4
+                        %590 = load %571 : float, align 4
+                        cmp
+                        yield %591
+                }
+                not
+                %580 = ternary %579 ? { : bool
+                        %588 = const true : bool
+                        yield %588
+                } : {
+                        %585 = load %570 : float, align 4
+                        %586 = load %571 : float, align 4
+                        cmp
+                        yield %587
+                }
+                %581 = cast(bool_to_int) %580 : s32i
+                %582 = load %572 : s32i, align 4
+                cmp
+                if %583 {
+                        %584 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %574 = load %573 : s32i
         return %574
@@ -879,137 +879,137 @@ fn igt(%arg6: float, %arg7: float, %arg8: s32i) -> s32i [external, c, no_inline,
         store %arg7, %496
         store %arg8, %497
         scope {
-            %548 = load %495 : float, align 4
-            %549 = load %496 : float, align 4
-            %550 = cmp lt %548, %549 : bool
-            %551 = ternary %550 ? { : bool
-                %569 = const true : bool
-                yield %569
-            } : {
-                %566 = load %495 : float, align 4
-                %567 = load %496 : float, align 4
-                %568 = cmp ge %566, %567 : bool
-                yield %568
-            }
-            %552 = ternary %551 ? { : bool
-                %558 = load %495 : float, align 4
-                %559 = load %496 : float, align 4
-                %560 = cmp gt %558, %559 : bool
-                %561 = ternary %560 ? { : bool
-                    %565 = const true : bool
-                    yield %565
+                %548 = load %495 : float, align 4
+                %549 = load %496 : float, align 4
+                cmp
+                %551 = ternary %550 ? { : bool
+                        %569 = const true : bool
+                        yield %569
                 } : {
-                    %562 = load %495 : float, align 4
-                    %563 = load %496 : float, align 4
-                    %564 = cmp uno %562, %563 : bool
-                    yield %564
+                        %566 = load %495 : float, align 4
+                        %567 = load %496 : float, align 4
+                        cmp
+                        yield %568
                 }
-                yield %561
-            } : {
-                %557 = const false : bool
-                yield %557
-            }
-            %553 = cast(bool_to_int) %552 : s32i
-            %554 = load %497 : s32i, align 4
-            %555 = cmp ne %553, %554 : bool
-            if %555 {
-                %556 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %552 = ternary %551 ? { : bool
+                        %558 = load %495 : float, align 4
+                        %559 = load %496 : float, align 4
+                        cmp
+                        %561 = ternary %560 ? { : bool
+                                %565 = const true : bool
+                                yield %565
+                        } : {
+                                %562 = load %495 : float, align 4
+                                %563 = load %496 : float, align 4
+                                cmp
+                                yield %564
+                        }
+                        yield %561
+                } : {
+                        %557 = const false : bool
+                        yield %557
+                }
+                %553 = cast(bool_to_int) %552 : s32i
+                %554 = load %497 : s32i, align 4
+                cmp
+                if %555 {
+                        %556 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %536 = load %495 : float, align 4
-            %537 = load %496 : float, align 4
-            %538 = cmp ge %536, %537 : bool
-            %539 = ternary %538 ? { : bool
-                %545 = load %495 : float, align 4
-                %546 = load %496 : float, align 4
-                %547 = cmp ne %545, %546 : bool
-                yield %547
-            } : {
-                %544 = const false : bool
-                yield %544
-            }
-            %540 = cast(bool_to_int) %539 : s32i
-            %541 = load %497 : s32i, align 4
-            %542 = cmp ne %540, %541 : bool
-            if %542 {
-                %543 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %536 = load %495 : float, align 4
+                %537 = load %496 : float, align 4
+                cmp
+                %539 = ternary %538 ? { : bool
+                        %545 = load %495 : float, align 4
+                        %546 = load %496 : float, align 4
+                        cmp
+                        yield %547
+                } : {
+                        %544 = const false : bool
+                        yield %544
+                }
+                %540 = cast(bool_to_int) %539 : s32i
+                %541 = load %497 : s32i, align 4
+                cmp
+                if %542 {
+                        %543 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %524 = load %495 : float, align 4
-            %525 = load %496 : float, align 4
-            %526 = cmp ge %524, %525 : bool
-            %527 = ternary %526 ? { : bool
-                %533 = load %496 : float, align 4
-                %534 = load %495 : float, align 4
-                %535 = cmp ne %533, %534 : bool
-                yield %535
-            } : {
-                %532 = const false : bool
-                yield %532
-            }
-            %528 = cast(bool_to_int) %527 : s32i
-            %529 = load %497 : s32i, align 4
-            %530 = cmp ne %528, %529 : bool
-            if %530 {
-                %531 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %524 = load %495 : float, align 4
+                %525 = load %496 : float, align 4
+                cmp
+                %527 = ternary %526 ? { : bool
+                        %533 = load %496 : float, align 4
+                        %534 = load %495 : float, align 4
+                        cmp
+                        yield %535
+                } : {
+                        %532 = const false : bool
+                        yield %532
+                }
+                %528 = cast(bool_to_int) %527 : s32i
+                %529 = load %497 : s32i, align 4
+                cmp
+                if %530 {
+                        %531 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %512 = load %495 : float, align 4
-            %513 = load %496 : float, align 4
-            %514 = cmp ne %512, %513 : bool
-            %515 = ternary %514 ? { : bool
-                %521 = load %495 : float, align 4
-                %522 = load %496 : float, align 4
-                %523 = cmp ge %521, %522 : bool
-                yield %523
-            } : {
-                %520 = const false : bool
-                yield %520
-            }
-            %516 = cast(bool_to_int) %515 : s32i
-            %517 = load %497 : s32i, align 4
-            %518 = cmp ne %516, %517 : bool
-            if %518 {
-                %519 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %512 = load %495 : float, align 4
+                %513 = load %496 : float, align 4
+                cmp
+                %515 = ternary %514 ? { : bool
+                        %521 = load %495 : float, align 4
+                        %522 = load %496 : float, align 4
+                        cmp
+                        yield %523
+                } : {
+                        %520 = const false : bool
+                        yield %520
+                }
+                %516 = cast(bool_to_int) %515 : s32i
+                %517 = load %497 : s32i, align 4
+                cmp
+                if %518 {
+                        %519 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %500 = load %496 : float, align 4
-            %501 = load %495 : float, align 4
-            %502 = cmp ne %500, %501 : bool
-            %503 = ternary %502 ? { : bool
-                %509 = load %495 : float, align 4
-                %510 = load %496 : float, align 4
-                %511 = cmp ge %509, %510 : bool
-                yield %511
-            } : {
-                %508 = const false : bool
-                yield %508
-            }
-            %504 = cast(bool_to_int) %503 : s32i
-            %505 = load %497 : s32i, align 4
-            %506 = cmp ne %504, %505 : bool
-            if %506 {
-                %507 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %500 = load %496 : float, align 4
+                %501 = load %495 : float, align 4
+                cmp
+                %503 = ternary %502 ? { : bool
+                        %509 = load %495 : float, align 4
+                        %510 = load %496 : float, align 4
+                        cmp
+                        yield %511
+                } : {
+                        %508 = const false : bool
+                        yield %508
+                }
+                %504 = cast(bool_to_int) %503 : s32i
+                %505 = load %497 : s32i, align 4
+                cmp
+                if %506 {
+                        %507 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %499 = load %498 : s32i
         return %499
@@ -1024,60 +1024,60 @@ fn iunge(%arg3: float, %arg4: float, %arg5: s32i) -> s32i [external, c, no_inlin
         store %arg4, %461
         store %arg5, %462
         scope {
-            %483 = load %460 : float, align 4
-            %484 = load %461 : float, align 4
-            %485 = cmp ge %483, %484 : bool
-            %486 = ternary %485 ? { : bool
-                %494 = const true : bool
-                yield %494
-            } : {
-                %491 = load %460 : float, align 4
-                %492 = load %461 : float, align 4
-                %493 = cmp uno %491, %492 : bool
-                yield %493
-            }
-            %487 = cast(bool_to_int) %486 : s32i
-            %488 = load %462 : s32i, align 4
-            %489 = cmp ne %487, %488 : bool
-            if %489 {
-                %490 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %483 = load %460 : float, align 4
+                %484 = load %461 : float, align 4
+                cmp
+                %486 = ternary %485 ? { : bool
+                        %494 = const true : bool
+                        yield %494
+                } : {
+                        %491 = load %460 : float, align 4
+                        %492 = load %461 : float, align 4
+                        cmp
+                        yield %493
+                }
+                %487 = cast(bool_to_int) %486 : s32i
+                %488 = load %462 : s32i, align 4
+                cmp
+                if %489 {
+                        %490 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %465 = load %460 : float, align 4
-            %466 = load %461 : float, align 4
-            %467 = cmp lt %465, %466 : bool
-            %468 = ternary %467 ? { : bool
-                %482 = const true : bool
-                yield %482
-            } : {
-                %479 = load %460 : float, align 4
-                %480 = load %461 : float, align 4
-                %481 = cmp ge %479, %480 : bool
-                yield %481
-            }
-            %469 = not %468 : bool
-            %470 = ternary %469 ? { : bool
-                %478 = const true : bool
-                yield %478
-            } : {
-                %475 = load %460 : float, align 4
-                %476 = load %461 : float, align 4
-                %477 = cmp ge %475, %476 : bool
-                yield %477
-            }
-            %471 = cast(bool_to_int) %470 : s32i
-            %472 = load %462 : s32i, align 4
-            %473 = cmp ne %471, %472 : bool
-            if %473 {
-                %474 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %465 = load %460 : float, align 4
+                %466 = load %461 : float, align 4
+                cmp
+                %468 = ternary %467 ? { : bool
+                        %482 = const true : bool
+                        yield %482
+                } : {
+                        %479 = load %460 : float, align 4
+                        %480 = load %461 : float, align 4
+                        cmp
+                        yield %481
+                }
+                not
+                %470 = ternary %469 ? { : bool
+                        %478 = const true : bool
+                        yield %478
+                } : {
+                        %475 = load %460 : float, align 4
+                        %476 = load %461 : float, align 4
+                        cmp
+                        yield %477
+                }
+                %471 = cast(bool_to_int) %470 : s32i
+                %472 = load %462 : s32i, align 4
+                cmp
+                if %473 {
+                        %474 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %464 = load %463 : s32i
         return %464
@@ -1092,531 +1092,531 @@ fn ige(%arg0: float, %arg1: float, %arg2: s32i) -> s32i [external, c, no_inline,
         store %arg1, %386
         store %arg2, %387
         scope {
-            %438 = load %385 : float, align 4
-            %439 = load %386 : float, align 4
-            %440 = cmp lt %438, %439 : bool
-            %441 = ternary %440 ? { : bool
-                %459 = const true : bool
-                yield %459
-            } : {
-                %456 = load %385 : float, align 4
-                %457 = load %386 : float, align 4
-                %458 = cmp ge %456, %457 : bool
-                yield %458
-            }
-            %442 = ternary %441 ? { : bool
-                %448 = load %385 : float, align 4
-                %449 = load %386 : float, align 4
-                %450 = cmp ge %448, %449 : bool
-                %451 = ternary %450 ? { : bool
-                    %455 = const true : bool
-                    yield %455
+                %438 = load %385 : float, align 4
+                %439 = load %386 : float, align 4
+                cmp
+                %441 = ternary %440 ? { : bool
+                        %459 = const true : bool
+                        yield %459
                 } : {
-                    %452 = load %385 : float, align 4
-                    %453 = load %386 : float, align 4
-                    %454 = cmp uno %452, %453 : bool
-                    yield %454
+                        %456 = load %385 : float, align 4
+                        %457 = load %386 : float, align 4
+                        cmp
+                        yield %458
                 }
-                yield %451
-            } : {
-                %447 = const false : bool
-                yield %447
-            }
-            %443 = cast(bool_to_int) %442 : s32i
-            %444 = load %387 : s32i, align 4
-            %445 = cmp ne %443, %444 : bool
-            if %445 {
-                %446 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %442 = ternary %441 ? { : bool
+                        %448 = load %385 : float, align 4
+                        %449 = load %386 : float, align 4
+                        cmp
+                        %451 = ternary %450 ? { : bool
+                                %455 = const true : bool
+                                yield %455
+                        } : {
+                                %452 = load %385 : float, align 4
+                                %453 = load %386 : float, align 4
+                                cmp
+                                yield %454
+                        }
+                        yield %451
+                } : {
+                        %447 = const false : bool
+                        yield %447
+                }
+                %443 = cast(bool_to_int) %442 : s32i
+                %444 = load %387 : s32i, align 4
+                cmp
+                if %445 {
+                        %446 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %426 = load %385 : float, align 4
-            %427 = load %386 : float, align 4
-            %428 = cmp gt %426, %427 : bool
-            %429 = ternary %428 ? { : bool
-                %437 = const true : bool
-                yield %437
-            } : {
-                %434 = load %385 : float, align 4
-                %435 = load %386 : float, align 4
-                %436 = cmp eq %434, %435 : bool
-                yield %436
-            }
-            %430 = cast(bool_to_int) %429 : s32i
-            %431 = load %387 : s32i, align 4
-            %432 = cmp ne %430, %431 : bool
-            if %432 {
-                %433 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %426 = load %385 : float, align 4
+                %427 = load %386 : float, align 4
+                cmp
+                %429 = ternary %428 ? { : bool
+                        %437 = const true : bool
+                        yield %437
+                } : {
+                        %434 = load %385 : float, align 4
+                        %435 = load %386 : float, align 4
+                        cmp
+                        yield %436
+                }
+                %430 = cast(bool_to_int) %429 : s32i
+                %431 = load %387 : s32i, align 4
+                cmp
+                if %432 {
+                        %433 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %414 = load %386 : float, align 4
-            %415 = load %385 : float, align 4
-            %416 = cmp lt %414, %415 : bool
-            %417 = ternary %416 ? { : bool
-                %425 = const true : bool
-                yield %425
-            } : {
-                %422 = load %385 : float, align 4
-                %423 = load %386 : float, align 4
-                %424 = cmp eq %422, %423 : bool
-                yield %424
-            }
-            %418 = cast(bool_to_int) %417 : s32i
-            %419 = load %387 : s32i, align 4
-            %420 = cmp ne %418, %419 : bool
-            if %420 {
-                %421 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %414 = load %386 : float, align 4
+                %415 = load %385 : float, align 4
+                cmp
+                %417 = ternary %416 ? { : bool
+                        %425 = const true : bool
+                        yield %425
+                } : {
+                        %422 = load %385 : float, align 4
+                        %423 = load %386 : float, align 4
+                        cmp
+                        yield %424
+                }
+                %418 = cast(bool_to_int) %417 : s32i
+                %419 = load %387 : s32i, align 4
+                cmp
+                if %420 {
+                        %421 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %402 = load %385 : float, align 4
-            %403 = load %386 : float, align 4
-            %404 = cmp eq %402, %403 : bool
-            %405 = ternary %404 ? { : bool
-                %413 = const true : bool
-                yield %413
-            } : {
-                %410 = load %385 : float, align 4
-                %411 = load %386 : float, align 4
-                %412 = cmp gt %410, %411 : bool
-                yield %412
-            }
-            %406 = cast(bool_to_int) %405 : s32i
-            %407 = load %387 : s32i, align 4
-            %408 = cmp ne %406, %407 : bool
-            if %408 {
-                %409 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %402 = load %385 : float, align 4
+                %403 = load %386 : float, align 4
+                cmp
+                %405 = ternary %404 ? { : bool
+                        %413 = const true : bool
+                        yield %413
+                } : {
+                        %410 = load %385 : float, align 4
+                        %411 = load %386 : float, align 4
+                        cmp
+                        yield %412
+                }
+                %406 = cast(bool_to_int) %405 : s32i
+                %407 = load %387 : s32i, align 4
+                cmp
+                if %408 {
+                        %409 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %390 = load %386 : float, align 4
-            %391 = load %385 : float, align 4
-            %392 = cmp eq %390, %391 : bool
-            %393 = ternary %392 ? { : bool
-                %401 = const true : bool
-                yield %401
-            } : {
-                %398 = load %385 : float, align 4
-                %399 = load %386 : float, align 4
-                %400 = cmp gt %398, %399 : bool
-                yield %400
-            }
-            %394 = cast(bool_to_int) %393 : s32i
-            %395 = load %387 : s32i, align 4
-            %396 = cmp ne %394, %395 : bool
-            if %396 {
-                %397 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %390 = load %386 : float, align 4
+                %391 = load %385 : float, align 4
+                cmp
+                %393 = ternary %392 ? { : bool
+                        %401 = const true : bool
+                        yield %401
+                } : {
+                        %398 = load %385 : float, align 4
+                        %399 = load %386 : float, align 4
+                        cmp
+                        yield %400
+                }
+                %394 = cast(bool_to_int) %393 : s32i
+                %395 = load %387 : s32i, align 4
+                cmp
+                if %396 {
+                        %397 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %389 = load %388 : s32i
         return %389
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 0x7FF0000000000000 : double
-    %3 = cast(floating) %2 : float
-    %4 = get_global @pinf : float*
-    store %3, %4, align 4
-    %5 = const 0xFFF0000000000000 : double
-    %6 = cast(floating) %5 : float
-    %7 = get_global @ninf : float*
-    store %6, %7, align 4
-    %8 = const 0x7FF8000000000000 : double
-    %9 = cast(floating) %8 : float
-    %10 = get_global @NaN : float*
-    store %9, %10, align 4
-    %11 = get_global @ninf : float*
-    %12 = load %11 : float, align 4
-    %13 = get_global @pinf : float*
-    %14 = load %13 : float, align 4
-    %15 = const 0 : s32i
-    %16 = call @iuneq(%12, %14, %15) : s32i [all]
-    %17 = get_global @NaN : float*
-    %18 = load %17 : float, align 4
-    %19 = get_global @NaN : float*
-    %20 = load %19 : float, align 4
-    %21 = const 1 : s32i
-    %22 = call @iuneq(%18, %20, %21) : s32i [all]
-    %23 = get_global @pinf : float*
-    %24 = load %23 : float, align 4
-    %25 = get_global @ninf : float*
-    %26 = load %25 : float, align 4
-    %27 = const 0 : s32i
-    %28 = call @iuneq(%24, %26, %27) : s32i [all]
-    %29 = const 1 : s32i
-    %30 = cast(int_to_float) %29 : float
-    %31 = const 4 : s32i
-    %32 = cast(int_to_float) %31 : float
-    %33 = const 0 : s32i
-    %34 = call @iuneq(%30, %32, %33) : s32i [all]
-    %35 = const 3 : s32i
-    %36 = cast(int_to_float) %35 : float
-    %37 = const 3 : s32i
-    %38 = cast(int_to_float) %37 : float
-    %39 = const 1 : s32i
-    %40 = call @iuneq(%36, %38, %39) : s32i [all]
-    %41 = const 5 : s32i
-    %42 = cast(int_to_float) %41 : float
-    %43 = const 2 : s32i
-    %44 = cast(int_to_float) %43 : float
-    %45 = const 0 : s32i
-    %46 = call @iuneq(%42, %44, %45) : s32i [all]
-    %47 = const 1 : s32i
-    %48 = cast(int_to_float) %47 : float
-    %49 = const 4 : s32i
-    %50 = cast(int_to_float) %49 : float
-    %51 = const 0 : s32i
-    %52 = call @ieq(%48, %50, %51) : s32i [all]
-    %53 = const 3 : s32i
-    %54 = cast(int_to_float) %53 : float
-    %55 = const 3 : s32i
-    %56 = cast(int_to_float) %55 : float
-    %57 = const 1 : s32i
-    %58 = call @ieq(%54, %56, %57) : s32i [all]
-    %59 = const 5 : s32i
-    %60 = cast(int_to_float) %59 : float
-    %61 = const 2 : s32i
-    %62 = cast(int_to_float) %61 : float
-    %63 = const 0 : s32i
-    %64 = call @ieq(%60, %62, %63) : s32i [all]
-    %65 = get_global @ninf : float*
-    %66 = load %65 : float, align 4
-    %67 = get_global @pinf : float*
-    %68 = load %67 : float, align 4
-    %69 = const 1 : s32i
-    %70 = call @iltgt(%66, %68, %69) : s32i [all]
-    %71 = get_global @NaN : float*
-    %72 = load %71 : float, align 4
-    %73 = get_global @NaN : float*
-    %74 = load %73 : float, align 4
-    %75 = const 0 : s32i
-    %76 = call @iltgt(%72, %74, %75) : s32i [all]
-    %77 = get_global @pinf : float*
-    %78 = load %77 : float, align 4
-    %79 = get_global @ninf : float*
-    %80 = load %79 : float, align 4
-    %81 = const 1 : s32i
-    %82 = call @iltgt(%78, %80, %81) : s32i [all]
-    %83 = const 1 : s32i
-    %84 = cast(int_to_float) %83 : float
-    %85 = const 4 : s32i
-    %86 = cast(int_to_float) %85 : float
-    %87 = const 1 : s32i
-    %88 = call @iltgt(%84, %86, %87) : s32i [all]
-    %89 = const 3 : s32i
-    %90 = cast(int_to_float) %89 : float
-    %91 = const 3 : s32i
-    %92 = cast(int_to_float) %91 : float
-    %93 = const 0 : s32i
-    %94 = call @iltgt(%90, %92, %93) : s32i [all]
-    %95 = const 5 : s32i
-    %96 = cast(int_to_float) %95 : float
-    %97 = const 2 : s32i
-    %98 = cast(int_to_float) %97 : float
-    %99 = const 1 : s32i
-    %100 = call @iltgt(%96, %98, %99) : s32i [all]
-    %101 = const 1 : s32i
-    %102 = cast(int_to_float) %101 : float
-    %103 = const 4 : s32i
-    %104 = cast(int_to_float) %103 : float
-    %105 = const 1 : s32i
-    %106 = call @ine(%102, %104, %105) : s32i [all]
-    %107 = const 3 : s32i
-    %108 = cast(int_to_float) %107 : float
-    %109 = const 3 : s32i
-    %110 = cast(int_to_float) %109 : float
-    %111 = const 0 : s32i
-    %112 = call @ine(%108, %110, %111) : s32i [all]
-    %113 = const 5 : s32i
-    %114 = cast(int_to_float) %113 : float
-    %115 = const 2 : s32i
-    %116 = cast(int_to_float) %115 : float
-    %117 = const 1 : s32i
-    %118 = call @ine(%114, %116, %117) : s32i [all]
-    %119 = get_global @NaN : float*
-    %120 = load %119 : float, align 4
-    %121 = get_global @ninf : float*
-    %122 = load %121 : float, align 4
-    %123 = const 1 : s32i
-    %124 = call @iunlt(%120, %122, %123) : s32i [all]
-    %125 = get_global @pinf : float*
-    %126 = load %125 : float, align 4
-    %127 = get_global @NaN : float*
-    %128 = load %127 : float, align 4
-    %129 = const 1 : s32i
-    %130 = call @iunlt(%126, %128, %129) : s32i [all]
-    %131 = get_global @pinf : float*
-    %132 = load %131 : float, align 4
-    %133 = get_global @ninf : float*
-    %134 = load %133 : float, align 4
-    %135 = const 0 : s32i
-    %136 = call @iunlt(%132, %134, %135) : s32i [all]
-    %137 = get_global @pinf : float*
-    %138 = load %137 : float, align 4
-    %139 = get_global @pinf : float*
-    %140 = load %139 : float, align 4
-    %141 = const 0 : s32i
-    %142 = call @iunlt(%138, %140, %141) : s32i [all]
-    %143 = get_global @ninf : float*
-    %144 = load %143 : float, align 4
-    %145 = get_global @ninf : float*
-    %146 = load %145 : float, align 4
-    %147 = const 0 : s32i
-    %148 = call @iunlt(%144, %146, %147) : s32i [all]
-    %149 = const 1 : s32i
-    %150 = cast(int_to_float) %149 : float
-    %151 = const 4 : s32i
-    %152 = cast(int_to_float) %151 : float
-    %153 = const 1 : s32i
-    %154 = call @iunlt(%150, %152, %153) : s32i [all]
-    %155 = const 3 : s32i
-    %156 = cast(int_to_float) %155 : float
-    %157 = const 3 : s32i
-    %158 = cast(int_to_float) %157 : float
-    %159 = const 0 : s32i
-    %160 = call @iunlt(%156, %158, %159) : s32i [all]
-    %161 = const 5 : s32i
-    %162 = cast(int_to_float) %161 : float
-    %163 = const 2 : s32i
-    %164 = cast(int_to_float) %163 : float
-    %165 = const 0 : s32i
-    %166 = call @iunlt(%162, %164, %165) : s32i [all]
-    %167 = const 1 : s32i
-    %168 = cast(int_to_float) %167 : float
-    %169 = const 4 : s32i
-    %170 = cast(int_to_float) %169 : float
-    %171 = const 1 : s32i
-    %172 = call @ilt(%168, %170, %171) : s32i [all]
-    %173 = const 3 : s32i
-    %174 = cast(int_to_float) %173 : float
-    %175 = const 3 : s32i
-    %176 = cast(int_to_float) %175 : float
-    %177 = const 0 : s32i
-    %178 = call @ilt(%174, %176, %177) : s32i [all]
-    %179 = const 5 : s32i
-    %180 = cast(int_to_float) %179 : float
-    %181 = const 2 : s32i
-    %182 = cast(int_to_float) %181 : float
-    %183 = const 0 : s32i
-    %184 = call @ilt(%180, %182, %183) : s32i [all]
-    %185 = get_global @NaN : float*
-    %186 = load %185 : float, align 4
-    %187 = get_global @ninf : float*
-    %188 = load %187 : float, align 4
-    %189 = const 1 : s32i
-    %190 = call @iunle(%186, %188, %189) : s32i [all]
-    %191 = get_global @pinf : float*
-    %192 = load %191 : float, align 4
-    %193 = get_global @NaN : float*
-    %194 = load %193 : float, align 4
-    %195 = const 1 : s32i
-    %196 = call @iunle(%192, %194, %195) : s32i [all]
-    %197 = get_global @pinf : float*
-    %198 = load %197 : float, align 4
-    %199 = get_global @ninf : float*
-    %200 = load %199 : float, align 4
-    %201 = const 0 : s32i
-    %202 = call @iunle(%198, %200, %201) : s32i [all]
-    %203 = get_global @pinf : float*
-    %204 = load %203 : float, align 4
-    %205 = get_global @pinf : float*
-    %206 = load %205 : float, align 4
-    %207 = const 1 : s32i
-    %208 = call @iunle(%204, %206, %207) : s32i [all]
-    %209 = get_global @ninf : float*
-    %210 = load %209 : float, align 4
-    %211 = get_global @ninf : float*
-    %212 = load %211 : float, align 4
-    %213 = const 1 : s32i
-    %214 = call @iunle(%210, %212, %213) : s32i [all]
-    %215 = const 1 : s32i
-    %216 = cast(int_to_float) %215 : float
-    %217 = const 4 : s32i
-    %218 = cast(int_to_float) %217 : float
-    %219 = const 1 : s32i
-    %220 = call @iunle(%216, %218, %219) : s32i [all]
-    %221 = const 3 : s32i
-    %222 = cast(int_to_float) %221 : float
-    %223 = const 3 : s32i
-    %224 = cast(int_to_float) %223 : float
-    %225 = const 1 : s32i
-    %226 = call @iunle(%222, %224, %225) : s32i [all]
-    %227 = const 5 : s32i
-    %228 = cast(int_to_float) %227 : float
-    %229 = const 2 : s32i
-    %230 = cast(int_to_float) %229 : float
-    %231 = const 0 : s32i
-    %232 = call @iunle(%228, %230, %231) : s32i [all]
-    %233 = const 1 : s32i
-    %234 = cast(int_to_float) %233 : float
-    %235 = const 4 : s32i
-    %236 = cast(int_to_float) %235 : float
-    %237 = const 1 : s32i
-    %238 = call @ile(%234, %236, %237) : s32i [all]
-    %239 = const 3 : s32i
-    %240 = cast(int_to_float) %239 : float
-    %241 = const 3 : s32i
-    %242 = cast(int_to_float) %241 : float
-    %243 = const 1 : s32i
-    %244 = call @ile(%240, %242, %243) : s32i [all]
-    %245 = const 5 : s32i
-    %246 = cast(int_to_float) %245 : float
-    %247 = const 2 : s32i
-    %248 = cast(int_to_float) %247 : float
-    %249 = const 0 : s32i
-    %250 = call @ile(%246, %248, %249) : s32i [all]
-    %251 = get_global @NaN : float*
-    %252 = load %251 : float, align 4
-    %253 = get_global @ninf : float*
-    %254 = load %253 : float, align 4
-    %255 = const 1 : s32i
-    %256 = call @iungt(%252, %254, %255) : s32i [all]
-    %257 = get_global @pinf : float*
-    %258 = load %257 : float, align 4
-    %259 = get_global @NaN : float*
-    %260 = load %259 : float, align 4
-    %261 = const 1 : s32i
-    %262 = call @iungt(%258, %260, %261) : s32i [all]
-    %263 = get_global @pinf : float*
-    %264 = load %263 : float, align 4
-    %265 = get_global @ninf : float*
-    %266 = load %265 : float, align 4
-    %267 = const 1 : s32i
-    %268 = call @iungt(%264, %266, %267) : s32i [all]
-    %269 = get_global @pinf : float*
-    %270 = load %269 : float, align 4
-    %271 = get_global @pinf : float*
-    %272 = load %271 : float, align 4
-    %273 = const 0 : s32i
-    %274 = call @iungt(%270, %272, %273) : s32i [all]
-    %275 = get_global @ninf : float*
-    %276 = load %275 : float, align 4
-    %277 = get_global @ninf : float*
-    %278 = load %277 : float, align 4
-    %279 = const 0 : s32i
-    %280 = call @iungt(%276, %278, %279) : s32i [all]
-    %281 = const 1 : s32i
-    %282 = cast(int_to_float) %281 : float
-    %283 = const 4 : s32i
-    %284 = cast(int_to_float) %283 : float
-    %285 = const 0 : s32i
-    %286 = call @iungt(%282, %284, %285) : s32i [all]
-    %287 = const 3 : s32i
-    %288 = cast(int_to_float) %287 : float
-    %289 = const 3 : s32i
-    %290 = cast(int_to_float) %289 : float
-    %291 = const 0 : s32i
-    %292 = call @iungt(%288, %290, %291) : s32i [all]
-    %293 = const 5 : s32i
-    %294 = cast(int_to_float) %293 : float
-    %295 = const 2 : s32i
-    %296 = cast(int_to_float) %295 : float
-    %297 = const 1 : s32i
-    %298 = call @iungt(%294, %296, %297) : s32i [all]
-    %299 = const 1 : s32i
-    %300 = cast(int_to_float) %299 : float
-    %301 = const 4 : s32i
-    %302 = cast(int_to_float) %301 : float
-    %303 = const 0 : s32i
-    %304 = call @igt(%300, %302, %303) : s32i [all]
-    %305 = const 3 : s32i
-    %306 = cast(int_to_float) %305 : float
-    %307 = const 3 : s32i
-    %308 = cast(int_to_float) %307 : float
-    %309 = const 0 : s32i
-    %310 = call @igt(%306, %308, %309) : s32i [all]
-    %311 = const 5 : s32i
-    %312 = cast(int_to_float) %311 : float
-    %313 = const 2 : s32i
-    %314 = cast(int_to_float) %313 : float
-    %315 = const 1 : s32i
-    %316 = call @igt(%312, %314, %315) : s32i [all]
-    %317 = get_global @NaN : float*
-    %318 = load %317 : float, align 4
-    %319 = get_global @ninf : float*
-    %320 = load %319 : float, align 4
-    %321 = const 1 : s32i
-    %322 = call @iunge(%318, %320, %321) : s32i [all]
-    %323 = get_global @pinf : float*
-    %324 = load %323 : float, align 4
-    %325 = get_global @NaN : float*
-    %326 = load %325 : float, align 4
-    %327 = const 1 : s32i
-    %328 = call @iunge(%324, %326, %327) : s32i [all]
-    %329 = get_global @ninf : float*
-    %330 = load %329 : float, align 4
-    %331 = get_global @pinf : float*
-    %332 = load %331 : float, align 4
-    %333 = const 0 : s32i
-    %334 = call @iunge(%330, %332, %333) : s32i [all]
-    %335 = get_global @pinf : float*
-    %336 = load %335 : float, align 4
-    %337 = get_global @pinf : float*
-    %338 = load %337 : float, align 4
-    %339 = const 1 : s32i
-    %340 = call @iunge(%336, %338, %339) : s32i [all]
-    %341 = get_global @ninf : float*
-    %342 = load %341 : float, align 4
-    %343 = get_global @ninf : float*
-    %344 = load %343 : float, align 4
-    %345 = const 1 : s32i
-    %346 = call @iunge(%342, %344, %345) : s32i [all]
-    %347 = const 1 : s32i
-    %348 = cast(int_to_float) %347 : float
-    %349 = const 4 : s32i
-    %350 = cast(int_to_float) %349 : float
-    %351 = const 0 : s32i
-    %352 = call @iunge(%348, %350, %351) : s32i [all]
-    %353 = const 3 : s32i
-    %354 = cast(int_to_float) %353 : float
-    %355 = const 3 : s32i
-    %356 = cast(int_to_float) %355 : float
-    %357 = const 1 : s32i
-    %358 = call @iunge(%354, %356, %357) : s32i [all]
-    %359 = const 5 : s32i
-    %360 = cast(int_to_float) %359 : float
-    %361 = const 2 : s32i
-    %362 = cast(int_to_float) %361 : float
-    %363 = const 1 : s32i
-    %364 = call @iunge(%360, %362, %363) : s32i [all]
-    %365 = const 1 : s32i
-    %366 = cast(int_to_float) %365 : float
-    %367 = const 4 : s32i
-    %368 = cast(int_to_float) %367 : float
-    %369 = const 0 : s32i
-    %370 = call @ige(%366, %368, %369) : s32i [all]
-    %371 = const 3 : s32i
-    %372 = cast(int_to_float) %371 : float
-    %373 = const 3 : s32i
-    %374 = cast(int_to_float) %373 : float
-    %375 = const 1 : s32i
-    %376 = call @ige(%372, %374, %375) : s32i [all]
-    %377 = const 5 : s32i
-    %378 = cast(int_to_float) %377 : float
-    %379 = const 2 : s32i
-    %380 = cast(int_to_float) %379 : float
-    %381 = const 1 : s32i
-    %382 = call @ige(%378, %380, %381) : s32i [all]
-    %383 = const 0 : s32i
-    store %383, %0
-    %384 = load %0 : s32i
-    return %384
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 0x7FF0000000000000 : double
+        %3 = cast(floating) %2 : float
+        %4 = get_global @pinf : float*
+        store %3, %4, align 4
+        %5 = const 0xFFF0000000000000 : double
+        %6 = cast(floating) %5 : float
+        %7 = get_global @ninf : float*
+        store %6, %7, align 4
+        %8 = const 0x7FF8000000000000 : double
+        %9 = cast(floating) %8 : float
+        %10 = get_global @NaN : float*
+        store %9, %10, align 4
+        %11 = get_global @ninf : float*
+        %12 = load %11 : float, align 4
+        %13 = get_global @pinf : float*
+        %14 = load %13 : float, align 4
+        %15 = const 0 : s32i
+        %16 = call @iuneq(%12, %14, %15) : s32i [all]
+        %17 = get_global @NaN : float*
+        %18 = load %17 : float, align 4
+        %19 = get_global @NaN : float*
+        %20 = load %19 : float, align 4
+        %21 = const 1 : s32i
+        %22 = call @iuneq(%18, %20, %21) : s32i [all]
+        %23 = get_global @pinf : float*
+        %24 = load %23 : float, align 4
+        %25 = get_global @ninf : float*
+        %26 = load %25 : float, align 4
+        %27 = const 0 : s32i
+        %28 = call @iuneq(%24, %26, %27) : s32i [all]
+        %29 = const 1 : s32i
+        %30 = cast(int_to_float) %29 : float
+        %31 = const 4 : s32i
+        %32 = cast(int_to_float) %31 : float
+        %33 = const 0 : s32i
+        %34 = call @iuneq(%30, %32, %33) : s32i [all]
+        %35 = const 3 : s32i
+        %36 = cast(int_to_float) %35 : float
+        %37 = const 3 : s32i
+        %38 = cast(int_to_float) %37 : float
+        %39 = const 1 : s32i
+        %40 = call @iuneq(%36, %38, %39) : s32i [all]
+        %41 = const 5 : s32i
+        %42 = cast(int_to_float) %41 : float
+        %43 = const 2 : s32i
+        %44 = cast(int_to_float) %43 : float
+        %45 = const 0 : s32i
+        %46 = call @iuneq(%42, %44, %45) : s32i [all]
+        %47 = const 1 : s32i
+        %48 = cast(int_to_float) %47 : float
+        %49 = const 4 : s32i
+        %50 = cast(int_to_float) %49 : float
+        %51 = const 0 : s32i
+        %52 = call @ieq(%48, %50, %51) : s32i [all]
+        %53 = const 3 : s32i
+        %54 = cast(int_to_float) %53 : float
+        %55 = const 3 : s32i
+        %56 = cast(int_to_float) %55 : float
+        %57 = const 1 : s32i
+        %58 = call @ieq(%54, %56, %57) : s32i [all]
+        %59 = const 5 : s32i
+        %60 = cast(int_to_float) %59 : float
+        %61 = const 2 : s32i
+        %62 = cast(int_to_float) %61 : float
+        %63 = const 0 : s32i
+        %64 = call @ieq(%60, %62, %63) : s32i [all]
+        %65 = get_global @ninf : float*
+        %66 = load %65 : float, align 4
+        %67 = get_global @pinf : float*
+        %68 = load %67 : float, align 4
+        %69 = const 1 : s32i
+        %70 = call @iltgt(%66, %68, %69) : s32i [all]
+        %71 = get_global @NaN : float*
+        %72 = load %71 : float, align 4
+        %73 = get_global @NaN : float*
+        %74 = load %73 : float, align 4
+        %75 = const 0 : s32i
+        %76 = call @iltgt(%72, %74, %75) : s32i [all]
+        %77 = get_global @pinf : float*
+        %78 = load %77 : float, align 4
+        %79 = get_global @ninf : float*
+        %80 = load %79 : float, align 4
+        %81 = const 1 : s32i
+        %82 = call @iltgt(%78, %80, %81) : s32i [all]
+        %83 = const 1 : s32i
+        %84 = cast(int_to_float) %83 : float
+        %85 = const 4 : s32i
+        %86 = cast(int_to_float) %85 : float
+        %87 = const 1 : s32i
+        %88 = call @iltgt(%84, %86, %87) : s32i [all]
+        %89 = const 3 : s32i
+        %90 = cast(int_to_float) %89 : float
+        %91 = const 3 : s32i
+        %92 = cast(int_to_float) %91 : float
+        %93 = const 0 : s32i
+        %94 = call @iltgt(%90, %92, %93) : s32i [all]
+        %95 = const 5 : s32i
+        %96 = cast(int_to_float) %95 : float
+        %97 = const 2 : s32i
+        %98 = cast(int_to_float) %97 : float
+        %99 = const 1 : s32i
+        %100 = call @iltgt(%96, %98, %99) : s32i [all]
+        %101 = const 1 : s32i
+        %102 = cast(int_to_float) %101 : float
+        %103 = const 4 : s32i
+        %104 = cast(int_to_float) %103 : float
+        %105 = const 1 : s32i
+        %106 = call @ine(%102, %104, %105) : s32i [all]
+        %107 = const 3 : s32i
+        %108 = cast(int_to_float) %107 : float
+        %109 = const 3 : s32i
+        %110 = cast(int_to_float) %109 : float
+        %111 = const 0 : s32i
+        %112 = call @ine(%108, %110, %111) : s32i [all]
+        %113 = const 5 : s32i
+        %114 = cast(int_to_float) %113 : float
+        %115 = const 2 : s32i
+        %116 = cast(int_to_float) %115 : float
+        %117 = const 1 : s32i
+        %118 = call @ine(%114, %116, %117) : s32i [all]
+        %119 = get_global @NaN : float*
+        %120 = load %119 : float, align 4
+        %121 = get_global @ninf : float*
+        %122 = load %121 : float, align 4
+        %123 = const 1 : s32i
+        %124 = call @iunlt(%120, %122, %123) : s32i [all]
+        %125 = get_global @pinf : float*
+        %126 = load %125 : float, align 4
+        %127 = get_global @NaN : float*
+        %128 = load %127 : float, align 4
+        %129 = const 1 : s32i
+        %130 = call @iunlt(%126, %128, %129) : s32i [all]
+        %131 = get_global @pinf : float*
+        %132 = load %131 : float, align 4
+        %133 = get_global @ninf : float*
+        %134 = load %133 : float, align 4
+        %135 = const 0 : s32i
+        %136 = call @iunlt(%132, %134, %135) : s32i [all]
+        %137 = get_global @pinf : float*
+        %138 = load %137 : float, align 4
+        %139 = get_global @pinf : float*
+        %140 = load %139 : float, align 4
+        %141 = const 0 : s32i
+        %142 = call @iunlt(%138, %140, %141) : s32i [all]
+        %143 = get_global @ninf : float*
+        %144 = load %143 : float, align 4
+        %145 = get_global @ninf : float*
+        %146 = load %145 : float, align 4
+        %147 = const 0 : s32i
+        %148 = call @iunlt(%144, %146, %147) : s32i [all]
+        %149 = const 1 : s32i
+        %150 = cast(int_to_float) %149 : float
+        %151 = const 4 : s32i
+        %152 = cast(int_to_float) %151 : float
+        %153 = const 1 : s32i
+        %154 = call @iunlt(%150, %152, %153) : s32i [all]
+        %155 = const 3 : s32i
+        %156 = cast(int_to_float) %155 : float
+        %157 = const 3 : s32i
+        %158 = cast(int_to_float) %157 : float
+        %159 = const 0 : s32i
+        %160 = call @iunlt(%156, %158, %159) : s32i [all]
+        %161 = const 5 : s32i
+        %162 = cast(int_to_float) %161 : float
+        %163 = const 2 : s32i
+        %164 = cast(int_to_float) %163 : float
+        %165 = const 0 : s32i
+        %166 = call @iunlt(%162, %164, %165) : s32i [all]
+        %167 = const 1 : s32i
+        %168 = cast(int_to_float) %167 : float
+        %169 = const 4 : s32i
+        %170 = cast(int_to_float) %169 : float
+        %171 = const 1 : s32i
+        %172 = call @ilt(%168, %170, %171) : s32i [all]
+        %173 = const 3 : s32i
+        %174 = cast(int_to_float) %173 : float
+        %175 = const 3 : s32i
+        %176 = cast(int_to_float) %175 : float
+        %177 = const 0 : s32i
+        %178 = call @ilt(%174, %176, %177) : s32i [all]
+        %179 = const 5 : s32i
+        %180 = cast(int_to_float) %179 : float
+        %181 = const 2 : s32i
+        %182 = cast(int_to_float) %181 : float
+        %183 = const 0 : s32i
+        %184 = call @ilt(%180, %182, %183) : s32i [all]
+        %185 = get_global @NaN : float*
+        %186 = load %185 : float, align 4
+        %187 = get_global @ninf : float*
+        %188 = load %187 : float, align 4
+        %189 = const 1 : s32i
+        %190 = call @iunle(%186, %188, %189) : s32i [all]
+        %191 = get_global @pinf : float*
+        %192 = load %191 : float, align 4
+        %193 = get_global @NaN : float*
+        %194 = load %193 : float, align 4
+        %195 = const 1 : s32i
+        %196 = call @iunle(%192, %194, %195) : s32i [all]
+        %197 = get_global @pinf : float*
+        %198 = load %197 : float, align 4
+        %199 = get_global @ninf : float*
+        %200 = load %199 : float, align 4
+        %201 = const 0 : s32i
+        %202 = call @iunle(%198, %200, %201) : s32i [all]
+        %203 = get_global @pinf : float*
+        %204 = load %203 : float, align 4
+        %205 = get_global @pinf : float*
+        %206 = load %205 : float, align 4
+        %207 = const 1 : s32i
+        %208 = call @iunle(%204, %206, %207) : s32i [all]
+        %209 = get_global @ninf : float*
+        %210 = load %209 : float, align 4
+        %211 = get_global @ninf : float*
+        %212 = load %211 : float, align 4
+        %213 = const 1 : s32i
+        %214 = call @iunle(%210, %212, %213) : s32i [all]
+        %215 = const 1 : s32i
+        %216 = cast(int_to_float) %215 : float
+        %217 = const 4 : s32i
+        %218 = cast(int_to_float) %217 : float
+        %219 = const 1 : s32i
+        %220 = call @iunle(%216, %218, %219) : s32i [all]
+        %221 = const 3 : s32i
+        %222 = cast(int_to_float) %221 : float
+        %223 = const 3 : s32i
+        %224 = cast(int_to_float) %223 : float
+        %225 = const 1 : s32i
+        %226 = call @iunle(%222, %224, %225) : s32i [all]
+        %227 = const 5 : s32i
+        %228 = cast(int_to_float) %227 : float
+        %229 = const 2 : s32i
+        %230 = cast(int_to_float) %229 : float
+        %231 = const 0 : s32i
+        %232 = call @iunle(%228, %230, %231) : s32i [all]
+        %233 = const 1 : s32i
+        %234 = cast(int_to_float) %233 : float
+        %235 = const 4 : s32i
+        %236 = cast(int_to_float) %235 : float
+        %237 = const 1 : s32i
+        %238 = call @ile(%234, %236, %237) : s32i [all]
+        %239 = const 3 : s32i
+        %240 = cast(int_to_float) %239 : float
+        %241 = const 3 : s32i
+        %242 = cast(int_to_float) %241 : float
+        %243 = const 1 : s32i
+        %244 = call @ile(%240, %242, %243) : s32i [all]
+        %245 = const 5 : s32i
+        %246 = cast(int_to_float) %245 : float
+        %247 = const 2 : s32i
+        %248 = cast(int_to_float) %247 : float
+        %249 = const 0 : s32i
+        %250 = call @ile(%246, %248, %249) : s32i [all]
+        %251 = get_global @NaN : float*
+        %252 = load %251 : float, align 4
+        %253 = get_global @ninf : float*
+        %254 = load %253 : float, align 4
+        %255 = const 1 : s32i
+        %256 = call @iungt(%252, %254, %255) : s32i [all]
+        %257 = get_global @pinf : float*
+        %258 = load %257 : float, align 4
+        %259 = get_global @NaN : float*
+        %260 = load %259 : float, align 4
+        %261 = const 1 : s32i
+        %262 = call @iungt(%258, %260, %261) : s32i [all]
+        %263 = get_global @pinf : float*
+        %264 = load %263 : float, align 4
+        %265 = get_global @ninf : float*
+        %266 = load %265 : float, align 4
+        %267 = const 1 : s32i
+        %268 = call @iungt(%264, %266, %267) : s32i [all]
+        %269 = get_global @pinf : float*
+        %270 = load %269 : float, align 4
+        %271 = get_global @pinf : float*
+        %272 = load %271 : float, align 4
+        %273 = const 0 : s32i
+        %274 = call @iungt(%270, %272, %273) : s32i [all]
+        %275 = get_global @ninf : float*
+        %276 = load %275 : float, align 4
+        %277 = get_global @ninf : float*
+        %278 = load %277 : float, align 4
+        %279 = const 0 : s32i
+        %280 = call @iungt(%276, %278, %279) : s32i [all]
+        %281 = const 1 : s32i
+        %282 = cast(int_to_float) %281 : float
+        %283 = const 4 : s32i
+        %284 = cast(int_to_float) %283 : float
+        %285 = const 0 : s32i
+        %286 = call @iungt(%282, %284, %285) : s32i [all]
+        %287 = const 3 : s32i
+        %288 = cast(int_to_float) %287 : float
+        %289 = const 3 : s32i
+        %290 = cast(int_to_float) %289 : float
+        %291 = const 0 : s32i
+        %292 = call @iungt(%288, %290, %291) : s32i [all]
+        %293 = const 5 : s32i
+        %294 = cast(int_to_float) %293 : float
+        %295 = const 2 : s32i
+        %296 = cast(int_to_float) %295 : float
+        %297 = const 1 : s32i
+        %298 = call @iungt(%294, %296, %297) : s32i [all]
+        %299 = const 1 : s32i
+        %300 = cast(int_to_float) %299 : float
+        %301 = const 4 : s32i
+        %302 = cast(int_to_float) %301 : float
+        %303 = const 0 : s32i
+        %304 = call @igt(%300, %302, %303) : s32i [all]
+        %305 = const 3 : s32i
+        %306 = cast(int_to_float) %305 : float
+        %307 = const 3 : s32i
+        %308 = cast(int_to_float) %307 : float
+        %309 = const 0 : s32i
+        %310 = call @igt(%306, %308, %309) : s32i [all]
+        %311 = const 5 : s32i
+        %312 = cast(int_to_float) %311 : float
+        %313 = const 2 : s32i
+        %314 = cast(int_to_float) %313 : float
+        %315 = const 1 : s32i
+        %316 = call @igt(%312, %314, %315) : s32i [all]
+        %317 = get_global @NaN : float*
+        %318 = load %317 : float, align 4
+        %319 = get_global @ninf : float*
+        %320 = load %319 : float, align 4
+        %321 = const 1 : s32i
+        %322 = call @iunge(%318, %320, %321) : s32i [all]
+        %323 = get_global @pinf : float*
+        %324 = load %323 : float, align 4
+        %325 = get_global @NaN : float*
+        %326 = load %325 : float, align 4
+        %327 = const 1 : s32i
+        %328 = call @iunge(%324, %326, %327) : s32i [all]
+        %329 = get_global @ninf : float*
+        %330 = load %329 : float, align 4
+        %331 = get_global @pinf : float*
+        %332 = load %331 : float, align 4
+        %333 = const 0 : s32i
+        %334 = call @iunge(%330, %332, %333) : s32i [all]
+        %335 = get_global @pinf : float*
+        %336 = load %335 : float, align 4
+        %337 = get_global @pinf : float*
+        %338 = load %337 : float, align 4
+        %339 = const 1 : s32i
+        %340 = call @iunge(%336, %338, %339) : s32i [all]
+        %341 = get_global @ninf : float*
+        %342 = load %341 : float, align 4
+        %343 = get_global @ninf : float*
+        %344 = load %343 : float, align 4
+        %345 = const 1 : s32i
+        %346 = call @iunge(%342, %344, %345) : s32i [all]
+        %347 = const 1 : s32i
+        %348 = cast(int_to_float) %347 : float
+        %349 = const 4 : s32i
+        %350 = cast(int_to_float) %349 : float
+        %351 = const 0 : s32i
+        %352 = call @iunge(%348, %350, %351) : s32i [all]
+        %353 = const 3 : s32i
+        %354 = cast(int_to_float) %353 : float
+        %355 = const 3 : s32i
+        %356 = cast(int_to_float) %355 : float
+        %357 = const 1 : s32i
+        %358 = call @iunge(%354, %356, %357) : s32i [all]
+        %359 = const 5 : s32i
+        %360 = cast(int_to_float) %359 : float
+        %361 = const 2 : s32i
+        %362 = cast(int_to_float) %361 : float
+        %363 = const 1 : s32i
+        %364 = call @iunge(%360, %362, %363) : s32i [all]
+        %365 = const 1 : s32i
+        %366 = cast(int_to_float) %365 : float
+        %367 = const 4 : s32i
+        %368 = cast(int_to_float) %367 : float
+        %369 = const 0 : s32i
+        %370 = call @ige(%366, %368, %369) : s32i [all]
+        %371 = const 3 : s32i
+        %372 = cast(int_to_float) %371 : float
+        %373 = const 3 : s32i
+        %374 = cast(int_to_float) %373 : float
+        %375 = const 1 : s32i
+        %376 = call @ige(%372, %374, %375) : s32i [all]
+        %377 = const 5 : s32i
+        %378 = cast(int_to_float) %377 : float
+        %379 = const 2 : s32i
+        %380 = cast(int_to_float) %379 : float
+        %381 = const 1 : s32i
+        %382 = call @ige(%378, %380, %381) : s32i [all]
+        %383 = const 0 : s32i
+        store %383, %0
+        %384 = load %0 : s32i
+        return %384
 }

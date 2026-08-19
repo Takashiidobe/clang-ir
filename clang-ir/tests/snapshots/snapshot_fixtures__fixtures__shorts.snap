@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/shorts.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn sadd(%arg0: s16i, %arg1: s16i) -> s16i [internal, c, no_inline, dso_local, nothrow] {
@@ -27,40 +27,40 @@ fn sadd(%arg0: s16i, %arg1: s16i) -> s16i [internal, c, no_inline, dso_local, no
         return %41
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s16i, "s", align 2
-    %2 = alloca u16i, "us", align 2
-    %3 = alloca s16i, "neg", align 2
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = const 30000 : s16i
-    store %5, %1, align 2
-    %6 = const 60000 : u16i
-    store %6, %2, align 2
-    %7 = const -12345 : s16i
-    store %7, %3, align 2
-    %8 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %9 = get_global @.str : s8i[4]*
-    %10 = cast(array_to_ptrdecay) %9 : s8i*
-    %11 = load %1 : s16i, align 2
-    %12 = const -30000 : s16i
-    %13 = call @sadd(%11, %12) : s16i [all]
-    %14 = cast(integral) %13 : s32i
-    %15 = call @printf(%10, %14) : s32i [all]
-    %16 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %17 = get_global @.str : s8i[4]*
-    %18 = cast(array_to_ptrdecay) %17 : s8i*
-    %19 = load %2 : u16i, align 2
-    %20 = cast(integral) %19 : s32i
-    %21 = call @printf(%18, %20) : s32i [all]
-    %22 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %23 = get_global @.str : s8i[4]*
-    %24 = cast(array_to_ptrdecay) %23 : s8i*
-    %25 = load %3 : s16i, align 2
-    %26 = cast(integral) %25 : s32i
-    %27 = call @printf(%24, %26) : s32i [all]
-    %28 = const 0 : s32i
-    store %28, %0
-    %29 = load %0 : s32i
-    return %29
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s16i, "s", align 2
+        %2 = alloca u16i, "us", align 2
+        %3 = alloca s16i, "neg", align 2
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = const 30000 : s16i
+        store %5, %1, align 2
+        %6 = const 60000 : u16i
+        store %6, %2, align 2
+        %7 = const -12345 : s16i
+        store %7, %3, align 2
+        %8 = get_global @printf : (s8i*, ...) -> s32i*
+        %9 = get_global @.str : s8i[4]*
+        %10 = cast(array_to_ptrdecay) %9 : s8i*
+        %11 = load %1 : s16i, align 2
+        %12 = const -30000 : s16i
+        %13 = call @sadd(%11, %12) : s16i [all]
+        %14 = cast(integral) %13 : s32i
+        %15 = call @printf(%10, %14) : s32i [all]
+        %16 = get_global @printf : (s8i*, ...) -> s32i*
+        %17 = get_global @.str : s8i[4]*
+        %18 = cast(array_to_ptrdecay) %17 : s8i*
+        %19 = load %2 : u16i, align 2
+        %20 = cast(integral) %19 : s32i
+        %21 = call @printf(%18, %20) : s32i [all]
+        %22 = get_global @printf : (s8i*, ...) -> s32i*
+        %23 = get_global @.str : s8i[4]*
+        %24 = cast(array_to_ptrdecay) %23 : s8i*
+        %25 = load %3 : s16i, align 2
+        %26 = cast(integral) %25 : s32i
+        %27 = call @printf(%24, %26) : s32i [all]
+        %28 = const 0 : s32i
+        store %28, %0
+        %29 = load %0 : s32i
+        return %29
 }

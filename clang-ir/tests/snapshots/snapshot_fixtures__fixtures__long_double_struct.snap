@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/long_double_struct.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn sum_box(%arg0: rec_box*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
@@ -12,51 +12,51 @@ fn sum_box(%arg0: rec_box*) -> s32i [internal, c, no_inline, dso_local, nothrow]
         %29 = alloca rec_box, "b", align 16
         %30 = alloca s32i, "__retval", align 4
         store %28, %29
-        %31 = get_member %29[1] "value" : long_double<f80>*
+        get_member
         %32 = load %31 : long_double<f80>, align 16
-        %33 = get_member %29[0] "tag" : s32i*
+        get_member
         %34 = load %33 : s32i, align 16
         %35 = cast(int_to_float) %34 : long_double<f80>
-        %36 = fadd %32, %35 : long_double<f80>
+        fadd
         %37 = cast(float_to_int) %36 : s32i
         store %37, %30
         %38 = load %30 : s32i
         return %38
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_box, "b", align 16
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 3 : s32i
-    %4 = get_member %1[0] "tag" : s32i*
-    store %3, %4, align 16
-    %5 = const 4.500000e+00 : long_double<f80>
-    %6 = get_member %1[1] "value" : long_double<f80>*
-    store %5, %6, align 16
-    %7 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %8 = get_global @.str : s8i[4]*
-    %9 = cast(array_to_ptrdecay) %8 : s8i*
-    %10 = load %1 : rec_box, align 16
-    %11 = alloca rec_box, "byval", align 16
-    store %10, %11
-    %12 = call @sum_box(%11) : s32i [all]
-    %13 = call @printf(%9, %12) : s32i [all]
-    %14 = get_member %1[1] "value" : long_double<f80>*
-    %15 = load %14 : long_double<f80>, align 16
-    %16 = const 2.000000e+00 : long_double<f80>
-    %17 = fmul %15, %16 : long_double<f80>
-    %18 = get_member %1[1] "value" : long_double<f80>*
-    store %17, %18, align 16
-    %19 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %20 = get_global @.str : s8i[4]*
-    %21 = cast(array_to_ptrdecay) %20 : s8i*
-    %22 = get_member %1[1] "value" : long_double<f80>*
-    %23 = load %22 : long_double<f80>, align 16
-    %24 = cast(float_to_int) %23 : s32i
-    %25 = call @printf(%21, %24) : s32i [all]
-    %26 = const 0 : s32i
-    store %26, %0
-    %27 = load %0 : s32i
-    return %27
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_box, "b", align 16
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 3 : s32i
+        get_member
+        store %3, %4, align 16
+        %5 = const 4.500000e+00 : long_double<f80>
+        get_member
+        store %5, %6, align 16
+        %7 = get_global @printf : (s8i*, ...) -> s32i*
+        %8 = get_global @.str : s8i[4]*
+        %9 = cast(array_to_ptrdecay) %8 : s8i*
+        %10 = load %1 : rec_box, align 16
+        %11 = alloca rec_box, "byval", align 16
+        store %10, %11
+        %12 = call @sum_box(%11) : s32i [all]
+        %13 = call @printf(%9, %12) : s32i [all]
+        get_member
+        %15 = load %14 : long_double<f80>, align 16
+        %16 = const 2.000000e+00 : long_double<f80>
+        fmul
+        get_member
+        store %17, %18, align 16
+        %19 = get_global @printf : (s8i*, ...) -> s32i*
+        %20 = get_global @.str : s8i[4]*
+        %21 = cast(array_to_ptrdecay) %20 : s8i*
+        get_member
+        %23 = load %22 : long_double<f80>, align 16
+        %24 = cast(float_to_int) %23 : s32i
+        %25 = call @printf(%21, %24) : s32i [all]
+        %26 = const 0 : s32i
+        store %26, %0
+        %27 = load %0 : s32i
+        return %27
 }

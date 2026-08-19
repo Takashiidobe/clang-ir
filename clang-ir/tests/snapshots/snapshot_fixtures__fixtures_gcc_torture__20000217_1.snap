@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000217-1.c" (c, x86_64-unknown-linux-gnu)
@@ -14,7 +14,7 @@ fn showbug(%arg0: u16i*, %arg1: u16i*) -> u16i [external, c, no_inline, dso_loca
         %18 = load %17 : u16i, align 2
         %19 = cast(integral) %18 : s32i
         %20 = const 8 : s32i
-        %21 = sub %19, %20 : s32i [nsw]
+        sub
         %22 = load %14 : u16i*, align 8
         %23 = load %22 : u16i, align 2
         %24 = cast(integral) %23 : s32i
@@ -25,7 +25,7 @@ fn showbug(%arg0: u16i*, %arg1: u16i*) -> u16i [external, c, no_inline, dso_loca
         %28 = load %27 : u16i, align 2
         %29 = cast(integral) %28 : s32i
         %30 = const 8 : s32i
-        %31 = cmp ge %29, %30 : bool
+        cmp
         %32 = cast(bool_to_int) %31 : s32i
         %33 = cast(integral) %32 : u16i
         store %33, %16
@@ -35,30 +35,30 @@ fn showbug(%arg0: u16i*, %arg1: u16i*) -> u16i [external, c, no_inline, dso_loca
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u16i, "x", align 2
-    %2 = alloca u16i, "y", align 2
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 0 : u16i
-    store %4, %1, align 2
-    %5 = const 10 : u16i
-    store %5, %2, align 2
-    scope {
-        %9 = call @showbug(%1, %2) : u16i [all]
-        %10 = cast(integral) %9 : s32i
-        %11 = const 0 : s32i
-        %12 = cmp ne %10, %11 : bool
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u16i, "x", align 2
+        %2 = alloca u16i, "y", align 2
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 0 : u16i
+        store %4, %1, align 2
+        %5 = const 10 : u16i
+        store %5, %2, align 2
+        scope {
+                %9 = call @showbug(%1, %2) : u16i [all]
+                %10 = cast(integral) %9 : s32i
+                %11 = const 0 : s32i
+                cmp
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %6 = get_global @exit : ((s32i) -> void)*
-    %7 = const 0 : s32i
-    call @exit(%7) [all]
-    %8 = load %0 : s32i
-    return %8
+        %6 = get_global @exit : (s32i) -> void*
+        %7 = const 0 : s32i
+        call @exit(%7) [all]
+        %8 = load %0 : s32i
+        return %8
 }

@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20171008-1.c" (c, x86_64-unknown-linux-gnu)
-global i : s32i = 0 [external, default, align 4, dso_local]
+global i : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn bar(%arg0: s8i**) -> s8i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s8i**):
@@ -19,67 +19,67 @@ fn bar(%arg0: s8i**) -> s8i [internal, c, no_inline, dso_local, nothrow] {
         return %39
 }
 fn foo() -> u32i [internal, c, no_inline, dso_local, nothrow] {
-    %14 = alloca rec_S, "coerce", align 4
-    %15 = alloca rec_S, "__retval", align 4
-    %16 = alloca s8i, "r", align 1
-    %17 = alloca s8i, "s", align 1
-    %18 = alloca s8i, "c1", align 1
-    %19 = alloca s8i, "c2", align 1
-    %20 = alloca s8i*, "p", align 8
-    store %16, %20, align 8
-    %21 = call @bar(%20) : s8i [all]
-    store %21, %17, align 1
-    scope {
-        %30 = load %17 : s8i, align 1
-        %31 = cast(int_to_bool) %30 : bool
-        if %31 {
-            %32 = load %20 : s8i*, align 8
-            %33 = load %32 : s8i, align 1
-            store %33, %19, align 1
-            yield
+        %14 = alloca rec_S, "coerce", align 4
+        %15 = alloca rec_S, "__retval", align 4
+        %16 = alloca s8i, "r", align 1
+        %17 = alloca s8i, "s", align 1
+        %18 = alloca s8i, "c1", align 1
+        %19 = alloca s8i, "c2", align 1
+        %20 = alloca s8i*, "p", align 8
+        store %16, %20, align 8
+        %21 = call @bar(%20) : s8i [all]
+        store %21, %17, align 1
+        scope {
+                %30 = load %17 : s8i, align 1
+                %31 = cast(int_to_bool) %30 : bool
+                if %31 {
+                        %32 = load %20 : s8i*, align 8
+                        %33 = load %32 : s8i, align 1
+                        store %33, %19, align 1
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %22 = const 0 : s8i
-    store %22, %18, align 1
-    %23 = load %18 : s8i, align 1
-    %24 = get_member %15[0] "c1" : s8i*
-    store %23, %24, align 4
-    %25 = load %19 : s8i, align 1
-    %26 = get_member %15[1] "c2" : s8i*
-    store %25, %26, align 1
-    %27 = load %15 : rec_S
-    store %27, %14
-    %28 = cast(bitcast) %14 : u32i*
-    %29 = load %28 : u32i
-    return %29
+        %22 = const 0 : s8i
+        store %22, %18, align 1
+        %23 = load %18 : s8i, align 1
+        get_member
+        store %23, %24, align 4
+        %25 = load %19 : s8i, align 1
+        get_member
+        store %25, %26, align 1
+        %27 = load %15 : rec_S
+        store %27, %14
+        %28 = cast(bitcast) %14 : u32i*
+        %29 = load %28 : u32i
+        return %29
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca u32i, "coerce", align 4
-    %1 = alloca s32i, "__retval", align 4
-    %2 = alloca rec_S, "s", align 4
-    %3 = const 0 : s32i
-    store %3, %1
-    %4 = call @foo() : u32i [all]
-    store %4, %0
-    %5 = cast(bitcast) %0 : rec_S*
-    %6 = load %5 : rec_S
-    store %6, %2, align 4
-    scope {
-        %9 = get_member %2[0] "c1" : s8i*
-        %10 = load %9 : s8i, align 4
-        %11 = cast(integral) %10 : s32i
-        %12 = const 0 : s32i
-        %13 = cmp ne %11, %12 : bool
-        if %13 {
-            call @abort() [all]
-            yield
+        %0 = alloca u32i, "coerce", align 4
+        %1 = alloca s32i, "__retval", align 4
+        %2 = alloca rec_S, "s", align 4
+        %3 = const 0 : s32i
+        store %3, %1
+        %4 = call @foo() : u32i [all]
+        store %4, %0
+        %5 = cast(bitcast) %0 : rec_S*
+        %6 = load %5 : rec_S
+        store %6, %2, align 4
+        scope {
+                get_member
+                %10 = load %9 : s8i, align 4
+                %11 = cast(integral) %10 : s32i
+                %12 = const 0 : s32i
+                cmp
+                if %13 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = const 0 : s32i
-    store %7, %1
-    %8 = load %1 : s32i
-    return %8
+        %7 = const 0 : s32i
+        store %7, %1
+        %8 = load %1 : s32i
+        return %8
 }

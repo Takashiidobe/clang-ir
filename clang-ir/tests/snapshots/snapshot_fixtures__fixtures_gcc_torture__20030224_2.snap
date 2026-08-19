@@ -1,61 +1,61 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20030224-2.c" (c, x86_64-unknown-linux-gnu)
-global node : rec_node = zero [external, default, align 1, dso_local]
-global node_p : rec_node* = @node [external, default, align 8, dso_local]
+global node : rec_node = Zero { ty: Named("rec_node") } [external, default, align 1, dso_local]
+global node_p : rec_node* = GlobalView { ty: Pointer { pointee: Named("rec_node"), addr_space: None }, symbol: "node", indices: None } [external, default, align 8, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_node, "marker", align 1
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_member %1[0] "magic" : rec_jint16_t*
-    %4 = get_member %3[0] "v16" : s16i*
-    %5 = const 6533 : s16i
-    store %5, %4, align 1
-    %6 = get_member %1[1] "nodetype" : rec_jint16_t*
-    %7 = get_member %6[0] "v16" : s16i*
-    %8 = const 8195 : s16i
-    store %8, %7, align 1
-    %9 = get_member %1[2] "totlen" : s32i*
-    %10 = get_global @node_p : rec_node**
-    %11 = load %10 : rec_node*, align 8
-    %12 = get_member %11[2] "totlen" : s32i*
-    %13 = load %12 : s32i, align 1
-    store %13, %9, align 1
-    scope {
-        %23 = get_member %1[0] "magic" : rec_jint16_t*
-        %24 = get_member %23[0] "v16" : s16i*
-        %25 = load %24 : s16i, align 1
-        %26 = cast(integral) %25 : s32i
-        %27 = const 6533 : s32i
-        %28 = cmp ne %26, %27 : bool
-        if %28 {
-            %29 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_node, "marker", align 1
+        %2 = const 0 : s32i
+        store %2, %0
+        get_member
+        get_member
+        %5 = const 6533 : s16i
+        store %5, %4, align 1
+        get_member
+        get_member
+        %8 = const 8195 : s16i
+        store %8, %7, align 1
+        get_member
+        %10 = get_global @node_p : rec_node**
+        %11 = load %10 : rec_node*, align 8
+        get_member
+        %13 = load %12 : s32i, align 1
+        store %13, %9, align 1
+        scope {
+                get_member
+                get_member
+                %25 = load %24 : s16i, align 1
+                %26 = cast(integral) %25 : s32i
+                %27 = const 6533 : s32i
+                cmp
+                if %28 {
+                        %29 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %16 = get_member %1[1] "nodetype" : rec_jint16_t*
-        %17 = get_member %16[0] "v16" : s16i*
-        %18 = load %17 : s16i, align 1
-        %19 = cast(integral) %18 : s32i
-        %20 = const 8195 : s32i
-        %21 = cmp ne %19, %20 : bool
-        if %21 {
-            %22 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                get_member
+                get_member
+                %18 = load %17 : s16i, align 1
+                %19 = cast(integral) %18 : s32i
+                %20 = const 8195 : s32i
+                cmp
+                if %21 {
+                        %22 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %14 = const 0 : s32i
-    store %14, %0
-    %15 = load %0 : s32i
-    return %15
+        %14 = const 0 : s32i
+        store %14, %0
+        %15 = load %0 : s32i
+        return %15
 }

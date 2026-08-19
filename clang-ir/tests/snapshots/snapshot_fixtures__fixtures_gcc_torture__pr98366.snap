@@ -1,50 +1,50 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr98366.c" (c, x86_64-unknown-linux-gnu)
-global f : rec_S[1] = [{0, 3, 260}] [external, default, align 4, dso_local, constant]
+global f : rec_S[1] = ConstArray { ty: Array { element_type: Named("rec_S"), size: 1 }, elts: Array([ConstRecord { ty: Named("rec_S"), members: Array([CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "3" }, CirInt { ty: Named("u32i"), value: "260" }]) }]), trailing_zeros_num: 0 } [external, default, align 4, dso_local, constant]
 
 fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c, nothrow];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = alloca rec_S[1], ".compoundliteral", align 4
-        %5 = get_global @f : rec_S[1]*
-        %6 = cast(array_to_ptrdecay) %5 : rec_S*
-        %7 = cast(bitcast) %6 : void*
-        %8 = cast(array_to_ptrdecay) %4 : rec_S*
-        %9 = get_member %8[0] "a" : s32i*
-        %10 = const 0 : s32i
-        store %10, %9, align 4
-        %11 = get_member %8[1] "b" : s32i*
-        %12 = const 3 : s32i
-        store %12, %11, align 4
-        %13 = get_member %8[2] "c" : u32i*
-        %14 = const 4 : s32i
-        %15 = set_bitfield %13, %14, "c": 7 bits @0 in signed u32i : s32i, align 4
-        %16 = get_member %8[2] "d" : u32i*
-        %17 = const 2 : s32i
-        %18 = set_bitfield %16, %17, "d": 8 bits @7 in signed u32i : s32i, align 4
-        %19 = get_member %8[2] "e" : u32i*
-        %20 = const 0 : s32i
-        %21 = set_bitfield %19, %20, "e": 17 bits @15 in signed u32i : s32i, align 4
-        %22 = cast(array_to_ptrdecay) %4 : rec_S*
-        %23 = cast(bitcast) %22 : void*
-        %24 = const 12 : u64i
-        %25 = call @memcmp(%7, %23, %24) : s32i [all]
-        %26 = cast(int_to_bool) %25 : bool
-        if %26 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = alloca rec_S[1], ".compoundliteral", align 4
+                %5 = get_global @f : rec_S[1]*
+                %6 = cast(array_to_ptrdecay) %5 : rec_S*
+                %7 = cast(bitcast) %6 : void*
+                %8 = cast(array_to_ptrdecay) %4 : rec_S*
+                get_member
+                %10 = const 0 : s32i
+                store %10, %9, align 4
+                get_member
+                %12 = const 3 : s32i
+                store %12, %11, align 4
+                get_member
+                %14 = const 4 : s32i
+                set_bitfield
+                get_member
+                %17 = const 2 : s32i
+                set_bitfield
+                get_member
+                %20 = const 0 : s32i
+                set_bitfield
+                %22 = cast(array_to_ptrdecay) %4 : rec_S*
+                %23 = cast(bitcast) %22 : void*
+                %24 = const 12 : u64i
+                %25 = call @memcmp(%7, %23, %24) : s32i [all]
+                %26 = cast(int_to_bool) %25 : bool
+                if %26 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/ieee__pr109008.c" (c, x86_64-unknown-linux-gnu)
@@ -11,19 +11,19 @@ fn foo(%arg0: double) -> double [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %10
         %13 = const 1.000000e+00 : double
         %14 = load %10 : double, align 8
-        %15 = fadd %13, %14 : double
+        fadd
         store %15, %12, align 8
         scope {
-            %18 = load %12 : double, align 8
-            %19 = const 1.000000e+00 : double
-            %20 = cmp eq %18, %19 : bool
-            if %20 {
-                %21 = load %10 : double, align 8
-                store %21, %11
-                %22 = load %11 : double
-                return %22
-            }
-            yield
+                %18 = load %12 : double, align 8
+                %19 = const 1.000000e+00 : double
+                cmp
+                if %20 {
+                        %21 = load %10 : double, align 8
+                        store %21, %11
+                        %22 = load %11 : double
+                        return %22
+                }
+                yield
         }
         %16 = const 0.000000e+00 : double
         store %16, %11
@@ -32,24 +32,24 @@ fn foo(%arg0: double) -> double [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const 2.2204460492503131E-16 : double
-        %5 = const 8.000000e+00 : double
-        %6 = fdiv %4, %5 : double
-        %7 = call @foo(%6) : double [all]
-        %8 = const 0.000000e+00 : double
-        %9 = cmp eq %7, %8 : bool
-        if %9 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const 2.2204460492503131E-16 : double
+                %5 = const 8.000000e+00 : double
+                fdiv
+                %7 = call @foo(%6) : double [all]
+                %8 = const 0.000000e+00 : double
+                cmp
+                if %9 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

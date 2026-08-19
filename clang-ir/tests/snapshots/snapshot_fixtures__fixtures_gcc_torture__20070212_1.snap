@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20070212-1.c" (c, x86_64-unknown-linux-gnu)
@@ -16,18 +16,18 @@ fn g(%arg0: s32i, %arg1: s32i, %arg2: rec_f*, %arg3: s32i*) -> s32i [external, c
         store %arg2, %16
         store %arg3, %17
         scope {
-            %25 = load %15 : s32i, align 4
-            %26 = cast(int_to_bool) %25 : bool
-            if %26 {
-                store %14, %19, align 8
+                %25 = load %15 : s32i, align 4
+                %26 = cast(int_to_bool) %25 : bool
+                if %26 {
+                        store %14, %19, align 8
+                        yield
+                } else {
+                        %27 = load %16 : rec_f*, align 8
+                        get_member
+                        store %28, %19, align 8
+                        yield
+                }
                 yield
-            } else {
-                %27 = load %16 : rec_f*, align 8
-                %28 = get_member %27[0] "i" : s32i*
-                store %28, %19, align 8
-                yield
-            }
-            yield
         }
         %20 = const 0 : s32i
         %21 = load %17 : s32i*, align 8
@@ -40,29 +40,29 @@ fn g(%arg0: s32i, %arg1: s32i, %arg2: rec_f*, %arg3: s32i*) -> s32i [external, c
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_f, "f", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 1 : s32i
-    %4 = get_member %1[0] "i" : s32i*
-    store %3, %4, align 4
-    scope {
-        %7 = const 5 : s32i
-        %8 = const 0 : s32i
-        %9 = get_member %1[0] "i" : s32i*
-        %10 = call @g(%7, %8, %1, %9) : s32i [all]
-        %11 = const 0 : s32i
-        %12 = cmp ne %10, %11 : bool
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_f, "f", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 1 : s32i
+        get_member
+        store %3, %4, align 4
+        scope {
+                %7 = const 5 : s32i
+                %8 = const 0 : s32i
+                get_member
+                %10 = call @g(%7, %8, %1, %9) : s32i [all]
+                %11 = const 0 : s32i
+                cmp
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = load %0 : s32i
-    return %6
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = load %0 : s32i
+        return %6
 }

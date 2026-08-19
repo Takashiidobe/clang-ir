@@ -1,11 +1,11 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20111208-1.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[7] = "�\u{1}��\u{1d}�" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[3] = "sl" [cir_private, default, align 1, dso_local, constant]
-global a : s32i = 0 [external, default, align 4, dso_local]
+global .str : s8i[7] = ConstArray { ty: Array { element_type: Named("s8i"), size: 7 }, elts: Str("�\u{1}��\u{1d}�"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[3] = ConstArray { ty: Array { element_type: Named("s8i"), size: 3 }, elts: Str("sl"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global a : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn strlen(%arg0: s8i*) -> u64i [external, c, pure, nothrow];
 fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
@@ -30,107 +30,109 @@ fn pack_unpack(%arg0: s8i*, %arg1: s8i*) -> s32i [external, c, no_inline, dso_lo
         store %arg0, %14
         store %arg1, %15
         %21 = load %14 : s8i*, align 8
-        %22 = get_global @strlen : ((s8i*) -> u64i)*
+        %22 = get_global @strlen : (s8i*) -> u64i*
         %23 = load %14 : s8i*, align 8
         %24 = call @strlen(%23) : u64i [pure]
-        %25 = ptr_stride %21, %24 : s8i*
+        ptr_stride
         store %25, %17, align 8
         %26 = load %15 : s8i*, align 8
-        %27 = get_global @strlen : ((s8i*) -> u64i)*
+        %27 = get_global @strlen : (s8i*) -> u64i*
         %28 = load %15 : s8i*, align 8
         %29 = call @strlen(%28) : u64i [pure]
-        %30 = ptr_stride %26, %29 : s8i*
+        ptr_stride
         store %30, %18, align 8
         scope {
-            while {
-                %73 = load %15 : s8i*, align 8
-                %74 = load %18 : s8i*, align 8
-                %75 = cmp lt %73, %74 : bool
-                condition %75
-            } do {
-                scope {
-                    %35 = load %15 : s8i*, align 8
-                    %36 = const 1 : s32i
-                    %37 = ptr_stride %35, %36 : s8i*
-                    store %37, %15, align 8
-                    %38 = load %35 : s8i, align 1
-                    store %38, %19, align 1
-                    scope {
-                        %39 = load %19 : s8i, align 1
-                        %40 = cast(integral) %39 : s32i
-                        switch %40 {
-                            case equal 115 {
-                                %72 = const 2 : s32i
-                                store %72, %20, align 4
-                                goto unpack_integer
-                            }
-                            case equal 108 {
-                                %41 = const 4 : s32i
-                                store %41, %20, align 4
-                                goto unpack_integer
-                                ^bb1():
-                                    label unpack_integer:
-                                    scope {
-                                        %42 = load %20 : s32i, align 4
-                                        switch %42 {
-                                            case equal 2 {
-                                                scope {
-                                                    %57 = alloca rec_anon2E0, "v", align 2
-                                                    %58 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
-                                                    %59 = get_member %57[1] "a" : s8i[2]*
-                                                    %60 = cast(array_to_ptrdecay) %59 : s8i*
-                                                    %61 = cast(bitcast) %60 : void*
-                                                    %62 = load %14 : s8i*, align 8
-                                                    %63 = cast(bitcast) %62 : void*
-                                                    %64 = const 2 : u64i
-                                                    %65 = call @memcpy(%61, %63, %64) : void* [all]
-                                                    %66 = const 2 : u64i
-                                                    %67 = load %14 : s8i*, align 8
-                                                    %68 = ptr_stride %67, %66 : s8i*
-                                                    store %68, %14, align 8
-                                                    %69 = get_member %57[0] "i" : s16i*
-                                                    %70 = load %69 : s16i, align 2
-                                                    %71 = cast(integral) %70 : s32i
-                                                    call @do_something(%71) [all]
-                                                    yield
+                while {
+                        %73 = load %15 : s8i*, align 8
+                        %74 = load %18 : s8i*, align 8
+                        cmp
+                        condition %75
+                } do {
+                        scope {
+                                %35 = load %15 : s8i*, align 8
+                                %36 = const 1 : s32i
+                                ptr_stride
+                                store %37, %15, align 8
+                                %38 = load %35 : s8i, align 1
+                                store %38, %19, align 1
+                                scope {
+                                        %39 = load %19 : s8i, align 1
+                                        %40 = cast(integral) %39 : s32i
+                                        switch %40 {
+                                                case equal [115] {
+                                                        %72 = const 2 : s32i
+                                                        store %72, %20, align 4
+                                                        goto unpack_integer
                                                 }
-                                                break
-                                            }
-                                            case equal 4 {
-                                                scope {
-                                                    %43 = alloca rec_anon2E1, "v", align 4
-                                                    %44 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
-                                                    %45 = get_member %43[1] "a" : s8i[4]*
-                                                    %46 = cast(array_to_ptrdecay) %45 : s8i*
-                                                    %47 = cast(bitcast) %46 : void*
-                                                    %48 = load %14 : s8i*, align 8
-                                                    %49 = cast(bitcast) %48 : void*
-                                                    %50 = const 4 : u64i
-                                                    %51 = call @memcpy(%47, %49, %50) : void* [all]
-                                                    %52 = const 4 : u64i
-                                                    %53 = load %14 : s8i*, align 8
-                                                    %54 = ptr_stride %53, %52 : s8i*
-                                                    store %54, %14, align 8
-                                                    %55 = get_member %43[0] "i" : s32i*
-                                                    %56 = load %55 : s32i, align 4
-                                                    call @do_something(%56) [all]
-                                                    yield
+                                                case equal [108] {
+                                                        %41 = const 4 : s32i
+                                                        store %41, %20, align 4
+                                                        goto unpack_integer
+                                                    ^bb1:
+                                                        label unpack_integer:
+                                                        scope {
+                                                                %42 = load %20 : s32i, align 4
+                                                                switch %42 {
+                                                                        case equal [2] {
+                                                                                scope {
+                                                                                        %57 = alloca rec_anon2E0, "v", align 2
+                                                                                        %58 = get_global @memcpy : (void*, void*, u64i) -> void**
+                                                                                        get_member
+                                                                                        %60 = cast(array_to_ptrdecay) %59 : s8i*
+                                                                                        %61 = cast(bitcast) %60 : void*
+                                                                                        %62 = load %14 : s8i*, align 8
+                                                                                        %63 = cast(bitcast) %62 : void*
+                                                                                        %64 = const 2 : u64i
+                                                                                        %65 = call @memcpy(%61, %63, %64) : void* [all]
+                                                                                        %66 = const 2 : u64i
+                                                                                        %67 = load %14 : s8i*, align 8
+                                                                                        ptr_stride
+                                                                                        store %68, %14, align 8
+                                                                                        get_member
+                                                                                        %70 = load %69 : s16i, align 2
+                                                                                        %71 = cast(integral) %70 : s32i
+                                                                                        call @do_something(%71) [all]
+                                                                                        yield
+                                                                                }
+                                                                                break
+                                                                        }
+                                                                        case equal [4] {
+                                                                                scope {
+                                                                                        %43 = alloca rec_anon2E1, "v", align 4
+                                                                                        %44 = get_global @memcpy : (void*, void*, u64i) -> void**
+                                                                                        get_member
+                                                                                        %46 = cast(array_to_ptrdecay) %45 : s8i*
+                                                                                        %47 = cast(bitcast) %46 : void*
+                                                                                        %48 = load %14 : s8i*, align 8
+                                                                                        %49 = cast(bitcast) %48 : void*
+                                                                                        %50 = const 4 : u64i
+                                                                                        %51 = call @memcpy(%47, %49, %50) : void* [all]
+                                                                                        %52 = const 4 : u64i
+                                                                                        %53 = load %14 : s8i*, align 8
+                                                                                        ptr_stride
+                                                                                        store %54, %14, align 8
+                                                                                        get_member
+                                                                                        %56 = load %55 : s32i, align 4
+                                                                                        call @do_something(%56) [all]
+                                                                                        yield
+                                                                                }
+                                                                                break
+                                                                        }
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        break
                                                 }
-                                                break
-                                            }
+                                                yield
                                         }
                                         yield
-                                    }
-                                    break
-                            }
+                                }
+                                yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         %31 = load %14 : s8i*, align 8
         %32 = load %31 : s8i, align 1
@@ -141,29 +143,29 @@ fn pack_unpack(%arg0: s8i*, %arg1: s8i*) -> s32i [external, c, no_inline, dso_lo
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "n", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @.str : s8i[7]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = get_global @.str.1 : s8i[3]*
-    %6 = cast(array_to_ptrdecay) %5 : s8i*
-    %7 = call @pack_unpack(%4, %6) : s32i [all]
-    store %7, %1, align 4
-    scope {
-        %10 = load %1 : s32i, align 4
-        %11 = const 0 : s32i
-        %12 = cmp ne %10, %11 : bool
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "n", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @.str : s8i[7]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = get_global @.str.1 : s8i[3]*
+        %6 = cast(array_to_ptrdecay) %5 : s8i*
+        %7 = call @pack_unpack(%4, %6) : s32i [all]
+        store %7, %1, align 4
+        scope {
+                %10 = load %1 : s32i, align 4
+                %11 = const 0 : s32i
+                cmp
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %8 = const 0 : s32i
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        %8 = const 0 : s32i
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

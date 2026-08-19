@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20120615-1.c" (c, x86_64-unknown-linux-gnu)
@@ -9,44 +9,44 @@ fn test1(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %5 = alloca s32i, "i", align 4
         store %arg0, %5
         scope {
-            %13 = load %5 : s32i, align 4
-            %14 = const 12 : s32i
-            %15 = cmp eq %13, %14 : bool
-            if %15 {
-                return
-            }
-            yield
+                %13 = load %5 : s32i, align 4
+                %14 = const 12 : s32i
+                cmp
+                if %15 {
+                        return
+                }
+                yield
         }
         scope {
-            %6 = load %5 : s32i, align 4
-            %7 = const 17 : s32i
-            %8 = cmp ne %6, %7 : bool
-            if %8 {
-                scope {
-                    %10 = load %5 : s32i, align 4
-                    %11 = const 15 : s32i
-                    %12 = cmp eq %10, %11 : bool
-                    if %12 {
-                        return
-                    }
-                    yield
+                %6 = load %5 : s32i, align 4
+                %7 = const 17 : s32i
+                cmp
+                if %8 {
+                        scope {
+                                %10 = load %5 : s32i, align 4
+                                %11 = const 15 : s32i
+                                cmp
+                                if %12 {
+                                        return
+                                }
+                                yield
+                        }
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
                 }
-                %9 = get_global @abort : (() -> void)*
-                call @abort() [all]
                 yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 15 : s32i
-    call @test1(%2) [all]
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = load %0 : s32i
-    return %4
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 15 : s32i
+        call @test1(%2) [all]
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = load %0 : s32i
+        return %4
 }

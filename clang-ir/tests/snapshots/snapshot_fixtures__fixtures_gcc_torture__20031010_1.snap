@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20031010-1.c" (c, x86_64-unknown-linux-gnu)
@@ -20,73 +20,73 @@ fn foo(%arg0: s64i, %arg1: s64i, %arg2: bool, %arg3: bool, %arg4: bool) -> s64i 
         store %arg4, %20
         %23 = load %16 : s64i, align 8
         %24 = load %17 : s64i, align 8
-        %25 = sub %23, %24 : s64i [nsw]
+        sub
         store %25, %22, align 8
         scope {
-            %28 = load %18 : bool, align 1
-            if %28 {
-                scope {
-                    %31 = load %19 : bool, align 1
-                    if %31 {
+                %28 = load %18 : bool, align 1
+                if %28 {
                         scope {
-                            %35 = load %20 : bool, align 1
-                            if %35 {
-                                %36 = alloca s64i, "tmp", align 8
-                                %37 = load %16 : s64i, align 8
-                                store %37, %36, align 8
-                                %38 = load %17 : s64i, align 8
-                                store %38, %16, align 8
-                                %39 = load %36 : s64i, align 8
-                                store %39, %17, align 8
+                                %31 = load %19 : bool, align 1
+                                if %31 {
+                                        scope {
+                                                %35 = load %20 : bool, align 1
+                                                if %35 {
+                                                        %36 = alloca s64i, "tmp", align 8
+                                                        %37 = load %16 : s64i, align 8
+                                                        store %37, %36, align 8
+                                                        %38 = load %17 : s64i, align 8
+                                                        store %38, %16, align 8
+                                                        %39 = load %36 : s64i, align 8
+                                                        store %39, %17, align 8
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        %32 = load %16 : s64i, align 8
+                                        %33 = load %17 : s64i, align 8
+                                        sub
+                                        store %34, %22, align 8
+                                        yield
+                                }
                                 yield
-                            }
-                            yield
                         }
-                        %32 = load %16 : s64i, align 8
-                        %33 = load %17 : s64i, align 8
-                        %34 = sub %32, %33 : s64i [nsw]
-                        store %34, %22, align 8
-                        yield
-                    }
-                    yield
+                        %29 = load %22 : s64i, align 8
+                        store %29, %21
+                        %30 = load %21 : s64i
+                        return %30
                 }
-                %29 = load %22 : s64i, align 8
-                store %29, %21
-                %30 = load %21 : s64i
-                return %30
-            }
-            yield
+                yield
         }
-        %26 = get_global @abort : (() -> void)*
+        %26 = get_global @abort : () -> void*
         call @abort() [all]
         %27 = load %21 : s64i
         return %27
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const 2 : s64i
-        %5 = const 3 : s64i
-        %6 = const 1 : s32i
-        %7 = cast(int_to_bool) %6 : bool
-        %8 = const 1 : s32i
-        %9 = cast(int_to_bool) %8 : bool
-        %10 = const 1 : s32i
-        %11 = cast(int_to_bool) %10 : bool
-        %12 = call @foo(%4, %5, %7, %9, %11) : s64i [all]
-        %13 = const 0 : s64i
-        %14 = cmp eq %12, %13 : bool
-        if %14 {
-            %15 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const 2 : s64i
+                %5 = const 3 : s64i
+                %6 = const 1 : s32i
+                %7 = cast(int_to_bool) %6 : bool
+                %8 = const 1 : s32i
+                %9 = cast(int_to_bool) %8 : bool
+                %10 = const 1 : s32i
+                %11 = cast(int_to_bool) %10 : bool
+                %12 = call @foo(%4, %5, %7, %9, %11) : s64i [all]
+                %13 = const 0 : s64i
+                cmp
+                if %14 {
+                        %15 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

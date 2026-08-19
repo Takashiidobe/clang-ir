@@ -1,67 +1,67 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/time/clock.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn clock() -> s64i [external, c, nothrow];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s64i, "start", align 8
-    %2 = alloca s64i, "acc", align 8
-    %3 = alloca s64i, "end", align 8
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = call @clock() : s64i [all]
-    store %5, %1, align 8
-    %6 = const 0 : s64i
-    store %6, %2, align 8, volatile
-    scope {
-        %23 = alloca s64i, "i", align 8
-        %24 = const 0 : s64i
-        store %24, %23, align 8
-        for cond: {
-            %30 = load %23 : s64i, align 8
-            %31 = const 100000 : s64i
-            %32 = cmp lt %30, %31 : bool
-            condition %32
-        } step: {
-            %25 = load %23 : s64i, align 8
-            %26 = inc %25 : s64i [nsw]
-            store %26, %23, align 8
-            yield
-        } do {
-            %27 = load %23 : s64i, align 8
-            %28 = load %2 : s64i, align 8, volatile
-            %29 = add %28, %27 : s64i [nsw]
-            store %29, %2, align 8, volatile
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s64i, "start", align 8
+        %2 = alloca s64i, "acc", align 8
+        %3 = alloca s64i, "end", align 8
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = call @clock() : s64i [all]
+        store %5, %1, align 8
+        %6 = const 0 : s64i
+        store %6, %2, align 8
+        scope {
+                %23 = alloca s64i, "i", align 8
+                %24 = const 0 : s64i
+                store %24, %23, align 8
+                for cond {
+                        %30 = load %23 : s64i, align 8
+                        %31 = const 100000 : s64i
+                        cmp
+                        condition %32
+                } step {
+                        %25 = load %23 : s64i, align 8
+                        inc
+                        store %26, %23, align 8
+                        yield
+                } body {
+                        %27 = load %23 : s64i, align 8
+                        %28 = load %2 : s64i, align 8
+                        %29 = add %28, %27 : s64i [nsw]
+                        store %29, %2, align 8
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = call @clock() : s64i [all]
-    store %7, %3, align 8
-    %8 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %9 = get_global @.str : s8i[4]*
-    %10 = cast(array_to_ptrdecay) %9 : s8i*
-    %11 = load %3 : s64i, align 8
-    %12 = load %1 : s64i, align 8
-    %13 = cmp ge %11, %12 : bool
-    %14 = ternary %13 ? { : bool
-        %20 = load %1 : s64i, align 8
-        %21 = const -1 : s64i
-        %22 = cmp ne %20, %21 : bool
-        yield %22
-    } : {
-        %19 = const false : bool
-        yield %19
-    }
-    %15 = cast(bool_to_int) %14 : s32i
-    %16 = call @printf(%10, %15) : s32i [all]
-    %17 = const 0 : s32i
-    store %17, %0
-    %18 = load %0 : s32i
-    return %18
+        %7 = call @clock() : s64i [all]
+        store %7, %3, align 8
+        %8 = get_global @printf : (s8i*, ...) -> s32i*
+        %9 = get_global @.str : s8i[4]*
+        %10 = cast(array_to_ptrdecay) %9 : s8i*
+        %11 = load %3 : s64i, align 8
+        %12 = load %1 : s64i, align 8
+        cmp
+        %14 = ternary %13 ? { : bool
+                %20 = load %1 : s64i, align 8
+                %21 = const -1 : s64i
+                cmp
+                yield %22
+        } : {
+                %19 = const false : bool
+                yield %19
+        }
+        %15 = cast(bool_to_int) %14 : s32i
+        %16 = call @printf(%10, %15) : s32i [all]
+        %17 = const 0 : s32i
+        store %17, %0
+        %18 = load %0 : s32i
+        return %18
 }

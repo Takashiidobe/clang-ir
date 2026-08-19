@@ -1,52 +1,52 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/sizeof.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn sizeof_values() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %19 = alloca s32i, "__retval", align 4
-    %20 = alloca s32i[3], "values", align 4
-    %21 = const 4 : u64i
-    %22 = const 12 : u64i
-    %23 = add %21, %22 : u64i
-    %24 = const 8 : u64i
-    %25 = add %23, %24 : u64i
-    %26 = const 4 : u64i
-    %27 = add %25, %26 : u64i
-    %28 = cast(integral) %27 : s32i
-    store %28, %19
-    %29 = load %19 : s32i
-    return %29
+        %19 = alloca s32i, "__retval", align 4
+        %20 = alloca s32i[3], "values", align 4
+        %21 = const 4 : u64i
+        %22 = const 12 : u64i
+        %23 = add %21, %22 : u64i
+        %24 = const 8 : u64i
+        %25 = add %23, %24 : u64i
+        %26 = const 4 : u64i
+        %27 = add %25, %26 : u64i
+        %28 = cast(integral) %27 : s32i
+        store %28, %19
+        %29 = load %19 : s32i
+        return %29
 }
 fn sizeof_expr() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %14 = alloca s32i, "__retval", align 4
-    %15 = alloca s32i, "value", align 4
-    %16 = const 0 : s32i
-    store %16, %15, align 4
-    %17 = const 4 : s32i
-    store %17, %14
-    %18 = load %14 : s32i
-    return %18
+        %14 = alloca s32i, "__retval", align 4
+        %15 = alloca s32i, "value", align 4
+        %16 = const 0 : s32i
+        store %16, %15, align 4
+        %17 = const 4 : s32i
+        store %17, %14
+        %18 = load %14 : s32i
+        return %18
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[4]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = call @sizeof_values() : s32i [all]
-    %6 = call @printf(%4, %5) : s32i [all]
-    %7 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %8 = get_global @.str : s8i[4]*
-    %9 = cast(array_to_ptrdecay) %8 : s8i*
-    %10 = call @sizeof_expr() : s32i [all]
-    %11 = call @printf(%9, %10) : s32i [all]
-    %12 = const 0 : s32i
-    store %12, %0
-    %13 = load %0 : s32i
-    return %13
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[4]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = call @sizeof_values() : s32i [all]
+        %6 = call @printf(%4, %5) : s32i [all]
+        %7 = get_global @printf : (s8i*, ...) -> s32i*
+        %8 = get_global @.str : s8i[4]*
+        %9 = cast(array_to_ptrdecay) %8 : s8i*
+        %10 = call @sizeof_expr() : s32i [all]
+        %11 = call @printf(%9, %10) : s32i [all]
+        %12 = const 0 : s32i
+        store %12, %0
+        %13 = load %0 : s32i
+        return %13
 }

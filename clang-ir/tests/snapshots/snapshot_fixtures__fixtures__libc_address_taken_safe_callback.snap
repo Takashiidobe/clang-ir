@@ -1,37 +1,37 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/libc_address_taken_safe_callback.c" (c, x86_64-unknown-linux-gnu)
-global alloc : rec_Allocator = {@realloc, @free} [external, default, align 8, dso_local]
-global .str : s8i[4] = "ok\n" [cir_private, default, align 1, dso_local, constant]
+global alloc : rec_Allocator = ConstRecord { ty: Named("rec_Allocator"), members: Array([GlobalView { ty: Pointer { pointee: Func { inputs: [Pointer { pointee: Named("void"), addr_space: None }, Named("u64i")], optional_return_type: Some(Pointer { pointee: Named("void"), addr_space: None }), var_arg: false }, addr_space: None }, symbol: "realloc", indices: None }, GlobalView { ty: Pointer { pointee: Func { inputs: [Pointer { pointee: Named("void"), addr_space: None }], optional_return_type: None, var_arg: false }, addr_space: None }, symbol: "free", indices: None }]) } [external, default, align 8, dso_local]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("ok\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn realloc(%arg0: void*, %arg1: u64i) -> void* [external, c, nothrow];
 fn free(%arg0: void*) -> void [external, c, nothrow];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca void*, "p", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @alloc : rec_Allocator*
-    %4 = get_member %3[0] "realloc_fn" : ((void*, u64i) -> void*)**
-    %5 = load %4 : ((void*, u64i) -> void*)*, align 8
-    %6 = const #cir.ptr<null> : void*
-    %7 = const 8 : u64i
-    %8 = call %5(%6, %7) : void* [all]
-    store %8, %1, align 8
-    %9 = get_global @alloc : rec_Allocator*
-    %10 = get_member %9[1] "free_fn" : ((void*) -> void)**
-    %11 = load %10 : ((void*) -> void)*, align 8
-    %12 = load %1 : void*, align 8
-    call %11(%12) [all]
-    %13 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %14 = get_global @.str : s8i[4]*
-    %15 = cast(array_to_ptrdecay) %14 : s8i*
-    %16 = call @printf(%15) : s32i [all]
-    %17 = const 0 : s32i
-    store %17, %0
-    %18 = load %0 : s32i
-    return %18
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca void*, "p", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @alloc : rec_Allocator*
+        get_member
+        %5 = load %4 : (void*, u64i) -> void**, align 8
+        %6 = const #cir.ptr<null> : void*
+        %7 = const 8 : u64i
+        %8 = call (%6, %7) : void* [all]
+        store %8, %1, align 8
+        %9 = get_global @alloc : rec_Allocator*
+        get_member
+        %11 = load %10 : (void*) -> void*, align 8
+        %12 = load %1 : void*, align 8
+        call (%12) [all]
+        %13 = get_global @printf : (s8i*, ...) -> s32i*
+        %14 = get_global @.str : s8i[4]*
+        %15 = cast(array_to_ptrdecay) %14 : s8i*
+        %16 = call @printf(%15) : s32i [all]
+        %17 = const 0 : s32i
+        store %17, %0
+        %18 = load %0 : s32i
+        return %18
 }

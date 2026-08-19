@@ -1,118 +1,118 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.c-testsuite/case_00150.c" (c, x86_64-unknown-linux-gnu)
-global gs1 : rec_S1 = {1, 2} [external, default, align 4, dso_local]
-global .compoundliteral : rec_S2 = {{1, 2}, @gs1, [1, 2]} [internal, default, align 8, dso_local]
-global s : rec_S2* = @.compoundliteral [external, default, align 8, dso_local]
+global gs1 : rec_S1 = ConstRecord { ty: Named("rec_S1"), members: Array([CirInt { ty: Named("s32i"), value: "1" }, CirInt { ty: Named("s32i"), value: "2" }]) } [external, default, align 4, dso_local]
+global .compoundliteral : rec_S2 = ConstRecord { ty: Named("rec_S2"), members: Array([ConstRecord { ty: Named("rec_S1"), members: Array([CirInt { ty: Named("s32i"), value: "1" }, CirInt { ty: Named("s32i"), value: "2" }]) }, GlobalView { ty: Pointer { pointee: Named("rec_S1"), addr_space: None }, symbol: "gs1", indices: None }, ConstArray { ty: Array { element_type: Named("s32i"), size: 2 }, elts: Array([CirInt { ty: Named("s32i"), value: "1" }, CirInt { ty: Named("s32i"), value: "2" }]), trailing_zeros_num: 0 }]) } [internal, default, align 8, dso_local]
+global s : rec_S2* = GlobalView { ty: Pointer { pointee: Named("rec_S2"), addr_space: None }, symbol: ".compoundliteral", indices: None } [external, default, align 8, dso_local]
 
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %53 = get_global @s : rec_S2**
-        %54 = load %53 : rec_S2*, align 8
-        %55 = get_member %54[0] "s1" : rec_S1*
-        %56 = get_member %55[0] "a" : s32i*
-        %57 = load %56 : s32i, align 8
-        %58 = const 1 : s32i
-        %59 = cmp ne %57, %58 : bool
-        if %59 {
-            %60 = const 1 : s32i
-            store %60, %0
-            %61 = load %0 : s32i
-            return %61
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %53 = get_global @s : rec_S2**
+                %54 = load %53 : rec_S2*, align 8
+                get_member
+                get_member
+                %57 = load %56 : s32i, align 8
+                %58 = const 1 : s32i
+                cmp
+                if %59 {
+                        %60 = const 1 : s32i
+                        store %60, %0
+                        %61 = load %0 : s32i
+                        return %61
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %44 = get_global @s : rec_S2**
-        %45 = load %44 : rec_S2*, align 8
-        %46 = get_member %45[0] "s1" : rec_S1*
-        %47 = get_member %46[1] "b" : s32i*
-        %48 = load %47 : s32i, align 4
-        %49 = const 2 : s32i
-        %50 = cmp ne %48, %49 : bool
-        if %50 {
-            %51 = const 2 : s32i
-            store %51, %0
-            %52 = load %0 : s32i
-            return %52
+        scope {
+                %44 = get_global @s : rec_S2**
+                %45 = load %44 : rec_S2*, align 8
+                get_member
+                get_member
+                %48 = load %47 : s32i, align 4
+                %49 = const 2 : s32i
+                cmp
+                if %50 {
+                        %51 = const 2 : s32i
+                        store %51, %0
+                        %52 = load %0 : s32i
+                        return %52
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %34 = get_global @s : rec_S2**
-        %35 = load %34 : rec_S2*, align 8
-        %36 = get_member %35[1] "ps1" : rec_S1**
-        %37 = load %36 : rec_S1*, align 8
-        %38 = get_member %37[0] "a" : s32i*
-        %39 = load %38 : s32i, align 4
-        %40 = const 1 : s32i
-        %41 = cmp ne %39, %40 : bool
-        if %41 {
-            %42 = const 3 : s32i
-            store %42, %0
-            %43 = load %0 : s32i
-            return %43
+        scope {
+                %34 = get_global @s : rec_S2**
+                %35 = load %34 : rec_S2*, align 8
+                get_member
+                %37 = load %36 : rec_S1*, align 8
+                get_member
+                %39 = load %38 : s32i, align 4
+                %40 = const 1 : s32i
+                cmp
+                if %41 {
+                        %42 = const 3 : s32i
+                        store %42, %0
+                        %43 = load %0 : s32i
+                        return %43
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %24 = get_global @s : rec_S2**
-        %25 = load %24 : rec_S2*, align 8
-        %26 = get_member %25[1] "ps1" : rec_S1**
-        %27 = load %26 : rec_S1*, align 8
-        %28 = get_member %27[1] "b" : s32i*
-        %29 = load %28 : s32i, align 4
-        %30 = const 2 : s32i
-        %31 = cmp ne %29, %30 : bool
-        if %31 {
-            %32 = const 4 : s32i
-            store %32, %0
-            %33 = load %0 : s32i
-            return %33
+        scope {
+                %24 = get_global @s : rec_S2**
+                %25 = load %24 : rec_S2*, align 8
+                get_member
+                %27 = load %26 : rec_S1*, align 8
+                get_member
+                %29 = load %28 : s32i, align 4
+                %30 = const 2 : s32i
+                cmp
+                if %31 {
+                        %32 = const 4 : s32i
+                        store %32, %0
+                        %33 = load %0 : s32i
+                        return %33
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %14 = const 0 : s64i
-        %15 = get_global @s : rec_S2**
-        %16 = load %15 : rec_S2*, align 8
-        %17 = get_member %16[2] "arr" : s32i[2]*
-        %18 = get_element %17[%14] : s32i*
-        %19 = load %18 : s32i, align 8
-        %20 = const 1 : s32i
-        %21 = cmp ne %19, %20 : bool
-        if %21 {
-            %22 = const 5 : s32i
-            store %22, %0
-            %23 = load %0 : s32i
-            return %23
+        scope {
+                %14 = const 0 : s64i
+                %15 = get_global @s : rec_S2**
+                %16 = load %15 : rec_S2*, align 8
+                get_member
+                get_element
+                %19 = load %18 : s32i, align 8
+                %20 = const 1 : s32i
+                cmp
+                if %21 {
+                        %22 = const 5 : s32i
+                        store %22, %0
+                        %23 = load %0 : s32i
+                        return %23
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %4 = const 1 : s64i
-        %5 = get_global @s : rec_S2**
-        %6 = load %5 : rec_S2*, align 8
-        %7 = get_member %6[2] "arr" : s32i[2]*
-        %8 = get_element %7[%4] : s32i*
-        %9 = load %8 : s32i, align 4
-        %10 = const 2 : s32i
-        %11 = cmp ne %9, %10 : bool
-        if %11 {
-            %12 = const 6 : s32i
-            store %12, %0
-            %13 = load %0 : s32i
-            return %13
+        scope {
+                %4 = const 1 : s64i
+                %5 = get_global @s : rec_S2**
+                %6 = load %5 : rec_S2*, align 8
+                get_member
+                get_element
+                %9 = load %8 : s32i, align 4
+                %10 = const 2 : s32i
+                cmp
+                if %11 {
+                        %12 = const 6 : s32i
+                        store %12, %0
+                        %13 = load %0 : s32i
+                        return %13
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

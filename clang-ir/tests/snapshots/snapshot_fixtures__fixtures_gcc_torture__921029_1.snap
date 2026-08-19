@@ -1,11 +1,11 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/921029-1.c" (c, x86_64-unknown-linux-gnu)
-global hpart : u64i = 0 [external, default, align 8, dso_local]
-global lpart : u64i = 0 [external, default, align 8, dso_local]
-global back : u64i = 0 [external, default, align 8, dso_local]
+global hpart : u64i = CirInt { ty: Named("u64i"), value: "0" } [external, default, align 8, dso_local]
+global lpart : u64i = CirInt { ty: Named("u64i"), value: "0" } [external, default, align 8, dso_local]
+global back : u64i = CirInt { ty: Named("u64i"), value: "0" } [external, default, align 8, dso_local]
 
 fn build(%arg0: s64i, %arg1: s64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s64i, %arg1: s64i):
@@ -21,7 +21,7 @@ fn build(%arg0: s64i, %arg1: s64i) -> u64i [external, c, no_inline, dso_local, n
         %83 = const 32 : s32i
         %84 = get_global @hpart : u64i*
         %85 = load %84 : u64i, align 8
-        %86 = shift left %85, %83 : u64i
+        shift
         store %86, %84, align 8
         %87 = load %78 : s64i, align 8
         %88 = cast(integral) %87 : u64i
@@ -30,13 +30,13 @@ fn build(%arg0: s64i, %arg1: s64i) -> u64i [external, c, no_inline, dso_local, n
         %90 = const 4294967295 : u64i
         %91 = get_global @lpart : u64i*
         %92 = load %91 : u64i, align 8
-        %93 = and %92, %90 : u64i
+        and
         store %93, %91, align 8
         %94 = get_global @hpart : u64i*
         %95 = load %94 : u64i, align 8
         %96 = get_global @lpart : u64i*
         %97 = load %96 : u64i, align 8
-        %98 = or %95, %97 : u64i
+        or
         %99 = get_global @back : u64i*
         store %98, %99, align 8
         %100 = get_global @back : u64i*
@@ -48,168 +48,168 @@ fn build(%arg0: s64i, %arg1: s64i) -> u64i [external, c, no_inline, dso_local, n
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %71 = const 0 : s64i
-        %72 = const 1 : s64i
-        %73 = call @build(%71, %72) : u64i [all]
-        %74 = const 1 : u64i
-        %75 = cmp ne %73, %74 : bool
-        if %75 {
-            %76 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %71 = const 0 : s64i
+                %72 = const 1 : s64i
+                %73 = call @build(%71, %72) : u64i [all]
+                %74 = const 1 : u64i
+                cmp
+                if %75 {
+                        %76 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %65 = const 0 : s64i
-        %66 = const 0 : s64i
-        %67 = call @build(%65, %66) : u64i [all]
-        %68 = const 0 : u64i
-        %69 = cmp ne %67, %68 : bool
-        if %69 {
-            %70 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %65 = const 0 : s64i
+                %66 = const 0 : s64i
+                %67 = call @build(%65, %66) : u64i [all]
+                %68 = const 0 : u64i
+                cmp
+                if %69 {
+                        %70 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %59 = const 0 : s64i
-        %60 = const 4294967295 : s64i
-        %61 = call @build(%59, %60) : u64i [all]
-        %62 = const 4294967295 : u64i
-        %63 = cmp ne %61, %62 : bool
-        if %63 {
-            %64 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %59 = const 0 : s64i
+                %60 = const 4294967295 : s64i
+                %61 = call @build(%59, %60) : u64i [all]
+                %62 = const 4294967295 : u64i
+                cmp
+                if %63 {
+                        %64 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %53 = const 0 : s64i
-        %54 = const 4294967294 : s64i
-        %55 = call @build(%53, %54) : u64i [all]
-        %56 = const 4294967294 : u64i
-        %57 = cmp ne %55, %56 : bool
-        if %57 {
-            %58 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %53 = const 0 : s64i
+                %54 = const 4294967294 : s64i
+                %55 = call @build(%53, %54) : u64i [all]
+                %56 = const 4294967294 : u64i
+                cmp
+                if %57 {
+                        %58 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %47 = const 1 : s64i
-        %48 = const 1 : s64i
-        %49 = call @build(%47, %48) : u64i [all]
-        %50 = const 4294967297 : u64i
-        %51 = cmp ne %49, %50 : bool
-        if %51 {
-            %52 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %47 = const 1 : s64i
+                %48 = const 1 : s64i
+                %49 = call @build(%47, %48) : u64i [all]
+                %50 = const 4294967297 : u64i
+                cmp
+                if %51 {
+                        %52 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %41 = const 1 : s64i
-        %42 = const 0 : s64i
-        %43 = call @build(%41, %42) : u64i [all]
-        %44 = const 4294967296 : u64i
-        %45 = cmp ne %43, %44 : bool
-        if %45 {
-            %46 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %41 = const 1 : s64i
+                %42 = const 0 : s64i
+                %43 = call @build(%41, %42) : u64i [all]
+                %44 = const 4294967296 : u64i
+                cmp
+                if %45 {
+                        %46 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %35 = const 1 : s64i
-        %36 = const 4294967295 : s64i
-        %37 = call @build(%35, %36) : u64i [all]
-        %38 = const 8589934591 : u64i
-        %39 = cmp ne %37, %38 : bool
-        if %39 {
-            %40 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %35 = const 1 : s64i
+                %36 = const 4294967295 : s64i
+                %37 = call @build(%35, %36) : u64i [all]
+                %38 = const 8589934591 : u64i
+                cmp
+                if %39 {
+                        %40 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %29 = const 1 : s64i
-        %30 = const 4294967294 : s64i
-        %31 = call @build(%29, %30) : u64i [all]
-        %32 = const 8589934590 : u64i
-        %33 = cmp ne %31, %32 : bool
-        if %33 {
-            %34 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %29 = const 1 : s64i
+                %30 = const 4294967294 : s64i
+                %31 = call @build(%29, %30) : u64i [all]
+                %32 = const 8589934590 : u64i
+                cmp
+                if %33 {
+                        %34 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %23 = const 4294967295 : s64i
-        %24 = const 1 : s64i
-        %25 = call @build(%23, %24) : u64i [all]
-        %26 = const 18446744069414584321 : u64i
-        %27 = cmp ne %25, %26 : bool
-        if %27 {
-            %28 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %23 = const 4294967295 : s64i
+                %24 = const 1 : s64i
+                %25 = call @build(%23, %24) : u64i [all]
+                %26 = const 18446744069414584321 : u64i
+                cmp
+                if %27 {
+                        %28 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %17 = const 4294967295 : s64i
-        %18 = const 0 : s64i
-        %19 = call @build(%17, %18) : u64i [all]
-        %20 = const 18446744069414584320 : u64i
-        %21 = cmp ne %19, %20 : bool
-        if %21 {
-            %22 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %17 = const 4294967295 : s64i
+                %18 = const 0 : s64i
+                %19 = call @build(%17, %18) : u64i [all]
+                %20 = const 18446744069414584320 : u64i
+                cmp
+                if %21 {
+                        %22 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %11 = const 4294967295 : s64i
-        %12 = const 4294967295 : s64i
-        %13 = call @build(%11, %12) : u64i [all]
-        %14 = const 18446744073709551615 : u64i
-        %15 = cmp ne %13, %14 : bool
-        if %15 {
-            %16 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %11 = const 4294967295 : s64i
+                %12 = const 4294967295 : s64i
+                %13 = call @build(%11, %12) : u64i [all]
+                %14 = const 18446744073709551615 : u64i
+                cmp
+                if %15 {
+                        %16 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %5 = const 4294967295 : s64i
-        %6 = const 4294967294 : s64i
-        %7 = call @build(%5, %6) : u64i [all]
-        %8 = const 18446744073709551614 : u64i
-        %9 = cmp ne %7, %8 : bool
-        if %9 {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %5 = const 4294967295 : s64i
+                %6 = const 4294967294 : s64i
+                %7 = call @build(%5, %6) : u64i [all]
+                %8 = const 18446744073709551614 : u64i
+                cmp
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

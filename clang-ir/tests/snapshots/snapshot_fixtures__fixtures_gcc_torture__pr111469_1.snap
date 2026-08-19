@@ -1,33 +1,33 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr111469-1.c" (c, x86_64-unknown-linux-gnu)
-global f : s64i = 0 [external, default, align 8, dso_local]
-global g : s8i* = #cir.ptr<null> [external, default, align 8, dso_local]
+global f : s64i = CirInt { ty: Named("s64i"), value: "0" } [external, default, align 8, dso_local]
+global g : s8i* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("s8i"), addr_space: None }) } [external, default, align 8, dso_local]
 
 fn o() -> s8i [external, c, no_inline, dso_local, nothrow] {
-    %24 = alloca s8i, "__retval", align 1
-    %25 = alloca s8i, "l", align 1
-    scope {
-        while {
-            %31 = get_global @f : s64i*
-            %32 = load %31 : s64i, align 8
-            %33 = cast(int_to_bool) %32 : bool
-            condition %33
-        } do {
-            yield
+        %24 = alloca s8i, "__retval", align 1
+        %25 = alloca s8i, "l", align 1
+        scope {
+                while {
+                        %31 = get_global @f : s64i*
+                        %32 = load %31 : s64i, align 8
+                        %33 = cast(int_to_bool) %32 : bool
+                        condition %33
+                } do {
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %26 = get_global @g : s8i**
-    %27 = load %26 : s8i*, align 8
-    %28 = load %27 : s8i, align 1
-    store %28, %25, align 1
-    %29 = load %25 : s8i, align 1
-    store %29, %24
-    %30 = load %24 : s8i
-    return %30
+        %26 = get_global @g : s8i**
+        %27 = load %26 : s8i*, align 8
+        %28 = load %27 : s8i, align 1
+        store %28, %25, align 1
+        %29 = load %25 : s8i, align 1
+        store %29, %24
+        %30 = load %24 : s8i
+        return %30
 }
 fn gg(%arg0: u16i, %arg1: u16i) -> u16i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: u16i, %arg1: u16i):
@@ -38,25 +38,25 @@ fn gg(%arg0: u16i, %arg1: u16i) -> u16i [external, c, no_inline, dso_local, noth
         store %arg0, %6
         store %arg1, %7
         scope {
-            %13 = load %6 : u16i, align 2
-            %14 = cast(integral) %13 : s32i
-            %15 = load %7 : u16i, align 2
-            %16 = cast(integral) %15 : s32i
-            %17 = cmp gt %14, %16 : bool
-            if %17 {
-                %22 = load %7 : u16i, align 2
-                %23 = cast(integral) %22 : s16i
-                store %23, %9, align 2
+                %13 = load %6 : u16i, align 2
+                %14 = cast(integral) %13 : s32i
+                %15 = load %7 : u16i, align 2
+                %16 = cast(integral) %15 : s32i
+                cmp
+                if %17 {
+                        %22 = load %7 : u16i, align 2
+                        %23 = cast(integral) %22 : s16i
+                        store %23, %9, align 2
+                        yield
+                } else {
+                        %18 = get_global @o : () -> s8i*
+                        %19 = call @o() : s8i [all]
+                        %20 = load %6 : u16i, align 2
+                        %21 = cast(integral) %20 : s16i
+                        store %21, %9, align 2
+                        yield
+                }
                 yield
-            } else {
-                %18 = get_global @o : (() -> s8i)*
-                %19 = call @o() : s8i [all]
-                %20 = load %6 : u16i, align 2
-                %21 = cast(integral) %20 : s16i
-                store %21, %9, align 2
-                yield
-            }
-            yield
         }
         %10 = load %9 : s16i, align 2
         %11 = cast(integral) %10 : u16i
@@ -65,12 +65,12 @@ fn gg(%arg0: u16i, %arg1: u16i) -> u16i [external, c, no_inline, dso_local, noth
         return %12
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 3 : u16i
-    %3 = const 2 : u16i
-    %4 = call @gg(%2, %3) : u16i [all]
-    %5 = load %0 : s32i
-    return %5
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 3 : u16i
+        %3 = const 2 : u16i
+        %4 = call @gg(%2, %3) : u16i [all]
+        %5 = load %0 : s32i
+        return %5
 }

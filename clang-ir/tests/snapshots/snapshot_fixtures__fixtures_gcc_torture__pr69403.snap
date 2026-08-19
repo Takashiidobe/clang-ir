@@ -1,57 +1,57 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr69403.c" (c, x86_64-unknown-linux-gnu)
-global b : s32i = 0 [external, default, align 4, dso_local]
-global a : s32i = 0 [external, default, align 4, dso_local]
-global c : s32i = 0 [external, default, align 4, dso_local]
+global b : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global a : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global c : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn fn1() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %11 = alloca s32i, "__retval", align 4
-    scope {
-        %14 = get_global @b : s32i*
-        %15 = load %14 : s32i, align 4
-        %16 = get_global @a : s32i*
-        %17 = load %16 : s32i, align 4
-        %18 = get_global @a : s32i*
-        %19 = load %18 : s32i, align 4
-        %20 = get_global @c : s32i*
-        %21 = load %20 : s32i, align 4
-        %22 = and %19, %21 : s32i
-        %23 = cmp ne %17, %22 : bool
-        %24 = cast(bool_to_int) %23 : s32i
-        %25 = or %15, %24 : s32i
-        %26 = const 1 : s32i
-        %27 = cmp eq %25, %26 : bool
-        if %27 {
-            call @abort() [all]
-            yield
+        %11 = alloca s32i, "__retval", align 4
+        scope {
+                %14 = get_global @b : s32i*
+                %15 = load %14 : s32i, align 4
+                %16 = get_global @a : s32i*
+                %17 = load %16 : s32i, align 4
+                %18 = get_global @a : s32i*
+                %19 = load %18 : s32i, align 4
+                %20 = get_global @c : s32i*
+                %21 = load %20 : s32i, align 4
+                and
+                cmp
+                %24 = cast(bool_to_int) %23 : s32i
+                or
+                %26 = const 1 : s32i
+                cmp
+                if %27 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %12 = const 0 : s32i
-    store %12, %11
-    %13 = load %11 : s32i
-    return %13
+        %12 = const 0 : s32i
+        store %12, %11
+        %13 = load %11 : s32i
+        return %13
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 5 : s32i
-    %3 = get_global @a : s32i*
-    store %2, %3, align 4
-    %4 = const 1 : s32i
-    %5 = get_global @c : s32i*
-    store %4, %5, align 4
-    %6 = const 6 : s32i
-    %7 = get_global @b : s32i*
-    store %6, %7, align 4
-    %8 = get_global @fn1 : (() -> s32i)*
-    %9 = call @fn1() : s32i [all]
-    store %9, %0
-    %10 = load %0 : s32i
-    return %10
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 5 : s32i
+        %3 = get_global @a : s32i*
+        store %2, %3, align 4
+        %4 = const 1 : s32i
+        %5 = get_global @c : s32i*
+        store %4, %5, align 4
+        %6 = const 6 : s32i
+        %7 = get_global @b : s32i*
+        store %6, %7, align 4
+        %8 = get_global @fn1 : () -> s32i*
+        %9 = call @fn1() : s32i [all]
+        store %9, %0
+        %10 = load %0 : s32i
+        return %10
 }

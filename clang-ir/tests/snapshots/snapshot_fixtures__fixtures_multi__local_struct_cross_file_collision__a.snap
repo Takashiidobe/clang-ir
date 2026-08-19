@@ -1,56 +1,56 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.multi/local_struct_cross_file_collision/a.c" (c, x86_64-unknown-linux-gnu)
-global __const.run_a.items : rec_Item[2] = [{1, 10}, {2, 20}] [cir_private, default, dso_local, constant]
+global __const.run_a.items : rec_Item[2] = ConstArray { ty: Array { element_type: Named("rec_Item"), size: 2 }, elts: Array([ConstRecord { ty: Named("rec_Item"), members: Array([CirInt { ty: Named("s32i"), value: "1" }, CirInt { ty: Named("s32i"), value: "10" }]) }, ConstRecord { ty: Named("rec_Item"), members: Array([CirInt { ty: Named("s32i"), value: "2" }, CirInt { ty: Named("s32i"), value: "20" }]) }]), trailing_zeros_num: 0 } [cir_private, default, dso_local, constant]
 
 fn run_a() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_Item[2], "items", align 16
-    %2 = alloca s32i, "total", align 4
-    %3 = get_global @__const.run_a.items : rec_Item[2]*
-    copy %1, %3
-    %4 = const 0 : s32i
-    store %4, %2, align 4
-    scope {
-        %7 = alloca s32i, "i", align 4
-        %8 = const 0 : s32i
-        store %8, %7, align 4
-        for cond: {
-            %24 = load %7 : s32i, align 4
-            %25 = const 2 : s32i
-            %26 = cmp lt %24, %25 : bool
-            condition %26
-        } step: {
-            %9 = load %7 : s32i, align 4
-            %10 = inc %9 : s32i [nsw]
-            store %10, %7, align 4
-            yield
-        } do {
-            scope {
-                %11 = load %7 : s32i, align 4
-                %12 = cast(integral) %11 : s64i
-                %13 = get_element %1[%12] : rec_Item*
-                %14 = get_member %13[0] "value" : s32i*
-                %15 = load %14 : s32i, align 8
-                %16 = load %7 : s32i, align 4
-                %17 = cast(integral) %16 : s64i
-                %18 = get_element %1[%17] : rec_Item*
-                %19 = get_member %18[1] "weight" : s32i*
-                %20 = load %19 : s32i, align 4
-                %21 = mul %15, %20 : s32i [nsw]
-                %22 = load %2 : s32i, align 4
-                %23 = add %22, %21 : s32i [nsw]
-                store %23, %2, align 4
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_Item[2], "items", align 16
+        %2 = alloca s32i, "total", align 4
+        %3 = get_global @__const.run_a.items : rec_Item[2]*
+        copy
+        %4 = const 0 : s32i
+        store %4, %2, align 4
+        scope {
+                %7 = alloca s32i, "i", align 4
+                %8 = const 0 : s32i
+                store %8, %7, align 4
+                for cond {
+                        %24 = load %7 : s32i, align 4
+                        %25 = const 2 : s32i
+                        cmp
+                        condition %26
+                } step {
+                        %9 = load %7 : s32i, align 4
+                        inc
+                        store %10, %7, align 4
+                        yield
+                } body {
+                        scope {
+                                %11 = load %7 : s32i, align 4
+                                %12 = cast(integral) %11 : s64i
+                                get_element
+                                get_member
+                                %15 = load %14 : s32i, align 8
+                                %16 = load %7 : s32i, align 4
+                                %17 = cast(integral) %16 : s64i
+                                get_element
+                                get_member
+                                %20 = load %19 : s32i, align 4
+                                mul
+                                %22 = load %2 : s32i, align 4
+                                %23 = add %22, %21 : s32i [nsw]
+                                store %23, %2, align 4
+                                yield
+                        }
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %5 = load %2 : s32i, align 4
-    store %5, %0
-    %6 = load %0 : s32i
-    return %6
+        %5 = load %2 : s32i, align 4
+        store %5, %0
+        %6 = load %0 : s32i
+        return %6
 }

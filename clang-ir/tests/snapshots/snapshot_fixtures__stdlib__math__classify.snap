@@ -1,165 +1,165 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/math/classify.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[13] = "%d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[16] = "%d %d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[13] = ConstArray { ty: Array { element_type: Named("s8i"), size: 13 }, elts: Str("%d %d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[16] = ConstArray { ty: Array { element_type: Named("s8i"), size: 16 }, elts: Str("%d %d %d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca double, "zero", align 8
-    %2 = alloca double, "neg", align 8
-    %3 = alloca double, "finite", align 8
-    %4 = alloca double, "inf", align 8
-    %5 = alloca double, "nan", align 8
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = const 0.000000e+00 : double
-    store %7, %1, align 8
-    %8 = const -0.000000e+00 : double
-    store %8, %2, align 8
-    %9 = const 3.500000e+00 : double
-    store %9, %3, align 8
-    %10 = const 0x7F800000 : float
-    %11 = cast(floating) %10 : double
-    store %11, %4, align 8
-    %12 = const 0x7FC00000 : float
-    %13 = cast(floating) %12 : double
-    store %13, %5, align 8
-    %14 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %15 = get_global @.str : s8i[13]*
-    %16 = cast(array_to_ptrdecay) %15 : s8i*
-    %17 = load %5 : double, align 8
-    %18 = is_fp_class %17, fcSNan|fcQNan : bool
-    %19 = cast(bool_to_int) %18 : s32i
-    %20 = load %4 : double, align 8
-    %21 = is_fp_class %20, fcNegInf|fcPosInf : bool
-    %22 = signbit %20 : bool
-    %23 = const 0 : s32i
-    %24 = const 1 : s32i
-    %25 = const -1 : s32i
-    %26 = select %22, %25, %24 : s32i
-    %27 = select %21, %26, %23 : s32i
-    %28 = load %3 : double, align 8
-    %29 = is_fp_class %28, fcNegNormal|fcNegSubnormal|fcNegZero|fcPosZero|fcPosSubnormal|fcPosNormal : bool
-    %30 = cast(bool_to_int) %29 : s32i
-    %31 = load %2 : double, align 8
-    %32 = signbit %31 : bool
-    %33 = cast(bool_to_int) %32 : s32i
-    %34 = call @printf(%16, %19, %27, %30, %33) : s32i [all]
-    %35 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %36 = get_global @.str.1 : s8i[16]*
-    %37 = cast(array_to_ptrdecay) %36 : s8i*
-    %38 = load %5 : double, align 8
-    %39 = is_fp_class %38, fcNegZero|fcPosZero : bool
-    %40 = ternary %39 ? { : s32i
-        %97 = const 2 : s32i
-        yield %97
-    } : {
-        %87 = is_fp_class %38, fcSNan|fcQNan : bool
-        %88 = ternary %87 ? { : s32i
-            %96 = const 0 : s32i
-            yield %96
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca double, "zero", align 8
+        %2 = alloca double, "neg", align 8
+        %3 = alloca double, "finite", align 8
+        %4 = alloca double, "inf", align 8
+        %5 = alloca double, "nan", align 8
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = const 0.000000e+00 : double
+        store %7, %1, align 8
+        %8 = const -0.000000e+00 : double
+        store %8, %2, align 8
+        %9 = const 3.500000e+00 : double
+        store %9, %3, align 8
+        %10 = const 0x7F800000 : float
+        %11 = cast(floating) %10 : double
+        store %11, %4, align 8
+        %12 = const 0x7FC00000 : float
+        %13 = cast(floating) %12 : double
+        store %13, %5, align 8
+        %14 = get_global @printf : (s8i*, ...) -> s32i*
+        %15 = get_global @.str : s8i[13]*
+        %16 = cast(array_to_ptrdecay) %15 : s8i*
+        %17 = load %5 : double, align 8
+        is_fp_class
+        %19 = cast(bool_to_int) %18 : s32i
+        %20 = load %4 : double, align 8
+        is_fp_class
+        signbit
+        %23 = const 0 : s32i
+        %24 = const 1 : s32i
+        %25 = const -1 : s32i
+        select
+        select
+        %28 = load %3 : double, align 8
+        is_fp_class
+        %30 = cast(bool_to_int) %29 : s32i
+        %31 = load %2 : double, align 8
+        signbit
+        %33 = cast(bool_to_int) %32 : s32i
+        %34 = call @printf(%16, %19, %27, %30, %33) : s32i [all]
+        %35 = get_global @printf : (s8i*, ...) -> s32i*
+        %36 = get_global @.str.1 : s8i[16]*
+        %37 = cast(array_to_ptrdecay) %36 : s8i*
+        %38 = load %5 : double, align 8
+        is_fp_class
+        %40 = ternary %39 ? { : s32i
+                %97 = const 2 : s32i
+                yield %97
         } : {
-            %89 = is_fp_class %38, fcNegInf|fcPosInf : bool
-            %90 = ternary %89 ? { : s32i
-                %95 = const 1 : s32i
-                yield %95
-            } : {
-                %91 = is_fp_class %38, fcNegNormal|fcPosNormal : bool
-                %92 = const 4 : s32i
-                %93 = const 3 : s32i
-                %94 = select %91, %92, %93 : s32i
-                yield %94
-            }
-            yield %90
+                is_fp_class
+                %88 = ternary %87 ? { : s32i
+                        %96 = const 0 : s32i
+                        yield %96
+                } : {
+                        is_fp_class
+                        %90 = ternary %89 ? { : s32i
+                                %95 = const 1 : s32i
+                                yield %95
+                        } : {
+                                is_fp_class
+                                %92 = const 4 : s32i
+                                %93 = const 3 : s32i
+                                select
+                                yield %94
+                        }
+                        yield %90
+                }
+                yield %88
         }
-        yield %88
-    }
-    %41 = load %4 : double, align 8
-    %42 = is_fp_class %41, fcNegZero|fcPosZero : bool
-    %43 = ternary %42 ? { : s32i
-        %86 = const 2 : s32i
-        yield %86
-    } : {
-        %76 = is_fp_class %41, fcSNan|fcQNan : bool
-        %77 = ternary %76 ? { : s32i
-            %85 = const 0 : s32i
-            yield %85
+        %41 = load %4 : double, align 8
+        is_fp_class
+        %43 = ternary %42 ? { : s32i
+                %86 = const 2 : s32i
+                yield %86
         } : {
-            %78 = is_fp_class %41, fcNegInf|fcPosInf : bool
-            %79 = ternary %78 ? { : s32i
-                %84 = const 1 : s32i
-                yield %84
-            } : {
-                %80 = is_fp_class %41, fcNegNormal|fcPosNormal : bool
-                %81 = const 4 : s32i
-                %82 = const 3 : s32i
-                %83 = select %80, %81, %82 : s32i
-                yield %83
-            }
-            yield %79
+                is_fp_class
+                %77 = ternary %76 ? { : s32i
+                        %85 = const 0 : s32i
+                        yield %85
+                } : {
+                        is_fp_class
+                        %79 = ternary %78 ? { : s32i
+                                %84 = const 1 : s32i
+                                yield %84
+                        } : {
+                                is_fp_class
+                                %81 = const 4 : s32i
+                                %82 = const 3 : s32i
+                                select
+                                yield %83
+                        }
+                        yield %79
+                }
+                yield %77
         }
-        yield %77
-    }
-    %44 = load %1 : double, align 8
-    %45 = is_fp_class %44, fcNegZero|fcPosZero : bool
-    %46 = ternary %45 ? { : s32i
-        %75 = const 2 : s32i
-        yield %75
-    } : {
-        %65 = is_fp_class %44, fcSNan|fcQNan : bool
-        %66 = ternary %65 ? { : s32i
-            %74 = const 0 : s32i
-            yield %74
+        %44 = load %1 : double, align 8
+        is_fp_class
+        %46 = ternary %45 ? { : s32i
+                %75 = const 2 : s32i
+                yield %75
         } : {
-            %67 = is_fp_class %44, fcNegInf|fcPosInf : bool
-            %68 = ternary %67 ? { : s32i
-                %73 = const 1 : s32i
-                yield %73
-            } : {
-                %69 = is_fp_class %44, fcNegNormal|fcPosNormal : bool
-                %70 = const 4 : s32i
-                %71 = const 3 : s32i
-                %72 = select %69, %70, %71 : s32i
-                yield %72
-            }
-            yield %68
+                is_fp_class
+                %66 = ternary %65 ? { : s32i
+                        %74 = const 0 : s32i
+                        yield %74
+                } : {
+                        is_fp_class
+                        %68 = ternary %67 ? { : s32i
+                                %73 = const 1 : s32i
+                                yield %73
+                        } : {
+                                is_fp_class
+                                %70 = const 4 : s32i
+                                %71 = const 3 : s32i
+                                select
+                                yield %72
+                        }
+                        yield %68
+                }
+                yield %66
         }
-        yield %66
-    }
-    %47 = load %3 : double, align 8
-    %48 = is_fp_class %47, fcNegZero|fcPosZero : bool
-    %49 = ternary %48 ? { : s32i
-        %64 = const 2 : s32i
-        yield %64
-    } : {
-        %54 = is_fp_class %47, fcSNan|fcQNan : bool
-        %55 = ternary %54 ? { : s32i
-            %63 = const 0 : s32i
-            yield %63
+        %47 = load %3 : double, align 8
+        is_fp_class
+        %49 = ternary %48 ? { : s32i
+                %64 = const 2 : s32i
+                yield %64
         } : {
-            %56 = is_fp_class %47, fcNegInf|fcPosInf : bool
-            %57 = ternary %56 ? { : s32i
-                %62 = const 1 : s32i
-                yield %62
-            } : {
-                %58 = is_fp_class %47, fcNegNormal|fcPosNormal : bool
-                %59 = const 4 : s32i
-                %60 = const 3 : s32i
-                %61 = select %58, %59, %60 : s32i
-                yield %61
-            }
-            yield %57
+                is_fp_class
+                %55 = ternary %54 ? { : s32i
+                        %63 = const 0 : s32i
+                        yield %63
+                } : {
+                        is_fp_class
+                        %57 = ternary %56 ? { : s32i
+                                %62 = const 1 : s32i
+                                yield %62
+                        } : {
+                                is_fp_class
+                                %59 = const 4 : s32i
+                                %60 = const 3 : s32i
+                                select
+                                yield %61
+                        }
+                        yield %57
+                }
+                yield %55
         }
-        yield %55
-    }
-    %50 = const 3 : s32i
-    %51 = call @printf(%37, %40, %43, %46, %49, %50) : s32i [all]
-    %52 = const 0 : s32i
-    store %52, %0
-    %53 = load %0 : s32i
-    return %53
+        %50 = const 3 : s32i
+        %51 = call @printf(%37, %40, %43, %46, %49, %50) : s32i [all]
+        %52 = const 0 : s32i
+        store %52, %0
+        %53 = load %0 : s32i
+        return %53
 }

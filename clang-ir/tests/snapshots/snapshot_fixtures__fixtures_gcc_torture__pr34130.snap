@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr34130.c" (c, x86_64-unknown-linux-gnu)
@@ -11,42 +11,42 @@ fn foo(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %17 = const -2 : s32i
         %18 = load %15 : s32i, align 4
         %19 = const 2 : s32i
-        %20 = sub %18, %19 : s32i [nsw]
-        %21 = abs %20 : s32i [poison]
-        %22 = mul %17, %21 : s32i [nsw]
+        sub
+        abs
+        mul
         store %22, %16
         %23 = load %16 : s32i
         return %23
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const 1 : s32i
-        %5 = call @foo(%4) : s32i [all]
-        %6 = const -2 : s32i
-        %7 = cmp ne %5, %6 : bool
-        %8 = ternary %7 ? { : bool
-            %14 = const true : bool
-            yield %14
-        } : {
-            %10 = const 3 : s32i
-            %11 = call @foo(%10) : s32i [all]
-            %12 = const -2 : s32i
-            %13 = cmp ne %11, %12 : bool
-            yield %13
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const 1 : s32i
+                %5 = call @foo(%4) : s32i [all]
+                %6 = const -2 : s32i
+                cmp
+                %8 = ternary %7 ? { : bool
+                        %14 = const true : bool
+                        yield %14
+                } : {
+                        %10 = const 3 : s32i
+                        %11 = call @foo(%10) : s32i [all]
+                        %12 = const -2 : s32i
+                        cmp
+                        yield %13
+                }
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

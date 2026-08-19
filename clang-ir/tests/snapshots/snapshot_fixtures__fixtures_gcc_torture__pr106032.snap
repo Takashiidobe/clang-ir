@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr106032.c" (c, x86_64-unknown-linux-gnu)
@@ -14,16 +14,16 @@ fn foo(%arg0: s32i, %arg1: s32i*) -> s32i [external, c, no_inline, dso_local, no
         %32 = const 0 : s32i
         store %32, %31, align 4
         scope {
-            %35 = load %28 : s32i, align 4
-            %36 = const 0 : s32i
-            %37 = cmp lt %35, %36 : bool
-            if %37 {
-                %38 = load %29 : s32i*, align 8
-                %39 = load %38 : s32i, align 4
-                store %39, %31, align 4
+                %35 = load %28 : s32i, align 4
+                %36 = const 0 : s32i
+                cmp
+                if %37 {
+                        %38 = load %29 : s32i*, align 8
+                        %39 = load %38 : s32i, align 4
+                        store %39, %31, align 4
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %33 = load %31 : s32i, align 4
         store %33, %30
@@ -32,58 +32,58 @@ fn foo(%arg0: s32i, %arg1: s32i*) -> s32i [external, c, no_inline, dso_local, no
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "a", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 42 : s32i
-    store %3, %1, align 4
-    scope {
-        %16 = const 0 : s32i
-        %17 = const #cir.ptr<null> : s32i*
-        %18 = call @foo(%16, %17) : s32i [all]
-        %19 = const 0 : s32i
-        %20 = cmp ne %18, %19 : bool
-        %21 = ternary %20 ? { : bool
-            %27 = const true : bool
-            yield %27
-        } : {
-            %22 = const 1 : s32i
-            %23 = const #cir.ptr<null> : s32i*
-            %24 = call @foo(%22, %23) : s32i [all]
-            %25 = const 0 : s32i
-            %26 = cmp ne %24, %25 : bool
-            yield %26
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "a", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 42 : s32i
+        store %3, %1, align 4
+        scope {
+                %16 = const 0 : s32i
+                %17 = const #cir.ptr<null> : s32i*
+                %18 = call @foo(%16, %17) : s32i [all]
+                %19 = const 0 : s32i
+                cmp
+                %21 = ternary %20 ? { : bool
+                        %27 = const true : bool
+                        yield %27
+                } : {
+                        %22 = const 1 : s32i
+                        %23 = const #cir.ptr<null> : s32i*
+                        %24 = call @foo(%22, %23) : s32i [all]
+                        %25 = const 0 : s32i
+                        cmp
+                        yield %26
+                }
+                if %21 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %21 {
-            call @abort() [all]
-            yield
+        scope {
+                %6 = const -1 : s32i
+                %7 = call @foo(%6, %1) : s32i [all]
+                %8 = const 42 : s32i
+                cmp
+                %10 = ternary %9 ? { : bool
+                        %15 = const true : bool
+                        yield %15
+                } : {
+                        %11 = const -42 : s32i
+                        %12 = call @foo(%11, %1) : s32i [all]
+                        %13 = const 42 : s32i
+                        cmp
+                        yield %14
+                }
+                if %10 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %6 = const -1 : s32i
-        %7 = call @foo(%6, %1) : s32i [all]
-        %8 = const 42 : s32i
-        %9 = cmp ne %7, %8 : bool
-        %10 = ternary %9 ? { : bool
-            %15 = const true : bool
-            yield %15
-        } : {
-            %11 = const -42 : s32i
-            %12 = call @foo(%11, %1) : s32i [all]
-            %13 = const 42 : s32i
-            %14 = cmp ne %12, %13 : bool
-            yield %14
-        }
-        if %10 {
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

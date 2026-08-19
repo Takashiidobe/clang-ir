@@ -1,97 +1,97 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr97421-2.c" (c, x86_64-unknown-linux-gnu)
-global c : s32i = 0 [internal, default, align 4, dso_local]
-global d : s32i* = @c [external, default, align 8, dso_local]
-global e : s32i** = @d [external, default, align 8, dso_local]
-global f : s32i*** = @e [external, default, align 8, dso_local]
-global a : s32i = 0 [internal, default, align 4, dso_local]
-global b : s32i = 0 [internal, default, align 4, dso_local]
+global c : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
+global d : s32i* = GlobalView { ty: Pointer { pointee: Named("s32i"), addr_space: None }, symbol: "c", indices: None } [external, default, align 8, dso_local]
+global e : s32i** = GlobalView { ty: Pointer { pointee: Pointer { pointee: Named("s32i"), addr_space: None }, addr_space: None }, symbol: "d", indices: None } [external, default, align 8, dso_local]
+global f : s32i*** = GlobalView { ty: Pointer { pointee: Pointer { pointee: Pointer { pointee: Named("s32i"), addr_space: None }, addr_space: None }, addr_space: None }, symbol: "e", indices: None } [external, default, align 8, dso_local]
+global a : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
+global b : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "h", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    scope {
-        %8 = const 2 : s32i
-        %9 = get_global @a : s32i*
-        store %8, %9, align 4
-        for cond: {
-            %33 = get_global @a : s32i*
-            %34 = load %33 : s32i, align 4
-            %35 = cast(int_to_bool) %34 : bool
-            condition %35
-        } step: {
-            %10 = get_global @a : s32i*
-            %11 = load %10 : s32i, align 4
-            %12 = dec %11 : s32i [nsw]
-            store %12, %10, align 4
-            yield
-        } do {
-            scope {
-                %13 = const 0 : s32i
-                store %13, %1, align 4
-                for cond: {
-                    %30 = load %1 : s32i, align 4
-                    %31 = const 2 : s32i
-                    %32 = cmp le %30, %31 : bool
-                    condition %32
-                } step: {
-                    %14 = load %1 : s32i, align 4
-                    %15 = inc %14 : s32i [nsw]
-                    store %15, %1, align 4
-                    yield
-                } do {
-                    scope {
-                        %16 = const 0 : s32i
-                        %17 = get_global @b : s32i*
-                        store %16, %17, align 4
-                        for cond: {
-                            %26 = get_global @b : s32i*
-                            %27 = load %26 : s32i, align 4
-                            %28 = const 2 : s32i
-                            %29 = cmp le %27, %28 : bool
-                            condition %29
-                        } step: {
-                            %18 = get_global @b : s32i*
-                            %19 = load %18 : s32i, align 4
-                            %20 = inc %19 : s32i [nsw]
-                            store %20, %18, align 4
-                            yield
-                        } do {
-                            %21 = const 6 : s32i
-                            %22 = get_global @f : s32i****
-                            %23 = load %22 : s32i***, align 8
-                            %24 = load %23 : s32i**, align 8
-                            %25 = load %24 : s32i*, align 8
-                            store %21, %25, align 4
-                            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "h", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        scope {
+                %8 = const 2 : s32i
+                %9 = get_global @a : s32i*
+                store %8, %9, align 4
+                for cond {
+                        %33 = get_global @a : s32i*
+                        %34 = load %33 : s32i, align 4
+                        %35 = cast(int_to_bool) %34 : bool
+                        condition %35
+                } step {
+                        %10 = get_global @a : s32i*
+                        %11 = load %10 : s32i, align 4
+                        dec
+                        store %12, %10, align 4
+                        yield
+                } body {
+                        scope {
+                                %13 = const 0 : s32i
+                                store %13, %1, align 4
+                                for cond {
+                                        %30 = load %1 : s32i, align 4
+                                        %31 = const 2 : s32i
+                                        cmp
+                                        condition %32
+                                } step {
+                                        %14 = load %1 : s32i, align 4
+                                        inc
+                                        store %15, %1, align 4
+                                        yield
+                                } body {
+                                        scope {
+                                                %16 = const 0 : s32i
+                                                %17 = get_global @b : s32i*
+                                                store %16, %17, align 4
+                                                for cond {
+                                                        %26 = get_global @b : s32i*
+                                                        %27 = load %26 : s32i, align 4
+                                                        %28 = const 2 : s32i
+                                                        cmp
+                                                        condition %29
+                                                } step {
+                                                        %18 = get_global @b : s32i*
+                                                        %19 = load %18 : s32i, align 4
+                                                        inc
+                                                        store %20, %18, align 4
+                                                        yield
+                                                } body {
+                                                        %21 = const 6 : s32i
+                                                        %22 = get_global @f : s32i****
+                                                        %23 = load %22 : s32i***, align 8
+                                                        %24 = load %23 : s32i**, align 8
+                                                        %25 = load %24 : s32i*, align 8
+                                                        store %21, %25, align 4
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    scope {
-        %4 = get_global @b : s32i*
-        %5 = load %4 : s32i, align 4
-        %6 = const 3 : s32i
-        %7 = cmp ne %5, %6 : bool
-        if %7 {
-            call @abort() [all]
-            yield
+        scope {
+                %4 = get_global @b : s32i*
+                %5 = load %4 : s32i, align 4
+                %6 = const 3 : s32i
+                cmp
+                if %7 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %3 = load %0 : s32i
-    return %3
+        %3 = load %0 : s32i
+        return %3
 }

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/ieee__pr72824-2.c" (c, x86_64-unknown-linux-gnu)
@@ -11,62 +11,62 @@ fn foo(%arg0: vector<4 x float>*, %arg1: vector<4 x float>) -> void [internal, c
         store %arg0, %19
         store %arg1, %20
         scope {
-            %22 = const 0 : s32i
-            store %22, %21, align 4
-            for cond: {
-                %30 = load %21 : s32i, align 4
-                %31 = const 32 : s32i
-                %32 = cmp lt %30, %31 : bool
-                condition %32
-            } step: {
-                %23 = load %21 : s32i, align 4
-                %24 = inc %23 : s32i [nsw]
-                store %24, %21, align 4
+                %22 = const 0 : s32i
+                store %22, %21, align 4
+                for cond {
+                        %30 = load %21 : s32i, align 4
+                        %31 = const 32 : s32i
+                        cmp
+                        condition %32
+                } step {
+                        %23 = load %21 : s32i, align 4
+                        inc
+                        store %24, %21, align 4
+                        yield
+                } body {
+                        %25 = load %20 : vector<4 x float>, align 16
+                        %26 = load %21 : s32i, align 4
+                        %27 = cast(integral) %26 : s64i
+                        %28 = load %19 : vector<4 x float>*, align 8
+                        ptr_stride
+                        store %25, %29, align 16
+                        yield
+                }
                 yield
-            } do {
-                %25 = load %20 : vector<4 x float>, align 16
-                %26 = load %21 : s32i, align 4
-                %27 = cast(integral) %26 : s64i
-                %28 = load %19 : vector<4 x float>*, align 8
-                %29 = ptr_stride %28, %27 : vector<4 x float>*
-                store %25, %29, align 16
-                yield
-            }
-            yield
         }
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca vector<4 x float>[32], "x", align 16
-    %2 = alloca vector<4 x float>, ".compoundliteral", align 16
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = cast(array_to_ptrdecay) %1 : vector<4 x float>*
-    %5 = const [0.000000e+00, -0.000000e+00, 0.000000e+00, -0.000000e+00] : vector<4 x float>
-    store %5, %2, align 16
-    %6 = load %2 : vector<4 x float>, align 16
-    call @foo(%4, %6) [all]
-    scope {
-        %9 = const 1.000000e+00 : double
-        %10 = cast(floating) %9 : float
-        %11 = const 3 : s64i
-        %12 = get_element %1[%11] : vector<4 x float>*
-        %13 = load %12 : vector<4 x float>, align 16
-        %14 = const 1 : s32i
-        %15 = vec.extract %13[%14] : float
-        %16 = copysign %10, %15 : float
-        %17 = const -1.000000e+00 : float
-        %18 = cmp ne %16, %17 : bool
-        if %18 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca vector<4 x float>[32], "x", align 16
+        %2 = alloca vector<4 x float>, ".compoundliteral", align 16
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = cast(array_to_ptrdecay) %1 : vector<4 x float>*
+        %5 = const [[0.000000e+00, -0.000000e+00, 0.000000e+00, -0.000000e+00]] : vector<4 x float>
+        store %5, %2, align 16
+        %6 = load %2 : vector<4 x float>, align 16
+        call @foo(%4, %6) [all]
+        scope {
+                %9 = const 1.000000e+00 : double
+                %10 = cast(floating) %9 : float
+                %11 = const 3 : s64i
+                get_element
+                %13 = load %12 : vector<4 x float>, align 16
+                %14 = const 1 : s32i
+                vec.extract
+                copysign
+                %17 = const -1.000000e+00 : float
+                cmp
+                if %18 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = load %0 : s32i
-    return %8
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = load %0 : s32i
+        return %8
 }

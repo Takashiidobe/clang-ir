@@ -1,32 +1,32 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/960326-1.c" (c, x86_64-unknown-linux-gnu)
-global s : rec_s = {0, 3, 0, [2]} [external, default, align 4, dso_local]
+global s : rec_s = ConstRecord { ty: Named("rec_s"), members: Array([CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "3" }, CirInt { ty: Named("s16i"), value: "0" }, ConstArray { ty: Array { element_type: Named("s32i"), size: 3 }, elts: Array([CirInt { ty: Named("s32i"), value: "2" }]), trailing_zeros_num: 1 }]) } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %5 = get_global @s : rec_s*
-        %6 = get_member %5[1] "b" : s32i*
-        %7 = load %6 : s32i, align 4
-        %8 = const 3 : s32i
-        %9 = cmp ne %7, %8 : bool
-        if %9 {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %5 = get_global @s : rec_s*
+                get_member
+                %7 = load %6 : s32i, align 4
+                %8 = const 3 : s32i
+                cmp
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

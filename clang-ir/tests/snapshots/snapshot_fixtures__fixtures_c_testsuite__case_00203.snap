@@ -1,62 +1,62 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.c-testsuite/case_00203.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[24] = "Error: 0 < -2147483648\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[23] = "Error: 2147483647 < 0\n" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[29] = "long long constant test ok.\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[24] = ConstArray { ty: Array { element_type: Named("s8i"), size: 24 }, elts: Str("Error: 0 < -2147483648\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[23] = ConstArray { ty: Array { element_type: Named("s8i"), size: 23 }, elts: Str("Error: 2147483647 < 0\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[29] = ConstArray { ty: Array { element_type: Named("s8i"), size: 29 }, elts: Str("long long constant test ok.\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s64i, "res", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 0 : s64i
-    store %3, %1, align 8
-    scope {
-        %6 = load %1 : s64i, align 8
-        %7 = const -2147483648 : s64i
-        %8 = cmp lt %6, %7 : bool
-        if %8 {
-            %22 = get_global @printf : ((s8i*, ...) -> s32i)*
-            %23 = get_global @.str : s8i[24]*
-            %24 = cast(array_to_ptrdecay) %23 : s8i*
-            %25 = call @printf(%24) : s32i [all]
-            %26 = const 1 : s32i
-            store %26, %0
-            %27 = load %0 : s32i
-            return %27
-        } else {
-            scope {
-                %9 = const 2147483647 : s64i
-                %10 = load %1 : s64i, align 8
-                %11 = cmp lt %9, %10 : bool
-                if %11 {
-                    %16 = get_global @printf : ((s8i*, ...) -> s32i)*
-                    %17 = get_global @.str.1 : s8i[23]*
-                    %18 = cast(array_to_ptrdecay) %17 : s8i*
-                    %19 = call @printf(%18) : s32i [all]
-                    %20 = const 2 : s32i
-                    store %20, %0
-                    %21 = load %0 : s32i
-                    return %21
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s64i, "res", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 0 : s64i
+        store %3, %1, align 8
+        scope {
+                %6 = load %1 : s64i, align 8
+                %7 = const -2147483648 : s64i
+                cmp
+                if %8 {
+                        %22 = get_global @printf : (s8i*, ...) -> s32i*
+                        %23 = get_global @.str : s8i[24]*
+                        %24 = cast(array_to_ptrdecay) %23 : s8i*
+                        %25 = call @printf(%24) : s32i [all]
+                        %26 = const 1 : s32i
+                        store %26, %0
+                        %27 = load %0 : s32i
+                        return %27
                 } else {
-                    %12 = get_global @printf : ((s8i*, ...) -> s32i)*
-                    %13 = get_global @.str.2 : s8i[29]*
-                    %14 = cast(array_to_ptrdecay) %13 : s8i*
-                    %15 = call @printf(%14) : s32i [all]
-                    yield
+                        scope {
+                                %9 = const 2147483647 : s64i
+                                %10 = load %1 : s64i, align 8
+                                cmp
+                                if %11 {
+                                        %16 = get_global @printf : (s8i*, ...) -> s32i*
+                                        %17 = get_global @.str.1 : s8i[23]*
+                                        %18 = cast(array_to_ptrdecay) %17 : s8i*
+                                        %19 = call @printf(%18) : s32i [all]
+                                        %20 = const 2 : s32i
+                                        store %20, %0
+                                        %21 = load %0 : s32i
+                                        return %21
+                                } else {
+                                        %12 = get_global @printf : (s8i*, ...) -> s32i*
+                                        %13 = get_global @.str.2 : s8i[29]*
+                                        %14 = cast(array_to_ptrdecay) %13 : s8i*
+                                        %15 = call @printf(%14) : s32i [all]
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

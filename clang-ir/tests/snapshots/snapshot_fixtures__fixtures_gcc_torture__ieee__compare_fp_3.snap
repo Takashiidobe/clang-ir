@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/ieee__compare-fp-3.c" (c, x86_64-unknown-linux-gnu)
@@ -10,24 +10,24 @@ fn test1(%arg14: float, %arg15: float) -> void [external, c, no_inline, dso_loca
         store %arg14, %109
         store %arg15, %110
         scope {
-            %111 = load %109 : float, align 4
-            %112 = load %110 : float, align 4
-            %113 = cmp eq %111, %112 : bool
-            %114 = ternary %113 ? { : bool
-                %117 = load %109 : float, align 4
-                %118 = load %110 : float, align 4
-                %119 = cmp ne %117, %118 : bool
-                yield %119
-            } : {
-                %116 = const false : bool
-                yield %116
-            }
-            if %114 {
-                %115 = get_global @link_error0 : (() -> void)*
-                call %115() [all]
+                %111 = load %109 : float, align 4
+                %112 = load %110 : float, align 4
+                cmp
+                %114 = ternary %113 ? { : bool
+                        %117 = load %109 : float, align 4
+                        %118 = load %110 : float, align 4
+                        cmp
+                        yield %119
+                } : {
+                        %116 = const false : bool
+                        yield %116
+                }
+                if %114 {
+                        %115 = get_global @link_error0 : () -> void*
+                        call () [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -38,24 +38,24 @@ fn test2(%arg12: float, %arg13: float) -> void [external, c, no_inline, dso_loca
         store %arg12, %98
         store %arg13, %99
         scope {
-            %100 = load %98 : float, align 4
-            %101 = load %99 : float, align 4
-            %102 = cmp lt %100, %101 : bool
-            %103 = ternary %102 ? { : bool
-                %106 = load %98 : float, align 4
-                %107 = load %99 : float, align 4
-                %108 = cmp gt %106, %107 : bool
-                yield %108
-            } : {
-                %105 = const false : bool
-                yield %105
-            }
-            if %103 {
-                %104 = get_global @link_error0 : (() -> void)*
-                call %104() [all]
+                %100 = load %98 : float, align 4
+                %101 = load %99 : float, align 4
+                cmp
+                %103 = ternary %102 ? { : bool
+                        %106 = load %98 : float, align 4
+                        %107 = load %99 : float, align 4
+                        cmp
+                        yield %108
+                } : {
+                        %105 = const false : bool
+                        yield %105
+                }
+                if %103 {
+                        %104 = get_global @link_error0 : () -> void*
+                        call () [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -66,24 +66,24 @@ fn test3(%arg10: float, %arg11: float) -> void [external, c, no_inline, dso_loca
         store %arg10, %87
         store %arg11, %88
         scope {
-            %89 = load %87 : float, align 4
-            %90 = load %88 : float, align 4
-            %91 = cmp lt %89, %90 : bool
-            %92 = ternary %91 ? { : bool
-                %95 = load %88 : float, align 4
-                %96 = load %87 : float, align 4
-                %97 = cmp lt %95, %96 : bool
-                yield %97
-            } : {
-                %94 = const false : bool
-                yield %94
-            }
-            if %92 {
-                %93 = get_global @link_error0 : (() -> void)*
-                call %93() [all]
+                %89 = load %87 : float, align 4
+                %90 = load %88 : float, align 4
+                cmp
+                %92 = ternary %91 ? { : bool
+                        %95 = load %88 : float, align 4
+                        %96 = load %87 : float, align 4
+                        cmp
+                        yield %97
+                } : {
+                        %94 = const false : bool
+                        yield %94
+                }
+                if %92 {
+                        %93 = get_global @link_error0 : () -> void*
+                        call () [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -94,26 +94,26 @@ fn test4(%arg8: float, %arg9: float) -> void [external, c, no_inline, dso_local,
         store %arg8, %76
         store %arg9, %77
         scope {
-            %78 = load %76 : float, align 4
-            %79 = load %77 : float, align 4
-            %80 = cmp eq %78, %79 : bool
-            %81 = ternary %80 ? { : bool
-                %86 = const true : bool
-                yield %86
-            } : {
-                %83 = load %76 : float, align 4
-                %84 = load %77 : float, align 4
-                %85 = cmp ne %83, %84 : bool
-                yield %85
-            }
-            if %81 {
+                %78 = load %76 : float, align 4
+                %79 = load %77 : float, align 4
+                cmp
+                %81 = ternary %80 ? { : bool
+                        %86 = const true : bool
+                        yield %86
+                } : {
+                        %83 = load %76 : float, align 4
+                        %84 = load %77 : float, align 4
+                        cmp
+                        yield %85
+                }
+                if %81 {
+                        yield
+                } else {
+                        %82 = get_global @link_error1 : () -> void*
+                        call () [all]
+                        yield
+                }
                 yield
-            } else {
-                %82 = get_global @link_error1 : (() -> void)*
-                call %82() [all]
-                yield
-            }
-            yield
         }
         return
 }
@@ -124,35 +124,35 @@ fn test5(%arg6: float, %arg7: float) -> void [external, c, no_inline, dso_local,
         store %arg6, %60
         store %arg7, %61
         scope {
-            %62 = load %60 : float, align 4
-            %63 = load %61 : float, align 4
-            %64 = cmp uno %62, %63 : bool
-            %65 = ternary %64 ? { : bool
-                %75 = const true : bool
-                yield %75
-            } : {
-                %72 = load %60 : float, align 4
-                %73 = load %61 : float, align 4
-                %74 = cmp ge %72, %73 : bool
-                yield %74
-            }
-            %66 = ternary %65 ? { : bool
-                %71 = const true : bool
-                yield %71
-            } : {
-                %68 = load %60 : float, align 4
-                %69 = load %61 : float, align 4
-                %70 = cmp lt %68, %69 : bool
-                yield %70
-            }
-            if %66 {
+                %62 = load %60 : float, align 4
+                %63 = load %61 : float, align 4
+                cmp
+                %65 = ternary %64 ? { : bool
+                        %75 = const true : bool
+                        yield %75
+                } : {
+                        %72 = load %60 : float, align 4
+                        %73 = load %61 : float, align 4
+                        cmp
+                        yield %74
+                }
+                %66 = ternary %65 ? { : bool
+                        %71 = const true : bool
+                        yield %71
+                } : {
+                        %68 = load %60 : float, align 4
+                        %69 = load %61 : float, align 4
+                        cmp
+                        yield %70
+                }
+                if %66 {
+                        yield
+                } else {
+                        %67 = get_global @link_error1 : () -> void*
+                        call () [all]
+                        yield
+                }
                 yield
-            } else {
-                %67 = get_global @link_error1 : (() -> void)*
-                call %67() [all]
-                yield
-            }
-            yield
         }
         return
 }
@@ -163,35 +163,35 @@ fn test6(%arg4: float, %arg5: float) -> void [external, c, no_inline, dso_local,
         store %arg4, %44
         store %arg5, %45
         scope {
-            %46 = load %45 : float, align 4
-            %47 = load %44 : float, align 4
-            %48 = cmp uno %46, %47 : bool
-            %49 = ternary %48 ? { : bool
-                %59 = const true : bool
-                yield %59
-            } : {
-                %56 = load %44 : float, align 4
-                %57 = load %45 : float, align 4
-                %58 = cmp le %56, %57 : bool
-                yield %58
-            }
-            %50 = ternary %49 ? { : bool
-                %55 = const true : bool
-                yield %55
-            } : {
-                %52 = load %45 : float, align 4
-                %53 = load %44 : float, align 4
-                %54 = cmp lt %52, %53 : bool
-                yield %54
-            }
-            if %50 {
+                %46 = load %45 : float, align 4
+                %47 = load %44 : float, align 4
+                cmp
+                %49 = ternary %48 ? { : bool
+                        %59 = const true : bool
+                        yield %59
+                } : {
+                        %56 = load %44 : float, align 4
+                        %57 = load %45 : float, align 4
+                        cmp
+                        yield %58
+                }
+                %50 = ternary %49 ? { : bool
+                        %55 = const true : bool
+                        yield %55
+                } : {
+                        %52 = load %45 : float, align 4
+                        %53 = load %44 : float, align 4
+                        cmp
+                        yield %54
+                }
+                if %50 {
+                        yield
+                } else {
+                        %51 = get_global @link_error1 : () -> void*
+                        call () [all]
+                        yield
+                }
                 yield
-            } else {
-                %51 = get_global @link_error1 : (() -> void)*
-                call %51() [all]
-                yield
-            }
-            yield
         }
         return
 }
@@ -202,27 +202,27 @@ fn test7(%arg2: float, %arg3: float) -> void [external, c, no_inline, dso_local,
         store %arg2, %32
         store %arg3, %33
         scope {
-            %34 = load %32 : float, align 4
-            %35 = load %33 : float, align 4
-            %36 = cmp uno %34, %35 : bool
-            %37 = ternary %36 ? { : bool
-                %43 = const true : bool
-                yield %43
-            } : {
-                %39 = load %32 : float, align 4
-                %40 = load %33 : float, align 4
-                %41 = cmp uno %39, %40 : bool
-                %42 = not %41 : bool
-                yield %42
-            }
-            if %37 {
+                %34 = load %32 : float, align 4
+                %35 = load %33 : float, align 4
+                cmp
+                %37 = ternary %36 ? { : bool
+                        %43 = const true : bool
+                        yield %43
+                } : {
+                        %39 = load %32 : float, align 4
+                        %40 = load %33 : float, align 4
+                        cmp
+                        not
+                        yield %42
+                }
+                if %37 {
+                        yield
+                } else {
+                        %38 = get_global @link_error1 : () -> void*
+                        call () [all]
+                        yield
+                }
                 yield
-            } else {
-                %38 = get_global @link_error1 : (() -> void)*
-                call %38() [all]
-                yield
-            }
-            yield
         }
         return
 }
@@ -256,32 +256,32 @@ fn all_tests(%arg0: float, %arg1: float) -> void [external, c, no_inline, dso_lo
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 0 : s32i
-    %3 = cast(int_to_float) %2 : float
-    %4 = const 0 : s32i
-    %5 = cast(int_to_float) %4 : float
-    call @all_tests(%3, %5) [all]
-    %6 = const 1 : s32i
-    %7 = cast(int_to_float) %6 : float
-    %8 = const 2 : s32i
-    %9 = cast(int_to_float) %8 : float
-    call @all_tests(%7, %9) [all]
-    %10 = const 4 : s32i
-    %11 = cast(int_to_float) %10 : float
-    %12 = const 3 : s32i
-    %13 = cast(int_to_float) %12 : float
-    call @all_tests(%11, %13) [all]
-    %14 = const 0 : s32i
-    store %14, %0
-    %15 = load %0 : s32i
-    return %15
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 0 : s32i
+        %3 = cast(int_to_float) %2 : float
+        %4 = const 0 : s32i
+        %5 = cast(int_to_float) %4 : float
+        call @all_tests(%3, %5) [all]
+        %6 = const 1 : s32i
+        %7 = cast(int_to_float) %6 : float
+        %8 = const 2 : s32i
+        %9 = cast(int_to_float) %8 : float
+        call @all_tests(%7, %9) [all]
+        %10 = const 4 : s32i
+        %11 = cast(int_to_float) %10 : float
+        %12 = const 3 : s32i
+        %13 = cast(int_to_float) %12 : float
+        call @all_tests(%11, %13) [all]
+        %14 = const 0 : s32i
+        store %14, %0
+        %15 = load %0 : s32i
+        return %15
 }
 fn link_error0() -> void [external, c, no_inline, dso_local, nothrow] {
-    return
+        return
 }
 fn link_error1() -> void [external, c, no_inline, dso_local, nothrow] {
-    return
+        return
 }

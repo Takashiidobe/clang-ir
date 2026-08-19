@@ -1,26 +1,26 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.multi/unsafe_public/main.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn read_ptr(%arg0: s32i*) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "value", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 7 : s32i
-    store %3, %1, align 4
-    %4 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %5 = get_global @.str : s8i[4]*
-    %6 = cast(array_to_ptrdecay) %5 : s8i*
-    %7 = call @read_ptr(%1) : s32i [all]
-    %8 = call @printf(%6, %7) : s32i [all]
-    %9 = const 0 : s32i
-    store %9, %0
-    %10 = load %0 : s32i
-    return %10
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "value", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 7 : s32i
+        store %3, %1, align 4
+        %4 = get_global @printf : (s8i*, ...) -> s32i*
+        %5 = get_global @.str : s8i[4]*
+        %6 = cast(array_to_ptrdecay) %5 : s8i*
+        %7 = call @read_ptr(%1) : s32i [all]
+        %8 = call @printf(%6, %7) : s32i [all]
+        %9 = const 0 : s32i
+        store %9, %0
+        %10 = load %0 : s32i
+        return %10
 }

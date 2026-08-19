@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20020129-1.c" (c, x86_64-unknown-linux-gnu)
-global y : rec_B = zero [external, default, align 8, dso_local]
-global x : rec_B = zero [external, default, align 8, dso_local]
+global y : rec_B = Zero { ty: Named("rec_B") } [external, default, align 8, dso_local]
+global x : rec_B = Zero { ty: Named("rec_B") } [external, default, align 8, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn foo(%arg0: rec_B*, %arg1: rec_B*) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -14,148 +14,148 @@ fn foo(%arg0: rec_B*, %arg1: rec_B*) -> void [external, c, no_inline, dso_local,
         store %arg0, %24
         store %arg1, %25
         scope {
-            %67 = load %24 : rec_B*, align 8
-            %68 = get_member %67[1] "b2" : rec_A**
-            %69 = load %68 : rec_A*, align 8
-            %70 = const #cir.ptr<null> : rec_A*
-            %71 = cmp eq %69, %70 : bool
-            if %71 {
-                %72 = alloca rec_A*, "a", align 8
-                %73 = load %25 : rec_B*, align 8
-                %74 = get_member %73[1] "b2" : rec_A**
-                %75 = load %74 : rec_A*, align 8
-                store %75, %72, align 8
-                %76 = load %24 : rec_B*, align 8
-                %77 = get_member %76[1] "b2" : rec_A**
-                store %75, %77, align 8
-                %78 = const #cir.ptr<null> : rec_A*
-                %79 = load %25 : rec_B*, align 8
-                %80 = get_member %79[1] "b2" : rec_A**
-                store %78, %80, align 8
-                scope {
-                    for cond: {
-                        %88 = load %72 : rec_A*, align 8
-                        %89 = cast(ptr_to_bool) %88 : bool
-                        condition %89
-                    } step: {
-                        %81 = load %72 : rec_A*, align 8
-                        %82 = get_member %81[0] "a1" : rec_A**
-                        %83 = load %82 : rec_A*, align 8
-                        store %83, %72, align 8
+                %67 = load %24 : rec_B*, align 8
+                get_member
+                %69 = load %68 : rec_A*, align 8
+                %70 = const #cir.ptr<null> : rec_A*
+                cmp
+                if %71 {
+                        %72 = alloca rec_A*, "a", align 8
+                        %73 = load %25 : rec_B*, align 8
+                        get_member
+                        %75 = load %74 : rec_A*, align 8
+                        store %75, %72, align 8
+                        %76 = load %24 : rec_B*, align 8
+                        get_member
+                        store %75, %77, align 8
+                        %78 = const #cir.ptr<null> : rec_A*
+                        %79 = load %25 : rec_B*, align 8
+                        get_member
+                        store %78, %80, align 8
+                        scope {
+                                for cond {
+                                        %88 = load %72 : rec_A*, align 8
+                                        %89 = cast(ptr_to_bool) %88 : bool
+                                        condition %89
+                                } step {
+                                        %81 = load %72 : rec_A*, align 8
+                                        get_member
+                                        %83 = load %82 : rec_A*, align 8
+                                        store %83, %72, align 8
+                                        yield
+                                } body {
+                                        %84 = load %24 : rec_B*, align 8
+                                        get_member
+                                        %86 = load %72 : rec_A*, align 8
+                                        get_member
+                                        store %85, %87, align 8
+                                        yield
+                                }
+                                yield
+                        }
                         yield
-                    } do {
-                        %84 = load %24 : rec_B*, align 8
-                        %85 = get_member %84[0] "b1" : rec_C*
-                        %86 = load %72 : rec_A*, align 8
-                        %87 = get_member %86[1] "a2" : rec_C**
-                        store %85, %87, align 8
-                        yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         scope {
-            %61 = load %25 : rec_B*, align 8
-            %62 = get_member %61[1] "b2" : rec_A**
-            %63 = load %62 : rec_A*, align 8
-            %64 = const #cir.ptr<null> : rec_A*
-            %65 = cmp ne %63, %64 : bool
-            if %65 {
-                %66 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %61 = load %25 : rec_B*, align 8
+                get_member
+                %63 = load %62 : rec_A*, align 8
+                %64 = const #cir.ptr<null> : rec_A*
+                cmp
+                if %65 {
+                        %66 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %33 = load %24 : rec_B*, align 8
-            %34 = get_member %33[0] "b1" : rec_C*
-            %35 = get_member %34[2] "c3" : s64i*
-            %36 = load %35 : s64i, align 8
-            %37 = const -1 : s64i
-            %38 = cmp eq %36, %37 : bool
-            if %38 {
-                %39 = load %25 : rec_B*, align 8
-                %40 = get_member %39[0] "b1" : rec_C*
-                %41 = get_member %40[2] "c3" : s64i*
-                %42 = load %41 : s64i, align 8
-                %43 = load %24 : rec_B*, align 8
-                %44 = get_member %43[0] "b1" : rec_C*
-                %45 = get_member %44[2] "c3" : s64i*
-                store %42, %45, align 8
-                %46 = load %25 : rec_B*, align 8
-                %47 = get_member %46[0] "b1" : rec_C*
-                %48 = get_member %47[3] "c4" : s64i*
-                %49 = load %48 : s64i, align 8
-                %50 = load %24 : rec_B*, align 8
-                %51 = get_member %50[0] "b1" : rec_C*
-                %52 = get_member %51[3] "c4" : s64i*
-                store %49, %52, align 8
-                %53 = const -1 : s64i
-                %54 = load %25 : rec_B*, align 8
-                %55 = get_member %54[0] "b1" : rec_C*
-                %56 = get_member %55[2] "c3" : s64i*
-                store %53, %56, align 8
-                %57 = const 0 : s64i
-                %58 = load %25 : rec_B*, align 8
-                %59 = get_member %58[0] "b1" : rec_C*
-                %60 = get_member %59[3] "c4" : s64i*
-                store %57, %60, align 8
+                %33 = load %24 : rec_B*, align 8
+                get_member
+                get_member
+                %36 = load %35 : s64i, align 8
+                %37 = const -1 : s64i
+                cmp
+                if %38 {
+                        %39 = load %25 : rec_B*, align 8
+                        get_member
+                        get_member
+                        %42 = load %41 : s64i, align 8
+                        %43 = load %24 : rec_B*, align 8
+                        get_member
+                        get_member
+                        store %42, %45, align 8
+                        %46 = load %25 : rec_B*, align 8
+                        get_member
+                        get_member
+                        %49 = load %48 : s64i, align 8
+                        %50 = load %24 : rec_B*, align 8
+                        get_member
+                        get_member
+                        store %49, %52, align 8
+                        %53 = const -1 : s64i
+                        %54 = load %25 : rec_B*, align 8
+                        get_member
+                        get_member
+                        store %53, %56, align 8
+                        %57 = const 0 : s64i
+                        %58 = load %25 : rec_B*, align 8
+                        get_member
+                        get_member
+                        store %57, %60, align 8
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %26 = load %25 : rec_B*, align 8
-            %27 = get_member %26[0] "b1" : rec_C*
-            %28 = get_member %27[2] "c3" : s64i*
-            %29 = load %28 : s64i, align 8
-            %30 = const -1 : s64i
-            %31 = cmp ne %29, %30 : bool
-            if %31 {
-                %32 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %26 = load %25 : rec_B*, align 8
+                get_member
+                get_member
+                %29 = load %28 : s64i, align 8
+                %30 = const -1 : s64i
+                cmp
+                if %31 {
+                        %32 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 6 : s32i
-    %3 = get_global @y : rec_B*
-    %4 = get_member %3[0] "b1" : rec_C*
-    %5 = get_member %4[0] "c1" : rec_D*
-    %6 = get_member %5[0] "d1" : s32i*
-    store %2, %6, align 8
-    %7 = const 145 : s64i
-    %8 = get_global @y : rec_B*
-    %9 = get_member %8[0] "b1" : rec_C*
-    %10 = get_member %9[2] "c3" : s64i*
-    store %7, %10, align 8
-    %11 = const 2448 : s64i
-    %12 = get_global @y : rec_B*
-    %13 = get_member %12[0] "b1" : rec_C*
-    %14 = get_member %13[3] "c4" : s64i*
-    store %11, %14, align 8
-    %15 = const -1 : s64i
-    %16 = get_global @x : rec_B*
-    %17 = get_member %16[0] "b1" : rec_C*
-    %18 = get_member %17[2] "c3" : s64i*
-    store %15, %18, align 8
-    %19 = get_global @x : rec_B*
-    %20 = get_global @y : rec_B*
-    call @foo(%19, %20) [all]
-    %21 = get_global @exit : ((s32i) -> void)*
-    %22 = const 0 : s32i
-    call @exit(%22) [all]
-    %23 = load %0 : s32i
-    return %23
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 6 : s32i
+        %3 = get_global @y : rec_B*
+        get_member
+        get_member
+        get_member
+        store %2, %6, align 8
+        %7 = const 145 : s64i
+        %8 = get_global @y : rec_B*
+        get_member
+        get_member
+        store %7, %10, align 8
+        %11 = const 2448 : s64i
+        %12 = get_global @y : rec_B*
+        get_member
+        get_member
+        store %11, %14, align 8
+        %15 = const -1 : s64i
+        %16 = get_global @x : rec_B*
+        get_member
+        get_member
+        store %15, %18, align 8
+        %19 = get_global @x : rec_B*
+        %20 = get_global @y : rec_B*
+        call @foo(%19, %20) [all]
+        %21 = get_global @exit : (s32i) -> void*
+        %22 = const 0 : s32i
+        call @exit(%22) [all]
+        %23 = load %0 : s32i
+        return %23
 }

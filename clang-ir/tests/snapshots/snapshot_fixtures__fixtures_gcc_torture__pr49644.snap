@@ -1,93 +1,93 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr49644.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.b : double[12] = [1.000000e+00, 2.000000e+00, 3.000000e+00, 4.000000e+00, 5.000000e+00, 6.000000e+00, 7.000000e+00, 8.000000e+00, 9.000000e+00, 1.000000e+01, 1.100000e+01, 1.200000e+01] [cir_private, default, dso_local, constant]
+global __const.main.b : double[12] = ConstArray { ty: Array { element_type: Double, size: 12 }, elts: Array([CirFloat { ty: Double, value: "1.000000e+00" }, CirFloat { ty: Double, value: "2.000000e+00" }, CirFloat { ty: Double, value: "3.000000e+00" }, CirFloat { ty: Double, value: "4.000000e+00" }, CirFloat { ty: Double, value: "5.000000e+00" }, CirFloat { ty: Double, value: "6.000000e+00" }, CirFloat { ty: Double, value: "7.000000e+00" }, CirFloat { ty: Double, value: "8.000000e+00" }, CirFloat { ty: Double, value: "9.000000e+00" }, CirFloat { ty: Double, value: "1.000000e+01" }, CirFloat { ty: Double, value: "1.100000e+01" }, CirFloat { ty: Double, value: "1.200000e+01" }]), trailing_zeros_num: 0 } [cir_private, default, dso_local, constant]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca complex<double>[12], "a", align 16
-    %2 = alloca complex<double>*, "c", align 8
-    %3 = alloca complex<double>, "s", align 8
-    %4 = alloca double[12], "b", align 16
-    %5 = alloca double*, "d", align 8
-    %6 = alloca s32i, "i", align 4
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = cast(array_to_ptrdecay) %1 : complex<double>*
-    store %8, %2, align 8
-    %9 = const 3.000000e+00 : double
-    %10 = const 0.000000e+00 : double
-    %11 = const 1.000000e+00 : double
-    %12 = fadd %9, %10 : double
-    %13 = complex.create %12, %11 : complex<double>
-    store %13, %3, align 8
-    %14 = get_global @__const.main.b : double[12]*
-    copy %4, %14
-    %15 = cast(array_to_ptrdecay) %4 : double*
-    store %15, %5, align 8
-    scope {
-        %31 = const 0 : s32i
-        store %31, %6, align 4
-        for cond: {
-            %47 = load %6 : s32i, align 4
-            %48 = const 6 : s32i
-            %49 = cmp lt %47, %48 : bool
-            condition %49
-        } step: {
-            %32 = load %6 : s32i, align 4
-            %33 = inc %32 : s32i [nsw]
-            store %33, %6, align 4
-            yield
-        } do {
-            %34 = load %5 : double*, align 8
-            %35 = const 1 : s32i
-            %36 = ptr_stride %34, %35 : double*
-            store %36, %5, align 8
-            %37 = load %34 : double, align 8
-            %38 = load %3 : complex<double>, align 8
-            %39 = complex.real %38 : double
-            %40 = complex.imag %38 : double
-            %41 = fmul %37, %39 : double
-            %42 = fmul %37, %40 : double
-            %43 = complex.create %41, %42 : complex<double>
-            %44 = load %2 : complex<double>*, align 8
-            %45 = const 1 : s32i
-            %46 = ptr_stride %44, %45 : complex<double>*
-            store %46, %2, align 8
-            store %43, %44, align 8
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca complex<double>[12], "a", align 16
+        %2 = alloca complex<double>*, "c", align 8
+        %3 = alloca complex<double>, "s", align 8
+        %4 = alloca double[12], "b", align 16
+        %5 = alloca double*, "d", align 8
+        %6 = alloca s32i, "i", align 4
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = cast(array_to_ptrdecay) %1 : complex<double>*
+        store %8, %2, align 8
+        %9 = const 3.000000e+00 : double
+        %10 = const 0.000000e+00 : double
+        %11 = const 1.000000e+00 : double
+        fadd
+        complex.create
+        store %13, %3, align 8
+        %14 = get_global @__const.main.b : double[12]*
+        copy
+        %15 = cast(array_to_ptrdecay) %4 : double*
+        store %15, %5, align 8
+        scope {
+                %31 = const 0 : s32i
+                store %31, %6, align 4
+                for cond {
+                        %47 = load %6 : s32i, align 4
+                        %48 = const 6 : s32i
+                        cmp
+                        condition %49
+                } step {
+                        %32 = load %6 : s32i, align 4
+                        inc
+                        store %33, %6, align 4
+                        yield
+                } body {
+                        %34 = load %5 : double*, align 8
+                        %35 = const 1 : s32i
+                        ptr_stride
+                        store %36, %5, align 8
+                        %37 = load %34 : double, align 8
+                        %38 = load %3 : complex<double>, align 8
+                        complex.real
+                        complex.imag
+                        fmul
+                        fmul
+                        complex.create
+                        %44 = load %2 : complex<double>*, align 8
+                        %45 = const 1 : s32i
+                        ptr_stride
+                        store %46, %2, align 8
+                        store %43, %44, align 8
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %18 = load %2 : complex<double>*, align 8
-        %19 = cast(array_to_ptrdecay) %1 : complex<double>*
-        %20 = const 6 : s32i
-        %21 = ptr_stride %19, %20 : complex<double>*
-        %22 = cmp ne %18, %21 : bool
-        %23 = ternary %22 ? { : bool
-            %30 = const true : bool
-            yield %30
-        } : {
-            %25 = load %5 : double*, align 8
-            %26 = cast(array_to_ptrdecay) %4 : double*
-            %27 = const 6 : s32i
-            %28 = ptr_stride %26, %27 : double*
-            %29 = cmp ne %25, %28 : bool
-            yield %29
+        scope {
+                %18 = load %2 : complex<double>*, align 8
+                %19 = cast(array_to_ptrdecay) %1 : complex<double>*
+                %20 = const 6 : s32i
+                ptr_stride
+                cmp
+                %23 = ternary %22 ? { : bool
+                        %30 = const true : bool
+                        yield %30
+                } : {
+                        %25 = load %5 : double*, align 8
+                        %26 = cast(array_to_ptrdecay) %4 : double*
+                        %27 = const 6 : s32i
+                        ptr_stride
+                        cmp
+                        yield %29
+                }
+                if %23 {
+                        %24 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %23 {
-            %24 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %16 = const 0 : s32i
-    store %16, %0
-    %17 = load %0 : s32i
-    return %17
+        %16 = const 0 : s32i
+        store %16, %0
+        %17 = load %0 : s32i
+        return %17
 }

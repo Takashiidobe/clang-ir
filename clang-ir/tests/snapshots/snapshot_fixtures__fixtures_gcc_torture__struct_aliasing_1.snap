@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/struct-aliasing-1.c" (c, x86_64-unknown-linux-gnu)
@@ -13,7 +13,7 @@ fn foo(%arg0: s32i*, %arg1: rec_S*) -> s32i [external, c, no_inline, dso_local, 
         store %arg0, %11
         store %arg1, %12
         %16 = load %12 : rec_S*, align 8
-        %17 = get_member %16[0] "f" : float*
+        get_member
         %18 = cast(bitcast) %17 : s32i*
         store %18, %14, align 8
         %19 = load %14 : s32i*, align 8
@@ -32,26 +32,26 @@ fn foo(%arg0: s32i*, %arg1: rec_S*) -> s32i [external, c, no_inline, dso_local, 
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 1 : s32i
-    store %3, %1, align 4
-    scope {
-        %6 = cast(bitcast) %1 : rec_S*
-        %7 = call @foo(%1, %6) : s32i [all]
-        %8 = const 1 : s32i
-        %9 = cmp ne %7, %8 : bool
-        if %9 {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 1 : s32i
+        store %3, %1, align 4
+        scope {
+                %6 = cast(bitcast) %1 : rec_S*
+                %7 = call @foo(%1, %6) : s32i [all]
+                %8 = const 1 : s32i
+                cmp
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

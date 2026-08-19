@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20120919-1.c" (c, x86_64-unknown-linux-gnu)
-global vd : double[2] = [1.000000e+00] [external, default, align 16, dso_local]
-global vi : s32i[2] = [1234567890] [external, default, align 4, dso_local]
-global pd : double* = @vd [external, default, align 8, dso_local]
-global pi : s32i* = @vi [external, default, align 8, dso_local]
+global vd : double[2] = ConstArray { ty: Array { element_type: Double, size: 2 }, elts: Array([CirFloat { ty: Double, value: "1.000000e+00" }]), trailing_zeros_num: 1 } [external, default, align 16, dso_local]
+global vi : s32i[2] = ConstArray { ty: Array { element_type: Named("s32i"), size: 2 }, elts: Array([CirInt { ty: Named("s32i"), value: "1234567890" }]), trailing_zeros_num: 1 } [external, default, align 4, dso_local]
+global pd : double* = GlobalView { ty: Pointer { pointee: Double, addr_space: None }, symbol: "vd", indices: None } [external, default, align 8, dso_local]
+global pi : s32i* = GlobalView { ty: Pointer { pointee: Named("s32i"), addr_space: None }, symbol: "vi", indices: None } [external, default, align 8, dso_local]
 
 fn init(%arg0: s32i*, %arg1: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i*, %arg1: s32i*):
@@ -15,128 +15,128 @@ fn init(%arg0: s32i*, %arg1: s32i*) -> void [external, c, no_inline, dso_local, 
         store %arg0, %61
         store %arg1, %62
         scope {
-            %63 = const #cir.ptr<null> : s32i*
-            %64 = load %61 : s32i*, align 8
-            %65 = cmp eq %63, %64 : bool
-            if %65 {
-                %66 = const 0 : s32i
-                %67 = const 0 : s64i
-                %68 = load %62 : s32i*, align 8
-                %69 = ptr_stride %68, %67 : s32i*
-                store %66, %69, align 4
+                %63 = const #cir.ptr<null> : s32i*
+                %64 = load %61 : s32i*, align 8
+                cmp
+                if %65 {
+                        %66 = const 0 : s32i
+                        %67 = const 0 : s64i
+                        %68 = load %62 : s32i*, align 8
+                        ptr_stride
+                        store %66, %69, align 4
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i[1532], "dummy", align 16
-    %2 = alloca s32i, "i", align 4
-    %3 = alloca s32i, "n", align 4
-    %4 = alloca s32i, "s", align 4
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = const -1 : s32i
-    store %6, %2, align 4
-    %7 = const 1 : s32i
-    store %7, %3, align 4
-    %8 = const 0 : s32i
-    store %8, %4, align 4
-    %9 = cast(array_to_ptrdecay) %1 : s32i*
-    call @init(%3, %9) [all]
-    scope {
-        while {
-            %58 = load %2 : s32i, align 4
-            %59 = load %3 : s32i, align 4
-            %60 = cmp lt %58, %59 : bool
-            condition %60
-        } do {
-            scope {
-                scope {
-                    %18 = load %2 : s32i, align 4
-                    %19 = const 0 : s32i
-                    %20 = cmp eq %18, %19 : bool
-                    if %20 {
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i[1532], "dummy", align 16
+        %2 = alloca s32i, "i", align 4
+        %3 = alloca s32i, "n", align 4
+        %4 = alloca s32i, "s", align 4
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = const -1 : s32i
+        store %6, %2, align 4
+        %7 = const 1 : s32i
+        store %7, %3, align 4
+        %8 = const 0 : s32i
+        store %8, %4, align 4
+        %9 = cast(array_to_ptrdecay) %1 : s32i*
+        call @init(%3, %9) [all]
+        scope {
+                while {
+                        %58 = load %2 : s32i, align 4
+                        %59 = load %3 : s32i, align 4
+                        cmp
+                        condition %60
+                } do {
                         scope {
-                            %33 = load %2 : s32i, align 4
-                            %34 = cast(integral) %33 : s64i
-                            %35 = get_global @pd : double**
-                            %36 = load %35 : double*, align 8
-                            %37 = ptr_stride %36, %34 : double*
-                            %38 = load %37 : double, align 8
-                            %39 = const 0 : s32i
-                            %40 = cast(int_to_float) %39 : double
-                            %41 = cmp gt %38, %40 : bool
-                            if %41 {
                                 scope {
-                                    %42 = load %2 : s32i, align 4
-                                    %43 = cast(integral) %42 : s64i
-                                    %44 = get_global @pi : s32i**
-                                    %45 = load %44 : s32i*, align 8
-                                    %46 = ptr_stride %45, %43 : s32i*
-                                    %47 = load %46 : s32i, align 4
-                                    %48 = const 0 : s32i
-                                    %49 = cmp gt %47, %48 : bool
-                                    if %49 {
-                                        %50 = load %2 : s32i, align 4
-                                        %51 = cast(integral) %50 : s64i
-                                        %52 = get_global @pi : s32i**
-                                        %53 = load %52 : s32i*, align 8
-                                        %54 = ptr_stride %53, %51 : s32i*
-                                        %55 = load %54 : s32i, align 4
-                                        %56 = load %4 : s32i, align 4
-                                        %57 = add %56, %55 : s32i [nsw]
-                                        store %57, %4, align 4
+                                        %18 = load %2 : s32i, align 4
+                                        %19 = const 0 : s32i
+                                        cmp
+                                        if %20 {
+                                                scope {
+                                                        %33 = load %2 : s32i, align 4
+                                                        %34 = cast(integral) %33 : s64i
+                                                        %35 = get_global @pd : double**
+                                                        %36 = load %35 : double*, align 8
+                                                        ptr_stride
+                                                        %38 = load %37 : double, align 8
+                                                        %39 = const 0 : s32i
+                                                        %40 = cast(int_to_float) %39 : double
+                                                        cmp
+                                                        if %41 {
+                                                                scope {
+                                                                        %42 = load %2 : s32i, align 4
+                                                                        %43 = cast(integral) %42 : s64i
+                                                                        %44 = get_global @pi : s32i**
+                                                                        %45 = load %44 : s32i*, align 8
+                                                                        ptr_stride
+                                                                        %47 = load %46 : s32i, align 4
+                                                                        %48 = const 0 : s32i
+                                                                        cmp
+                                                                        if %49 {
+                                                                                %50 = load %2 : s32i, align 4
+                                                                                %51 = cast(integral) %50 : s64i
+                                                                                %52 = get_global @pi : s32i**
+                                                                                %53 = load %52 : s32i*, align 8
+                                                                                ptr_stride
+                                                                                %55 = load %54 : s32i, align 4
+                                                                                %56 = load %4 : s32i, align 4
+                                                                                %57 = add %56, %55 : s32i [nsw]
+                                                                                store %57, %4, align 4
+                                                                                yield
+                                                                        }
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                %21 = load %2 : s32i, align 4
+                                                %22 = cast(integral) %21 : s64i
+                                                %23 = get_global @pi : s32i**
+                                                %24 = load %23 : s32i*, align 8
+                                                ptr_stride
+                                                %26 = load %25 : s32i, align 4
+                                                %27 = cast(int_to_float) %26 : double
+                                                %28 = load %2 : s32i, align 4
+                                                %29 = cast(integral) %28 : s64i
+                                                %30 = get_global @pd : double**
+                                                %31 = load %30 : double*, align 8
+                                                ptr_stride
+                                                store %27, %32, align 8
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
+                                %16 = load %2 : s32i, align 4
+                                inc
+                                store %17, %2, align 4
                                 yield
-                            }
-                            yield
                         }
-                        %21 = load %2 : s32i, align 4
-                        %22 = cast(integral) %21 : s64i
-                        %23 = get_global @pi : s32i**
-                        %24 = load %23 : s32i*, align 8
-                        %25 = ptr_stride %24, %22 : s32i*
-                        %26 = load %25 : s32i, align 4
-                        %27 = cast(int_to_float) %26 : double
-                        %28 = load %2 : s32i, align 4
-                        %29 = cast(integral) %28 : s64i
-                        %30 = get_global @pd : double**
-                        %31 = load %30 : double*, align 8
-                        %32 = ptr_stride %31, %29 : double*
-                        store %27, %32, align 8
                         yield
-                    }
-                    yield
                 }
-                %16 = load %2 : s32i, align 4
-                %17 = inc %16 : s32i [nsw]
-                store %17, %2, align 4
                 yield
-            }
-            yield
         }
-        yield
-    }
-    scope {
-        %12 = load %4 : s32i, align 4
-        %13 = const 1234567890 : s32i
-        %14 = cmp ne %12, %13 : bool
-        if %14 {
-            %15 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %12 = load %4 : s32i, align 4
+                %13 = const 1234567890 : s32i
+                cmp
+                if %14 {
+                        %15 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %10 = const 0 : s32i
-    store %10, %0
-    %11 = load %0 : s32i
-    return %11
+        %10 = const 0 : s32i
+        store %10, %0
+        %11 = load %0 : s32i
+        return %11
 }

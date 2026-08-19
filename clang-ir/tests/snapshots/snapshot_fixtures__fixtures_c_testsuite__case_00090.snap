@@ -1,61 +1,61 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.c-testsuite/case_00090.c" (c, x86_64-unknown-linux-gnu)
-global a : s32i[3] = [0, 1, 2] [external, default, align 4, dso_local]
+global a : s32i[3] = ConstArray { ty: Array { element_type: Named("s32i"), size: 3 }, elts: Array([CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "1" }, CirInt { ty: Named("s32i"), value: "2" }]), trailing_zeros_num: 0 } [external, default, align 4, dso_local]
 
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %20 = const 0 : s64i
-        %21 = get_global @a : s32i[3]*
-        %22 = get_element %21[%20] : s32i*
-        %23 = load %22 : s32i, align 4
-        %24 = const 0 : s32i
-        %25 = cmp ne %23, %24 : bool
-        if %25 {
-            %26 = const 1 : s32i
-            store %26, %0
-            %27 = load %0 : s32i
-            return %27
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %20 = const 0 : s64i
+                %21 = get_global @a : s32i[3]*
+                get_element
+                %23 = load %22 : s32i, align 4
+                %24 = const 0 : s32i
+                cmp
+                if %25 {
+                        %26 = const 1 : s32i
+                        store %26, %0
+                        %27 = load %0 : s32i
+                        return %27
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %12 = const 1 : s64i
-        %13 = get_global @a : s32i[3]*
-        %14 = get_element %13[%12] : s32i*
-        %15 = load %14 : s32i, align 4
-        %16 = const 1 : s32i
-        %17 = cmp ne %15, %16 : bool
-        if %17 {
-            %18 = const 2 : s32i
-            store %18, %0
-            %19 = load %0 : s32i
-            return %19
+        scope {
+                %12 = const 1 : s64i
+                %13 = get_global @a : s32i[3]*
+                get_element
+                %15 = load %14 : s32i, align 4
+                %16 = const 1 : s32i
+                cmp
+                if %17 {
+                        %18 = const 2 : s32i
+                        store %18, %0
+                        %19 = load %0 : s32i
+                        return %19
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %4 = const 2 : s64i
-        %5 = get_global @a : s32i[3]*
-        %6 = get_element %5[%4] : s32i*
-        %7 = load %6 : s32i, align 4
-        %8 = const 2 : s32i
-        %9 = cmp ne %7, %8 : bool
-        if %9 {
-            %10 = const 3 : s32i
-            store %10, %0
-            %11 = load %0 : s32i
-            return %11
+        scope {
+                %4 = const 2 : s64i
+                %5 = get_global @a : s32i[3]*
+                get_element
+                %7 = load %6 : s32i, align 4
+                %8 = const 2 : s32i
+                cmp
+                if %9 {
+                        %10 = const 3 : s32i
+                        store %10, %0
+                        %11 = load %0 : s32i
+                        return %11
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

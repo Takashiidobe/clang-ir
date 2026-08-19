@@ -1,43 +1,43 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/signal/raise_handler.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
-global hit : s32i = 0 [internal, default, align 4, dso_local]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global hit : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
 
-fn signal(%arg0: s32i, %arg1: ((s32i) -> void)*) -> ((s32i) -> void)* [external, c, nothrow];
+fn signal(%arg0: s32i, %arg1: (s32i) -> void*) -> (s32i) -> void* [external, c, nothrow];
 fn handler(%arg0: s32i) -> void [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i):
         %18 = alloca s32i, "s", align 4
         store %arg0, %18
         %19 = load %18 : s32i, align 4
         %20 = get_global @hit : s32i*
-        store %19, %20, align 4, volatile
+        store %19, %20, align 4
         return
 }
 fn raise(%arg0: s32i) -> s32i [external, c, nothrow];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 10 : s32i
-    %3 = get_global @handler : ((s32i) -> void)*
-    %4 = call @signal(%2, %3) : ((s32i) -> void)* [all]
-    %5 = const 10 : s32i
-    %6 = call @raise(%5) : s32i [all]
-    %7 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %8 = get_global @.str : s8i[4]*
-    %9 = cast(array_to_ptrdecay) %8 : s8i*
-    %10 = get_global @hit : s32i*
-    %11 = load %10 : s32i, align 4, volatile
-    %12 = const 10 : s32i
-    %13 = cmp eq %11, %12 : bool
-    %14 = cast(bool_to_int) %13 : s32i
-    %15 = call @printf(%9, %14) : s32i [all]
-    %16 = const 0 : s32i
-    store %16, %0
-    %17 = load %0 : s32i
-    return %17
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 10 : s32i
+        %3 = get_global @handler : (s32i) -> void*
+        %4 = call @signal(%2, %3) : (s32i) -> void* [all]
+        %5 = const 10 : s32i
+        %6 = call @raise(%5) : s32i [all]
+        %7 = get_global @printf : (s8i*, ...) -> s32i*
+        %8 = get_global @.str : s8i[4]*
+        %9 = cast(array_to_ptrdecay) %8 : s8i*
+        %10 = get_global @hit : s32i*
+        %11 = load %10 : s32i, align 4
+        %12 = const 10 : s32i
+        cmp
+        %14 = cast(bool_to_int) %13 : s32i
+        %15 = call @printf(%9, %14) : s32i [all]
+        %16 = const 0 : s32i
+        store %16, %0
+        %17 = load %0 : s32i
+        return %17
 }

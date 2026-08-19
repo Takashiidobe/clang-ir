@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/ieee__mul-subnormal-single-1.c" (c, x86_64-unknown-linux-gnu)
-global ok : s32i = 1 [external, default, align 4, dso_local]
-global expected : rec_anon2E0[3] = [{4095, 1065354240, 4095}, {15, 1070106760, 23}, {15, 1065632836, 15}] [external, default, align 16, dso_local]
+global ok : s32i = CirInt { ty: Named("s32i"), value: "1" } [external, default, align 4, dso_local]
+global expected : rec_anon2E0[3] = ConstArray { ty: Array { element_type: Named("rec_anon2E0"), size: 3 }, elts: Array([ConstRecord { ty: Named("rec_anon2E0"), members: Array([CirInt { ty: Named("u32i"), value: "4095" }, CirInt { ty: Named("u32i"), value: "1065354240" }, CirInt { ty: Named("u32i"), value: "4095" }]) }, ConstRecord { ty: Named("rec_anon2E0"), members: Array([CirInt { ty: Named("u32i"), value: "15" }, CirInt { ty: Named("u32i"), value: "1070106760" }, CirInt { ty: Named("u32i"), value: "23" }]) }, ConstRecord { ty: Named("rec_anon2E0"), members: Array([CirInt { ty: Named("u32i"), value: "15" }, CirInt { ty: Named("u32i"), value: "1065632836" }, CirInt { ty: Named("u32i"), value: "15" }]) }]), trailing_zeros_num: 0 } [external, default, align 16, dso_local]
 
 fn u2f(%arg4: u32i) -> float [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg4: u32i):
@@ -13,9 +13,9 @@ fn u2f(%arg4: u32i) -> float [internal, c, no_inline, dso_local, nothrow] {
         %83 = alloca rec_uf, "u", align 4
         store %arg4, %81
         %84 = load %81 : u32i, align 4
-        %85 = get_member %83[0] "u" : u32i*
+        get_member
         store %84, %85, align 4
-        %86 = get_member %83[1] "f" : float*
+        get_member
         %87 = load %86 : float, align 4
         store %87, %82
         %88 = load %82 : float
@@ -28,9 +28,9 @@ fn f2u(%arg3: float) -> u32i [internal, c, no_inline, dso_local, nothrow] {
         %75 = alloca rec_uf, "u", align 4
         store %arg3, %73
         %76 = load %73 : float, align 4
-        %77 = get_member %75[1] "f" : float*
+        get_member
         store %76, %77, align 4
-        %78 = get_member %75[0] "u" : u32i*
+        get_member
         %79 = load %78 : u32i, align 4
         store %79, %74
         %80 = load %74 : u32i
@@ -53,106 +53,106 @@ fn tstmul(%arg0: u32i, %arg1: u32i, %arg2: u32i) -> void [internal, c, no_inline
         %64 = call @u2f(%63) : float [all]
         store %64, %60, align 4
         scope {
-            %65 = load %59 : float, align 4
-            %66 = load %60 : float, align 4
-            %67 = fmul %65, %66 : float
-            %68 = call @f2u(%67) : u32i [all]
-            %69 = load %58 : u32i, align 4
-            %70 = cmp ne %68, %69 : bool
-            if %70 {
-                %71 = const 0 : s32i
-                %72 = get_global @ok : s32i*
-                store %71, %72, align 4
+                %65 = load %59 : float, align 4
+                %66 = load %60 : float, align 4
+                fmul
+                %68 = call @f2u(%67) : u32i [all]
+                %69 = load %58 : u32i, align 4
+                cmp
+                if %70 {
+                        %71 = const 0 : s32i
+                        %72 = get_global @ok : s32i*
+                        store %71, %72, align 4
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u32i, "i", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    scope {
-        %11 = const 0 : u32i
-        store %11, %1, align 4
-        for cond: {
-            %50 = load %1 : u32i, align 4
-            %51 = cast(integral) %50 : u64i
-            %52 = const 36 : u64i
-            %53 = const 12 : u64i
-            %54 = div %52, %53 : u64i
-            %55 = cmp lt %51, %54 : bool
-            condition %55
-        } step: {
-            %12 = load %1 : u32i, align 4
-            %13 = inc %12 : u32i
-            store %13, %1, align 4
-            yield
-        } do {
-            scope {
-                %14 = load %1 : u32i, align 4
-                %15 = cast(integral) %14 : u64i
-                %16 = get_global @expected : rec_anon2E0[3]*
-                %17 = get_element %16[%15] : rec_anon2E0*
-                %18 = get_member %17[0] "p1" : u32i*
-                %19 = load %18 : u32i, align 4
-                %20 = load %1 : u32i, align 4
-                %21 = cast(integral) %20 : u64i
-                %22 = get_global @expected : rec_anon2E0[3]*
-                %23 = get_element %22[%21] : rec_anon2E0*
-                %24 = get_member %23[1] "p2" : u32i*
-                %25 = load %24 : u32i, align 4
-                %26 = load %1 : u32i, align 4
-                %27 = cast(integral) %26 : u64i
-                %28 = get_global @expected : rec_anon2E0[3]*
-                %29 = get_element %28[%27] : rec_anon2E0*
-                %30 = get_member %29[2] "res" : u32i*
-                %31 = load %30 : u32i, align 4
-                call @tstmul(%19, %25, %31) [all]
-                %32 = load %1 : u32i, align 4
-                %33 = cast(integral) %32 : u64i
-                %34 = get_global @expected : rec_anon2E0[3]*
-                %35 = get_element %34[%33] : rec_anon2E0*
-                %36 = get_member %35[1] "p2" : u32i*
-                %37 = load %36 : u32i, align 4
-                %38 = load %1 : u32i, align 4
-                %39 = cast(integral) %38 : u64i
-                %40 = get_global @expected : rec_anon2E0[3]*
-                %41 = get_element %40[%39] : rec_anon2E0*
-                %42 = get_member %41[0] "p1" : u32i*
-                %43 = load %42 : u32i, align 4
-                %44 = load %1 : u32i, align 4
-                %45 = cast(integral) %44 : u64i
-                %46 = get_global @expected : rec_anon2E0[3]*
-                %47 = get_element %46[%45] : rec_anon2E0*
-                %48 = get_member %47[2] "res" : u32i*
-                %49 = load %48 : u32i, align 4
-                call @tstmul(%37, %43, %49) [all]
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u32i, "i", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        scope {
+                %11 = const 0 : u32i
+                store %11, %1, align 4
+                for cond {
+                        %50 = load %1 : u32i, align 4
+                        %51 = cast(integral) %50 : u64i
+                        %52 = const 36 : u64i
+                        %53 = const 12 : u64i
+                        div
+                        cmp
+                        condition %55
+                } step {
+                        %12 = load %1 : u32i, align 4
+                        inc
+                        store %13, %1, align 4
+                        yield
+                } body {
+                        scope {
+                                %14 = load %1 : u32i, align 4
+                                %15 = cast(integral) %14 : u64i
+                                %16 = get_global @expected : rec_anon2E0[3]*
+                                get_element
+                                get_member
+                                %19 = load %18 : u32i, align 4
+                                %20 = load %1 : u32i, align 4
+                                %21 = cast(integral) %20 : u64i
+                                %22 = get_global @expected : rec_anon2E0[3]*
+                                get_element
+                                get_member
+                                %25 = load %24 : u32i, align 4
+                                %26 = load %1 : u32i, align 4
+                                %27 = cast(integral) %26 : u64i
+                                %28 = get_global @expected : rec_anon2E0[3]*
+                                get_element
+                                get_member
+                                %31 = load %30 : u32i, align 4
+                                call @tstmul(%19, %25, %31) [all]
+                                %32 = load %1 : u32i, align 4
+                                %33 = cast(integral) %32 : u64i
+                                %34 = get_global @expected : rec_anon2E0[3]*
+                                get_element
+                                get_member
+                                %37 = load %36 : u32i, align 4
+                                %38 = load %1 : u32i, align 4
+                                %39 = cast(integral) %38 : u64i
+                                %40 = get_global @expected : rec_anon2E0[3]*
+                                get_element
+                                get_member
+                                %43 = load %42 : u32i, align 4
+                                %44 = load %1 : u32i, align 4
+                                %45 = cast(integral) %44 : u64i
+                                %46 = get_global @expected : rec_anon2E0[3]*
+                                get_element
+                                get_member
+                                %49 = load %48 : u32i, align 4
+                                call @tstmul(%37, %43, %49) [all]
+                                yield
+                        }
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    scope {
-        %6 = get_global @ok : s32i*
-        %7 = load %6 : s32i, align 4
-        %8 = cast(int_to_bool) %7 : bool
-        %9 = not %8 : bool
-        if %9 {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %6 = get_global @ok : s32i*
+                %7 = load %6 : s32i, align 4
+                %8 = cast(int_to_bool) %7 : bool
+                not
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %3 = get_global @exit : ((s32i) -> void)*
-    %4 = const 0 : s32i
-    call @exit(%4) [all]
-    %5 = load %0 : s32i
-    return %5
+        %3 = get_global @exit : (s32i) -> void*
+        %4 = const 0 : s32i
+        call @exit(%4) [all]
+        %5 = load %0 : s32i
+        return %5
 }

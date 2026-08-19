@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20030606-1.c" (c, x86_64-unknown-linux-gnu)
@@ -13,22 +13,22 @@ fn foo(%arg0: s32i*, %arg1: s32i) -> s32i* [external, c, no_inline, dso_local, n
         %65 = const 55 : s32i
         %66 = load %62 : s32i*, align 8
         %67 = const 1 : s32i
-        %68 = ptr_stride %66, %67 : s32i*
+        ptr_stride
         store %68, %62, align 8
         store %65, %66, align 4
         scope {
-            %71 = load %63 : s32i, align 4
-            %72 = cast(int_to_bool) %71 : bool
-            if %72 {
-                %73 = load %63 : s32i, align 4
-                %74 = load %62 : s32i*, align 8
-                %75 = const 1 : s32i
-                %76 = ptr_stride %74, %75 : s32i*
-                store %76, %62, align 8
-                store %73, %74, align 4
+                %71 = load %63 : s32i, align 4
+                %72 = cast(int_to_bool) %71 : bool
+                if %72 {
+                        %73 = load %63 : s32i, align 4
+                        %74 = load %62 : s32i*, align 8
+                        %75 = const 1 : s32i
+                        ptr_stride
+                        store %76, %62, align 8
+                        store %73, %74, align 4
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %69 = load %62 : s32i*, align 8
         store %69, %64
@@ -39,99 +39,99 @@ fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i[5], "a", align 16
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = cast(array_to_ptrdecay) %1 : s32i*
-    %4 = cast(bitcast) %3 : void*
-    %5 = const 1 : s32i
-    %6 = const 20 : u64i
-    %7 = call @memset(%4, %5, %6) : void* [all]
-    scope {
-        %38 = cast(array_to_ptrdecay) %1 : s32i*
-        %39 = const 0 : s32i
-        %40 = call @foo(%38, %39) : s32i* [all]
-        %41 = cast(array_to_ptrdecay) %1 : s32i*
-        %42 = ptr_diff %40, %41 : s64i
-        %43 = const 1 : s64i
-        %44 = cmp ne %42, %43 : bool
-        %45 = ternary %44 ? { : bool
-            %61 = const true : bool
-            yield %61
-        } : {
-            %56 = const 0 : s64i
-            %57 = get_element %1[%56] : s32i*
-            %58 = load %57 : s32i, align 16
-            %59 = const 55 : s32i
-            %60 = cmp ne %58, %59 : bool
-            yield %60
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i[5], "a", align 16
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = cast(array_to_ptrdecay) %1 : s32i*
+        %4 = cast(bitcast) %3 : void*
+        %5 = const 1 : s32i
+        %6 = const 20 : u64i
+        %7 = call @memset(%4, %5, %6) : void* [all]
+        scope {
+                %38 = cast(array_to_ptrdecay) %1 : s32i*
+                %39 = const 0 : s32i
+                %40 = call @foo(%38, %39) : s32i* [all]
+                %41 = cast(array_to_ptrdecay) %1 : s32i*
+                ptr_diff
+                %43 = const 1 : s64i
+                cmp
+                %45 = ternary %44 ? { : bool
+                        %61 = const true : bool
+                        yield %61
+                } : {
+                        %56 = const 0 : s64i
+                        get_element
+                        %58 = load %57 : s32i, align 16
+                        %59 = const 55 : s32i
+                        cmp
+                        yield %60
+                }
+                %46 = ternary %45 ? { : bool
+                        %55 = const true : bool
+                        yield %55
+                } : {
+                        %48 = const 1 : s64i
+                        get_element
+                        %50 = load %49 : s32i, align 4
+                        %51 = const 4 : s64i
+                        get_element
+                        %53 = load %52 : s32i, align 16
+                        cmp
+                        yield %54
+                }
+                if %46 {
+                        %47 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        %46 = ternary %45 ? { : bool
-            %55 = const true : bool
-            yield %55
-        } : {
-            %48 = const 1 : s64i
-            %49 = get_element %1[%48] : s32i*
-            %50 = load %49 : s32i, align 4
-            %51 = const 4 : s64i
-            %52 = get_element %1[%51] : s32i*
-            %53 = load %52 : s32i, align 16
-            %54 = cmp ne %50, %53 : bool
-            yield %54
+        %8 = cast(array_to_ptrdecay) %1 : s32i*
+        %9 = cast(bitcast) %8 : void*
+        %10 = const 1 : s32i
+        %11 = const 20 : u64i
+        %12 = call @memset(%9, %10, %11) : void* [all]
+        scope {
+                %16 = cast(array_to_ptrdecay) %1 : s32i*
+                %17 = const 2 : s32i
+                %18 = call @foo(%16, %17) : s32i* [all]
+                %19 = cast(array_to_ptrdecay) %1 : s32i*
+                ptr_diff
+                %21 = const 2 : s64i
+                cmp
+                %23 = ternary %22 ? { : bool
+                        %37 = const true : bool
+                        yield %37
+                } : {
+                        %32 = const 0 : s64i
+                        get_element
+                        %34 = load %33 : s32i, align 16
+                        %35 = const 55 : s32i
+                        cmp
+                        yield %36
+                }
+                %24 = ternary %23 ? { : bool
+                        %31 = const true : bool
+                        yield %31
+                } : {
+                        %26 = const 1 : s64i
+                        get_element
+                        %28 = load %27 : s32i, align 4
+                        %29 = const 2 : s32i
+                        cmp
+                        yield %30
+                }
+                if %24 {
+                        %25 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %46 {
-            %47 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %8 = cast(array_to_ptrdecay) %1 : s32i*
-    %9 = cast(bitcast) %8 : void*
-    %10 = const 1 : s32i
-    %11 = const 20 : u64i
-    %12 = call @memset(%9, %10, %11) : void* [all]
-    scope {
-        %16 = cast(array_to_ptrdecay) %1 : s32i*
-        %17 = const 2 : s32i
-        %18 = call @foo(%16, %17) : s32i* [all]
-        %19 = cast(array_to_ptrdecay) %1 : s32i*
-        %20 = ptr_diff %18, %19 : s64i
-        %21 = const 2 : s64i
-        %22 = cmp ne %20, %21 : bool
-        %23 = ternary %22 ? { : bool
-            %37 = const true : bool
-            yield %37
-        } : {
-            %32 = const 0 : s64i
-            %33 = get_element %1[%32] : s32i*
-            %34 = load %33 : s32i, align 16
-            %35 = const 55 : s32i
-            %36 = cmp ne %34, %35 : bool
-            yield %36
-        }
-        %24 = ternary %23 ? { : bool
-            %31 = const true : bool
-            yield %31
-        } : {
-            %26 = const 1 : s64i
-            %27 = get_element %1[%26] : s32i*
-            %28 = load %27 : s32i, align 4
-            %29 = const 2 : s32i
-            %30 = cmp ne %28, %29 : bool
-            yield %30
-        }
-        if %24 {
-            %25 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %13 = get_global @exit : ((s32i) -> void)*
-    %14 = const 0 : s32i
-    call @exit(%14) [all]
-    %15 = load %0 : s32i
-    return %15
+        %13 = get_global @exit : (s32i) -> void*
+        %14 = const 0 : s32i
+        call @exit(%14) [all]
+        %15 = load %0 : s32i
+        return %15
 }

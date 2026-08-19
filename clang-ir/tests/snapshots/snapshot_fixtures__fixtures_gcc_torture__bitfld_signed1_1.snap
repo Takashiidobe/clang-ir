@@ -1,31 +1,31 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/bitfld-signed1-1.c" (c, x86_64-unknown-linux-gnu)
-global b : rec_anon2E0 = {1, zero} [external, default, align 4, dso_local]
-global c : s8i = 0 [external, default, align 1, dso_local]
+global b : rec_anon2E0 = ConstRecord { ty: Named("rec_anon2E0"), members: Array([CirInt { ty: Named("u8i"), value: "1" }, Zero { ty: Array { element_type: Named("u8i"), size: 3 } }]) } [external, default, align 4, dso_local]
+global c : s8i = CirInt { ty: Named("s8i"), value: "0" } [external, default, align 1, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %3 = get_global @b : rec_anon2E0*
-        %4 = get_member %3[0] "a" : u8i*
-        %5 = get_bitfield %4, "a": 1 bits @0 in signed u8i : s32i, align 4
-        %6 = cast(integral) %5 : u64i
-        %7 = const 1 : u64i
-        %8 = xor %6, %7 : u64i
-        %9 = const 3 : u64i
-        %10 = cmp lt %8, %9 : bool
-        if %10 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %3 = get_global @b : rec_anon2E0*
+                get_member
+                get_bitfield
+                %6 = cast(integral) %5 : u64i
+                %7 = const 1 : u64i
+                xor
+                %9 = const 3 : u64i
+                cmp
+                if %10 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = load %0 : s32i
-    return %2
+        %2 = load %0 : s32i
+        return %2
 }

@@ -1,80 +1,80 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.c-testsuite/case_00194.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[3] = "%d" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[3] = "%c" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[2] = "e" [cir_private, default, align 1, dso_local, constant]
-global .str.3 : s8i[2] = "\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[3] = ConstArray { ty: Array { element_type: Named("s8i"), size: 3 }, elts: Str("%d"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[3] = ConstArray { ty: Array { element_type: Named("s8i"), size: 3 }, elts: Str("%c"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[2] = ConstArray { ty: Array { element_type: Named("s8i"), size: 2 }, elts: Str("e"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[2] = ConstArray { ty: Array { element_type: Named("s8i"), size: 2 }, elts: Str("\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "a", align 4
-    %2 = alloca s8i, "b", align 1
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 0 : s32i
-    store %4, %1, align 4
-    scope {
-        while {
-            %33 = load %1 : s32i, align 4
-            %34 = const 2 : s32i
-            %35 = cmp lt %33, %34 : bool
-            condition %35
-        } do {
-            scope {
-                %11 = get_global @printf : ((s8i*, ...) -> s32i)*
-                %12 = get_global @.str : s8i[3]*
-                %13 = cast(array_to_ptrdecay) %12 : s8i*
-                %14 = load %1 : s32i, align 4
-                %15 = inc %14 : s32i [nsw]
-                store %15, %1, align 4
-                %16 = call @printf(%13, %14) : s32i [all]
-                break
-                ^bb1():
-                    %17 = const 65 : s8i
-                    store %17, %2, align 1
-                    scope {
-                        while {
-                            %29 = load %2 : s8i, align 1
-                            %30 = cast(integral) %29 : s32i
-                            %31 = const 67 : s32i
-                            %32 = cmp lt %30, %31 : bool
-                            condition %32
-                        } do {
-                            scope {
-                                %22 = get_global @printf : ((s8i*, ...) -> s32i)*
-                                %23 = get_global @.str.1 : s8i[3]*
-                                %24 = cast(array_to_ptrdecay) %23 : s8i*
-                                %25 = load %2 : s8i, align 1
-                                %26 = inc %25 : s8i
-                                store %26, %2, align 1
-                                %27 = cast(integral) %25 : s32i
-                                %28 = call @printf(%24, %27) : s32i [all]
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "a", align 4
+        %2 = alloca s8i, "b", align 1
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 0 : s32i
+        store %4, %1, align 4
+        scope {
+                while {
+                        %33 = load %1 : s32i, align 4
+                        %34 = const 2 : s32i
+                        cmp
+                        condition %35
+                } do {
+                        scope {
+                                %11 = get_global @printf : (s8i*, ...) -> s32i*
+                                %12 = get_global @.str : s8i[3]*
+                                %13 = cast(array_to_ptrdecay) %12 : s8i*
+                                %14 = load %1 : s32i, align 4
+                                inc
+                                store %15, %1, align 4
+                                %16 = call @printf(%13, %14) : s32i [all]
+                                break
+                            ^bb1:
+                                %17 = const 65 : s8i
+                                store %17, %2, align 1
+                                scope {
+                                        while {
+                                                %29 = load %2 : s8i, align 1
+                                                %30 = cast(integral) %29 : s32i
+                                                %31 = const 67 : s32i
+                                                cmp
+                                                condition %32
+                                        } do {
+                                                scope {
+                                                        %22 = get_global @printf : (s8i*, ...) -> s32i*
+                                                        %23 = get_global @.str.1 : s8i[3]*
+                                                        %24 = cast(array_to_ptrdecay) %23 : s8i*
+                                                        %25 = load %2 : s8i, align 1
+                                                        inc
+                                                        store %26, %2, align 1
+                                                        %27 = cast(integral) %25 : s32i
+                                                        %28 = call @printf(%24, %27) : s32i [all]
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
+                                %18 = get_global @printf : (s8i*, ...) -> s32i*
+                                %19 = get_global @.str.2 : s8i[2]*
+                                %20 = cast(array_to_ptrdecay) %19 : s8i*
+                                %21 = call @printf(%20) : s32i [all]
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    %18 = get_global @printf : ((s8i*, ...) -> s32i)*
-                    %19 = get_global @.str.2 : s8i[2]*
-                    %20 = cast(array_to_ptrdecay) %19 : s8i*
-                    %21 = call @printf(%20) : s32i [all]
-                    yield
-            }
-            yield
+                }
+                yield
         }
-        yield
-    }
-    %5 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %6 = get_global @.str.3 : s8i[2]*
-    %7 = cast(array_to_ptrdecay) %6 : s8i*
-    %8 = call @printf(%7) : s32i [all]
-    %9 = const 0 : s32i
-    store %9, %0
-    %10 = load %0 : s32i
-    return %10
+        %5 = get_global @printf : (s8i*, ...) -> s32i*
+        %6 = get_global @.str.3 : s8i[2]*
+        %7 = cast(array_to_ptrdecay) %6 : s8i*
+        %8 = call @printf(%7) : s32i [all]
+        %9 = const 0 : s32i
+        store %9, %0
+        %10 = load %0 : s32i
+        return %10
 }

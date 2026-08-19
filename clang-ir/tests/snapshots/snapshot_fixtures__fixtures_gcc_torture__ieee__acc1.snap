@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/ieee__acc1.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.values : double[4] = [1.000000e-101, 1.000000e+00, -1.000000e+00] [cir_private, default, dso_local, constant]
+global __const.main.values : double[4] = ConstArray { ty: Array { element_type: Double, size: 4 }, elts: Array([CirFloat { ty: Double, value: "1.000000e-101" }, CirFloat { ty: Double, value: "1.000000e+00" }, CirFloat { ty: Double, value: "-1.000000e+00" }]), trailing_zeros_num: 1 } [cir_private, default, dso_local, constant]
 
 fn func(%arg0: double*) -> double [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: double*):
@@ -15,26 +15,26 @@ fn func(%arg0: double*) -> double [external, c, no_inline, dso_local, nothrow] {
         %16 = load %15 : double, align 8
         store %16, %14, align 8
         scope {
-            %18 = load %14 : double, align 8
-            %19 = const 0.000000e+00 : double
-            %20 = cmp eq %18, %19 : bool
-            if %20 {
-                %28 = load %14 : double, align 8
-                store %28, %13
-                %29 = load %13 : double
-                return %29
-            } else {
-                %21 = load %14 : double, align 8
-                %22 = load %12 : double*, align 8
-                %23 = const 1 : s32i
-                %24 = ptr_stride %22, %23 : double*
-                %25 = call @func(%24) : double [all]
-                %26 = fadd %21, %25 : double
-                store %26, %13
-                %27 = load %13 : double
-                return %27
-            }
-            yield
+                %18 = load %14 : double, align 8
+                %19 = const 0.000000e+00 : double
+                cmp
+                if %20 {
+                        %28 = load %14 : double, align 8
+                        store %28, %13
+                        %29 = load %13 : double
+                        return %29
+                } else {
+                        %21 = load %14 : double, align 8
+                        %22 = load %12 : double*, align 8
+                        %23 = const 1 : s32i
+                        ptr_stride
+                        %25 = call @func(%24) : double [all]
+                        fadd
+                        store %26, %13
+                        %27 = load %13 : double
+                        return %27
+                }
+                yield
         }
         %17 = load %13 : double
         return %17
@@ -42,27 +42,27 @@ fn func(%arg0: double*) -> double [external, c, no_inline, dso_local, nothrow] {
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca double[4], "values", align 16
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @__const.main.values : double[4]*
-    copy %1, %3
-    scope {
-        %7 = cast(array_to_ptrdecay) %1 : double*
-        %8 = call @func(%7) : double [all]
-        %9 = const 1.000000e-101 : double
-        %10 = cmp ne %8, %9 : bool
-        if %10 {
-            %11 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca double[4], "values", align 16
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @__const.main.values : double[4]*
+        copy
+        scope {
+                %7 = cast(array_to_ptrdecay) %1 : double*
+                %8 = call @func(%7) : double [all]
+                %9 = const 1.000000e-101 : double
+                cmp
+                if %10 {
+                        %11 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %4 = get_global @exit : ((s32i) -> void)*
-    %5 = const 0 : s32i
-    call @exit(%5) [all]
-    %6 = load %0 : s32i
-    return %6
+        %4 = get_global @exit : (s32i) -> void*
+        %5 = const 0 : s32i
+        call @exit(%5) [all]
+        %6 = load %0 : s32i
+        return %6
 }

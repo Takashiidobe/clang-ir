@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20030715-1.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[6] = "inetd" [cir_private, default, align 1, dso_local, constant]
-global ap_standalone : s32i = 0 [external, default, align 4, dso_local]
-global .str.1 : s8i[11] = "standalone" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[50] = "ServerType must be either 'inetd' or 'standalone'" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[6] = ConstArray { ty: Array { element_type: Named("s8i"), size: 6 }, elts: Str("inetd"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global ap_standalone : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global .str.1 : s8i[11] = ConstArray { ty: Array { element_type: Named("s8i"), size: 11 }, elts: Str("standalone"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[50] = ConstArray { ty: Array { element_type: Named("s8i"), size: 50 }, elts: Str("ServerType must be either 'inetd' or 'standalone'"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn ap_check_cmd_context(%arg3: void*, %arg4: s32i) -> s8i* [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg3: void*, %arg4: s32i):
@@ -34,65 +34,65 @@ fn server_type(%arg0: void*, %arg1: void*, %arg2: s8i*) -> s8i* [external, c, no
         %14 = load %9 : void*, align 8
         %15 = const 1 : s32i
         %16 = const 2 : s32i
-        %17 = or %15, %16 : s32i
+        or
         %18 = const 4 : s32i
-        %19 = or %17, %18 : s32i
+        or
         %20 = const 8 : s32i
-        %21 = or %19, %20 : s32i
+        or
         %22 = const 16 : s32i
-        %23 = or %21, %22 : s32i
+        or
         %24 = call @ap_check_cmd_context(%14, %23) : s8i* [all]
         store %24, %13, align 8
         scope {
-            %48 = load %13 : s8i*, align 8
-            %49 = cast(ptr_to_bool) %48 : bool
-            if %49 {
-                %50 = load %13 : s8i*, align 8
-                store %50, %12
-                %51 = load %12 : s8i*
-                return %51
-            }
-            yield
-        }
-        scope {
-            %27 = get_global @strcmp : ((s8i*, s8i*) -> s32i)*
-            %28 = load %11 : s8i*, align 8
-            %29 = get_global @.str : s8i[6]*
-            %30 = cast(array_to_ptrdecay) %29 : s8i*
-            %31 = call @strcmp(%28, %30) : s32i [all]
-            %32 = cast(int_to_bool) %31 : bool
-            %33 = not %32 : bool
-            if %33 {
-                %46 = const 0 : s32i
-                %47 = get_global @ap_standalone : s32i*
-                store %46, %47, align 4
-                yield
-            } else {
-                scope {
-                    %34 = get_global @strcmp : ((s8i*, s8i*) -> s32i)*
-                    %35 = load %11 : s8i*, align 8
-                    %36 = get_global @.str.1 : s8i[11]*
-                    %37 = cast(array_to_ptrdecay) %36 : s8i*
-                    %38 = call @strcmp(%35, %37) : s32i [all]
-                    %39 = cast(int_to_bool) %38 : bool
-                    %40 = not %39 : bool
-                    if %40 {
-                        %44 = const 1 : s32i
-                        %45 = get_global @ap_standalone : s32i*
-                        store %44, %45, align 4
-                        yield
-                    } else {
-                        %41 = get_global @.str.2 : s8i[50]*
-                        %42 = cast(array_to_ptrdecay) %41 : s8i*
-                        store %42, %12
-                        %43 = load %12 : s8i*
-                        return %43
-                    }
-                    yield
+                %48 = load %13 : s8i*, align 8
+                %49 = cast(ptr_to_bool) %48 : bool
+                if %49 {
+                        %50 = load %13 : s8i*, align 8
+                        store %50, %12
+                        %51 = load %12 : s8i*
+                        return %51
                 }
                 yield
-            }
-            yield
+        }
+        scope {
+                %27 = get_global @strcmp : (s8i*, s8i*) -> s32i*
+                %28 = load %11 : s8i*, align 8
+                %29 = get_global @.str : s8i[6]*
+                %30 = cast(array_to_ptrdecay) %29 : s8i*
+                %31 = call @strcmp(%28, %30) : s32i [all]
+                %32 = cast(int_to_bool) %31 : bool
+                not
+                if %33 {
+                        %46 = const 0 : s32i
+                        %47 = get_global @ap_standalone : s32i*
+                        store %46, %47, align 4
+                        yield
+                } else {
+                        scope {
+                                %34 = get_global @strcmp : (s8i*, s8i*) -> s32i*
+                                %35 = load %11 : s8i*, align 8
+                                %36 = get_global @.str.1 : s8i[11]*
+                                %37 = cast(array_to_ptrdecay) %36 : s8i*
+                                %38 = call @strcmp(%35, %37) : s32i [all]
+                                %39 = cast(int_to_bool) %38 : bool
+                                not
+                                if %40 {
+                                        %44 = const 1 : s32i
+                                        %45 = get_global @ap_standalone : s32i*
+                                        store %44, %45, align 4
+                                        yield
+                                } else {
+                                        %41 = get_global @.str.2 : s8i[50]*
+                                        %42 = cast(array_to_ptrdecay) %41 : s8i*
+                                        store %42, %12
+                                        %43 = load %12 : s8i*
+                                        return %43
+                                }
+                                yield
+                        }
+                        yield
+                }
+                yield
         }
         %25 = const #cir.ptr<null> : s8i*
         store %25, %12
@@ -100,16 +100,16 @@ fn server_type(%arg0: void*, %arg1: void*, %arg2: s8i*) -> s8i* [external, c, no
         return %26
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const #cir.ptr<null> : void*
-    %3 = const #cir.ptr<null> : void*
-    %4 = get_global @.str.1 : s8i[11]*
-    %5 = cast(array_to_ptrdecay) %4 : s8i*
-    %6 = call @server_type(%2, %3, %5) : s8i* [all]
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = load %0 : s32i
-    return %8
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const #cir.ptr<null> : void*
+        %3 = const #cir.ptr<null> : void*
+        %4 = get_global @.str.1 : s8i[11]*
+        %5 = cast(array_to_ptrdecay) %4 : s8i*
+        %6 = call @server_type(%2, %3, %5) : s8i* [all]
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = load %0 : s32i
+        return %8
 }

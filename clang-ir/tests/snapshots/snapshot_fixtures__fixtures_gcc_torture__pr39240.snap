@@ -1,14 +1,14 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr39240.c" (c, x86_64-unknown-linux-gnu)
-global l1 : u64i = 4294967292 [external, default, align 8, dso_local]
-global l2 : u64i = 65532 [external, default, align 8, dso_local]
-global l3 : u64i = 252 [external, default, align 8, dso_local]
-global l4 : u64i = 18446744073709551612 [external, default, align 8, dso_local]
-global l5 : u64i = 18446744073709551612 [external, default, align 8, dso_local]
-global l6 : u64i = 18446744073709551612 [external, default, align 8, dso_local]
+global l1 : u64i = CirInt { ty: Named("u64i"), value: "4294967292" } [external, default, align 8, dso_local]
+global l2 : u64i = CirInt { ty: Named("u64i"), value: "65532" } [external, default, align 8, dso_local]
+global l3 : u64i = CirInt { ty: Named("u64i"), value: "252" } [external, default, align 8, dso_local]
+global l4 : u64i = CirInt { ty: Named("u64i"), value: "18446744073709551612" } [external, default, align 8, dso_local]
+global l5 : u64i = CirInt { ty: Named("u64i"), value: "18446744073709551612" } [external, default, align 8, dso_local]
+global l6 : u64i = CirInt { ty: Named("u64i"), value: "18446744073709551612" } [external, default, align 8, dso_local]
 
 fn foo1(%arg11: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg11: s32i):
@@ -161,95 +161,95 @@ fn bar6(%arg0: s32i) -> s8i [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %39 = const -10 : s32i
-        %40 = call @bar1(%39) : u32i [all]
-        %41 = cast(integral) %40 : u64i
-        %42 = get_global @l1 : u64i*
-        %43 = load %42 : u64i, align 8, volatile
-        %44 = cmp ne %41, %43 : bool
-        if %44 {
-            %45 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %39 = const -10 : s32i
+                %40 = call @bar1(%39) : u32i [all]
+                %41 = cast(integral) %40 : u64i
+                %42 = get_global @l1 : u64i*
+                %43 = load %42 : u64i, align 8
+                cmp
+                if %44 {
+                        %45 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %32 = const -10 : s32i
-        %33 = call @bar2(%32) : u16i [all]
-        %34 = cast(integral) %33 : u64i
-        %35 = get_global @l2 : u64i*
-        %36 = load %35 : u64i, align 8, volatile
-        %37 = cmp ne %34, %36 : bool
-        if %37 {
-            %38 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %32 = const -10 : s32i
+                %33 = call @bar2(%32) : u16i [all]
+                %34 = cast(integral) %33 : u64i
+                %35 = get_global @l2 : u64i*
+                %36 = load %35 : u64i, align 8
+                cmp
+                if %37 {
+                        %38 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %25 = const -10 : s32i
-        %26 = call @bar3(%25) : u8i [all]
-        %27 = cast(integral) %26 : u64i
-        %28 = get_global @l3 : u64i*
-        %29 = load %28 : u64i, align 8, volatile
-        %30 = cmp ne %27, %29 : bool
-        if %30 {
-            %31 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %25 = const -10 : s32i
+                %26 = call @bar3(%25) : u8i [all]
+                %27 = cast(integral) %26 : u64i
+                %28 = get_global @l3 : u64i*
+                %29 = load %28 : u64i, align 8
+                cmp
+                if %30 {
+                        %31 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %18 = const -10 : s32i
-        %19 = call @bar4(%18) : s32i [all]
-        %20 = cast(integral) %19 : u64i
-        %21 = get_global @l4 : u64i*
-        %22 = load %21 : u64i, align 8, volatile
-        %23 = cmp ne %20, %22 : bool
-        if %23 {
-            %24 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %18 = const -10 : s32i
+                %19 = call @bar4(%18) : s32i [all]
+                %20 = cast(integral) %19 : u64i
+                %21 = get_global @l4 : u64i*
+                %22 = load %21 : u64i, align 8
+                cmp
+                if %23 {
+                        %24 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %11 = const -10 : s32i
-        %12 = call @bar5(%11) : s16i [all]
-        %13 = cast(integral) %12 : u64i
-        %14 = get_global @l5 : u64i*
-        %15 = load %14 : u64i, align 8, volatile
-        %16 = cmp ne %13, %15 : bool
-        if %16 {
-            %17 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %11 = const -10 : s32i
+                %12 = call @bar5(%11) : s16i [all]
+                %13 = cast(integral) %12 : u64i
+                %14 = get_global @l5 : u64i*
+                %15 = load %14 : u64i, align 8
+                cmp
+                if %16 {
+                        %17 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %4 = const -10 : s32i
-        %5 = call @bar6(%4) : s8i [all]
-        %6 = cast(integral) %5 : u64i
-        %7 = get_global @l6 : u64i*
-        %8 = load %7 : u64i, align 8, volatile
-        %9 = cmp ne %6, %8 : bool
-        if %9 {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %4 = const -10 : s32i
+                %5 = call @bar6(%4) : s8i [all]
+                %6 = cast(integral) %5 : u64i
+                %7 = get_global @l6 : u64i*
+                %8 = load %7 : u64i, align 8
+                cmp
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

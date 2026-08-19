@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr28651.c" (c, x86_64-unknown-linux-gnu)
@@ -14,7 +14,7 @@ fn foo(%arg2: u32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %18 = cast(integral) %17 : s32i
         %19 = load %13 : u32i, align 4
         %20 = cast(integral) %19 : s32i
-        %21 = cmp lt %18, %20 : bool
+        cmp
         %22 = cast(bool_to_int) %21 : s32i
         store %22, %14
         %23 = load %14 : s32i
@@ -34,16 +34,16 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         %5 = const 2147483647 : u32i
         store %5, %3, align 4
         scope {
-            %8 = load %3 : u32i, align 4
-            %9 = call @foo(%8) : s32i [all]
-            %10 = const 0 : s32i
-            %11 = cmp eq %9, %10 : bool
-            if %11 {
-                %12 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %8 = load %3 : u32i, align 4
+                %9 = call @foo(%8) : s32i [all]
+                %10 = const 0 : s32i
+                cmp
+                if %11 {
+                        %12 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %6 = const 0 : s32i
         store %6, %2

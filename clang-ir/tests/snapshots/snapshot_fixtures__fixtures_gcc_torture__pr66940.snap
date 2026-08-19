@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr66940.c" (c, x86_64-unknown-linux-gnu)
@@ -9,18 +9,18 @@ fn foo(%arg0: s64i) -> s64i [external, c, no_inline, dso_local, nothrow] {
         %15 = alloca s64i, "__retval", align 8
         store %arg0, %14
         scope {
-            %18 = load %14 : s64i, align 8
-            %19 = const 0 : s64i
-            %20 = cmp le %18, %19 : bool
-            if %20 {
-                %21 = const -9223372036854775807 : s64i
-                %22 = const 1 : s64i
-                %23 = sub %21, %22 : s64i [nsw]
-                store %23, %15
-                %24 = load %15 : s64i
-                return %24
-            }
-            yield
+                %18 = load %14 : s64i, align 8
+                %19 = const 0 : s64i
+                cmp
+                if %20 {
+                        %21 = const -9223372036854775807 : s64i
+                        %22 = const 1 : s64i
+                        sub
+                        store %23, %15
+                        %24 = load %15 : s64i
+                        return %24
+                }
+                yield
         }
         %16 = const 9223372036854775807 : s64i
         store %16, %15
@@ -29,35 +29,35 @@ fn foo(%arg0: s64i) -> s64i [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %8 = const -1 : s64i
-        %9 = call @foo(%8) : s64i [all]
-        %10 = const -9223372036854775807 : s64i
-        %11 = const 1 : s64i
-        %12 = sub %10, %11 : s64i [nsw]
-        %13 = cmp ne %9, %12 : bool
-        if %13 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %8 = const -1 : s64i
+                %9 = call @foo(%8) : s64i [all]
+                %10 = const -9223372036854775807 : s64i
+                %11 = const 1 : s64i
+                sub
+                cmp
+                if %13 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %4 = const 1 : s64i
-        %5 = call @foo(%4) : s64i [all]
-        %6 = const 9223372036854775807 : s64i
-        %7 = cmp ne %5, %6 : bool
-        if %7 {
-            call @abort() [all]
-            yield
+        scope {
+                %4 = const 1 : s64i
+                %5 = call @foo(%4) : s64i [all]
+                %6 = const 9223372036854775807 : s64i
+                cmp
+                if %7 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

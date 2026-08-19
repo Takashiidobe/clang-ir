@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr57124.c" (c, x86_64-unknown-linux-gnu)
@@ -26,7 +26,7 @@ fn foo(%arg0: u16i*, %arg1: u16i*) -> void [external, c, no_inline, dso_local, n
         store %19, %11, align 4
         %20 = load %11 : s32i, align 4
         %21 = const 65536 : s32i
-        %22 = mul %20, %21 : s32i [nsw]
+        mul
         store %22, %12, align 4
         %23 = load %8 : u16i*, align 8
         %24 = load %23 : u16i, align 2
@@ -43,32 +43,32 @@ fn foo(%arg0: u16i*, %arg1: u16i*) -> void [external, c, no_inline, dso_local, n
         %32 = cast(integral) %31 : u32i
         store %32, %15, align 4
         scope {
-            %35 = load %15 : u32i, align 4
-            %36 = const 268435455 : u32i
-            %37 = cmp le %35, %36 : bool
-            if %37 {
-                %38 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %35 = load %15 : u32i, align 4
+                %36 = const 268435455 : u32i
+                cmp
+                if %37 {
+                        %38 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        %33 = get_global @exit : ((s32i) -> void)*
+        %33 = get_global @exit : (s32i) -> void*
         %34 = const 0 : s32i
         call @exit(%34) [all]
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u16i, "x", align 2
-    %2 = alloca u16i, "y", align 2
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 65531 : u16i
-    store %4, %1, align 2
-    %5 = const 65526 : u16i
-    store %5, %2, align 2
-    call @foo(%1, %2) [all]
-    %6 = load %0 : s32i
-    return %6
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u16i, "x", align 2
+        %2 = alloca u16i, "y", align 2
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 65531 : u16i
+        store %4, %1, align 2
+        %5 = const 65526 : u16i
+        store %5, %2, align 2
+        call @foo(%1, %2) [all]
+        %6 = load %0 : s32i
+        return %6
 }

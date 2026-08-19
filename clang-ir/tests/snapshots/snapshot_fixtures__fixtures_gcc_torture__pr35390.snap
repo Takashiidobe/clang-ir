@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr35390.c" (c, x86_64-unknown-linux-gnu)
@@ -9,32 +9,32 @@ fn foo(%arg0: s32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         %10 = alloca u32i, "__retval", align 4
         store %arg0, %9
         %11 = load %9 : s32i, align 4
-        %12 = not %11 : s32i
+        not
         %13 = cast(integral) %12 : u32i
-        %14 = not %13 : u32i
+        not
         store %14, %10
         %15 = load %10 : u32i
         return %15
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const 0 : s32i
-        %5 = call @foo(%4) : u32i [all]
-        %6 = const 0 : u32i
-        %7 = cmp ne %5, %6 : bool
-        if %7 {
-            %8 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const 0 : s32i
+                %5 = call @foo(%4) : u32i [all]
+                %6 = const 0 : u32i
+                cmp
+                if %7 {
+                        %8 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

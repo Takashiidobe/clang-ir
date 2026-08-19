@@ -1,25 +1,25 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr93908.c" (c, x86_64-unknown-linux-gnu)
-global buf : rec_S[2] = zero [external, default, align 16, dso_local]
-global .str : s8i[4] = "foo" [cir_private, default, align 1, dso_local, constant]
-global baz.cnt : s32i = 0 [internal, default, align 4, dso_local]
+global buf : rec_S[2] = Zero { ty: Array { element_type: Named("rec_S"), size: 2 } } [external, default, align 16, dso_local]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("foo"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global baz.cnt : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
 
 fn baz() -> void* [external, c, no_inline, dso_local, nothrow] {
-    %160 = alloca void*, "__retval", align 8
-    %161 = get_global @baz.cnt : s32i*
-    %162 = load %161 : s32i, align 4
-    %163 = inc %162 : s32i [nsw]
-    store %163, %161, align 4
-    %164 = cast(integral) %162 : s64i
-    %165 = get_global @buf : rec_S[2]*
-    %166 = get_element %165[%164] : rec_S*
-    %167 = cast(bitcast) %166 : void*
-    store %167, %160
-    %168 = load %160 : void*
-    return %168
+        %160 = alloca void*, "__retval", align 8
+        %161 = get_global @baz.cnt : s32i*
+        %162 = load %161 : s32i, align 4
+        inc
+        store %163, %161, align 4
+        %164 = cast(integral) %162 : s64i
+        %165 = get_global @buf : rec_S[2]*
+        get_element
+        %167 = cast(bitcast) %166 : void*
+        store %167, %160
+        %168 = load %160 : void*
+        return %168
 }
 fn bar(%arg2: s8i*) -> rec_T* [internal, c, always_inline, dso_local, nothrow] {
     ^bb0(%arg2: s8i*):
@@ -32,12 +32,12 @@ fn bar(%arg2: s8i*) -> rec_T* [internal, c, always_inline, dso_local, nothrow] {
         store %150, %148, align 8
         %151 = const 1 : s32i
         %152 = load %148 : rec_T*, align 8
-        %153 = get_member %152[0] "b" : s32i*
+        get_member
         store %151, %153, align 4
         %154 = const -1 : s32i
         %155 = load %148 : rec_T*, align 8
-        %156 = get_member %155[3] "k" : u16i*
-        %157 = set_bitfield %156, %154, "k": 2 bits @7 in signed u16i : s32i, align 2
+        get_member
+        set_bitfield
         %158 = load %148 : rec_T*, align 8
         store %158, %147
         %159 = load %147 : rec_T*
@@ -60,211 +60,211 @@ fn foo(%arg0: s8i*, %arg1: rec_T**) -> void [external, c, no_inline, dso_local, 
         %138 = load %132 : rec_T*, align 8
         %139 = const 0 : s64i
         %140 = load %131 : rec_T**, align 8
-        %141 = ptr_stride %140, %139 : rec_T**
+        ptr_stride
         store %138, %141, align 8
         %142 = load %133 : rec_T*, align 8
         %143 = const 1 : s64i
         %144 = load %131 : rec_T**, align 8
-        %145 = ptr_stride %144, %143 : rec_T**
+        ptr_stride
         store %142, %145, align 8
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_T*[2], "r", align 16
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @.str : s8i[4]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = cast(array_to_ptrdecay) %1 : rec_T**
-    call @foo(%4, %5) [all]
-    scope {
-        %69 = const 0 : s64i
-        %70 = get_element %1[%69] : rec_T**
-        %71 = load %70 : rec_T*, align 16
-        %72 = get_member %71[3] "e" : u16i*
-        %73 = get_bitfield %72, "e": 1 bits @0 in u16i : u32i, align 2
-        %74 = cast(integral) %73 : s32i
-        %75 = cast(int_to_bool) %74 : bool
-        %76 = ternary %75 ? { : bool
-            %129 = const true : bool
-            yield %129
-        } : {
-            %122 = const 0 : s64i
-            %123 = get_element %1[%122] : rec_T**
-            %124 = load %123 : rec_T*, align 16
-            %125 = get_member %124[3] "f" : u16i*
-            %126 = get_bitfield %125, "f": 1 bits @1 in u16i : u32i, align 2
-            %127 = cast(integral) %126 : s32i
-            %128 = cast(int_to_bool) %127 : bool
-            yield %128
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_T*[2], "r", align 16
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @.str : s8i[4]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = cast(array_to_ptrdecay) %1 : rec_T**
+        call @foo(%4, %5) [all]
+        scope {
+                %69 = const 0 : s64i
+                get_element
+                %71 = load %70 : rec_T*, align 16
+                get_member
+                get_bitfield
+                %74 = cast(integral) %73 : s32i
+                %75 = cast(int_to_bool) %74 : bool
+                %76 = ternary %75 ? { : bool
+                        %129 = const true : bool
+                        yield %129
+                } : {
+                        %122 = const 0 : s64i
+                        get_element
+                        %124 = load %123 : rec_T*, align 16
+                        get_member
+                        get_bitfield
+                        %127 = cast(integral) %126 : s32i
+                        %128 = cast(int_to_bool) %127 : bool
+                        yield %128
+                }
+                %77 = ternary %76 ? { : bool
+                        %121 = const true : bool
+                        yield %121
+                } : {
+                        %114 = const 0 : s64i
+                        get_element
+                        %116 = load %115 : rec_T*, align 16
+                        get_member
+                        get_bitfield
+                        %119 = cast(integral) %118 : s32i
+                        %120 = cast(int_to_bool) %119 : bool
+                        yield %120
+                }
+                %78 = ternary %77 ? { : bool
+                        %113 = const true : bool
+                        yield %113
+                } : {
+                        %106 = const 0 : s64i
+                        get_element
+                        %108 = load %107 : rec_T*, align 16
+                        get_member
+                        get_bitfield
+                        %111 = cast(integral) %110 : s32i
+                        %112 = cast(int_to_bool) %111 : bool
+                        yield %112
+                }
+                %79 = ternary %78 ? { : bool
+                        %105 = const true : bool
+                        yield %105
+                } : {
+                        %98 = const 0 : s64i
+                        get_element
+                        %100 = load %99 : rec_T*, align 16
+                        get_member
+                        get_bitfield
+                        %103 = cast(integral) %102 : s32i
+                        %104 = cast(int_to_bool) %103 : bool
+                        yield %104
+                }
+                %80 = ternary %79 ? { : bool
+                        %97 = const true : bool
+                        yield %97
+                } : {
+                        %90 = const 0 : s64i
+                        get_element
+                        %92 = load %91 : rec_T*, align 16
+                        get_member
+                        get_bitfield
+                        %95 = cast(integral) %94 : s32i
+                        %96 = cast(int_to_bool) %95 : bool
+                        yield %96
+                }
+                %81 = ternary %80 ? { : bool
+                        %89 = const true : bool
+                        yield %89
+                } : {
+                        %82 = const 0 : s64i
+                        get_element
+                        %84 = load %83 : rec_T*, align 16
+                        get_member
+                        get_bitfield
+                        %87 = const -1 : s32i
+                        cmp
+                        yield %88
+                }
+                if %81 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        %77 = ternary %76 ? { : bool
-            %121 = const true : bool
-            yield %121
-        } : {
-            %114 = const 0 : s64i
-            %115 = get_element %1[%114] : rec_T**
-            %116 = load %115 : rec_T*, align 16
-            %117 = get_member %116[3] "g" : u16i*
-            %118 = get_bitfield %117, "g": 1 bits @2 in u16i : u32i, align 2
-            %119 = cast(integral) %118 : s32i
-            %120 = cast(int_to_bool) %119 : bool
-            yield %120
+        scope {
+                %8 = const 1 : s64i
+                get_element
+                %10 = load %9 : rec_T*, align 8
+                get_member
+                get_bitfield
+                %13 = cast(integral) %12 : s32i
+                %14 = cast(int_to_bool) %13 : bool
+                %15 = ternary %14 ? { : bool
+                        %68 = const true : bool
+                        yield %68
+                } : {
+                        %61 = const 1 : s64i
+                        get_element
+                        %63 = load %62 : rec_T*, align 8
+                        get_member
+                        get_bitfield
+                        %66 = cast(integral) %65 : s32i
+                        %67 = cast(int_to_bool) %66 : bool
+                        yield %67
+                }
+                %16 = ternary %15 ? { : bool
+                        %60 = const true : bool
+                        yield %60
+                } : {
+                        %53 = const 1 : s64i
+                        get_element
+                        %55 = load %54 : rec_T*, align 8
+                        get_member
+                        get_bitfield
+                        %58 = cast(integral) %57 : s32i
+                        %59 = cast(int_to_bool) %58 : bool
+                        yield %59
+                }
+                %17 = ternary %16 ? { : bool
+                        %52 = const true : bool
+                        yield %52
+                } : {
+                        %45 = const 1 : s64i
+                        get_element
+                        %47 = load %46 : rec_T*, align 8
+                        get_member
+                        get_bitfield
+                        %50 = cast(integral) %49 : s32i
+                        %51 = cast(int_to_bool) %50 : bool
+                        yield %51
+                }
+                %18 = ternary %17 ? { : bool
+                        %44 = const true : bool
+                        yield %44
+                } : {
+                        %37 = const 1 : s64i
+                        get_element
+                        %39 = load %38 : rec_T*, align 8
+                        get_member
+                        get_bitfield
+                        %42 = cast(integral) %41 : s32i
+                        %43 = cast(int_to_bool) %42 : bool
+                        yield %43
+                }
+                %19 = ternary %18 ? { : bool
+                        %36 = const true : bool
+                        yield %36
+                } : {
+                        %29 = const 1 : s64i
+                        get_element
+                        %31 = load %30 : rec_T*, align 8
+                        get_member
+                        get_bitfield
+                        %34 = cast(integral) %33 : s32i
+                        %35 = cast(int_to_bool) %34 : bool
+                        yield %35
+                }
+                %20 = ternary %19 ? { : bool
+                        %28 = const true : bool
+                        yield %28
+                } : {
+                        %21 = const 1 : s64i
+                        get_element
+                        %23 = load %22 : rec_T*, align 8
+                        get_member
+                        get_bitfield
+                        %26 = const -1 : s32i
+                        cmp
+                        yield %27
+                }
+                if %20 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        %78 = ternary %77 ? { : bool
-            %113 = const true : bool
-            yield %113
-        } : {
-            %106 = const 0 : s64i
-            %107 = get_element %1[%106] : rec_T**
-            %108 = load %107 : rec_T*, align 16
-            %109 = get_member %108[3] "h" : u16i*
-            %110 = get_bitfield %109, "h": 2 bits @3 in u16i : u32i, align 2
-            %111 = cast(integral) %110 : s32i
-            %112 = cast(int_to_bool) %111 : bool
-            yield %112
-        }
-        %79 = ternary %78 ? { : bool
-            %105 = const true : bool
-            yield %105
-        } : {
-            %98 = const 0 : s64i
-            %99 = get_element %1[%98] : rec_T**
-            %100 = load %99 : rec_T*, align 16
-            %101 = get_member %100[3] "i" : u16i*
-            %102 = get_bitfield %101, "i": 1 bits @5 in u16i : u32i, align 2
-            %103 = cast(integral) %102 : s32i
-            %104 = cast(int_to_bool) %103 : bool
-            yield %104
-        }
-        %80 = ternary %79 ? { : bool
-            %97 = const true : bool
-            yield %97
-        } : {
-            %90 = const 0 : s64i
-            %91 = get_element %1[%90] : rec_T**
-            %92 = load %91 : rec_T*, align 16
-            %93 = get_member %92[3] "j" : u16i*
-            %94 = get_bitfield %93, "j": 1 bits @6 in u16i : u32i, align 2
-            %95 = cast(integral) %94 : s32i
-            %96 = cast(int_to_bool) %95 : bool
-            yield %96
-        }
-        %81 = ternary %80 ? { : bool
-            %89 = const true : bool
-            yield %89
-        } : {
-            %82 = const 0 : s64i
-            %83 = get_element %1[%82] : rec_T**
-            %84 = load %83 : rec_T*, align 16
-            %85 = get_member %84[3] "k" : u16i*
-            %86 = get_bitfield %85, "k": 2 bits @7 in signed u16i : s32i, align 2
-            %87 = const -1 : s32i
-            %88 = cmp ne %86, %87 : bool
-            yield %88
-        }
-        if %81 {
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    scope {
-        %8 = const 1 : s64i
-        %9 = get_element %1[%8] : rec_T**
-        %10 = load %9 : rec_T*, align 8
-        %11 = get_member %10[3] "e" : u16i*
-        %12 = get_bitfield %11, "e": 1 bits @0 in u16i : u32i, align 2
-        %13 = cast(integral) %12 : s32i
-        %14 = cast(int_to_bool) %13 : bool
-        %15 = ternary %14 ? { : bool
-            %68 = const true : bool
-            yield %68
-        } : {
-            %61 = const 1 : s64i
-            %62 = get_element %1[%61] : rec_T**
-            %63 = load %62 : rec_T*, align 8
-            %64 = get_member %63[3] "f" : u16i*
-            %65 = get_bitfield %64, "f": 1 bits @1 in u16i : u32i, align 2
-            %66 = cast(integral) %65 : s32i
-            %67 = cast(int_to_bool) %66 : bool
-            yield %67
-        }
-        %16 = ternary %15 ? { : bool
-            %60 = const true : bool
-            yield %60
-        } : {
-            %53 = const 1 : s64i
-            %54 = get_element %1[%53] : rec_T**
-            %55 = load %54 : rec_T*, align 8
-            %56 = get_member %55[3] "g" : u16i*
-            %57 = get_bitfield %56, "g": 1 bits @2 in u16i : u32i, align 2
-            %58 = cast(integral) %57 : s32i
-            %59 = cast(int_to_bool) %58 : bool
-            yield %59
-        }
-        %17 = ternary %16 ? { : bool
-            %52 = const true : bool
-            yield %52
-        } : {
-            %45 = const 1 : s64i
-            %46 = get_element %1[%45] : rec_T**
-            %47 = load %46 : rec_T*, align 8
-            %48 = get_member %47[3] "h" : u16i*
-            %49 = get_bitfield %48, "h": 2 bits @3 in u16i : u32i, align 2
-            %50 = cast(integral) %49 : s32i
-            %51 = cast(int_to_bool) %50 : bool
-            yield %51
-        }
-        %18 = ternary %17 ? { : bool
-            %44 = const true : bool
-            yield %44
-        } : {
-            %37 = const 1 : s64i
-            %38 = get_element %1[%37] : rec_T**
-            %39 = load %38 : rec_T*, align 8
-            %40 = get_member %39[3] "i" : u16i*
-            %41 = get_bitfield %40, "i": 1 bits @5 in u16i : u32i, align 2
-            %42 = cast(integral) %41 : s32i
-            %43 = cast(int_to_bool) %42 : bool
-            yield %43
-        }
-        %19 = ternary %18 ? { : bool
-            %36 = const true : bool
-            yield %36
-        } : {
-            %29 = const 1 : s64i
-            %30 = get_element %1[%29] : rec_T**
-            %31 = load %30 : rec_T*, align 8
-            %32 = get_member %31[3] "j" : u16i*
-            %33 = get_bitfield %32, "j": 1 bits @6 in u16i : u32i, align 2
-            %34 = cast(integral) %33 : s32i
-            %35 = cast(int_to_bool) %34 : bool
-            yield %35
-        }
-        %20 = ternary %19 ? { : bool
-            %28 = const true : bool
-            yield %28
-        } : {
-            %21 = const 1 : s64i
-            %22 = get_element %1[%21] : rec_T**
-            %23 = load %22 : rec_T*, align 8
-            %24 = get_member %23[3] "k" : u16i*
-            %25 = get_bitfield %24, "k": 2 bits @7 in signed u16i : s32i, align 2
-            %26 = const -1 : s32i
-            %27 = cmp ne %25, %26 : bool
-            yield %27
-        }
-        if %20 {
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

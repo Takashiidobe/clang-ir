@@ -1,61 +1,61 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr114207.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.s : rec_S = {6, 12} [cir_private, default, dso_local, constant]
+global __const.main.s : rec_S = ConstRecord { ty: Named("rec_S"), members: Array([CirInt { ty: Named("s32i"), value: "6" }, CirInt { ty: Named("s32i"), value: "12" }]) } [cir_private, default, dso_local, constant]
 
 fn foo(%arg0: rec_S*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: rec_S*):
         %16 = alloca rec_S*, "s", align 8
         %17 = alloca rec_S, "ss", align 4
         store %arg0, %16
-        %18 = get_member %17[0] "a" : s32i*
+        get_member
         %19 = load %16 : rec_S*, align 8
-        %20 = get_member %19[1] "b" : s32i*
+        get_member
         %21 = load %20 : s32i, align 4
         store %21, %18, align 4
-        %22 = get_member %17[1] "b" : s32i*
+        get_member
         %23 = load %16 : rec_S*, align 8
-        %24 = get_member %23[0] "a" : s32i*
+        get_member
         %25 = load %24 : s32i, align 4
         store %25, %22, align 4
         %26 = load %16 : rec_S*, align 8
-        copy %26, %17
+        copy
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_S, "s", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @__const.main.s : rec_S*
-    copy %1, %3
-    call @foo(%1) [all]
-    scope {
-        %6 = get_member %1[0] "a" : s32i*
-        %7 = load %6 : s32i, align 4
-        %8 = const 12 : s32i
-        %9 = cmp ne %7, %8 : bool
-        %10 = ternary %9 ? { : bool
-            %15 = const true : bool
-            yield %15
-        } : {
-            %11 = get_member %1[1] "b" : s32i*
-            %12 = load %11 : s32i, align 4
-            %13 = const 6 : s32i
-            %14 = cmp ne %12, %13 : bool
-            yield %14
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_S, "s", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @__const.main.s : rec_S*
+        copy
+        call @foo(%1) [all]
+        scope {
+                get_member
+                %7 = load %6 : s32i, align 4
+                %8 = const 12 : s32i
+                cmp
+                %10 = ternary %9 ? { : bool
+                        %15 = const true : bool
+                        yield %15
+                } : {
+                        get_member
+                        %12 = load %11 : s32i, align 4
+                        %13 = const 6 : s32i
+                        cmp
+                        yield %14
+                }
+                if %10 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %10 {
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

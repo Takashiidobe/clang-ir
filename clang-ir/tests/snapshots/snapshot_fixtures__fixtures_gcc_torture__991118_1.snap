@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/991118-1.c" (c, x86_64-unknown-linux-gnu)
-global tmp : rec_tmp = {1311768467463786787} [external, default, align 8, dso_local]
-global tmp2 : rec_tmp2 = {1310867747538316237} [external, default, align 8, dso_local]
-global tmp3 : rec_tmp3 = {1152912708513825059} [external, default, align 8, dso_local]
-global tmp4 : rec_tmp4 = {2621657928788082688} [external, default, align 8, dso_local]
+global tmp : rec_tmp = ConstRecord { ty: Named("rec_tmp"), members: Array([CirInt { ty: Named("u64i"), value: "1311768467463786787" }]) } [external, default, align 8, dso_local]
+global tmp2 : rec_tmp2 = ConstRecord { ty: Named("rec_tmp2"), members: Array([CirInt { ty: Named("u64i"), value: "1310867747538316237" }]) } [external, default, align 8, dso_local]
+global tmp3 : rec_tmp3 = ConstRecord { ty: Named("rec_tmp3"), members: Array([CirInt { ty: Named("u64i"), value: "1152912708513825059" }]) } [external, default, align 8, dso_local]
+global tmp4 : rec_tmp4 = ConstRecord { ty: Named("rec_tmp4"), members: Array([CirInt { ty: Named("u64i"), value: "2621657928788082688" }]) } [external, default, align 8, dso_local]
 
 fn sub(%arg3: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg3: u64i):
@@ -19,11 +19,11 @@ fn sub(%arg3: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
         %157 = alloca rec_tmp, "__retval", align 8
         store %155, %156
         %158 = const 2381903268435576 : s64i
-        %159 = get_member %156[0] "field" : u64i*
-        %160 = get_bitfield %159, "field": 52 bits @12 in signed u64i : s64i, align 8
-        %161 = xor %160, %158 : s64i
-        %162 = set_bitfield %159, %161, "field": 52 bits @12 in signed u64i : s64i, align 8
-        copy %157, %156
+        get_member
+        get_bitfield
+        xor
+        set_bitfield
+        copy
         %163 = load %157 : rec_tmp
         store %163, %152
         %164 = cast(bitcast) %152 : u64i*
@@ -41,11 +41,11 @@ fn sub2(%arg2: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
         %143 = alloca rec_tmp2, "__retval", align 8
         store %141, %142
         %144 = const 2381903268435576 : s64i
-        %145 = get_member %142[0] "field" : u64i*
-        %146 = get_bitfield %145, "field": 52 bits @0 in signed u64i : s64i, align 8
-        %147 = xor %146, %144 : s64i
-        %148 = set_bitfield %145, %147, "field": 52 bits @0 in signed u64i : s64i, align 8
-        copy %143, %142
+        get_member
+        get_bitfield
+        xor
+        set_bitfield
+        copy
         %149 = load %143 : rec_tmp2
         store %149, %138
         %150 = cast(bitcast) %138 : u64i*
@@ -63,11 +63,11 @@ fn sub3(%arg1: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
         %129 = alloca rec_tmp3, "__retval", align 8
         store %127, %128
         %130 = const 6885502895806072 : s64i
-        %131 = get_member %128[0] "field" : u64i*
-        %132 = get_bitfield %131, "field": 53 bits @11 in signed u64i : s64i, align 8
-        %133 = xor %132, %130 : s64i
-        %134 = set_bitfield %131, %133, "field": 53 bits @11 in signed u64i : s64i, align 8
-        copy %129, %128
+        get_member
+        get_bitfield
+        xor
+        set_bitfield
+        copy
         %135 = load %129 : rec_tmp3
         store %135, %124
         %136 = cast(bitcast) %124 : u64i*
@@ -85,11 +85,11 @@ fn sub4(%arg0: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
         %115 = alloca rec_tmp4, "__retval", align 8
         store %113, %114
         %116 = const 6885502895806072 : s64i
-        %117 = get_member %114[0] "field" : u64i*
-        %118 = get_bitfield %117, "field": 53 bits @0 in signed u64i : s64i, align 8
-        %119 = xor %118, %116 : s64i
-        %120 = set_bitfield %117, %119, "field": 53 bits @0 in signed u64i : s64i, align 8
-        copy %115, %114
+        get_member
+        get_bitfield
+        xor
+        set_bitfield
+        copy
         %121 = load %115 : rec_tmp4
         store %121, %110
         %122 = cast(bitcast) %110 : u64i*
@@ -99,180 +99,180 @@ fn sub4(%arg0: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
 fn exit(%arg0: s32i) -> void [external, c];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca u64i, "coerce", align 8
-    %1 = alloca rec_tmp4, "coerce", align 8
-    %2 = alloca u64i, "coerce", align 8
-    %3 = alloca rec_tmp3, "coerce", align 8
-    %4 = alloca u64i, "coerce", align 8
-    %5 = alloca rec_tmp2, "coerce", align 8
-    %6 = alloca u64i, "coerce", align 8
-    %7 = alloca rec_tmp, "coerce", align 8
-    %8 = alloca s32i, "__retval", align 4
-    %9 = const 0 : s32i
-    store %9, %8
-    scope {
-        %105 = const 8 : u64i
-        %106 = const 8 : u64i
-        %107 = cmp ne %105, %106 : bool
-        if %107 {
-            %108 = get_global @exit : ((s32i) -> void)*
-            %109 = const 0 : s32i
-            call @exit(%109) [all]
-            yield
+        %0 = alloca u64i, "coerce", align 8
+        %1 = alloca rec_tmp4, "coerce", align 8
+        %2 = alloca u64i, "coerce", align 8
+        %3 = alloca rec_tmp3, "coerce", align 8
+        %4 = alloca u64i, "coerce", align 8
+        %5 = alloca rec_tmp2, "coerce", align 8
+        %6 = alloca u64i, "coerce", align 8
+        %7 = alloca rec_tmp, "coerce", align 8
+        %8 = alloca s32i, "__retval", align 4
+        %9 = const 0 : s32i
+        store %9, %8
+        scope {
+                %105 = const 8 : u64i
+                %106 = const 8 : u64i
+                cmp
+                if %107 {
+                        %108 = get_global @exit : (s32i) -> void*
+                        %109 = const 0 : s32i
+                        call @exit(%109) [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %10 = get_global @tmp : rec_tmp*
-    %11 = get_global @tmp : rec_tmp*
-    %12 = load %11 : rec_tmp, align 8
-    store %12, %7
-    %13 = cast(bitcast) %7 : u64i*
-    %14 = load %13 : u64i
-    %15 = call @sub(%14) : u64i [all]
-    store %15, %6
-    %16 = cast(bitcast) %6 : rec_tmp*
-    %17 = load %16 : rec_tmp
-    store %17, %10, align 8
-    %18 = get_global @tmp2 : rec_tmp2*
-    %19 = get_global @tmp2 : rec_tmp2*
-    %20 = load %19 : rec_tmp2, align 8
-    store %20, %5
-    %21 = cast(bitcast) %5 : u64i*
-    %22 = load %21 : u64i
-    %23 = call @sub2(%22) : u64i [all]
-    store %23, %4
-    %24 = cast(bitcast) %4 : rec_tmp2*
-    %25 = load %24 : rec_tmp2
-    store %25, %18, align 8
-    scope {
-        %90 = get_global @tmp : rec_tmp*
-        %91 = get_member %90[0] "pad" : u64i*
-        %92 = get_bitfield %91, "pad": 12 bits @0 in signed u64i : s64i, align 8
-        %93 = cast(integral) %92 : s32i
-        %94 = const 291 : s32i
-        %95 = cmp ne %93, %94 : bool
-        %96 = ternary %95 ? { : bool
-            %104 = const true : bool
-            yield %104
-        } : {
-            %98 = get_global @tmp : rec_tmp*
-            %99 = get_member %98[0] "field" : u64i*
-            %100 = get_bitfield %99, "field": 52 bits @12 in signed u64i : s64i, align 8
-            %101 = cast(integral) %100 : u64i
-            %102 = const 18444867282350767541 : u64i
-            %103 = cmp ne %101, %102 : bool
-            yield %103
+        %10 = get_global @tmp : rec_tmp*
+        %11 = get_global @tmp : rec_tmp*
+        %12 = load %11 : rec_tmp, align 8
+        store %12, %7
+        %13 = cast(bitcast) %7 : u64i*
+        %14 = load %13 : u64i
+        %15 = call @sub(%14) : u64i [all]
+        store %15, %6
+        %16 = cast(bitcast) %6 : rec_tmp*
+        %17 = load %16 : rec_tmp
+        store %17, %10, align 8
+        %18 = get_global @tmp2 : rec_tmp2*
+        %19 = get_global @tmp2 : rec_tmp2*
+        %20 = load %19 : rec_tmp2, align 8
+        store %20, %5
+        %21 = cast(bitcast) %5 : u64i*
+        %22 = load %21 : u64i
+        %23 = call @sub2(%22) : u64i [all]
+        store %23, %4
+        %24 = cast(bitcast) %4 : rec_tmp2*
+        %25 = load %24 : rec_tmp2
+        store %25, %18, align 8
+        scope {
+                %90 = get_global @tmp : rec_tmp*
+                get_member
+                get_bitfield
+                %93 = cast(integral) %92 : s32i
+                %94 = const 291 : s32i
+                cmp
+                %96 = ternary %95 ? { : bool
+                        %104 = const true : bool
+                        yield %104
+                } : {
+                        %98 = get_global @tmp : rec_tmp*
+                        get_member
+                        get_bitfield
+                        %101 = cast(integral) %100 : u64i
+                        %102 = const 18444867282350767541 : u64i
+                        cmp
+                        yield %103
+                }
+                if %96 {
+                        %97 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %96 {
-            %97 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %75 = get_global @tmp2 : rec_tmp2*
+                get_member
+                get_bitfield
+                %78 = cast(integral) %77 : s32i
+                %79 = const 291 : s32i
+                cmp
+                %81 = ternary %80 ? { : bool
+                        %89 = const true : bool
+                        yield %89
+                } : {
+                        %83 = get_global @tmp2 : rec_tmp2*
+                        get_member
+                        get_bitfield
+                        %86 = cast(integral) %85 : u64i
+                        %87 = const 18444867282350767541 : u64i
+                        cmp
+                        yield %88
+                }
+                if %81 {
+                        %82 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %75 = get_global @tmp2 : rec_tmp2*
-        %76 = get_member %75[0] "pad" : u64i*
-        %77 = get_bitfield %76, "pad": 12 bits @52 in signed u64i : s64i, align 8
-        %78 = cast(integral) %77 : s32i
-        %79 = const 291 : s32i
-        %80 = cmp ne %78, %79 : bool
-        %81 = ternary %80 ? { : bool
-            %89 = const true : bool
-            yield %89
-        } : {
-            %83 = get_global @tmp2 : rec_tmp2*
-            %84 = get_member %83[0] "field" : u64i*
-            %85 = get_bitfield %84, "field": 52 bits @0 in signed u64i : s64i, align 8
-            %86 = cast(integral) %85 : u64i
-            %87 = const 18444867282350767541 : u64i
-            %88 = cmp ne %86, %87 : bool
-            yield %88
+        %26 = get_global @tmp3 : rec_tmp3*
+        %27 = get_global @tmp3 : rec_tmp3*
+        %28 = load %27 : rec_tmp3, align 8
+        store %28, %3
+        %29 = cast(bitcast) %3 : u64i*
+        %30 = load %29 : u64i
+        %31 = call @sub3(%30) : u64i [all]
+        store %31, %2
+        %32 = cast(bitcast) %2 : rec_tmp3*
+        %33 = load %32 : rec_tmp3
+        store %33, %26, align 8
+        %34 = get_global @tmp4 : rec_tmp4*
+        %35 = get_global @tmp4 : rec_tmp4*
+        %36 = load %35 : rec_tmp4, align 8
+        store %36, %1
+        %37 = cast(bitcast) %1 : u64i*
+        %38 = load %37 : u64i
+        %39 = call @sub4(%38) : u64i [all]
+        store %39, %0
+        %40 = cast(bitcast) %0 : rec_tmp4*
+        %41 = load %40 : rec_tmp4
+        store %41, %34, align 8
+        scope {
+                %60 = get_global @tmp3 : rec_tmp3*
+                get_member
+                get_bitfield
+                %63 = cast(integral) %62 : s32i
+                %64 = const 291 : s32i
+                cmp
+                %66 = ternary %65 ? { : bool
+                        %74 = const true : bool
+                        yield %74
+                } : {
+                        %68 = get_global @tmp3 : rec_tmp3*
+                        get_member
+                        get_bitfield
+                        %71 = cast(integral) %70 : u64i
+                        %72 = const 18444925116710409848 : u64i
+                        cmp
+                        yield %73
+                }
+                if %66 {
+                        %67 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %81 {
-            %82 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %45 = get_global @tmp4 : rec_tmp4*
+                get_member
+                get_bitfield
+                %48 = cast(integral) %47 : s32i
+                %49 = const 291 : s32i
+                cmp
+                %51 = ternary %50 ? { : bool
+                        %59 = const true : bool
+                        yield %59
+                } : {
+                        %53 = get_global @tmp4 : rec_tmp4*
+                        get_member
+                        get_bitfield
+                        %56 = cast(integral) %55 : u64i
+                        %57 = const 18444925116710409848 : u64i
+                        cmp
+                        yield %58
+                }
+                if %51 {
+                        %52 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %26 = get_global @tmp3 : rec_tmp3*
-    %27 = get_global @tmp3 : rec_tmp3*
-    %28 = load %27 : rec_tmp3, align 8
-    store %28, %3
-    %29 = cast(bitcast) %3 : u64i*
-    %30 = load %29 : u64i
-    %31 = call @sub3(%30) : u64i [all]
-    store %31, %2
-    %32 = cast(bitcast) %2 : rec_tmp3*
-    %33 = load %32 : rec_tmp3
-    store %33, %26, align 8
-    %34 = get_global @tmp4 : rec_tmp4*
-    %35 = get_global @tmp4 : rec_tmp4*
-    %36 = load %35 : rec_tmp4, align 8
-    store %36, %1
-    %37 = cast(bitcast) %1 : u64i*
-    %38 = load %37 : u64i
-    %39 = call @sub4(%38) : u64i [all]
-    store %39, %0
-    %40 = cast(bitcast) %0 : rec_tmp4*
-    %41 = load %40 : rec_tmp4
-    store %41, %34, align 8
-    scope {
-        %60 = get_global @tmp3 : rec_tmp3*
-        %61 = get_member %60[0] "pad" : u64i*
-        %62 = get_bitfield %61, "pad": 11 bits @0 in signed u64i : s64i, align 8
-        %63 = cast(integral) %62 : s32i
-        %64 = const 291 : s32i
-        %65 = cmp ne %63, %64 : bool
-        %66 = ternary %65 ? { : bool
-            %74 = const true : bool
-            yield %74
-        } : {
-            %68 = get_global @tmp3 : rec_tmp3*
-            %69 = get_member %68[0] "field" : u64i*
-            %70 = get_bitfield %69, "field": 53 bits @11 in signed u64i : s64i, align 8
-            %71 = cast(integral) %70 : u64i
-            %72 = const 18444925116710409848 : u64i
-            %73 = cmp ne %71, %72 : bool
-            yield %73
-        }
-        if %66 {
-            %67 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    scope {
-        %45 = get_global @tmp4 : rec_tmp4*
-        %46 = get_member %45[0] "pad" : u64i*
-        %47 = get_bitfield %46, "pad": 11 bits @53 in signed u64i : s64i, align 8
-        %48 = cast(integral) %47 : s32i
-        %49 = const 291 : s32i
-        %50 = cmp ne %48, %49 : bool
-        %51 = ternary %50 ? { : bool
-            %59 = const true : bool
-            yield %59
-        } : {
-            %53 = get_global @tmp4 : rec_tmp4*
-            %54 = get_member %53[0] "field" : u64i*
-            %55 = get_bitfield %54, "field": 53 bits @0 in signed u64i : s64i, align 8
-            %56 = cast(integral) %55 : u64i
-            %57 = const 18444925116710409848 : u64i
-            %58 = cmp ne %56, %57 : bool
-            yield %58
-        }
-        if %51 {
-            %52 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %42 = get_global @exit : ((s32i) -> void)*
-    %43 = const 0 : s32i
-    call @exit(%43) [all]
-    %44 = load %8 : s32i
-    return %44
+        %42 = get_global @exit : (s32i) -> void*
+        %43 = const 0 : s32i
+        call @exit(%43) [all]
+        %44 = load %8 : s32i
+        return %44
 }

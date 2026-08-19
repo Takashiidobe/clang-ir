@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/920625-1.c" (c, x86_64-unknown-linux-gnu)
-global pts : rec_point[4] = [{1.000000e+00, 2.000000e+00}, {3.000000e+00, 4.000000e+00}, {5.000000e+00, 6.000000e+00}, {7.000000e+00, 8.000000e+00}] [external, default, align 16, dso_local]
-global ipts : rec_ipoint[4] = [{1, 2}, {3, 4}, {5, 6}, {7, 8}] [external, default, align 16, dso_local]
+global pts : rec_point[4] = ConstArray { ty: Array { element_type: Named("rec_point"), size: 4 }, elts: Array([ConstRecord { ty: Named("rec_point"), members: Array([CirFloat { ty: Double, value: "1.000000e+00" }, CirFloat { ty: Double, value: "2.000000e+00" }]) }, ConstRecord { ty: Named("rec_point"), members: Array([CirFloat { ty: Double, value: "3.000000e+00" }, CirFloat { ty: Double, value: "4.000000e+00" }]) }, ConstRecord { ty: Named("rec_point"), members: Array([CirFloat { ty: Double, value: "5.000000e+00" }, CirFloat { ty: Double, value: "6.000000e+00" }]) }, ConstRecord { ty: Named("rec_point"), members: Array([CirFloat { ty: Double, value: "7.000000e+00" }, CirFloat { ty: Double, value: "8.000000e+00" }]) }]), trailing_zeros_num: 0 } [external, default, align 16, dso_local]
+global ipts : rec_ipoint[4] = ConstArray { ty: Array { element_type: Named("rec_ipoint"), size: 4 }, elts: Array([ConstRecord { ty: Named("rec_ipoint"), members: Array([CirInt { ty: Named("s32i"), value: "1" }, CirInt { ty: Named("s32i"), value: "2" }]) }, ConstRecord { ty: Named("rec_ipoint"), members: Array([CirInt { ty: Named("s32i"), value: "3" }, CirInt { ty: Named("s32i"), value: "4" }]) }, ConstRecord { ty: Named("rec_ipoint"), members: Array([CirInt { ty: Named("s32i"), value: "5" }, CirInt { ty: Named("s32i"), value: "6" }]) }, ConstRecord { ty: Named("rec_ipoint"), members: Array([CirInt { ty: Named("s32i"), value: "7" }, CirInt { ty: Named("s32i"), value: "8" }]) }]), trailing_zeros_num: 0 } [external, default, align 16, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn va1(%arg1: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
@@ -16,67 +16,67 @@ fn va1(%arg1: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         %119 = alloca rec_point, "pi", align 8
         store %arg1, %115
         %120 = cast(array_to_ptrdecay) %117 : rec___va_list_tag*
-        va_start %120
+        va_start
         scope {
-            %123 = const 0 : s32i
-            store %123, %118, align 4
-            for cond: {
-                %150 = load %118 : s32i, align 4
-                %151 = load %115 : s32i, align 4
-                %152 = cmp lt %150, %151 : bool
-                condition %152
-            } step: {
-                %124 = load %118 : s32i, align 4
-                %125 = inc %124 : s32i [nsw]
-                store %125, %118, align 4
-                yield
-            } do {
-                scope {
-                    %126 = alloca rec_point, "vaarg.tmp", align 8
-                    %127 = cast(array_to_ptrdecay) %117 : rec___va_list_tag*
-                    %128 = va_arg %127 : rec_point
-                    store %128, %126, align 8
-                    copy %119, %126
-                    scope {
-                        %129 = load %118 : s32i, align 4
-                        %130 = cast(integral) %129 : s64i
-                        %131 = get_global @pts : rec_point[4]*
-                        %132 = get_element %131[%130] : rec_point*
-                        %133 = get_member %132[0] "x" : double*
-                        %134 = load %133 : double, align 16
-                        %135 = get_member %119[0] "x" : double*
-                        %136 = load %135 : double, align 8
-                        %137 = cmp ne %134, %136 : bool
-                        %138 = ternary %137 ? { : bool
-                            %149 = const true : bool
-                            yield %149
-                        } : {
-                            %140 = load %118 : s32i, align 4
-                            %141 = cast(integral) %140 : s64i
-                            %142 = get_global @pts : rec_point[4]*
-                            %143 = get_element %142[%141] : rec_point*
-                            %144 = get_member %143[1] "y" : double*
-                            %145 = load %144 : double, align 8
-                            %146 = get_member %119[1] "y" : double*
-                            %147 = load %146 : double, align 8
-                            %148 = cmp ne %145, %147 : bool
-                            yield %148
-                        }
-                        if %138 {
-                            %139 = get_global @abort : (() -> void)*
-                            call @abort() [all]
-                            yield
+                %123 = const 0 : s32i
+                store %123, %118, align 4
+                for cond {
+                        %150 = load %118 : s32i, align 4
+                        %151 = load %115 : s32i, align 4
+                        cmp
+                        condition %152
+                } step {
+                        %124 = load %118 : s32i, align 4
+                        inc
+                        store %125, %118, align 4
+                        yield
+                } body {
+                        scope {
+                                %126 = alloca rec_point, "vaarg.tmp", align 8
+                                %127 = cast(array_to_ptrdecay) %117 : rec___va_list_tag*
+                                va_arg
+                                store %128, %126, align 8
+                                copy
+                                scope {
+                                        %129 = load %118 : s32i, align 4
+                                        %130 = cast(integral) %129 : s64i
+                                        %131 = get_global @pts : rec_point[4]*
+                                        get_element
+                                        get_member
+                                        %134 = load %133 : double, align 16
+                                        get_member
+                                        %136 = load %135 : double, align 8
+                                        cmp
+                                        %138 = ternary %137 ? { : bool
+                                                %149 = const true : bool
+                                                yield %149
+                                        } : {
+                                                %140 = load %118 : s32i, align 4
+                                                %141 = cast(integral) %140 : s64i
+                                                %142 = get_global @pts : rec_point[4]*
+                                                get_element
+                                                get_member
+                                                %145 = load %144 : double, align 8
+                                                get_member
+                                                %147 = load %146 : double, align 8
+                                                cmp
+                                                yield %148
+                                        }
+                                        if %138 {
+                                                %139 = get_global @abort : () -> void*
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         %121 = cast(array_to_ptrdecay) %117 : rec___va_list_tag*
-        va_end %121
+        va_end
         %122 = load %116 : s32i
         return %122
 }
@@ -89,158 +89,158 @@ fn va2(%arg0: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         %81 = alloca rec_ipoint, "pi", align 4
         store %arg0, %77
         %82 = cast(array_to_ptrdecay) %79 : rec___va_list_tag*
-        va_start %82
+        va_start
         scope {
-            %85 = const 0 : s32i
-            store %85, %80, align 4
-            for cond: {
-                %112 = load %80 : s32i, align 4
-                %113 = load %77 : s32i, align 4
-                %114 = cmp lt %112, %113 : bool
-                condition %114
-            } step: {
-                %86 = load %80 : s32i, align 4
-                %87 = inc %86 : s32i [nsw]
-                store %87, %80, align 4
-                yield
-            } do {
-                scope {
-                    %88 = alloca rec_ipoint, "vaarg.tmp", align 4
-                    %89 = cast(array_to_ptrdecay) %79 : rec___va_list_tag*
-                    %90 = va_arg %89 : rec_ipoint
-                    store %90, %88, align 4
-                    copy %81, %88
-                    scope {
-                        %91 = load %80 : s32i, align 4
-                        %92 = cast(integral) %91 : s64i
-                        %93 = get_global @ipts : rec_ipoint[4]*
-                        %94 = get_element %93[%92] : rec_ipoint*
-                        %95 = get_member %94[0] "x" : s32i*
-                        %96 = load %95 : s32i, align 8
-                        %97 = get_member %81[0] "x" : s32i*
-                        %98 = load %97 : s32i, align 4
-                        %99 = cmp ne %96, %98 : bool
-                        %100 = ternary %99 ? { : bool
-                            %111 = const true : bool
-                            yield %111
-                        } : {
-                            %102 = load %80 : s32i, align 4
-                            %103 = cast(integral) %102 : s64i
-                            %104 = get_global @ipts : rec_ipoint[4]*
-                            %105 = get_element %104[%103] : rec_ipoint*
-                            %106 = get_member %105[1] "y" : s32i*
-                            %107 = load %106 : s32i, align 4
-                            %108 = get_member %81[1] "y" : s32i*
-                            %109 = load %108 : s32i, align 4
-                            %110 = cmp ne %107, %109 : bool
-                            yield %110
-                        }
-                        if %100 {
-                            %101 = get_global @abort : (() -> void)*
-                            call @abort() [all]
-                            yield
+                %85 = const 0 : s32i
+                store %85, %80, align 4
+                for cond {
+                        %112 = load %80 : s32i, align 4
+                        %113 = load %77 : s32i, align 4
+                        cmp
+                        condition %114
+                } step {
+                        %86 = load %80 : s32i, align 4
+                        inc
+                        store %87, %80, align 4
+                        yield
+                } body {
+                        scope {
+                                %88 = alloca rec_ipoint, "vaarg.tmp", align 4
+                                %89 = cast(array_to_ptrdecay) %79 : rec___va_list_tag*
+                                va_arg
+                                store %90, %88, align 4
+                                copy
+                                scope {
+                                        %91 = load %80 : s32i, align 4
+                                        %92 = cast(integral) %91 : s64i
+                                        %93 = get_global @ipts : rec_ipoint[4]*
+                                        get_element
+                                        get_member
+                                        %96 = load %95 : s32i, align 8
+                                        get_member
+                                        %98 = load %97 : s32i, align 4
+                                        cmp
+                                        %100 = ternary %99 ? { : bool
+                                                %111 = const true : bool
+                                                yield %111
+                                        } : {
+                                                %102 = load %80 : s32i, align 4
+                                                %103 = cast(integral) %102 : s64i
+                                                %104 = get_global @ipts : rec_ipoint[4]*
+                                                get_element
+                                                get_member
+                                                %107 = load %106 : s32i, align 4
+                                                get_member
+                                                %109 = load %108 : s32i, align 4
+                                                cmp
+                                                yield %110
+                                        }
+                                        if %100 {
+                                                %101 = get_global @abort : () -> void*
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         %83 = cast(array_to_ptrdecay) %79 : rec___va_list_tag*
-        va_end %83
+        va_end
         %84 = load %78 : s32i
         return %84
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca rec_ipoint, "coerce", align 8
-    %1 = alloca rec_ipoint, "coerce", align 8
-    %2 = alloca rec_ipoint, "coerce", align 8
-    %3 = alloca rec_ipoint, "coerce", align 8
-    %4 = alloca rec_point, "coerce", align 8
-    %5 = alloca rec_point, "coerce", align 8
-    %6 = alloca rec_point, "coerce", align 8
-    %7 = alloca rec_point, "coerce", align 8
-    %8 = alloca s32i, "__retval", align 4
-    %9 = const 0 : s32i
-    store %9, %8
-    %10 = const 4 : s32i
-    %11 = const 0 : s64i
-    %12 = get_global @pts : rec_point[4]*
-    %13 = get_element %12[%11] : rec_point*
-    %14 = const 1 : s64i
-    %15 = get_global @pts : rec_point[4]*
-    %16 = get_element %15[%14] : rec_point*
-    %17 = const 2 : s64i
-    %18 = get_global @pts : rec_point[4]*
-    %19 = get_element %18[%17] : rec_point*
-    %20 = const 3 : s64i
-    %21 = get_global @pts : rec_point[4]*
-    %22 = get_element %21[%20] : rec_point*
-    %23 = load %13 : rec_point, align 16
-    %24 = load %16 : rec_point, align 16
-    %25 = load %19 : rec_point, align 16
-    %26 = load %22 : rec_point, align 16
-    store %23, %7
-    %27 = cast(bitcast) %7 : rec_anon_struct*
-    %28 = get_member %27[0] "" : double*
-    %29 = load %28 : double
-    %30 = get_member %27[1] "" : double*
-    %31 = load %30 : double
-    store %24, %6
-    %32 = cast(bitcast) %6 : rec_anon_struct*
-    %33 = get_member %32[0] "" : double*
-    %34 = load %33 : double
-    %35 = get_member %32[1] "" : double*
-    %36 = load %35 : double
-    store %25, %5
-    %37 = cast(bitcast) %5 : rec_anon_struct*
-    %38 = get_member %37[0] "" : double*
-    %39 = load %38 : double
-    %40 = get_member %37[1] "" : double*
-    %41 = load %40 : double
-    store %26, %4
-    %42 = cast(bitcast) %4 : rec_anon_struct*
-    %43 = get_member %42[0] "" : double*
-    %44 = load %43 : double
-    %45 = get_member %42[1] "" : double*
-    %46 = load %45 : double
-    %47 = call @va1(%10, %29, %31, %34, %36, %39, %41, %44, %46) : s32i [all]
-    %48 = const 4 : s32i
-    %49 = const 0 : s64i
-    %50 = get_global @ipts : rec_ipoint[4]*
-    %51 = get_element %50[%49] : rec_ipoint*
-    %52 = const 1 : s64i
-    %53 = get_global @ipts : rec_ipoint[4]*
-    %54 = get_element %53[%52] : rec_ipoint*
-    %55 = const 2 : s64i
-    %56 = get_global @ipts : rec_ipoint[4]*
-    %57 = get_element %56[%55] : rec_ipoint*
-    %58 = const 3 : s64i
-    %59 = get_global @ipts : rec_ipoint[4]*
-    %60 = get_element %59[%58] : rec_ipoint*
-    %61 = load %51 : rec_ipoint, align 16
-    %62 = load %54 : rec_ipoint, align 8
-    %63 = load %57 : rec_ipoint, align 16
-    %64 = load %60 : rec_ipoint, align 8
-    store %61, %3
-    %65 = cast(bitcast) %3 : u64i*
-    %66 = load %65 : u64i
-    store %62, %2
-    %67 = cast(bitcast) %2 : u64i*
-    %68 = load %67 : u64i
-    store %63, %1
-    %69 = cast(bitcast) %1 : u64i*
-    %70 = load %69 : u64i
-    store %64, %0
-    %71 = cast(bitcast) %0 : u64i*
-    %72 = load %71 : u64i
-    %73 = call @va2(%48, %66, %68, %70, %72) : s32i [all]
-    %74 = get_global @exit : ((s32i) -> void)*
-    %75 = const 0 : s32i
-    call @exit(%75) [all]
-    %76 = load %8 : s32i
-    return %76
+        %0 = alloca rec_ipoint, "coerce", align 8
+        %1 = alloca rec_ipoint, "coerce", align 8
+        %2 = alloca rec_ipoint, "coerce", align 8
+        %3 = alloca rec_ipoint, "coerce", align 8
+        %4 = alloca rec_point, "coerce", align 8
+        %5 = alloca rec_point, "coerce", align 8
+        %6 = alloca rec_point, "coerce", align 8
+        %7 = alloca rec_point, "coerce", align 8
+        %8 = alloca s32i, "__retval", align 4
+        %9 = const 0 : s32i
+        store %9, %8
+        %10 = const 4 : s32i
+        %11 = const 0 : s64i
+        %12 = get_global @pts : rec_point[4]*
+        get_element
+        %14 = const 1 : s64i
+        %15 = get_global @pts : rec_point[4]*
+        get_element
+        %17 = const 2 : s64i
+        %18 = get_global @pts : rec_point[4]*
+        get_element
+        %20 = const 3 : s64i
+        %21 = get_global @pts : rec_point[4]*
+        get_element
+        %23 = load %13 : rec_point, align 16
+        %24 = load %16 : rec_point, align 16
+        %25 = load %19 : rec_point, align 16
+        %26 = load %22 : rec_point, align 16
+        store %23, %7
+        %27 = cast(bitcast) %7 : rec_anon_struct*
+        get_member
+        %29 = load %28 : double
+        get_member
+        %31 = load %30 : double
+        store %24, %6
+        %32 = cast(bitcast) %6 : rec_anon_struct*
+        get_member
+        %34 = load %33 : double
+        get_member
+        %36 = load %35 : double
+        store %25, %5
+        %37 = cast(bitcast) %5 : rec_anon_struct*
+        get_member
+        %39 = load %38 : double
+        get_member
+        %41 = load %40 : double
+        store %26, %4
+        %42 = cast(bitcast) %4 : rec_anon_struct*
+        get_member
+        %44 = load %43 : double
+        get_member
+        %46 = load %45 : double
+        %47 = call @va1(%10, %29, %31, %34, %36, %39, %41, %44, %46) : s32i [all]
+        %48 = const 4 : s32i
+        %49 = const 0 : s64i
+        %50 = get_global @ipts : rec_ipoint[4]*
+        get_element
+        %52 = const 1 : s64i
+        %53 = get_global @ipts : rec_ipoint[4]*
+        get_element
+        %55 = const 2 : s64i
+        %56 = get_global @ipts : rec_ipoint[4]*
+        get_element
+        %58 = const 3 : s64i
+        %59 = get_global @ipts : rec_ipoint[4]*
+        get_element
+        %61 = load %51 : rec_ipoint, align 16
+        %62 = load %54 : rec_ipoint, align 8
+        %63 = load %57 : rec_ipoint, align 16
+        %64 = load %60 : rec_ipoint, align 8
+        store %61, %3
+        %65 = cast(bitcast) %3 : u64i*
+        %66 = load %65 : u64i
+        store %62, %2
+        %67 = cast(bitcast) %2 : u64i*
+        %68 = load %67 : u64i
+        store %63, %1
+        %69 = cast(bitcast) %1 : u64i*
+        %70 = load %69 : u64i
+        store %64, %0
+        %71 = cast(bitcast) %0 : u64i*
+        %72 = load %71 : u64i
+        %73 = call @va2(%48, %66, %68, %70, %72) : s32i [all]
+        %74 = get_global @exit : (s32i) -> void*
+        %75 = const 0 : s32i
+        call @exit(%75) [all]
+        %76 = load %8 : s32i
+        return %76
 }

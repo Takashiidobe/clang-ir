@@ -1,64 +1,64 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000731-1.c" (c, x86_64-unknown-linux-gnu)
 fn foo() -> double [external, c, no_inline, dso_local, nothrow] {
-    %22 = alloca double, "__retval", align 8
-    %23 = const 0.000000e+00 : double
-    store %23, %22
-    %24 = load %22 : double
-    return %24
+        %22 = alloca double, "__retval", align 8
+        %23 = const 0.000000e+00 : double
+        store %23, %22
+        %24 = load %22 : double
+        return %24
 }
 fn do_sibcall() -> void [external, c, no_inline, dso_local, nothrow] {
-    %21 = call @foo() : double [all]
-    return
+        %21 = call @foo() : double [all]
+        return
 }
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca double, "x", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    scope {
-        %12 = const 0 : s32i
-        %13 = cast(int_to_float) %12 : double
-        store %13, %1, align 8
-        for cond: {
-            %17 = load %1 : double, align 8
-            %18 = const 20 : s32i
-            %19 = cast(int_to_float) %18 : double
-            %20 = cmp lt %17, %19 : bool
-            condition %20
-        } step: {
-            %14 = load %1 : double, align 8
-            %15 = const 1.000000e+00 : double
-            %16 = fadd %14, %15 : double
-            store %16, %1, align 8
-            yield
-        } do {
-            call @do_sibcall() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca double, "x", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        scope {
+                %12 = const 0 : s32i
+                %13 = cast(int_to_float) %12 : double
+                store %13, %1, align 8
+                for cond {
+                        %17 = load %1 : double, align 8
+                        %18 = const 20 : s32i
+                        %19 = cast(int_to_float) %18 : double
+                        cmp
+                        condition %20
+                } step {
+                        %14 = load %1 : double, align 8
+                        %15 = const 1.000000e+00 : double
+                        fadd
+                        store %16, %1, align 8
+                        yield
+                } body {
+                        call @do_sibcall() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %6 = load %1 : double, align 8
-        %7 = const 10 : s32i
-        %8 = cast(int_to_float) %7 : double
-        %9 = cmp ge %6, %8 : bool
-        %10 = not %9 : bool
-        if %10 {
-            %11 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %6 = load %1 : double, align 8
+                %7 = const 10 : s32i
+                %8 = cast(int_to_float) %7 : double
+                cmp
+                not
+                if %10 {
+                        %11 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %3 = get_global @exit : ((s32i) -> void)*
-    %4 = const 0 : s32i
-    call @exit(%4) [all]
-    %5 = load %0 : s32i
-    return %5
+        %3 = get_global @exit : (s32i) -> void*
+        %4 = const 0 : s32i
+        call @exit(%4) [all]
+        %5 = load %0 : s32i
+        return %5
 }

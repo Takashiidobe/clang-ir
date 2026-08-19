@@ -1,32 +1,32 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/anon_struct_array.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.error_log : rec_anon2E0[3] = [{404, @.str, 0.98999999999999999}, {500, @.str.1, 8.500000e-01}, {200, @.str.2, 1.000000e+00}] [cir_private, default, dso_local, constant]
-global .str : s8i[10] = "Not Found" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[22] = "Internal Server Error" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[3] = "OK" [cir_private, default, align 1, dso_local, constant]
-global .str.3 : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global __const.main.error_log : rec_anon2E0[3] = ConstArray { ty: Array { element_type: Named("rec_anon2E0"), size: 3 }, elts: Array([ConstRecord { ty: Named("rec_anon2E0"), members: Array([CirInt { ty: Named("s32i"), value: "404" }, GlobalView { ty: Pointer { pointee: Named("s8i"), addr_space: None }, symbol: ".str", indices: None }, CirFloat { ty: Double, value: "0.98999999999999999" }]) }, ConstRecord { ty: Named("rec_anon2E0"), members: Array([CirInt { ty: Named("s32i"), value: "500" }, GlobalView { ty: Pointer { pointee: Named("s8i"), addr_space: None }, symbol: ".str.1", indices: None }, CirFloat { ty: Double, value: "8.500000e-01" }]) }, ConstRecord { ty: Named("rec_anon2E0"), members: Array([CirInt { ty: Named("s32i"), value: "200" }, GlobalView { ty: Pointer { pointee: Named("s8i"), addr_space: None }, symbol: ".str.2", indices: None }, CirFloat { ty: Double, value: "1.000000e+00" }]) }]), trailing_zeros_num: 0 } [cir_private, default, dso_local, constant]
+global .str : s8i[10] = ConstArray { ty: Array { element_type: Named("s8i"), size: 10 }, elts: Str("Not Found"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[22] = ConstArray { ty: Array { element_type: Named("s8i"), size: 22 }, elts: Str("Internal Server Error"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[3] = ConstArray { ty: Array { element_type: Named("s8i"), size: 3 }, elts: Str("OK"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_anon2E0[3], "error_log", align 16
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @__const.main.error_log : rec_anon2E0[3]*
-    copy %1, %3
-    %4 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %5 = get_global @.str.3 : s8i[4]*
-    %6 = cast(array_to_ptrdecay) %5 : s8i*
-    %7 = const 0 : s64i
-    %8 = get_element %1[%7] : rec_anon2E0*
-    %9 = get_member %8[0] "code" : s32i*
-    %10 = load %9 : s32i, align 16
-    %11 = call @printf(%6, %10) : s32i [all]
-    %12 = const 0 : s32i
-    store %12, %0
-    %13 = load %0 : s32i
-    return %13
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_anon2E0[3], "error_log", align 16
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @__const.main.error_log : rec_anon2E0[3]*
+        copy
+        %4 = get_global @printf : (s8i*, ...) -> s32i*
+        %5 = get_global @.str.3 : s8i[4]*
+        %6 = cast(array_to_ptrdecay) %5 : s8i*
+        %7 = const 0 : s64i
+        get_element
+        get_member
+        %10 = load %9 : s32i, align 16
+        %11 = call @printf(%6, %10) : s32i [all]
+        %12 = const 0 : s32i
+        store %12, %0
+        %13 = load %0 : s32i
+        return %13
 }

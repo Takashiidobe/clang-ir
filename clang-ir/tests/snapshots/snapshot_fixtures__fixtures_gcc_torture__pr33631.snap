@@ -1,32 +1,32 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr33631.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.r : rec_anon2E0 = zero [cir_private, default, dso_local, constant]
+global __const.main.r : rec_anon2E0 = Zero { ty: Named("rec_anon2E0") } [cir_private, default, dso_local, constant]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_anon2E0, "r", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @__const.main.r : rec_anon2E0*
-    copy %1, %3
-    scope {
-        %6 = get_member %1[0] "c" : s32i*
-        %7 = load %6 : s32i, align 4
-        %8 = const 0 : s32i
-        %9 = cmp ne %7, %8 : bool
-        if %9 {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_anon2E0, "r", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @__const.main.r : rec_anon2E0*
+        copy
+        scope {
+                get_member
+                %7 = load %6 : s32i, align 4
+                %8 = const 0 : s32i
+                cmp
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

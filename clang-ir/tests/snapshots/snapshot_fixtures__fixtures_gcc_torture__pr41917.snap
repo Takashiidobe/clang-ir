@@ -1,72 +1,72 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr41917.c" (c, x86_64-unknown-linux-gnu)
-global a : u32i = 1 [external, default, align 4, dso_local]
+global a : u32i = CirInt { ty: Named("u32i"), value: "1" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u32i, "b", align 4
-    %2 = alloca u32i, "c", align 4
-    %3 = alloca u32i, "d", align 4
-    %4 = const 0 : s32i
-    store %4, %0
-    scope {
-        %24 = const 4 : u64i
-        %25 = const 4 : u64i
-        %26 = cmp ne %24, %25 : bool
-        %27 = ternary %26 ? { : bool
-            %33 = const true : bool
-            yield %33
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u32i, "b", align 4
+        %2 = alloca u32i, "c", align 4
+        %3 = alloca u32i, "d", align 4
+        %4 = const 0 : s32i
+        store %4, %0
+        scope {
+                %24 = const 4 : u64i
+                %25 = const 4 : u64i
+                cmp
+                %27 = ternary %26 ? { : bool
+                        %33 = const true : bool
+                        yield %33
+                } : {
+                        %30 = const -942519458 : s32i
+                        %31 = const 0 : s32i
+                        cmp
+                        yield %32
+                }
+                if %27 {
+                        %28 = const 0 : s32i
+                        store %28, %0
+                        %29 = load %0 : s32i
+                        return %29
+                }
+                yield
+        }
+        %5 = const 3352447838 : u32i
+        store %5, %2, align 4
+        %6 = get_global @a : u32i*
+        %7 = load %6 : u32i, align 4
+        %8 = const 4294967294 : u32i
+        or
+        store %9, %3, align 4
+        %10 = load %3 : u32i, align 4
+        %11 = const 0 : u32i
+        cmp
+        %13 = ternary %12 ? { : u32i
+                %23 = load %2 : u32i, align 4
+                yield %23
         } : {
-            %30 = const -942519458 : s32i
-            %31 = const 0 : s32i
-            %32 = cmp gt %30, %31 : bool
-            yield %32
+                %20 = load %2 : u32i, align 4
+                %21 = load %3 : u32i, align 4
+                rem
+                yield %22
         }
-        if %27 {
-            %28 = const 0 : s32i
-            store %28, %0
-            %29 = load %0 : s32i
-            return %29
+        store %13, %1, align 4
+        scope {
+                %16 = load %1 : u32i, align 4
+                %17 = load %2 : u32i, align 4
+                cmp
+                if %18 {
+                        %19 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %5 = const 3352447838 : u32i
-    store %5, %2, align 4
-    %6 = get_global @a : u32i*
-    %7 = load %6 : u32i, align 4
-    %8 = const 4294967294 : u32i
-    %9 = or %7, %8 : u32i
-    store %9, %3, align 4
-    %10 = load %3 : u32i, align 4
-    %11 = const 0 : u32i
-    %12 = cmp eq %10, %11 : bool
-    %13 = ternary %12 ? { : u32i
-        %23 = load %2 : u32i, align 4
-        yield %23
-    } : {
-        %20 = load %2 : u32i, align 4
-        %21 = load %3 : u32i, align 4
-        %22 = rem %20, %21 : u32i
-        yield %22
-    }
-    store %13, %1, align 4
-    scope {
-        %16 = load %1 : u32i, align 4
-        %17 = load %2 : u32i, align 4
-        %18 = cmp ne %16, %17 : bool
-        if %18 {
-            %19 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %14 = const 0 : s32i
-    store %14, %0
-    %15 = load %0 : s32i
-    return %15
+        %14 = const 0 : s32i
+        store %14, %0
+        %15 = load %0 : s32i
+        return %15
 }

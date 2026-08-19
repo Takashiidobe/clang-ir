@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20070212-3.c" (c, x86_64-unknown-linux-gnu)
@@ -18,40 +18,40 @@ fn bar(%arg0: rec_foo*, %arg1: s32i, %arg2: s32i, %arg3: s32i) -> s32i [external
         store %arg2, %18
         store %arg3, %19
         scope {
-            %37 = load %18 : s32i, align 4
-            %38 = cast(int_to_bool) %37 : bool
-            if %38 {
-                %41 = load %16 : rec_foo*, align 8
-                %42 = get_member %41[0] "i" : s32i*
-                store %42, %21, align 8
+                %37 = load %18 : s32i, align 4
+                %38 = cast(int_to_bool) %37 : bool
+                if %38 {
+                        %41 = load %16 : rec_foo*, align 8
+                        get_member
+                        store %42, %21, align 8
+                        yield
+                } else {
+                        %39 = load %16 : rec_foo*, align 8
+                        get_member
+                        store %40, %21, align 8
+                        yield
+                }
                 yield
-            } else {
-                %39 = load %16 : rec_foo*, align 8
-                %40 = get_member %39[1] "j" : s32i*
-                store %40, %21, align 8
-                yield
-            }
-            yield
         }
         %24 = load %21 : s32i*, align 8
         %25 = load %24 : s32i, align 4
         store %25, %23, align 4
         %26 = const 1 : s32i
         %27 = load %16 : rec_foo*, align 8
-        %28 = get_member %27[0] "i" : s32i*
+        get_member
         store %26, %28, align 4
         scope {
-            %34 = load %19 : s32i, align 4
-            %35 = cast(int_to_bool) %34 : bool
-            if %35 {
-                %36 = load %21 : s32i*, align 8
-                store %36, %22, align 8
+                %34 = load %19 : s32i, align 4
+                %35 = cast(int_to_bool) %34 : bool
+                if %35 {
+                        %36 = load %21 : s32i*, align 8
+                        store %36, %22, align 8
+                        yield
+                } else {
+                        store %17, %22, align 8
+                        yield
+                }
                 yield
-            } else {
-                store %17, %22, align 8
-                yield
-            }
-            yield
         }
         %29 = load %23 : s32i, align 4
         %30 = load %22 : s32i*, align 8
@@ -63,32 +63,32 @@ fn bar(%arg0: rec_foo*, %arg1: s32i, %arg2: s32i, %arg3: s32i) -> s32i [external
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_foo, "k", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 0 : s32i
-    %4 = get_member %1[0] "i" : s32i*
-    store %3, %4, align 4
-    %5 = const 1 : s32i
-    %6 = get_member %1[1] "j" : s32i*
-    store %5, %6, align 4
-    scope {
-        %9 = const 1 : s32i
-        %10 = const 1 : s32i
-        %11 = const 1 : s32i
-        %12 = call @bar(%1, %9, %10, %11) : s32i [all]
-        %13 = const 1 : s32i
-        %14 = cmp ne %12, %13 : bool
-        if %14 {
-            %15 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_foo, "k", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 0 : s32i
+        get_member
+        store %3, %4, align 4
+        %5 = const 1 : s32i
+        get_member
+        store %5, %6, align 4
+        scope {
+                %9 = const 1 : s32i
+                %10 = const 1 : s32i
+                %11 = const 1 : s32i
+                %12 = call @bar(%1, %9, %10, %11) : s32i [all]
+                %13 = const 1 : s32i
+                cmp
+                if %14 {
+                        %15 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = load %0 : s32i
-    return %8
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = load %0 : s32i
+        return %8
 }

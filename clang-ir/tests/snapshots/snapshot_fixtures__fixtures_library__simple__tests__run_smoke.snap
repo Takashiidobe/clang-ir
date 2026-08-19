@@ -1,43 +1,43 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.library/simple/tests/run-smoke.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.value : rec_shared_value = {3, 1} [cir_private, default, dso_local, constant]
+global __const.main.value : rec_shared_value = ConstRecord { ty: Named("rec_shared_value"), members: Array([CirInt { ty: Named("s32i"), value: "3" }, CirInt { ty: Named("u32i"), value: "1" }]) } [cir_private, default, dso_local, constant]
 
 fn square(%arg0: s32i) -> s32i [external, c];
 fn bump() -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_shared_value, "value", align 4
-    %2 = alloca s32i, "result", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = get_global @__const.main.value : rec_shared_value*
-    copy %1, %4
-    %5 = get_member %1[0] "value" : s32i*
-    %6 = load %5 : s32i, align 4
-    %7 = call @square(%6) : s32i [all]
-    %8 = call @bump() : s32i [all]
-    %9 = add %7, %8 : s32i [nsw]
-    store %9, %2, align 4
-    %10 = load %2 : s32i, align 4
-    %11 = const 10 : s32i
-    %12 = cmp eq %10, %11 : bool
-    %13 = ternary %12 ? { : bool
-        %19 = get_member %1[1] "mode" : u32i*
-        %20 = load %19 : u32i, align 4
-        %21 = const 1 : u32i
-        %22 = cmp eq %20, %21 : bool
-        yield %22
-    } : {
-        %18 = const false : bool
-        yield %18
-    }
-    %14 = const 0 : s32i
-    %15 = const 1 : s32i
-    %16 = select %13, %14, %15 : s32i
-    store %16, %0
-    %17 = load %0 : s32i
-    return %17
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_shared_value, "value", align 4
+        %2 = alloca s32i, "result", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = get_global @__const.main.value : rec_shared_value*
+        copy
+        get_member
+        %6 = load %5 : s32i, align 4
+        %7 = call @square(%6) : s32i [all]
+        %8 = call @bump() : s32i [all]
+        %9 = add %7, %8 : s32i [nsw]
+        store %9, %2, align 4
+        %10 = load %2 : s32i, align 4
+        %11 = const 10 : s32i
+        cmp
+        %13 = ternary %12 ? { : bool
+                get_member
+                %20 = load %19 : u32i, align 4
+                %21 = const 1 : u32i
+                cmp
+                yield %22
+        } : {
+                %18 = const false : bool
+                yield %18
+        }
+        %14 = const 0 : s32i
+        %15 = const 1 : s32i
+        select
+        store %16, %0
+        %17 = load %0 : s32i
+        return %17
 }

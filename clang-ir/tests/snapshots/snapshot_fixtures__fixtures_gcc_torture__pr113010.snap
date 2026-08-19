@@ -1,29 +1,29 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr113010.c" (c, x86_64-unknown-linux-gnu)
-global minus_1 : s32i = -1 [external, default, align 4, dso_local]
+global minus_1 : s32i = CirInt { ty: Named("s32i"), value: "-1" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const 4294967295 : u64i
-        %5 = get_global @minus_1 : s32i*
-        %6 = load %5 : s32i, align 4
-        %7 = cast(integral) %6 : u64i
-        %8 = cmp ge %4, %7 : bool
-        if %8 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const 4294967295 : u64i
+                %5 = get_global @minus_1 : s32i*
+                %6 = load %5 : s32i, align 4
+                %7 = cast(integral) %6 : u64i
+                cmp
+                if %8 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

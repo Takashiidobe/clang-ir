@@ -1,16 +1,16 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/c99.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.qualified_values : s32i[3] = [2, 3, 5] [cir_private, default, dso_local, constant]
-global __const.main.compound_pair : rec_C99Pair = {43, 47} [cir_private, default, dso_local, constant]
-global __const.main.designated_array : s32i[4] = [27, 0, 29] [cir_private, default, dso_local, constant]
-global __const.main.designated_initializer : rec_C99Pair = {22, 23} [cir_private, default, dso_local, constant]
-global c99_external_identifier_with_more_than_thirty_one_significant_characters : s32i = 5 [external, default, align 4, dso_local]
-global .str : s8i[88] = "%s %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
-global __func__.main : s8i[5] = "main" [cir_private, default, align 1, dso_local, constant]
-global slash_comment_value : s32i = 3 [internal, default, align 4, dso_local]
+global __const.main.qualified_values : s32i[3] = ConstArray { ty: Array { element_type: Named("s32i"), size: 3 }, elts: Array([CirInt { ty: Named("s32i"), value: "2" }, CirInt { ty: Named("s32i"), value: "3" }, CirInt { ty: Named("s32i"), value: "5" }]), trailing_zeros_num: 0 } [cir_private, default, dso_local, constant]
+global __const.main.compound_pair : rec_C99Pair = ConstRecord { ty: Named("rec_C99Pair"), members: Array([CirInt { ty: Named("s32i"), value: "43" }, CirInt { ty: Named("s32i"), value: "47" }]) } [cir_private, default, dso_local, constant]
+global __const.main.designated_array : s32i[4] = ConstArray { ty: Array { element_type: Named("s32i"), size: 4 }, elts: Array([CirInt { ty: Named("s32i"), value: "27" }, CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "29" }]), trailing_zeros_num: 1 } [cir_private, default, dso_local, constant]
+global __const.main.designated_initializer : rec_C99Pair = ConstRecord { ty: Named("rec_C99Pair"), members: Array([CirInt { ty: Named("s32i"), value: "22" }, CirInt { ty: Named("s32i"), value: "23" }]) } [cir_private, default, dso_local, constant]
+global c99_external_identifier_with_more_than_thirty_one_significant_characters : s32i = CirInt { ty: Named("s32i"), value: "5" } [external, default, align 4, dso_local]
+global .str : s8i[88] = ConstArray { ty: Array { element_type: Named("s8i"), size: 88 }, elts: Str("%s %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global __func__.main : s8i[5] = ConstArray { ty: Array { element_type: Named("s8i"), size: 5 }, elts: Str("main"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global slash_comment_value : s32i = CirInt { ty: Named("s32i"), value: "3" } [internal, default, align 4, dso_local]
 
 fn malloc(%arg0: u64i) -> void* [external, c, nothrow];
 fn free(%arg0: void*) -> void [external, c, nothrow];
@@ -25,34 +25,34 @@ fn c99_vm_sum(%arg39: s32i, %arg40: s32i*) -> s32i [internal, c, no_inline, dso_
         %516 = const 0 : s32i
         store %516, %515, align 4
         scope {
-            %519 = alloca s32i, "index", align 4
-            %520 = const 0 : s32i
-            store %520, %519, align 4
-            for cond: {
-                %530 = load %519 : s32i, align 4
-                %531 = load %512 : s32i, align 4
-                %532 = cmp lt %530, %531 : bool
-                condition %532
-            } step: {
-                %521 = load %519 : s32i, align 4
-                %522 = inc %521 : s32i [nsw]
-                store %522, %519, align 4
-                yield
-            } do {
-                scope {
-                    %523 = load %519 : s32i, align 4
-                    %524 = cast(integral) %523 : s64i
-                    %525 = load %513 : s32i*, align 8
-                    %526 = ptr_stride %525, %524 : s32i*
-                    %527 = load %526 : s32i, align 4
-                    %528 = load %515 : s32i, align 4
-                    %529 = add %528, %527 : s32i [nsw]
-                    store %529, %515, align 4
-                    yield
+                %519 = alloca s32i, "index", align 4
+                %520 = const 0 : s32i
+                store %520, %519, align 4
+                for cond {
+                        %530 = load %519 : s32i, align 4
+                        %531 = load %512 : s32i, align 4
+                        cmp
+                        condition %532
+                } step {
+                        %521 = load %519 : s32i, align 4
+                        inc
+                        store %522, %519, align 4
+                        yield
+                } body {
+                        scope {
+                                %523 = load %519 : s32i, align 4
+                                %524 = cast(integral) %523 : s64i
+                                %525 = load %513 : s32i*, align 8
+                                ptr_stride
+                                %527 = load %526 : s32i, align 4
+                                %528 = load %515 : s32i, align 4
+                                %529 = add %528, %527 : s32i [nsw]
+                                store %529, %515, align 4
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %517 = load %515 : s32i, align 4
         store %517, %514
@@ -221,7 +221,7 @@ fn c99_inline_square(%arg3: s32i) -> s32i [internal, c, no_inline, dso_local, no
         store %arg3, %399
         %401 = load %399 : s32i, align 4
         %402 = load %399 : s32i, align 4
-        %403 = mul %401, %402 : s32i [nsw]
+        mul
         store %403, %400
         %404 = load %400 : s32i
         return %404
@@ -233,16 +233,16 @@ fn c99_qualified_array_sum(%arg2: s32i*) -> s32i [internal, c, no_inline, dso_lo
         store %arg2, %382
         %384 = const 0 : s64i
         %385 = load %382 : s32i*, align 8
-        %386 = ptr_stride %385, %384 : s32i*
+        ptr_stride
         %387 = load %386 : s32i, align 4
         %388 = const 1 : s64i
         %389 = load %382 : s32i*, align 8
-        %390 = ptr_stride %389, %388 : s32i*
+        ptr_stride
         %391 = load %390 : s32i, align 4
         %392 = add %387, %391 : s32i [nsw]
         %393 = const 2 : s64i
         %394 = load %382 : s32i*, align 8
-        %395 = ptr_stride %394, %393 : s32i*
+        ptr_stride
         %396 = load %395 : s32i, align 4
         %397 = add %392, %396 : s32i [nsw]
         store %397, %383
@@ -266,483 +266,483 @@ fn c99_restrict_sum(%arg0: s32i*, %arg1: s32i*) -> s32i [internal, c, no_inline,
         return %381
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "α", align 4
-    %2 = alloca bool, "boolean_value", align 1
-    %3 = alloca s64i, "signed_long_long", align 8
-    %4 = alloca u64i, "unsigned_long_long", align 8
-    %5 = alloca complex<float>, "float_complex", align 4
-    %6 = alloca complex<double>, "double_complex", align 8
-    %7 = alloca complex<long_double<f80>>, "long_double_complex", align 16
-    %8 = alloca s32i, "enhanced_arithmetic", align 4
-    %9 = alloca s32i, "flexible_total", align 4
-    %10 = alloca rec_C99Flexible*, "flexible", align 8
-    %11 = alloca s32i, "length", align 4
-    %12 = alloca u8i*, "saved_stack", align 8
-    %13 = alloca s32i, "vm_total", align 4
-    %14 = alloca s32i, "initializer_seed", align 4
-    %15 = alloca rec_C99Pair, "nonconstant_initializer", align 4
-    %16 = alloca rec_C99Pair, "designated_initializer", align 4
-    %17 = alloca s32i[4], "designated_array", align 16
-    %18 = alloca s32i, "const_value", align 4
-    %19 = alloca s32i, "idempotent_const_value", align 4
-    %20 = alloca s32i, "volatile_value", align 4
-    %21 = alloca s32i, "idempotent_volatile_value", align 4
-    %22 = alloca s32i, "restricted_value", align 4
-    %23 = alloca s32i*, "restricted_pointer", align 8
-    %24 = alloca double, "hexadecimal_float", align 8
-    %25 = alloca rec_C99Pair, "compound_pair", align 4
-    %26 = alloca s32i, "compound_array_value", align 4
-    %27 = alloca s32i[2], ".compoundliteral", align 4
-    %28 = alloca s32i, "signed_quotient", align 4
-    %29 = alloca s32i, "signed_remainder", align 4
-    %30 = alloca s32i, "mixed_order", align 4
-    %31 = alloca s32i, "declaration_after_statement", align 4
-    %32 = alloca s32i, "for_total", align 4
-    %33 = alloca s32i[3], "qualified_values", align 4
-    %34 = alloca s32i, "macro_total", align 4
-    %35 = alloca s32i, "translation_limit_total", align 4
-    %36 = alloca s32i, "fenv_clear", align 4
-    %37 = alloca s32i, "fenv_flags", align 4
-    %38 = const 0 : s32i
-    store %38, %0
-    %39 = const 7 : s32i
-    store %39, %1, align 4
-    %40 = const 4 : s32i
-    %41 = cast(int_to_bool) %40 : bool
-    store %41, %2, align 1
-    %42 = const -9000000000 : s64i
-    store %42, %3, align 8
-    %43 = const 18000000000 : u64i
-    store %43, %4, align 8
-    %44 = const 1.000000e+00 : float
-    %45 = const 2.000000e+00 : float
-    %46 = const 0.000000e+00 : float
-    %47 = const 1.000000e+00 : float
-    %48 = fmul %45, %46 : float
-    %49 = fmul %45, %47 : float
-    %50 = fadd %44, %48 : float
-    %51 = complex.create %50, %49 : complex<float>
-    store %51, %5, align 4
-    %52 = const 3.000000e+00 : double
-    %53 = const 4.000000e+00 : double
-    %54 = const (0.000000e+00, 1.000000e+00) : complex<float>
-    %55 = complex.real %54 : float
-    %56 = complex.imag %54 : float
-    %57 = cast(floating) %55 : double
-    %58 = cast(floating) %56 : double
-    %59 = complex.create %57, %58 : complex<double>
-    %60 = complex.real %59 : double
-    %61 = complex.imag %59 : double
-    %62 = fmul %53, %60 : double
-    %63 = fmul %53, %61 : double
-    %64 = fadd %52, %62 : double
-    %65 = complex.create %64, %63 : complex<double>
-    store %65, %6, align 8
-    %66 = const 5.000000e+00 : long_double<f80>
-    %67 = const 6.000000e+00 : long_double<f80>
-    %68 = const (0.000000e+00, 1.000000e+00) : complex<float>
-    %69 = complex.real %68 : float
-    %70 = complex.imag %68 : float
-    %71 = cast(floating) %69 : long_double<f80>
-    %72 = cast(floating) %70 : long_double<f80>
-    %73 = complex.create %71, %72 : complex<long_double<f80>>
-    %74 = complex.real %73 : long_double<f80>
-    %75 = complex.imag %73 : long_double<f80>
-    %76 = fmul %67, %74 : long_double<f80>
-    %77 = fmul %67, %75 : long_double<f80>
-    %78 = fadd %66, %76 : long_double<f80>
-    %79 = complex.create %78, %77 : complex<long_double<f80>>
-    store %79, %7, align 16
-    %80 = load %2 : bool, align 1
-    %81 = cast(bool_to_int) %80 : s32i
-    %82 = load %3 : s64i, align 8
-    %83 = const -9000000000 : s64i
-    %84 = cmp eq %82, %83 : bool
-    %85 = cast(bool_to_int) %84 : s32i
-    %86 = add %81, %85 : s32i [nsw]
-    %87 = load %4 : u64i, align 8
-    %88 = const 18000000000 : u64i
-    %89 = cmp eq %87, %88 : bool
-    %90 = cast(bool_to_int) %89 : s32i
-    %91 = add %86, %90 : s32i [nsw]
-    %92 = load %5 : complex<float>, align 4
-    %93 = const 1.000000e+00 : float
-    %94 = const 2.000000e+00 : float
-    %95 = const 0.000000e+00 : float
-    %96 = const 1.000000e+00 : float
-    %97 = fmul %94, %95 : float
-    %98 = fmul %94, %96 : float
-    %99 = fadd %93, %97 : float
-    %100 = complex.create %99, %98 : complex<float>
-    %101 = cmp eq %92, %100 : bool
-    %102 = cast(bool_to_int) %101 : s32i
-    %103 = add %91, %102 : s32i [nsw]
-    %104 = load %6 : complex<double>, align 8
-    %105 = const 3.000000e+00 : double
-    %106 = const 4.000000e+00 : double
-    %107 = const (0.000000e+00, 1.000000e+00) : complex<float>
-    %108 = complex.real %107 : float
-    %109 = complex.imag %107 : float
-    %110 = cast(floating) %108 : double
-    %111 = cast(floating) %109 : double
-    %112 = complex.create %110, %111 : complex<double>
-    %113 = complex.real %112 : double
-    %114 = complex.imag %112 : double
-    %115 = fmul %106, %113 : double
-    %116 = fmul %106, %114 : double
-    %117 = fadd %105, %115 : double
-    %118 = complex.create %117, %116 : complex<double>
-    %119 = cmp eq %104, %118 : bool
-    %120 = cast(bool_to_int) %119 : s32i
-    %121 = add %103, %120 : s32i [nsw]
-    %122 = load %7 : complex<long_double<f80>>, align 16
-    %123 = const 5.000000e+00 : long_double<f80>
-    %124 = const 6.000000e+00 : long_double<f80>
-    %125 = const (0.000000e+00, 1.000000e+00) : complex<float>
-    %126 = complex.real %125 : float
-    %127 = complex.imag %125 : float
-    %128 = cast(floating) %126 : long_double<f80>
-    %129 = cast(floating) %127 : long_double<f80>
-    %130 = complex.create %128, %129 : complex<long_double<f80>>
-    %131 = complex.real %130 : long_double<f80>
-    %132 = complex.imag %130 : long_double<f80>
-    %133 = fmul %124, %131 : long_double<f80>
-    %134 = fmul %124, %132 : long_double<f80>
-    %135 = fadd %123, %133 : long_double<f80>
-    %136 = complex.create %135, %134 : complex<long_double<f80>>
-    %137 = cmp eq %122, %136 : bool
-    %138 = cast(bool_to_int) %137 : s32i
-    %139 = add %121, %138 : s32i [nsw]
-    store %139, %8, align 4
-    %140 = const 0 : s32i
-    store %140, %9, align 4
-    %141 = get_global @malloc : ((u64i) -> void*)*
-    %142 = const 8 : u64i
-    %143 = const 3 : u64i
-    %144 = const 4 : u64i
-    %145 = mul %143, %144 : u64i
-    %146 = add %142, %145 : u64i
-    %147 = call @malloc(%146) : void* [all]
-    %148 = cast(bitcast) %147 : rec_C99Flexible*
-    store %148, %10, align 8
-    scope {
-        %367 = load %10 : rec_C99Flexible*, align 8
-        %368 = const #cir.ptr<null> : void*
-        %369 = cast(bitcast) %368 : rec_C99Flexible*
-        %370 = cmp eq %367, %369 : bool
-        if %370 {
-            %371 = const 2 : s32i
-            store %371, %0
-            %372 = load %0 : s32i
-            return %372
-        }
-        yield
-    }
-    %149 = const 3 : u64i
-    %150 = load %10 : rec_C99Flexible*, align 8
-    %151 = get_member %150[0] "count" : u64i*
-    store %149, %151, align 8
-    scope {
-        %343 = alloca u64i, "index", align 8
-        %344 = const 0 : u64i
-        store %344, %343, align 8
-        for cond: {
-            %362 = load %343 : u64i, align 8
-            %363 = load %10 : rec_C99Flexible*, align 8
-            %364 = get_member %363[0] "count" : u64i*
-            %365 = load %364 : u64i, align 8
-            %366 = cmp lt %362, %365 : bool
-            condition %366
-        } step: {
-            %345 = load %343 : u64i, align 8
-            %346 = inc %345 : u64i
-            store %346, %343, align 8
-            yield
-        } do {
-            scope {
-                %347 = load %343 : u64i, align 8
-                %348 = cast(integral) %347 : s32i
-                %349 = const 1 : s32i
-                %350 = add %348, %349 : s32i [nsw]
-                %351 = load %343 : u64i, align 8
-                %352 = load %10 : rec_C99Flexible*, align 8
-                %353 = get_member %352[1] "values" : s32i[0]*
-                %354 = get_element %353[%351] : s32i*
-                store %350, %354, align 4
-                %355 = load %343 : u64i, align 8
-                %356 = load %10 : rec_C99Flexible*, align 8
-                %357 = get_member %356[1] "values" : s32i[0]*
-                %358 = get_element %357[%355] : s32i*
-                %359 = load %358 : s32i, align 4
-                %360 = load %9 : s32i, align 4
-                %361 = add %360, %359 : s32i [nsw]
-                store %361, %9, align 4
-                yield
-            }
-            yield
-        }
-        yield
-    }
-    %152 = get_global @free : ((void*) -> void)*
-    %153 = load %10 : rec_C99Flexible*, align 8
-    %154 = cast(bitcast) %153 : void*
-    call @free(%154) [all]
-    %155 = const 3 : s32i
-    store %155, %11, align 4
-    %156 = load %11 : s32i, align 4
-    %157 = cast(integral) %156 : u64i
-    %158 = stacksave : u8i*
-    store %158, %12, align 8
-    cleanup.scope {
-        %161 = alloca s32i, "variable_length_array", align 16, dynamic %157
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "α", align 4
+        %2 = alloca bool, "boolean_value", align 1
+        %3 = alloca s64i, "signed_long_long", align 8
+        %4 = alloca u64i, "unsigned_long_long", align 8
+        %5 = alloca complex<float>, "float_complex", align 4
+        %6 = alloca complex<double>, "double_complex", align 8
+        %7 = alloca complex<long_double<f80>>, "long_double_complex", align 16
+        %8 = alloca s32i, "enhanced_arithmetic", align 4
+        %9 = alloca s32i, "flexible_total", align 4
+        %10 = alloca rec_C99Flexible*, "flexible", align 8
+        %11 = alloca s32i, "length", align 4
+        %12 = alloca u8i*, "saved_stack", align 8
+        %13 = alloca s32i, "vm_total", align 4
+        %14 = alloca s32i, "initializer_seed", align 4
+        %15 = alloca rec_C99Pair, "nonconstant_initializer", align 4
+        %16 = alloca rec_C99Pair, "designated_initializer", align 4
+        %17 = alloca s32i[4], "designated_array", align 16
+        %18 = alloca s32i, "const_value", align 4
+        %19 = alloca s32i, "idempotent_const_value", align 4
+        %20 = alloca s32i, "volatile_value", align 4
+        %21 = alloca s32i, "idempotent_volatile_value", align 4
+        %22 = alloca s32i, "restricted_value", align 4
+        %23 = alloca s32i*, "restricted_pointer", align 8
+        %24 = alloca double, "hexadecimal_float", align 8
+        %25 = alloca rec_C99Pair, "compound_pair", align 4
+        %26 = alloca s32i, "compound_array_value", align 4
+        %27 = alloca s32i[2], ".compoundliteral", align 4
+        %28 = alloca s32i, "signed_quotient", align 4
+        %29 = alloca s32i, "signed_remainder", align 4
+        %30 = alloca s32i, "mixed_order", align 4
+        %31 = alloca s32i, "declaration_after_statement", align 4
+        %32 = alloca s32i, "for_total", align 4
+        %33 = alloca s32i[3], "qualified_values", align 4
+        %34 = alloca s32i, "macro_total", align 4
+        %35 = alloca s32i, "translation_limit_total", align 4
+        %36 = alloca s32i, "fenv_clear", align 4
+        %37 = alloca s32i, "fenv_flags", align 4
+        %38 = const 0 : s32i
+        store %38, %0
+        %39 = const 7 : s32i
+        store %39, %1, align 4
+        %40 = const 4 : s32i
+        %41 = cast(int_to_bool) %40 : bool
+        store %41, %2, align 1
+        %42 = const -9000000000 : s64i
+        store %42, %3, align 8
+        %43 = const 18000000000 : u64i
+        store %43, %4, align 8
+        %44 = const 1.000000e+00 : float
+        %45 = const 2.000000e+00 : float
+        %46 = const 0.000000e+00 : float
+        %47 = const 1.000000e+00 : float
+        fmul
+        fmul
+        fadd
+        complex.create
+        store %51, %5, align 4
+        %52 = const 3.000000e+00 : double
+        %53 = const 4.000000e+00 : double
+        %54 = const (0.000000e+00, 1.000000e+00) : complex<float>
+        complex.real
+        complex.imag
+        %57 = cast(floating) %55 : double
+        %58 = cast(floating) %56 : double
+        complex.create
+        complex.real
+        complex.imag
+        fmul
+        fmul
+        fadd
+        complex.create
+        store %65, %6, align 8
+        %66 = const 5.000000e+00 : long_double<f80>
+        %67 = const 6.000000e+00 : long_double<f80>
+        %68 = const (0.000000e+00, 1.000000e+00) : complex<float>
+        complex.real
+        complex.imag
+        %71 = cast(floating) %69 : long_double<f80>
+        %72 = cast(floating) %70 : long_double<f80>
+        complex.create
+        complex.real
+        complex.imag
+        fmul
+        fmul
+        fadd
+        complex.create
+        store %79, %7, align 16
+        %80 = load %2 : bool, align 1
+        %81 = cast(bool_to_int) %80 : s32i
+        %82 = load %3 : s64i, align 8
+        %83 = const -9000000000 : s64i
+        cmp
+        %85 = cast(bool_to_int) %84 : s32i
+        %86 = add %81, %85 : s32i [nsw]
+        %87 = load %4 : u64i, align 8
+        %88 = const 18000000000 : u64i
+        cmp
+        %90 = cast(bool_to_int) %89 : s32i
+        %91 = add %86, %90 : s32i [nsw]
+        %92 = load %5 : complex<float>, align 4
+        %93 = const 1.000000e+00 : float
+        %94 = const 2.000000e+00 : float
+        %95 = const 0.000000e+00 : float
+        %96 = const 1.000000e+00 : float
+        fmul
+        fmul
+        fadd
+        complex.create
+        cmp
+        %102 = cast(bool_to_int) %101 : s32i
+        %103 = add %91, %102 : s32i [nsw]
+        %104 = load %6 : complex<double>, align 8
+        %105 = const 3.000000e+00 : double
+        %106 = const 4.000000e+00 : double
+        %107 = const (0.000000e+00, 1.000000e+00) : complex<float>
+        complex.real
+        complex.imag
+        %110 = cast(floating) %108 : double
+        %111 = cast(floating) %109 : double
+        complex.create
+        complex.real
+        complex.imag
+        fmul
+        fmul
+        fadd
+        complex.create
+        cmp
+        %120 = cast(bool_to_int) %119 : s32i
+        %121 = add %103, %120 : s32i [nsw]
+        %122 = load %7 : complex<long_double<f80>>, align 16
+        %123 = const 5.000000e+00 : long_double<f80>
+        %124 = const 6.000000e+00 : long_double<f80>
+        %125 = const (0.000000e+00, 1.000000e+00) : complex<float>
+        complex.real
+        complex.imag
+        %128 = cast(floating) %126 : long_double<f80>
+        %129 = cast(floating) %127 : long_double<f80>
+        complex.create
+        complex.real
+        complex.imag
+        fmul
+        fmul
+        fadd
+        complex.create
+        cmp
+        %138 = cast(bool_to_int) %137 : s32i
+        %139 = add %121, %138 : s32i [nsw]
+        store %139, %8, align 4
+        %140 = const 0 : s32i
+        store %140, %9, align 4
+        %141 = get_global @malloc : (u64i) -> void**
+        %142 = const 8 : u64i
+        %143 = const 3 : u64i
+        %144 = const 4 : u64i
+        mul
+        %146 = add %142, %145 : u64i
+        %147 = call @malloc(%146) : void* [all]
+        %148 = cast(bitcast) %147 : rec_C99Flexible*
+        store %148, %10, align 8
         scope {
-            %330 = alloca s32i, "index", align 4
-            %331 = const 0 : s32i
-            store %331, %330, align 4
-            for cond: {
-                %340 = load %330 : s32i, align 4
-                %341 = load %11 : s32i, align 4
-                %342 = cmp lt %340, %341 : bool
-                condition %342
-            } step: {
-                %332 = load %330 : s32i, align 4
-                %333 = inc %332 : s32i [nsw]
-                store %333, %330, align 4
-                yield
-            } do {
-                scope {
-                    %334 = load %330 : s32i, align 4
-                    %335 = const 4 : s32i
-                    %336 = add %334, %335 : s32i [nsw]
-                    %337 = load %330 : s32i, align 4
-                    %338 = cast(integral) %337 : s64i
-                    %339 = ptr_stride %161, %338 : s32i*
-                    store %336, %339, align 4
-                    yield
+                %367 = load %10 : rec_C99Flexible*, align 8
+                %368 = const #cir.ptr<null> : void*
+                %369 = cast(bitcast) %368 : rec_C99Flexible*
+                cmp
+                if %370 {
+                        %371 = const 2 : s32i
+                        store %371, %0
+                        %372 = load %0 : s32i
+                        return %372
                 }
                 yield
-            }
-            yield
         }
-        %162 = load %11 : s32i, align 4
-        %163 = call @c99_vm_sum(%162, %161) : s32i [all]
-        store %163, %13, align 4
-        %164 = const 19 : s32i
-        store %164, %14, align 4
-        %165 = get_member %15[0] "first" : s32i*
-        %166 = load %14 : s32i, align 4
-        store %166, %165, align 4
-        %167 = get_member %15[1] "second" : s32i*
-        %168 = load %14 : s32i, align 4
-        %169 = const 1 : s32i
-        %170 = add %168, %169 : s32i [nsw]
-        store %170, %167, align 4
-        %171 = get_global @__const.main.designated_initializer : rec_C99Pair*
-        copy %16, %171
-        %172 = get_global @__const.main.designated_array : s32i[4]*
-        copy %17, %172
-        %173 = const 31 : s32i
-        store %173, %18, align 4
-        %174 = load %18 : s32i, align 4
-        store %174, %19, align 4
-        %175 = const 37 : s32i
-        store %175, %20, align 4, volatile
-        %176 = load %20 : s32i, align 4, volatile
-        store %176, %21, align 4, volatile
-        %177 = const 41 : s32i
-        store %177, %22, align 4
-        store %22, %23, align 8
-        %178 = const 3.000000e+00 : double
-        store %178, %24, align 8
-        %179 = get_global @__const.main.compound_pair : rec_C99Pair*
-        copy %25, %179
-        %180 = const 1 : s64i
-        %181 = cast(array_to_ptrdecay) %27 : s32i*
-        %182 = const 51 : s32i
-        store %182, %181, align 4
-        %183 = const 1 : s64i
-        %184 = ptr_stride %181, %183 : s32i*
-        %185 = const 53 : s32i
-        store %185, %184, align 4
-        %186 = get_element %27[%180] : s32i*
-        %187 = load %186 : s32i, align 4
-        store %187, %26, align 4
-        %188 = const -7 : s32i
-        %189 = const 3 : s32i
-        %190 = div %188, %189 : s32i
-        store %190, %28, align 4
-        %191 = const -7 : s32i
-        %192 = const 3 : s32i
-        %193 = rem %191, %192 : s32i
-        store %193, %29, align 4
-        %194 = const 59 : s32i
-        store %194, %30, align 4
-        %195 = const 2 : s32i
-        %196 = load %30 : s32i, align 4
-        %197 = add %196, %195 : s32i [nsw]
-        store %197, %30, align 4
-        %198 = const 61 : s32i
-        store %198, %31, align 4
-        %199 = const 0 : s32i
-        store %199, %32, align 4
+        %149 = const 3 : u64i
+        %150 = load %10 : rec_C99Flexible*, align 8
+        get_member
+        store %149, %151, align 8
         scope {
-            %320 = alloca s32i, "index", align 4
-            %321 = const 0 : s32i
-            store %321, %320, align 4
-            for cond: {
-                %327 = load %320 : s32i, align 4
-                %328 = const 3 : s32i
-                %329 = cmp lt %327, %328 : bool
-                condition %329
-            } step: {
-                %322 = load %320 : s32i, align 4
-                %323 = inc %322 : s32i [nsw]
-                store %323, %320, align 4
-                yield
-            } do {
-                scope {
-                    %324 = load %320 : s32i, align 4
-                    %325 = load %32 : s32i, align 4
-                    %326 = add %325, %324 : s32i [nsw]
-                    store %326, %32, align 4
-                    yield
+                %343 = alloca u64i, "index", align 8
+                %344 = const 0 : u64i
+                store %344, %343, align 8
+                for cond {
+                        %362 = load %343 : u64i, align 8
+                        %363 = load %10 : rec_C99Flexible*, align 8
+                        get_member
+                        %365 = load %364 : u64i, align 8
+                        cmp
+                        condition %366
+                } step {
+                        %345 = load %343 : u64i, align 8
+                        inc
+                        store %346, %343, align 8
+                        yield
+                } body {
+                        scope {
+                                %347 = load %343 : u64i, align 8
+                                %348 = cast(integral) %347 : s32i
+                                %349 = const 1 : s32i
+                                %350 = add %348, %349 : s32i [nsw]
+                                %351 = load %343 : u64i, align 8
+                                %352 = load %10 : rec_C99Flexible*, align 8
+                                get_member
+                                get_element
+                                store %350, %354, align 4
+                                %355 = load %343 : u64i, align 8
+                                %356 = load %10 : rec_C99Flexible*, align 8
+                                get_member
+                                get_element
+                                %359 = load %358 : s32i, align 4
+                                %360 = load %9 : s32i, align 4
+                                %361 = add %360, %359 : s32i [nsw]
+                                store %361, %9, align 4
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        %200 = get_global @__const.main.qualified_values : s32i[3]*
-        copy %33, %200
-        %201 = const 7 : s32i
-        %202 = const 11 : s32i
-        %203 = const 13 : s32i
-        %204 = call @sum3(%201, %202, %203) : s32i [all]
-        store %204, %34, align 4
-        %205 = const 1 : s32i
-        %206 = const 1 : s32i
-        %207 = const 1 : s32i
-        %208 = const 1 : s32i
-        %209 = const 1 : s32i
-        %210 = const 1 : s32i
-        %211 = const 1 : s32i
-        %212 = const 1 : s32i
-        %213 = const 1 : s32i
-        %214 = const 1 : s32i
-        %215 = const 1 : s32i
-        %216 = const 1 : s32i
-        %217 = const 1 : s32i
-        %218 = const 1 : s32i
-        %219 = const 1 : s32i
-        %220 = const 1 : s32i
-        %221 = const 1 : s32i
-        %222 = const 1 : s32i
-        %223 = const 1 : s32i
-        %224 = const 1 : s32i
-        %225 = const 1 : s32i
-        %226 = const 1 : s32i
-        %227 = const 1 : s32i
-        %228 = const 1 : s32i
-        %229 = const 1 : s32i
-        %230 = const 1 : s32i
-        %231 = const 1 : s32i
-        %232 = const 1 : s32i
-        %233 = const 1 : s32i
-        %234 = const 1 : s32i
-        %235 = const 1 : s32i
-        %236 = const 1 : s32i
-        %237 = call @c99_thirty_two_parameters(%205, %206, %207, %208, %209, %210, %211, %212, %213, %214, %215, %216, %217, %218, %219, %220, %221, %222, %223, %224, %225, %226, %227, %228, %229, %230, %231, %232, %233, %234, %235, %236) : s32i [all]
-        store %237, %35, align 4
-        %238 = const 32 : s32i
-        %239 = const 4 : s32i
-        %240 = or %238, %239 : s32i
-        %241 = const 16 : s32i
-        %242 = or %240, %241 : s32i
-        %243 = const 8 : s32i
-        %244 = or %242, %243 : s32i
-        %245 = const 1 : s32i
-        %246 = or %244, %245 : s32i
-        %247 = call @feclearexcept(%246) : s32i [all]
-        store %247, %36, align 4
-        %248 = const 32 : s32i
-        %249 = const 4 : s32i
-        %250 = or %248, %249 : s32i
-        %251 = const 16 : s32i
-        %252 = or %250, %251 : s32i
-        %253 = const 8 : s32i
-        %254 = or %252, %253 : s32i
-        %255 = const 1 : s32i
-        %256 = or %254, %255 : s32i
-        %257 = call @fetestexcept(%256) : s32i [all]
-        store %257, %37, align 4
-        %258 = get_global @printf : ((s8i*, ...) -> s32i)*
-        %259 = get_global @.str : s8i[88]*
-        %260 = cast(array_to_ptrdecay) %259 : s8i*
-        %261 = get_global @__func__.main : s8i[5]*
-        %262 = cast(array_to_ptrdecay) %261 : s8i*
-        %263 = load %1 : s32i, align 4
-        %264 = get_global @c99_external_identifier_with_more_than_thirty_one_significant_characters : s32i*
-        %265 = load %264 : s32i, align 4
-        %266 = get_global @slash_comment_value : s32i*
-        %267 = load %266 : s32i, align 4
-        %268 = load %8 : s32i, align 4
-        %269 = load %9 : s32i, align 4
-        %270 = load %13 : s32i, align 4
-        %271 = get_member %15[0] "first" : s32i*
-        %272 = load %271 : s32i, align 4
-        %273 = get_member %15[1] "second" : s32i*
-        %274 = load %273 : s32i, align 4
-        %275 = add %272, %274 : s32i [nsw]
-        %276 = get_member %16[0] "first" : s32i*
-        %277 = load %276 : s32i, align 4
-        %278 = get_member %16[1] "second" : s32i*
-        %279 = load %278 : s32i, align 4
-        %280 = add %277, %279 : s32i [nsw]
-        %281 = const 0 : s64i
-        %282 = get_element %17[%281] : s32i*
-        %283 = load %282 : s32i, align 16
-        %284 = const 2 : s64i
-        %285 = get_element %17[%284] : s32i*
-        %286 = load %285 : s32i, align 8
-        %287 = add %283, %286 : s32i [nsw]
-        %288 = load %19 : s32i, align 4
-        %289 = load %21 : s32i, align 4, volatile
-        %290 = load %23 : s32i*, align 8
-        %291 = load %290 : s32i, align 4
-        %292 = load %24 : double, align 8
-        %293 = cast(float_to_int) %292 : s32i
-        %294 = get_member %25[0] "first" : s32i*
-        %295 = load %294 : s32i, align 4
-        %296 = get_member %25[1] "second" : s32i*
-        %297 = load %296 : s32i, align 4
-        %298 = add %295, %297 : s32i [nsw]
-        %299 = load %26 : s32i, align 4
-        %300 = load %28 : s32i, align 4
-        %301 = load %29 : s32i, align 4
-        %302 = load %30 : s32i, align 4
-        %303 = load %31 : s32i, align 4
-        %304 = load %32 : s32i, align 4
-        %305 = const 8 : s32i
-        %306 = call @c99_inline_square(%305) : s32i [all]
-        %307 = cast(array_to_ptrdecay) %33 : s32i*
-        %308 = call @c99_qualified_array_sum(%307) : s32i [all]
-        %309 = load %34 : s32i, align 4
-        %310 = load %35 : s32i, align 4
-        %311 = const 17 : s32i
-        %312 = load %36 : s32i, align 4
-        %313 = load %37 : s32i, align 4
-        %314 = const 0 : s64i
-        %315 = get_element %33[%314] : s32i*
-        %316 = const 1 : s64i
-        %317 = get_element %33[%316] : s32i*
-        %318 = call @c99_restrict_sum(%315, %317) : s32i [all]
-        %319 = call @printf(%260, %262, %263, %265, %267, %268, %269, %270, %275, %280, %287, %288, %289, %291, %293, %298, %299, %300, %301, %302, %303, %304, %306, %308, %309, %310, %311, %312, %313, %318) : s32i [all]
-        yield
-    } cleanup normal {
-        %160 = load %12 : u8i*, align 8
-        stackrestore %160
-        yield
-    }
-    %159 = load %0 : s32i
-    return %159
+        %152 = get_global @free : (void*) -> void*
+        %153 = load %10 : rec_C99Flexible*, align 8
+        %154 = cast(bitcast) %153 : void*
+        call @free(%154) [all]
+        %155 = const 3 : s32i
+        store %155, %11, align 4
+        %156 = load %11 : s32i, align 4
+        %157 = cast(integral) %156 : u64i
+        stacksave
+        store %158, %12, align 8
+        cleanup.scope {
+                %161 = alloca s32i, "variable_length_array", size(%157), align 16
+                scope {
+                        %330 = alloca s32i, "index", align 4
+                        %331 = const 0 : s32i
+                        store %331, %330, align 4
+                        for cond {
+                                %340 = load %330 : s32i, align 4
+                                %341 = load %11 : s32i, align 4
+                                cmp
+                                condition %342
+                        } step {
+                                %332 = load %330 : s32i, align 4
+                                inc
+                                store %333, %330, align 4
+                                yield
+                        } body {
+                                scope {
+                                        %334 = load %330 : s32i, align 4
+                                        %335 = const 4 : s32i
+                                        %336 = add %334, %335 : s32i [nsw]
+                                        %337 = load %330 : s32i, align 4
+                                        %338 = cast(integral) %337 : s64i
+                                        ptr_stride
+                                        store %336, %339, align 4
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
+                }
+                %162 = load %11 : s32i, align 4
+                %163 = call @c99_vm_sum(%162, %161) : s32i [all]
+                store %163, %13, align 4
+                %164 = const 19 : s32i
+                store %164, %14, align 4
+                get_member
+                %166 = load %14 : s32i, align 4
+                store %166, %165, align 4
+                get_member
+                %168 = load %14 : s32i, align 4
+                %169 = const 1 : s32i
+                %170 = add %168, %169 : s32i [nsw]
+                store %170, %167, align 4
+                %171 = get_global @__const.main.designated_initializer : rec_C99Pair*
+                copy
+                %172 = get_global @__const.main.designated_array : s32i[4]*
+                copy
+                %173 = const 31 : s32i
+                store %173, %18, align 4
+                %174 = load %18 : s32i, align 4
+                store %174, %19, align 4
+                %175 = const 37 : s32i
+                store %175, %20, align 4
+                %176 = load %20 : s32i, align 4
+                store %176, %21, align 4
+                %177 = const 41 : s32i
+                store %177, %22, align 4
+                store %22, %23, align 8
+                %178 = const 3.000000e+00 : double
+                store %178, %24, align 8
+                %179 = get_global @__const.main.compound_pair : rec_C99Pair*
+                copy
+                %180 = const 1 : s64i
+                %181 = cast(array_to_ptrdecay) %27 : s32i*
+                %182 = const 51 : s32i
+                store %182, %181, align 4
+                %183 = const 1 : s64i
+                ptr_stride
+                %185 = const 53 : s32i
+                store %185, %184, align 4
+                get_element
+                %187 = load %186 : s32i, align 4
+                store %187, %26, align 4
+                %188 = const -7 : s32i
+                %189 = const 3 : s32i
+                div
+                store %190, %28, align 4
+                %191 = const -7 : s32i
+                %192 = const 3 : s32i
+                rem
+                store %193, %29, align 4
+                %194 = const 59 : s32i
+                store %194, %30, align 4
+                %195 = const 2 : s32i
+                %196 = load %30 : s32i, align 4
+                %197 = add %196, %195 : s32i [nsw]
+                store %197, %30, align 4
+                %198 = const 61 : s32i
+                store %198, %31, align 4
+                %199 = const 0 : s32i
+                store %199, %32, align 4
+                scope {
+                        %320 = alloca s32i, "index", align 4
+                        %321 = const 0 : s32i
+                        store %321, %320, align 4
+                        for cond {
+                                %327 = load %320 : s32i, align 4
+                                %328 = const 3 : s32i
+                                cmp
+                                condition %329
+                        } step {
+                                %322 = load %320 : s32i, align 4
+                                inc
+                                store %323, %320, align 4
+                                yield
+                        } body {
+                                scope {
+                                        %324 = load %320 : s32i, align 4
+                                        %325 = load %32 : s32i, align 4
+                                        %326 = add %325, %324 : s32i [nsw]
+                                        store %326, %32, align 4
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
+                }
+                %200 = get_global @__const.main.qualified_values : s32i[3]*
+                copy
+                %201 = const 7 : s32i
+                %202 = const 11 : s32i
+                %203 = const 13 : s32i
+                %204 = call @sum3(%201, %202, %203) : s32i [all]
+                store %204, %34, align 4
+                %205 = const 1 : s32i
+                %206 = const 1 : s32i
+                %207 = const 1 : s32i
+                %208 = const 1 : s32i
+                %209 = const 1 : s32i
+                %210 = const 1 : s32i
+                %211 = const 1 : s32i
+                %212 = const 1 : s32i
+                %213 = const 1 : s32i
+                %214 = const 1 : s32i
+                %215 = const 1 : s32i
+                %216 = const 1 : s32i
+                %217 = const 1 : s32i
+                %218 = const 1 : s32i
+                %219 = const 1 : s32i
+                %220 = const 1 : s32i
+                %221 = const 1 : s32i
+                %222 = const 1 : s32i
+                %223 = const 1 : s32i
+                %224 = const 1 : s32i
+                %225 = const 1 : s32i
+                %226 = const 1 : s32i
+                %227 = const 1 : s32i
+                %228 = const 1 : s32i
+                %229 = const 1 : s32i
+                %230 = const 1 : s32i
+                %231 = const 1 : s32i
+                %232 = const 1 : s32i
+                %233 = const 1 : s32i
+                %234 = const 1 : s32i
+                %235 = const 1 : s32i
+                %236 = const 1 : s32i
+                %237 = call @c99_thirty_two_parameters(%205, %206, %207, %208, %209, %210, %211, %212, %213, %214, %215, %216, %217, %218, %219, %220, %221, %222, %223, %224, %225, %226, %227, %228, %229, %230, %231, %232, %233, %234, %235, %236) : s32i [all]
+                store %237, %35, align 4
+                %238 = const 32 : s32i
+                %239 = const 4 : s32i
+                or
+                %241 = const 16 : s32i
+                or
+                %243 = const 8 : s32i
+                or
+                %245 = const 1 : s32i
+                or
+                %247 = call @feclearexcept(%246) : s32i [all]
+                store %247, %36, align 4
+                %248 = const 32 : s32i
+                %249 = const 4 : s32i
+                or
+                %251 = const 16 : s32i
+                or
+                %253 = const 8 : s32i
+                or
+                %255 = const 1 : s32i
+                or
+                %257 = call @fetestexcept(%256) : s32i [all]
+                store %257, %37, align 4
+                %258 = get_global @printf : (s8i*, ...) -> s32i*
+                %259 = get_global @.str : s8i[88]*
+                %260 = cast(array_to_ptrdecay) %259 : s8i*
+                %261 = get_global @__func__.main : s8i[5]*
+                %262 = cast(array_to_ptrdecay) %261 : s8i*
+                %263 = load %1 : s32i, align 4
+                %264 = get_global @c99_external_identifier_with_more_than_thirty_one_significant_characters : s32i*
+                %265 = load %264 : s32i, align 4
+                %266 = get_global @slash_comment_value : s32i*
+                %267 = load %266 : s32i, align 4
+                %268 = load %8 : s32i, align 4
+                %269 = load %9 : s32i, align 4
+                %270 = load %13 : s32i, align 4
+                get_member
+                %272 = load %271 : s32i, align 4
+                get_member
+                %274 = load %273 : s32i, align 4
+                %275 = add %272, %274 : s32i [nsw]
+                get_member
+                %277 = load %276 : s32i, align 4
+                get_member
+                %279 = load %278 : s32i, align 4
+                %280 = add %277, %279 : s32i [nsw]
+                %281 = const 0 : s64i
+                get_element
+                %283 = load %282 : s32i, align 16
+                %284 = const 2 : s64i
+                get_element
+                %286 = load %285 : s32i, align 8
+                %287 = add %283, %286 : s32i [nsw]
+                %288 = load %19 : s32i, align 4
+                %289 = load %21 : s32i, align 4
+                %290 = load %23 : s32i*, align 8
+                %291 = load %290 : s32i, align 4
+                %292 = load %24 : double, align 8
+                %293 = cast(float_to_int) %292 : s32i
+                get_member
+                %295 = load %294 : s32i, align 4
+                get_member
+                %297 = load %296 : s32i, align 4
+                %298 = add %295, %297 : s32i [nsw]
+                %299 = load %26 : s32i, align 4
+                %300 = load %28 : s32i, align 4
+                %301 = load %29 : s32i, align 4
+                %302 = load %30 : s32i, align 4
+                %303 = load %31 : s32i, align 4
+                %304 = load %32 : s32i, align 4
+                %305 = const 8 : s32i
+                %306 = call @c99_inline_square(%305) : s32i [all]
+                %307 = cast(array_to_ptrdecay) %33 : s32i*
+                %308 = call @c99_qualified_array_sum(%307) : s32i [all]
+                %309 = load %34 : s32i, align 4
+                %310 = load %35 : s32i, align 4
+                %311 = const 17 : s32i
+                %312 = load %36 : s32i, align 4
+                %313 = load %37 : s32i, align 4
+                %314 = const 0 : s64i
+                get_element
+                %316 = const 1 : s64i
+                get_element
+                %318 = call @c99_restrict_sum(%315, %317) : s32i [all]
+                %319 = call @printf(%260, %262, %263, %265, %267, %268, %269, %270, %275, %280, %287, %288, %289, %291, %293, %298, %299, %300, %301, %302, %303, %304, %306, %308, %309, %310, %311, %312, %313, %318) : s32i [all]
+                yield
+        } cleanup normal {
+                %160 = load %12 : u8i*, align 8
+                stackrestore
+                yield
+        }
+        %159 = load %0 : s32i
+        return %159
 }

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/loop-2e.c" (c, x86_64-unknown-linux-gnu)
@@ -11,120 +11,120 @@ fn f(%arg0: s32i*, %arg1: s32i**) -> void [external, c, no_inline, dso_local, no
         store %arg0, %41
         store %arg1, %42
         scope {
-            %44 = const 0 : s32i
-            store %44, %43, align 4
-            for cond: {
-                %54 = load %43 : s32i, align 4
-                %55 = const 40 : s32i
-                %56 = cmp lt %54, %55 : bool
-                condition %56
-            } step: {
-                %45 = load %43 : s32i, align 4
-                %46 = inc %45 : s32i [nsw]
-                store %46, %43, align 4
-                yield
-            } do {
-                scope {
-                    %47 = load %43 : s32i, align 4
-                    %48 = cast(integral) %47 : s64i
-                    %49 = load %41 : s32i*, align 8
-                    %50 = ptr_stride %49, %48 : s32i*
-                    %51 = load %42 : s32i**, align 8
-                    %52 = const 1 : s32i
-                    %53 = ptr_stride %51, %52 : s32i**
-                    store %53, %42, align 8
-                    store %50, %51, align 8
-                    yield
+                %44 = const 0 : s32i
+                store %44, %43, align 4
+                for cond {
+                        %54 = load %43 : s32i, align 4
+                        %55 = const 40 : s32i
+                        cmp
+                        condition %56
+                } step {
+                        %45 = load %43 : s32i, align 4
+                        inc
+                        store %46, %43, align 4
+                        yield
+                } body {
+                        scope {
+                                %47 = load %43 : s32i, align 4
+                                %48 = cast(integral) %47 : s64i
+                                %49 = load %41 : s32i*, align 8
+                                ptr_stride
+                                %51 = load %42 : s32i**, align 8
+                                %52 = const 1 : s32i
+                                ptr_stride
+                                store %53, %42, align 8
+                                store %50, %51, align 8
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca void*, "p", align 8
-    %2 = alloca s32i*[40], "q", align 16
-    %3 = alloca u64i, "start", align 8
-    %4 = const 0 : s32i
-    store %4, %0
-    scope {
-        %27 = const 8 : u64i
-        %28 = const 4 : u64i
-        %29 = cmp eq %27, %28 : bool
-        if %29 {
-            %40 = const 2147483647 : u64i
-            store %40, %3, align 8
-            yield
-        } else {
-            scope {
-                %30 = const 8 : u64i
-                %31 = const 8 : u64i
-                %32 = cmp eq %30, %31 : bool
-                if %32 {
-                    %39 = const 9223372036854775807 : u64i
-                    store %39, %3, align 8
-                    yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca void*, "p", align 8
+        %2 = alloca s32i*[40], "q", align 16
+        %3 = alloca u64i, "start", align 8
+        %4 = const 0 : s32i
+        store %4, %0
+        scope {
+                %27 = const 8 : u64i
+                %28 = const 4 : u64i
+                cmp
+                if %29 {
+                        %40 = const 2147483647 : u64i
+                        store %40, %3, align 8
+                        yield
                 } else {
-                    scope {
-                        %33 = const 8 : u64i
-                        %34 = const 8 : u64i
-                        %35 = cmp eq %33, %34 : bool
-                        if %35 {
-                            %38 = const 9223372036854775807 : u64i
-                            store %38, %3, align 8
-                            yield
-                        } else {
-                            %36 = const 0 : s32i
-                            store %36, %0
-                            %37 = load %0 : s32i
-                            return %37
+                        scope {
+                                %30 = const 8 : u64i
+                                %31 = const 8 : u64i
+                                cmp
+                                if %32 {
+                                        %39 = const 9223372036854775807 : u64i
+                                        store %39, %3, align 8
+                                        yield
+                                } else {
+                                        scope {
+                                                %33 = const 8 : u64i
+                                                %34 = const 8 : u64i
+                                                cmp
+                                                if %35 {
+                                                        %38 = const 9223372036854775807 : u64i
+                                                        store %38, %3, align 8
+                                                        yield
+                                                } else {
+                                                        %36 = const 0 : s32i
+                                                        store %36, %0
+                                                        %37 = load %0 : s32i
+                                                        return %37
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %5 = const 18446744073709551584 : u64i
-    %6 = load %3 : u64i, align 8
-    %7 = and %6, %5 : u64i
-    store %7, %3, align 8
-    %8 = load %3 : u64i, align 8
-    %9 = cast(int_to_ptr) %8 : void*
-    store %9, %1, align 8
-    %10 = const #cir.ptr<null> : s32i*
-    %11 = const 39 : s64i
-    %12 = get_element %2[%11] : s32i**
-    store %10, %12, align 8
-    %13 = load %1 : void*, align 8
-    %14 = cast(bitcast) %13 : s32i*
-    %15 = cast(array_to_ptrdecay) %2 : s32i**
-    call @f(%14, %15) [all]
-    scope {
-        %18 = const 39 : s64i
-        %19 = get_element %2[%18] : s32i**
-        %20 = load %19 : s32i*, align 8
-        %21 = load %1 : void*, align 8
-        %22 = cast(bitcast) %21 : s32i*
-        %23 = const 39 : s32i
-        %24 = ptr_stride %22, %23 : s32i*
-        %25 = cmp ne %20, %24 : bool
-        if %25 {
-            %26 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %5 = const 18446744073709551584 : u64i
+        %6 = load %3 : u64i, align 8
+        and
+        store %7, %3, align 8
+        %8 = load %3 : u64i, align 8
+        %9 = cast(int_to_ptr) %8 : void*
+        store %9, %1, align 8
+        %10 = const #cir.ptr<null> : s32i*
+        %11 = const 39 : s64i
+        get_element
+        store %10, %12, align 8
+        %13 = load %1 : void*, align 8
+        %14 = cast(bitcast) %13 : s32i*
+        %15 = cast(array_to_ptrdecay) %2 : s32i**
+        call @f(%14, %15) [all]
+        scope {
+                %18 = const 39 : s64i
+                get_element
+                %20 = load %19 : s32i*, align 8
+                %21 = load %1 : void*, align 8
+                %22 = cast(bitcast) %21 : s32i*
+                %23 = const 39 : s32i
+                ptr_stride
+                cmp
+                if %25 {
+                        %26 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %16 = const 0 : s32i
-    store %16, %0
-    %17 = load %0 : s32i
-    return %17
+        %16 = const 0 : s32i
+        store %16, %0
+        %17 = load %0 : s32i
+        return %17
 }

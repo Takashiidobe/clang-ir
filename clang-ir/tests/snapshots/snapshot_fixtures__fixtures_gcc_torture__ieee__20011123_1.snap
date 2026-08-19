@@ -1,57 +1,57 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/ieee__20011123-1.c" (c, x86_64-unknown-linux-gnu)
 fn exit(%arg0: s32i) -> void [external, c];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca double, "db1", align 8
-    %2 = alloca long_double<f80>, "ldb1", align 16
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 1.7976931348623157E+308 : double
-    store %4, %1, align 8
-    %5 = load %1 : double, align 8
-    %6 = cast(floating) %5 : long_double<f80>
-    store %6, %2, align 16
-    scope {
-        %15 = const 8 : u64i
-        %16 = const 8 : u64i
-        %17 = cmp ne %15, %16 : bool
-        %18 = ternary %17 ? { : bool
-            %24 = const true : bool
-            yield %24
-        } : {
-            %21 = const 16 : u64i
-            %22 = const 16 : u64i
-            %23 = cmp ne %21, %22 : bool
-            yield %23
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca double, "db1", align 8
+        %2 = alloca long_double<f80>, "ldb1", align 16
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 1.7976931348623157E+308 : double
+        store %4, %1, align 8
+        %5 = load %1 : double, align 8
+        %6 = cast(floating) %5 : long_double<f80>
+        store %6, %2, align 16
+        scope {
+                %15 = const 8 : u64i
+                %16 = const 8 : u64i
+                cmp
+                %18 = ternary %17 ? { : bool
+                        %24 = const true : bool
+                        yield %24
+                } : {
+                        %21 = const 16 : u64i
+                        %22 = const 16 : u64i
+                        cmp
+                        yield %23
+                }
+                if %18 {
+                        %19 = get_global @exit : (s32i) -> void*
+                        %20 = const 0 : s32i
+                        call @exit(%20) [all]
+                        yield
+                }
+                yield
         }
-        if %18 {
-            %19 = get_global @exit : ((s32i) -> void)*
-            %20 = const 0 : s32i
-            call @exit(%20) [all]
-            yield
+        scope {
+                %10 = load %2 : long_double<f80>, align 16
+                %11 = const 1.7976931348623157E+308 : double
+                %12 = cast(floating) %11 : long_double<f80>
+                cmp
+                if %13 {
+                        %14 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %10 = load %2 : long_double<f80>, align 16
-        %11 = const 1.7976931348623157E+308 : double
-        %12 = cast(floating) %11 : long_double<f80>
-        %13 = cmp ne %10, %12 : bool
-        if %13 {
-            %14 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %7 = get_global @exit : ((s32i) -> void)*
-    %8 = const 0 : s32i
-    call @exit(%8) [all]
-    %9 = load %0 : s32i
-    return %9
+        %7 = get_global @exit : (s32i) -> void*
+        %8 = const 0 : s32i
+        call @exit(%8) [all]
+        %9 = load %0 : s32i
+        return %9
 }

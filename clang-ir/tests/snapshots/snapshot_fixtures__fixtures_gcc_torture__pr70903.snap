@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr70903.c" (c, x86_64-unknown-linux-gnu)
@@ -16,27 +16,27 @@ fn foo(%arg0: vector<4 x u64i>*) -> vector<8 x u32i> [internal, c, no_inline, ds
         %22 = const 65535 : u64i
         %23 = load %16 : vector<4 x u64i>, align 32
         %24 = const 0 : s32i
-        %25 = vec.extract %23[%24] : u64i
+        vec.extract
         %26 = const 0 : u64i
-        %27 = vec.create(%22, %25, %26, %26) : vector<4 x u64i>
+        vec.create
         store %27, %20, align 32
         %28 = load %20 : vector<4 x u64i>, align 32
         %29 = cast(bitcast) %28 : vector<32 x u8i>
         %30 = const 1 : s32i
-        %31 = vec.extract %29[%30] : u8i
+        vec.extract
         %32 = const 0 : u8i
-        %33 = vec.create(%31, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32, %32) : vector<32 x u8i>
+        vec.create
         store %33, %19, align 32
         %34 = load %19 : vector<32 x u8i>, align 32
         %35 = cast(bitcast) %34 : vector<4 x u64i>
         store %35, %18, align 32
         %36 = load %18 : vector<4 x u64i>, align 32
         %37 = const 0 : s32i
-        %38 = vec.extract %36[%37] : u64i
+        vec.extract
         %39 = cast(integral) %38 : u32i
         %40 = const 255 : u32i
         %41 = const 0 : u32i
-        %42 = vec.create(%39, %40, %41, %41, %41, %41, %41, %41) : vector<8 x u32i>
+        vec.create
         store %42, %21, align 32
         %43 = load %21 : vector<8 x u32i>, align 32
         store %43, %17
@@ -45,32 +45,32 @@ fn foo(%arg0: vector<4 x u64i>*) -> vector<8 x u32i> [internal, c, no_inline, ds
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca vector<8 x u32i>, "x", align 32
-    %2 = alloca vector<4 x u64i>, ".compoundliteral", align 32
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const [0, 0, 0, 0] : vector<4 x u64i>
-    store %4, %2, align 32
-    %5 = load %2 : vector<4 x u64i>, align 32
-    %6 = alloca vector<4 x u64i>, "byval", align 32
-    store %5, %6
-    %7 = call @foo(%6) : vector<8 x u32i> [all]
-    store %7, %1, align 32
-    scope {
-        %10 = load %1 : vector<8 x u32i>, align 32
-        %11 = const 1 : s32i
-        %12 = vec.extract %10[%11] : u32i
-        %13 = const 255 : u32i
-        %14 = cmp ne %12, %13 : bool
-        if %14 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca vector<8 x u32i>, "x", align 32
+        %2 = alloca vector<4 x u64i>, ".compoundliteral", align 32
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const [[0, 0, 0, 0]] : vector<4 x u64i>
+        store %4, %2, align 32
+        %5 = load %2 : vector<4 x u64i>, align 32
+        %6 = alloca vector<4 x u64i>, "byval", align 32
+        store %5, %6
+        %7 = call @foo(%6) : vector<8 x u32i> [all]
+        store %7, %1, align 32
+        scope {
+                %10 = load %1 : vector<8 x u32i>, align 32
+                %11 = const 1 : s32i
+                vec.extract
+                %13 = const 255 : u32i
+                cmp
+                if %14 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %8 = const 0 : s32i
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        %8 = const 0 : s32i
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20100827-1.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[2] = "a" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[2] = ConstArray { ty: Array { element_type: Named("s8i"), size: 2 }, elts: Str("a"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn abort() -> void [external, c, nothrow];
 fn foo(%arg0: s8i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
@@ -15,46 +15,46 @@ fn foo(%arg0: s8i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %13 = const 0 : s32i
         store %13, %12, align 4
         scope {
-            do {
-                scope {
-                    scope {
-                        %27 = load %10 : s8i*, align 8
-                        %28 = load %27 : s8i, align 1
-                        %29 = cast(integral) %28 : s32i
-                        %30 = const 0 : s32i
-                        %31 = cmp eq %29, %30 : bool
-                        if %31 {
-                            break
+                do {
+                        scope {
+                                scope {
+                                        %27 = load %10 : s8i*, align 8
+                                        %28 = load %27 : s8i, align 1
+                                        %29 = cast(integral) %28 : s32i
+                                        %30 = const 0 : s32i
+                                        cmp
+                                        if %31 {
+                                                break
+                                        }
+                                        yield
+                                }
+                                %18 = load %12 : s32i, align 4
+                                inc
+                                store %19, %12, align 4
+                                scope {
+                                        %23 = load %10 : s8i*, align 8
+                                        %24 = const #cir.ptr<null> : s8i*
+                                        cmp
+                                        if %25 {
+                                                %26 = get_global @abort : () -> void*
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                %20 = load %10 : s8i*, align 8
+                                %21 = const 1 : s32i
+                                ptr_stride
+                                store %22, %10, align 8
+                                yield
                         }
                         yield
-                    }
-                    %18 = load %12 : s32i, align 4
-                    %19 = inc %18 : s32i [nsw]
-                    store %19, %12, align 4
-                    scope {
-                        %23 = load %10 : s8i*, align 8
-                        %24 = const #cir.ptr<null> : s8i*
-                        %25 = cmp eq %23, %24 : bool
-                        if %25 {
-                            %26 = get_global @abort : (() -> void)*
-                            call @abort() [all]
-                            yield
-                        }
-                        yield
-                    }
-                    %20 = load %10 : s8i*, align 8
-                    %21 = const 1 : s32i
-                    %22 = ptr_stride %20, %21 : s8i*
-                    store %22, %10, align 8
-                    yield
+                } while {
+                        %16 = const 1 : s32i
+                        %17 = cast(int_to_bool) %16 : bool
+                        condition %17
                 }
                 yield
-            } while {
-                %16 = const 1 : s32i
-                %17 = cast(int_to_bool) %16 : bool
-                condition %17
-            }
-            yield
         }
         %14 = load %12 : s32i, align 4
         store %14, %11
@@ -62,24 +62,24 @@ fn foo(%arg0: s8i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
         return %15
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = get_global @.str : s8i[2]*
-        %5 = cast(array_to_ptrdecay) %4 : s8i*
-        %6 = call @foo(%5) : s32i [all]
-        %7 = const 1 : s32i
-        %8 = cmp ne %6, %7 : bool
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = get_global @.str : s8i[2]*
+                %5 = cast(array_to_ptrdecay) %4 : s8i*
+                %6 = call @foo(%5) : s32i [all]
+                %7 = const 1 : s32i
+                cmp
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

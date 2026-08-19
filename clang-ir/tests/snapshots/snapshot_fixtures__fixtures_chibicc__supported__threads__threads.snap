@@ -1,19 +1,19 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.chibicc/supported/threads/threads.c" (c, x86_64-unknown-linux-gnu)
-global mutex : rec_mtx_t = zero [internal, default, align 8, dso_local]
-global counter : s32i = 0 [internal, default, align 4, dso_local]
-global .str : s8i[28] = "mtx_init(&mutex, mtx_plain)" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[37] = "thrd_create(&t1, thread_func, &arg1)" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[37] = "thrd_create(&t2, thread_func, &arg2)" [cir_private, default, align 1, dso_local, constant]
-global .str.3 : s8i[21] = "thrd_join(t1, &res1)" [cir_private, default, align 1, dso_local, constant]
-global .str.4 : s8i[21] = "thrd_join(t2, &res2)" [cir_private, default, align 1, dso_local, constant]
-global .str.5 : s8i[5] = "res1" [cir_private, default, align 1, dso_local, constant]
-global .str.6 : s8i[5] = "res2" [cir_private, default, align 1, dso_local, constant]
-global .str.7 : s8i[8] = "counter" [cir_private, default, align 1, dso_local, constant]
-global .str.8 : s8i[4] = "OK\n" [cir_private, default, align 1, dso_local, constant]
+global mutex : rec_mtx_t = Zero { ty: Named("rec_mtx_t") } [internal, default, align 8, dso_local]
+global counter : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
+global .str : s8i[28] = ConstArray { ty: Array { element_type: Named("s8i"), size: 28 }, elts: Str("mtx_init(&mutex, mtx_plain)"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[37] = ConstArray { ty: Array { element_type: Named("s8i"), size: 37 }, elts: Str("thrd_create(&t1, thread_func, &arg1)"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[37] = ConstArray { ty: Array { element_type: Named("s8i"), size: 37 }, elts: Str("thrd_create(&t2, thread_func, &arg2)"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[21] = ConstArray { ty: Array { element_type: Named("s8i"), size: 21 }, elts: Str("thrd_join(t1, &res1)"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[21] = ConstArray { ty: Array { element_type: Named("s8i"), size: 21 }, elts: Str("thrd_join(t2, &res2)"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[5] = ConstArray { ty: Array { element_type: Named("s8i"), size: 5 }, elts: Str("res1"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[5] = ConstArray { ty: Array { element_type: Named("s8i"), size: 5 }, elts: Str("res2"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.7 : s8i[8] = ConstArray { ty: Array { element_type: Named("s8i"), size: 8 }, elts: Str("counter"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.8 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("OK\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn mtx_lock(%arg0: rec_mtx_t*) -> s32i [external, c];
 fn mtx_unlock(%arg0: rec_mtx_t*) -> s32i [external, c];
@@ -43,80 +43,80 @@ fn thread_func(%arg0: void*) -> s32i [external, c, no_inline, dso_local, nothrow
 }
 fn assert(%arg0: s32i, %arg1: s32i, %arg2: s8i*) -> void [external, c];
 fn mtx_init(%arg0: rec_mtx_t*, %arg1: s32i) -> s32i [external, c];
-fn thrd_create(%arg0: u64i*, %arg1: ((void*) -> s32i)*, %arg2: void*) -> s32i [external, c];
+fn thrd_create(%arg0: u64i*, %arg1: (void*) -> s32i*, %arg2: void*) -> s32i [external, c];
 fn thrd_join(%arg0: u64i, %arg1: s32i*) -> s32i [external, c];
 fn mtx_destroy(%arg0: rec_mtx_t*) -> void [external, c];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u64i, "t1", align 8
-    %2 = alloca u64i, "t2", align 8
-    %3 = alloca s32i, "arg1", align 4
-    %4 = alloca s32i, "arg2", align 4
-    %5 = alloca s32i, "res1", align 4
-    %6 = alloca s32i, "res2", align 4
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = const 10 : s32i
-    store %8, %3, align 4
-    %9 = const 20 : s32i
-    store %9, %4, align 4
-    %10 = const 0 : s32i
-    %11 = get_global @mutex : rec_mtx_t*
-    %12 = const 0 : s32i
-    %13 = call @mtx_init(%11, %12) : s32i [all]
-    %14 = get_global @.str : s8i[28]*
-    %15 = cast(array_to_ptrdecay) %14 : s8i*
-    call @assert(%10, %13, %15) [all]
-    %16 = const 0 : s32i
-    %17 = get_global @thread_func : ((void*) -> s32i)*
-    %18 = cast(bitcast) %3 : void*
-    %19 = call @thrd_create(%1, %17, %18) : s32i [all]
-    %20 = get_global @.str.1 : s8i[37]*
-    %21 = cast(array_to_ptrdecay) %20 : s8i*
-    call @assert(%16, %19, %21) [all]
-    %22 = const 0 : s32i
-    %23 = get_global @thread_func : ((void*) -> s32i)*
-    %24 = cast(bitcast) %4 : void*
-    %25 = call @thrd_create(%2, %23, %24) : s32i [all]
-    %26 = get_global @.str.2 : s8i[37]*
-    %27 = cast(array_to_ptrdecay) %26 : s8i*
-    call @assert(%22, %25, %27) [all]
-    %28 = const 0 : s32i
-    %29 = load %1 : u64i, align 8
-    %30 = call @thrd_join(%29, %5) : s32i [all]
-    %31 = get_global @.str.3 : s8i[21]*
-    %32 = cast(array_to_ptrdecay) %31 : s8i*
-    call @assert(%28, %30, %32) [all]
-    %33 = const 0 : s32i
-    %34 = load %2 : u64i, align 8
-    %35 = call @thrd_join(%34, %6) : s32i [all]
-    %36 = get_global @.str.4 : s8i[21]*
-    %37 = cast(array_to_ptrdecay) %36 : s8i*
-    call @assert(%33, %35, %37) [all]
-    %38 = const 0 : s32i
-    %39 = load %5 : s32i, align 4
-    %40 = get_global @.str.5 : s8i[5]*
-    %41 = cast(array_to_ptrdecay) %40 : s8i*
-    call @assert(%38, %39, %41) [all]
-    %42 = const 0 : s32i
-    %43 = load %6 : s32i, align 4
-    %44 = get_global @.str.6 : s8i[5]*
-    %45 = cast(array_to_ptrdecay) %44 : s8i*
-    call @assert(%42, %43, %45) [all]
-    %46 = const 30 : s32i
-    %47 = get_global @counter : s32i*
-    %48 = load %47 : s32i, align 4
-    %49 = get_global @.str.7 : s8i[8]*
-    %50 = cast(array_to_ptrdecay) %49 : s8i*
-    call @assert(%46, %48, %50) [all]
-    %51 = get_global @mutex : rec_mtx_t*
-    call @mtx_destroy(%51) [all]
-    %52 = get_global @.str.8 : s8i[4]*
-    %53 = cast(array_to_ptrdecay) %52 : s8i*
-    %54 = call @printf(%53) : s32i [all]
-    %55 = const 0 : s32i
-    store %55, %0
-    %56 = load %0 : s32i
-    return %56
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u64i, "t1", align 8
+        %2 = alloca u64i, "t2", align 8
+        %3 = alloca s32i, "arg1", align 4
+        %4 = alloca s32i, "arg2", align 4
+        %5 = alloca s32i, "res1", align 4
+        %6 = alloca s32i, "res2", align 4
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = const 10 : s32i
+        store %8, %3, align 4
+        %9 = const 20 : s32i
+        store %9, %4, align 4
+        %10 = const 0 : s32i
+        %11 = get_global @mutex : rec_mtx_t*
+        %12 = const 0 : s32i
+        %13 = call @mtx_init(%11, %12) : s32i [all]
+        %14 = get_global @.str : s8i[28]*
+        %15 = cast(array_to_ptrdecay) %14 : s8i*
+        call @assert(%10, %13, %15) [all]
+        %16 = const 0 : s32i
+        %17 = get_global @thread_func : (void*) -> s32i*
+        %18 = cast(bitcast) %3 : void*
+        %19 = call @thrd_create(%1, %17, %18) : s32i [all]
+        %20 = get_global @.str.1 : s8i[37]*
+        %21 = cast(array_to_ptrdecay) %20 : s8i*
+        call @assert(%16, %19, %21) [all]
+        %22 = const 0 : s32i
+        %23 = get_global @thread_func : (void*) -> s32i*
+        %24 = cast(bitcast) %4 : void*
+        %25 = call @thrd_create(%2, %23, %24) : s32i [all]
+        %26 = get_global @.str.2 : s8i[37]*
+        %27 = cast(array_to_ptrdecay) %26 : s8i*
+        call @assert(%22, %25, %27) [all]
+        %28 = const 0 : s32i
+        %29 = load %1 : u64i, align 8
+        %30 = call @thrd_join(%29, %5) : s32i [all]
+        %31 = get_global @.str.3 : s8i[21]*
+        %32 = cast(array_to_ptrdecay) %31 : s8i*
+        call @assert(%28, %30, %32) [all]
+        %33 = const 0 : s32i
+        %34 = load %2 : u64i, align 8
+        %35 = call @thrd_join(%34, %6) : s32i [all]
+        %36 = get_global @.str.4 : s8i[21]*
+        %37 = cast(array_to_ptrdecay) %36 : s8i*
+        call @assert(%33, %35, %37) [all]
+        %38 = const 0 : s32i
+        %39 = load %5 : s32i, align 4
+        %40 = get_global @.str.5 : s8i[5]*
+        %41 = cast(array_to_ptrdecay) %40 : s8i*
+        call @assert(%38, %39, %41) [all]
+        %42 = const 0 : s32i
+        %43 = load %6 : s32i, align 4
+        %44 = get_global @.str.6 : s8i[5]*
+        %45 = cast(array_to_ptrdecay) %44 : s8i*
+        call @assert(%42, %43, %45) [all]
+        %46 = const 30 : s32i
+        %47 = get_global @counter : s32i*
+        %48 = load %47 : s32i, align 4
+        %49 = get_global @.str.7 : s8i[8]*
+        %50 = cast(array_to_ptrdecay) %49 : s8i*
+        call @assert(%46, %48, %50) [all]
+        %51 = get_global @mutex : rec_mtx_t*
+        call @mtx_destroy(%51) [all]
+        %52 = get_global @.str.8 : s8i[4]*
+        %53 = cast(array_to_ptrdecay) %52 : s8i*
+        %54 = call @printf(%53) : s32i [all]
+        %55 = const 0 : s32i
+        store %55, %0
+        %56 = load %0 : s32i
+        return %56
 }

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20020206-2.c" (c, x86_64-unknown-linux-gnu)
@@ -9,24 +9,24 @@ fn foo(%arg2: u32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %38 = alloca u32i, "x", align 4
         store %arg2, %38
         scope {
-            %39 = load %38 : u32i, align 4
-            %40 = const 2048 : u32i
-            %41 = cmp ne %39, %40 : bool
-            %42 = ternary %41 ? { : bool
-                %45 = load %38 : u32i, align 4
-                %46 = const 2064 : u32i
-                %47 = cmp ne %45, %46 : bool
-                yield %47
-            } : {
-                %44 = const false : bool
-                yield %44
-            }
-            if %42 {
-                %43 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %39 = load %38 : u32i, align 4
+                %40 = const 2048 : u32i
+                cmp
+                %42 = ternary %41 ? { : bool
+                        %45 = load %38 : u32i, align 4
+                        %46 = const 2064 : u32i
+                        cmp
+                        yield %47
+                } : {
+                        %44 = const false : bool
+                        yield %44
+                }
+                if %42 {
+                        %43 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -42,54 +42,54 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         %4 = const 0 : s32i
         store %4, %2
         scope {
-            %8 = alloca rec_A, ".compoundliteral", align 2
-            %9 = const 0 : s32i
-            store %9, %3, align 4
-            for cond: {
-                %35 = load %3 : s32i, align 4
-                %36 = const 2 : s32i
-                %37 = cmp lt %35, %36 : bool
-                condition %37
-            } step: {
-                %10 = load %3 : s32i, align 4
-                %11 = inc %10 : s32i [nsw]
-                store %11, %3, align 4
-                yield
-            } do {
-                %12 = get_member %8[0] "a" : u16i*
-                %13 = load %3 : s32i, align 4
-                %14 = const 4 : s32i
-                %15 = shift right %13, %14 : s32i
-                %16 = cast(int_to_bool) %15 : bool
-                %17 = not %16 : bool
-                %18 = ternary %17 ? { : s32i
-                    %34 = const 8 : s32i
-                    yield %34
-                } : {
-                    %29 = const 64 : s32i
-                    %30 = load %3 : s32i, align 4
-                    %31 = const 4 : s32i
-                    %32 = shift right %30, %31 : s32i
-                    %33 = add %29, %32 : s32i [nsw]
-                    yield %33
+                %8 = alloca rec_A, ".compoundliteral", align 2
+                %9 = const 0 : s32i
+                store %9, %3, align 4
+                for cond {
+                        %35 = load %3 : s32i, align 4
+                        %36 = const 2 : s32i
+                        cmp
+                        condition %37
+                } step {
+                        %10 = load %3 : s32i, align 4
+                        inc
+                        store %11, %3, align 4
+                        yield
+                } body {
+                        get_member
+                        %13 = load %3 : s32i, align 4
+                        %14 = const 4 : s32i
+                        shift
+                        %16 = cast(int_to_bool) %15 : bool
+                        not
+                        %18 = ternary %17 ? { : s32i
+                                %34 = const 8 : s32i
+                                yield %34
+                        } : {
+                                %29 = const 64 : s32i
+                                %30 = load %3 : s32i, align 4
+                                %31 = const 4 : s32i
+                                shift
+                                %33 = add %29, %32 : s32i [nsw]
+                                yield %33
+                        }
+                        %19 = const 8 : s32i
+                        shift
+                        %21 = load %3 : s32i, align 4
+                        %22 = const 4 : s32i
+                        shift
+                        %24 = add %20, %23 : s32i [nsw]
+                        %25 = cast(integral) %24 : u16i
+                        store %25, %12, align 2
+                        get_member
+                        %27 = load %26 : u16i, align 2
+                        %28 = cast(integral) %27 : u32i
+                        call @foo(%28) [all]
+                        yield
                 }
-                %19 = const 8 : s32i
-                %20 = shift left %18, %19 : s32i
-                %21 = load %3 : s32i, align 4
-                %22 = const 4 : s32i
-                %23 = shift left %21, %22 : s32i
-                %24 = add %20, %23 : s32i [nsw]
-                %25 = cast(integral) %24 : u16i
-                store %25, %12, align 2
-                %26 = get_member %8[0] "a" : u16i*
-                %27 = load %26 : u16i, align 2
-                %28 = cast(integral) %27 : u32i
-                call @foo(%28) [all]
                 yield
-            }
-            yield
         }
-        %5 = get_global @exit : ((s32i) -> void)*
+        %5 = get_global @exit : (s32i) -> void*
         %6 = const 0 : s32i
         call @exit(%6) [all]
         %7 = load %2 : s32i

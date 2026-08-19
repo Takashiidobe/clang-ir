@@ -1,148 +1,148 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/atomics.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[37] = "%d %d %d %d %d %d %d %d %d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[37] = ConstArray { ty: Array { element_type: Named("s8i"), size: 37 }, elts: Str("%d %d %d %d %d %d %d %d %d %d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "a", align 4
-    %2 = alloca s32i, ".atomictmp", align 4
-    %3 = alloca s32i, "loaded", align 4
-    %4 = alloca s32i, "atomic-temp", align 4
-    %5 = alloca s32i, "fa", align 4
-    %6 = alloca s32i, ".atomictmp", align 4
-    %7 = alloca s32i, "atomic-temp", align 4
-    %8 = alloca s32i, "fs", align 4
-    %9 = alloca s32i, ".atomictmp", align 4
-    %10 = alloca s32i, "atomic-temp", align 4
-    %11 = alloca s32i, "fand", align 4
-    %12 = alloca s32i, ".atomictmp", align 4
-    %13 = alloca s32i, "atomic-temp", align 4
-    %14 = alloca s32i, "forr", align 4
-    %15 = alloca s32i, ".atomictmp", align 4
-    %16 = alloca s32i, "atomic-temp", align 4
-    %17 = alloca s32i, "fxor", align 4
-    %18 = alloca s32i, ".atomictmp", align 4
-    %19 = alloca s32i, "atomic-temp", align 4
-    %20 = alloca s32i, "xchg_old", align 4
-    %21 = alloca s32i, ".atomictmp", align 4
-    %22 = alloca s32i, "atomic-temp", align 4
-    %23 = alloca s32i, "expected", align 4
-    %24 = alloca s32i, "ok", align 4
-    %25 = alloca s32i, ".atomictmp", align 4
-    %26 = alloca bool, "cmpxchg.bool", align 1
-    %27 = alloca s32i, "expected2", align 4
-    %28 = alloca s32i, "bad", align 4
-    %29 = alloca s32i, ".atomictmp", align 4
-    %30 = alloca bool, "cmpxchg.bool", align 1
-    %31 = const 0 : s32i
-    store %31, %0
-    %32 = const 0 : s32i
-    store %32, %1, align 4
-    %33 = const 100 : s32i
-    store %33, %2, align 4
-    %34 = load %2 : s32i, align 4
-    store %34, %1, align 4
-    %35 = load %1 : s32i, align 4
-    store %35, %4, align 4
-    %36 = load %4 : s32i, align 4
-    store %36, %3, align 4
-    %37 = const 5 : s32i
-    store %37, %6, align 4
-    %38 = load %6 : s32i, align 4
-    %39 = atomic.fetch add seq_cst syncscope(system) %1, %38 : s32i [fetch_first]
-    store %39, %7, align 4
-    %40 = load %7 : s32i, align 4
-    store %40, %5, align 4
-    %41 = const 10 : s32i
-    store %41, %9, align 4
-    %42 = load %9 : s32i, align 4
-    %43 = atomic.fetch sub seq_cst syncscope(system) %1, %42 : s32i [fetch_first]
-    store %43, %10, align 4
-    %44 = load %10 : s32i, align 4
-    store %44, %8, align 4
-    %45 = const 60 : s32i
-    store %45, %12, align 4
-    %46 = load %12 : s32i, align 4
-    %47 = atomic.fetch and seq_cst syncscope(system) %1, %46 : s32i [fetch_first]
-    store %47, %13, align 4
-    %48 = load %13 : s32i, align 4
-    store %48, %11, align 4
-    %49 = const 1 : s32i
-    store %49, %15, align 4
-    %50 = load %15 : s32i, align 4
-    %51 = atomic.fetch or seq_cst syncscope(system) %1, %50 : s32i [fetch_first]
-    store %51, %16, align 4
-    %52 = load %16 : s32i, align 4
-    store %52, %14, align 4
-    %53 = const 15 : s32i
-    store %53, %18, align 4
-    %54 = load %18 : s32i, align 4
-    %55 = atomic.fetch xor seq_cst syncscope(system) %1, %54 : s32i [fetch_first]
-    store %55, %19, align 4
-    %56 = load %19 : s32i, align 4
-    store %56, %17, align 4
-    %57 = const 7 : s32i
-    store %57, %21, align 4
-    %58 = load %21 : s32i, align 4
-    %59 = atomic.xchg seq_cst syncscope(system) %1, %58 : s32i
-    store %59, %22, align 4
-    %60 = load %22 : s32i, align 4
-    store %60, %20, align 4
-    %61 = const 7 : s32i
-    store %61, %23, align 4
-    %62 = const 42 : s32i
-    store %62, %25, align 4
-    %63 = load %23 : s32i, align 4
-    %64 = load %25 : s32i, align 4
-    %65#0, %65#1 = atomic.cmpxchg success(seq_cst) failure(seq_cst) syncscope(system) %1, %63, %64 : s32i, align 4
-    %66 = not %65#1 : bool
-    if %66 {
-        store %65#0, %23, align 4
-        yield
-    }
-    store %65#1, %26, align 1
-    %67 = load %26 : bool, align 1
-    %68 = cast(bool_to_int) %67 : s32i
-    store %68, %24, align 4
-    %69 = const 999 : s32i
-    store %69, %27, align 4
-    %70 = const 0 : s32i
-    store %70, %29, align 4
-    %71 = load %27 : s32i, align 4
-    %72 = load %29 : s32i, align 4
-    %73#0, %73#1 = atomic.cmpxchg success(seq_cst) failure(seq_cst) syncscope(system) %1, %71, %72 : s32i, align 4
-    %74 = not %73#1 : bool
-    if %74 {
-        store %73#0, %27, align 4
-        yield
-    }
-    store %73#1, %30, align 1
-    %75 = load %30 : bool, align 1
-    %76 = cast(bool_to_int) %75 : s32i
-    store %76, %28, align 4
-    atomic.fence seq_cst syncscope(system)
-    %77 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %78 = get_global @.str : s8i[37]*
-    %79 = cast(array_to_ptrdecay) %78 : s8i*
-    %80 = load %3 : s32i, align 4
-    %81 = load %5 : s32i, align 4
-    %82 = load %8 : s32i, align 4
-    %83 = load %11 : s32i, align 4
-    %84 = load %14 : s32i, align 4
-    %85 = load %17 : s32i, align 4
-    %86 = load %20 : s32i, align 4
-    %87 = load %24 : s32i, align 4
-    %88 = load %23 : s32i, align 4
-    %89 = load %28 : s32i, align 4
-    %90 = load %27 : s32i, align 4
-    %91 = load %1 : s32i, align 4
-    %92 = call @printf(%79, %80, %81, %82, %83, %84, %85, %86, %87, %88, %89, %90, %91) : s32i [all]
-    %93 = const 0 : s32i
-    store %93, %0
-    %94 = load %0 : s32i
-    return %94
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "a", align 4
+        %2 = alloca s32i, ".atomictmp", align 4
+        %3 = alloca s32i, "loaded", align 4
+        %4 = alloca s32i, "atomic-temp", align 4
+        %5 = alloca s32i, "fa", align 4
+        %6 = alloca s32i, ".atomictmp", align 4
+        %7 = alloca s32i, "atomic-temp", align 4
+        %8 = alloca s32i, "fs", align 4
+        %9 = alloca s32i, ".atomictmp", align 4
+        %10 = alloca s32i, "atomic-temp", align 4
+        %11 = alloca s32i, "fand", align 4
+        %12 = alloca s32i, ".atomictmp", align 4
+        %13 = alloca s32i, "atomic-temp", align 4
+        %14 = alloca s32i, "forr", align 4
+        %15 = alloca s32i, ".atomictmp", align 4
+        %16 = alloca s32i, "atomic-temp", align 4
+        %17 = alloca s32i, "fxor", align 4
+        %18 = alloca s32i, ".atomictmp", align 4
+        %19 = alloca s32i, "atomic-temp", align 4
+        %20 = alloca s32i, "xchg_old", align 4
+        %21 = alloca s32i, ".atomictmp", align 4
+        %22 = alloca s32i, "atomic-temp", align 4
+        %23 = alloca s32i, "expected", align 4
+        %24 = alloca s32i, "ok", align 4
+        %25 = alloca s32i, ".atomictmp", align 4
+        %26 = alloca bool, "cmpxchg.bool", align 1
+        %27 = alloca s32i, "expected2", align 4
+        %28 = alloca s32i, "bad", align 4
+        %29 = alloca s32i, ".atomictmp", align 4
+        %30 = alloca bool, "cmpxchg.bool", align 1
+        %31 = const 0 : s32i
+        store %31, %0
+        %32 = const 0 : s32i
+        store %32, %1, align 4
+        %33 = const 100 : s32i
+        store %33, %2, align 4
+        %34 = load %2 : s32i, align 4
+        store %34, %1, align 4
+        %35 = load %1 : s32i, align 4
+        store %35, %4, align 4
+        %36 = load %4 : s32i, align 4
+        store %36, %3, align 4
+        %37 = const 5 : s32i
+        store %37, %6, align 4
+        %38 = load %6 : s32i, align 4
+        atomic.fetch
+        store %39, %7, align 4
+        %40 = load %7 : s32i, align 4
+        store %40, %5, align 4
+        %41 = const 10 : s32i
+        store %41, %9, align 4
+        %42 = load %9 : s32i, align 4
+        atomic.fetch
+        store %43, %10, align 4
+        %44 = load %10 : s32i, align 4
+        store %44, %8, align 4
+        %45 = const 60 : s32i
+        store %45, %12, align 4
+        %46 = load %12 : s32i, align 4
+        atomic.fetch
+        store %47, %13, align 4
+        %48 = load %13 : s32i, align 4
+        store %48, %11, align 4
+        %49 = const 1 : s32i
+        store %49, %15, align 4
+        %50 = load %15 : s32i, align 4
+        atomic.fetch
+        store %51, %16, align 4
+        %52 = load %16 : s32i, align 4
+        store %52, %14, align 4
+        %53 = const 15 : s32i
+        store %53, %18, align 4
+        %54 = load %18 : s32i, align 4
+        atomic.fetch
+        store %55, %19, align 4
+        %56 = load %19 : s32i, align 4
+        store %56, %17, align 4
+        %57 = const 7 : s32i
+        store %57, %21, align 4
+        %58 = load %21 : s32i, align 4
+        atomic.xchg
+        store %59, %22, align 4
+        %60 = load %22 : s32i, align 4
+        store %60, %20, align 4
+        %61 = const 7 : s32i
+        store %61, %23, align 4
+        %62 = const 42 : s32i
+        store %62, %25, align 4
+        %63 = load %23 : s32i, align 4
+        %64 = load %25 : s32i, align 4
+        atomic.cmpxchg
+        not
+        if %66 {
+                store %65#0, %23, align 4
+                yield
+        }
+        store %65#1, %26, align 1
+        %67 = load %26 : bool, align 1
+        %68 = cast(bool_to_int) %67 : s32i
+        store %68, %24, align 4
+        %69 = const 999 : s32i
+        store %69, %27, align 4
+        %70 = const 0 : s32i
+        store %70, %29, align 4
+        %71 = load %27 : s32i, align 4
+        %72 = load %29 : s32i, align 4
+        atomic.cmpxchg
+        not
+        if %74 {
+                store %73#0, %27, align 4
+                yield
+        }
+        store %73#1, %30, align 1
+        %75 = load %30 : bool, align 1
+        %76 = cast(bool_to_int) %75 : s32i
+        store %76, %28, align 4
+        atomic.fence
+        %77 = get_global @printf : (s8i*, ...) -> s32i*
+        %78 = get_global @.str : s8i[37]*
+        %79 = cast(array_to_ptrdecay) %78 : s8i*
+        %80 = load %3 : s32i, align 4
+        %81 = load %5 : s32i, align 4
+        %82 = load %8 : s32i, align 4
+        %83 = load %11 : s32i, align 4
+        %84 = load %14 : s32i, align 4
+        %85 = load %17 : s32i, align 4
+        %86 = load %20 : s32i, align 4
+        %87 = load %24 : s32i, align 4
+        %88 = load %23 : s32i, align 4
+        %89 = load %28 : s32i, align 4
+        %90 = load %27 : s32i, align 4
+        %91 = load %1 : s32i, align 4
+        %92 = call @printf(%79, %80, %81, %82, %83, %84, %85, %86, %87, %88, %89, %90, %91) : s32i [all]
+        %93 = const 0 : s32i
+        store %93, %0
+        %94 = load %0 : s32i
+        return %94
 }

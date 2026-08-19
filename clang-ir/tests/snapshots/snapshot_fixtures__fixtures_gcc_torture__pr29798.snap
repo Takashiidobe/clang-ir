@@ -1,79 +1,79 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr29798.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = alloca double, "oldrho", align 8
-    %3 = alloca double, "beta", align 8
-    %4 = alloca double, "work", align 8
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = const 0.000000e+00 : double
-    store %6, %3, align 8
-    %7 = const 1.000000e+00 : double
-    store %7, %4, align 8
-    scope {
-        %10 = const 1 : s32i
-        store %10, %1, align 4
-        for cond: {
-            %31 = load %1 : s32i, align 4
-            %32 = const 2 : s32i
-            %33 = cmp le %31, %32 : bool
-            condition %33
-        } step: {
-            %11 = load %1 : s32i, align 4
-            %12 = inc %11 : s32i [nsw]
-            store %12, %1, align 4
-            yield
-        } do {
-            scope {
-                %13 = alloca double, "rho", align 8
-                %14 = load %4 : double, align 8
-                %15 = load %4 : double, align 8
-                %16 = fmul %14, %15 : double
-                store %16, %13, align 8
-                scope {
-                    %25 = load %1 : s32i, align 4
-                    %26 = const 1 : s32i
-                    %27 = cmp ne %25, %26 : bool
-                    if %27 {
-                        %28 = load %13 : double, align 8
-                        %29 = load %2 : double, align 8
-                        %30 = fdiv %28, %29 : double
-                        store %30, %3, align 8
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = alloca double, "oldrho", align 8
+        %3 = alloca double, "beta", align 8
+        %4 = alloca double, "work", align 8
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = const 0.000000e+00 : double
+        store %6, %3, align 8
+        %7 = const 1.000000e+00 : double
+        store %7, %4, align 8
+        scope {
+                %10 = const 1 : s32i
+                store %10, %1, align 4
+                for cond {
+                        %31 = load %1 : s32i, align 4
+                        %32 = const 2 : s32i
+                        cmp
+                        condition %33
+                } step {
+                        %11 = load %1 : s32i, align 4
+                        inc
+                        store %12, %1, align 4
                         yield
-                    }
-                    yield
-                }
-                scope {
-                    %21 = load %3 : double, align 8
-                    %22 = const 1.000000e+00 : double
-                    %23 = cmp eq %21, %22 : bool
-                    if %23 {
-                        %24 = get_global @abort : (() -> void)*
-                        call @abort() [all]
+                } body {
+                        scope {
+                                %13 = alloca double, "rho", align 8
+                                %14 = load %4 : double, align 8
+                                %15 = load %4 : double, align 8
+                                fmul
+                                store %16, %13, align 8
+                                scope {
+                                        %25 = load %1 : s32i, align 4
+                                        %26 = const 1 : s32i
+                                        cmp
+                                        if %27 {
+                                                %28 = load %13 : double, align 8
+                                                %29 = load %2 : double, align 8
+                                                fdiv
+                                                store %30, %3, align 8
+                                                yield
+                                        }
+                                        yield
+                                }
+                                scope {
+                                        %21 = load %3 : double, align 8
+                                        %22 = const 1.000000e+00 : double
+                                        cmp
+                                        if %23 {
+                                                %24 = get_global @abort : () -> void*
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                %17 = const 2.000000e+00 : double
+                                %18 = load %4 : double, align 8
+                                fdiv
+                                store %19, %4, align 8
+                                %20 = load %13 : double, align 8
+                                store %20, %2, align 8
+                                yield
+                        }
                         yield
-                    }
-                    yield
                 }
-                %17 = const 2.000000e+00 : double
-                %18 = load %4 : double, align 8
-                %19 = fdiv %18, %17 : double
-                store %19, %4, align 8
-                %20 = load %13 : double, align 8
-                store %20, %2, align 8
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %8 = const 0 : s32i
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        %8 = const 0 : s32i
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

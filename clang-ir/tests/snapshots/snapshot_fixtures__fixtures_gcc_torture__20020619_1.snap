@@ -1,72 +1,72 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20020619-1.c" (c, x86_64-unknown-linux-gnu)
 fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
 fn ref() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %15 = alloca s32i, "__retval", align 4
-    %16 = alloca rec_anon2E0, "u", align 4
-    %17 = cast(bitcast) %16 : void*
-    %18 = const 0 : s32i
-    %19 = const 8 : u64i
-    %20 = call @memset(%17, %18, %19) : void* [all]
-    %21 = const 1 : s8i
-    %22 = const 0 : s64i
-    %23 = get_member %16[0] "c" : s8i[5]*
-    %24 = get_element %23[%22] : s8i*
-    store %21, %24, align 4
-    %25 = const 2 : s8i
-    %26 = const 1 : s64i
-    %27 = get_member %16[0] "c" : s8i[5]*
-    %28 = get_element %27[%26] : s8i*
-    store %25, %28, align 1
-    %29 = const 3 : s8i
-    %30 = const 2 : s64i
-    %31 = get_member %16[0] "c" : s8i[5]*
-    %32 = get_element %31[%30] : s8i*
-    store %29, %32, align 2
-    %33 = const 4 : s8i
-    %34 = const 3 : s64i
-    %35 = get_member %16[0] "c" : s8i[5]*
-    %36 = get_element %35[%34] : s8i*
-    store %33, %36, align 1
-    %37 = get_member %16[1] "i" : s32i*
-    %38 = load %37 : s32i, align 4
-    store %38, %15
-    %39 = load %15 : s32i
-    return %39
+        %15 = alloca s32i, "__retval", align 4
+        %16 = alloca rec_anon2E0, "u", align 4
+        %17 = cast(bitcast) %16 : void*
+        %18 = const 0 : s32i
+        %19 = const 8 : u64i
+        %20 = call @memset(%17, %18, %19) : void* [all]
+        %21 = const 1 : s8i
+        %22 = const 0 : s64i
+        get_member
+        get_element
+        store %21, %24, align 4
+        %25 = const 2 : s8i
+        %26 = const 1 : s64i
+        get_member
+        get_element
+        store %25, %28, align 1
+        %29 = const 3 : s8i
+        %30 = const 2 : s64i
+        get_member
+        get_element
+        store %29, %32, align 2
+        %33 = const 4 : s8i
+        %34 = const 3 : s64i
+        get_member
+        get_element
+        store %33, %36, align 1
+        get_member
+        %38 = load %37 : s32i, align 4
+        store %38, %15
+        %39 = load %15 : s32i
+        return %39
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "b", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = call @ref() : s32i [all]
-    store %3, %1, align 4
-    scope {
-        %6 = load %1 : s32i, align 4
-        %7 = const 16909060 : s32i
-        %8 = cmp ne %6, %7 : bool
-        %9 = ternary %8 ? { : bool
-            %12 = load %1 : s32i, align 4
-            %13 = const 67305985 : s32i
-            %14 = cmp ne %12, %13 : bool
-            yield %14
-        } : {
-            %11 = const false : bool
-            yield %11
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "b", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = call @ref() : s32i [all]
+        store %3, %1, align 4
+        scope {
+                %6 = load %1 : s32i, align 4
+                %7 = const 16909060 : s32i
+                cmp
+                %9 = ternary %8 ? { : bool
+                        %12 = load %1 : s32i, align 4
+                        %13 = const 67305985 : s32i
+                        cmp
+                        yield %14
+                } : {
+                        %11 = const false : bool
+                        yield %11
+                }
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %9 {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

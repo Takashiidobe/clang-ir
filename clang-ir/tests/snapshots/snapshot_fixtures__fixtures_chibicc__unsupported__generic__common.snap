@@ -1,14 +1,14 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.chibicc/common.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[10] = "%s => %d\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[30] = "%s => %d expected but got %d\n" [cir_private, default, align 1, dso_local, constant]
-global ext1 : s32i = 5 [external, default, align 4, dso_local]
-global ext2 : s32i* = @ext1 [external, default, align 8, dso_local]
-global ext3 : s32i = 7 [external, default, align 4, dso_local]
-global common_ext2 : s32i = 3 [external, default, align 4, dso_local]
+global .str : s8i[10] = ConstArray { ty: Array { element_type: Named("s8i"), size: 10 }, elts: Str("%s => %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[30] = ConstArray { ty: Array { element_type: Named("s8i"), size: 30 }, elts: Str("%s => %d expected but got %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global ext1 : s32i = CirInt { ty: Named("s32i"), value: "5" } [external, default, align 4, dso_local]
+global ext2 : s32i* = GlobalView { ty: Pointer { pointee: Named("s32i"), addr_space: None }, symbol: "ext1", indices: None } [external, default, align 8, dso_local]
+global ext3 : s32i = CirInt { ty: Named("s32i"), value: "7" } [external, default, align 4, dso_local]
+global common_ext2 : s32i = CirInt { ty: Named("s32i"), value: "3" } [external, default, align 4, dso_local]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn exit(%arg0: s32i) -> void [external, c, nothrow];
@@ -21,31 +21,31 @@ fn assert(%arg48: s32i, %arg49: s32i, %arg50: s8i*) -> void [external, c, no_inl
         store %arg49, %406
         store %arg50, %407
         scope {
-            %408 = load %405 : s32i, align 4
-            %409 = load %406 : s32i, align 4
-            %410 = cmp eq %408, %409 : bool
-            if %410 {
-                %420 = get_global @printf : ((s8i*, ...) -> s32i)*
-                %421 = get_global @.str : s8i[10]*
-                %422 = cast(array_to_ptrdecay) %421 : s8i*
-                %423 = load %407 : s8i*, align 8
-                %424 = load %406 : s32i, align 4
-                %425 = call @printf(%422, %423, %424) : s32i [all]
+                %408 = load %405 : s32i, align 4
+                %409 = load %406 : s32i, align 4
+                cmp
+                if %410 {
+                        %420 = get_global @printf : (s8i*, ...) -> s32i*
+                        %421 = get_global @.str : s8i[10]*
+                        %422 = cast(array_to_ptrdecay) %421 : s8i*
+                        %423 = load %407 : s8i*, align 8
+                        %424 = load %406 : s32i, align 4
+                        %425 = call @printf(%422, %423, %424) : s32i [all]
+                        yield
+                } else {
+                        %411 = get_global @printf : (s8i*, ...) -> s32i*
+                        %412 = get_global @.str.1 : s8i[30]*
+                        %413 = cast(array_to_ptrdecay) %412 : s8i*
+                        %414 = load %407 : s8i*, align 8
+                        %415 = load %405 : s32i, align 4
+                        %416 = load %406 : s32i, align 4
+                        %417 = call @printf(%413, %414, %415, %416) : s32i [all]
+                        %418 = get_global @exit : (s32i) -> void*
+                        %419 = const 1 : s32i
+                        call @exit(%419) [all]
+                        yield
+                }
                 yield
-            } else {
-                %411 = get_global @printf : ((s8i*, ...) -> s32i)*
-                %412 = get_global @.str.1 : s8i[30]*
-                %413 = cast(array_to_ptrdecay) %412 : s8i*
-                %414 = load %407 : s8i*, align 8
-                %415 = load %405 : s32i, align 4
-                %416 = load %406 : s32i, align 4
-                %417 = call @printf(%413, %414, %415, %416) : s32i [all]
-                %418 = get_global @exit : ((s32i) -> void)*
-                %419 = const 1 : s32i
-                call @exit(%419) [all]
-                yield
-            }
-            yield
         }
         return
 }
@@ -70,92 +70,92 @@ fn ext_fn2(%arg46: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         return %400
 }
 fn false_fn() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %394 = alloca s32i, "__retval", align 4
-    %395 = const 512 : s32i
-    store %395, %394
-    %396 = load %394 : s32i
-    return %396
+        %394 = alloca s32i, "__retval", align 4
+        %395 = const 512 : s32i
+        store %395, %394
+        %396 = load %394 : s32i
+        return %396
 }
 fn true_fn() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %391 = alloca s32i, "__retval", align 4
-    %392 = const 513 : s32i
-    store %392, %391
-    %393 = load %391 : s32i
-    return %393
+        %391 = alloca s32i, "__retval", align 4
+        %392 = const 513 : s32i
+        store %392, %391
+        %393 = load %391 : s32i
+        return %393
 }
 fn char_fn() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %384 = alloca s32i, "__retval", align 4
-    %385 = const 2 : s32i
-    %386 = const 8 : s32i
-    %387 = shift left %385, %386 : s32i
-    %388 = const 3 : s32i
-    %389 = add %387, %388 : s32i [nsw]
-    store %389, %384
-    %390 = load %384 : s32i
-    return %390
+        %384 = alloca s32i, "__retval", align 4
+        %385 = const 2 : s32i
+        %386 = const 8 : s32i
+        shift
+        %388 = const 3 : s32i
+        %389 = add %387, %388 : s32i [nsw]
+        store %389, %384
+        %390 = load %384 : s32i
+        return %390
 }
 fn short_fn() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %377 = alloca s32i, "__retval", align 4
-    %378 = const 2 : s32i
-    %379 = const 16 : s32i
-    %380 = shift left %378, %379 : s32i
-    %381 = const 5 : s32i
-    %382 = add %380, %381 : s32i [nsw]
-    store %382, %377
-    %383 = load %377 : s32i
-    return %383
+        %377 = alloca s32i, "__retval", align 4
+        %378 = const 2 : s32i
+        %379 = const 16 : s32i
+        shift
+        %381 = const 5 : s32i
+        %382 = add %380, %381 : s32i [nsw]
+        store %382, %377
+        %383 = load %377 : s32i
+        return %383
 }
 fn uchar_fn() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %368 = alloca s32i, "__retval", align 4
-    %369 = const 2 : s32i
-    %370 = const 10 : s32i
-    %371 = shift left %369, %370 : s32i
-    %372 = const 1 : s32i
-    %373 = sub %371, %372 : s32i [nsw]
-    %374 = const 4 : s32i
-    %375 = sub %373, %374 : s32i [nsw]
-    store %375, %368
-    %376 = load %368 : s32i
-    return %376
+        %368 = alloca s32i, "__retval", align 4
+        %369 = const 2 : s32i
+        %370 = const 10 : s32i
+        shift
+        %372 = const 1 : s32i
+        sub
+        %374 = const 4 : s32i
+        sub
+        store %375, %368
+        %376 = load %368 : s32i
+        return %376
 }
 fn ushort_fn() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %359 = alloca s32i, "__retval", align 4
-    %360 = const 2 : s32i
-    %361 = const 20 : s32i
-    %362 = shift left %360, %361 : s32i
-    %363 = const 1 : s32i
-    %364 = sub %362, %363 : s32i [nsw]
-    %365 = const 7 : s32i
-    %366 = sub %364, %365 : s32i [nsw]
-    store %366, %359
-    %367 = load %359 : s32i
-    return %367
+        %359 = alloca s32i, "__retval", align 4
+        %360 = const 2 : s32i
+        %361 = const 20 : s32i
+        shift
+        %363 = const 1 : s32i
+        sub
+        %365 = const 7 : s32i
+        sub
+        store %366, %359
+        %367 = load %359 : s32i
+        return %367
 }
 fn schar_fn() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %350 = alloca s32i, "__retval", align 4
-    %351 = const 2 : s32i
-    %352 = const 10 : s32i
-    %353 = shift left %351, %352 : s32i
-    %354 = const 1 : s32i
-    %355 = sub %353, %354 : s32i [nsw]
-    %356 = const 4 : s32i
-    %357 = sub %355, %356 : s32i [nsw]
-    store %357, %350
-    %358 = load %350 : s32i
-    return %358
+        %350 = alloca s32i, "__retval", align 4
+        %351 = const 2 : s32i
+        %352 = const 10 : s32i
+        shift
+        %354 = const 1 : s32i
+        sub
+        %356 = const 4 : s32i
+        sub
+        store %357, %350
+        %358 = load %350 : s32i
+        return %358
 }
 fn sshort_fn() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %341 = alloca s32i, "__retval", align 4
-    %342 = const 2 : s32i
-    %343 = const 20 : s32i
-    %344 = shift left %342, %343 : s32i
-    %345 = const 1 : s32i
-    %346 = sub %344, %345 : s32i [nsw]
-    %347 = const 7 : s32i
-    %348 = sub %346, %347 : s32i [nsw]
-    store %348, %341
-    %349 = load %341 : s32i
-    return %349
+        %341 = alloca s32i, "__retval", align 4
+        %342 = const 2 : s32i
+        %343 = const 20 : s32i
+        shift
+        %345 = const 1 : s32i
+        sub
+        %347 = const 7 : s32i
+        sub
+        store %348, %341
+        %349 = load %341 : s32i
+        return %349
 }
 fn add_all(%arg45: s32i, ...) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg45: s32i):
@@ -165,32 +165,32 @@ fn add_all(%arg45: s32i, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %325 = alloca s32i, "sum", align 4
         store %arg45, %322
         %326 = cast(array_to_ptrdecay) %324 : rec___va_list_tag*
-        va_start %326
+        va_start
         %327 = const 0 : s32i
         store %327, %325, align 4
         scope {
-            %330 = alloca s32i, "i", align 4
-            %331 = const 0 : s32i
-            store %331, %330, align 4
-            for cond: {
-                %338 = load %330 : s32i, align 4
-                %339 = load %322 : s32i, align 4
-                %340 = cmp lt %338, %339 : bool
-                condition %340
-            } step: {
-                %332 = load %330 : s32i, align 4
-                %333 = inc %332 : s32i [nsw]
-                store %333, %330, align 4
+                %330 = alloca s32i, "i", align 4
+                %331 = const 0 : s32i
+                store %331, %330, align 4
+                for cond {
+                        %338 = load %330 : s32i, align 4
+                        %339 = load %322 : s32i, align 4
+                        cmp
+                        condition %340
+                } step {
+                        %332 = load %330 : s32i, align 4
+                        inc
+                        store %333, %330, align 4
+                        yield
+                } body {
+                        %334 = cast(array_to_ptrdecay) %324 : rec___va_list_tag*
+                        va_arg
+                        %336 = load %325 : s32i, align 4
+                        %337 = add %336, %335 : s32i [nsw]
+                        store %337, %325, align 4
+                        yield
+                }
                 yield
-            } do {
-                %334 = cast(array_to_ptrdecay) %324 : rec___va_list_tag*
-                %335 = va_arg %334 : s32i
-                %336 = load %325 : s32i, align 4
-                %337 = add %336, %335 : s32i [nsw]
-                store %337, %325, align 4
-                yield
-            }
-            yield
         }
         %328 = load %325 : s32i, align 4
         store %328, %323
@@ -206,7 +206,7 @@ fn add_float(%arg43: float, %arg44: float) -> float [external, c, no_inline, dso
         store %arg44, %316
         %318 = load %315 : float, align 4
         %319 = load %316 : float, align 4
-        %320 = fadd %318, %319 : float
+        fadd
         store %320, %317
         %321 = load %317 : float
         return %321
@@ -220,7 +220,7 @@ fn add_double(%arg41: double, %arg42: double) -> double [external, c, no_inline,
         store %arg42, %309
         %311 = load %308 : double, align 8
         %312 = load %309 : double, align 8
-        %313 = fadd %311, %312 : double
+        fadd
         store %313, %310
         %314 = load %310 : double
         return %314
@@ -296,23 +296,23 @@ fn add10_float(%arg21: float, %arg22: float, %arg23: float, %arg24: float, %arg2
         store %arg30, %255
         %257 = load %246 : float, align 4
         %258 = load %247 : float, align 4
-        %259 = fadd %257, %258 : float
+        fadd
         %260 = load %248 : float, align 4
-        %261 = fadd %259, %260 : float
+        fadd
         %262 = load %249 : float, align 4
-        %263 = fadd %261, %262 : float
+        fadd
         %264 = load %250 : float, align 4
-        %265 = fadd %263, %264 : float
+        fadd
         %266 = load %251 : float, align 4
-        %267 = fadd %265, %266 : float
+        fadd
         %268 = load %252 : float, align 4
-        %269 = fadd %267, %268 : float
+        fadd
         %270 = load %253 : float, align 4
-        %271 = fadd %269, %270 : float
+        fadd
         %272 = load %254 : float, align 4
-        %273 = fadd %271, %272 : float
+        fadd
         %274 = load %255 : float, align 4
-        %275 = fadd %273, %274 : float
+        fadd
         store %275, %256
         %276 = load %256 : float
         return %276
@@ -342,23 +342,23 @@ fn add10_double(%arg11: double, %arg12: double, %arg13: double, %arg14: double, 
         store %arg20, %224
         %226 = load %215 : double, align 8
         %227 = load %216 : double, align 8
-        %228 = fadd %226, %227 : double
+        fadd
         %229 = load %217 : double, align 8
-        %230 = fadd %228, %229 : double
+        fadd
         %231 = load %218 : double, align 8
-        %232 = fadd %230, %231 : double
+        fadd
         %233 = load %219 : double, align 8
-        %234 = fadd %232, %233 : double
+        fadd
         %235 = load %220 : double, align 8
-        %236 = fadd %234, %235 : double
+        fadd
         %237 = load %221 : double, align 8
-        %238 = fadd %236, %237 : double
+        fadd
         %239 = load %222 : double, align 8
-        %240 = fadd %238, %239 : double
+        fadd
         %241 = load %223 : double, align 8
-        %242 = fadd %240, %241 : double
+        fadd
         %243 = load %224 : double, align 8
-        %244 = fadd %242, %243 : double
+        fadd
         store %244, %225
         %245 = load %225 : double
         return %245
@@ -367,9 +367,9 @@ fn struct_test4(%arg8: u64i, %arg9: u32i, %arg10: s32i) -> s32i [external, c, no
     ^bb0(%arg8: u64i, %arg9: u32i, %arg10: s32i):
         %189 = alloca rec_anon_struct, "coerce", align 8
         %190 = alloca rec_anon_struct, "coerce", align 8
-        %191 = get_member %190[0] "" : u64i*
+        get_member
         store %arg8, %191
-        %192 = get_member %190[1] "" : u32i*
+        get_member
         store %arg9, %192
         %193 = load %190 : rec_anon_struct
         store %193, %189
@@ -381,40 +381,41 @@ fn struct_test4(%arg8: u64i, %arg9: u32i, %arg10: s32i) -> s32i [external, c, no
         store %195, %196
         store %arg10, %197
         scope {
-            %200 = load %197 : s32i, align 4
-            switch %200 {
-                case equal 0 {
-                    %212 = get_member %196[0] "a" : s32i*
-                    %213 = load %212 : s32i, align 4
-                    store %213, %198
-                    %214 = load %198 : s32i
-                    return %214
+                %200 = load %197 : s32i, align 4
+                switch %200 {
+                        case equal [0] {
+                                get_member
+                                %213 = load %212 : s32i, align 4
+                                store %213, %198
+                                %214 = load %198 : s32i
+                                return %214
+                        }
+                        case equal [1] {
+                                get_member
+                                %210 = load %209 : s32i, align 4
+                                store %210, %198
+                                %211 = load %198 : s32i
+                                return %211
+                        }
+                        case equal [2] {
+                                get_member
+                                %206 = load %205 : s16i, align 4
+                                %207 = cast(integral) %206 : s32i
+                                store %207, %198
+                                %208 = load %198 : s32i
+                                return %208
+                        }
+                        case default [] {
+                                get_member
+                                %202 = load %201 : s8i, align 2
+                                %203 = cast(integral) %202 : s32i
+                                store %203, %198
+                                %204 = load %198 : s32i
+                                return %204
+                        }
+                        yield
                 }
-                case equal 1 {
-                    %209 = get_member %196[1] "b" : s32i*
-                    %210 = load %209 : s32i, align 4
-                    store %210, %198
-                    %211 = load %198 : s32i
-                    return %211
-                }
-                case equal 2 {
-                    %205 = get_member %196[2] "c" : s16i*
-                    %206 = load %205 : s16i, align 4
-                    %207 = cast(integral) %206 : s32i
-                    store %207, %198
-                    %208 = load %198 : s32i
-                    return %208
-                }
-                case default {
-                    %201 = get_member %196[3] "d" : s8i*
-                    %202 = load %201 : s8i, align 2
-                    %203 = cast(integral) %202 : s32i
-                    store %203, %198
-                    %204 = load %198 : s32i
-                    return %204
-                }
-            }
-            yield
+                yield
         }
         %199 = load %198 : s32i
         return %199
@@ -423,9 +424,9 @@ fn struct_test5(%arg5: u64i, %arg6: double, %arg7: s32i) -> s32i [external, c, n
     ^bb0(%arg5: u64i, %arg6: double, %arg7: s32i):
         %166 = alloca rec_anon_struct1, "coerce", align 8
         %167 = alloca rec_anon_struct1, "coerce", align 8
-        %168 = get_member %167[0] "" : u64i*
+        get_member
         store %arg5, %168
-        %169 = get_member %167[1] "" : double*
+        get_member
         store %arg6, %169
         %170 = load %167 : rec_anon_struct1
         store %170, %166
@@ -437,33 +438,34 @@ fn struct_test5(%arg5: u64i, %arg6: double, %arg7: s32i) -> s32i [external, c, n
         store %172, %173
         store %arg7, %174
         scope {
-            %177 = load %174 : s32i, align 4
-            switch %177 {
-                case equal 0 {
-                    %186 = get_member %173[0] "a" : s32i*
-                    %187 = load %186 : s32i, align 8
-                    store %187, %175
-                    %188 = load %175 : s32i
-                    return %188
+                %177 = load %174 : s32i, align 4
+                switch %177 {
+                        case equal [0] {
+                                get_member
+                                %187 = load %186 : s32i, align 8
+                                store %187, %175
+                                %188 = load %175 : s32i
+                                return %188
+                        }
+                        case equal [1] {
+                                get_member
+                                %183 = load %182 : float, align 4
+                                %184 = cast(float_to_int) %183 : s32i
+                                store %184, %175
+                                %185 = load %175 : s32i
+                                return %185
+                        }
+                        case default [] {
+                                get_member
+                                %179 = load %178 : double, align 8
+                                %180 = cast(float_to_int) %179 : s32i
+                                store %180, %175
+                                %181 = load %175 : s32i
+                                return %181
+                        }
+                        yield
                 }
-                case equal 1 {
-                    %182 = get_member %173[1] "b" : float*
-                    %183 = load %182 : float, align 4
-                    %184 = cast(float_to_int) %183 : s32i
-                    store %184, %175
-                    %185 = load %175 : s32i
-                    return %185
-                }
-                case default {
-                    %178 = get_member %173[2] "c" : double*
-                    %179 = load %178 : double, align 8
-                    %180 = cast(float_to_int) %179 : s32i
-                    store %180, %175
-                    %181 = load %175 : s32i
-                    return %181
-                }
-            }
-            yield
+                yield
         }
         %176 = load %175 : s32i
         return %176
@@ -481,8 +483,8 @@ fn struct_test6(%arg3: u24, %arg4: s32i) -> s32i [external, c, no_inline, dso_lo
         store %arg4, %157
         %159 = load %157 : s32i, align 4
         %160 = cast(integral) %159 : s64i
-        %161 = get_member %156[0] "a" : u8i[3]*
-        %162 = get_element %161[%160] : u8i*
+        get_member
+        get_element
         %163 = load %162 : u8i, align 1
         %164 = cast(integral) %163 : s32i
         store %164, %158
@@ -498,229 +500,230 @@ fn struct_test7(%arg1: rec_Ty7*, %arg2: s32i) -> s32i [external, c, no_inline, d
         store %135, %136
         store %arg2, %137
         scope {
-            %140 = load %137 : s32i, align 4
-            switch %140 {
-                case equal 0 {
-                    %149 = get_member %136[0] "a" : s64i*
-                    %150 = load %149 : s64i, align 8
-                    %151 = cast(integral) %150 : s32i
-                    store %151, %138
-                    %152 = load %138 : s32i
-                    return %152
+                %140 = load %137 : s32i, align 4
+                switch %140 {
+                        case equal [0] {
+                                get_member
+                                %150 = load %149 : s64i, align 8
+                                %151 = cast(integral) %150 : s32i
+                                store %151, %138
+                                %152 = load %138 : s32i
+                                return %152
+                        }
+                        case equal [1] {
+                                get_member
+                                %146 = load %145 : s64i, align 8
+                                %147 = cast(integral) %146 : s32i
+                                store %147, %138
+                                %148 = load %138 : s32i
+                                return %148
+                        }
+                        case default [] {
+                                get_member
+                                %142 = load %141 : s64i, align 8
+                                %143 = cast(integral) %142 : s32i
+                                store %143, %138
+                                %144 = load %138 : s32i
+                                return %144
+                        }
+                        yield
                 }
-                case equal 1 {
-                    %145 = get_member %136[1] "b" : s64i*
-                    %146 = load %145 : s64i, align 8
-                    %147 = cast(integral) %146 : s32i
-                    store %147, %138
-                    %148 = load %138 : s32i
-                    return %148
-                }
-                case default {
-                    %141 = get_member %136[2] "c" : s64i*
-                    %142 = load %141 : s64i, align 8
-                    %143 = cast(integral) %142 : s32i
-                    store %143, %138
-                    %144 = load %138 : s32i
-                    return %144
-                }
-            }
-            yield
+                yield
         }
         %139 = load %138 : s32i
         return %139
 }
 fn struct_test24() -> rec_anon_struct [external, c, no_inline, dso_local, nothrow] {
-    %122 = alloca rec_anon_struct, "coerce", align 8
-    %123 = alloca rec_Ty4, "__retval", align 4
-    %124 = get_member %123[0] "a" : s32i*
-    %125 = const 10 : s32i
-    store %125, %124, align 4
-    %126 = get_member %123[1] "b" : s32i*
-    %127 = const 20 : s32i
-    store %127, %126, align 4
-    %128 = get_member %123[2] "c" : s16i*
-    %129 = const 30 : s16i
-    store %129, %128, align 4
-    %130 = get_member %123[3] "d" : s8i*
-    %131 = const 40 : s8i
-    store %131, %130, align 2
-    %132 = load %123 : rec_Ty4
-    %133 = cast(bitcast) %122 : rec_Ty4*
-    store %132, %133
-    %134 = load %122 : rec_anon_struct
-    return %134
+        %122 = alloca rec_anon_struct, "coerce", align 8
+        %123 = alloca rec_Ty4, "__retval", align 4
+        get_member
+        %125 = const 10 : s32i
+        store %125, %124, align 4
+        get_member
+        %127 = const 20 : s32i
+        store %127, %126, align 4
+        get_member
+        %129 = const 30 : s16i
+        store %129, %128, align 4
+        get_member
+        %131 = const 40 : s8i
+        store %131, %130, align 2
+        %132 = load %123 : rec_Ty4
+        %133 = cast(bitcast) %122 : rec_Ty4*
+        store %132, %133
+        %134 = load %122 : rec_anon_struct
+        return %134
 }
 fn struct_test25() -> rec_anon_struct1 [external, c, no_inline, dso_local, nothrow] {
-    %109 = alloca rec_Ty5, "coerce", align 8
-    %110 = alloca rec_Ty5, "__retval", align 8
-    %111 = get_member %110[0] "a" : s32i*
-    %112 = const 10 : s32i
-    store %112, %111, align 8
-    %113 = get_member %110[1] "b" : float*
-    %114 = const 20 : s32i
-    %115 = cast(int_to_float) %114 : float
-    store %115, %113, align 4
-    %116 = get_member %110[2] "c" : double*
-    %117 = const 30 : s32i
-    %118 = cast(int_to_float) %117 : double
-    store %118, %116, align 8
-    %119 = load %110 : rec_Ty5
-    store %119, %109
-    %120 = cast(bitcast) %109 : rec_anon_struct1*
-    %121 = load %120 : rec_anon_struct1
-    return %121
+        %109 = alloca rec_Ty5, "coerce", align 8
+        %110 = alloca rec_Ty5, "__retval", align 8
+        get_member
+        %112 = const 10 : s32i
+        store %112, %111, align 8
+        get_member
+        %114 = const 20 : s32i
+        %115 = cast(int_to_float) %114 : float
+        store %115, %113, align 4
+        get_member
+        %117 = const 30 : s32i
+        %118 = cast(int_to_float) %117 : double
+        store %118, %116, align 8
+        %119 = load %110 : rec_Ty5
+        store %119, %109
+        %120 = cast(bitcast) %109 : rec_anon_struct1*
+        %121 = load %120 : rec_anon_struct1
+        return %121
 }
 fn struct_test26() -> u24 [external, c, no_inline, dso_local, nothrow] {
-    %95 = alloca rec_Ty6, "coerce", align 4
-    %96 = alloca rec_Ty6, "__retval", align 1
-    %97 = get_member %96[0] "a" : u8i[3]*
-    %98 = cast(array_to_ptrdecay) %97 : u8i*
-    %99 = const 10 : u8i
-    store %99, %98, align 1
-    %100 = const 1 : s64i
-    %101 = ptr_stride %98, %100 : u8i*
-    %102 = const 20 : u8i
-    store %102, %101, align 1
-    %103 = const 2 : s64i
-    %104 = ptr_stride %98, %103 : u8i*
-    %105 = const 30 : u8i
-    store %105, %104, align 1
-    %106 = load %96 : rec_Ty6
-    store %106, %95
-    %107 = cast(bitcast) %95 : u24*
-    %108 = load %107 : u24
-    return %108
+        %95 = alloca rec_Ty6, "coerce", align 4
+        %96 = alloca rec_Ty6, "__retval", align 1
+        get_member
+        %98 = cast(array_to_ptrdecay) %97 : u8i*
+        %99 = const 10 : u8i
+        store %99, %98, align 1
+        %100 = const 1 : s64i
+        ptr_stride
+        %102 = const 20 : u8i
+        store %102, %101, align 1
+        %103 = const 2 : s64i
+        ptr_stride
+        %105 = const 30 : u8i
+        store %105, %104, align 1
+        %106 = load %96 : rec_Ty6
+        store %106, %95
+        %107 = cast(bitcast) %95 : u24*
+        %108 = load %107 : u24
+        return %108
 }
 fn struct_test27() -> rec_anon_struct2 [external, c, no_inline, dso_local, nothrow] {
-    %60 = alloca rec_anon_struct2, "coerce", align 8
-    %61 = alloca rec_Ty20, "__retval", align 1
-    %62 = get_member %61[0] "a" : u8i[10]*
-    %63 = cast(array_to_ptrdecay) %62 : u8i*
-    %64 = const 10 : u8i
-    store %64, %63, align 1
-    %65 = const 1 : s64i
-    %66 = ptr_stride %63, %65 : u8i*
-    %67 = const 20 : u8i
-    store %67, %66, align 1
-    %68 = const 2 : s64i
-    %69 = ptr_stride %63, %68 : u8i*
-    %70 = const 30 : u8i
-    store %70, %69, align 1
-    %71 = const 3 : s64i
-    %72 = ptr_stride %63, %71 : u8i*
-    %73 = const 40 : u8i
-    store %73, %72, align 1
-    %74 = const 4 : s64i
-    %75 = ptr_stride %63, %74 : u8i*
-    %76 = const 50 : u8i
-    store %76, %75, align 1
-    %77 = const 5 : s64i
-    %78 = ptr_stride %63, %77 : u8i*
-    %79 = const 60 : u8i
-    store %79, %78, align 1
-    %80 = const 6 : s64i
-    %81 = ptr_stride %63, %80 : u8i*
-    %82 = const 70 : u8i
-    store %82, %81, align 1
-    %83 = const 7 : s64i
-    %84 = ptr_stride %63, %83 : u8i*
-    %85 = const 80 : u8i
-    store %85, %84, align 1
-    %86 = const 8 : s64i
-    %87 = ptr_stride %63, %86 : u8i*
-    %88 = const 90 : u8i
-    store %88, %87, align 1
-    %89 = const 9 : s64i
-    %90 = ptr_stride %63, %89 : u8i*
-    %91 = const 100 : u8i
-    store %91, %90, align 1
-    %92 = load %61 : rec_Ty20
-    %93 = cast(bitcast) %60 : rec_Ty20*
-    store %92, %93
-    %94 = load %60 : rec_anon_struct2
-    return %94
+        %60 = alloca rec_anon_struct2, "coerce", align 8
+        %61 = alloca rec_Ty20, "__retval", align 1
+        get_member
+        %63 = cast(array_to_ptrdecay) %62 : u8i*
+        %64 = const 10 : u8i
+        store %64, %63, align 1
+        %65 = const 1 : s64i
+        ptr_stride
+        %67 = const 20 : u8i
+        store %67, %66, align 1
+        %68 = const 2 : s64i
+        ptr_stride
+        %70 = const 30 : u8i
+        store %70, %69, align 1
+        %71 = const 3 : s64i
+        ptr_stride
+        %73 = const 40 : u8i
+        store %73, %72, align 1
+        %74 = const 4 : s64i
+        ptr_stride
+        %76 = const 50 : u8i
+        store %76, %75, align 1
+        %77 = const 5 : s64i
+        ptr_stride
+        %79 = const 60 : u8i
+        store %79, %78, align 1
+        %80 = const 6 : s64i
+        ptr_stride
+        %82 = const 70 : u8i
+        store %82, %81, align 1
+        %83 = const 7 : s64i
+        ptr_stride
+        %85 = const 80 : u8i
+        store %85, %84, align 1
+        %86 = const 8 : s64i
+        ptr_stride
+        %88 = const 90 : u8i
+        store %88, %87, align 1
+        %89 = const 9 : s64i
+        ptr_stride
+        %91 = const 100 : u8i
+        store %91, %90, align 1
+        %92 = load %61 : rec_Ty20
+        %93 = cast(bitcast) %60 : rec_Ty20*
+        store %92, %93
+        %94 = load %60 : rec_anon_struct2
+        return %94
 }
 fn struct_test28(%arg0: rec_Ty21*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: rec_Ty21*):
-        %0 = get_member %arg0[0] "a" : u8i[20]*
+        get_member
         %1 = cast(array_to_ptrdecay) %0 : u8i*
         %2 = const 1 : u8i
         store %2, %1, align 1
         %3 = const 1 : s64i
-        %4 = ptr_stride %1, %3 : u8i*
+        ptr_stride
         %5 = const 2 : u8i
         store %5, %4, align 1
         %6 = const 2 : s64i
-        %7 = ptr_stride %1, %6 : u8i*
+        ptr_stride
         %8 = const 3 : u8i
         store %8, %7, align 1
         %9 = const 3 : s64i
-        %10 = ptr_stride %1, %9 : u8i*
+        ptr_stride
         %11 = const 4 : u8i
         store %11, %10, align 1
         %12 = const 4 : s64i
-        %13 = ptr_stride %1, %12 : u8i*
+        ptr_stride
         %14 = const 5 : u8i
         store %14, %13, align 1
         %15 = const 5 : s64i
-        %16 = ptr_stride %1, %15 : u8i*
+        ptr_stride
         %17 = const 6 : u8i
         store %17, %16, align 1
         %18 = const 6 : s64i
-        %19 = ptr_stride %1, %18 : u8i*
+        ptr_stride
         %20 = const 7 : u8i
         store %20, %19, align 1
         %21 = const 7 : s64i
-        %22 = ptr_stride %1, %21 : u8i*
+        ptr_stride
         %23 = const 8 : u8i
         store %23, %22, align 1
         %24 = const 8 : s64i
-        %25 = ptr_stride %1, %24 : u8i*
+        ptr_stride
         %26 = const 9 : u8i
         store %26, %25, align 1
         %27 = const 9 : s64i
-        %28 = ptr_stride %1, %27 : u8i*
+        ptr_stride
         %29 = const 10 : u8i
         store %29, %28, align 1
         %30 = const 10 : s64i
-        %31 = ptr_stride %1, %30 : u8i*
+        ptr_stride
         %32 = const 11 : u8i
         store %32, %31, align 1
         %33 = const 11 : s64i
-        %34 = ptr_stride %1, %33 : u8i*
+        ptr_stride
         %35 = const 12 : u8i
         store %35, %34, align 1
         %36 = const 12 : s64i
-        %37 = ptr_stride %1, %36 : u8i*
+        ptr_stride
         %38 = const 13 : u8i
         store %38, %37, align 1
         %39 = const 13 : s64i
-        %40 = ptr_stride %1, %39 : u8i*
+        ptr_stride
         %41 = const 14 : u8i
         store %41, %40, align 1
         %42 = const 14 : s64i
-        %43 = ptr_stride %1, %42 : u8i*
+        ptr_stride
         %44 = const 15 : u8i
         store %44, %43, align 1
         %45 = const 15 : s64i
-        %46 = ptr_stride %1, %45 : u8i*
+        ptr_stride
         %47 = const 16 : u8i
         store %47, %46, align 1
         %48 = const 16 : s64i
-        %49 = ptr_stride %1, %48 : u8i*
+        ptr_stride
         %50 = const 17 : u8i
         store %50, %49, align 1
         %51 = const 17 : s64i
-        %52 = ptr_stride %1, %51 : u8i*
+        ptr_stride
         %53 = const 18 : u8i
         store %53, %52, align 1
         %54 = const 18 : s64i
-        %55 = ptr_stride %1, %54 : u8i*
+        ptr_stride
         %56 = const 19 : u8i
         store %56, %55, align 1
         %57 = const 19 : s64i
-        %58 = ptr_stride %1, %57 : u8i*
+        ptr_stride
         %59 = const 20 : u8i
         store %59, %58, align 1
         return

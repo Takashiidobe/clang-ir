@@ -1,49 +1,49 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr110817-3.c" (c, x86_64-unknown-linux-gnu)
-global v : vector<1 x u32i> = zero [external, default, align 4, dso_local]
-global c : u8i = 0 [external, default, align 1, dso_local]
+global v : vector<1 x u32i> = Zero { ty: Vector { element_type: Named("u32i"), size: 1, is_scalable: None } } [external, default, align 4, dso_local]
+global c : u8i = CirInt { ty: Named("u8i"), value: "0" } [external, default, align 1, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca vector<1 x u32i>, "x", align 4
-    %2 = alloca s32i, "t", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = get_global @v : vector<1 x u32i>*
-    %5 = load %4 : vector<1 x u32i>, align 4
-    %6 = const 0 : u32i
-    %7 = vec.splat %6 : vector<1 x u32i>
-    %8 = vec.cmp gt %5, %7 : vector<1 x s32i>
-    %9 = get_global @v : vector<1 x u32i>*
-    %10 = load %9 : vector<1 x u32i>, align 4
-    %11 = get_global @c : u8i*
-    %12 = load %11 : u8i, align 1
-    %13 = cast(integral) %12 : u32i
-    %14 = vec.splat %13 : vector<1 x u32i>
-    %15 = vec.cmp ne %10, %14 : vector<1 x s32i>
-    %16 = vec.cmp gt %8, %15 : vector<1 x s32i>
-    %17 = cast(bitcast) %16 : vector<1 x u32i>
-    store %17, %1, align 4
-    %18 = load %1 : vector<1 x u32i>, align 4
-    %19 = const 0 : s32i
-    %20 = vec.extract %18[%19] : u32i
-    %21 = cast(integral) %20 : s32i
-    store %21, %2, align 4, volatile
-    scope {
-        %24 = load %2 : s32i, align 4, volatile
-        %25 = cast(int_to_bool) %24 : bool
-        if %25 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca vector<1 x u32i>, "x", align 4
+        %2 = alloca s32i, "t", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = get_global @v : vector<1 x u32i>*
+        %5 = load %4 : vector<1 x u32i>, align 4
+        %6 = const 0 : u32i
+        vec.splat
+        vec.cmp
+        %9 = get_global @v : vector<1 x u32i>*
+        %10 = load %9 : vector<1 x u32i>, align 4
+        %11 = get_global @c : u8i*
+        %12 = load %11 : u8i, align 1
+        %13 = cast(integral) %12 : u32i
+        vec.splat
+        vec.cmp
+        vec.cmp
+        %17 = cast(bitcast) %16 : vector<1 x u32i>
+        store %17, %1, align 4
+        %18 = load %1 : vector<1 x u32i>, align 4
+        %19 = const 0 : s32i
+        vec.extract
+        %21 = cast(integral) %20 : s32i
+        store %21, %2, align 4
+        scope {
+                %24 = load %2 : s32i, align 4
+                %25 = cast(int_to_bool) %24 : bool
+                if %25 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %22 = const 0 : s32i
-    store %22, %0
-    %23 = load %0 : s32i
-    return %23
+        %22 = const 0 : s32i
+        store %22, %0
+        %23 = load %0 : s32i
+        return %23
 }

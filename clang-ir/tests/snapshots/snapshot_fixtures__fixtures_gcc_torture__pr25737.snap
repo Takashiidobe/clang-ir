@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr25737.c" (c, x86_64-unknown-linux-gnu)
-global Timer_Queue : rec_delay_block = zero [internal, default, align 8, dso_local]
+global Timer_Queue : rec_delay_block = Zero { ty: Named("rec_delay_block") } [internal, default, align 8, dso_local]
 
 fn time_enqueue(%arg0: rec_delay_block*) -> rec_delay_block* [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: rec_delay_block*):
@@ -12,15 +12,15 @@ fn time_enqueue(%arg0: rec_delay_block*) -> rec_delay_block* [external, c, no_in
         %15 = alloca rec_delay_block*, "q", align 8
         store %arg0, %13
         %16 = get_global @Timer_Queue : rec_delay_block*
-        %17 = get_member %16[0] "succ" : rec_delay_block**
+        get_member
         %18 = load %17 : rec_delay_block*, align 8
         store %18, %15, align 8
         %19 = const #cir.ptr<null> : rec_delay_block*
         %20 = load %13 : rec_delay_block*, align 8
-        %21 = get_member %20[0] "succ" : rec_delay_block**
+        get_member
         store %19, %21, align 8
         %22 = get_global @Timer_Queue : rec_delay_block*
-        %23 = get_member %22[0] "succ" : rec_delay_block**
+        get_member
         %24 = load %23 : rec_delay_block*, align 8
         store %24, %14
         %25 = load %14 : rec_delay_block*
@@ -28,28 +28,28 @@ fn time_enqueue(%arg0: rec_delay_block*) -> rec_delay_block* [external, c, no_in
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @Timer_Queue : rec_delay_block*
-    %3 = get_global @Timer_Queue : rec_delay_block*
-    %4 = get_member %3[0] "succ" : rec_delay_block**
-    store %2, %4, align 8
-    scope {
-        %7 = get_global @Timer_Queue : rec_delay_block*
-        %8 = call @time_enqueue(%7) : rec_delay_block* [all]
-        %9 = const #cir.ptr<null> : void*
-        %10 = cast(bitcast) %9 : rec_delay_block*
-        %11 = cmp ne %8, %10 : bool
-        if %11 {
-            %12 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @Timer_Queue : rec_delay_block*
+        %3 = get_global @Timer_Queue : rec_delay_block*
+        get_member
+        store %2, %4, align 8
+        scope {
+                %7 = get_global @Timer_Queue : rec_delay_block*
+                %8 = call @time_enqueue(%7) : rec_delay_block* [all]
+                %9 = const #cir.ptr<null> : void*
+                %10 = cast(bitcast) %9 : rec_delay_block*
+                cmp
+                if %11 {
+                        %12 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = load %0 : s32i
-    return %6
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = load %0 : s32i
+        return %6
 }

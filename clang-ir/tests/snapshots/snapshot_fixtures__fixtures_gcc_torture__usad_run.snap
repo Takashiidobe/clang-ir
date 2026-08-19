@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/usad-run.c" (c, x86_64-unknown-linux-gnu)
@@ -18,70 +18,70 @@ fn foo(%arg4: u8i*, %arg5: s32i, %arg6: u8i*, %arg7: s32i) -> s32i [internal, c,
         %83 = const 0 : s32i
         store %83, %82, align 4
         scope {
-            %86 = alloca s32i, "a", align 4
-            %87 = const 0 : s32i
-            store %87, %86, align 4
-            for cond: {
-                %119 = load %86 : s32i, align 4
-                %120 = const 16 : s32i
-                %121 = cmp lt %119, %120 : bool
-                condition %121
-            } step: {
-                %88 = load %86 : s32i, align 4
-                %89 = inc %88 : s32i [nsw]
-                store %89, %86, align 4
-                yield
-            } do {
-                scope {
-                    scope {
-                        %96 = alloca s32i, "b", align 4
-                        %97 = const 0 : s32i
-                        store %97, %96, align 4
-                        for cond: {
-                            %116 = load %96 : s32i, align 4
-                            %117 = const 16 : s32i
-                            %118 = cmp lt %116, %117 : bool
-                            condition %118
-                        } step: {
-                            %98 = load %96 : s32i, align 4
-                            %99 = inc %98 : s32i [nsw]
-                            store %99, %96, align 4
-                            yield
-                        } do {
-                            %100 = load %96 : s32i, align 4
-                            %101 = cast(integral) %100 : s64i
-                            %102 = load %77 : u8i*, align 8
-                            %103 = ptr_stride %102, %101 : u8i*
-                            %104 = load %103 : u8i, align 1
-                            %105 = cast(integral) %104 : s32i
-                            %106 = load %96 : s32i, align 4
-                            %107 = cast(integral) %106 : s64i
-                            %108 = load %79 : u8i*, align 8
-                            %109 = ptr_stride %108, %107 : u8i*
-                            %110 = load %109 : u8i, align 1
-                            %111 = cast(integral) %110 : s32i
-                            %112 = sub %105, %111 : s32i [nsw]
-                            %113 = abs %112 : s32i [poison]
-                            %114 = load %82 : s32i, align 4
-                            %115 = add %114, %113 : s32i [nsw]
-                            store %115, %82, align 4
-                            yield
+                %86 = alloca s32i, "a", align 4
+                %87 = const 0 : s32i
+                store %87, %86, align 4
+                for cond {
+                        %119 = load %86 : s32i, align 4
+                        %120 = const 16 : s32i
+                        cmp
+                        condition %121
+                } step {
+                        %88 = load %86 : s32i, align 4
+                        inc
+                        store %89, %86, align 4
+                        yield
+                } body {
+                        scope {
+                                scope {
+                                        %96 = alloca s32i, "b", align 4
+                                        %97 = const 0 : s32i
+                                        store %97, %96, align 4
+                                        for cond {
+                                                %116 = load %96 : s32i, align 4
+                                                %117 = const 16 : s32i
+                                                cmp
+                                                condition %118
+                                        } step {
+                                                %98 = load %96 : s32i, align 4
+                                                inc
+                                                store %99, %96, align 4
+                                                yield
+                                        } body {
+                                                %100 = load %96 : s32i, align 4
+                                                %101 = cast(integral) %100 : s64i
+                                                %102 = load %77 : u8i*, align 8
+                                                ptr_stride
+                                                %104 = load %103 : u8i, align 1
+                                                %105 = cast(integral) %104 : s32i
+                                                %106 = load %96 : s32i, align 4
+                                                %107 = cast(integral) %106 : s64i
+                                                %108 = load %79 : u8i*, align 8
+                                                ptr_stride
+                                                %110 = load %109 : u8i, align 1
+                                                %111 = cast(integral) %110 : s32i
+                                                sub
+                                                abs
+                                                %114 = load %82 : s32i, align 4
+                                                %115 = add %114, %113 : s32i [nsw]
+                                                store %115, %82, align 4
+                                                yield
+                                        }
+                                        yield
+                                }
+                                %90 = load %78 : s32i, align 4
+                                %91 = load %77 : u8i*, align 8
+                                ptr_stride
+                                store %92, %77, align 8
+                                %93 = load %80 : s32i, align 4
+                                %94 = load %79 : u8i*, align 8
+                                ptr_stride
+                                store %95, %79, align 8
+                                yield
                         }
                         yield
-                    }
-                    %90 = load %78 : s32i, align 4
-                    %91 = load %77 : u8i*, align 8
-                    %92 = ptr_stride %91, %90 : u8i*
-                    store %92, %77, align 8
-                    %93 = load %80 : s32i, align 4
-                    %94 = load %79 : u8i*, align 8
-                    %95 = ptr_stride %94, %93 : u8i*
-                    store %95, %79, align 8
-                    yield
                 }
                 yield
-            }
-            yield
         }
         %84 = load %82 : s32i, align 4
         store %84, %81
@@ -109,106 +109,106 @@ fn bar(%arg0: u8i*, %arg1: u8i*, %arg2: s32i, %arg3: s32i*) -> void [external, c
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u8i[256], "m", align 16
-    %2 = alloca u8i[256], "n", align 16
-    %3 = alloca s32i, "sum", align 4
-    %4 = alloca s32i, "i", align 4
-    %5 = const 0 : s32i
-    store %5, %0
-    scope {
-        %15 = const 0 : s32i
-        store %15, %4, align 4
-        for cond: {
-            %64 = load %4 : s32i, align 4
-            %65 = const 256 : s32i
-            %66 = cmp lt %64, %65 : bool
-            condition %66
-        } step: {
-            %16 = load %4 : s32i, align 4
-            %17 = inc %16 : s32i [nsw]
-            store %17, %4, align 4
-            yield
-        } do {
-            scope {
-                %18 = load %4 : s32i, align 4
-                %19 = const 2 : s32i
-                %20 = rem %18, %19 : s32i
-                %21 = const 0 : s32i
-                %22 = cmp eq %20, %21 : bool
-                if %22 {
-                    %45 = load %4 : s32i, align 4
-                    %46 = const 8 : s32i
-                    %47 = rem %45, %46 : s32i
-                    %48 = const 2 : s32i
-                    %49 = mul %47, %48 : s32i [nsw]
-                    %50 = const 1 : s32i
-                    %51 = add %49, %50 : s32i [nsw]
-                    %52 = cast(integral) %51 : u8i
-                    %53 = load %4 : s32i, align 4
-                    %54 = cast(integral) %53 : s64i
-                    %55 = get_element %1[%54] : u8i*
-                    store %52, %55, align 1
-                    %56 = load %4 : s32i, align 4
-                    %57 = const 8 : s32i
-                    %58 = rem %56, %57 : s32i
-                    %59 = minus %58 : s32i [nsw]
-                    %60 = cast(integral) %59 : u8i
-                    %61 = load %4 : s32i, align 4
-                    %62 = cast(integral) %61 : s64i
-                    %63 = get_element %2[%62] : u8i*
-                    store %60, %63, align 1
-                    yield
-                } else {
-                    %23 = load %4 : s32i, align 4
-                    %24 = const 8 : s32i
-                    %25 = rem %23, %24 : s32i
-                    %26 = const 2 : s32i
-                    %27 = mul %25, %26 : s32i [nsw]
-                    %28 = const 2 : s32i
-                    %29 = add %27, %28 : s32i [nsw]
-                    %30 = minus %29 : s32i [nsw]
-                    %31 = cast(integral) %30 : u8i
-                    %32 = load %4 : s32i, align 4
-                    %33 = cast(integral) %32 : s64i
-                    %34 = get_element %1[%33] : u8i*
-                    store %31, %34, align 1
-                    %35 = load %4 : s32i, align 4
-                    %36 = const 8 : s32i
-                    %37 = rem %35, %36 : s32i
-                    %38 = const 1 : s32i
-                    %39 = shift right %37, %38 : s32i
-                    %40 = minus %39 : s32i [nsw]
-                    %41 = cast(integral) %40 : u8i
-                    %42 = load %4 : s32i, align 4
-                    %43 = cast(integral) %42 : s64i
-                    %44 = get_element %2[%43] : u8i*
-                    store %41, %44, align 1
-                    yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u8i[256], "m", align 16
+        %2 = alloca u8i[256], "n", align 16
+        %3 = alloca s32i, "sum", align 4
+        %4 = alloca s32i, "i", align 4
+        %5 = const 0 : s32i
+        store %5, %0
+        scope {
+                %15 = const 0 : s32i
+                store %15, %4, align 4
+                for cond {
+                        %64 = load %4 : s32i, align 4
+                        %65 = const 256 : s32i
+                        cmp
+                        condition %66
+                } step {
+                        %16 = load %4 : s32i, align 4
+                        inc
+                        store %17, %4, align 4
+                        yield
+                } body {
+                        scope {
+                                %18 = load %4 : s32i, align 4
+                                %19 = const 2 : s32i
+                                rem
+                                %21 = const 0 : s32i
+                                cmp
+                                if %22 {
+                                        %45 = load %4 : s32i, align 4
+                                        %46 = const 8 : s32i
+                                        rem
+                                        %48 = const 2 : s32i
+                                        mul
+                                        %50 = const 1 : s32i
+                                        %51 = add %49, %50 : s32i [nsw]
+                                        %52 = cast(integral) %51 : u8i
+                                        %53 = load %4 : s32i, align 4
+                                        %54 = cast(integral) %53 : s64i
+                                        get_element
+                                        store %52, %55, align 1
+                                        %56 = load %4 : s32i, align 4
+                                        %57 = const 8 : s32i
+                                        rem
+                                        minus
+                                        %60 = cast(integral) %59 : u8i
+                                        %61 = load %4 : s32i, align 4
+                                        %62 = cast(integral) %61 : s64i
+                                        get_element
+                                        store %60, %63, align 1
+                                        yield
+                                } else {
+                                        %23 = load %4 : s32i, align 4
+                                        %24 = const 8 : s32i
+                                        rem
+                                        %26 = const 2 : s32i
+                                        mul
+                                        %28 = const 2 : s32i
+                                        %29 = add %27, %28 : s32i [nsw]
+                                        minus
+                                        %31 = cast(integral) %30 : u8i
+                                        %32 = load %4 : s32i, align 4
+                                        %33 = cast(integral) %32 : s64i
+                                        get_element
+                                        store %31, %34, align 1
+                                        %35 = load %4 : s32i, align 4
+                                        %36 = const 8 : s32i
+                                        rem
+                                        %38 = const 1 : s32i
+                                        shift
+                                        minus
+                                        %41 = cast(integral) %40 : u8i
+                                        %42 = load %4 : s32i, align 4
+                                        %43 = cast(integral) %42 : s64i
+                                        get_element
+                                        store %41, %44, align 1
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %6 = cast(array_to_ptrdecay) %1 : u8i*
-    %7 = cast(array_to_ptrdecay) %2 : u8i*
-    %8 = const 16 : s32i
-    call @bar(%6, %7, %8, %3) [all]
-    scope {
-        %11 = load %3 : s32i, align 4
-        %12 = const 32384 : s32i
-        %13 = cmp ne %11, %12 : bool
-        if %13 {
-            %14 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %6 = cast(array_to_ptrdecay) %1 : u8i*
+        %7 = cast(array_to_ptrdecay) %2 : u8i*
+        %8 = const 16 : s32i
+        call @bar(%6, %7, %8, %3) [all]
+        scope {
+                %11 = load %3 : s32i, align 4
+                %12 = const 32384 : s32i
+                cmp
+                if %13 {
+                        %14 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %9 = const 0 : s32i
-    store %9, %0
-    %10 = load %0 : s32i
-    return %10
+        %9 = const 0 : s32i
+        store %9, %0
+        %10 = load %0 : s32i
+        return %10
 }

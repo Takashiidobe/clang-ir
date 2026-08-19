@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr68841.c" (c, x86_64-unknown-linux-gnu)
@@ -15,19 +15,19 @@ fn foo(%arg0: s32i*, %arg1: s32i) -> s32i [internal, c, no_inline, dso_local, no
         %42 = load %41 : s32i, align 4
         store %42, %40, align 4
         scope {
-            while {
-                %48 = load %38 : s32i, align 4
-                %49 = load %40 : s32i, align 4
-                %50 = cmp gt %48, %49 : bool
-                condition %50
-            } do {
-                %45 = const 2 : s32i
-                %46 = load %40 : s32i, align 4
-                %47 = mul %46, %45 : s32i [nsw]
-                store %47, %40, align 4
+                while {
+                        %48 = load %38 : s32i, align 4
+                        %49 = load %40 : s32i, align 4
+                        cmp
+                        condition %50
+                } do {
+                        %45 = const 2 : s32i
+                        %46 = load %40 : s32i, align 4
+                        mul
+                        store %47, %40, align 4
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %43 = load %40 : s32i, align 4
         store %43, %39
@@ -36,95 +36,95 @@ fn foo(%arg0: s32i*, %arg1: s32i) -> s32i [internal, c, no_inline, dso_local, no
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    scope {
-        %5 = const 1 : s32i
-        store %5, %1, align 4
-        for cond: {
-            %34 = load %1 : s32i, align 4
-            %35 = const 17 : s32i
-            %36 = cmp lt %34, %35 : bool
-            condition %36
-        } step: {
-            %6 = load %1 : s32i, align 4
-            %7 = inc %6 : s32i [nsw]
-            store %7, %1, align 4
-            yield
-        } do {
-            scope {
-                %8 = alloca s32i, "j", align 4
-                %9 = alloca s32i, "k", align 4
-                %10 = const 7 : s32i
-                %11 = call @foo(%1, %10) : s32i [all]
-                store %11, %8, align 4
-                scope {
-                    %15 = load %1 : s32i, align 4
-                    %16 = const 7 : s32i
-                    %17 = cmp ge %15, %16 : bool
-                    if %17 {
-                        %33 = load %1 : s32i, align 4
-                        store %33, %9, align 4
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        scope {
+                %5 = const 1 : s32i
+                store %5, %1, align 4
+                for cond {
+                        %34 = load %1 : s32i, align 4
+                        %35 = const 17 : s32i
+                        cmp
+                        condition %36
+                } step {
+                        %6 = load %1 : s32i, align 4
+                        inc
+                        store %7, %1, align 4
                         yield
-                    } else {
+                } body {
                         scope {
-                            %18 = load %1 : s32i, align 4
-                            %19 = const 4 : s32i
-                            %20 = cmp ge %18, %19 : bool
-                            if %20 {
-                                %26 = const 8 : s32i
-                                %27 = load %1 : s32i, align 4
-                                %28 = const 4 : s32i
-                                %29 = sub %27, %28 : s32i [nsw]
-                                %30 = const 2 : s32i
-                                %31 = mul %29, %30 : s32i [nsw]
-                                %32 = add %26, %31 : s32i [nsw]
-                                store %32, %9, align 4
-                                yield
-                            } else {
+                                %8 = alloca s32i, "j", align 4
+                                %9 = alloca s32i, "k", align 4
+                                %10 = const 7 : s32i
+                                %11 = call @foo(%1, %10) : s32i [all]
+                                store %11, %8, align 4
                                 scope {
-                                    %21 = load %1 : s32i, align 4
-                                    %22 = const 3 : s32i
-                                    %23 = cmp eq %21, %22 : bool
-                                    if %23 {
-                                        %25 = const 12 : s32i
-                                        store %25, %9, align 4
+                                        %15 = load %1 : s32i, align 4
+                                        %16 = const 7 : s32i
+                                        cmp
+                                        if %17 {
+                                                %33 = load %1 : s32i, align 4
+                                                store %33, %9, align 4
+                                                yield
+                                        } else {
+                                                scope {
+                                                        %18 = load %1 : s32i, align 4
+                                                        %19 = const 4 : s32i
+                                                        cmp
+                                                        if %20 {
+                                                                %26 = const 8 : s32i
+                                                                %27 = load %1 : s32i, align 4
+                                                                %28 = const 4 : s32i
+                                                                sub
+                                                                %30 = const 2 : s32i
+                                                                mul
+                                                                %32 = add %26, %31 : s32i [nsw]
+                                                                store %32, %9, align 4
+                                                                yield
+                                                        } else {
+                                                                scope {
+                                                                        %21 = load %1 : s32i, align 4
+                                                                        %22 = const 3 : s32i
+                                                                        cmp
+                                                                        if %23 {
+                                                                                %25 = const 12 : s32i
+                                                                                store %25, %9, align 4
+                                                                                yield
+                                                                        } else {
+                                                                                %24 = const 8 : s32i
+                                                                                store %24, %9, align 4
+                                                                                yield
+                                                                        }
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
                                         yield
-                                    } else {
-                                        %24 = const 8 : s32i
-                                        store %24, %9, align 4
+                                }
+                                scope {
+                                        %12 = load %8 : s32i, align 4
+                                        %13 = load %9 : s32i, align 4
+                                        cmp
+                                        if %14 {
+                                                call @abort() [all]
+                                                yield
+                                        }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
-                }
-                scope {
-                    %12 = load %8 : s32i, align 4
-                    %13 = load %9 : s32i, align 4
-                    %14 = cmp ne %12, %13 : bool
-                    if %14 {
-                        call @abort() [all]
-                        yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = load %0 : s32i
-    return %4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = load %0 : s32i
+        return %4
 }

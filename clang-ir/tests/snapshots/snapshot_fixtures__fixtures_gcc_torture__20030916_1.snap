@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20030916-1.c" (c, x86_64-unknown-linux-gnu)
@@ -12,127 +12,127 @@ fn f(%arg0: u32i*) -> void [external, c, no_inline, dso_local, nothrow] {
         %43 = const 16 : u8i
         store %43, %41, align 1
         scope {
-            %44 = const 0 : s32i
-            store %44, %42, align 4
-            for cond: {
-                %62 = load %42 : s32i, align 4
-                %63 = const 16 : s32i
-                %64 = cmp lt %62, %63 : bool
-                condition %64
-            } step: {
-                %45 = load %42 : s32i, align 4
-                %46 = inc %45 : s32i [nsw]
-                store %46, %42, align 4
-                yield
-            } do {
-                scope {
-                    %47 = const 232 : s32i
-                    %48 = load %41 : u8i, align 1
-                    %49 = cast(integral) %48 : s32i
-                    %50 = add %49, %47 : s32i [nsw]
-                    %51 = cast(integral) %50 : u8i
-                    store %51, %41, align 1
-                    %52 = const 0 : u32i
-                    %53 = load %41 : u8i, align 1
-                    %54 = cast(integral) %53 : u64i
-                    %55 = load %40 : u32i*, align 8
-                    %56 = ptr_stride %55, %54 : u32i*
-                    store %52, %56, align 4
-                    %57 = const 231 : s32i
-                    %58 = load %41 : u8i, align 1
-                    %59 = cast(integral) %58 : s32i
-                    %60 = sub %59, %57 : s32i [nsw]
-                    %61 = cast(integral) %60 : u8i
-                    store %61, %41, align 1
-                    yield
+                %44 = const 0 : s32i
+                store %44, %42, align 4
+                for cond {
+                        %62 = load %42 : s32i, align 4
+                        %63 = const 16 : s32i
+                        cmp
+                        condition %64
+                } step {
+                        %45 = load %42 : s32i, align 4
+                        inc
+                        store %46, %42, align 4
+                        yield
+                } body {
+                        scope {
+                                %47 = const 232 : s32i
+                                %48 = load %41 : u8i, align 1
+                                %49 = cast(integral) %48 : s32i
+                                %50 = add %49, %47 : s32i [nsw]
+                                %51 = cast(integral) %50 : u8i
+                                store %51, %41, align 1
+                                %52 = const 0 : u32i
+                                %53 = load %41 : u8i, align 1
+                                %54 = cast(integral) %53 : u64i
+                                %55 = load %40 : u32i*, align 8
+                                ptr_stride
+                                store %52, %56, align 4
+                                %57 = const 231 : s32i
+                                %58 = load %41 : u8i, align 1
+                                %59 = cast(integral) %58 : s32i
+                                sub
+                                %61 = cast(integral) %60 : u8i
+                                store %61, %41, align 1
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u32i[256], "x", align 16
-    %2 = alloca s32i, "i", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    scope {
-        %30 = const 0 : s32i
-        store %30, %2, align 4
-        for cond: {
-            %37 = load %2 : s32i, align 4
-            %38 = const 256 : s32i
-            %39 = cmp lt %37, %38 : bool
-            condition %39
-        } step: {
-            %31 = load %2 : s32i, align 4
-            %32 = inc %31 : s32i [nsw]
-            store %32, %2, align 4
-            yield
-        } do {
-            %33 = const 1 : u32i
-            %34 = load %2 : s32i, align 4
-            %35 = cast(integral) %34 : s64i
-            %36 = get_element %1[%35] : u32i*
-            store %33, %36, align 4
-            yield
-        }
-        yield
-    }
-    %4 = cast(array_to_ptrdecay) %1 : u32i*
-    call @f(%4) [all]
-    scope {
-        %8 = const 0 : s32i
-        store %8, %2, align 4
-        for cond: {
-            %27 = load %2 : s32i, align 4
-            %28 = const 256 : s32i
-            %29 = cmp lt %27, %28 : bool
-            condition %29
-        } step: {
-            %9 = load %2 : s32i, align 4
-            %10 = inc %9 : s32i [nsw]
-            store %10, %2, align 4
-            yield
-        } do {
-            scope {
-                %11 = load %2 : s32i, align 4
-                %12 = cast(integral) %11 : s64i
-                %13 = get_element %1[%12] : u32i*
-                %14 = load %13 : u32i, align 4
-                %15 = load %2 : s32i, align 4
-                %16 = const 8 : s32i
-                %17 = cmp ge %15, %16 : bool
-                %18 = ternary %17 ? { : bool
-                    %24 = load %2 : s32i, align 4
-                    %25 = const 248 : s32i
-                    %26 = cmp lt %24, %25 : bool
-                    yield %26
-                } : {
-                    %23 = const false : bool
-                    yield %23
-                }
-                %19 = cast(bool_to_int) %18 : s32i
-                %20 = cast(integral) %19 : u32i
-                %21 = cmp ne %14, %20 : bool
-                if %21 {
-                    %22 = get_global @abort : (() -> void)*
-                    call @abort() [all]
-                    yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u32i[256], "x", align 16
+        %2 = alloca s32i, "i", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        scope {
+                %30 = const 0 : s32i
+                store %30, %2, align 4
+                for cond {
+                        %37 = load %2 : s32i, align 4
+                        %38 = const 256 : s32i
+                        cmp
+                        condition %39
+                } step {
+                        %31 = load %2 : s32i, align 4
+                        inc
+                        store %32, %2, align 4
+                        yield
+                } body {
+                        %33 = const 1 : u32i
+                        %34 = load %2 : s32i, align 4
+                        %35 = cast(integral) %34 : s64i
+                        get_element
+                        store %33, %36, align 4
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %5 = get_global @exit : ((s32i) -> void)*
-    %6 = const 0 : s32i
-    call @exit(%6) [all]
-    %7 = load %0 : s32i
-    return %7
+        %4 = cast(array_to_ptrdecay) %1 : u32i*
+        call @f(%4) [all]
+        scope {
+                %8 = const 0 : s32i
+                store %8, %2, align 4
+                for cond {
+                        %27 = load %2 : s32i, align 4
+                        %28 = const 256 : s32i
+                        cmp
+                        condition %29
+                } step {
+                        %9 = load %2 : s32i, align 4
+                        inc
+                        store %10, %2, align 4
+                        yield
+                } body {
+                        scope {
+                                %11 = load %2 : s32i, align 4
+                                %12 = cast(integral) %11 : s64i
+                                get_element
+                                %14 = load %13 : u32i, align 4
+                                %15 = load %2 : s32i, align 4
+                                %16 = const 8 : s32i
+                                cmp
+                                %18 = ternary %17 ? { : bool
+                                        %24 = load %2 : s32i, align 4
+                                        %25 = const 248 : s32i
+                                        cmp
+                                        yield %26
+                                } : {
+                                        %23 = const false : bool
+                                        yield %23
+                                }
+                                %19 = cast(bool_to_int) %18 : s32i
+                                %20 = cast(integral) %19 : u32i
+                                cmp
+                                if %21 {
+                                        %22 = get_global @abort : () -> void*
+                                        call @abort() [all]
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
+                }
+                yield
+        }
+        %5 = get_global @exit : (s32i) -> void*
+        %6 = const 0 : s32i
+        call @exit(%6) [all]
+        %7 = load %0 : s32i
+        return %7
 }

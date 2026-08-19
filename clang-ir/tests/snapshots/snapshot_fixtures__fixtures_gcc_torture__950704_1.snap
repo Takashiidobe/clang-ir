@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/950704-1.c" (c, x86_64-unknown-linux-gnu)
-global errflag : s32i = 0 [external, default, align 4, dso_local]
+global errflag : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn f(%arg0: s64i, %arg1: s64i) -> s64i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s64i, %arg1: s64i):
@@ -21,57 +21,57 @@ fn f(%arg0: s64i, %arg1: s64i) -> s64i [external, c, no_inline, dso_local, nothr
         %73 = add %71, %72 : s64i [nsw]
         store %73, %68, align 8
         scope {
-            %78 = load %65 : s64i, align 8
-            %79 = const 0 : s64i
-            %80 = cmp ge %78, %79 : bool
-            if %80 {
-                scope {
-                    %91 = load %66 : s64i, align 8
-                    %92 = const 0 : s64i
-                    %93 = cmp lt %91, %92 : bool
-                    %94 = ternary %93 ? { : bool
-                        %100 = const true : bool
-                        yield %100
-                    } : {
-                        %97 = load %68 : s64i, align 8
-                        %98 = const 0 : s64i
-                        %99 = cmp ge %97, %98 : bool
-                        yield %99
-                    }
-                    if %94 {
-                        %95 = load %68 : s64i, align 8
-                        store %95, %67
-                        %96 = load %67 : s64i
-                        return %96
-                    }
-                    yield
+                %78 = load %65 : s64i, align 8
+                %79 = const 0 : s64i
+                cmp
+                if %80 {
+                        scope {
+                                %91 = load %66 : s64i, align 8
+                                %92 = const 0 : s64i
+                                cmp
+                                %94 = ternary %93 ? { : bool
+                                        %100 = const true : bool
+                                        yield %100
+                                } : {
+                                        %97 = load %68 : s64i, align 8
+                                        %98 = const 0 : s64i
+                                        cmp
+                                        yield %99
+                                }
+                                if %94 {
+                                        %95 = load %68 : s64i, align 8
+                                        store %95, %67
+                                        %96 = load %67 : s64i
+                                        return %96
+                                }
+                                yield
+                        }
+                        yield
+                } else {
+                        scope {
+                                %81 = load %66 : s64i, align 8
+                                %82 = const 0 : s64i
+                                cmp
+                                %84 = ternary %83 ? { : bool
+                                        %90 = const true : bool
+                                        yield %90
+                                } : {
+                                        %87 = load %68 : s64i, align 8
+                                        %88 = const 0 : s64i
+                                        cmp
+                                        yield %89
+                                }
+                                if %84 {
+                                        %85 = load %68 : s64i, align 8
+                                        store %85, %67
+                                        %86 = load %67 : s64i
+                                        return %86
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            } else {
-                scope {
-                    %81 = load %66 : s64i, align 8
-                    %82 = const 0 : s64i
-                    %83 = cmp gt %81, %82 : bool
-                    %84 = ternary %83 ? { : bool
-                        %90 = const true : bool
-                        yield %90
-                    } : {
-                        %87 = load %68 : s64i, align 8
-                        %88 = const 0 : s64i
-                        %89 = cmp lt %87, %88 : bool
-                        yield %89
-                    }
-                    if %84 {
-                        %85 = load %68 : s64i, align 8
-                        store %85, %67
-                        %86 = load %67 : s64i
-                        return %86
-                    }
-                    yield
-                }
-                yield
-            }
-            yield
         }
         %74 = const 1 : s32i
         %75 = get_global @errflag : s32i*
@@ -84,128 +84,128 @@ fn f(%arg0: s64i, %arg1: s64i) -> s64i [external, c, no_inline, dso_local, nothr
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 0 : s64i
-    %3 = const 0 : s64i
-    %4 = call @f(%2, %3) : s64i [all]
-    scope {
-        %61 = get_global @errflag : s32i*
-        %62 = load %61 : s32i, align 4
-        %63 = cast(int_to_bool) %62 : bool
-        if %63 {
-            %64 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 0 : s64i
+        %3 = const 0 : s64i
+        %4 = call @f(%2, %3) : s64i [all]
+        scope {
+                %61 = get_global @errflag : s32i*
+                %62 = load %61 : s32i, align 4
+                %63 = cast(int_to_bool) %62 : bool
+                if %63 {
+                        %64 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %5 = const 1 : s64i
-    %6 = const -1 : s64i
-    %7 = call @f(%5, %6) : s64i [all]
-    scope {
-        %57 = get_global @errflag : s32i*
-        %58 = load %57 : s32i, align 4
-        %59 = cast(int_to_bool) %58 : bool
-        if %59 {
-            %60 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %5 = const 1 : s64i
+        %6 = const -1 : s64i
+        %7 = call @f(%5, %6) : s64i [all]
+        scope {
+                %57 = get_global @errflag : s32i*
+                %58 = load %57 : s32i, align 4
+                %59 = cast(int_to_bool) %58 : bool
+                if %59 {
+                        %60 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %8 = const -1 : s64i
-    %9 = const 1 : s64i
-    %10 = call @f(%8, %9) : s64i [all]
-    scope {
-        %53 = get_global @errflag : s32i*
-        %54 = load %53 : s32i, align 4
-        %55 = cast(int_to_bool) %54 : bool
-        if %55 {
-            %56 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %8 = const -1 : s64i
+        %9 = const 1 : s64i
+        %10 = call @f(%8, %9) : s64i [all]
+        scope {
+                %53 = get_global @errflag : s32i*
+                %54 = load %53 : s32i, align 4
+                %55 = cast(int_to_bool) %54 : bool
+                if %55 {
+                        %56 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %11 = const -9223372036854775808 : s64i
-    %12 = const -9223372036854775808 : s64i
-    %13 = call @f(%11, %12) : s64i [all]
-    scope {
-        %48 = get_global @errflag : s32i*
-        %49 = load %48 : s32i, align 4
-        %50 = cast(int_to_bool) %49 : bool
-        %51 = not %50 : bool
-        if %51 {
-            %52 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %11 = const -9223372036854775808 : s64i
+        %12 = const -9223372036854775808 : s64i
+        %13 = call @f(%11, %12) : s64i [all]
+        scope {
+                %48 = get_global @errflag : s32i*
+                %49 = load %48 : s32i, align 4
+                %50 = cast(int_to_bool) %49 : bool
+                not
+                if %51 {
+                        %52 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %14 = const -9223372036854775808 : s64i
-    %15 = const -1 : s64i
-    %16 = call @f(%14, %15) : s64i [all]
-    scope {
-        %43 = get_global @errflag : s32i*
-        %44 = load %43 : s32i, align 4
-        %45 = cast(int_to_bool) %44 : bool
-        %46 = not %45 : bool
-        if %46 {
-            %47 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %14 = const -9223372036854775808 : s64i
+        %15 = const -1 : s64i
+        %16 = call @f(%14, %15) : s64i [all]
+        scope {
+                %43 = get_global @errflag : s32i*
+                %44 = load %43 : s32i, align 4
+                %45 = cast(int_to_bool) %44 : bool
+                not
+                if %46 {
+                        %47 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %17 = const 9223372036854775807 : s64i
-    %18 = const 9223372036854775807 : s64i
-    %19 = call @f(%17, %18) : s64i [all]
-    scope {
-        %38 = get_global @errflag : s32i*
-        %39 = load %38 : s32i, align 4
-        %40 = cast(int_to_bool) %39 : bool
-        %41 = not %40 : bool
-        if %41 {
-            %42 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %17 = const 9223372036854775807 : s64i
+        %18 = const 9223372036854775807 : s64i
+        %19 = call @f(%17, %18) : s64i [all]
+        scope {
+                %38 = get_global @errflag : s32i*
+                %39 = load %38 : s32i, align 4
+                %40 = cast(int_to_bool) %39 : bool
+                not
+                if %41 {
+                        %42 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %20 = const 9223372036854775807 : s64i
-    %21 = const 1 : s64i
-    %22 = call @f(%20, %21) : s64i [all]
-    scope {
-        %33 = get_global @errflag : s32i*
-        %34 = load %33 : s32i, align 4
-        %35 = cast(int_to_bool) %34 : bool
-        %36 = not %35 : bool
-        if %36 {
-            %37 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %20 = const 9223372036854775807 : s64i
+        %21 = const 1 : s64i
+        %22 = call @f(%20, %21) : s64i [all]
+        scope {
+                %33 = get_global @errflag : s32i*
+                %34 = load %33 : s32i, align 4
+                %35 = cast(int_to_bool) %34 : bool
+                not
+                if %36 {
+                        %37 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %23 = const 9223372036854775807 : s64i
-    %24 = const -9223372036854775808 : s64i
-    %25 = call @f(%23, %24) : s64i [all]
-    scope {
-        %29 = get_global @errflag : s32i*
-        %30 = load %29 : s32i, align 4
-        %31 = cast(int_to_bool) %30 : bool
-        if %31 {
-            %32 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %23 = const 9223372036854775807 : s64i
+        %24 = const -9223372036854775808 : s64i
+        %25 = call @f(%23, %24) : s64i [all]
+        scope {
+                %29 = get_global @errflag : s32i*
+                %30 = load %29 : s32i, align 4
+                %31 = cast(int_to_bool) %30 : bool
+                if %31 {
+                        %32 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %26 = get_global @exit : ((s32i) -> void)*
-    %27 = const 0 : s32i
-    call @exit(%27) [all]
-    %28 = load %0 : s32i
-    return %28
+        %26 = get_global @exit : (s32i) -> void*
+        %27 = const 0 : s32i
+        call @exit(%27) [all]
+        %28 = load %0 : s32i
+        return %28
 }

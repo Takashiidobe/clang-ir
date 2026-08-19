@@ -1,48 +1,48 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20011126-1.c" (c, x86_64-unknown-linux-gnu)
-global a : s32i = 1 [external, default, align 4, dso_local]
+global a : s32i = CirInt { ty: Named("s32i"), value: "1" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s64i, "s", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @a : s32i*
-    %4 = load %3 : s32i, align 4
-    %5 = cast(integral) %4 : s64i
-    store %5, %1, align 8
-    scope {
-        %12 = load %1 : s64i, align 8
-        %13 = const 0 : s64i
-        %14 = cmp lt %12, %13 : bool
-        if %14 {
-            %16 = const -2147483648 : s64i
-            store %16, %1, align 8
-            yield
-        } else {
-            %15 = const 2147483647 : s64i
-            store %15, %1, align 8
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s64i, "s", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @a : s32i*
+        %4 = load %3 : s32i, align 4
+        %5 = cast(integral) %4 : s64i
+        store %5, %1, align 8
+        scope {
+                %12 = load %1 : s64i, align 8
+                %13 = const 0 : s64i
+                cmp
+                if %14 {
+                        %16 = const -2147483648 : s64i
+                        store %16, %1, align 8
+                        yield
+                } else {
+                        %15 = const 2147483647 : s64i
+                        store %15, %1, align 8
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %8 = load %1 : s64i, align 8
-        %9 = const 0 : s64i
-        %10 = cmp lt %8, %9 : bool
-        if %10 {
-            %11 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %8 = load %1 : s64i, align 8
+                %9 = const 0 : s64i
+                cmp
+                if %10 {
+                        %11 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

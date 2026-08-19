@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/va-arg-21.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[3] = "%s" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[13] = "hello world\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[3] = ConstArray { ty: Array { element_type: Named("s8i"), size: 3 }, elts: Str("%s"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[13] = ConstArray { ty: Array { element_type: Named("s8i"), size: 13 }, elts: Str("hello world\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn malloc(%arg0: u64i) -> void* [external, c, nothrow];
 fn vprintf(%arg0: s8i*, %arg1: rec___va_list_tag*) -> s32i [external, c, nothrow];
@@ -17,30 +17,30 @@ fn doit(%arg0: s8i*, ...) -> void [internal, c, no_inline, dso_local, nothrow] {
         store %arg0, %9
         %12 = cast(array_to_ptrdecay) %10 : rec___va_list_tag[1]**
         store %12, %11, align 8
-        %13 = get_global @malloc : ((u64i) -> void*)*
+        %13 = get_global @malloc : (u64i) -> void**
         %14 = const 24 : u64i
         %15 = call @malloc(%14) : void* [all]
         %16 = cast(bitcast) %15 : rec___va_list_tag[1]*
         %17 = const 0 : s64i
-        %18 = get_element %10[%17] : rec___va_list_tag[1]**
+        get_element
         store %16, %18, align 16
         %19 = const #cir.ptr<null> : rec___va_list_tag[1]*
         %20 = const 1 : s64i
-        %21 = get_element %10[%20] : rec___va_list_tag[1]**
+        get_element
         store %19, %21, align 8
-        %22 = get_global @malloc : ((u64i) -> void*)*
+        %22 = get_global @malloc : (u64i) -> void**
         %23 = const 24 : u64i
         %24 = call @malloc(%23) : void* [all]
         %25 = cast(bitcast) %24 : rec___va_list_tag[1]*
         %26 = const 2 : s64i
-        %27 = get_element %10[%26] : rec___va_list_tag[1]**
+        get_element
         store %25, %27, align 16
         %28 = const 0 : s64i
-        %29 = get_element %10[%28] : rec___va_list_tag[1]**
+        get_element
         %30 = load %29 : rec___va_list_tag[1]*, align 16
         %31 = cast(array_to_ptrdecay) %30 : rec___va_list_tag*
-        va_start %31
-        %32 = get_global @vprintf : ((s8i*, rec___va_list_tag*) -> s32i)*
+        va_start
+        %32 = get_global @vprintf : (s8i*, rec___va_list_tag*) -> s32i*
         %33 = load %9 : s8i*, align 8
         %34 = load %11 : rec___va_list_tag[1]**, align 8
         %35 = load %34 : rec___va_list_tag[1]*, align 8
@@ -48,21 +48,21 @@ fn doit(%arg0: s8i*, ...) -> void [internal, c, no_inline, dso_local, nothrow] {
         %37 = call @vprintf(%33, %36) : s32i [all]
         %38 = load %11 : rec___va_list_tag[1]**, align 8
         %39 = const 1 : s32i
-        %40 = ptr_stride %38, %39 : rec___va_list_tag[1]**
+        ptr_stride
         store %40, %11, align 8
         %41 = load %38 : rec___va_list_tag[1]*, align 8
         %42 = cast(array_to_ptrdecay) %41 : rec___va_list_tag*
-        va_end %42
+        va_end
         %43 = load %11 : rec___va_list_tag[1]**, align 8
         %44 = const 1 : s32i
-        %45 = ptr_stride %43, %44 : rec___va_list_tag[1]**
+        ptr_stride
         store %45, %11, align 8
         %46 = const 2 : s64i
-        %47 = get_element %10[%46] : rec___va_list_tag[1]**
+        get_element
         %48 = load %47 : rec___va_list_tag[1]*, align 16
         %49 = cast(array_to_ptrdecay) %48 : rec___va_list_tag*
-        va_start %49
-        %50 = get_global @vprintf : ((s8i*, rec___va_list_tag*) -> s32i)*
+        va_start
+        %50 = get_global @vprintf : (s8i*, rec___va_list_tag*) -> s32i*
         %51 = load %9 : s8i*, align 8
         %52 = load %11 : rec___va_list_tag[1]**, align 8
         %53 = load %52 : rec___va_list_tag[1]*, align 8
@@ -71,34 +71,34 @@ fn doit(%arg0: s8i*, ...) -> void [internal, c, no_inline, dso_local, nothrow] {
         %56 = load %11 : rec___va_list_tag[1]**, align 8
         %57 = load %56 : rec___va_list_tag[1]*, align 8
         %58 = cast(array_to_ptrdecay) %57 : rec___va_list_tag*
-        va_end %58
+        va_end
         scope {
-            %59 = load %11 : rec___va_list_tag[1]**, align 8
-            %60 = load %59 : rec___va_list_tag[1]*, align 8
-            %61 = const #cir.ptr<null> : rec___va_list_tag[1]*
-            %62 = cmp eq %60, %61 : bool
-            if %62 {
-                %63 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %59 = load %11 : rec___va_list_tag[1]**, align 8
+                %60 = load %59 : rec___va_list_tag[1]*, align 8
+                %61 = const #cir.ptr<null> : rec___va_list_tag[1]*
+                cmp
+                if %62 {
+                        %63 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn exit(%arg0: s32i) -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @.str : s8i[3]*
-    %3 = cast(array_to_ptrdecay) %2 : s8i*
-    %4 = get_global @.str.1 : s8i[13]*
-    %5 = cast(array_to_ptrdecay) %4 : s8i*
-    call @doit(%3, %5) [all]
-    %6 = get_global @exit : ((s32i) -> void)*
-    %7 = const 0 : s32i
-    call @exit(%7) [all]
-    %8 = load %0 : s32i
-    return %8
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @.str : s8i[3]*
+        %3 = cast(array_to_ptrdecay) %2 : s8i*
+        %4 = get_global @.str.1 : s8i[13]*
+        %5 = cast(array_to_ptrdecay) %4 : s8i*
+        call @doit(%3, %5) [all]
+        %6 = get_global @exit : (s32i) -> void*
+        %7 = const 0 : s32i
+        call @exit(%7) [all]
+        %8 = load %0 : s32i
+        return %8
 }

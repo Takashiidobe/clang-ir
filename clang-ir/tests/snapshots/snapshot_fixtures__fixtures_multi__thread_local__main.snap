@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.multi/thread_local/main.c" (c, x86_64-unknown-linux-gnu)
 global shared_value : s32i [external, default, tls_dyn, align 4, dso_local]
-global .str : s8i[13] = "%d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[13] = ConstArray { ty: Array { element_type: Named("s8i"), size: 13 }, elts: Str("%d %d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
-fn thrd_create(%arg0: u64i*, %arg1: ((void*) -> s32i)*, %arg2: void*) -> s32i [external, c];
+fn thrd_create(%arg0: u64i*, %arg1: (void*) -> s32i*, %arg2: void*) -> s32i [external, c];
 fn read_shared_value() -> s32i [external, c];
 fn worker(%arg0: void*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: void*):
@@ -27,7 +27,7 @@ fn worker(%arg0: void*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         store %41, %42, align 4
         %43 = load %35 : s32i, align 4
         %44 = const 100 : s32i
-        %45 = mul %43, %44 : s32i [nsw]
+        mul
         %46 = call @read_shared_value() : s32i [all]
         %47 = add %45, %46 : s32i [nsw]
         store %47, %33
@@ -37,48 +37,48 @@ fn worker(%arg0: void*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
 fn thrd_join(%arg0: u64i, %arg1: s32i*) -> s32i [external, c];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u64i, "thread", align 8
-    %2 = alloca s32i, "next", align 4
-    %3 = alloca s32i, "worker_result", align 4
-    %4 = alloca s32i, "created", align 4
-    %5 = alloca s32i, "joined", align 4
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = const 29 : s32i
-    store %7, %2, align 4
-    %8 = const 0 : s32i
-    store %8, %3, align 4
-    %9 = const 17 : s32i
-    %10 = get_global @shared_value : s32i*
-    store %9, %10, align 4
-    %11 = get_global @worker : ((void*) -> s32i)*
-    %12 = cast(bitcast) %2 : void*
-    %13 = call @thrd_create(%1, %11, %12) : s32i [all]
-    store %13, %4, align 4
-    %14 = load %4 : s32i, align 4
-    %15 = const 0 : s32i
-    %16 = cmp eq %14, %15 : bool
-    %17 = ternary %16 ? { : s32i
-        %30 = load %1 : u64i, align 8
-        %31 = call @thrd_join(%30, %3) : s32i [all]
-        yield %31
-    } : {
-        %29 = const -1 : s32i
-        yield %29
-    }
-    store %17, %5, align 4
-    %18 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %19 = get_global @.str : s8i[13]*
-    %20 = cast(array_to_ptrdecay) %19 : s8i*
-    %21 = load %3 : s32i, align 4
-    %22 = get_global @shared_value : s32i*
-    %23 = load %22 : s32i, align 4
-    %24 = load %4 : s32i, align 4
-    %25 = load %5 : s32i, align 4
-    %26 = call @printf(%20, %21, %23, %24, %25) : s32i [all]
-    %27 = const 0 : s32i
-    store %27, %0
-    %28 = load %0 : s32i
-    return %28
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u64i, "thread", align 8
+        %2 = alloca s32i, "next", align 4
+        %3 = alloca s32i, "worker_result", align 4
+        %4 = alloca s32i, "created", align 4
+        %5 = alloca s32i, "joined", align 4
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = const 29 : s32i
+        store %7, %2, align 4
+        %8 = const 0 : s32i
+        store %8, %3, align 4
+        %9 = const 17 : s32i
+        %10 = get_global @shared_value : s32i*
+        store %9, %10, align 4
+        %11 = get_global @worker : (void*) -> s32i*
+        %12 = cast(bitcast) %2 : void*
+        %13 = call @thrd_create(%1, %11, %12) : s32i [all]
+        store %13, %4, align 4
+        %14 = load %4 : s32i, align 4
+        %15 = const 0 : s32i
+        cmp
+        %17 = ternary %16 ? { : s32i
+                %30 = load %1 : u64i, align 8
+                %31 = call @thrd_join(%30, %3) : s32i [all]
+                yield %31
+        } : {
+                %29 = const -1 : s32i
+                yield %29
+        }
+        store %17, %5, align 4
+        %18 = get_global @printf : (s8i*, ...) -> s32i*
+        %19 = get_global @.str : s8i[13]*
+        %20 = cast(array_to_ptrdecay) %19 : s8i*
+        %21 = load %3 : s32i, align 4
+        %22 = get_global @shared_value : s32i*
+        %23 = load %22 : s32i, align 4
+        %24 = load %4 : s32i, align 4
+        %25 = load %5 : s32i, align 4
+        %26 = call @printf(%20, %21, %23, %24, %25) : s32i [all]
+        %27 = const 0 : s32i
+        store %27, %0
+        %28 = load %0 : s32i
+        return %28
 }

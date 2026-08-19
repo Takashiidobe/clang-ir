@@ -1,39 +1,39 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/mayalias-1.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "a", align 4
-    %2 = alloca s16i*, "b", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 305419896 : s32i
-    store %4, %1, align 4
-    %5 = cast(bitcast) %1 : s16i*
-    store %5, %2, align 8
-    %6 = const 0 : s16i
-    %7 = const 1 : s64i
-    %8 = load %2 : s16i*, align 8
-    %9 = ptr_stride %8, %7 : s16i*
-    store %6, %9, align 2
-    scope {
-        %13 = load %1 : s32i, align 4
-        %14 = const 305419896 : s32i
-        %15 = cmp eq %13, %14 : bool
-        if %15 {
-            %16 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "a", align 4
+        %2 = alloca s16i*, "b", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 305419896 : s32i
+        store %4, %1, align 4
+        %5 = cast(bitcast) %1 : s16i*
+        store %5, %2, align 8
+        %6 = const 0 : s16i
+        %7 = const 1 : s64i
+        %8 = load %2 : s16i*, align 8
+        ptr_stride
+        store %6, %9, align 2
+        scope {
+                %13 = load %1 : s32i, align 4
+                %14 = const 305419896 : s32i
+                cmp
+                if %15 {
+                        %16 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %10 = get_global @exit : ((s32i) -> void)*
-    %11 = const 0 : s32i
-    call @exit(%11) [all]
-    %12 = load %0 : s32i
-    return %12
+        %10 = get_global @exit : (s32i) -> void*
+        %11 = const 0 : s32i
+        call @exit(%11) [all]
+        %12 = load %0 : s32i
+        return %12
 }

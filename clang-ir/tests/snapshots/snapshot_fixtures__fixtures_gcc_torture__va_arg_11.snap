@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/va-arg-11.c" (c, x86_64-unknown-linux-gnu)
@@ -12,32 +12,32 @@ fn foo(%arg0: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         %18 = alloca s32i, "res", align 4
         store %arg0, %14
         %19 = cast(array_to_ptrdecay) %16 : rec___va_list_tag*
-        va_start %19
+        va_start
         scope {
-            %25 = const 0 : s32i
-            store %25, %17, align 4
-            for cond: {
-                %30 = load %17 : s32i, align 4
-                %31 = const 4 : s32i
-                %32 = cmp lt %30, %31 : bool
-                condition %32
-            } step: {
-                %26 = load %17 : s32i, align 4
-                %27 = inc %26 : s32i [nsw]
-                store %27, %17, align 4
+                %25 = const 0 : s32i
+                store %25, %17, align 4
+                for cond {
+                        %30 = load %17 : s32i, align 4
+                        %31 = const 4 : s32i
+                        cmp
+                        condition %32
+                } step {
+                        %26 = load %17 : s32i, align 4
+                        inc
+                        store %27, %17, align 4
+                        yield
+                } body {
+                        %28 = cast(array_to_ptrdecay) %16 : rec___va_list_tag*
+                        va_arg
+                        yield
+                }
                 yield
-            } do {
-                %28 = cast(array_to_ptrdecay) %16 : rec___va_list_tag*
-                %29 = va_arg %28 : s32i
-                yield
-            }
-            yield
         }
         %20 = cast(array_to_ptrdecay) %16 : rec___va_list_tag*
-        %21 = va_arg %20 : s32i
+        va_arg
         store %21, %18, align 4
         %22 = cast(array_to_ptrdecay) %16 : rec___va_list_tag*
-        va_end %22
+        va_end
         %23 = load %18 : s32i, align 4
         store %23, %15
         %24 = load %15 : s32i
@@ -46,28 +46,28 @@ fn foo(%arg0: s32i, ...) -> s32i [internal, c, no_inline, dso_local, nothrow] {
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %5 = const 5 : s32i
-        %6 = const 4 : s32i
-        %7 = const 3 : s32i
-        %8 = const 2 : s32i
-        %9 = const 1 : s32i
-        %10 = const 0 : s32i
-        %11 = call @foo(%5, %6, %7, %8, %9, %10) : s32i [all]
-        %12 = cast(int_to_bool) %11 : bool
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %5 = const 5 : s32i
+                %6 = const 4 : s32i
+                %7 = const 3 : s32i
+                %8 = const 2 : s32i
+                %9 = const 1 : s32i
+                %10 = const 0 : s32i
+                %11 = call @foo(%5, %6, %7, %8, %9, %10) : s32i [all]
+                %12 = cast(int_to_bool) %11 : bool
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

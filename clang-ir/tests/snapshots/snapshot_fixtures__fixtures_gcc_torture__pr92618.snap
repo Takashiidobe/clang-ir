@@ -1,53 +1,53 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr92618.c" (c, x86_64-unknown-linux-gnu)
-global b : u64i[4] = zero [external, default, align 16, dso_local]
-global a : double[4] = zero [external, default, align 16, dso_local]
-global qux.cnt : double = 0.000000e+00 [internal, default, align 8, dso_local]
-global bar.cnt : s32i = 0 [internal, default, align 4, dso_local]
+global b : u64i[4] = Zero { ty: Array { element_type: Named("u64i"), size: 4 } } [external, default, align 16, dso_local]
+global a : double[4] = Zero { ty: Array { element_type: Double, size: 4 } } [external, default, align 16, dso_local]
+global qux.cnt : double = CirFloat { ty: Double, value: "0.000000e+00" } [internal, default, align 8, dso_local]
+global bar.cnt : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
 
 fn bar() -> vector<2 x s64i> [external, c, no_inline, dso_local, nothrow] {
-    %110 = alloca vector<2 x s64i>, "__retval", align 16
-    %111 = alloca vector<2 x s64i>, ".compoundliteral", align 16
-    %112 = get_global @bar.cnt : s32i*
-    %113 = const 2 : s32i
-    %114 = load %112 : s32i, align 4
-    %115 = add %114, %113 : s32i [nsw]
-    store %115, %112, align 4
-    %116 = load %112 : s32i, align 4
-    %117 = cast(integral) %116 : s64i
-    %118 = load %112 : s32i, align 4
-    %119 = const 1 : s32i
-    %120 = add %118, %119 : s32i [nsw]
-    %121 = cast(integral) %120 : s64i
-    %122 = vec.create(%117, %121) : vector<2 x s64i>
-    store %122, %111, align 16
-    %123 = load %111 : vector<2 x s64i>, align 16
-    store %123, %110
-    %124 = load %110 : vector<2 x s64i>
-    return %124
+        %110 = alloca vector<2 x s64i>, "__retval", align 16
+        %111 = alloca vector<2 x s64i>, ".compoundliteral", align 16
+        %112 = get_global @bar.cnt : s32i*
+        %113 = const 2 : s32i
+        %114 = load %112 : s32i, align 4
+        %115 = add %114, %113 : s32i [nsw]
+        store %115, %112, align 4
+        %116 = load %112 : s32i, align 4
+        %117 = cast(integral) %116 : s64i
+        %118 = load %112 : s32i, align 4
+        %119 = const 1 : s32i
+        %120 = add %118, %119 : s32i [nsw]
+        %121 = cast(integral) %120 : s64i
+        vec.create
+        store %122, %111, align 16
+        %123 = load %111 : vector<2 x s64i>, align 16
+        store %123, %110
+        %124 = load %110 : vector<2 x s64i>
+        return %124
 }
 fn qux() -> vector<2 x s64i> [external, c, no_inline, dso_local, nothrow] {
-    %96 = alloca vector<2 x s64i>, "__retval", align 16
-    %97 = alloca vector<2 x double>, ".compoundliteral", align 16
-    %98 = get_global @qux.cnt : double*
-    %99 = const 2.000000e+00 : double
-    %100 = load %98 : double, align 8
-    %101 = fadd %100, %99 : double
-    store %101, %98, align 8
-    %102 = load %98 : double, align 8
-    %103 = load %98 : double, align 8
-    %104 = const 1.000000e+00 : double
-    %105 = fadd %103, %104 : double
-    %106 = vec.create(%102, %105) : vector<2 x double>
-    store %106, %97, align 16
-    %107 = load %97 : vector<2 x double>, align 16
-    %108 = cast(bitcast) %107 : vector<2 x s64i>
-    store %108, %96
-    %109 = load %96 : vector<2 x s64i>
-    return %109
+        %96 = alloca vector<2 x s64i>, "__retval", align 16
+        %97 = alloca vector<2 x double>, ".compoundliteral", align 16
+        %98 = get_global @qux.cnt : double*
+        %99 = const 2.000000e+00 : double
+        %100 = load %98 : double, align 8
+        fadd
+        store %101, %98, align 8
+        %102 = load %98 : double, align 8
+        %103 = load %98 : double, align 8
+        %104 = const 1.000000e+00 : double
+        fadd
+        vec.create
+        store %106, %97, align 16
+        %107 = load %97 : vector<2 x double>, align 16
+        %108 = cast(bitcast) %107 : vector<2 x s64i>
+        store %108, %96
+        %109 = load %96 : vector<2 x s64i>
+        return %109
 }
 fn foo(%arg1: u64i*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: u64i*):
@@ -62,32 +62,32 @@ fn foo(%arg1: u64i*) -> void [external, c, no_inline, dso_local, nothrow] {
         %66 = load %62 : vector<2 x s64i>, align 16
         %67 = const 0 : s64i
         %68 = get_global @b : u64i[4]*
-        %69 = get_element %68[%67] : u64i*
+        get_element
         %70 = cast(bitcast) %69 : vector<2 x s64i>*
         store %66, %70, align 16
         %71 = load %63 : vector<2 x s64i>, align 16
         %72 = const 2 : s64i
         %73 = get_global @b : u64i[4]*
-        %74 = get_element %73[%72] : u64i*
+        get_element
         %75 = cast(bitcast) %74 : vector<2 x s64i>*
         store %71, %75, align 16
         %76 = const 0 : s64i
         %77 = get_global @b : u64i[4]*
-        %78 = get_element %77[%76] : u64i*
+        get_element
         %79 = load %78 : u64i, align 16
         %80 = const 1 : s64i
         %81 = get_global @b : u64i[4]*
-        %82 = get_element %81[%80] : u64i*
+        get_element
         %83 = load %82 : u64i, align 8
         %84 = add %79, %83 : u64i
         %85 = const 2 : s64i
         %86 = get_global @b : u64i[4]*
-        %87 = get_element %86[%85] : u64i*
+        get_element
         %88 = load %87 : u64i, align 16
         %89 = add %84, %88 : u64i
         %90 = const 3 : s64i
         %91 = get_global @b : u64i[4]*
-        %92 = get_element %91[%90] : u64i*
+        get_element
         %93 = load %92 : u64i, align 8
         %94 = add %89, %93 : u64i
         %95 = load %61 : u64i*, align 8
@@ -107,84 +107,84 @@ fn baz(%arg0: double*) -> void [external, c, no_inline, dso_local, nothrow] {
         %31 = load %27 : vector<2 x s64i>, align 16
         %32 = const 0 : s64i
         %33 = get_global @a : double[4]*
-        %34 = get_element %33[%32] : double*
+        get_element
         %35 = cast(bitcast) %34 : vector<2 x s64i>*
         store %31, %35, align 16
         %36 = load %28 : vector<2 x s64i>, align 16
         %37 = const 2 : s64i
         %38 = get_global @a : double[4]*
-        %39 = get_element %38[%37] : double*
+        get_element
         %40 = cast(bitcast) %39 : vector<2 x s64i>*
         store %36, %40, align 16
         %41 = const 0 : s64i
         %42 = get_global @a : double[4]*
-        %43 = get_element %42[%41] : double*
+        get_element
         %44 = load %43 : double, align 16
         %45 = const 1 : s64i
         %46 = get_global @a : double[4]*
-        %47 = get_element %46[%45] : double*
+        get_element
         %48 = load %47 : double, align 8
-        %49 = fadd %44, %48 : double
+        fadd
         %50 = const 2 : s64i
         %51 = get_global @a : double[4]*
-        %52 = get_element %51[%50] : double*
+        get_element
         %53 = load %52 : double, align 16
-        %54 = fadd %49, %53 : double
+        fadd
         %55 = const 3 : s64i
         %56 = get_global @a : double[4]*
-        %57 = get_element %56[%55] : double*
+        get_element
         %58 = load %57 : double, align 8
-        %59 = fadd %54, %58 : double
+        fadd
         %60 = load %26 : double*, align 8
         store %59, %60, align 8
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u64i, "c", align 8
-    %2 = alloca double, "d", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 0 : u64i
-    store %4, %1, align 8
-    call @foo(%1) [all]
-    scope {
-        %16 = load %1 : u64i, align 8
-        %17 = const 2 : s32i
-        %18 = const 3 : s32i
-        %19 = add %17, %18 : s32i [nsw]
-        %20 = const 4 : s32i
-        %21 = add %19, %20 : s32i [nsw]
-        %22 = const 5 : s32i
-        %23 = add %21, %22 : s32i [nsw]
-        %24 = cast(integral) %23 : u64i
-        %25 = cmp ne %16, %24 : bool
-        if %25 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u64i, "c", align 8
+        %2 = alloca double, "d", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 0 : u64i
+        store %4, %1, align 8
+        call @foo(%1) [all]
+        scope {
+                %16 = load %1 : u64i, align 8
+                %17 = const 2 : s32i
+                %18 = const 3 : s32i
+                %19 = add %17, %18 : s32i [nsw]
+                %20 = const 4 : s32i
+                %21 = add %19, %20 : s32i [nsw]
+                %22 = const 5 : s32i
+                %23 = add %21, %22 : s32i [nsw]
+                %24 = cast(integral) %23 : u64i
+                cmp
+                if %25 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %5 = const 0.000000e+00 : double
-    store %5, %2, align 8
-    call @baz(%2) [all]
-    scope {
-        %7 = load %2 : double, align 8
-        %8 = const 2.000000e+00 : double
-        %9 = const 3.000000e+00 : double
-        %10 = fadd %8, %9 : double
-        %11 = const 4.000000e+00 : double
-        %12 = fadd %10, %11 : double
-        %13 = const 5.000000e+00 : double
-        %14 = fadd %12, %13 : double
-        %15 = cmp ne %7, %14 : bool
-        if %15 {
-            call @abort() [all]
-            yield
+        %5 = const 0.000000e+00 : double
+        store %5, %2, align 8
+        call @baz(%2) [all]
+        scope {
+                %7 = load %2 : double, align 8
+                %8 = const 2.000000e+00 : double
+                %9 = const 3.000000e+00 : double
+                fadd
+                %11 = const 4.000000e+00 : double
+                fadd
+                %13 = const 5.000000e+00 : double
+                fadd
+                cmp
+                if %15 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %6 = load %0 : s32i
-    return %6
+        %6 = load %0 : s32i
+        return %6
 }

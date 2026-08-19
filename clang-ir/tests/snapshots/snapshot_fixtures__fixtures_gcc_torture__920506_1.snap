@@ -1,50 +1,51 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/920506-1.c" (c, x86_64-unknown-linux-gnu)
-global l : s32i[2] = [0, 1] [external, default, align 4, dso_local]
+global l : s32i[2] = ConstArray { ty: Array { element_type: Named("s32i"), size: 2 }, elts: Array([CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "1" }]), trailing_zeros_num: 0 } [external, default, align 4, dso_local]
 
 fn exit(%arg0: s32i) -> void [external, c];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i*, "p", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @l : s32i[2]*
-    %4 = cast(array_to_ptrdecay) %3 : s32i*
-    store %4, %1, align 8
-    scope {
-        %7 = load %1 : s32i*, align 8
-        %8 = const 1 : s32i
-        %9 = ptr_stride %7, %8 : s32i*
-        store %9, %1, align 8
-        %10 = load %7 : s32i, align 4
-        switch %10 {
-            case equal 0 {
-                %11 = get_global @exit : ((s32i) -> void)*
-                %12 = const 0 : s32i
-                call @exit(%12) [all]
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i*, "p", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @l : s32i[2]*
+        %4 = cast(array_to_ptrdecay) %3 : s32i*
+        store %4, %1, align 8
+        scope {
+                %7 = load %1 : s32i*, align 8
+                %8 = const 1 : s32i
+                ptr_stride
+                store %9, %1, align 8
+                %10 = load %7 : s32i, align 4
+                switch %10 {
+                        case equal [0] {
+                                %11 = get_global @exit : (s32i) -> void*
+                                %12 = const 0 : s32i
+                                call @exit(%12) [all]
+                                yield
+                        }
+                        case equal [1] {
+                                break
+                        }
+                        case equal [2] {
+                                break
+                        }
+                        case equal [3] {
+                                yield
+                        }
+                        case equal [4] {
+                                break
+                        }
+                        yield
+                }
                 yield
-            }
-            case equal 1 {
-                break
-            }
-            case equal 2 {
-                break
-            }
-            case equal 3 {
-                yield
-            }
-            case equal 4 {
-                break
-            }
         }
-        yield
-    }
-    %5 = get_global @abort : (() -> void)*
-    call @abort() [all]
-    %6 = load %0 : s32i
-    return %6
+        %5 = get_global @abort : () -> void*
+        call @abort() [all]
+        %6 = load %0 : s32i
+        return %6
 }

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr79121.c" (c, x86_64-unknown-linux-gnu)
@@ -11,7 +11,7 @@ fn f1(%arg3: s32i) -> u64i [external, c, no_inline, dso_local, nothrow] {
         %48 = load %46 : s32i, align 4
         %49 = cast(integral) %48 : u64i
         %50 = const 4 : s32i
-        %51 = shift left %49, %50 : u64i
+        shift
         store %51, %47
         %52 = load %47 : u64i
         return %52
@@ -24,7 +24,7 @@ fn f2(%arg2: u32i) -> s64i [external, c, no_inline, dso_local, nothrow] {
         %41 = load %39 : u32i, align 4
         %42 = cast(integral) %41 : s64i
         %43 = const 4 : s32i
-        %44 = shift left %42, %43 : s64i
+        shift
         store %44, %40
         %45 = load %40 : s64i
         return %45
@@ -37,7 +37,7 @@ fn f3(%arg1: u32i) -> u64i [external, c, no_inline, dso_local, nothrow] {
         %34 = load %32 : u32i, align 4
         %35 = cast(integral) %34 : u64i
         %36 = const 4 : s32i
-        %37 = shift left %35, %36 : u64i
+        shift
         store %37, %33
         %38 = load %33 : u64i
         return %38
@@ -50,67 +50,67 @@ fn f4(%arg0: s32i) -> s64i [external, c, no_inline, dso_local, nothrow] {
         %27 = load %25 : s32i, align 4
         %28 = cast(integral) %27 : s64i
         %29 = const 4 : s32i
-        %30 = shift left %28, %29 : s64i
+        shift
         store %30, %26
         %31 = load %26 : s64i
         return %31
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %20 = const -268435456 : s32i
-        %21 = call @f1(%20) : u64i [all]
-        %22 = const 18446744069414584320 : u64i
-        %23 = cmp ne %21, %22 : bool
-        if %23 {
-            %24 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %20 = const -268435456 : s32i
+                %21 = call @f1(%20) : u64i [all]
+                %22 = const 18446744069414584320 : u64i
+                cmp
+                if %23 {
+                        %24 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %15 = const 4026531840 : u32i
-        %16 = call @f2(%15) : s64i [all]
-        %17 = const 64424509440 : s64i
-        %18 = cmp ne %16, %17 : bool
-        if %18 {
-            %19 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %15 = const 4026531840 : u32i
+                %16 = call @f2(%15) : s64i [all]
+                %17 = const 64424509440 : s64i
+                cmp
+                if %18 {
+                        %19 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %10 = const 4026531840 : u32i
-        %11 = call @f3(%10) : u64i [all]
-        %12 = const 64424509440 : u64i
-        %13 = cmp ne %11, %12 : bool
-        if %13 {
-            %14 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %10 = const 4026531840 : u32i
+                %11 = call @f3(%10) : u64i [all]
+                %12 = const 64424509440 : u64i
+                cmp
+                if %13 {
+                        %14 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %4 = const -268435456 : s32i
-        %5 = call @f4(%4) : s64i [all]
-        %6 = cast(integral) %5 : u64i
-        %7 = const 18446744069414584320 : u64i
-        %8 = cmp ne %6, %7 : bool
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %4 = const -268435456 : s32i
+                %5 = call @f4(%4) : s64i [all]
+                %6 = cast(integral) %5 : u64i
+                %7 = const 18446744069414584320 : u64i
+                cmp
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/assign_value_in_branch.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[13] = "%lu %lu %lu\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[13] = ConstArray { ty: Array { element_type: Named("s8i"), size: 13 }, elts: Str("%lu %lu %lu\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn bump(%arg0: u64i*, %arg1: s32i) -> u64i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: u64i*, %arg1: s32i):
@@ -15,19 +15,19 @@ fn bump(%arg0: u64i*, %arg1: s32i) -> u64i [external, c, no_inline, dso_local, n
         %22 = load %20 : s32i, align 4
         %23 = cast(int_to_bool) %22 : bool
         %24 = ternary %23 ? { : u64i
-            %30 = const 2 : u64i
-            %31 = load %19 : u64i*, align 8
-            %32 = load %31 : u64i, align 8
-            %33 = add %32, %30 : u64i
-            store %33, %31, align 8
-            yield %33
+                %30 = const 2 : u64i
+                %31 = load %19 : u64i*, align 8
+                %32 = load %31 : u64i, align 8
+                %33 = add %32, %30 : u64i
+                store %33, %31, align 8
+                yield %33
         } : {
-            %26 = const 1 : u64i
-            %27 = load %19 : u64i*, align 8
-            %28 = load %27 : u64i, align 8
-            %29 = add %28, %26 : u64i
-            store %29, %27, align 8
-            yield %29
+                %26 = const 1 : u64i
+                %27 = load %19 : u64i*, align 8
+                %28 = load %27 : u64i, align 8
+                %29 = add %28, %26 : u64i
+                store %29, %27, align 8
+                yield %29
         }
         store %24, %21
         %25 = load %21 : u64i
@@ -35,29 +35,29 @@ fn bump(%arg0: u64i*, %arg1: s32i) -> u64i [external, c, no_inline, dso_local, n
 }
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u64i, "x", align 8
-    %2 = alloca u64i, "a", align 8
-    %3 = alloca u64i, "b", align 8
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = const 10 : u64i
-    store %5, %1, align 8
-    %6 = const 1 : s32i
-    %7 = call @bump(%1, %6) : u64i [all]
-    store %7, %2, align 8
-    %8 = const 0 : s32i
-    %9 = call @bump(%1, %8) : u64i [all]
-    store %9, %3, align 8
-    %10 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %11 = get_global @.str : s8i[13]*
-    %12 = cast(array_to_ptrdecay) %11 : s8i*
-    %13 = load %2 : u64i, align 8
-    %14 = load %3 : u64i, align 8
-    %15 = load %1 : u64i, align 8
-    %16 = call @printf(%12, %13, %14, %15) : s32i [all]
-    %17 = const 0 : s32i
-    store %17, %0
-    %18 = load %0 : s32i
-    return %18
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u64i, "x", align 8
+        %2 = alloca u64i, "a", align 8
+        %3 = alloca u64i, "b", align 8
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = const 10 : u64i
+        store %5, %1, align 8
+        %6 = const 1 : s32i
+        %7 = call @bump(%1, %6) : u64i [all]
+        store %7, %2, align 8
+        %8 = const 0 : s32i
+        %9 = call @bump(%1, %8) : u64i [all]
+        store %9, %3, align 8
+        %10 = get_global @printf : (s8i*, ...) -> s32i*
+        %11 = get_global @.str : s8i[13]*
+        %12 = cast(array_to_ptrdecay) %11 : s8i*
+        %13 = load %2 : u64i, align 8
+        %14 = load %3 : u64i, align 8
+        %15 = load %1 : u64i, align 8
+        %16 = call @printf(%12, %13, %14, %15) : s32i [all]
+        %17 = const 0 : s32i
+        store %17, %0
+        %18 = load %0 : s32i
+        return %18
 }

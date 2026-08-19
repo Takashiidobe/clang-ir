@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/va-arg-13.c" (c, x86_64-unknown-linux-gnu)
@@ -9,16 +9,16 @@ fn dummy(%arg1: rec___va_list_tag*) -> void [external, c, no_inline, dso_local, 
         %25 = alloca rec___va_list_tag*, "vap", align 8
         store %arg1, %25
         scope {
-            %26 = load %25 : rec___va_list_tag*, align 8
-            %27 = va_arg %26 : s32i
-            %28 = const 1234 : s32i
-            %29 = cmp ne %27, %28 : bool
-            if %29 {
-                %30 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %26 = load %25 : rec___va_list_tag*, align 8
+                va_arg
+                %28 = const 1234 : s32i
+                cmp
+                if %29 {
+                        %30 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -30,39 +30,39 @@ fn test(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %7
         store %8, %9, align 8
         %10 = load %9 : rec_ScanfState*, align 8
-        %11 = get_member %10[1] "ap" : rec___va_list_tag[1]*
+        get_member
         %12 = cast(array_to_ptrdecay) %11 : rec___va_list_tag*
-        va_start %12
+        va_start
         %13 = load %9 : rec_ScanfState*, align 8
-        %14 = get_member %13[1] "ap" : rec___va_list_tag[1]*
+        get_member
         %15 = cast(array_to_ptrdecay) %14 : rec___va_list_tag*
         call @dummy(%15) [all]
         %16 = load %9 : rec_ScanfState*, align 8
-        %17 = get_member %16[1] "ap" : rec___va_list_tag[1]*
+        get_member
         %18 = cast(array_to_ptrdecay) %17 : rec___va_list_tag*
-        va_end %18
-        %19 = get_member %8[1] "ap" : rec___va_list_tag[1]*
+        va_end
+        get_member
         %20 = cast(array_to_ptrdecay) %19 : rec___va_list_tag*
-        va_start %20
-        %21 = get_member %8[1] "ap" : rec___va_list_tag[1]*
+        va_start
+        get_member
         %22 = cast(array_to_ptrdecay) %21 : rec___va_list_tag*
         call @dummy(%22) [all]
-        %23 = get_member %8[1] "ap" : rec___va_list_tag[1]*
+        get_member
         %24 = cast(array_to_ptrdecay) %23 : rec___va_list_tag*
-        va_end %24
+        va_end
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 456 : s32i
-    %3 = const 1234 : s32i
-    call @test(%2, %3) [all]
-    %4 = get_global @exit : ((s32i) -> void)*
-    %5 = const 0 : s32i
-    call @exit(%5) [all]
-    %6 = load %0 : s32i
-    return %6
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 456 : s32i
+        %3 = const 1234 : s32i
+        call @test(%2, %3) [all]
+        %4 = get_global @exit : (s32i) -> void*
+        %5 = const 0 : s32i
+        call @exit(%5) [all]
+        %6 = load %0 : s32i
+        return %6
 }

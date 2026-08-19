@@ -1,38 +1,38 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr66757.c" (c, x86_64-unknown-linux-gnu)
-global b : s32i = 0 [external, default, align 4, dso_local]
-global a : s32i = 0 [external, default, align 4, dso_local]
+global b : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global a : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u32i, "t", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @b : s32i*
-    %4 = load %3 : s32i, align 4
-    %5 = not %4 : s32i
-    %6 = cast(integral) %5 : u8i
-    %7 = cast(integral) %6 : u32i
-    store %7, %1, align 4
-    scope {
-        %10 = load %1 : u32i, align 4
-        %11 = const 1 : u32i
-        %12 = xor %10, %11 : u32i
-        %13 = const 255 : u32i
-        %14 = div %12, %13 : u32i
-        %15 = cast(int_to_bool) %14 : bool
-        if %15 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u32i, "t", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @b : s32i*
+        %4 = load %3 : s32i, align 4
+        not
+        %6 = cast(integral) %5 : u8i
+        %7 = cast(integral) %6 : u32i
+        store %7, %1, align 4
+        scope {
+                %10 = load %1 : u32i, align 4
+                %11 = const 1 : u32i
+                xor
+                %13 = const 255 : u32i
+                div
+                %15 = cast(int_to_bool) %14 : bool
+                if %15 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %8 = const 0 : s32i
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        %8 = const 0 : s32i
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

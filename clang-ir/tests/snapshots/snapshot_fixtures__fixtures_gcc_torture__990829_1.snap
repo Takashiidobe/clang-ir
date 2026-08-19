@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/990829-1.c" (c, x86_64-unknown-linux-gnu)
@@ -13,13 +13,13 @@ fn test(%arg0: double, %arg1: double) -> double [external, c, no_inline, dso_loc
         store %arg1, %19
         %22 = load %19 : double, align 8
         %23 = load %18 : double, align 8
-        %24 = fsub %22, %23 : double
+        fsub
         %25 = load %19 : double, align 8
         %26 = load %18 : double, align 8
         %27 = const 1.000000e+00 : double
-        %28 = fadd %26, %27 : double
-        %29 = fmul %25, %28 : double
-        %30 = fdiv %24, %29 : double
+        fadd
+        fmul
+        fdiv
         store %30, %21, align 8
         %31 = load %21 : double, align 8
         store %31, %20
@@ -29,37 +29,37 @@ fn test(%arg0: double, %arg1: double) -> double [external, c, no_inline, dso_loc
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca double, "retval", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 1.000000e+00 : double
-    %4 = const 2.000000e+00 : double
-    %5 = call @test(%3, %4) : double [all]
-    store %5, %1, align 8
-    scope {
-        %9 = load %1 : double, align 8
-        %10 = const 2.400000e-01 : double
-        %11 = cmp lt %9, %10 : bool
-        %12 = ternary %11 ? { : bool
-            %17 = const true : bool
-            yield %17
-        } : {
-            %14 = load %1 : double, align 8
-            %15 = const 2.600000e-01 : double
-            %16 = cmp gt %14, %15 : bool
-            yield %16
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca double, "retval", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 1.000000e+00 : double
+        %4 = const 2.000000e+00 : double
+        %5 = call @test(%3, %4) : double [all]
+        store %5, %1, align 8
+        scope {
+                %9 = load %1 : double, align 8
+                %10 = const 2.400000e-01 : double
+                cmp
+                %12 = ternary %11 ? { : bool
+                        %17 = const true : bool
+                        yield %17
+                } : {
+                        %14 = load %1 : double, align 8
+                        %15 = const 2.600000e-01 : double
+                        cmp
+                        yield %16
+                }
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %6 = get_global @exit : ((s32i) -> void)*
-    %7 = const 0 : s32i
-    call @exit(%7) [all]
-    %8 = load %0 : s32i
-    return %8
+        %6 = get_global @exit : (s32i) -> void*
+        %7 = const 0 : s32i
+        call @exit(%7) [all]
+        %8 = load %0 : s32i
+        return %8
 }

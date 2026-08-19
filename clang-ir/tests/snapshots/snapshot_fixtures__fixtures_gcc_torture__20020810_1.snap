@@ -1,18 +1,18 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20020810-1.c" (c, x86_64-unknown-linux-gnu)
-global R : rec_R = {{100}, {200}} [external, default, align 8, dso_local]
+global R : rec_R = ConstRecord { ty: Named("rec_R"), members: Array([ConstRecord { ty: Named("rec_A"), members: Array([CirInt { ty: Named("s64i"), value: "100" }]) }, ConstRecord { ty: Named("rec_A"), members: Array([CirInt { ty: Named("s64i"), value: "200" }]) }]) } [external, default, align 8, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn f(%arg0: s64i, %arg1: s64i) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s64i, %arg1: s64i):
         %42 = alloca rec_anon_struct, "coerce", align 8
         %43 = alloca rec_anon_struct, "coerce", align 8
-        %44 = get_member %43[0] "" : s64i*
+        get_member
         store %arg0, %44
-        %45 = get_member %43[1] "" : s64i*
+        get_member
         store %arg1, %45
         %46 = load %43 : rec_anon_struct
         store %46, %42
@@ -21,101 +21,101 @@ fn f(%arg0: s64i, %arg1: s64i) -> void [external, c, no_inline, dso_local, nothr
         %49 = alloca rec_R, "r", align 8
         store %48, %49
         scope {
-            %50 = get_member %49[0] "a" : rec_A*
-            %51 = get_member %50[0] "x" : s64i*
-            %52 = load %51 : s64i, align 8
-            %53 = get_global @R : rec_R*
-            %54 = get_member %53[0] "a" : rec_A*
-            %55 = get_member %54[0] "x" : s64i*
-            %56 = load %55 : s64i, align 8
-            %57 = cmp ne %52, %56 : bool
-            %58 = ternary %57 ? { : bool
-                %68 = const true : bool
-                yield %68
-            } : {
-                %60 = get_member %49[1] "b" : rec_A*
-                %61 = get_member %60[0] "x" : s64i*
-                %62 = load %61 : s64i, align 8
-                %63 = get_global @R : rec_R*
-                %64 = get_member %63[1] "b" : rec_A*
-                %65 = get_member %64[0] "x" : s64i*
-                %66 = load %65 : s64i, align 8
-                %67 = cmp ne %62, %66 : bool
-                yield %67
-            }
-            if %58 {
-                %59 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                get_member
+                get_member
+                %52 = load %51 : s64i, align 8
+                %53 = get_global @R : rec_R*
+                get_member
+                get_member
+                %56 = load %55 : s64i, align 8
+                cmp
+                %58 = ternary %57 ? { : bool
+                        %68 = const true : bool
+                        yield %68
+                } : {
+                        get_member
+                        get_member
+                        %62 = load %61 : s64i, align 8
+                        %63 = get_global @R : rec_R*
+                        get_member
+                        get_member
+                        %66 = load %65 : s64i, align 8
+                        cmp
+                        yield %67
+                }
+                if %58 {
+                        %59 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn g() -> rec_anon_struct [external, c, no_inline, dso_local, nothrow] {
-    %36 = alloca rec_R, "coerce", align 8
-    %37 = alloca rec_R, "__retval", align 8
-    %38 = get_global @R : rec_R*
-    copy %37, %38
-    %39 = load %37 : rec_R
-    store %39, %36
-    %40 = cast(bitcast) %36 : rec_anon_struct*
-    %41 = load %40 : rec_anon_struct
-    return %41
+        %36 = alloca rec_R, "coerce", align 8
+        %37 = alloca rec_R, "__retval", align 8
+        %38 = get_global @R : rec_R*
+        copy
+        %39 = load %37 : rec_R
+        store %39, %36
+        %40 = cast(bitcast) %36 : rec_anon_struct*
+        %41 = load %40 : rec_anon_struct
+        return %41
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca rec_anon_struct, "coerce", align 8
-    %1 = alloca rec_R, "coerce", align 8
-    %2 = alloca s32i, "__retval", align 4
-    %3 = alloca rec_R, "r", align 8
-    %4 = const 0 : s32i
-    store %4, %2
-    %5 = get_global @R : rec_R*
-    %6 = load %5 : rec_R, align 8
-    store %6, %1
-    %7 = cast(bitcast) %1 : rec_anon_struct*
-    %8 = get_member %7[0] "" : s64i*
-    %9 = load %8 : s64i
-    %10 = get_member %7[1] "" : s64i*
-    %11 = load %10 : s64i
-    call @f(%9, %11) [all]
-    %12 = call @g() : rec_anon_struct [all]
-    store %12, %0
-    %13 = cast(bitcast) %0 : rec_R*
-    %14 = load %13 : rec_R
-    store %14, %3, align 8
-    scope {
-        %17 = get_member %3[0] "a" : rec_A*
-        %18 = get_member %17[0] "x" : s64i*
-        %19 = load %18 : s64i, align 8
-        %20 = get_global @R : rec_R*
-        %21 = get_member %20[0] "a" : rec_A*
-        %22 = get_member %21[0] "x" : s64i*
-        %23 = load %22 : s64i, align 8
-        %24 = cmp ne %19, %23 : bool
-        %25 = ternary %24 ? { : bool
-            %35 = const true : bool
-            yield %35
-        } : {
-            %27 = get_member %3[1] "b" : rec_A*
-            %28 = get_member %27[0] "x" : s64i*
-            %29 = load %28 : s64i, align 8
-            %30 = get_global @R : rec_R*
-            %31 = get_member %30[1] "b" : rec_A*
-            %32 = get_member %31[0] "x" : s64i*
-            %33 = load %32 : s64i, align 8
-            %34 = cmp ne %29, %33 : bool
-            yield %34
+        %0 = alloca rec_anon_struct, "coerce", align 8
+        %1 = alloca rec_R, "coerce", align 8
+        %2 = alloca s32i, "__retval", align 4
+        %3 = alloca rec_R, "r", align 8
+        %4 = const 0 : s32i
+        store %4, %2
+        %5 = get_global @R : rec_R*
+        %6 = load %5 : rec_R, align 8
+        store %6, %1
+        %7 = cast(bitcast) %1 : rec_anon_struct*
+        get_member
+        %9 = load %8 : s64i
+        get_member
+        %11 = load %10 : s64i
+        call @f(%9, %11) [all]
+        %12 = call @g() : rec_anon_struct [all]
+        store %12, %0
+        %13 = cast(bitcast) %0 : rec_R*
+        %14 = load %13 : rec_R
+        store %14, %3, align 8
+        scope {
+                get_member
+                get_member
+                %19 = load %18 : s64i, align 8
+                %20 = get_global @R : rec_R*
+                get_member
+                get_member
+                %23 = load %22 : s64i, align 8
+                cmp
+                %25 = ternary %24 ? { : bool
+                        %35 = const true : bool
+                        yield %35
+                } : {
+                        get_member
+                        get_member
+                        %29 = load %28 : s64i, align 8
+                        %30 = get_global @R : rec_R*
+                        get_member
+                        get_member
+                        %33 = load %32 : s64i, align 8
+                        cmp
+                        yield %34
+                }
+                if %25 {
+                        %26 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %25 {
-            %26 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %15 = const 0 : s32i
-    store %15, %2
-    %16 = load %2 : s32i
-    return %16
+        %15 = const 0 : s32i
+        store %15, %2
+        %16 = load %2 : s32i
+        return %16
 }

@@ -1,34 +1,34 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/mem_bitcast_copy.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.p : rec_Pair = {7, 9} [cir_private, default, dso_local, constant]
-global .str : s8i[7] = "%u %u\n" [cir_private, default, align 1, dso_local, constant]
+global __const.main.p : rec_Pair = ConstRecord { ty: Named("rec_Pair"), members: Array([CirInt { ty: Named("s32i"), value: "7" }, CirInt { ty: Named("s32i"), value: "9" }]) } [cir_private, default, dso_local, constant]
+global .str : s8i[7] = ConstArray { ty: Array { element_type: Named("s8i"), size: 7 }, elts: Str("%u %u\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_Pair, "p", align 4
-    %2 = alloca rec_Bits, "b", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = get_global @__const.main.p : rec_Pair*
-    copy %1, %4
-    %5 = cast(bitcast) %1 : void*
-    %6 = cast(bitcast) %2 : void*
-    %7 = const 8 : u64i
-    libc.memcpy %6, %5, %7
-    %8 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %9 = get_global @.str : s8i[7]*
-    %10 = cast(array_to_ptrdecay) %9 : s8i*
-    %11 = get_member %2[0] "a" : u32i*
-    %12 = load %11 : u32i, align 4
-    %13 = get_member %2[1] "b" : u32i*
-    %14 = load %13 : u32i, align 4
-    %15 = call @printf(%10, %12, %14) : s32i [all]
-    %16 = const 0 : s32i
-    store %16, %0
-    %17 = load %0 : s32i
-    return %17
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_Pair, "p", align 4
+        %2 = alloca rec_Bits, "b", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = get_global @__const.main.p : rec_Pair*
+        copy
+        %5 = cast(bitcast) %1 : void*
+        %6 = cast(bitcast) %2 : void*
+        %7 = const 8 : u64i
+        libc.memcpy
+        %8 = get_global @printf : (s8i*, ...) -> s32i*
+        %9 = get_global @.str : s8i[7]*
+        %10 = cast(array_to_ptrdecay) %9 : s8i*
+        get_member
+        %12 = load %11 : u32i, align 4
+        get_member
+        %14 = load %13 : u32i, align 4
+        %15 = call @printf(%10, %12, %14) : s32i [all]
+        %16 = const 0 : s32i
+        store %16, %0
+        %17 = load %0 : s32i
+        return %17
 }

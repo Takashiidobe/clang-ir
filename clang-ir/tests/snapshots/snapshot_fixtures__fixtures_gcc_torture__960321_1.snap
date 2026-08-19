@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/960321-1.c" (c, x86_64-unknown-linux-gnu)
-global a : s8i[10] = "deadbeef" [external, default, align 1, dso_local]
+global a : s8i[10] = ConstArray { ty: Array { element_type: Named("s8i"), size: 10 }, elts: Str("deadbeef"), trailing_zeros_num: 1 } [external, default, align 1, dso_local]
 
 fn acc_a(%arg0: s64i) -> s8i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s64i):
@@ -12,9 +12,9 @@ fn acc_a(%arg0: s64i) -> s8i [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %11
         %13 = load %11 : s64i, align 8
         %14 = const 2000000000 : s64i
-        %15 = sub %13, %14 : s64i [nsw]
+        sub
         %16 = get_global @a : s8i[10]*
-        %17 = get_element %16[%15] : s8i*
+        get_element
         %18 = load %17 : s8i, align 1
         store %18, %12
         %19 = load %12 : s8i
@@ -23,25 +23,25 @@ fn acc_a(%arg0: s64i) -> s8i [external, c, no_inline, dso_local, nothrow] {
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %5 = const 2000000000 : s64i
-        %6 = call @acc_a(%5) : s8i [all]
-        %7 = cast(integral) %6 : s32i
-        %8 = const 100 : s32i
-        %9 = cmp ne %7, %8 : bool
-        if %9 {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %5 = const 2000000000 : s64i
+                %6 = call @acc_a(%5) : s8i [all]
+                %7 = cast(integral) %6 : s32i
+                %8 = const 100 : s32i
+                cmp
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

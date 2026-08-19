@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr85582-2.c" (c, x86_64-unknown-linux-gnu)
@@ -13,8 +13,8 @@ fn f1(%arg4: s128i, %arg5: s32i) -> s128i [external, c, no_inline, dso_local, no
         %107 = load %104 : s128i, align 16
         %108 = load %105 : s32i, align 4
         %109 = const 5 : s32i
-        %110 = and %108, %109 : s32i
-        %111 = shift left %107, %110 : s128i
+        and
+        shift
         store %111, %104, align 16
         %112 = load %105 : s32i, align 4
         %113 = cast(integral) %112 : s128i
@@ -36,8 +36,8 @@ fn f2(%arg2: s128i, %arg3: s32i) -> s128i [external, c, no_inline, dso_local, no
         %93 = load %90 : s128i, align 16
         %94 = load %91 : s32i, align 4
         %95 = const 5 : s32i
-        %96 = and %94, %95 : s32i
-        %97 = shift right %93, %96 : s128i
+        and
+        shift
         store %97, %90, align 16
         %98 = load %91 : s32i, align 4
         %99 = cast(integral) %98 : s128i
@@ -59,8 +59,8 @@ fn f3(%arg0: u128i, %arg1: s32i) -> u128i [external, c, no_inline, dso_local, no
         %79 = load %76 : u128i, align 16
         %80 = load %77 : s32i, align 4
         %81 = const 5 : s32i
-        %82 = and %80, %81 : s32i
-        %83 = shift right %79, %82 : u128i
+        and
+        shift
         store %83, %76, align 16
         %84 = load %77 : s32i, align 4
         %85 = cast(integral) %84 : u128i
@@ -74,110 +74,110 @@ fn f3(%arg0: u128i, %arg1: s32i) -> u128i [external, c, no_inline, dso_local, no
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s128i, "a", align 16
-    %2 = alloca s128i, "b", align 16
-    %3 = alloca s128i, "c", align 16
-    %4 = alloca s128i, "d", align 16
-    %5 = alloca u128i, "e", align 16
-    %6 = alloca u128i, "f", align 16
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = const 1 : s128i
-    %9 = const 16 : u64i
-    %10 = const 8 : u64i
-    %11 = mul %9, %10 : u64i
-    %12 = const 7 : u64i
-    %13 = sub %11, %12 : u64i
-    %14 = shift left %8, %13 : s128i
-    store %14, %1, align 16
-    %15 = load %1 : s128i, align 16
-    %16 = const 12 : s32i
-    %17 = call @f1(%15, %16) : s128i [all]
-    store %17, %2, align 16
-    scope {
-        %65 = load %2 : s128i, align 16
-        %66 = const 1 : s128i
-        %67 = const 16 : u64i
-        %68 = const 8 : u64i
-        %69 = mul %67, %68 : u64i
-        %70 = const 3 : u64i
-        %71 = sub %69, %70 : u64i
-        %72 = shift left %66, %71 : s128i
-        %73 = const 12 : s128i
-        %74 = add %72, %73 : s128i [nsw]
-        %75 = cmp ne %65, %74 : bool
-        if %75 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s128i, "a", align 16
+        %2 = alloca s128i, "b", align 16
+        %3 = alloca s128i, "c", align 16
+        %4 = alloca s128i, "d", align 16
+        %5 = alloca u128i, "e", align 16
+        %6 = alloca u128i, "f", align 16
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = const 1 : s128i
+        %9 = const 16 : u64i
+        %10 = const 8 : u64i
+        mul
+        %12 = const 7 : u64i
+        sub
+        shift
+        store %14, %1, align 16
+        %15 = load %1 : s128i, align 16
+        %16 = const 12 : s32i
+        %17 = call @f1(%15, %16) : s128i [all]
+        store %17, %2, align 16
+        scope {
+                %65 = load %2 : s128i, align 16
+                %66 = const 1 : s128i
+                %67 = const 16 : u64i
+                %68 = const 8 : u64i
+                mul
+                %70 = const 3 : u64i
+                sub
+                shift
+                %73 = const 12 : s128i
+                %74 = add %72, %73 : s128i [nsw]
+                cmp
+                if %75 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %18 = const 1 : u128i
-    %19 = const 16 : u64i
-    %20 = const 8 : u64i
-    %21 = mul %19, %20 : u64i
-    %22 = const 1 : u64i
-    %23 = sub %21, %22 : u64i
-    %24 = shift left %18, %23 : u128i
-    %25 = cast(integral) %24 : s128i
-    store %25, %3, align 16
-    %26 = load %3 : s128i, align 16
-    %27 = const 12 : s32i
-    %28 = call @f2(%26, %27) : s128i [all]
-    store %28, %4, align 16
-    scope {
-        %53 = load %4 : s128i, align 16
-        %54 = cast(integral) %53 : u128i
-        %55 = const 31 : u128i
-        %56 = const 16 : u64i
-        %57 = const 8 : u64i
-        %58 = mul %56, %57 : u64i
-        %59 = const 5 : u64i
-        %60 = sub %58, %59 : u64i
-        %61 = shift left %55, %60 : u128i
-        %62 = const 12 : u128i
-        %63 = add %61, %62 : u128i
-        %64 = cmp ne %54, %63 : bool
-        if %64 {
-            call @abort() [all]
-            yield
+        %18 = const 1 : u128i
+        %19 = const 16 : u64i
+        %20 = const 8 : u64i
+        mul
+        %22 = const 1 : u64i
+        sub
+        shift
+        %25 = cast(integral) %24 : s128i
+        store %25, %3, align 16
+        %26 = load %3 : s128i, align 16
+        %27 = const 12 : s32i
+        %28 = call @f2(%26, %27) : s128i [all]
+        store %28, %4, align 16
+        scope {
+                %53 = load %4 : s128i, align 16
+                %54 = cast(integral) %53 : u128i
+                %55 = const 31 : u128i
+                %56 = const 16 : u64i
+                %57 = const 8 : u64i
+                mul
+                %59 = const 5 : u64i
+                sub
+                shift
+                %62 = const 12 : u128i
+                %63 = add %61, %62 : u128i
+                cmp
+                if %64 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %29 = const 1 : u128i
-    %30 = const 16 : u64i
-    %31 = const 8 : u64i
-    %32 = mul %30, %31 : u64i
-    %33 = const 1 : u64i
-    %34 = sub %32, %33 : u64i
-    %35 = shift left %29, %34 : u128i
-    store %35, %5, align 16
-    %36 = load %3 : s128i, align 16
-    %37 = cast(integral) %36 : u128i
-    %38 = const 12 : s32i
-    %39 = call @f3(%37, %38) : u128i [all]
-    store %39, %6, align 16
-    scope {
-        %42 = load %6 : u128i, align 16
-        %43 = const 1 : u128i
-        %44 = const 16 : u64i
-        %45 = const 8 : u64i
-        %46 = mul %44, %45 : u64i
-        %47 = const 5 : u64i
-        %48 = sub %46, %47 : u64i
-        %49 = shift left %43, %48 : u128i
-        %50 = const 12 : u128i
-        %51 = add %49, %50 : u128i
-        %52 = cmp ne %42, %51 : bool
-        if %52 {
-            call @abort() [all]
-            yield
+        %29 = const 1 : u128i
+        %30 = const 16 : u64i
+        %31 = const 8 : u64i
+        mul
+        %33 = const 1 : u64i
+        sub
+        shift
+        store %35, %5, align 16
+        %36 = load %3 : s128i, align 16
+        %37 = cast(integral) %36 : u128i
+        %38 = const 12 : s32i
+        %39 = call @f3(%37, %38) : u128i [all]
+        store %39, %6, align 16
+        scope {
+                %42 = load %6 : u128i, align 16
+                %43 = const 1 : u128i
+                %44 = const 16 : u64i
+                %45 = const 8 : u64i
+                mul
+                %47 = const 5 : u64i
+                sub
+                shift
+                %50 = const 12 : u128i
+                %51 = add %49, %50 : u128i
+                cmp
+                if %52 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %40 = const 0 : s32i
-    store %40, %0
-    %41 = load %0 : s32i
-    return %41
+        %40 = const 0 : s32i
+        store %40, %0
+        %41 = load %0 : s32i
+        return %41
 }

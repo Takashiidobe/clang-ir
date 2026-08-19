@@ -1,21 +1,21 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/volatile_qualified_types.c" (c, x86_64-unknown-linux-gnu)
-global marker : s8i = 65 [internal, default, align 1, dso_local]
-global gain : double = 1.500000e+00 [internal, default, align 8, dso_local]
-global .str : s8i[4] = "%c\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[4] = "%f\n" [cir_private, default, align 1, dso_local, constant]
+global marker : s8i = CirInt { ty: Named("s8i"), value: "65" } [internal, default, align 1, dso_local]
+global gain : double = CirFloat { ty: Double, value: "1.500000e+00" } [internal, default, align 8, dso_local]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%c\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%f\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn read_volatile_param(%arg2: double) -> double [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg2: double):
         %58 = alloca double, "value", align 8
         %59 = alloca double, "__retval", align 8
         store %arg2, %58
-        %60 = load %58 : double, align 8, volatile
+        %60 = load %58 : double, align 8
         %61 = const 5.000000e-01 : double
-        %62 = fadd %60, %61 : double
+        fadd
         store %62, %59
         %63 = load %59 : double
         return %63
@@ -41,62 +41,62 @@ fn use_volatile_fields(%arg0: double) -> double [internal, c, no_inline, dso_loc
         store %arg0, %34
         %37 = const 4 : s32i
         %38 = call @bump_return(%37) : s32i [all]
-        %39 = get_member %36[0] "count" : s32i*
-        store %38, %39, align 8, volatile
+        get_member
+        store %38, %39, align 8
         %40 = load %34 : double, align 8
         %41 = get_global @gain : double*
-        %42 = load %41 : double, align 8, volatile
-        %43 = fadd %40, %42 : double
-        %44 = get_member %36[1] "ratio" : double*
-        store %43, %44, align 8, volatile
-        %45 = get_member %36[1] "ratio" : double*
-        %46 = load %45 : double, align 8, volatile
-        %47 = get_member %36[0] "count" : s32i*
-        %48 = load %47 : s32i, align 8, volatile
+        %42 = load %41 : double, align 8
+        fadd
+        get_member
+        store %43, %44, align 8
+        get_member
+        %46 = load %45 : double, align 8
+        get_member
+        %48 = load %47 : s32i, align 8
         %49 = cast(int_to_float) %48 : double
-        %50 = fadd %46, %49 : double
+        fadd
         store %50, %35
         %51 = load %35 : double
         return %51
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @marker : s8i*
-    %3 = load %2 : s8i, align 1, volatile
-    %4 = cast(integral) %3 : s32i
-    %5 = const 1 : s32i
-    %6 = add %4, %5 : s32i [nsw]
-    %7 = cast(integral) %6 : s8i
-    %8 = get_global @marker : s8i*
-    store %7, %8, align 1, volatile
-    %9 = get_global @gain : double*
-    %10 = load %9 : double, align 8, volatile
-    %11 = call @read_volatile_param(%10) : double [all]
-    %12 = get_global @gain : double*
-    store %11, %12, align 8, volatile
-    %13 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %14 = get_global @.str : s8i[4]*
-    %15 = cast(array_to_ptrdecay) %14 : s8i*
-    %16 = get_global @marker : s8i*
-    %17 = load %16 : s8i, align 1, volatile
-    %18 = cast(integral) %17 : s32i
-    %19 = call @printf(%15, %18) : s32i [all]
-    %20 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %21 = get_global @.str.1 : s8i[4]*
-    %22 = cast(array_to_ptrdecay) %21 : s8i*
-    %23 = get_global @gain : double*
-    %24 = load %23 : double, align 8, volatile
-    %25 = call @printf(%22, %24) : s32i [all]
-    %26 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %27 = get_global @.str.1 : s8i[4]*
-    %28 = cast(array_to_ptrdecay) %27 : s8i*
-    %29 = const 2.000000e+00 : double
-    %30 = call @use_volatile_fields(%29) : double [all]
-    %31 = call @printf(%28, %30) : s32i [all]
-    %32 = const 0 : s32i
-    store %32, %0
-    %33 = load %0 : s32i
-    return %33
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @marker : s8i*
+        %3 = load %2 : s8i, align 1
+        %4 = cast(integral) %3 : s32i
+        %5 = const 1 : s32i
+        %6 = add %4, %5 : s32i [nsw]
+        %7 = cast(integral) %6 : s8i
+        %8 = get_global @marker : s8i*
+        store %7, %8, align 1
+        %9 = get_global @gain : double*
+        %10 = load %9 : double, align 8
+        %11 = call @read_volatile_param(%10) : double [all]
+        %12 = get_global @gain : double*
+        store %11, %12, align 8
+        %13 = get_global @printf : (s8i*, ...) -> s32i*
+        %14 = get_global @.str : s8i[4]*
+        %15 = cast(array_to_ptrdecay) %14 : s8i*
+        %16 = get_global @marker : s8i*
+        %17 = load %16 : s8i, align 1
+        %18 = cast(integral) %17 : s32i
+        %19 = call @printf(%15, %18) : s32i [all]
+        %20 = get_global @printf : (s8i*, ...) -> s32i*
+        %21 = get_global @.str.1 : s8i[4]*
+        %22 = cast(array_to_ptrdecay) %21 : s8i*
+        %23 = get_global @gain : double*
+        %24 = load %23 : double, align 8
+        %25 = call @printf(%22, %24) : s32i [all]
+        %26 = get_global @printf : (s8i*, ...) -> s32i*
+        %27 = get_global @.str.1 : s8i[4]*
+        %28 = cast(array_to_ptrdecay) %27 : s8i*
+        %29 = const 2.000000e+00 : double
+        %30 = call @use_volatile_fields(%29) : double [all]
+        %31 = call @printf(%28, %30) : s32i [all]
+        %32 = const 0 : s32i
+        store %32, %0
+        %33 = load %0 : s32i
+        return %33
 }

@@ -1,16 +1,16 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000818-1.c" (c, x86_64-unknown-linux-gnu)
-global temporary_obstack : void* = #cir.ptr<null> [external, default, align 8, dso_local]
+global temporary_obstack : void* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("void"), addr_space: None }) } [external, default, align 8, dso_local]
 
 fn input() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %55 = alloca s32i, "__retval", align 4
-    %56 = const 0 : s32i
-    store %56, %55
-    %57 = load %55 : s32i
-    return %57
+        %55 = alloca s32i, "__retval", align 4
+        %56 = const 0 : s32i
+        store %56, %55
+        %57 = load %55 : s32i
+        return %57
 }
 fn ISALNUM(%arg2: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg2: s32i):
@@ -19,51 +19,51 @@ fn ISALNUM(%arg2: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         store %arg2, %23
         %25 = load %23 : s32i, align 4
         %26 = const 65 : s32i
-        %27 = cmp ge %25, %26 : bool
+        cmp
         %28 = ternary %27 ? { : bool
-            %52 = load %23 : s32i, align 4
-            %53 = const 90 : s32i
-            %54 = cmp le %52, %53 : bool
-            yield %54
+                %52 = load %23 : s32i, align 4
+                %53 = const 90 : s32i
+                cmp
+                yield %54
         } : {
-            %51 = const false : bool
-            yield %51
+                %51 = const false : bool
+                yield %51
         }
         %29 = ternary %28 ? { : bool
-            %50 = const true : bool
-            yield %50
+                %50 = const true : bool
+                yield %50
         } : {
-            %42 = load %23 : s32i, align 4
-            %43 = const 97 : s32i
-            %44 = cmp ge %42, %43 : bool
-            %45 = ternary %44 ? { : bool
-                %47 = load %23 : s32i, align 4
-                %48 = const 122 : s32i
-                %49 = cmp le %47, %48 : bool
-                yield %49
-            } : {
-                %46 = const false : bool
-                yield %46
-            }
-            yield %45
+                %42 = load %23 : s32i, align 4
+                %43 = const 97 : s32i
+                cmp
+                %45 = ternary %44 ? { : bool
+                        %47 = load %23 : s32i, align 4
+                        %48 = const 122 : s32i
+                        cmp
+                        yield %49
+                } : {
+                        %46 = const false : bool
+                        yield %46
+                }
+                yield %45
         }
         %30 = ternary %29 ? { : bool
-            %41 = const true : bool
-            yield %41
+                %41 = const true : bool
+                yield %41
         } : {
-            %33 = load %23 : s32i, align 4
-            %34 = const 48 : s32i
-            %35 = cmp ge %33, %34 : bool
-            %36 = ternary %35 ? { : bool
-                %38 = load %23 : s32i, align 4
-                %39 = const 48 : s32i
-                %40 = cmp le %38, %39 : bool
-                yield %40
-            } : {
-                %37 = const false : bool
-                yield %37
-            }
-            yield %36
+                %33 = load %23 : s32i, align 4
+                %34 = const 48 : s32i
+                cmp
+                %36 = ternary %35 ? { : bool
+                        %38 = load %23 : s32i, align 4
+                        %39 = const 48 : s32i
+                        cmp
+                        yield %40
+                } : {
+                        %37 = const false : bool
+                        yield %37
+                }
+                yield %36
         }
         %31 = cast(bool_to_int) %30 : s32i
         store %31, %24
@@ -79,63 +79,63 @@ fn obstack_1grow(%arg0: void**, %arg1: s32i) -> void [internal, c, no_inline, ds
         return
 }
 fn yylex() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %7 = alloca s32i, "__retval", align 4
-    %8 = alloca s32i, "ch", align 4
-    scope {
-        for cond: {
-            %20 = const true : bool
-            condition %20
-        } step: {
-            yield
-        } do {
-            scope {
-                %11 = call @input() : s32i [all]
-                store %11, %8, align 4
-                scope {
-                    %12 = load %8 : s32i, align 4
-                    %13 = call @ISALNUM(%12) : s32i [all]
-                    %14 = cast(int_to_bool) %13 : bool
-                    if %14 {
-                        %18 = get_global @temporary_obstack : void**
-                        %19 = load %8 : s32i, align 4
-                        call @obstack_1grow(%18, %19) [all]
+        %7 = alloca s32i, "__retval", align 4
+        %8 = alloca s32i, "ch", align 4
+        scope {
+                for cond {
+                        %20 = const true : bool
+                        condition %20
+                } step {
                         yield
-                    } else {
+                } body {
                         scope {
-                            %15 = load %8 : s32i, align 4
-                            %16 = const 95 : s32i
-                            %17 = cmp ne %15, %16 : bool
-                            if %17 {
-                                break
-                            }
-                            yield
+                                %11 = call @input() : s32i [all]
+                                store %11, %8, align 4
+                                scope {
+                                        %12 = load %8 : s32i, align 4
+                                        %13 = call @ISALNUM(%12) : s32i [all]
+                                        %14 = cast(int_to_bool) %13 : bool
+                                        if %14 {
+                                                %18 = get_global @temporary_obstack : void**
+                                                %19 = load %8 : s32i, align 4
+                                                call @obstack_1grow(%18, %19) [all]
+                                                yield
+                                        } else {
+                                                scope {
+                                                        %15 = load %8 : s32i, align 4
+                                                        %16 = const 95 : s32i
+                                                        cmp
+                                                        if %17 {
+                                                                break
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %9 = load %8 : s32i, align 4
-    store %9, %7
-    %10 = load %7 : s32i
-    return %10
+        %9 = load %8 : s32i, align 4
+        store %9, %7
+        %10 = load %7 : s32i
+        return %10
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "ch", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = call @yylex() : s32i [all]
-    store %3, %1, align 4
-    %4 = get_global @exit : ((s32i) -> void)*
-    %5 = const 0 : s32i
-    call @exit(%5) [all]
-    %6 = load %0 : s32i
-    return %6
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "ch", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = call @yylex() : s32i [all]
+        store %3, %1, align 4
+        %4 = get_global @exit : (s32i) -> void*
+        %5 = const 0 : s32i
+        call @exit(%5) [all]
+        %6 = load %0 : s32i
+        return %6
 }

@@ -1,134 +1,134 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.c-testsuite/case_00181.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "A: " [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[5] = " %d " [cir_private, default, align 1, dso_local, constant]
-global A : s32i[4] = zero [external, default, align 16, dso_local]
-global .str.2 : s8i[2] = "\n" [cir_private, default, align 1, dso_local, constant]
-global .str.3 : s8i[4] = "B: " [cir_private, default, align 1, dso_local, constant]
-global B : s32i[4] = zero [external, default, align 16, dso_local]
-global .str.4 : s8i[4] = "C: " [cir_private, default, align 1, dso_local, constant]
-global C : s32i[4] = zero [external, default, align 16, dso_local]
-global .str.5 : s8i[44] = "------------------------------------------\n" [cir_private, default, align 1, dso_local, constant]
-global .str.6 : s8i[51] = "Solution of Tower of Hanoi Problem with %d Disks\n\n" [cir_private, default, align 1, dso_local, constant]
-global .str.7 : s8i[17] = "Starting state:\n" [cir_private, default, align 1, dso_local, constant]
-global .str.8 : s8i[23] = "\n\nSubsequent states:\n\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("A: "), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[5] = ConstArray { ty: Array { element_type: Named("s8i"), size: 5 }, elts: Str(" %d "), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global A : s32i[4] = Zero { ty: Array { element_type: Named("s32i"), size: 4 } } [external, default, align 16, dso_local]
+global .str.2 : s8i[2] = ConstArray { ty: Array { element_type: Named("s8i"), size: 2 }, elts: Str("\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("B: "), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global B : s32i[4] = Zero { ty: Array { element_type: Named("s32i"), size: 4 } } [external, default, align 16, dso_local]
+global .str.4 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("C: "), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global C : s32i[4] = Zero { ty: Array { element_type: Named("s32i"), size: 4 } } [external, default, align 16, dso_local]
+global .str.5 : s8i[44] = ConstArray { ty: Array { element_type: Named("s8i"), size: 44 }, elts: Str("------------------------------------------\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[51] = ConstArray { ty: Array { element_type: Named("s8i"), size: 51 }, elts: Str("Solution of Tower of Hanoi Problem with %d Disks\n\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.7 : s8i[17] = ConstArray { ty: Array { element_type: Named("s8i"), size: 17 }, elts: Str("Starting state:\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.8 : s8i[23] = ConstArray { ty: Array { element_type: Named("s8i"), size: 23 }, elts: Str("\n\nSubsequent states:\n\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn PrintAll() -> void [external, c, no_inline, dso_local, nothrow] {
-    %147 = alloca s32i, "i", align 4
-    %148 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %149 = get_global @.str : s8i[4]*
-    %150 = cast(array_to_ptrdecay) %149 : s8i*
-    %151 = call @printf(%150) : s32i [all]
-    scope {
-        %206 = const 0 : s32i
-        store %206, %147, align 4
-        for cond: {
-            %218 = load %147 : s32i, align 4
-            %219 = const 4 : s32i
-            %220 = cmp lt %218, %219 : bool
-            condition %220
-        } step: {
-            %207 = load %147 : s32i, align 4
-            %208 = inc %207 : s32i [nsw]
-            store %208, %147, align 4
-            yield
-        } do {
-            %209 = get_global @printf : ((s8i*, ...) -> s32i)*
-            %210 = get_global @.str.1 : s8i[5]*
-            %211 = cast(array_to_ptrdecay) %210 : s8i*
-            %212 = load %147 : s32i, align 4
-            %213 = cast(integral) %212 : s64i
-            %214 = get_global @A : s32i[4]*
-            %215 = get_element %214[%213] : s32i*
-            %216 = load %215 : s32i, align 4
-            %217 = call @printf(%211, %216) : s32i [all]
-            yield
+        %147 = alloca s32i, "i", align 4
+        %148 = get_global @printf : (s8i*, ...) -> s32i*
+        %149 = get_global @.str : s8i[4]*
+        %150 = cast(array_to_ptrdecay) %149 : s8i*
+        %151 = call @printf(%150) : s32i [all]
+        scope {
+                %206 = const 0 : s32i
+                store %206, %147, align 4
+                for cond {
+                        %218 = load %147 : s32i, align 4
+                        %219 = const 4 : s32i
+                        cmp
+                        condition %220
+                } step {
+                        %207 = load %147 : s32i, align 4
+                        inc
+                        store %208, %147, align 4
+                        yield
+                } body {
+                        %209 = get_global @printf : (s8i*, ...) -> s32i*
+                        %210 = get_global @.str.1 : s8i[5]*
+                        %211 = cast(array_to_ptrdecay) %210 : s8i*
+                        %212 = load %147 : s32i, align 4
+                        %213 = cast(integral) %212 : s64i
+                        %214 = get_global @A : s32i[4]*
+                        get_element
+                        %216 = load %215 : s32i, align 4
+                        %217 = call @printf(%211, %216) : s32i [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %152 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %153 = get_global @.str.2 : s8i[2]*
-    %154 = cast(array_to_ptrdecay) %153 : s8i*
-    %155 = call @printf(%154) : s32i [all]
-    %156 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %157 = get_global @.str.3 : s8i[4]*
-    %158 = cast(array_to_ptrdecay) %157 : s8i*
-    %159 = call @printf(%158) : s32i [all]
-    scope {
-        %191 = const 0 : s32i
-        store %191, %147, align 4
-        for cond: {
-            %203 = load %147 : s32i, align 4
-            %204 = const 4 : s32i
-            %205 = cmp lt %203, %204 : bool
-            condition %205
-        } step: {
-            %192 = load %147 : s32i, align 4
-            %193 = inc %192 : s32i [nsw]
-            store %193, %147, align 4
-            yield
-        } do {
-            %194 = get_global @printf : ((s8i*, ...) -> s32i)*
-            %195 = get_global @.str.1 : s8i[5]*
-            %196 = cast(array_to_ptrdecay) %195 : s8i*
-            %197 = load %147 : s32i, align 4
-            %198 = cast(integral) %197 : s64i
-            %199 = get_global @B : s32i[4]*
-            %200 = get_element %199[%198] : s32i*
-            %201 = load %200 : s32i, align 4
-            %202 = call @printf(%196, %201) : s32i [all]
-            yield
+        %152 = get_global @printf : (s8i*, ...) -> s32i*
+        %153 = get_global @.str.2 : s8i[2]*
+        %154 = cast(array_to_ptrdecay) %153 : s8i*
+        %155 = call @printf(%154) : s32i [all]
+        %156 = get_global @printf : (s8i*, ...) -> s32i*
+        %157 = get_global @.str.3 : s8i[4]*
+        %158 = cast(array_to_ptrdecay) %157 : s8i*
+        %159 = call @printf(%158) : s32i [all]
+        scope {
+                %191 = const 0 : s32i
+                store %191, %147, align 4
+                for cond {
+                        %203 = load %147 : s32i, align 4
+                        %204 = const 4 : s32i
+                        cmp
+                        condition %205
+                } step {
+                        %192 = load %147 : s32i, align 4
+                        inc
+                        store %193, %147, align 4
+                        yield
+                } body {
+                        %194 = get_global @printf : (s8i*, ...) -> s32i*
+                        %195 = get_global @.str.1 : s8i[5]*
+                        %196 = cast(array_to_ptrdecay) %195 : s8i*
+                        %197 = load %147 : s32i, align 4
+                        %198 = cast(integral) %197 : s64i
+                        %199 = get_global @B : s32i[4]*
+                        get_element
+                        %201 = load %200 : s32i, align 4
+                        %202 = call @printf(%196, %201) : s32i [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %160 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %161 = get_global @.str.2 : s8i[2]*
-    %162 = cast(array_to_ptrdecay) %161 : s8i*
-    %163 = call @printf(%162) : s32i [all]
-    %164 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %165 = get_global @.str.4 : s8i[4]*
-    %166 = cast(array_to_ptrdecay) %165 : s8i*
-    %167 = call @printf(%166) : s32i [all]
-    scope {
-        %176 = const 0 : s32i
-        store %176, %147, align 4
-        for cond: {
-            %188 = load %147 : s32i, align 4
-            %189 = const 4 : s32i
-            %190 = cmp lt %188, %189 : bool
-            condition %190
-        } step: {
-            %177 = load %147 : s32i, align 4
-            %178 = inc %177 : s32i [nsw]
-            store %178, %147, align 4
-            yield
-        } do {
-            %179 = get_global @printf : ((s8i*, ...) -> s32i)*
-            %180 = get_global @.str.1 : s8i[5]*
-            %181 = cast(array_to_ptrdecay) %180 : s8i*
-            %182 = load %147 : s32i, align 4
-            %183 = cast(integral) %182 : s64i
-            %184 = get_global @C : s32i[4]*
-            %185 = get_element %184[%183] : s32i*
-            %186 = load %185 : s32i, align 4
-            %187 = call @printf(%181, %186) : s32i [all]
-            yield
+        %160 = get_global @printf : (s8i*, ...) -> s32i*
+        %161 = get_global @.str.2 : s8i[2]*
+        %162 = cast(array_to_ptrdecay) %161 : s8i*
+        %163 = call @printf(%162) : s32i [all]
+        %164 = get_global @printf : (s8i*, ...) -> s32i*
+        %165 = get_global @.str.4 : s8i[4]*
+        %166 = cast(array_to_ptrdecay) %165 : s8i*
+        %167 = call @printf(%166) : s32i [all]
+        scope {
+                %176 = const 0 : s32i
+                store %176, %147, align 4
+                for cond {
+                        %188 = load %147 : s32i, align 4
+                        %189 = const 4 : s32i
+                        cmp
+                        condition %190
+                } step {
+                        %177 = load %147 : s32i, align 4
+                        inc
+                        store %178, %147, align 4
+                        yield
+                } body {
+                        %179 = get_global @printf : (s8i*, ...) -> s32i*
+                        %180 = get_global @.str.1 : s8i[5]*
+                        %181 = cast(array_to_ptrdecay) %180 : s8i*
+                        %182 = load %147 : s32i, align 4
+                        %183 = cast(integral) %182 : s64i
+                        %184 = get_global @C : s32i[4]*
+                        get_element
+                        %186 = load %185 : s32i, align 4
+                        %187 = call @printf(%181, %186) : s32i [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %168 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %169 = get_global @.str.2 : s8i[2]*
-    %170 = cast(array_to_ptrdecay) %169 : s8i*
-    %171 = call @printf(%170) : s32i [all]
-    %172 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %173 = get_global @.str.5 : s8i[44]*
-    %174 = cast(array_to_ptrdecay) %173 : s8i*
-    %175 = call @printf(%174) : s32i [all]
-    return
+        %168 = get_global @printf : (s8i*, ...) -> s32i*
+        %169 = get_global @.str.2 : s8i[2]*
+        %170 = cast(array_to_ptrdecay) %169 : s8i*
+        %171 = call @printf(%170) : s32i [all]
+        %172 = get_global @printf : (s8i*, ...) -> s32i*
+        %173 = get_global @.str.5 : s8i[44]*
+        %174 = cast(array_to_ptrdecay) %173 : s8i*
+        %175 = call @printf(%174) : s32i [all]
+        return
 }
 fn Move(%arg4: s32i*, %arg5: s32i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg4: s32i*, %arg5: s32i*):
@@ -144,85 +144,85 @@ fn Move(%arg4: s32i*, %arg5: s32i*) -> s32i [external, c, no_inline, dso_local, 
         %93 = const 0 : s32i
         store %93, %91, align 4
         scope {
-            while {
-                %135 = load %90 : s32i, align 4
-                %136 = const 4 : s32i
-                %137 = cmp lt %135, %136 : bool
-                %138 = ternary %137 ? { : bool
-                    %140 = load %90 : s32i, align 4
-                    %141 = cast(integral) %140 : s64i
-                    %142 = load %87 : s32i*, align 8
-                    %143 = ptr_stride %142, %141 : s32i*
-                    %144 = load %143 : s32i, align 4
-                    %145 = const 0 : s32i
-                    %146 = cmp eq %144, %145 : bool
-                    yield %146
-                } : {
-                    %139 = const false : bool
-                    yield %139
+                while {
+                        %135 = load %90 : s32i, align 4
+                        %136 = const 4 : s32i
+                        cmp
+                        %138 = ternary %137 ? { : bool
+                                %140 = load %90 : s32i, align 4
+                                %141 = cast(integral) %140 : s64i
+                                %142 = load %87 : s32i*, align 8
+                                ptr_stride
+                                %144 = load %143 : s32i, align 4
+                                %145 = const 0 : s32i
+                                cmp
+                                yield %146
+                        } : {
+                                %139 = const false : bool
+                                yield %139
+                        }
+                        condition %138
+                } do {
+                        %133 = load %90 : s32i, align 4
+                        inc
+                        store %134, %90, align 4
+                        yield
                 }
-                condition %138
-            } do {
-                %133 = load %90 : s32i, align 4
-                %134 = inc %133 : s32i [nsw]
-                store %134, %90, align 4
                 yield
-            }
-            yield
         }
         scope {
-            while {
-                %121 = load %91 : s32i, align 4
-                %122 = const 4 : s32i
-                %123 = cmp lt %121, %122 : bool
-                %124 = ternary %123 ? { : bool
-                    %126 = load %91 : s32i, align 4
-                    %127 = cast(integral) %126 : s64i
-                    %128 = load %88 : s32i*, align 8
-                    %129 = ptr_stride %128, %127 : s32i*
-                    %130 = load %129 : s32i, align 4
-                    %131 = const 0 : s32i
-                    %132 = cmp eq %130, %131 : bool
-                    yield %132
-                } : {
-                    %125 = const false : bool
-                    yield %125
+                while {
+                        %121 = load %91 : s32i, align 4
+                        %122 = const 4 : s32i
+                        cmp
+                        %124 = ternary %123 ? { : bool
+                                %126 = load %91 : s32i, align 4
+                                %127 = cast(integral) %126 : s64i
+                                %128 = load %88 : s32i*, align 8
+                                ptr_stride
+                                %130 = load %129 : s32i, align 4
+                                %131 = const 0 : s32i
+                                cmp
+                                yield %132
+                        } : {
+                                %125 = const false : bool
+                                yield %125
+                        }
+                        condition %124
+                } do {
+                        %119 = load %91 : s32i, align 4
+                        inc
+                        store %120, %91, align 4
+                        yield
                 }
-                condition %124
-            } do {
-                %119 = load %91 : s32i, align 4
-                %120 = inc %119 : s32i [nsw]
-                store %120, %91, align 4
                 yield
-            }
-            yield
         }
         %94 = load %90 : s32i, align 4
         %95 = cast(integral) %94 : s64i
         %96 = load %87 : s32i*, align 8
-        %97 = ptr_stride %96, %95 : s32i*
+        ptr_stride
         %98 = load %97 : s32i, align 4
         %99 = load %91 : s32i, align 4
         %100 = const 1 : s32i
-        %101 = sub %99, %100 : s32i [nsw]
+        sub
         %102 = cast(integral) %101 : s64i
         %103 = load %88 : s32i*, align 8
-        %104 = ptr_stride %103, %102 : s32i*
+        ptr_stride
         store %98, %104, align 4
         %105 = const 0 : s32i
         %106 = load %90 : s32i, align 4
         %107 = cast(integral) %106 : s64i
         %108 = load %87 : s32i*, align 8
-        %109 = ptr_stride %108, %107 : s32i*
+        ptr_stride
         store %105, %109, align 4
-        %110 = get_global @PrintAll : (() -> void)*
+        %110 = get_global @PrintAll : () -> void*
         call @PrintAll() [all]
         %111 = load %91 : s32i, align 4
         %112 = const 1 : s32i
-        %113 = sub %111, %112 : s32i [nsw]
+        sub
         %114 = cast(integral) %113 : s64i
         %115 = load %88 : s32i*, align 8
-        %116 = ptr_stride %115, %114 : s32i*
+        ptr_stride
         %117 = load %116 : s32i, align 4
         store %117, %89
         %118 = load %89 : s32i
@@ -240,20 +240,20 @@ fn Hanoi(%arg0: s32i, %arg1: s32i*, %arg2: s32i*, %arg3: s32i*) -> void [externa
         store %arg2, %63
         store %arg3, %64
         scope {
-            %81 = load %61 : s32i, align 4
-            %82 = const 1 : s32i
-            %83 = cmp eq %81, %82 : bool
-            if %83 {
-                %84 = load %62 : s32i*, align 8
-                %85 = load %63 : s32i*, align 8
-                %86 = call @Move(%84, %85) : s32i [all]
-                return
-            }
-            yield
+                %81 = load %61 : s32i, align 4
+                %82 = const 1 : s32i
+                cmp
+                if %83 {
+                        %84 = load %62 : s32i*, align 8
+                        %85 = load %63 : s32i*, align 8
+                        %86 = call @Move(%84, %85) : s32i [all]
+                        return
+                }
+                yield
         }
         %66 = load %61 : s32i, align 4
         %67 = const 1 : s32i
-        %68 = sub %66, %67 : s32i [nsw]
+        sub
         %69 = load %62 : s32i*, align 8
         %70 = load %64 : s32i*, align 8
         %71 = load %63 : s32i*, align 8
@@ -263,7 +263,7 @@ fn Hanoi(%arg0: s32i, %arg1: s32i*, %arg2: s32i*, %arg3: s32i*) -> void [externa
         %74 = call @Move(%72, %73) : s32i [all]
         %75 = load %61 : s32i, align 4
         %76 = const 1 : s32i
-        %77 = sub %75, %76 : s32i [nsw]
+        sub
         %78 = load %64 : s32i*, align 8
         %79 = load %63 : s32i*, align 8
         %80 = load %62 : s32i*, align 8
@@ -271,109 +271,109 @@ fn Hanoi(%arg0: s32i, %arg1: s32i*, %arg2: s32i*, %arg3: s32i*) -> void [externa
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    scope {
-        %48 = const 0 : s32i
-        store %48, %1, align 4
-        for cond: {
-            %58 = load %1 : s32i, align 4
-            %59 = const 4 : s32i
-            %60 = cmp lt %58, %59 : bool
-            condition %60
-        } step: {
-            %49 = load %1 : s32i, align 4
-            %50 = inc %49 : s32i [nsw]
-            store %50, %1, align 4
-            yield
-        } do {
-            %51 = load %1 : s32i, align 4
-            %52 = const 1 : s32i
-            %53 = add %51, %52 : s32i [nsw]
-            %54 = load %1 : s32i, align 4
-            %55 = cast(integral) %54 : s64i
-            %56 = get_global @A : s32i[4]*
-            %57 = get_element %56[%55] : s32i*
-            store %53, %57, align 4
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        scope {
+                %48 = const 0 : s32i
+                store %48, %1, align 4
+                for cond {
+                        %58 = load %1 : s32i, align 4
+                        %59 = const 4 : s32i
+                        cmp
+                        condition %60
+                } step {
+                        %49 = load %1 : s32i, align 4
+                        inc
+                        store %50, %1, align 4
+                        yield
+                } body {
+                        %51 = load %1 : s32i, align 4
+                        %52 = const 1 : s32i
+                        %53 = add %51, %52 : s32i [nsw]
+                        %54 = load %1 : s32i, align 4
+                        %55 = cast(integral) %54 : s64i
+                        %56 = get_global @A : s32i[4]*
+                        get_element
+                        store %53, %57, align 4
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %37 = const 0 : s32i
-        store %37, %1, align 4
-        for cond: {
-            %45 = load %1 : s32i, align 4
-            %46 = const 4 : s32i
-            %47 = cmp lt %45, %46 : bool
-            condition %47
-        } step: {
-            %38 = load %1 : s32i, align 4
-            %39 = inc %38 : s32i [nsw]
-            store %39, %1, align 4
-            yield
-        } do {
-            %40 = const 0 : s32i
-            %41 = load %1 : s32i, align 4
-            %42 = cast(integral) %41 : s64i
-            %43 = get_global @B : s32i[4]*
-            %44 = get_element %43[%42] : s32i*
-            store %40, %44, align 4
-            yield
+        scope {
+                %37 = const 0 : s32i
+                store %37, %1, align 4
+                for cond {
+                        %45 = load %1 : s32i, align 4
+                        %46 = const 4 : s32i
+                        cmp
+                        condition %47
+                } step {
+                        %38 = load %1 : s32i, align 4
+                        inc
+                        store %39, %1, align 4
+                        yield
+                } body {
+                        %40 = const 0 : s32i
+                        %41 = load %1 : s32i, align 4
+                        %42 = cast(integral) %41 : s64i
+                        %43 = get_global @B : s32i[4]*
+                        get_element
+                        store %40, %44, align 4
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %26 = const 0 : s32i
-        store %26, %1, align 4
-        for cond: {
-            %34 = load %1 : s32i, align 4
-            %35 = const 4 : s32i
-            %36 = cmp lt %34, %35 : bool
-            condition %36
-        } step: {
-            %27 = load %1 : s32i, align 4
-            %28 = inc %27 : s32i [nsw]
-            store %28, %1, align 4
-            yield
-        } do {
-            %29 = const 0 : s32i
-            %30 = load %1 : s32i, align 4
-            %31 = cast(integral) %30 : s64i
-            %32 = get_global @C : s32i[4]*
-            %33 = get_element %32[%31] : s32i*
-            store %29, %33, align 4
-            yield
+        scope {
+                %26 = const 0 : s32i
+                store %26, %1, align 4
+                for cond {
+                        %34 = load %1 : s32i, align 4
+                        %35 = const 4 : s32i
+                        cmp
+                        condition %36
+                } step {
+                        %27 = load %1 : s32i, align 4
+                        inc
+                        store %28, %1, align 4
+                        yield
+                } body {
+                        %29 = const 0 : s32i
+                        %30 = load %1 : s32i, align 4
+                        %31 = cast(integral) %30 : s64i
+                        %32 = get_global @C : s32i[4]*
+                        get_element
+                        store %29, %33, align 4
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %3 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %4 = get_global @.str.6 : s8i[51]*
-    %5 = cast(array_to_ptrdecay) %4 : s8i*
-    %6 = const 4 : s32i
-    %7 = call @printf(%5, %6) : s32i [all]
-    %8 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %9 = get_global @.str.7 : s8i[17]*
-    %10 = cast(array_to_ptrdecay) %9 : s8i*
-    %11 = call @printf(%10) : s32i [all]
-    %12 = get_global @PrintAll : (() -> void)*
-    call @PrintAll() [all]
-    %13 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %14 = get_global @.str.8 : s8i[23]*
-    %15 = cast(array_to_ptrdecay) %14 : s8i*
-    %16 = call @printf(%15) : s32i [all]
-    %17 = const 4 : s32i
-    %18 = get_global @A : s32i[4]*
-    %19 = cast(array_to_ptrdecay) %18 : s32i*
-    %20 = get_global @B : s32i[4]*
-    %21 = cast(array_to_ptrdecay) %20 : s32i*
-    %22 = get_global @C : s32i[4]*
-    %23 = cast(array_to_ptrdecay) %22 : s32i*
-    call @Hanoi(%17, %19, %21, %23) [all]
-    %24 = const 0 : s32i
-    store %24, %0
-    %25 = load %0 : s32i
-    return %25
+        %3 = get_global @printf : (s8i*, ...) -> s32i*
+        %4 = get_global @.str.6 : s8i[51]*
+        %5 = cast(array_to_ptrdecay) %4 : s8i*
+        %6 = const 4 : s32i
+        %7 = call @printf(%5, %6) : s32i [all]
+        %8 = get_global @printf : (s8i*, ...) -> s32i*
+        %9 = get_global @.str.7 : s8i[17]*
+        %10 = cast(array_to_ptrdecay) %9 : s8i*
+        %11 = call @printf(%10) : s32i [all]
+        %12 = get_global @PrintAll : () -> void*
+        call @PrintAll() [all]
+        %13 = get_global @printf : (s8i*, ...) -> s32i*
+        %14 = get_global @.str.8 : s8i[23]*
+        %15 = cast(array_to_ptrdecay) %14 : s8i*
+        %16 = call @printf(%15) : s32i [all]
+        %17 = const 4 : s32i
+        %18 = get_global @A : s32i[4]*
+        %19 = cast(array_to_ptrdecay) %18 : s32i*
+        %20 = get_global @B : s32i[4]*
+        %21 = cast(array_to_ptrdecay) %20 : s32i*
+        %22 = get_global @C : s32i[4]*
+        %23 = cast(array_to_ptrdecay) %22 : s32i*
+        call @Hanoi(%17, %19, %21, %23) [all]
+        %24 = const 0 : s32i
+        store %24, %0
+        %25 = load %0 : s32i
+        return %25
 }

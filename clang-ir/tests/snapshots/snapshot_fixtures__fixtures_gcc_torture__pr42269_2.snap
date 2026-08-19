@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr42269-2.c" (c, x86_64-unknown-linux-gnu)
-global s : u16i = 65535 [external, default, align 2, dso_local]
+global s : u16i = CirInt { ty: Named("u16i"), value: "65535" } [external, default, align 2, dso_local]
 
 fn foo(%arg0: u16i) -> s64i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: u16i):
@@ -18,18 +18,18 @@ fn foo(%arg0: u16i) -> s64i [internal, c, no_inline, dso_local, nothrow] {
         return %16
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @s : u16i*
-    %3 = load %2 : u16i, align 2
-    %4 = call @foo(%3) : s64i [all]
-    %5 = const 1 : s64i
-    %6 = add %4, %5 : s64i [nsw]
-    %7 = const 0 : s64i
-    %8 = cmp ne %6, %7 : bool
-    %9 = cast(bool_to_int) %8 : s32i
-    store %9, %0
-    %10 = load %0 : s32i
-    return %10
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @s : u16i*
+        %3 = load %2 : u16i, align 2
+        %4 = call @foo(%3) : s64i [all]
+        %5 = const 1 : s64i
+        %6 = add %4, %5 : s64i [nsw]
+        %7 = const 0 : s64i
+        cmp
+        %9 = cast(bool_to_int) %8 : s32i
+        store %9, %0
+        %10 = load %0 : s32i
+        return %10
 }

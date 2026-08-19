@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr49161.c" (c, x86_64-unknown-linux-gnu)
-global c : s32i = 0 [external, default, align 4, dso_local]
+global c : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn bar(%arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -11,18 +11,18 @@ fn bar(%arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %23 = alloca s32i, "x", align 4
         store %arg1, %23
         scope {
-            %24 = load %23 : s32i, align 4
-            %25 = get_global @c : s32i*
-            %26 = load %25 : s32i, align 4
-            %27 = inc %26 : s32i [nsw]
-            store %27, %25, align 4
-            %28 = cmp ne %24, %26 : bool
-            if %28 {
-                %29 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %24 = load %23 : s32i, align 4
+                %25 = get_global @c : s32i*
+                %26 = load %25 : s32i, align 4
+                inc
+                store %27, %25, align 4
+                cmp
+                if %28 {
+                        %29 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -31,85 +31,86 @@ fn foo(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %10 = alloca s32i, "x", align 4
         store %arg0, %10
         scope {
-            %22 = load %10 : s32i, align 4
-            switch %22 {
-                case equal 3 {
-                    goto l1
+                %22 = load %10 : s32i, align 4
+                switch %22 {
+                        case equal [3] {
+                                goto l1
+                        }
+                        case equal [4] {
+                                goto l2
+                        }
+                        case equal [6] {
+                                goto l3
+                        }
+                        case default [] {
+                                return
+                        }
+                        yield
                 }
-                case equal 4 {
-                    goto l2
-                }
-                case equal 6 {
-                    goto l3
-                }
-                case default {
-                    return
-                }
-            }
-            yield
+                yield
         }
         br ^bb1
-    ^bb1():
+    ^bb1:
         label l1:
         goto l4
-    ^bb2():
+    ^bb2:
         label l2:
         goto l4
-    ^bb3():
+    ^bb3:
         label l3:
         %11 = const -1 : s32i
         call @bar(%11) [all]
         br ^bb4
-    ^bb4():
+    ^bb4:
         label l4:
         %12 = const 0 : s32i
         call @bar(%12) [all]
         scope {
-            %18 = load %10 : s32i, align 4
-            %19 = const 4 : s32i
-            %20 = cmp ne %18, %19 : bool
-            if %20 {
-                %21 = const 1 : s32i
-                call @bar(%21) [all]
+                %18 = load %10 : s32i, align 4
+                %19 = const 4 : s32i
+                cmp
+                if %20 {
+                        %21 = const 1 : s32i
+                        call @bar(%21) [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %14 = load %10 : s32i, align 4
-            %15 = const 3 : s32i
-            %16 = cmp ne %14, %15 : bool
-            if %16 {
-                %17 = const -1 : s32i
-                call @bar(%17) [all]
+                %14 = load %10 : s32i, align 4
+                %15 = const 3 : s32i
+                cmp
+                if %16 {
+                        %17 = const -1 : s32i
+                        call @bar(%17) [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %13 = const 2 : s32i
         call @bar(%13) [all]
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 3 : s32i
-    call @foo(%2) [all]
-    scope {
-        %5 = get_global @c : s32i*
-        %6 = load %5 : s32i, align 4
-        %7 = const 3 : s32i
-        %8 = cmp ne %6, %7 : bool
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 3 : s32i
+        call @foo(%2) [all]
+        scope {
+                %5 = get_global @c : s32i*
+                %6 = load %5 : s32i, align 4
+                %7 = const 3 : s32i
+                cmp
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = load %0 : s32i
-    return %4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = load %0 : s32i
+        return %4
 }

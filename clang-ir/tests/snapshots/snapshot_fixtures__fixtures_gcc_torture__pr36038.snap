@@ -1,163 +1,163 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr36038.c" (c, x86_64-unknown-linux-gnu)
-global expect : s64i[10] = [0, 1, 2, 3, 4, 4, 5, 6, 7, 9] [external, default, align 16, dso_local]
-global stack_base : s64i* = #cir.ptr<null> [external, default, align 8, dso_local]
-global markstack_ptr : s32i* = #cir.ptr<null> [external, default, align 8, dso_local]
-global list : s64i[10] = zero [external, default, align 16, dso_local]
-global indices : s32i[10] = zero [external, default, align 16, dso_local]
+global expect : s64i[10] = ConstArray { ty: Array { element_type: Named("s64i"), size: 10 }, elts: Array([CirInt { ty: Named("s64i"), value: "0" }, CirInt { ty: Named("s64i"), value: "1" }, CirInt { ty: Named("s64i"), value: "2" }, CirInt { ty: Named("s64i"), value: "3" }, CirInt { ty: Named("s64i"), value: "4" }, CirInt { ty: Named("s64i"), value: "4" }, CirInt { ty: Named("s64i"), value: "5" }, CirInt { ty: Named("s64i"), value: "6" }, CirInt { ty: Named("s64i"), value: "7" }, CirInt { ty: Named("s64i"), value: "9" }]), trailing_zeros_num: 0 } [external, default, align 16, dso_local]
+global stack_base : s64i* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("s64i"), addr_space: None }) } [external, default, align 8, dso_local]
+global markstack_ptr : s32i* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("s32i"), addr_space: None }) } [external, default, align 8, dso_local]
+global list : s64i[10] = Zero { ty: Array { element_type: Named("s64i"), size: 10 } } [external, default, align 16, dso_local]
+global indices : s32i[10] = Zero { ty: Array { element_type: Named("s32i"), size: 10 } } [external, default, align 16, dso_local]
 
 fn doit() -> void [external, c, no_inline, dso_local, nothrow] {
-    %46 = alloca s64i*, "src", align 8
-    %47 = alloca s64i*, "dst", align 8
-    %48 = alloca s64i*, "sp", align 8
-    %49 = alloca s32i, "diff", align 4
-    %50 = alloca s32i, "shift", align 4
-    %51 = alloca s32i, "count", align 4
-    %52 = get_global @stack_base : s64i**
-    %53 = load %52 : s64i*, align 8
-    %54 = const 5 : s32i
-    %55 = ptr_stride %53, %54 : s64i*
-    store %55, %48, align 8
-    %56 = const 2 : s32i
-    store %56, %49, align 4
-    %57 = load %49 : s32i, align 4
-    %58 = const -1 : s64i
-    %59 = get_global @markstack_ptr : s32i**
-    %60 = load %59 : s32i*, align 8
-    %61 = ptr_stride %60, %58 : s32i*
-    %62 = load %61 : s32i, align 4
-    %63 = const -2 : s64i
-    %64 = get_global @markstack_ptr : s32i**
-    %65 = load %64 : s32i*, align 8
-    %66 = ptr_stride %65, %63 : s32i*
-    %67 = load %66 : s32i, align 4
-    %68 = sub %62, %67 : s32i [nsw]
-    %69 = sub %57, %68 : s32i [nsw]
-    store %69, %50, align 4
-    %70 = load %48 : s64i*, align 8
-    %71 = get_global @stack_base : s64i**
-    %72 = load %71 : s64i*, align 8
-    %73 = ptr_diff %70, %72 : s64i
-    %74 = const -1 : s64i
-    %75 = get_global @markstack_ptr : s32i**
-    %76 = load %75 : s32i*, align 8
-    %77 = ptr_stride %76, %74 : s32i*
-    %78 = load %77 : s32i, align 4
-    %79 = cast(integral) %78 : s64i
-    %80 = sub %73, %79 : s64i [nsw]
-    %81 = const 2 : s64i
-    %82 = add %80, %81 : s64i [nsw]
-    %83 = cast(integral) %82 : s32i
-    store %83, %51, align 4
-    %84 = load %48 : s64i*, align 8
-    store %84, %46, align 8
-    %85 = load %50 : s32i, align 4
-    %86 = load %48 : s64i*, align 8
-    %87 = ptr_stride %86, %85 : s64i*
-    store %87, %48, align 8
-    store %87, %47, align 8
-    scope {
-        while {
-            %95 = load %51 : s32i, align 4
-            %96 = dec %95 : s32i [nsw]
-            store %96, %51, align 4
-            %97 = cast(int_to_bool) %96 : bool
-            condition %97
-        } do {
-            %88 = load %46 : s64i*, align 8
-            %89 = const -1 : s32i
-            %90 = ptr_stride %88, %89 : s64i*
-            store %90, %46, align 8
-            %91 = load %88 : s64i, align 8
-            %92 = load %47 : s64i*, align 8
-            %93 = const -1 : s32i
-            %94 = ptr_stride %92, %93 : s64i*
-            store %94, %47, align 8
-            store %91, %92, align 8
-            yield
+        %46 = alloca s64i*, "src", align 8
+        %47 = alloca s64i*, "dst", align 8
+        %48 = alloca s64i*, "sp", align 8
+        %49 = alloca s32i, "diff", align 4
+        %50 = alloca s32i, "shift", align 4
+        %51 = alloca s32i, "count", align 4
+        %52 = get_global @stack_base : s64i**
+        %53 = load %52 : s64i*, align 8
+        %54 = const 5 : s32i
+        ptr_stride
+        store %55, %48, align 8
+        %56 = const 2 : s32i
+        store %56, %49, align 4
+        %57 = load %49 : s32i, align 4
+        %58 = const -1 : s64i
+        %59 = get_global @markstack_ptr : s32i**
+        %60 = load %59 : s32i*, align 8
+        ptr_stride
+        %62 = load %61 : s32i, align 4
+        %63 = const -2 : s64i
+        %64 = get_global @markstack_ptr : s32i**
+        %65 = load %64 : s32i*, align 8
+        ptr_stride
+        %67 = load %66 : s32i, align 4
+        sub
+        sub
+        store %69, %50, align 4
+        %70 = load %48 : s64i*, align 8
+        %71 = get_global @stack_base : s64i**
+        %72 = load %71 : s64i*, align 8
+        ptr_diff
+        %74 = const -1 : s64i
+        %75 = get_global @markstack_ptr : s32i**
+        %76 = load %75 : s32i*, align 8
+        ptr_stride
+        %78 = load %77 : s32i, align 4
+        %79 = cast(integral) %78 : s64i
+        sub
+        %81 = const 2 : s64i
+        %82 = add %80, %81 : s64i [nsw]
+        %83 = cast(integral) %82 : s32i
+        store %83, %51, align 4
+        %84 = load %48 : s64i*, align 8
+        store %84, %46, align 8
+        %85 = load %50 : s32i, align 4
+        %86 = load %48 : s64i*, align 8
+        ptr_stride
+        store %87, %48, align 8
+        store %87, %47, align 8
+        scope {
+                while {
+                        %95 = load %51 : s32i, align 4
+                        dec
+                        store %96, %51, align 4
+                        %97 = cast(int_to_bool) %96 : bool
+                        condition %97
+                } do {
+                        %88 = load %46 : s64i*, align 8
+                        %89 = const -1 : s32i
+                        ptr_stride
+                        store %90, %46, align 8
+                        %91 = load %88 : s64i, align 8
+                        %92 = load %47 : s64i*, align 8
+                        %93 = const -1 : s32i
+                        ptr_stride
+                        store %94, %47, align 8
+                        store %91, %92, align 8
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    return
+        return
 }
 fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c, nothrow];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    scope {
-        %34 = const 0 : s32i
-        store %34, %1, align 4
-        for cond: {
-            %43 = load %1 : s32i, align 4
-            %44 = const 10 : s32i
-            %45 = cmp lt %43, %44 : bool
-            condition %45
-        } step: {
-            %35 = load %1 : s32i, align 4
-            %36 = inc %35 : s32i [nsw]
-            store %36, %1, align 4
-            yield
-        } do {
-            %37 = load %1 : s32i, align 4
-            %38 = cast(integral) %37 : s64i
-            %39 = load %1 : s32i, align 4
-            %40 = cast(integral) %39 : s64i
-            %41 = get_global @list : s64i[10]*
-            %42 = get_element %41[%40] : s64i*
-            store %38, %42, align 8
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        scope {
+                %34 = const 0 : s32i
+                store %34, %1, align 4
+                for cond {
+                        %43 = load %1 : s32i, align 4
+                        %44 = const 10 : s32i
+                        cmp
+                        condition %45
+                } step {
+                        %35 = load %1 : s32i, align 4
+                        inc
+                        store %36, %1, align 4
+                        yield
+                } body {
+                        %37 = load %1 : s32i, align 4
+                        %38 = cast(integral) %37 : s64i
+                        %39 = load %1 : s32i, align 4
+                        %40 = cast(integral) %39 : s64i
+                        %41 = get_global @list : s64i[10]*
+                        get_element
+                        store %38, %42, align 8
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %3 = get_global @indices : s32i[10]*
-    %4 = cast(array_to_ptrdecay) %3 : s32i*
-    %5 = const 9 : s32i
-    %6 = ptr_stride %4, %5 : s32i*
-    %7 = get_global @markstack_ptr : s32i**
-    store %6, %7, align 8
-    %8 = const 2 : s32i
-    %9 = const -1 : s64i
-    %10 = get_global @markstack_ptr : s32i**
-    %11 = load %10 : s32i*, align 8
-    %12 = ptr_stride %11, %9 : s32i*
-    store %8, %12, align 4
-    %13 = const 1 : s32i
-    %14 = const -2 : s64i
-    %15 = get_global @markstack_ptr : s32i**
-    %16 = load %15 : s32i*, align 8
-    %17 = ptr_stride %16, %14 : s32i*
-    store %13, %17, align 4
-    %18 = get_global @list : s64i[10]*
-    %19 = cast(array_to_ptrdecay) %18 : s64i*
-    %20 = const 2 : s32i
-    %21 = ptr_stride %19, %20 : s64i*
-    %22 = get_global @stack_base : s64i**
-    store %21, %22, align 8
-    call @doit() [all]
-    scope {
-        %25 = get_global @expect : s64i[10]*
-        %26 = cast(array_to_ptrdecay) %25 : s64i*
-        %27 = cast(bitcast) %26 : void*
-        %28 = get_global @list : s64i[10]*
-        %29 = cast(array_to_ptrdecay) %28 : s64i*
-        %30 = cast(bitcast) %29 : void*
-        %31 = const 80 : u64i
-        %32 = call @memcmp(%27, %30, %31) : s32i [all]
-        %33 = cast(int_to_bool) %32 : bool
-        if %33 {
-            call @abort() [all]
-            yield
+        %3 = get_global @indices : s32i[10]*
+        %4 = cast(array_to_ptrdecay) %3 : s32i*
+        %5 = const 9 : s32i
+        ptr_stride
+        %7 = get_global @markstack_ptr : s32i**
+        store %6, %7, align 8
+        %8 = const 2 : s32i
+        %9 = const -1 : s64i
+        %10 = get_global @markstack_ptr : s32i**
+        %11 = load %10 : s32i*, align 8
+        ptr_stride
+        store %8, %12, align 4
+        %13 = const 1 : s32i
+        %14 = const -2 : s64i
+        %15 = get_global @markstack_ptr : s32i**
+        %16 = load %15 : s32i*, align 8
+        ptr_stride
+        store %13, %17, align 4
+        %18 = get_global @list : s64i[10]*
+        %19 = cast(array_to_ptrdecay) %18 : s64i*
+        %20 = const 2 : s32i
+        ptr_stride
+        %22 = get_global @stack_base : s64i**
+        store %21, %22, align 8
+        call @doit() [all]
+        scope {
+                %25 = get_global @expect : s64i[10]*
+                %26 = cast(array_to_ptrdecay) %25 : s64i*
+                %27 = cast(bitcast) %26 : void*
+                %28 = get_global @list : s64i[10]*
+                %29 = cast(array_to_ptrdecay) %28 : s64i*
+                %30 = cast(bitcast) %29 : void*
+                %31 = const 80 : u64i
+                %32 = call @memcmp(%27, %30, %31) : s32i [all]
+                %33 = cast(int_to_bool) %32 : bool
+                if %33 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %23 = const 0 : s32i
-    store %23, %0
-    %24 = load %0 : s32i
-    return %24
+        %23 = const 0 : s32i
+        store %23, %0
+        %24 = load %0 : s32i
+        return %24
 }

@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr64006.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.d : s64i[7] = [975, 975, 975, 975, 975, 975, 975] [cir_private, default, dso_local, constant]
-global v : s32i = 0 [external, default, align 4, dso_local]
+global __const.main.d : s64i[7] = ConstArray { ty: Array { element_type: Named("s64i"), size: 7 }, elts: Array([CirInt { ty: Named("s64i"), value: "975" }, CirInt { ty: Named("s64i"), value: "975" }, CirInt { ty: Named("s64i"), value: "975" }, CirInt { ty: Named("s64i"), value: "975" }, CirInt { ty: Named("s64i"), value: "975" }, CirInt { ty: Named("s64i"), value: "975" }, CirInt { ty: Named("s64i"), value: "975" }]), trailing_zeros_num: 0 } [cir_private, default, dso_local, constant]
+global v : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn test(%arg0: s64i*, %arg1: s32i) -> s64i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s64i*, %arg1: s32i):
@@ -18,40 +18,40 @@ fn test(%arg0: s64i*, %arg1: s32i) -> s64i [external, c, no_inline, dso_local, n
         %37 = const 1 : s64i
         store %37, %36, align 8
         scope {
-            %40 = const 0 : s32i
-            store %40, %35, align 4
-            for cond: {
-                %53 = load %35 : s32i, align 4
-                %54 = load %33 : s32i, align 4
-                %55 = cmp lt %53, %54 : bool
-                condition %55
-            } step: {
-                %41 = load %35 : s32i, align 4
-                %42 = inc %41 : s32i [nsw]
-                store %42, %35, align 4
-                yield
-            } do {
-                scope {
-                    %43 = load %36 : s64i, align 8
-                    %44 = load %35 : s32i, align 4
-                    %45 = cast(integral) %44 : s64i
-                    %46 = load %32 : s64i*, align 8
-                    %47 = ptr_stride %46, %45 : s64i*
-                    %48 = load %47 : s64i, align 8
-                    %49#0, %49#1 = mul.overflow %43, %48 : s64i
-                    store %49#0, %36, align 8
-                    if %49#1 {
-                        %50 = get_global @v : s32i*
-                        %51 = load %50 : s32i, align 4
-                        %52 = inc %51 : s32i [nsw]
-                        store %52, %50, align 4
+                %40 = const 0 : s32i
+                store %40, %35, align 4
+                for cond {
+                        %53 = load %35 : s32i, align 4
+                        %54 = load %33 : s32i, align 4
+                        cmp
+                        condition %55
+                } step {
+                        %41 = load %35 : s32i, align 4
+                        inc
+                        store %42, %35, align 4
                         yield
-                    }
-                    yield
+                } body {
+                        scope {
+                                %43 = load %36 : s64i, align 8
+                                %44 = load %35 : s32i, align 4
+                                %45 = cast(integral) %44 : s64i
+                                %46 = load %32 : s64i*, align 8
+                                ptr_stride
+                                %48 = load %47 : s64i, align 8
+                                mul.overflow
+                                store %49#0, %36, align 8
+                                if %49#1 {
+                                        %50 = get_global @v : s32i*
+                                        %51 = load %50 : s32i, align 4
+                                        inc
+                                        store %52, %50, align 4
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %38 = load %36 : s64i, align 8
         store %38, %34
@@ -60,65 +60,65 @@ fn test(%arg0: s64i*, %arg1: s32i) -> s64i [external, c, no_inline, dso_local, n
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s64i[7], "d", align 16
-    %2 = alloca s64i, "r", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = get_global @__const.main.d : s64i[7]*
-    copy %1, %4
-    %5 = cast(array_to_ptrdecay) %1 : s64i*
-    %6 = const 7 : s32i
-    %7 = call @test(%5, %6) : s64i [all]
-    store %7, %2, align 8
-    scope {
-        %10 = const 8 : u64i
-        %11 = const 8 : u64i
-        %12 = mul %10, %11 : u64i
-        %13 = const 64 : u64i
-        %14 = cmp eq %12, %13 : bool
-        %15 = ternary %14 ? { : bool
-            %28 = get_global @v : s32i*
-            %29 = load %28 : s32i, align 4
-            %30 = const 1 : s32i
-            %31 = cmp ne %29, %30 : bool
-            yield %31
-        } : {
-            %27 = const false : bool
-            yield %27
-        }
-        if %15 {
-            call @abort() [all]
-            yield
-        } else {
-            scope {
-                %16 = const 8 : u64i
-                %17 = const 8 : u64i
-                %18 = mul %16, %17 : u64i
-                %19 = const 32 : u64i
-                %20 = cmp eq %18, %19 : bool
-                %21 = ternary %20 ? { : bool
-                    %23 = get_global @v : s32i*
-                    %24 = load %23 : s32i, align 4
-                    %25 = const 4 : s32i
-                    %26 = cmp ne %24, %25 : bool
-                    yield %26
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s64i[7], "d", align 16
+        %2 = alloca s64i, "r", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = get_global @__const.main.d : s64i[7]*
+        copy
+        %5 = cast(array_to_ptrdecay) %1 : s64i*
+        %6 = const 7 : s32i
+        %7 = call @test(%5, %6) : s64i [all]
+        store %7, %2, align 8
+        scope {
+                %10 = const 8 : u64i
+                %11 = const 8 : u64i
+                mul
+                %13 = const 64 : u64i
+                cmp
+                %15 = ternary %14 ? { : bool
+                        %28 = get_global @v : s32i*
+                        %29 = load %28 : s32i, align 4
+                        %30 = const 1 : s32i
+                        cmp
+                        yield %31
                 } : {
-                    %22 = const false : bool
-                    yield %22
+                        %27 = const false : bool
+                        yield %27
                 }
-                if %21 {
-                    call @abort() [all]
-                    yield
+                if %15 {
+                        call @abort() [all]
+                        yield
+                } else {
+                        scope {
+                                %16 = const 8 : u64i
+                                %17 = const 8 : u64i
+                                mul
+                                %19 = const 32 : u64i
+                                cmp
+                                %21 = ternary %20 ? { : bool
+                                        %23 = get_global @v : s32i*
+                                        %24 = load %23 : s32i, align 4
+                                        %25 = const 4 : s32i
+                                        cmp
+                                        yield %26
+                                } : {
+                                        %22 = const false : bool
+                                        yield %22
+                                }
+                                if %21 {
+                                        call @abort() [all]
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %8 = const 0 : s32i
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        %8 = const 0 : s32i
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

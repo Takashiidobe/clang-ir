@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20090113-3.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.elem : rec_bitmap_element_def = {#cir.ptr<null>, #cir.ptr<null>, 0, [1, 1]} [cir_private, default, dso_local, constant]
-global bitmap_zero_bits : rec_bitmap_element_def = zero [external, default, align 8, dso_local]
+global __const.main.elem : rec_bitmap_element_def = ConstRecord { ty: Named("rec_bitmap_element_def"), members: Array([Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("rec_bitmap_element_def"), addr_space: None }) }, Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("rec_bitmap_element_def"), addr_space: None }) }, CirInt { ty: Named("u32i"), value: "0" }, ConstArray { ty: Array { element_type: Named("u64i"), size: 2 }, elts: Array([CirInt { ty: Named("u64i"), value: "1" }, CirInt { ty: Named("u64i"), value: "1" }]), trailing_zeros_num: 0 }]) } [cir_private, default, dso_local, constant]
+global bitmap_zero_bits : rec_bitmap_element_def = Zero { ty: Named("rec_bitmap_element_def") } [external, default, align 8, dso_local]
 
 fn bmp_iter_set_init(%arg5: rec_bitmap_iterator*, %arg6: rec_bitmap_head_def*, %arg7: u32i, %arg8: u32i*) -> void [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg5: rec_bitmap_iterator*, %arg6: rec_bitmap_head_def*, %arg7: u32i, %arg8: u32i*):
@@ -17,123 +17,123 @@ fn bmp_iter_set_init(%arg5: rec_bitmap_iterator*, %arg6: rec_bitmap_head_def*, %
         store %arg7, %148
         store %arg8, %149
         %150 = load %147 : rec_bitmap_head_def*, align 8
-        %151 = get_member %150[0] "first" : rec_bitmap_element_def**
+        get_member
         %152 = load %151 : rec_bitmap_element_def*, align 8
         %153 = load %146 : rec_bitmap_iterator*, align 8
-        %154 = get_member %153[0] "elt1" : rec_bitmap_element_def**
+        get_member
         store %152, %154, align 8
         %155 = const #cir.ptr<null> : rec_bitmap_element_def*
         %156 = load %146 : rec_bitmap_iterator*, align 8
-        %157 = get_member %156[1] "elt2" : rec_bitmap_element_def**
+        get_member
         store %155, %157, align 8
         scope {
-            while {
-                %235 = const 1 : s32i
-                %236 = cast(int_to_bool) %235 : bool
-                condition %236
-            } do {
-                scope {
-                    scope {
-                        %227 = load %146 : rec_bitmap_iterator*, align 8
-                        %228 = get_member %227[0] "elt1" : rec_bitmap_element_def**
-                        %229 = load %228 : rec_bitmap_element_def*, align 8
-                        %230 = cast(ptr_to_bool) %229 : bool
-                        %231 = not %230 : bool
-                        if %231 {
-                            %232 = get_global @bitmap_zero_bits : rec_bitmap_element_def*
-                            %233 = load %146 : rec_bitmap_iterator*, align 8
-                            %234 = get_member %233[0] "elt1" : rec_bitmap_element_def**
-                            store %232, %234, align 8
-                            break
+                while {
+                        %235 = const 1 : s32i
+                        %236 = cast(int_to_bool) %235 : bool
+                        condition %236
+                } do {
+                        scope {
+                                scope {
+                                        %227 = load %146 : rec_bitmap_iterator*, align 8
+                                        get_member
+                                        %229 = load %228 : rec_bitmap_element_def*, align 8
+                                        %230 = cast(ptr_to_bool) %229 : bool
+                                        not
+                                        if %231 {
+                                                %232 = get_global @bitmap_zero_bits : rec_bitmap_element_def*
+                                                %233 = load %146 : rec_bitmap_iterator*, align 8
+                                                get_member
+                                                store %232, %234, align 8
+                                                break
+                                        }
+                                        yield
+                                }
+                                scope {
+                                        %218 = load %146 : rec_bitmap_iterator*, align 8
+                                        get_member
+                                        %220 = load %219 : rec_bitmap_element_def*, align 8
+                                        get_member
+                                        %222 = load %221 : u32i, align 8
+                                        %223 = load %148 : u32i, align 4
+                                        %224 = const 128 : u32i
+                                        div
+                                        cmp
+                                        if %226 {
+                                                break
+                                        }
+                                        yield
+                                }
+                                %211 = load %146 : rec_bitmap_iterator*, align 8
+                                get_member
+                                %213 = load %212 : rec_bitmap_element_def*, align 8
+                                get_member
+                                %215 = load %214 : rec_bitmap_element_def*, align 8
+                                %216 = load %146 : rec_bitmap_iterator*, align 8
+                                get_member
+                                store %215, %217, align 8
+                                yield
                         }
                         yield
-                    }
-                    scope {
-                        %218 = load %146 : rec_bitmap_iterator*, align 8
-                        %219 = get_member %218[0] "elt1" : rec_bitmap_element_def**
-                        %220 = load %219 : rec_bitmap_element_def*, align 8
-                        %221 = get_member %220[2] "indx" : u32i*
-                        %222 = load %221 : u32i, align 8
-                        %223 = load %148 : u32i, align 4
-                        %224 = const 128 : u32i
-                        %225 = div %223, %224 : u32i
-                        %226 = cmp ge %222, %225 : bool
-                        if %226 {
-                            break
-                        }
-                        yield
-                    }
-                    %211 = load %146 : rec_bitmap_iterator*, align 8
-                    %212 = get_member %211[0] "elt1" : rec_bitmap_element_def**
-                    %213 = load %212 : rec_bitmap_element_def*, align 8
-                    %214 = get_member %213[0] "next" : rec_bitmap_element_def**
-                    %215 = load %214 : rec_bitmap_element_def*, align 8
-                    %216 = load %146 : rec_bitmap_iterator*, align 8
-                    %217 = get_member %216[0] "elt1" : rec_bitmap_element_def**
-                    store %215, %217, align 8
-                    yield
                 }
                 yield
-            }
-            yield
         }
         scope {
-            %195 = load %146 : rec_bitmap_iterator*, align 8
-            %196 = get_member %195[0] "elt1" : rec_bitmap_element_def**
-            %197 = load %196 : rec_bitmap_element_def*, align 8
-            %198 = get_member %197[2] "indx" : u32i*
-            %199 = load %198 : u32i, align 8
-            %200 = load %148 : u32i, align 4
-            %201 = const 128 : u32i
-            %202 = div %200, %201 : u32i
-            %203 = cmp ne %199, %202 : bool
-            if %203 {
-                %204 = load %146 : rec_bitmap_iterator*, align 8
-                %205 = get_member %204[0] "elt1" : rec_bitmap_element_def**
-                %206 = load %205 : rec_bitmap_element_def*, align 8
-                %207 = get_member %206[2] "indx" : u32i*
-                %208 = load %207 : u32i, align 8
-                %209 = const 128 : u32i
-                %210 = mul %208, %209 : u32i
-                store %210, %148, align 4
+                %195 = load %146 : rec_bitmap_iterator*, align 8
+                get_member
+                %197 = load %196 : rec_bitmap_element_def*, align 8
+                get_member
+                %199 = load %198 : u32i, align 8
+                %200 = load %148 : u32i, align 4
+                %201 = const 128 : u32i
+                div
+                cmp
+                if %203 {
+                        %204 = load %146 : rec_bitmap_iterator*, align 8
+                        get_member
+                        %206 = load %205 : rec_bitmap_element_def*, align 8
+                        get_member
+                        %208 = load %207 : u32i, align 8
+                        %209 = const 128 : u32i
+                        mul
+                        store %210, %148, align 4
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %158 = load %148 : u32i, align 4
         %159 = const 64 : u32i
-        %160 = div %158, %159 : u32i
+        div
         %161 = const 2 : u32i
-        %162 = rem %160, %161 : u32i
+        rem
         %163 = load %146 : rec_bitmap_iterator*, align 8
-        %164 = get_member %163[2] "word_no" : u32i*
+        get_member
         store %162, %164, align 8
         %165 = load %146 : rec_bitmap_iterator*, align 8
-        %166 = get_member %165[2] "word_no" : u32i*
+        get_member
         %167 = load %166 : u32i, align 8
         %168 = cast(integral) %167 : u64i
         %169 = load %146 : rec_bitmap_iterator*, align 8
-        %170 = get_member %169[0] "elt1" : rec_bitmap_element_def**
+        get_member
         %171 = load %170 : rec_bitmap_element_def*, align 8
-        %172 = get_member %171[3] "bits" : u64i[2]*
-        %173 = get_element %172[%168] : u64i*
+        get_member
+        get_element
         %174 = load %173 : u64i, align 8
         %175 = load %146 : rec_bitmap_iterator*, align 8
-        %176 = get_member %175[3] "bits" : u64i*
+        get_member
         store %174, %176, align 8
         %177 = load %148 : u32i, align 4
         %178 = const 64 : u32i
-        %179 = rem %177, %178 : u32i
+        rem
         %180 = load %146 : rec_bitmap_iterator*, align 8
-        %181 = get_member %180[3] "bits" : u64i*
+        get_member
         %182 = load %181 : u64i, align 8
-        %183 = shift right %182, %179 : u64i
+        shift
         store %183, %181, align 8
         %184 = load %146 : rec_bitmap_iterator*, align 8
-        %185 = get_member %184[3] "bits" : u64i*
+        get_member
         %186 = load %185 : u64i, align 8
         %187 = cast(int_to_bool) %186 : bool
-        %188 = not %187 : bool
+        not
         %189 = cast(bool_to_int) %188 : s32i
         %190 = cast(integral) %189 : u32i
         %191 = load %148 : u32i, align 4
@@ -152,192 +152,192 @@ fn bmp_iter_set(%arg3: rec_bitmap_iterator*, %arg4: u32i*) -> u8i [internal, c, 
         store %arg3, %31
         store %arg4, %32
         scope {
-            %124 = load %31 : rec_bitmap_iterator*, align 8
-            %125 = get_member %124[3] "bits" : u64i*
-            %126 = load %125 : u64i, align 8
-            %127 = cast(int_to_bool) %126 : bool
-            if %127 {
-                scope {
-                    while {
-                        %139 = load %31 : rec_bitmap_iterator*, align 8
-                        %140 = get_member %139[3] "bits" : u64i*
-                        %141 = load %140 : u64i, align 8
-                        %142 = const 1 : u64i
-                        %143 = and %141, %142 : u64i
-                        %144 = cast(int_to_bool) %143 : bool
-                        %145 = not %144 : bool
-                        condition %145
-                    } do {
+                %124 = load %31 : rec_bitmap_iterator*, align 8
+                get_member
+                %126 = load %125 : u64i, align 8
+                %127 = cast(int_to_bool) %126 : bool
+                if %127 {
                         scope {
-                            %130 = const 1 : s32i
-                            %131 = load %31 : rec_bitmap_iterator*, align 8
-                            %132 = get_member %131[3] "bits" : u64i*
-                            %133 = load %132 : u64i, align 8
-                            %134 = shift right %133, %130 : u64i
-                            store %134, %132, align 8
-                            %135 = const 1 : u32i
-                            %136 = load %32 : u32i*, align 8
-                            %137 = load %136 : u32i, align 4
-                            %138 = add %137, %135 : u32i
-                            store %138, %136, align 4
-                            yield
+                                while {
+                                        %139 = load %31 : rec_bitmap_iterator*, align 8
+                                        get_member
+                                        %141 = load %140 : u64i, align 8
+                                        %142 = const 1 : u64i
+                                        and
+                                        %144 = cast(int_to_bool) %143 : bool
+                                        not
+                                        condition %145
+                                } do {
+                                        scope {
+                                                %130 = const 1 : s32i
+                                                %131 = load %31 : rec_bitmap_iterator*, align 8
+                                                get_member
+                                                %133 = load %132 : u64i, align 8
+                                                shift
+                                                store %134, %132, align 8
+                                                %135 = const 1 : u32i
+                                                %136 = load %32 : u32i*, align 8
+                                                %137 = load %136 : u32i, align 4
+                                                %138 = add %137, %135 : u32i
+                                                store %138, %136, align 4
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
                         }
-                        yield
-                    }
-                    yield
+                        %128 = const 1 : u8i
+                        store %128, %33
+                        %129 = load %33 : u8i
+                        return %129
                 }
-                %128 = const 1 : u8i
-                store %128, %33
-                %129 = load %33 : u8i
-                return %129
-            }
-            yield
+                yield
         }
         %34 = load %32 : u32i*, align 8
         %35 = load %34 : u32i, align 4
         %36 = const 64 : u32i
         %37 = add %35, %36 : u32i
         %38 = const 1 : u32i
-        %39 = sub %37, %38 : u32i
+        sub
         %40 = const 64 : u32i
-        %41 = div %39, %40 : u32i
+        div
         %42 = const 64 : u32i
-        %43 = mul %41, %42 : u32i
+        mul
         %44 = load %32 : u32i*, align 8
         store %43, %44, align 4
         %45 = load %31 : rec_bitmap_iterator*, align 8
-        %46 = get_member %45[2] "word_no" : u32i*
+        get_member
         %47 = load %46 : u32i, align 8
-        %48 = inc %47 : u32i
+        inc
         store %48, %46, align 8
         scope {
-            while {
-                %122 = const 1 : s32i
-                %123 = cast(int_to_bool) %122 : bool
-                condition %123
-            } do {
-                scope {
-                    scope {
-                        while {
-                            %117 = load %31 : rec_bitmap_iterator*, align 8
-                            %118 = get_member %117[2] "word_no" : u32i*
-                            %119 = load %118 : u32i, align 8
-                            %120 = const 2 : u32i
-                            %121 = cmp ne %119, %120 : bool
-                            condition %121
-                        } do {
-                            scope {
-                                %75 = load %31 : rec_bitmap_iterator*, align 8
-                                %76 = get_member %75[2] "word_no" : u32i*
-                                %77 = load %76 : u32i, align 8
-                                %78 = cast(integral) %77 : u64i
-                                %79 = load %31 : rec_bitmap_iterator*, align 8
-                                %80 = get_member %79[0] "elt1" : rec_bitmap_element_def**
-                                %81 = load %80 : rec_bitmap_element_def*, align 8
-                                %82 = get_member %81[3] "bits" : u64i[2]*
-                                %83 = get_element %82[%78] : u64i*
-                                %84 = load %83 : u64i, align 8
-                                %85 = load %31 : rec_bitmap_iterator*, align 8
-                                %86 = get_member %85[3] "bits" : u64i*
-                                store %84, %86, align 8
+                while {
+                        %122 = const 1 : s32i
+                        %123 = cast(int_to_bool) %122 : bool
+                        condition %123
+                } do {
+                        scope {
                                 scope {
-                                    %95 = load %31 : rec_bitmap_iterator*, align 8
-                                    %96 = get_member %95[3] "bits" : u64i*
-                                    %97 = load %96 : u64i, align 8
-                                    %98 = cast(int_to_bool) %97 : bool
-                                    if %98 {
-                                        scope {
-                                            while {
-                                                %110 = load %31 : rec_bitmap_iterator*, align 8
-                                                %111 = get_member %110[3] "bits" : u64i*
-                                                %112 = load %111 : u64i, align 8
-                                                %113 = const 1 : u64i
-                                                %114 = and %112, %113 : u64i
-                                                %115 = cast(int_to_bool) %114 : bool
-                                                %116 = not %115 : bool
-                                                condition %116
-                                            } do {
+                                        while {
+                                                %117 = load %31 : rec_bitmap_iterator*, align 8
+                                                get_member
+                                                %119 = load %118 : u32i, align 8
+                                                %120 = const 2 : u32i
+                                                cmp
+                                                condition %121
+                                        } do {
                                                 scope {
-                                                    %101 = const 1 : s32i
-                                                    %102 = load %31 : rec_bitmap_iterator*, align 8
-                                                    %103 = get_member %102[3] "bits" : u64i*
-                                                    %104 = load %103 : u64i, align 8
-                                                    %105 = shift right %104, %101 : u64i
-                                                    store %105, %103, align 8
-                                                    %106 = const 1 : u32i
-                                                    %107 = load %32 : u32i*, align 8
-                                                    %108 = load %107 : u32i, align 4
-                                                    %109 = add %108, %106 : u32i
-                                                    store %109, %107, align 4
-                                                    yield
+                                                        %75 = load %31 : rec_bitmap_iterator*, align 8
+                                                        get_member
+                                                        %77 = load %76 : u32i, align 8
+                                                        %78 = cast(integral) %77 : u64i
+                                                        %79 = load %31 : rec_bitmap_iterator*, align 8
+                                                        get_member
+                                                        %81 = load %80 : rec_bitmap_element_def*, align 8
+                                                        get_member
+                                                        get_element
+                                                        %84 = load %83 : u64i, align 8
+                                                        %85 = load %31 : rec_bitmap_iterator*, align 8
+                                                        get_member
+                                                        store %84, %86, align 8
+                                                        scope {
+                                                                %95 = load %31 : rec_bitmap_iterator*, align 8
+                                                                get_member
+                                                                %97 = load %96 : u64i, align 8
+                                                                %98 = cast(int_to_bool) %97 : bool
+                                                                if %98 {
+                                                                        scope {
+                                                                                while {
+                                                                                        %110 = load %31 : rec_bitmap_iterator*, align 8
+                                                                                        get_member
+                                                                                        %112 = load %111 : u64i, align 8
+                                                                                        %113 = const 1 : u64i
+                                                                                        and
+                                                                                        %115 = cast(int_to_bool) %114 : bool
+                                                                                        not
+                                                                                        condition %116
+                                                                                } do {
+                                                                                        scope {
+                                                                                                %101 = const 1 : s32i
+                                                                                                %102 = load %31 : rec_bitmap_iterator*, align 8
+                                                                                                get_member
+                                                                                                %104 = load %103 : u64i, align 8
+                                                                                                shift
+                                                                                                store %105, %103, align 8
+                                                                                                %106 = const 1 : u32i
+                                                                                                %107 = load %32 : u32i*, align 8
+                                                                                                %108 = load %107 : u32i, align 4
+                                                                                                %109 = add %108, %106 : u32i
+                                                                                                store %109, %107, align 4
+                                                                                                yield
+                                                                                        }
+                                                                                        yield
+                                                                                }
+                                                                                yield
+                                                                        }
+                                                                        %99 = const 1 : u8i
+                                                                        store %99, %33
+                                                                        %100 = load %33 : u8i
+                                                                        return %100
+                                                                }
+                                                                yield
+                                                        }
+                                                        %87 = const 64 : u32i
+                                                        %88 = load %32 : u32i*, align 8
+                                                        %89 = load %88 : u32i, align 4
+                                                        %90 = add %89, %87 : u32i
+                                                        store %90, %88, align 4
+                                                        %91 = load %31 : rec_bitmap_iterator*, align 8
+                                                        get_member
+                                                        %93 = load %92 : u32i, align 8
+                                                        inc
+                                                        store %94, %92, align 8
+                                                        yield
                                                 }
                                                 yield
-                                            }
-                                            yield
                                         }
-                                        %99 = const 1 : u8i
-                                        store %99, %33
-                                        %100 = load %33 : u8i
-                                        return %100
-                                    }
-                                    yield
+                                        yield
                                 }
-                                %87 = const 64 : u32i
-                                %88 = load %32 : u32i*, align 8
-                                %89 = load %88 : u32i, align 4
-                                %90 = add %89, %87 : u32i
-                                store %90, %88, align 4
-                                %91 = load %31 : rec_bitmap_iterator*, align 8
-                                %92 = get_member %91[2] "word_no" : u32i*
-                                %93 = load %92 : u32i, align 8
-                                %94 = inc %93 : u32i
-                                store %94, %92, align 8
+                                %50 = load %31 : rec_bitmap_iterator*, align 8
+                                get_member
+                                %52 = load %51 : rec_bitmap_element_def*, align 8
+                                get_member
+                                %54 = load %53 : rec_bitmap_element_def*, align 8
+                                %55 = load %31 : rec_bitmap_iterator*, align 8
+                                get_member
+                                store %54, %56, align 8
+                                scope {
+                                        %68 = load %31 : rec_bitmap_iterator*, align 8
+                                        get_member
+                                        %70 = load %69 : rec_bitmap_element_def*, align 8
+                                        %71 = cast(ptr_to_bool) %70 : bool
+                                        not
+                                        if %72 {
+                                                %73 = const 0 : u8i
+                                                store %73, %33
+                                                %74 = load %33 : u8i
+                                                return %74
+                                        }
+                                        yield
+                                }
+                                %57 = load %31 : rec_bitmap_iterator*, align 8
+                                get_member
+                                %59 = load %58 : rec_bitmap_element_def*, align 8
+                                get_member
+                                %61 = load %60 : u32i, align 8
+                                %62 = const 128 : u32i
+                                mul
+                                %64 = load %32 : u32i*, align 8
+                                store %63, %64, align 4
+                                %65 = const 0 : u32i
+                                %66 = load %31 : rec_bitmap_iterator*, align 8
+                                get_member
+                                store %65, %67, align 8
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    %50 = load %31 : rec_bitmap_iterator*, align 8
-                    %51 = get_member %50[0] "elt1" : rec_bitmap_element_def**
-                    %52 = load %51 : rec_bitmap_element_def*, align 8
-                    %53 = get_member %52[0] "next" : rec_bitmap_element_def**
-                    %54 = load %53 : rec_bitmap_element_def*, align 8
-                    %55 = load %31 : rec_bitmap_iterator*, align 8
-                    %56 = get_member %55[0] "elt1" : rec_bitmap_element_def**
-                    store %54, %56, align 8
-                    scope {
-                        %68 = load %31 : rec_bitmap_iterator*, align 8
-                        %69 = get_member %68[0] "elt1" : rec_bitmap_element_def**
-                        %70 = load %69 : rec_bitmap_element_def*, align 8
-                        %71 = cast(ptr_to_bool) %70 : bool
-                        %72 = not %71 : bool
-                        if %72 {
-                            %73 = const 0 : u8i
-                            store %73, %33
-                            %74 = load %33 : u8i
-                            return %74
-                        }
-                        yield
-                    }
-                    %57 = load %31 : rec_bitmap_iterator*, align 8
-                    %58 = get_member %57[0] "elt1" : rec_bitmap_element_def**
-                    %59 = load %58 : rec_bitmap_element_def*, align 8
-                    %60 = get_member %59[2] "indx" : u32i*
-                    %61 = load %60 : u32i, align 8
-                    %62 = const 128 : u32i
-                    %63 = mul %61, %62 : u32i
-                    %64 = load %32 : u32i*, align 8
-                    store %63, %64, align 4
-                    %65 = const 0 : u32i
-                    %66 = load %31 : rec_bitmap_iterator*, align 8
-                    %67 = get_member %66[2] "word_no" : u32i*
-                    store %65, %67, align 8
-                    yield
                 }
                 yield
-            }
-            yield
         }
         %49 = load %33 : u8i
         return %49
@@ -350,9 +350,9 @@ fn bmp_iter_next(%arg1: rec_bitmap_iterator*, %arg2: u32i*) -> void [internal, c
         store %arg2, %21
         %22 = const 1 : s32i
         %23 = load %20 : rec_bitmap_iterator*, align 8
-        %24 = get_member %23[3] "bits" : u64i*
+        get_member
         %25 = load %24 : u64i, align 8
-        %26 = shift right %25, %22 : u64i
+        shift
         store %26, %24, align 8
         %27 = const 1 : u32i
         %28 = load %21 : u32i*, align 8
@@ -368,44 +368,44 @@ fn foobar(%arg0: rec_bitmap_head_def*) -> void [internal, c, no_inline, dso_loca
         %15 = alloca u32i, "regno", align 4
         store %arg0, %13
         scope {
-            %16 = load %13 : rec_bitmap_head_def*, align 8
-            %17 = const 0 : u32i
-            call @bmp_iter_set_init(%14, %16, %17, %15) [all]
-            for cond: {
-                %18 = call @bmp_iter_set(%14, %15) : u8i [all]
-                %19 = cast(int_to_bool) %18 : bool
-                condition %19
-            } step: {
-                call @bmp_iter_next(%14, %15) [all]
+                %16 = load %13 : rec_bitmap_head_def*, align 8
+                %17 = const 0 : u32i
+                call @bmp_iter_set_init(%14, %16, %17, %15) [all]
+                for cond {
+                        %18 = call @bmp_iter_set(%14, %15) : u8i [all]
+                        %19 = cast(int_to_bool) %18 : bool
+                        condition %19
+                } step {
+                        call @bmp_iter_next(%14, %15) [all]
+                        yield
+                } body {
+                        yield
+                }
                 yield
-            } do {
-                yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_bitmap_element_def, "elem", align 8
-    %2 = alloca rec_bitmap_head_def, "live_throughout", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = get_global @__const.main.elem : rec_bitmap_element_def*
-    copy %1, %4
-    %5 = get_member %2[0] "first" : rec_bitmap_element_def**
-    store %1, %5, align 8
-    %6 = get_member %2[1] "current" : rec_bitmap_element_def**
-    store %1, %6, align 8
-    %7 = get_member %2[2] "indx" : u32i*
-    %8 = const 0 : u32i
-    store %8, %7, align 8
-    %9 = get_member %2[3] "obstack" : rec_bitmap_obstack**
-    %10 = const #cir.ptr<null> : rec_bitmap_obstack*
-    store %10, %9, align 8
-    call @foobar(%2) [all]
-    %11 = const 0 : s32i
-    store %11, %0
-    %12 = load %0 : s32i
-    return %12
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_bitmap_element_def, "elem", align 8
+        %2 = alloca rec_bitmap_head_def, "live_throughout", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = get_global @__const.main.elem : rec_bitmap_element_def*
+        copy
+        get_member
+        store %1, %5, align 8
+        get_member
+        store %1, %6, align 8
+        get_member
+        %8 = const 0 : u32i
+        store %8, %7, align 8
+        get_member
+        %10 = const #cir.ptr<null> : rec_bitmap_obstack*
+        store %10, %9, align 8
+        call @foobar(%2) [all]
+        %11 = const 0 : s32i
+        store %11, %0
+        %12 = load %0 : s32i
+        return %12
 }

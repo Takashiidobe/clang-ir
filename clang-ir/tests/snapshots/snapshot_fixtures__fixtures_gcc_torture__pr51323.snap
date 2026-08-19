@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr51323.c" (c, x86_64-unknown-linux-gnu)
-global v : s32i = 0 [external, default, align 4, dso_local]
+global v : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn foo(%arg4: s32i, %arg5: s32i, %arg6: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -15,34 +15,34 @@ fn foo(%arg4: s32i, %arg5: s32i, %arg6: s32i) -> void [external, c, no_inline, d
         store %arg5, %70
         store %arg6, %71
         scope {
-            %72 = load %69 : s32i, align 4
-            %73 = get_global @v : s32i*
-            %74 = load %73 : s32i, align 4
-            %75 = cmp ne %72, %74 : bool
-            %76 = ternary %75 ? { : bool
-                %86 = const true : bool
-                yield %86
-            } : {
-                %83 = load %70 : s32i, align 4
-                %84 = const 0 : s32i
-                %85 = cmp ne %83, %84 : bool
-                yield %85
-            }
-            %77 = ternary %76 ? { : bool
-                %82 = const true : bool
-                yield %82
-            } : {
-                %79 = load %71 : s32i, align 4
-                %80 = const 9 : s32i
-                %81 = cmp ne %79, %80 : bool
-                yield %81
-            }
-            if %77 {
-                %78 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %72 = load %69 : s32i, align 4
+                %73 = get_global @v : s32i*
+                %74 = load %73 : s32i, align 4
+                cmp
+                %76 = ternary %75 ? { : bool
+                        %86 = const true : bool
+                        yield %86
+                } : {
+                        %83 = load %70 : s32i, align 4
+                        %84 = const 0 : s32i
+                        cmp
+                        yield %85
+                }
+                %77 = ternary %76 ? { : bool
+                        %82 = const true : bool
+                        yield %82
+                } : {
+                        %79 = load %71 : s32i, align 4
+                        %80 = const 9 : s32i
+                        cmp
+                        yield %81
+                }
+                if %77 {
+                        %78 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -52,7 +52,7 @@ fn baz(%arg3: rec_S*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         %64 = alloca s32i, "__retval", align 4
         store %arg3, %63
         %65 = load %63 : rec_S*, align 8
-        %66 = get_member %65[1] "b" : s32i*
+        get_member
         %67 = load %66 : s32i, align 4
         store %67, %64
         %68 = load %64 : s32i
@@ -62,9 +62,9 @@ fn bar(%arg0: s32i, %arg1: u64i, %arg2: s32i) -> void [external, c, no_inline, d
     ^bb0(%arg0: s32i, %arg1: u64i, %arg2: s32i):
         %51 = alloca rec_anon_struct, "coerce", align 8
         %52 = alloca rec_anon_struct, "coerce", align 8
-        %53 = get_member %52[0] "" : u64i*
+        get_member
         store %arg1, %53
-        %54 = get_member %52[1] "" : s32i*
+        get_member
         store %arg2, %54
         %55 = load %52 : rec_anon_struct
         store %55, %51
@@ -81,70 +81,70 @@ fn bar(%arg0: s32i, %arg1: u64i, %arg2: s32i) -> void [external, c, no_inline, d
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca rec_anon_struct, "coerce", align 8
-    %1 = alloca rec_anon_struct, "coerce", align 8
-    %2 = alloca s32i, "__retval", align 4
-    %3 = alloca rec_S, "s", align 4
-    %4 = const 0 : s32i
-    store %4, %2
-    %5 = const 3 : s32i
-    %6 = get_global @v : s32i*
-    store %5, %6, align 4
-    %7 = get_global @v : s32i*
-    %8 = load %7 : s32i, align 4
-    %9 = const 1 : s32i
-    %10 = sub %8, %9 : s32i [nsw]
-    %11 = get_member %3[0] "a" : s32i*
-    store %10, %11, align 4
-    %12 = get_global @v : s32i*
-    %13 = load %12 : s32i, align 4
-    %14 = get_member %3[1] "b" : s32i*
-    store %13, %14, align 4
-    %15 = get_global @v : s32i*
-    %16 = load %15 : s32i, align 4
-    %17 = const 1 : s32i
-    %18 = add %16, %17 : s32i [nsw]
-    %19 = get_member %3[2] "c" : s32i*
-    store %18, %19, align 4
-    %20 = const 9 : s32i
-    %21 = load %3 : rec_S, align 4
-    %22 = cast(bitcast) %1 : rec_S*
-    store %21, %22
-    %23 = get_member %1[0] "" : u64i*
-    %24 = load %23 : u64i
-    %25 = get_member %1[1] "" : s32i*
-    %26 = load %25 : s32i
-    call @bar(%20, %24, %26) [all]
-    %27 = const 17 : s32i
-    %28 = get_global @v : s32i*
-    store %27, %28, align 4
-    %29 = get_global @v : s32i*
-    %30 = load %29 : s32i, align 4
-    %31 = const 1 : s32i
-    %32 = sub %30, %31 : s32i [nsw]
-    %33 = get_member %3[0] "a" : s32i*
-    store %32, %33, align 4
-    %34 = get_global @v : s32i*
-    %35 = load %34 : s32i, align 4
-    %36 = get_member %3[1] "b" : s32i*
-    store %35, %36, align 4
-    %37 = get_global @v : s32i*
-    %38 = load %37 : s32i, align 4
-    %39 = const 1 : s32i
-    %40 = add %38, %39 : s32i [nsw]
-    %41 = get_member %3[2] "c" : s32i*
-    store %40, %41, align 4
-    %42 = const 9 : s32i
-    %43 = load %3 : rec_S, align 4
-    %44 = cast(bitcast) %0 : rec_S*
-    store %43, %44
-    %45 = get_member %0[0] "" : u64i*
-    %46 = load %45 : u64i
-    %47 = get_member %0[1] "" : s32i*
-    %48 = load %47 : s32i
-    call @bar(%42, %46, %48) [all]
-    %49 = const 0 : s32i
-    store %49, %2
-    %50 = load %2 : s32i
-    return %50
+        %0 = alloca rec_anon_struct, "coerce", align 8
+        %1 = alloca rec_anon_struct, "coerce", align 8
+        %2 = alloca s32i, "__retval", align 4
+        %3 = alloca rec_S, "s", align 4
+        %4 = const 0 : s32i
+        store %4, %2
+        %5 = const 3 : s32i
+        %6 = get_global @v : s32i*
+        store %5, %6, align 4
+        %7 = get_global @v : s32i*
+        %8 = load %7 : s32i, align 4
+        %9 = const 1 : s32i
+        sub
+        get_member
+        store %10, %11, align 4
+        %12 = get_global @v : s32i*
+        %13 = load %12 : s32i, align 4
+        get_member
+        store %13, %14, align 4
+        %15 = get_global @v : s32i*
+        %16 = load %15 : s32i, align 4
+        %17 = const 1 : s32i
+        %18 = add %16, %17 : s32i [nsw]
+        get_member
+        store %18, %19, align 4
+        %20 = const 9 : s32i
+        %21 = load %3 : rec_S, align 4
+        %22 = cast(bitcast) %1 : rec_S*
+        store %21, %22
+        get_member
+        %24 = load %23 : u64i
+        get_member
+        %26 = load %25 : s32i
+        call @bar(%20, %24, %26) [all]
+        %27 = const 17 : s32i
+        %28 = get_global @v : s32i*
+        store %27, %28, align 4
+        %29 = get_global @v : s32i*
+        %30 = load %29 : s32i, align 4
+        %31 = const 1 : s32i
+        sub
+        get_member
+        store %32, %33, align 4
+        %34 = get_global @v : s32i*
+        %35 = load %34 : s32i, align 4
+        get_member
+        store %35, %36, align 4
+        %37 = get_global @v : s32i*
+        %38 = load %37 : s32i, align 4
+        %39 = const 1 : s32i
+        %40 = add %38, %39 : s32i [nsw]
+        get_member
+        store %40, %41, align 4
+        %42 = const 9 : s32i
+        %43 = load %3 : rec_S, align 4
+        %44 = cast(bitcast) %0 : rec_S*
+        store %43, %44
+        get_member
+        %46 = load %45 : u64i
+        get_member
+        %48 = load %47 : s32i
+        call @bar(%42, %46, %48) [all]
+        %49 = const 0 : s32i
+        store %49, %2
+        %50 = load %2 : s32i
+        return %50
 }

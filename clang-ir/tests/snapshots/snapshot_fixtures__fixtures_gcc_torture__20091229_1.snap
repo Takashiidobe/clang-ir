@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20091229-1.c" (c, x86_64-unknown-linux-gnu)
@@ -10,7 +10,7 @@ fn foo(%arg2: s64i) -> s64i [external, c, no_inline, dso_local, nothrow] {
         store %arg2, %12
         %14 = load %12 : s64i, align 8
         %15 = const -2147483648 : s64i
-        %16 = div %14, %15 : s64i
+        div
         store %16, %13
         %17 = load %13 : s64i
         return %17
@@ -27,18 +27,18 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         %3 = const 0 : s32i
         store %3, %2
         scope {
-            %7 = const 2147483648 : s64i
-            %8 = call @foo(%7) : s64i [all]
-            %9 = const -1 : s64i
-            %10 = cmp ne %8, %9 : bool
-            if %10 {
-                %11 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %7 = const 2147483648 : s64i
+                %8 = call @foo(%7) : s64i [all]
+                %9 = const -1 : s64i
+                cmp
+                if %10 {
+                        %11 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        %4 = get_global @exit : ((s32i) -> void)*
+        %4 = get_global @exit : (s32i) -> void*
         %5 = const 0 : s32i
         call @exit(%5) [all]
         %6 = load %2 : s32i

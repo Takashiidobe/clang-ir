@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/bf-pack-1.c" (c, x86_64-unknown-linux-gnu)
@@ -9,51 +9,51 @@ fn f(%arg0: rec_foo*) -> void [external, c, no_inline, dso_local, nothrow] {
         %12 = alloca rec_foo*, "q", align 8
         store %arg0, %12
         scope {
-            %20 = load %12 : rec_foo*, align 8
-            %21 = get_member %20[0] "half" : u64i*
-            %22 = get_bitfield %21, "half": 16 bits @0 in u64i : u32i, align 4
-            %23 = cast(integral) %22 : s32i
-            %24 = const 4660 : s32i
-            %25 = cmp ne %23, %24 : bool
-            if %25 {
-                %26 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %20 = load %12 : rec_foo*, align 8
+                get_member
+                get_bitfield
+                %23 = cast(integral) %22 : s32i
+                %24 = const 4660 : s32i
+                cmp
+                if %25 {
+                        %26 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %13 = load %12 : rec_foo*, align 8
-            %14 = get_member %13[0] "whole" : u64i*
-            %15 = get_bitfield %14, "whole": 32 bits @16 in u64i : u64i, align 4
-            %16 = cast(integral) %15 : s64i
-            %17 = const 1450744508 : s64i
-            %18 = cmp ne %16, %17 : bool
-            if %18 {
-                %19 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %13 = load %12 : rec_foo*, align 8
+                get_member
+                get_bitfield
+                %16 = cast(integral) %15 : s64i
+                %17 = const 1450744508 : s64i
+                cmp
+                if %18 {
+                        %19 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_foo, "bar", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 4660 : u32i
-    %4 = get_member %1[0] "half" : u64i*
-    %5 = set_bitfield %4, %3, "half": 16 bits @0 in u64i : u32i, align 4
-    %6 = const 1450744508 : u64i
-    %7 = get_member %1[0] "whole" : u64i*
-    %8 = set_bitfield %7, %6, "whole": 32 bits @16 in u64i : u64i, align 4
-    call @f(%1) [all]
-    %9 = get_global @exit : ((s32i) -> void)*
-    %10 = const 0 : s32i
-    call @exit(%10) [all]
-    %11 = load %0 : s32i
-    return %11
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_foo, "bar", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 4660 : u32i
+        get_member
+        set_bitfield
+        %6 = const 1450744508 : u64i
+        get_member
+        set_bitfield
+        call @f(%1) [all]
+        %9 = get_global @exit : (s32i) -> void*
+        %10 = const 0 : s32i
+        call @exit(%10) [all]
+        %11 = load %0 : s32i
+        return %11
 }

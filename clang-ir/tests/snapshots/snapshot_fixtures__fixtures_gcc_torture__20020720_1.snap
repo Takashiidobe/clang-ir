@@ -1,13 +1,13 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20020720-1.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn link_error() -> void [external, c, no_inline, dso_local, nothrow] {
-    %14 = get_global @abort : (() -> void)*
-    call @abort() [all]
-    return
+        %14 = get_global @abort : () -> void*
+        call @abort() [all]
+        return
 }
 fn foo(%arg0: double) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: double):
@@ -16,30 +16,30 @@ fn foo(%arg0: double) -> void [external, c, no_inline, dso_local, nothrow] {
         %7 = alloca double, "q", align 8
         store %arg0, %5
         %8 = load %5 : double, align 8
-        %9 = fabs %8 : double
+        fabs
         store %9, %6, align 8
         %10 = const 0.000000e+00 : double
         store %10, %7, align 8
         scope {
-            %11 = load %6 : double, align 8
-            %12 = load %7 : double, align 8
-            %13 = cmp lt %11, %12 : bool
-            if %13 {
-                call @link_error() [all]
+                %11 = load %6 : double, align 8
+                %12 = load %7 : double, align 8
+                cmp
+                if %13 {
+                        call @link_error() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1.000000e+00 : double
-    call @foo(%2) [all]
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = load %0 : s32i
-    return %4
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1.000000e+00 : double
+        call @foo(%2) [all]
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = load %0 : s32i
+        return %4
 }

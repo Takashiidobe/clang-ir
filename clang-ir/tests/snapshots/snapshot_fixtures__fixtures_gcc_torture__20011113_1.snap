@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20011113-1.c" (c, x86_64-unknown-linux-gnu)
-global t : rec_t = {26, [0, 21, 22, 23]} [external, default, align 8, dso_local]
+global t : rec_t = ConstRecord { ty: Named("rec_t"), members: Array([CirInt { ty: Named("u32i"), value: "26" }, ConstArray { ty: Array { element_type: Named("s64i"), size: 4 }, elts: Array([CirInt { ty: Named("s64i"), value: "0" }, CirInt { ty: Named("s64i"), value: "21" }, CirInt { ty: Named("s64i"), value: "22" }, CirInt { ty: Named("s64i"), value: "23" }]), trailing_zeros_num: 0 }]) } [external, default, align 8, dso_local]
 
 fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
 fn abort() -> void [external, c, nothrow];
@@ -16,42 +16,42 @@ fn bar(%arg2: rec_U*, %arg3: u32i) -> rec_t* [external, c, no_inline, dso_local,
         store %61, %62
         store %arg3, %63
         scope {
-            %67 = const 0 : s64i
-            %68 = get_member %62[0] "r" : s64i[3]*
-            %69 = get_element %68[%67] : s64i*
-            %70 = load %69 : s64i, align 8
-            %71 = const 21 : s64i
-            %72 = cmp ne %70, %71 : bool
-            %73 = ternary %72 ? { : bool
-                %89 = const true : bool
-                yield %89
-            } : {
-                %83 = const 1 : s64i
-                %84 = get_member %62[0] "r" : s64i[3]*
-                %85 = get_element %84[%83] : s64i*
-                %86 = load %85 : s64i, align 8
-                %87 = const 22 : s64i
-                %88 = cmp ne %86, %87 : bool
-                yield %88
-            }
-            %74 = ternary %73 ? { : bool
-                %82 = const true : bool
-                yield %82
-            } : {
-                %76 = const 2 : s64i
-                %77 = get_member %62[0] "r" : s64i[3]*
-                %78 = get_element %77[%76] : s64i*
-                %79 = load %78 : s64i, align 8
-                %80 = const 23 : s64i
-                %81 = cmp ne %79, %80 : bool
-                yield %81
-            }
-            if %74 {
-                %75 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %67 = const 0 : s64i
+                get_member
+                get_element
+                %70 = load %69 : s64i, align 8
+                %71 = const 21 : s64i
+                cmp
+                %73 = ternary %72 ? { : bool
+                        %89 = const true : bool
+                        yield %89
+                } : {
+                        %83 = const 1 : s64i
+                        get_member
+                        get_element
+                        %86 = load %85 : s64i, align 8
+                        %87 = const 22 : s64i
+                        cmp
+                        yield %88
+                }
+                %74 = ternary %73 ? { : bool
+                        %82 = const true : bool
+                        yield %82
+                } : {
+                        %76 = const 2 : s64i
+                        get_member
+                        get_element
+                        %79 = load %78 : s64i, align 8
+                        %80 = const 23 : s64i
+                        cmp
+                        yield %81
+                }
+                if %74 {
+                        %75 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %65 = const #cir.ptr<null> : rec_t*
         store %65, %64
@@ -65,19 +65,19 @@ fn foo(%arg1: rec_t*) -> rec_t* [external, c, no_inline, dso_local, nothrow] {
         %43 = alloca rec_U, "d", align 8
         %44 = alloca rec_U, "u", align 8
         store %arg1, %41
-        %45 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %45 = get_global @memcpy : (void*, void*, u64i) -> void**
         %46 = cast(bitcast) %44 : void*
         %47 = const 1 : s64i
         %48 = load %41 : rec_t*, align 8
-        %49 = get_member %48[1] "d" : s64i[4]*
-        %50 = get_element %49[%47] : s64i*
+        get_member
+        get_element
         %51 = cast(bitcast) %50 : void*
         %52 = const 24 : u64i
         %53 = call @memcpy(%46, %51, %52) : void* [all]
-        copy %43, %44
+        copy
         %54 = load %41 : rec_t*, align 8
-        %55 = get_member %54[0] "b" : u32i*
-        %56 = get_bitfield %55, "b": 8 bits @16 in u32i : u32i, align 8
+        get_member
+        get_bitfield
         %57 = load %43 : rec_U, align 8
         %58 = alloca rec_U, "byval", align 8
         store %57, %58
@@ -95,32 +95,32 @@ fn baz(%arg0: rec_t*) -> rec_t* [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %9
         %13 = const 4886718345 : s64i
         %14 = const 0 : s64i
-        %15 = get_member %11[0] "r" : s64i[3]*
-        %16 = get_element %15[%14] : s64i*
+        get_member
+        get_element
         store %13, %16, align 8
         %17 = const 68414056839 : s64i
         %18 = const 1 : s64i
-        %19 = get_member %11[0] "r" : s64i[3]*
-        %20 = get_element %19[%18] : s64i*
+        get_member
+        get_element
         store %17, %20, align 8
         %21 = const 46118400291 : s64i
         %22 = const 2 : s64i
-        %23 = get_member %11[0] "r" : s64i[3]*
-        %24 = get_element %23[%22] : s64i*
+        get_member
+        get_element
         store %21, %24, align 8
-        %25 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %25 = get_global @memcpy : (void*, void*, u64i) -> void**
         %26 = cast(bitcast) %12 : void*
         %27 = const 1 : s64i
         %28 = load %9 : rec_t*, align 8
-        %29 = get_member %28[1] "d" : s64i[4]*
-        %30 = get_element %29[%27] : s64i*
+        get_member
+        get_element
         %31 = cast(bitcast) %30 : void*
         %32 = const 24 : u64i
         %33 = call @memcpy(%26, %31, %32) : void* [all]
-        copy %11, %12
+        copy
         %34 = load %9 : rec_t*, align 8
-        %35 = get_member %34[0] "b" : u32i*
-        %36 = get_bitfield %35, "b": 8 bits @16 in u32i : u32i, align 8
+        get_member
+        get_bitfield
         %37 = load %11 : rec_U, align 8
         %38 = alloca rec_U, "byval", align 8
         store %37, %38
@@ -131,16 +131,16 @@ fn baz(%arg0: rec_t*) -> rec_t* [external, c, no_inline, dso_local, nothrow] {
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @t : rec_t*
-    %3 = call @baz(%2) : rec_t* [all]
-    %4 = get_global @t : rec_t*
-    %5 = call @foo(%4) : rec_t* [all]
-    %6 = get_global @exit : ((s32i) -> void)*
-    %7 = const 0 : s32i
-    call @exit(%7) [all]
-    %8 = load %0 : s32i
-    return %8
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @t : rec_t*
+        %3 = call @baz(%2) : rec_t* [all]
+        %4 = get_global @t : rec_t*
+        %5 = call @foo(%4) : rec_t* [all]
+        %6 = get_global @exit : (s32i) -> void*
+        %7 = const 0 : s32i
+        call @exit(%7) [all]
+        %8 = load %0 : s32i
+        return %8
 }

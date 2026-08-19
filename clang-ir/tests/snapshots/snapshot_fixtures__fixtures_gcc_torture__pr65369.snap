@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr65369.c" (c, x86_64-unknown-linux-gnu)
-global data : s8i[81] = "12345678901234567890123456789012345678901234567890123456789012345678901234567890" [internal, default, align 16, dso_local, constant]
+global data : s8i[81] = ConstArray { ty: Array { element_type: Named("s8i"), size: 81 }, elts: Str("12345678901234567890123456789012345678901234567890123456789012345678901234567890"), trailing_zeros_num: 1 } [internal, default, align 16, dso_local, constant]
 
 fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
 fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
@@ -14,19 +14,19 @@ fn foo(%arg1: u32i*) -> void [internal, c, no_inline, dso_local, nothrow] {
         %185 = alloca u32i*, "buf", align 8
         store %arg1, %185
         scope {
-            %186 = load %185 : u32i*, align 8
-            %187 = cast(bitcast) %186 : void*
-            %188 = get_global @data : s8i[81]*
-            %189 = cast(array_to_ptrdecay) %188 : s8i*
-            %190 = cast(bitcast) %189 : void*
-            %191 = const 64 : u64i
-            %192 = call @memcmp(%187, %190, %191) : s32i [all]
-            %193 = cast(int_to_bool) %192 : bool
-            if %193 {
-                call @abort() [all]
+                %186 = load %185 : u32i*, align 8
+                %187 = cast(bitcast) %186 : void*
+                %188 = get_global @data : s8i[81]*
+                %189 = cast(array_to_ptrdecay) %188 : s8i*
+                %190 = cast(bitcast) %189 : void*
+                %191 = const 64 : u64i
+                %192 = call @memcmp(%187, %190, %191) : s32i [all]
+                %193 = cast(int_to_bool) %192 : bool
+                if %193 {
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -37,161 +37,161 @@ fn bar(%arg0: u8i*) -> void [internal, c, no_inline, dso_local, nothrow] {
         store %arg0, %22
         %24 = cast(array_to_ptrdecay) %23 : u32i*
         %25 = const 0 : s32i
-        %26 = ptr_stride %24, %25 : u32i*
+        ptr_stride
         %27 = cast(bitcast) %26 : void*
         %28 = load %22 : u8i*, align 8
         %29 = const 0 : s32i
-        %30 = ptr_stride %28, %29 : u8i*
+        ptr_stride
         %31 = cast(bitcast) %30 : void*
         %32 = const 4 : u64i
         %33 = call @memcpy(%27, %31, %32) : void* [all]
         %34 = cast(array_to_ptrdecay) %23 : u32i*
         %35 = const 1 : s32i
-        %36 = ptr_stride %34, %35 : u32i*
+        ptr_stride
         %37 = cast(bitcast) %36 : void*
         %38 = load %22 : u8i*, align 8
         %39 = const 4 : s32i
-        %40 = ptr_stride %38, %39 : u8i*
+        ptr_stride
         %41 = cast(bitcast) %40 : void*
         %42 = const 4 : u64i
         %43 = call @memcpy(%37, %41, %42) : void* [all]
         %44 = cast(array_to_ptrdecay) %23 : u32i*
         %45 = const 2 : s32i
-        %46 = ptr_stride %44, %45 : u32i*
+        ptr_stride
         %47 = cast(bitcast) %46 : void*
         %48 = load %22 : u8i*, align 8
         %49 = const 8 : s32i
-        %50 = ptr_stride %48, %49 : u8i*
+        ptr_stride
         %51 = cast(bitcast) %50 : void*
         %52 = const 4 : u64i
         %53 = call @memcpy(%47, %51, %52) : void* [all]
         %54 = cast(array_to_ptrdecay) %23 : u32i*
         %55 = const 3 : s32i
-        %56 = ptr_stride %54, %55 : u32i*
+        ptr_stride
         %57 = cast(bitcast) %56 : void*
         %58 = load %22 : u8i*, align 8
         %59 = const 12 : s32i
-        %60 = ptr_stride %58, %59 : u8i*
+        ptr_stride
         %61 = cast(bitcast) %60 : void*
         %62 = const 4 : u64i
         %63 = call @memcpy(%57, %61, %62) : void* [all]
         %64 = cast(array_to_ptrdecay) %23 : u32i*
         %65 = const 4 : s32i
-        %66 = ptr_stride %64, %65 : u32i*
+        ptr_stride
         %67 = cast(bitcast) %66 : void*
         %68 = load %22 : u8i*, align 8
         %69 = const 16 : s32i
-        %70 = ptr_stride %68, %69 : u8i*
+        ptr_stride
         %71 = cast(bitcast) %70 : void*
         %72 = const 4 : u64i
         %73 = call @memcpy(%67, %71, %72) : void* [all]
         %74 = cast(array_to_ptrdecay) %23 : u32i*
         %75 = const 5 : s32i
-        %76 = ptr_stride %74, %75 : u32i*
+        ptr_stride
         %77 = cast(bitcast) %76 : void*
         %78 = load %22 : u8i*, align 8
         %79 = const 20 : s32i
-        %80 = ptr_stride %78, %79 : u8i*
+        ptr_stride
         %81 = cast(bitcast) %80 : void*
         %82 = const 4 : u64i
         %83 = call @memcpy(%77, %81, %82) : void* [all]
         %84 = cast(array_to_ptrdecay) %23 : u32i*
         %85 = const 6 : s32i
-        %86 = ptr_stride %84, %85 : u32i*
+        ptr_stride
         %87 = cast(bitcast) %86 : void*
         %88 = load %22 : u8i*, align 8
         %89 = const 24 : s32i
-        %90 = ptr_stride %88, %89 : u8i*
+        ptr_stride
         %91 = cast(bitcast) %90 : void*
         %92 = const 4 : u64i
         %93 = call @memcpy(%87, %91, %92) : void* [all]
         %94 = cast(array_to_ptrdecay) %23 : u32i*
         %95 = const 7 : s32i
-        %96 = ptr_stride %94, %95 : u32i*
+        ptr_stride
         %97 = cast(bitcast) %96 : void*
         %98 = load %22 : u8i*, align 8
         %99 = const 28 : s32i
-        %100 = ptr_stride %98, %99 : u8i*
+        ptr_stride
         %101 = cast(bitcast) %100 : void*
         %102 = const 4 : u64i
         %103 = call @memcpy(%97, %101, %102) : void* [all]
         %104 = cast(array_to_ptrdecay) %23 : u32i*
         %105 = const 8 : s32i
-        %106 = ptr_stride %104, %105 : u32i*
+        ptr_stride
         %107 = cast(bitcast) %106 : void*
         %108 = load %22 : u8i*, align 8
         %109 = const 32 : s32i
-        %110 = ptr_stride %108, %109 : u8i*
+        ptr_stride
         %111 = cast(bitcast) %110 : void*
         %112 = const 4 : u64i
         %113 = call @memcpy(%107, %111, %112) : void* [all]
         %114 = cast(array_to_ptrdecay) %23 : u32i*
         %115 = const 9 : s32i
-        %116 = ptr_stride %114, %115 : u32i*
+        ptr_stride
         %117 = cast(bitcast) %116 : void*
         %118 = load %22 : u8i*, align 8
         %119 = const 36 : s32i
-        %120 = ptr_stride %118, %119 : u8i*
+        ptr_stride
         %121 = cast(bitcast) %120 : void*
         %122 = const 4 : u64i
         %123 = call @memcpy(%117, %121, %122) : void* [all]
         %124 = cast(array_to_ptrdecay) %23 : u32i*
         %125 = const 10 : s32i
-        %126 = ptr_stride %124, %125 : u32i*
+        ptr_stride
         %127 = cast(bitcast) %126 : void*
         %128 = load %22 : u8i*, align 8
         %129 = const 40 : s32i
-        %130 = ptr_stride %128, %129 : u8i*
+        ptr_stride
         %131 = cast(bitcast) %130 : void*
         %132 = const 4 : u64i
         %133 = call @memcpy(%127, %131, %132) : void* [all]
         %134 = cast(array_to_ptrdecay) %23 : u32i*
         %135 = const 11 : s32i
-        %136 = ptr_stride %134, %135 : u32i*
+        ptr_stride
         %137 = cast(bitcast) %136 : void*
         %138 = load %22 : u8i*, align 8
         %139 = const 44 : s32i
-        %140 = ptr_stride %138, %139 : u8i*
+        ptr_stride
         %141 = cast(bitcast) %140 : void*
         %142 = const 4 : u64i
         %143 = call @memcpy(%137, %141, %142) : void* [all]
         %144 = cast(array_to_ptrdecay) %23 : u32i*
         %145 = const 12 : s32i
-        %146 = ptr_stride %144, %145 : u32i*
+        ptr_stride
         %147 = cast(bitcast) %146 : void*
         %148 = load %22 : u8i*, align 8
         %149 = const 48 : s32i
-        %150 = ptr_stride %148, %149 : u8i*
+        ptr_stride
         %151 = cast(bitcast) %150 : void*
         %152 = const 4 : u64i
         %153 = call @memcpy(%147, %151, %152) : void* [all]
         %154 = cast(array_to_ptrdecay) %23 : u32i*
         %155 = const 13 : s32i
-        %156 = ptr_stride %154, %155 : u32i*
+        ptr_stride
         %157 = cast(bitcast) %156 : void*
         %158 = load %22 : u8i*, align 8
         %159 = const 52 : s32i
-        %160 = ptr_stride %158, %159 : u8i*
+        ptr_stride
         %161 = cast(bitcast) %160 : void*
         %162 = const 4 : u64i
         %163 = call @memcpy(%157, %161, %162) : void* [all]
         %164 = cast(array_to_ptrdecay) %23 : u32i*
         %165 = const 14 : s32i
-        %166 = ptr_stride %164, %165 : u32i*
+        ptr_stride
         %167 = cast(bitcast) %166 : void*
         %168 = load %22 : u8i*, align 8
         %169 = const 56 : s32i
-        %170 = ptr_stride %168, %169 : u8i*
+        ptr_stride
         %171 = cast(bitcast) %170 : void*
         %172 = const 4 : u64i
         %173 = call @memcpy(%167, %171, %172) : void* [all]
         %174 = cast(array_to_ptrdecay) %23 : u32i*
         %175 = const 15 : s32i
-        %176 = ptr_stride %174, %175 : u32i*
+        ptr_stride
         %177 = cast(bitcast) %176 : void*
         %178 = load %22 : u8i*, align 8
         %179 = const 60 : s32i
-        %180 = ptr_stride %178, %179 : u8i*
+        ptr_stride
         %181 = cast(bitcast) %180 : void*
         %182 = const 4 : u64i
         %183 = call @memcpy(%177, %181, %182) : void* [all]
@@ -200,30 +200,30 @@ fn bar(%arg0: u8i*) -> void [internal, c, no_inline, dso_local, nothrow] {
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u8i[97], "input", align 16
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = cast(array_to_ptrdecay) %1 : u8i*
-    %4 = cast(bitcast) %3 : void*
-    %5 = const 0 : s32i
-    %6 = const 97 : u64i
-    %7 = call @memset(%4, %5, %6) : void* [all]
-    %8 = cast(array_to_ptrdecay) %1 : u8i*
-    %9 = const 1 : s32i
-    %10 = ptr_stride %8, %9 : u8i*
-    %11 = cast(bitcast) %10 : void*
-    %12 = get_global @data : s8i[81]*
-    %13 = cast(array_to_ptrdecay) %12 : s8i*
-    %14 = cast(bitcast) %13 : void*
-    %15 = const 81 : u64i
-    %16 = call @memcpy(%11, %14, %15) : void* [all]
-    %17 = cast(array_to_ptrdecay) %1 : u8i*
-    %18 = const 1 : s32i
-    %19 = ptr_stride %17, %18 : u8i*
-    call @bar(%19) [all]
-    %20 = const 0 : s32i
-    store %20, %0
-    %21 = load %0 : s32i
-    return %21
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u8i[97], "input", align 16
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = cast(array_to_ptrdecay) %1 : u8i*
+        %4 = cast(bitcast) %3 : void*
+        %5 = const 0 : s32i
+        %6 = const 97 : u64i
+        %7 = call @memset(%4, %5, %6) : void* [all]
+        %8 = cast(array_to_ptrdecay) %1 : u8i*
+        %9 = const 1 : s32i
+        ptr_stride
+        %11 = cast(bitcast) %10 : void*
+        %12 = get_global @data : s8i[81]*
+        %13 = cast(array_to_ptrdecay) %12 : s8i*
+        %14 = cast(bitcast) %13 : void*
+        %15 = const 81 : u64i
+        %16 = call @memcpy(%11, %14, %15) : void* [all]
+        %17 = cast(array_to_ptrdecay) %1 : u8i*
+        %18 = const 1 : s32i
+        ptr_stride
+        call @bar(%19) [all]
+        %20 = const 0 : s32i
+        store %20, %0
+        %21 = load %0 : s32i
+        return %21
 }

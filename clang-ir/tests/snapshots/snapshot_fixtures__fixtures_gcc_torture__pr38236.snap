@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr38236.c" (c, x86_64-unknown-linux-gnu)
@@ -17,33 +17,33 @@ fn foo(%arg0: rec_X*, %arg1: s32i*, %arg2: s32i, %arg3: s32i) -> s32i [external,
         store %arg2, %14
         store %arg3, %15
         scope {
-            %29 = load %14 : s32i, align 4
-            %30 = cast(int_to_bool) %29 : bool
-            if %30 {
-                store %17, %12, align 8
+                %29 = load %14 : s32i, align 4
+                %30 = cast(int_to_bool) %29 : bool
+                if %30 {
+                        store %17, %12, align 8
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %25 = load %15 : s32i, align 4
-            %26 = cast(int_to_bool) %25 : bool
-            if %26 {
-                %28 = get_member %17[0] "i" : s32i*
-                store %28, %13, align 8
+                %25 = load %15 : s32i, align 4
+                %26 = cast(int_to_bool) %25 : bool
+                if %26 {
+                        get_member
+                        store %28, %13, align 8
+                        yield
+                } else {
+                        get_member
+                        store %27, %13, align 8
+                        yield
+                }
                 yield
-            } else {
-                %27 = get_member %18[0] "i" : s32i*
-                store %27, %13, align 8
-                yield
-            }
-            yield
         }
         %19 = const 1 : s32i
         %20 = load %13 : s32i*, align 8
         store %19, %20, align 4
         %21 = load %12 : rec_X*, align 8
-        %22 = get_member %21[0] "i" : s32i*
+        get_member
         %23 = load %22 : s32i, align 4
         store %23, %16
         %24 = load %16 : s32i
@@ -51,26 +51,26 @@ fn foo(%arg0: rec_X*, %arg1: s32i*, %arg2: s32i, %arg3: s32i) -> s32i [external,
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const #cir.ptr<null> : rec_X*
-        %5 = const #cir.ptr<null> : s32i*
-        %6 = const 1 : s32i
-        %7 = const 1 : s32i
-        %8 = call @foo(%4, %5, %6, %7) : s32i [all]
-        %9 = const 1 : s32i
-        %10 = cmp ne %8, %9 : bool
-        if %10 {
-            %11 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const #cir.ptr<null> : rec_X*
+                %5 = const #cir.ptr<null> : s32i*
+                %6 = const 1 : s32i
+                %7 = const 1 : s32i
+                %8 = call @foo(%4, %5, %6, %7) : s32i [all]
+                %9 = const 1 : s32i
+                cmp
+                if %10 {
+                        %11 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

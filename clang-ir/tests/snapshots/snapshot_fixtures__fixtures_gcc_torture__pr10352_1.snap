@@ -1,53 +1,53 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr10352-1.c" (c, x86_64-unknown-linux-gnu)
-global b : rec_anon2E0 = zero [external, default, align 4, dso_local]
-global c : s32i* = @b [external, default, align 8, dso_local]
-global d : s32i = 0 [external, default, align 4, dso_local]
+global b : rec_anon2E0 = Zero { ty: Named("rec_anon2E0") } [external, default, align 4, dso_local]
+global c : s32i* = GlobalView { ty: Pointer { pointee: Named("s32i"), addr_space: None }, symbol: "b", indices: None } [external, default, align 8, dso_local]
+global d : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @c : s32i**
-    %3 = load %2 : s32i*, align 8
-    %4 = cast(ptr_to_bool) %3 : bool
-    %5 = ternary %4 ? { : bool
-        %15 = get_global @d : s32i*
-        %16 = load %15 : s32i, align 4
-        %17 = const 0 : s32i
-        %18 = cmp lt %16, %17 : bool
-        %19 = cast(bool_to_int) %18 : s32i
-        %20 = const 3 : s32i
-        %21 = xor %19, %20 : s32i
-        %22 = get_global @b : rec_anon2E0*
-        %23 = get_member %22[0] "a" : u8i*
-        %24 = set_bitfield %23, %21, "a": 1 bits @0 in signed u8i : s32i, align 4
-        %25 = cast(int_to_bool) %24 : bool
-        yield %25
-    } : {
-        %14 = const false : bool
-        yield %14
-    }
-    %6 = cast(bool_to_int) %5 : s32i
-    %7 = get_global @d : s32i*
-    store %6, %7, align 4
-    scope {
-        %10 = get_global @d : s32i*
-        %11 = load %10 : s32i, align 4
-        %12 = const 1 : s32i
-        %13 = cmp ne %11, %12 : bool
-        if %13 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @c : s32i**
+        %3 = load %2 : s32i*, align 8
+        %4 = cast(ptr_to_bool) %3 : bool
+        %5 = ternary %4 ? { : bool
+                %15 = get_global @d : s32i*
+                %16 = load %15 : s32i, align 4
+                %17 = const 0 : s32i
+                cmp
+                %19 = cast(bool_to_int) %18 : s32i
+                %20 = const 3 : s32i
+                xor
+                %22 = get_global @b : rec_anon2E0*
+                get_member
+                set_bitfield
+                %25 = cast(int_to_bool) %24 : bool
+                yield %25
+        } : {
+                %14 = const false : bool
+                yield %14
         }
-        yield
-    }
-    %8 = const 0 : s32i
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        %6 = cast(bool_to_int) %5 : s32i
+        %7 = get_global @d : s32i*
+        store %6, %7, align 4
+        scope {
+                %10 = get_global @d : s32i*
+                %11 = load %10 : s32i, align 4
+                %12 = const 1 : s32i
+                cmp
+                if %13 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
+        }
+        %8 = const 0 : s32i
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

@@ -1,16 +1,16 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20001130-1.c" (c, x86_64-unknown-linux-gnu)
-global mem : s32i[3] = zero [internal, default, align 4, dso_local]
+global mem : s32i[3] = Zero { ty: Array { element_type: Named("s32i"), size: 3 } } [internal, default, align 4, dso_local]
 
 fn bar() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %26 = alloca s32i, "__retval", align 4
-    %27 = const 1 : s32i
-    store %27, %26
-    %28 = load %26 : s32i
-    return %28
+        %26 = alloca s32i, "__retval", align 4
+        %27 = const 1 : s32i
+        store %27, %26
+        %28 = load %26 : s32i
+        return %28
 }
 fn abort() -> void [external, c, nothrow];
 fn foo(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
@@ -19,36 +19,36 @@ fn foo(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         %7 = alloca s32i, "__retval", align 4
         store %arg0, %6
         scope {
-            %21 = load %6 : s32i, align 4
-            %22 = const 0 : s32i
-            %23 = cmp ne %21, %22 : bool
-            if %23 {
-                %24 = load %6 : s32i, align 4
-                store %24, %7
-                %25 = load %7 : s32i
-                return %25
-            }
-            yield
+                %21 = load %6 : s32i, align 4
+                %22 = const 0 : s32i
+                cmp
+                if %23 {
+                        %24 = load %6 : s32i, align 4
+                        store %24, %7
+                        %25 = load %7 : s32i
+                        return %25
+                }
+                yield
         }
         %8 = call @bar() : s32i [all]
         %9 = call @foo(%8) : s32i [all]
         %10 = load %6 : s32i, align 4
-        %11 = inc %10 : s32i [nsw]
+        inc
         store %11, %6, align 4
         %12 = cast(integral) %10 : s64i
         %13 = get_global @mem : s32i[3]*
-        %14 = get_element %13[%12] : s32i*
+        get_element
         store %9, %14, align 4
         scope {
-            %17 = load %6 : s32i, align 4
-            %18 = const 1 : s32i
-            %19 = cmp ne %17, %18 : bool
-            if %19 {
-                %20 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %17 = load %6 : s32i, align 4
+                %18 = const 1 : s32i
+                cmp
+                if %19 {
+                        %20 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %15 = const 0 : s32i
         store %15, %7
@@ -56,13 +56,13 @@ fn foo(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         return %16
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 0 : s32i
-    %3 = call @foo(%2) : s32i [all]
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 0 : s32i
+        %3 = call @foo(%2) : s32i [all]
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

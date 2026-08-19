@@ -1,37 +1,37 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000519-2.c" (c, x86_64-unknown-linux-gnu)
-global x : s64i = -1 [external, default, align 8, dso_local]
+global x : s64i = CirInt { ty: Named("s64i"), value: "-1" } [external, default, align 8, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s64i, "b", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @x : s64i*
-    %4 = load %3 : s64i, align 8
-    %5 = const -1 : s64i
-    %6 = cmp ne %4, %5 : bool
-    %7 = cast(bool_to_int) %6 : s32i
-    %8 = cast(integral) %7 : s64i
-    store %8, %1, align 8
-    scope {
-        %12 = load %1 : s64i, align 8
-        %13 = cast(int_to_bool) %12 : bool
-        if %13 {
-            %14 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s64i, "b", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @x : s64i*
+        %4 = load %3 : s64i, align 8
+        %5 = const -1 : s64i
+        cmp
+        %7 = cast(bool_to_int) %6 : s32i
+        %8 = cast(integral) %7 : s64i
+        store %8, %1, align 8
+        scope {
+                %12 = load %1 : s64i, align 8
+                %13 = cast(int_to_bool) %12 : bool
+                if %13 {
+                        %14 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %9 = get_global @exit : ((s32i) -> void)*
-    %10 = const 0 : s32i
-    call @exit(%10) [all]
-    %11 = load %0 : s32i
-    return %11
+        %9 = get_global @exit : (s32i) -> void*
+        %10 = const 0 : s32i
+        call @exit(%10) [all]
+        %11 = load %0 : s32i
+        return %11
 }

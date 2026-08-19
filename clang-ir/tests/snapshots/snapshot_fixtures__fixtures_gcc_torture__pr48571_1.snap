@@ -1,134 +1,134 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr48571-1.c" (c, x86_64-unknown-linux-gnu)
-global c : u32i[624] = zero [external, default, align 16, dso_local]
+global c : u32i[624] = Zero { ty: Array { element_type: Named("u32i"), size: 624 } } [external, default, align 16, dso_local]
 
 fn bar() -> void [external, c, no_inline, dso_local, nothrow] {
-    %35 = alloca u32i, "i", align 4
-    scope {
-        %36 = const 1 : u32i
-        store %36, %35, align 4
-        for cond: {
-            %64 = load %35 : u32i, align 4
-            %65 = const 624 : u32i
-            %66 = cmp lt %64, %65 : bool
-            condition %66
-        } step: {
-            %37 = load %35 : u32i, align 4
-            %38 = inc %37 : u32i
-            store %38, %35, align 4
-            yield
-        } do {
-            %39 = const 2 : u32i
-            %40 = get_global @c : u32i[624]*
-            %41 = cast(array_to_ptrdecay) %40 : u32i*
-            %42 = cast(bitcast) %41 : void*
-            %43 = load %35 : u32i, align 4
-            %44 = cast(integral) %43 : u64i
-            %45 = const 18446744073709551612 : u64i
-            %46 = const 4 : u64i
-            %47 = div %45, %46 : u64i
-            %48 = add %44, %47 : u64i
-            %49 = const 4 : u64i
-            %50 = mul %48, %49 : u64i
-            %51 = ptr_stride %42, %50 : void*
-            %52 = cast(bitcast) %51 : u32i*
-            %53 = load %52 : u32i, align 4
-            %54 = mul %39, %53 : u32i
-            %55 = get_global @c : u32i[624]*
-            %56 = cast(array_to_ptrdecay) %55 : u32i*
-            %57 = cast(bitcast) %56 : void*
-            %58 = load %35 : u32i, align 4
-            %59 = cast(integral) %58 : u64i
-            %60 = const 4 : u64i
-            %61 = mul %59, %60 : u64i
-            %62 = ptr_stride %57, %61 : void*
-            %63 = cast(bitcast) %62 : u32i*
-            store %54, %63, align 4
-            yield
+        %35 = alloca u32i, "i", align 4
+        scope {
+                %36 = const 1 : u32i
+                store %36, %35, align 4
+                for cond {
+                        %64 = load %35 : u32i, align 4
+                        %65 = const 624 : u32i
+                        cmp
+                        condition %66
+                } step {
+                        %37 = load %35 : u32i, align 4
+                        inc
+                        store %38, %35, align 4
+                        yield
+                } body {
+                        %39 = const 2 : u32i
+                        %40 = get_global @c : u32i[624]*
+                        %41 = cast(array_to_ptrdecay) %40 : u32i*
+                        %42 = cast(bitcast) %41 : void*
+                        %43 = load %35 : u32i, align 4
+                        %44 = cast(integral) %43 : u64i
+                        %45 = const 18446744073709551612 : u64i
+                        %46 = const 4 : u64i
+                        div
+                        %48 = add %44, %47 : u64i
+                        %49 = const 4 : u64i
+                        mul
+                        ptr_stride
+                        %52 = cast(bitcast) %51 : u32i*
+                        %53 = load %52 : u32i, align 4
+                        mul
+                        %55 = get_global @c : u32i[624]*
+                        %56 = cast(array_to_ptrdecay) %55 : u32i*
+                        %57 = cast(bitcast) %56 : void*
+                        %58 = load %35 : u32i, align 4
+                        %59 = cast(integral) %58 : u64i
+                        %60 = const 4 : u64i
+                        mul
+                        ptr_stride
+                        %63 = cast(bitcast) %62 : u32i*
+                        store %54, %63, align 4
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    return
+        return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u32i, "i", align 4
-    %2 = alloca u32i, "j", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    scope {
-        %24 = const 0 : u32i
-        store %24, %1, align 4
-        for cond: {
-            %32 = load %1 : u32i, align 4
-            %33 = const 624 : u32i
-            %34 = cmp lt %32, %33 : bool
-            condition %34
-        } step: {
-            %25 = load %1 : u32i, align 4
-            %26 = inc %25 : u32i
-            store %26, %1, align 4
-            yield
-        } do {
-            %27 = const 1 : u32i
-            %28 = load %1 : u32i, align 4
-            %29 = cast(integral) %28 : u64i
-            %30 = get_global @c : u32i[624]*
-            %31 = get_element %30[%29] : u32i*
-            store %27, %31, align 4
-            yield
-        }
-        yield
-    }
-    call @bar() [all]
-    %4 = const 1 : u32i
-    store %4, %2, align 4
-    scope {
-        %7 = const 0 : u32i
-        store %7, %1, align 4
-        for cond: {
-            %21 = load %1 : u32i, align 4
-            %22 = const 624 : u32i
-            %23 = cmp lt %21, %22 : bool
-            condition %23
-        } step: {
-            %8 = load %1 : u32i, align 4
-            %9 = inc %8 : u32i
-            store %9, %1, align 4
-            yield
-        } do {
-            scope {
-                scope {
-                    %13 = load %1 : u32i, align 4
-                    %14 = cast(integral) %13 : u64i
-                    %15 = get_global @c : u32i[624]*
-                    %16 = get_element %15[%14] : u32i*
-                    %17 = load %16 : u32i, align 4
-                    %18 = load %2 : u32i, align 4
-                    %19 = cmp ne %17, %18 : bool
-                    if %19 {
-                        %20 = get_global @abort : (() -> void)*
-                        call @abort() [all]
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u32i, "i", align 4
+        %2 = alloca u32i, "j", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        scope {
+                %24 = const 0 : u32i
+                store %24, %1, align 4
+                for cond {
+                        %32 = load %1 : u32i, align 4
+                        %33 = const 624 : u32i
+                        cmp
+                        condition %34
+                } step {
+                        %25 = load %1 : u32i, align 4
+                        inc
+                        store %26, %1, align 4
                         yield
-                    }
-                    yield
+                } body {
+                        %27 = const 1 : u32i
+                        %28 = load %1 : u32i, align 4
+                        %29 = cast(integral) %28 : u64i
+                        %30 = get_global @c : u32i[624]*
+                        get_element
+                        store %27, %31, align 4
+                        yield
                 }
-                %10 = load %2 : u32i, align 4
-                %11 = const 2 : u32i
-                %12 = mul %10, %11 : u32i
-                store %12, %2, align 4
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = load %0 : s32i
-    return %6
+        call @bar() [all]
+        %4 = const 1 : u32i
+        store %4, %2, align 4
+        scope {
+                %7 = const 0 : u32i
+                store %7, %1, align 4
+                for cond {
+                        %21 = load %1 : u32i, align 4
+                        %22 = const 624 : u32i
+                        cmp
+                        condition %23
+                } step {
+                        %8 = load %1 : u32i, align 4
+                        inc
+                        store %9, %1, align 4
+                        yield
+                } body {
+                        scope {
+                                scope {
+                                        %13 = load %1 : u32i, align 4
+                                        %14 = cast(integral) %13 : u64i
+                                        %15 = get_global @c : u32i[624]*
+                                        get_element
+                                        %17 = load %16 : u32i, align 4
+                                        %18 = load %2 : u32i, align 4
+                                        cmp
+                                        if %19 {
+                                                %20 = get_global @abort : () -> void*
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                %10 = load %2 : u32i, align 4
+                                %11 = const 2 : u32i
+                                mul
+                                store %12, %2, align 4
+                                yield
+                        }
+                        yield
+                }
+                yield
+        }
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = load %0 : s32i
+        return %6
 }

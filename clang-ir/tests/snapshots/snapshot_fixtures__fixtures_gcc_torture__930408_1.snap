@@ -1,44 +1,45 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/930408-1.c" (c, x86_64-unknown-linux-gnu)
-global s : rec_anon2E0 = zero [external, default, align 4, dso_local]
+global s : rec_anon2E0 = Zero { ty: Named("rec_anon2E0") } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn p() -> void [external, c, no_inline, dso_local, nothrow] {
-    %11 = get_global @abort : (() -> void)*
-    call @abort() [all]
-    return
+        %11 = get_global @abort : () -> void*
+        call @abort() [all]
+        return
 }
 fn f() -> void [external, c, no_inline, dso_local, nothrow] {
-    scope {
-        %8 = get_global @s : rec_anon2E0*
-        %9 = get_member %8[0] "eval" : u32i*
-        %10 = load %9 : u32i, align 4
-        switch %10 {
-            case equal 0 {
-                call @p() [all]
+        scope {
+                %8 = get_global @s : rec_anon2E0*
+                get_member
+                %10 = load %9 : u32i, align 4
+                switch %10 {
+                        case equal [0] {
+                                call @p() [all]
+                                yield
+                        }
+                        yield
+                }
                 yield
-            }
         }
-        yield
-    }
-    return
+        return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : u32i
-    %3 = get_global @s : rec_anon2E0*
-    %4 = get_member %3[0] "eval" : u32i*
-    store %2, %4, align 4
-    call @f() [all]
-    %5 = get_global @exit : ((s32i) -> void)*
-    %6 = const 0 : s32i
-    call @exit(%6) [all]
-    %7 = load %0 : s32i
-    return %7
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : u32i
+        %3 = get_global @s : rec_anon2E0*
+        get_member
+        store %2, %4, align 4
+        call @f() [all]
+        %5 = get_global @exit : (s32i) -> void*
+        %6 = const 0 : s32i
+        call @exit(%6) [all]
+        %7 = load %0 : s32i
+        return %7
 }

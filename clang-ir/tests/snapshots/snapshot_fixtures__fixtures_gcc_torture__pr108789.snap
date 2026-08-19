@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr108789.c" (c, x86_64-unknown-linux-gnu)
@@ -17,7 +17,7 @@ fn add(%arg3: u32i*, %arg4: u32i*, %arg5: u32i*) -> s32i [external, c, no_inline
         %54 = load %50 : u32i*, align 8
         %55 = load %54 : u32i, align 4
         %56 = load %48 : u32i*, align 8
-        %57#0, %57#1 = add.overflow %53, %55 : u32i
+        add.overflow
         store %57#0, %56, align 4
         %58 = cast(bool_to_int) %57#1 : s32i
         store %58, %51
@@ -38,7 +38,7 @@ fn mul(%arg0: u32i*, %arg1: u32i*, %arg2: u32i*) -> s32i [external, c, no_inline
         %42 = load %38 : u32i*, align 8
         %43 = load %42 : u32i, align 4
         %44 = load %36 : u32i*, align 8
-        %45#0, %45#1 = mul.overflow %41, %43 : u32i
+        mul.overflow
         store %45#0, %44, align 4
         %46 = cast(bool_to_int) %45#1 : s32i
         store %46, %39
@@ -47,74 +47,74 @@ fn mul(%arg0: u32i*, %arg1: u32i*, %arg2: u32i*) -> s32i [external, c, no_inline
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u32i, "x", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 2147483647 : u32i
-    %4 = const 1 : u32i
-    %5 = add %3, %4 : u32i
-    %6 = const 2 : u32i
-    %7 = div %5, %6 : u32i
-    store %7, %1, align 4
-    scope {
-        %34 = call @add(%1, %1, %1) : s32i [all]
-        %35 = cast(int_to_bool) %34 : bool
-        if %35 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u32i, "x", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 2147483647 : u32i
+        %4 = const 1 : u32i
+        %5 = add %3, %4 : u32i
+        %6 = const 2 : u32i
+        div
+        store %7, %1, align 4
+        scope {
+                %34 = call @add(%1, %1, %1) : s32i [all]
+                %35 = cast(int_to_bool) %34 : bool
+                if %35 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %8 = const 1 : u32i
-    %9 = const 4 : u64i
-    %10 = const 8 : u64i
-    %11 = mul %9, %10 : u64i
-    %12 = const 4 : u64i
-    %13 = div %11, %12 : u64i
-    %14 = shift left %8, %13 : u32i
-    store %14, %1, align 4
-    scope {
-        %32 = call @mul(%1, %1, %1) : s32i [all]
-        %33 = cast(int_to_bool) %32 : bool
-        if %33 {
-            call @abort() [all]
-            yield
+        %8 = const 1 : u32i
+        %9 = const 4 : u64i
+        %10 = const 8 : u64i
+        mul
+        %12 = const 4 : u64i
+        div
+        shift
+        store %14, %1, align 4
+        scope {
+                %32 = call @mul(%1, %1, %1) : s32i [all]
+                %33 = cast(int_to_bool) %32 : bool
+                if %33 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %15 = const 2147483647 : u32i
-    %16 = const 1 : u32i
-    %17 = add %15, %16 : u32i
-    store %17, %1, align 4
-    scope {
-        %29 = call @add(%1, %1, %1) : s32i [all]
-        %30 = cast(int_to_bool) %29 : bool
-        %31 = not %30 : bool
-        if %31 {
-            call @abort() [all]
-            yield
+        %15 = const 2147483647 : u32i
+        %16 = const 1 : u32i
+        %17 = add %15, %16 : u32i
+        store %17, %1, align 4
+        scope {
+                %29 = call @add(%1, %1, %1) : s32i [all]
+                %30 = cast(int_to_bool) %29 : bool
+                not
+                if %31 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %18 = const 1 : u32i
-    %19 = const 4 : u64i
-    %20 = const 8 : u64i
-    %21 = mul %19, %20 : u64i
-    %22 = const 2 : u64i
-    %23 = div %21, %22 : u64i
-    %24 = shift left %18, %23 : u32i
-    store %24, %1, align 4
-    scope {
-        %26 = call @mul(%1, %1, %1) : s32i [all]
-        %27 = cast(int_to_bool) %26 : bool
-        %28 = not %27 : bool
-        if %28 {
-            call @abort() [all]
-            yield
+        %18 = const 1 : u32i
+        %19 = const 4 : u64i
+        %20 = const 8 : u64i
+        mul
+        %22 = const 2 : u64i
+        div
+        shift
+        store %24, %1, align 4
+        scope {
+                %26 = call @mul(%1, %1, %1) : s32i [all]
+                %27 = cast(int_to_bool) %26 : bool
+                not
+                if %28 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %25 = load %0 : s32i
-    return %25
+        %25 = load %0 : s32i
+        return %25
 }

@@ -1,50 +1,50 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000412-1.c" (c, x86_64-unknown-linux-gnu)
-global i : s16i = -1 [external, default, align 2, dso_local]
-global wordlist : s8i*[207] = zero [external, default, align 16, dso_local, constant]
+global i : s16i = CirInt { ty: Named("s16i"), value: "-1" } [external, default, align 2, dso_local]
+global wordlist : s8i*[207] = Zero { ty: Array { element_type: Pointer { pointee: Named("s8i"), addr_space: None }, size: 207 } } [external, default, align 16, dso_local, constant]
 
 fn foo() -> s8i** [external, c, no_inline, dso_local, nothrow] {
-    %11 = alloca s8i**, "__retval", align 8
-    %12 = alloca s8i**, "wordptr", align 8
-    %13 = const 207 : u32i
-    %14 = get_global @i : s16i*
-    %15 = load %14 : s16i, align 2
-    %16 = cast(integral) %15 : u32i
-    %17 = add %13, %16 : u32i
-    %18 = cast(integral) %17 : u64i
-    %19 = get_global @wordlist : s8i*[207]*
-    %20 = get_element %19[%18] : s8i**
-    store %20, %12, align 8
-    %21 = load %12 : s8i**, align 8
-    store %21, %11
-    %22 = load %11 : s8i**
-    return %22
+        %11 = alloca s8i**, "__retval", align 8
+        %12 = alloca s8i**, "wordptr", align 8
+        %13 = const 207 : u32i
+        %14 = get_global @i : s16i*
+        %15 = load %14 : s16i, align 2
+        %16 = cast(integral) %15 : u32i
+        %17 = add %13, %16 : u32i
+        %18 = cast(integral) %17 : u64i
+        %19 = get_global @wordlist : s8i*[207]*
+        get_element
+        store %20, %12, align 8
+        %21 = load %12 : s8i**, align 8
+        store %21, %11
+        %22 = load %11 : s8i**
+        return %22
 }
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %5 = call @foo() : s8i** [all]
-        %6 = const 206 : s64i
-        %7 = get_global @wordlist : s8i*[207]*
-        %8 = get_element %7[%6] : s8i**
-        %9 = cmp ne %5, %8 : bool
-        if %9 {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %5 = call @foo() : s8i** [all]
+                %6 = const 206 : s64i
+                %7 = get_global @wordlist : s8i*[207]*
+                get_element
+                cmp
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

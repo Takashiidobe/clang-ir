@@ -1,14 +1,14 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr91635.c" (c, x86_64-unknown-linux-gnu)
-global b : u16i = 0 [external, default, align 2, dso_local]
-global u : s32i = 0 [external, default, align 4, dso_local]
-global v : s32i = 0 [external, default, align 4, dso_local]
-global c : u16i = 0 [external, default, align 2, dso_local]
-global w : s32i = 0 [external, default, align 4, dso_local]
-global x : s32i = 0 [external, default, align 4, dso_local]
+global b : u16i = CirInt { ty: Named("u16i"), value: "0" } [external, default, align 2, dso_local]
+global u : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global v : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global c : u16i = CirInt { ty: Named("u16i"), value: "0" } [external, default, align 2, dso_local]
+global w : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global x : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn foo(%arg3: u16i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg3: u16i):
@@ -17,21 +17,21 @@ fn foo(%arg3: u16i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %arg3, %87
         %89 = load %87 : u16i, align 2
         %90 = cast(integral) %89 : s32i
-        %91 = minus %90 : s32i [nsw]
+        minus
         %92 = const -1 : s32i
         %93 = get_global @b : u16i*
-        %94#0, %94#1 = add.overflow %91, %92 : u16i
+        add.overflow
         store %94#0, %93, align 2
         %95 = cast(bool_to_int) %94#1 : s32i
         %96 = load %87 : u16i, align 2
         %97 = cast(integral) %96 : s32i
-        %98 = shift left %97, %95 : s32i
+        shift
         %99 = cast(integral) %98 : u16i
         store %99, %87, align 2
         %100 = const 1 : s32i
         %101 = load %87 : u16i, align 2
         %102 = cast(integral) %101 : s32i
-        %103 = shift right %102, %100 : s32i
+        shift
         %104 = cast(integral) %103 : u16i
         store %104, %87, align 2
         %105 = load %87 : u16i, align 2
@@ -47,16 +47,16 @@ fn bar(%arg2: u16i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %arg2, %70
         %72 = const -14 : s32i
         %73 = const 15 : s32i
-        %74 = and %72, %73 : s32i
+        and
         %75 = load %70 : u16i, align 2
         %76 = cast(integral) %75 : s32i
-        %77 = shift left %76, %74 : s32i
+        shift
         %78 = cast(integral) %77 : u16i
         store %78, %70, align 2
         %79 = load %70 : u16i, align 2
         %80 = cast(integral) %79 : s32i
         %81 = const 2 : s32i
-        %82 = shift right %80, %81 : s32i
+        shift
         %83 = cast(integral) %82 : u16i
         store %83, %70, align 2
         %84 = load %70 : u16i, align 2
@@ -73,7 +73,7 @@ fn baz(%arg1: u16i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %51 = const 1 : s32i
         %52 = load %49 : u16i, align 2
         %53 = cast(integral) %52 : s32i
-        %54 = shift left %53, %51 : s32i
+        shift
         %55 = cast(integral) %54 : u16i
         store %55, %49, align 2
         %56 = const 8719476735 : s64i
@@ -81,12 +81,12 @@ fn baz(%arg1: u16i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %58 = load %57 : s32i, align 4
         %59 = get_global @v : s32i*
         %60 = cast(integral) %58 : s64i
-        %61#0, %61#1 = add.overflow %56, %60 : s32i
+        add.overflow
         store %61#0, %59, align 4
         %62 = cast(bool_to_int) %61#1 : s32i
         %63 = load %49 : u16i, align 2
         %64 = cast(integral) %63 : s32i
-        %65 = shift right %64, %62 : s32i
+        shift
         %66 = cast(integral) %65 : u16i
         store %66, %49, align 2
         %67 = load %49 : u16i, align 2
@@ -107,7 +107,7 @@ fn qux(%arg0: u32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %25 = get_global @c : u16i*
         %26 = load %25 : u16i, align 2
         %27 = cast(integral) %26 : u32i
-        %28 = mul %27, %24 : u32i
+        mul
         %29 = cast(integral) %28 : u16i
         store %29, %25, align 2
         %30 = get_global @c : u16i*
@@ -115,8 +115,8 @@ fn qux(%arg0: u32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %32 = cast(integral) %31 : s32i
         %33 = const -15 : s32i
         %34 = const 5 : s32i
-        %35 = and %33, %34 : s32i
-        %36 = shift right %32, %35 : s32i
+        and
+        shift
         %37 = cast(integral) %36 : u16i
         %38 = get_global @c : u16i*
         store %37, %38, align 2
@@ -135,55 +135,55 @@ fn qux(%arg0: u32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %16 = const 65535 : u16i
-        %17 = call @foo(%16) : s32i [all]
-        %18 = const 32767 : s32i
-        %19 = cmp ne %17, %18 : bool
-        if %19 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %16 = const 65535 : u16i
+                %17 = call @foo(%16) : s32i [all]
+                %18 = const 32767 : s32i
+                cmp
+                if %19 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %12 = const 5 : u16i
-        %13 = call @bar(%12) : s32i [all]
-        %14 = const 5 : s32i
-        %15 = cmp ne %13, %14 : bool
-        if %15 {
-            call @abort() [all]
-            yield
+        scope {
+                %12 = const 5 : u16i
+                %13 = call @bar(%12) : s32i [all]
+                %14 = const 5 : s32i
+                cmp
+                if %15 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %8 = const 65535 : u16i
-        %9 = call @baz(%8) : s32i [all]
-        %10 = const 32767 : s32i
-        %11 = cmp ne %9, %10 : bool
-        if %11 {
-            call @abort() [all]
-            yield
+        scope {
+                %8 = const 65535 : u16i
+                %9 = call @baz(%8) : s32i [all]
+                %10 = const 32767 : s32i
+                cmp
+                if %11 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %4 = const 2 : u32i
-        %5 = call @qux(%4) : s32i [all]
-        %6 = const 32766 : s32i
-        %7 = cmp ne %5, %6 : bool
-        if %7 {
-            call @abort() [all]
-            yield
+        scope {
+                %4 = const 2 : u32i
+                %5 = call @qux(%4) : s32i [all]
+                %6 = const 32766 : s32i
+                cmp
+                if %7 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

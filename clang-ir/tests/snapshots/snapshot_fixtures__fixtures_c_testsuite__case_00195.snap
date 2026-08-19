@@ -1,51 +1,51 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.c-testsuite/case_00195.c" (c, x86_64-unknown-linux-gnu)
-global point_array : rec_point[100] = zero [external, default, align 16, dso_local]
-global .str : s8i[8] = "%f, %f\n" [cir_private, default, align 1, dso_local, constant]
+global point_array : rec_point[100] = Zero { ty: Array { element_type: Named("rec_point"), size: 100 } } [external, default, align 16, dso_local]
+global .str : s8i[8] = ConstArray { ty: Array { element_type: Named("s8i"), size: 8 }, elts: Str("%f, %f\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "my_point", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 10 : s32i
-    store %3, %1, align 4
-    %4 = const 1.234000e+01 : double
-    %5 = load %1 : s32i, align 4
-    %6 = cast(integral) %5 : s64i
-    %7 = get_global @point_array : rec_point[100]*
-    %8 = get_element %7[%6] : rec_point*
-    %9 = get_member %8[0] "x" : double*
-    store %4, %9, align 16
-    %10 = const 5.678000e+01 : double
-    %11 = load %1 : s32i, align 4
-    %12 = cast(integral) %11 : s64i
-    %13 = get_global @point_array : rec_point[100]*
-    %14 = get_element %13[%12] : rec_point*
-    %15 = get_member %14[1] "y" : double*
-    store %10, %15, align 8
-    %16 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %17 = get_global @.str : s8i[8]*
-    %18 = cast(array_to_ptrdecay) %17 : s8i*
-    %19 = load %1 : s32i, align 4
-    %20 = cast(integral) %19 : s64i
-    %21 = get_global @point_array : rec_point[100]*
-    %22 = get_element %21[%20] : rec_point*
-    %23 = get_member %22[0] "x" : double*
-    %24 = load %23 : double, align 16
-    %25 = load %1 : s32i, align 4
-    %26 = cast(integral) %25 : s64i
-    %27 = get_global @point_array : rec_point[100]*
-    %28 = get_element %27[%26] : rec_point*
-    %29 = get_member %28[1] "y" : double*
-    %30 = load %29 : double, align 8
-    %31 = call @printf(%18, %24, %30) : s32i [all]
-    %32 = const 0 : s32i
-    store %32, %0
-    %33 = load %0 : s32i
-    return %33
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "my_point", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 10 : s32i
+        store %3, %1, align 4
+        %4 = const 1.234000e+01 : double
+        %5 = load %1 : s32i, align 4
+        %6 = cast(integral) %5 : s64i
+        %7 = get_global @point_array : rec_point[100]*
+        get_element
+        get_member
+        store %4, %9, align 16
+        %10 = const 5.678000e+01 : double
+        %11 = load %1 : s32i, align 4
+        %12 = cast(integral) %11 : s64i
+        %13 = get_global @point_array : rec_point[100]*
+        get_element
+        get_member
+        store %10, %15, align 8
+        %16 = get_global @printf : (s8i*, ...) -> s32i*
+        %17 = get_global @.str : s8i[8]*
+        %18 = cast(array_to_ptrdecay) %17 : s8i*
+        %19 = load %1 : s32i, align 4
+        %20 = cast(integral) %19 : s64i
+        %21 = get_global @point_array : rec_point[100]*
+        get_element
+        get_member
+        %24 = load %23 : double, align 16
+        %25 = load %1 : s32i, align 4
+        %26 = cast(integral) %25 : s64i
+        %27 = get_global @point_array : rec_point[100]*
+        get_element
+        get_member
+        %30 = load %29 : double, align 8
+        %31 = call @printf(%18, %24, %30) : s32i [all]
+        %32 = const 0 : s32i
+        store %32, %0
+        %33 = load %0 : s32i
+        return %33
 }

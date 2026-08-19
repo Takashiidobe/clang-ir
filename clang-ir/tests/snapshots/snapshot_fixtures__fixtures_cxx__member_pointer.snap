@@ -1,14 +1,14 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.cxx/member_pointer.cpp" (cxx, x86_64-unknown-linux-gnu)
 fn _Z11call_methodP3FooMS_FiiEi(%arg2: rec_Foo*, %arg3: s64i, %arg4: s64i, %arg5: s32i) -> s32i [external, c, no_inline, dso_local] {
     ^bb0(%arg2: rec_Foo*, %arg3: s64i, %arg4: s64i, %arg5: s32i):
         %10 = alloca rec_anon_struct, "coerce", align 8
-        %11 = get_member %10[0] "" : s64i*
+        get_member
         store %arg3, %11
-        %12 = get_member %10[1] "" : s64i*
+        get_member
         store %arg4, %12
         %13 = load %10 : rec_anon_struct
         %14 = alloca rec_Foo*, "object", align 8
@@ -21,26 +21,26 @@ fn _Z11call_methodP3FooMS_FiiEi(%arg2: rec_Foo*, %arg3: s64i, %arg4: s64i, %arg5
         %18 = load %14 : rec_Foo*, align 8
         %19 = load %15 : rec_anon_struct, align 8
         %20 = const 1 : s64i
-        %21 = extract_member %19[1] : s64i
+        extract_member
         %22 = cast(bitcast) %18 : void*
-        %23 = ptr_stride %22, %21 : void*
-        %24 = extract_member %19[0] : s64i
-        %25 = and %24, %20 : s64i
-        %26 = cmp eq %25, %20 : bool
-        %27 = ternary %26 ? { : ((void*, s32i) -> s32i)*
-            %32 = cast(bitcast) %23 : s8i**
-            %33 = load %32 : s8i*
-            %34 = sub %24, %20 : s64i
-            %35 = ptr_stride %33, %34 : s8i*
-            %36 = cast(bitcast) %35 : ((void*, s32i) -> s32i)**
-            %37 = load %36 : ((void*, s32i) -> s32i)*
-            yield %37
+        ptr_stride
+        extract_member
+        and
+        cmp
+        %27 = ternary %26 ? { : (void*, s32i) -> s32i*
+                %32 = cast(bitcast) %23 : s8i**
+                %33 = load %32 : s8i*
+                sub
+                ptr_stride
+                %36 = cast(bitcast) %35 : (void*, s32i) -> s32i**
+                %37 = load %36 : (void*, s32i) -> s32i*
+                yield %37
         } : {
-            %31 = cast(int_to_ptr) %24 : ((void*, s32i) -> s32i)*
-            yield %31
+                %31 = cast(int_to_ptr) %24 : (void*, s32i) -> s32i*
+                yield %31
         }
         %28 = load %16 : s32i, align 4
-        %29 = call %27(%23, %28) : s32i [all]
+        %29 = call (%23, %28) : s32i [all]
         store %29, %17
         %30 = load %17 : s32i
         return %30
@@ -55,7 +55,7 @@ fn _Z11access_dataP3FooMS_i(%arg0: rec_Foo*, %arg1: s64i) -> s32i [external, c, 
         %3 = load %0 : rec_Foo*, align 8
         %4 = load %1 : s64i, align 8
         %5 = cast(bitcast) %3 : s8i*
-        %6 = ptr_stride %5, %4 : s8i*
+        ptr_stride
         %7 = cast(bitcast) %6 : s32i*
         %8 = load %7 : s32i, align 4
         store %8, %2

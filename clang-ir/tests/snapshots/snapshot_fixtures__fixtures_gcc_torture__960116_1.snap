@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/960116-1.c" (c, x86_64-unknown-linux-gnu)
@@ -11,9 +11,9 @@ fn p(%arg1: s32i*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         %27 = load %25 : s32i*, align 8
         %28 = cast(ptr_to_int) %27 : s64i
         %29 = const 1 : s64i
-        %30 = and %28, %29 : s64i
+        and
         %31 = cast(int_to_bool) %30 : bool
-        %32 = not %31 : bool
+        not
         %33 = cast(bool_to_int) %32 : s32i
         store %33, %26
         %34 = load %26 : s32i
@@ -25,25 +25,25 @@ fn f(%arg0: s32i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %12 = alloca s32i, "__retval", align 4
         store %arg0, %11
         scope {
-            %15 = load %11 : s32i*, align 8
-            %16 = call @p(%15) : s32i [all]
-            %17 = cast(int_to_bool) %16 : bool
-            %18 = ternary %17 ? { : bool
-                %22 = load %11 : s32i*, align 8
-                %23 = load %22 : s32i, align 4
-                %24 = cast(int_to_bool) %23 : bool
-                yield %24
-            } : {
-                %21 = const false : bool
-                yield %21
-            }
-            if %18 {
-                %19 = const 1 : s32i
-                store %19, %12
-                %20 = load %12 : s32i
-                return %20
-            }
-            yield
+                %15 = load %11 : s32i*, align 8
+                %16 = call @p(%15) : s32i [all]
+                %17 = cast(int_to_bool) %16 : bool
+                %18 = ternary %17 ? { : bool
+                        %22 = load %11 : s32i*, align 8
+                        %23 = load %22 : s32i, align 4
+                        %24 = cast(int_to_bool) %23 : bool
+                        yield %24
+                } : {
+                        %21 = const false : bool
+                        yield %21
+                }
+                if %18 {
+                        %19 = const 1 : s32i
+                        store %19, %12
+                        %20 = load %12 : s32i
+                        return %20
+                }
+                yield
         }
         %13 = const 0 : s32i
         store %13, %12
@@ -53,25 +53,25 @@ fn f(%arg0: s32i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %5 = const 4294967295 : u64i
-        %6 = cast(int_to_ptr) %5 : s32i*
-        %7 = call @f(%6) : s32i [all]
-        %8 = const 0 : s32i
-        %9 = cmp ne %7, %8 : bool
-        if %9 {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %5 = const 4294967295 : u64i
+                %6 = cast(int_to_ptr) %5 : s32i*
+                %7 = call @f(%6) : s32i [all]
+                %8 = const 0 : s32i
+                cmp
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

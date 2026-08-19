@@ -1,34 +1,34 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/math/modf.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[7] = "%f %f\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[7] = ConstArray { ty: Array { element_type: Named("s8i"), size: 7 }, elts: Str("%f %f\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca double, "ip", align 8
-    %2 = alloca double, "x", align 8
-    %3 = alloca double, "fp", align 8
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = const 0.000000e+00 : double
-    store %5, %1, align 8
-    %6 = const 3.750000e+00 : double
-    store %6, %2, align 8, volatile
-    %7 = load %2 : double, align 8, volatile
-    %8#0, %8#1 = modf %7 : double
-    store %8#1, %1, align 8
-    store %8#0, %3, align 8
-    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %10 = get_global @.str : s8i[7]*
-    %11 = cast(array_to_ptrdecay) %10 : s8i*
-    %12 = load %1 : double, align 8
-    %13 = load %3 : double, align 8
-    %14 = call @printf(%11, %12, %13) : s32i [all]
-    %15 = const 0 : s32i
-    store %15, %0
-    %16 = load %0 : s32i
-    return %16
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca double, "ip", align 8
+        %2 = alloca double, "x", align 8
+        %3 = alloca double, "fp", align 8
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = const 0.000000e+00 : double
+        store %5, %1, align 8
+        %6 = const 3.750000e+00 : double
+        store %6, %2, align 8
+        %7 = load %2 : double, align 8
+        modf
+        store %8#1, %1, align 8
+        store %8#0, %3, align 8
+        %9 = get_global @printf : (s8i*, ...) -> s32i*
+        %10 = get_global @.str : s8i[7]*
+        %11 = cast(array_to_ptrdecay) %10 : s8i*
+        %12 = load %1 : double, align 8
+        %13 = load %3 : double, align 8
+        %14 = call @printf(%11, %12, %13) : s32i [all]
+        %15 = const 0 : s32i
+        store %15, %0
+        %16 = load %0 : s32i
+        return %16
 }

@@ -1,27 +1,27 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20080604-1.c" (c, x86_64-unknown-linux-gnu)
-global x : rec_barstruct = zero [external, default, align 8, dso_local]
-global .str : s8i[14] = "Everything OK" [cir_private, default, align 1, dso_local, constant]
+global x : rec_barstruct = Zero { ty: Named("rec_barstruct") } [external, default, align 8, dso_local]
+global .str : s8i[14] = ConstArray { ty: Array { element_type: Named("s8i"), size: 14 }, elts: Str("Everything OK"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn abort() -> void [external, c, nothrow];
 fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
-    scope {
-        %33 = get_global @x : rec_barstruct*
-        %34 = get_member %33[0] "some_string" : s8i**
-        %35 = load %34 : s8i*, align 8
-        %36 = cast(ptr_to_bool) %35 : bool
-        %37 = not %36 : bool
-        if %37 {
-            %38 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %33 = get_global @x : rec_barstruct*
+                get_member
+                %35 = load %34 : s8i*, align 8
+                %36 = cast(ptr_to_bool) %35 : bool
+                not
+                if %37 {
+                        %38 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    return
+        return
 }
 fn baz(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i):
@@ -30,62 +30,62 @@ fn baz(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %16 = alloca rec_barstruct*, "barptr", align 8
         store %arg0, %14
         scope {
-            %25 = load %14 : s32i, align 4
-            %26 = cast(int_to_bool) %25 : bool
-            if %26 {
-                store %15, %16, align 8
+                %25 = load %14 : s32i, align 4
+                %26 = cast(int_to_bool) %25 : bool
+                if %26 {
+                        store %15, %16, align 8
+                        yield
+                } else {
+                        %27 = get_global @x : rec_barstruct*
+                        %28 = const 1 : s32i
+                        ptr_stride
+                        store %29, %16, align 8
+                        %30 = load %16 : rec_barstruct*, align 8
+                        %31 = const -1 : s32i
+                        ptr_stride
+                        store %32, %16, align 8
+                        yield
+                }
                 yield
-            } else {
-                %27 = get_global @x : rec_barstruct*
-                %28 = const 1 : s32i
-                %29 = ptr_stride %27, %28 : rec_barstruct*
-                store %29, %16, align 8
-                %30 = load %16 : rec_barstruct*, align 8
-                %31 = const -1 : s32i
-                %32 = ptr_stride %30, %31 : rec_barstruct*
-                store %32, %16, align 8
-                yield
-            }
-            yield
         }
         %17 = get_global @.str : s8i[14]*
         %18 = cast(array_to_ptrdecay) %17 : s8i*
         %19 = load %16 : rec_barstruct*, align 8
-        %20 = get_member %19[0] "some_string" : s8i**
+        get_member
         store %18, %20, align 8
         call @foo() [all]
         %21 = get_global @.str : s8i[14]*
         %22 = cast(array_to_ptrdecay) %21 : s8i*
         %23 = load %16 : rec_barstruct*, align 8
-        %24 = get_member %23[0] "some_string" : s8i**
+        get_member
         store %22, %24, align 8
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const #cir.ptr<null> : s8i*
-    %3 = get_global @x : rec_barstruct*
-    %4 = get_member %3[0] "some_string" : s8i**
-    store %2, %4, align 8
-    %5 = const 0 : s32i
-    call @baz(%5) [all]
-    scope {
-        %8 = get_global @x : rec_barstruct*
-        %9 = get_member %8[0] "some_string" : s8i**
-        %10 = load %9 : s8i*, align 8
-        %11 = cast(ptr_to_bool) %10 : bool
-        %12 = not %11 : bool
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const #cir.ptr<null> : s8i*
+        %3 = get_global @x : rec_barstruct*
+        get_member
+        store %2, %4, align 8
+        %5 = const 0 : s32i
+        call @baz(%5) [all]
+        scope {
+                %8 = get_global @x : rec_barstruct*
+                get_member
+                %10 = load %9 : s8i*, align 8
+                %11 = cast(ptr_to_bool) %10 : bool
+                not
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

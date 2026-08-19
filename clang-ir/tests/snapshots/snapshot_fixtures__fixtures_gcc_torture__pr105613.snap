@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr105613.c" (c, x86_64-unknown-linux-gnu)
@@ -15,8 +15,8 @@ fn foo(%arg0: vector<2 x u64i>, %arg1: vector<1 x u128i>*) -> void [external, c,
         store %arg1, %42
         %43 = load %41 : vector<1 x u128i>, align 16
         %44 = const 0 : u128i
-        %45 = vec.splat %44 : vector<1 x u128i>
-        %46 = vec.cmp ne %43, %45 : vector<1 x s128i>
+        vec.splat
+        vec.cmp
         %47 = cast(bitcast) %46 : vector<1 x u128i>
         %48 = load %42 : vector<1 x u128i>*, align 8
         store %47, %48, align 16
@@ -24,75 +24,75 @@ fn foo(%arg0: vector<2 x u64i>, %arg1: vector<1 x u128i>*) -> void [external, c,
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca vector<1 x u128i>, "coerce", align 16
-    %1 = alloca vector<1 x u128i>, "coerce", align 16
-    %2 = alloca vector<1 x u128i>, "coerce", align 16
-    %3 = alloca s32i, "__retval", align 4
-    %4 = alloca vector<1 x u128i>, "r", align 16
-    %5 = alloca vector<1 x u128i>, ".compoundliteral", align 16
-    %6 = alloca vector<1 x u128i>, ".compoundliteral", align 16
-    %7 = alloca vector<1 x u128i>, ".compoundliteral", align 16
-    %8 = const 0 : s32i
-    store %8, %3
-    %9 = const [5] : vector<1 x u128i>
-    store %9, %5, align 16
-    %10 = load %5 : vector<1 x u128i>, align 16
-    store %10, %2
-    %11 = cast(bitcast) %2 : vector<2 x u64i>*
-    %12 = load %11 : vector<2 x u64i>
-    call @foo(%12, %4) [all]
-    scope {
-        %33 = load %4 : vector<1 x u128i>, align 16
-        %34 = const 0 : s32i
-        %35 = vec.extract %33[%34] : u128i
-        %36 = const 340282366920938463463374607431768211455 : u128i
-        %37 = cmp ne %35, %36 : bool
-        if %37 {
-            call @abort() [all]
-            yield
+        %0 = alloca vector<1 x u128i>, "coerce", align 16
+        %1 = alloca vector<1 x u128i>, "coerce", align 16
+        %2 = alloca vector<1 x u128i>, "coerce", align 16
+        %3 = alloca s32i, "__retval", align 4
+        %4 = alloca vector<1 x u128i>, "r", align 16
+        %5 = alloca vector<1 x u128i>, ".compoundliteral", align 16
+        %6 = alloca vector<1 x u128i>, ".compoundliteral", align 16
+        %7 = alloca vector<1 x u128i>, ".compoundliteral", align 16
+        %8 = const 0 : s32i
+        store %8, %3
+        %9 = const [[5]] : vector<1 x u128i>
+        store %9, %5, align 16
+        %10 = load %5 : vector<1 x u128i>, align 16
+        store %10, %2
+        %11 = cast(bitcast) %2 : vector<2 x u64i>*
+        %12 = load %11 : vector<2 x u64i>
+        call @foo(%12, %4) [all]
+        scope {
+                %33 = load %4 : vector<1 x u128i>, align 16
+                %34 = const 0 : s32i
+                vec.extract
+                %36 = const 340282366920938463463374607431768211455 : u128i
+                cmp
+                if %37 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %13 = const [21474836485] : vector<1 x u128i>
-    store %13, %6, align 16
-    %14 = load %6 : vector<1 x u128i>, align 16
-    store %14, %1
-    %15 = cast(bitcast) %1 : vector<2 x u64i>*
-    %16 = load %15 : vector<2 x u64i>
-    call @foo(%16, %4) [all]
-    scope {
-        %28 = load %4 : vector<1 x u128i>, align 16
-        %29 = const 0 : s32i
-        %30 = vec.extract %28[%29] : u128i
-        %31 = const 340282366920938463463374607431768211455 : u128i
-        %32 = cmp ne %30, %31 : bool
-        if %32 {
-            call @abort() [all]
-            yield
+        %13 = const [[21474836485]] : vector<1 x u128i>
+        store %13, %6, align 16
+        %14 = load %6 : vector<1 x u128i>, align 16
+        store %14, %1
+        %15 = cast(bitcast) %1 : vector<2 x u64i>*
+        %16 = load %15 : vector<2 x u64i>
+        call @foo(%16, %4) [all]
+        scope {
+                %28 = load %4 : vector<1 x u128i>, align 16
+                %29 = const 0 : s32i
+                vec.extract
+                %31 = const 340282366920938463463374607431768211455 : u128i
+                cmp
+                if %32 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %17 = const [0] : vector<1 x u128i>
-    store %17, %7, align 16
-    %18 = load %7 : vector<1 x u128i>, align 16
-    store %18, %0
-    %19 = cast(bitcast) %0 : vector<2 x u64i>*
-    %20 = load %19 : vector<2 x u64i>
-    call @foo(%20, %4) [all]
-    scope {
-        %23 = load %4 : vector<1 x u128i>, align 16
-        %24 = const 0 : s32i
-        %25 = vec.extract %23[%24] : u128i
-        %26 = const 0 : u128i
-        %27 = cmp ne %25, %26 : bool
-        if %27 {
-            call @abort() [all]
-            yield
+        %17 = const [[0]] : vector<1 x u128i>
+        store %17, %7, align 16
+        %18 = load %7 : vector<1 x u128i>, align 16
+        store %18, %0
+        %19 = cast(bitcast) %0 : vector<2 x u64i>*
+        %20 = load %19 : vector<2 x u64i>
+        call @foo(%20, %4) [all]
+        scope {
+                %23 = load %4 : vector<1 x u128i>, align 16
+                %24 = const 0 : s32i
+                vec.extract
+                %26 = const 0 : u128i
+                cmp
+                if %27 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %21 = const 0 : s32i
-    store %21, %3
-    %22 = load %3 : s32i
-    return %22
+        %21 = const 0 : s32i
+        store %21, %3
+        %22 = load %3 : s32i
+        return %22
 }

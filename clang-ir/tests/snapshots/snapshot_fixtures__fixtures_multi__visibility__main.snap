@@ -1,54 +1,54 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.multi/visibility/main.c" (c, x86_64-unknown-linux-gnu)
-global default_global : s32i = 4 [external, default, align 4, dso_local]
-global hidden_global : s32i = 5 [external, hidden, align 4, dso_local]
-global protected_global : s32i = 6 [external, protected, align 4, dso_local]
-global .str : s8i[19] = "%d %d %d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global default_global : s32i = CirInt { ty: Named("s32i"), value: "4" } [external, default, align 4, dso_local]
+global hidden_global : s32i = CirInt { ty: Named("s32i"), value: "5" } [external, hidden, align 4, dso_local]
+global protected_global : s32i = CirInt { ty: Named("s32i"), value: "6" } [external, protected, align 4, dso_local]
+global .str : s8i[19] = ConstArray { ty: Array { element_type: Named("s8i"), size: 19 }, elts: Str("%d %d %d %d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn default_fn() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %23 = alloca s32i, "__retval", align 4
-    %24 = const 1 : s32i
-    store %24, %23
-    %25 = load %23 : s32i
-    return %25
+        %23 = alloca s32i, "__retval", align 4
+        %24 = const 1 : s32i
+        store %24, %23
+        %25 = load %23 : s32i
+        return %25
 }
 fn hidden_fn() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %20 = alloca s32i, "__retval", align 4
-    %21 = const 2 : s32i
-    store %21, %20
-    %22 = load %20 : s32i
-    return %22
+        %20 = alloca s32i, "__retval", align 4
+        %21 = const 2 : s32i
+        store %21, %20
+        %22 = load %20 : s32i
+        return %22
 }
 fn protected_fn() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %17 = alloca s32i, "__retval", align 4
-    %18 = const 3 : s32i
-    store %18, %17
-    %19 = load %17 : s32i
-    return %19
+        %17 = alloca s32i, "__retval", align 4
+        %18 = const 3 : s32i
+        store %18, %17
+        %19 = load %17 : s32i
+        return %19
 }
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[19]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = call @default_fn() : s32i [all]
-    %6 = call @hidden_fn() : s32i [all]
-    %7 = call @protected_fn() : s32i [all]
-    %8 = get_global @default_global : s32i*
-    %9 = load %8 : s32i, align 4
-    %10 = get_global @hidden_global : s32i*
-    %11 = load %10 : s32i, align 4
-    %12 = get_global @protected_global : s32i*
-    %13 = load %12 : s32i, align 4
-    %14 = call @printf(%4, %5, %6, %7, %9, %11, %13) : s32i [all]
-    %15 = const 0 : s32i
-    store %15, %0
-    %16 = load %0 : s32i
-    return %16
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[19]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = call @default_fn() : s32i [all]
+        %6 = call @hidden_fn() : s32i [all]
+        %7 = call @protected_fn() : s32i [all]
+        %8 = get_global @default_global : s32i*
+        %9 = load %8 : s32i, align 4
+        %10 = get_global @hidden_global : s32i*
+        %11 = load %10 : s32i, align 4
+        %12 = get_global @protected_global : s32i*
+        %13 = load %12 : s32i, align 4
+        %14 = call @printf(%4, %5, %6, %7, %9, %11, %13) : s32i [all]
+        %15 = const 0 : s32i
+        store %15, %0
+        %16 = load %0 : s32i
+        return %16
 }

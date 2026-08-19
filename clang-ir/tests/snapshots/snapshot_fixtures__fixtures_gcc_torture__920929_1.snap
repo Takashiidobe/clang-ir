@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/920929-1.c" (c, x86_64-unknown-linux-gnu)
@@ -11,52 +11,52 @@ fn f(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %6
         %9 = load %6 : s32i, align 4
         %10 = cast(integral) %9 : u64i
-        %11 = stacksave : u8i*
+        stacksave
         store %11, %8, align 8
         cleanup.scope {
-            %13 = alloca double, "v", align 16, dynamic %10
-            scope {
-                %14 = const 0 : s32i
-                store %14, %7, align 4
-                for cond: {
-                    %22 = load %7 : s32i, align 4
-                    %23 = load %6 : s32i, align 4
-                    %24 = cmp lt %22, %23 : bool
-                    condition %24
-                } step: {
-                    %15 = load %7 : s32i, align 4
-                    %16 = inc %15 : s32i [nsw]
-                    store %16, %7, align 4
-                    yield
-                } do {
-                    %17 = const 0 : s32i
-                    %18 = cast(int_to_float) %17 : double
-                    %19 = load %7 : s32i, align 4
-                    %20 = cast(integral) %19 : s64i
-                    %21 = ptr_stride %13, %20 : double*
-                    store %18, %21, align 8
-                    yield
+                %13 = alloca double, "v", size(%10), align 16
+                scope {
+                        %14 = const 0 : s32i
+                        store %14, %7, align 4
+                        for cond {
+                                %22 = load %7 : s32i, align 4
+                                %23 = load %6 : s32i, align 4
+                                cmp
+                                condition %24
+                        } step {
+                                %15 = load %7 : s32i, align 4
+                                inc
+                                store %16, %7, align 4
+                                yield
+                        } body {
+                                %17 = const 0 : s32i
+                                %18 = cast(int_to_float) %17 : double
+                                %19 = load %7 : s32i, align 4
+                                %20 = cast(integral) %19 : s64i
+                                ptr_stride
+                                store %18, %21, align 8
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         } cleanup normal {
-            %12 = load %8 : u8i*, align 8
-            stackrestore %12
-            yield
+                %12 = load %8 : u8i*, align 8
+                stackrestore
+                yield
         }
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 100 : s32i
-    call @f(%2) [all]
-    %3 = get_global @exit : ((s32i) -> void)*
-    %4 = const 0 : s32i
-    call @exit(%4) [all]
-    %5 = load %0 : s32i
-    return %5
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 100 : s32i
+        call @f(%2) [all]
+        %3 = get_global @exit : (s32i) -> void*
+        %4 = const 0 : s32i
+        call @exit(%4) [all]
+        %5 = load %0 : s32i
+        return %5
 }

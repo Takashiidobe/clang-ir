@@ -1,16 +1,16 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/lto-tbaa-1.c" (c, x86_64-unknown-linux-gnu)
-global d : s32i = 0 [external, default, align 4, dso_local]
-global e : s32i = 0 [external, default, align 4, dso_local]
-global b : rec_b = {@e} [external, default, align 8, dso_local]
-global b2 : rec_b = zero [external, default, align 8, dso_local]
-global ptr : s32i** = @b2 [external, default, align 8, dso_local]
-global a : rec_a* = #cir.ptr<null> [external, default, align 8, dso_local]
-global b3 : rec_b = zero [external, default, align 8, dso_local]
-global c : rec_c* = #cir.ptr<null> [external, default, align 8, dso_local]
+global d : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global e : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global b : rec_b = ConstRecord { ty: Named("rec_b"), members: Array([GlobalView { ty: Pointer { pointee: Named("s32i"), addr_space: None }, symbol: "e", indices: None }]) } [external, default, align 8, dso_local]
+global b2 : rec_b = Zero { ty: Named("rec_b") } [external, default, align 8, dso_local]
+global ptr : s32i** = GlobalView { ty: Pointer { pointee: Pointer { pointee: Named("s32i"), addr_space: None }, addr_space: None }, symbol: "b2", indices: None } [external, default, align 8, dso_local]
+global a : rec_a* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("rec_a"), addr_space: None }) } [external, default, align 8, dso_local]
+global b3 : rec_b = Zero { ty: Named("rec_b") } [external, default, align 8, dso_local]
+global c : rec_c* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("rec_c"), addr_space: None }) } [external, default, align 8, dso_local]
 
 fn use_a(%arg3: rec_a*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg3: rec_a*):
@@ -45,44 +45,44 @@ fn retme(%arg0: s32i**) -> s32i** [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const #cir.ptr<null> : rec_a*
-    %3 = get_global @a : rec_a**
-    store %2, %3, align 8
-    %4 = get_global @e : s32i*
-    %5 = get_global @b : rec_b*
-    %6 = get_member %5[0] "b" : s32i**
-    store %4, %6, align 8
-    %7 = get_global @b : rec_b*
-    %8 = get_member %7[0] "b" : s32i**
-    %9 = call @retme(%8) : s32i** [all]
-    %10 = get_global @ptr : s32i***
-    store %9, %10, align 8
-    %11 = get_global @ptr : s32i***
-    %12 = load %11 : s32i**, align 8
-    call @set_b(%12) [all]
-    %13 = get_global @b3 : rec_b*
-    %14 = get_global @b : rec_b*
-    copy %13, %14
-    scope {
-        %19 = get_global @b3 : rec_b*
-        %20 = get_member %19[0] "b" : s32i**
-        %21 = load %20 : s32i*, align 8
-        %22 = get_global @d : s32i*
-        %23 = cmp ne %21, %22 : bool
-        if %23 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const #cir.ptr<null> : rec_a*
+        %3 = get_global @a : rec_a**
+        store %2, %3, align 8
+        %4 = get_global @e : s32i*
+        %5 = get_global @b : rec_b*
+        get_member
+        store %4, %6, align 8
+        %7 = get_global @b : rec_b*
+        get_member
+        %9 = call @retme(%8) : s32i** [all]
+        %10 = get_global @ptr : s32i***
+        store %9, %10, align 8
+        %11 = get_global @ptr : s32i***
+        %12 = load %11 : s32i**, align 8
+        call @set_b(%12) [all]
+        %13 = get_global @b3 : rec_b*
+        %14 = get_global @b : rec_b*
+        copy
+        scope {
+                %19 = get_global @b3 : rec_b*
+                get_member
+                %21 = load %20 : s32i*, align 8
+                %22 = get_global @d : s32i*
+                cmp
+                if %23 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %15 = const #cir.ptr<null> : rec_c*
-    %16 = get_global @c : rec_c**
-    store %15, %16, align 8
-    %17 = const 0 : s32i
-    store %17, %0
-    %18 = load %0 : s32i
-    return %18
+        %15 = const #cir.ptr<null> : rec_c*
+        %16 = get_global @c : rec_c**
+        store %15, %16, align 8
+        %17 = const 0 : s32i
+        store %17, %0
+        %18 = load %0 : s32i
+        return %18
 }

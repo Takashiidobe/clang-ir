@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20080117-1.c" (c, x86_64-unknown-linux-gnu)
-global gstate_initial : rec_gs_imager_state_s = {{1, 0, 0.000000e+00}} [internal, default, align 4, dso_local, constant]
+global gstate_initial : rec_gs_imager_state_s = ConstRecord { ty: Named("rec_gs_imager_state_s"), members: Array([ConstRecord { ty: Named("rec_anon2E0"), members: Array([CirInt { ty: Named("s32i"), value: "1" }, CirInt { ty: Named("s32i"), value: "0" }, CirFloat { ty: Single, value: "0.000000e+00" }]) }]) } [internal, default, align 4, dso_local, constant]
 
 fn gstate_path_memory(%arg0: rec_gs_imager_state_s*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: rec_gs_imager_state_s*):
@@ -11,36 +11,36 @@ fn gstate_path_memory(%arg0: rec_gs_imager_state_s*) -> void [external, c, no_in
         store %arg0, %13
         %14 = load %13 : rec_gs_imager_state_s*, align 8
         %15 = get_global @gstate_initial : rec_gs_imager_state_s*
-        copy %14, %15
+        copy
         return
 }
 fn gs_state_update_overprint() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %8 = alloca s32i, "__retval", align 4
-    %9 = get_global @gstate_initial : rec_gs_imager_state_s*
-    %10 = get_member %9[0] "line_params" : rec_anon2E0*
-    %11 = const 1 : s32i
-    store %11, %8
-    %12 = load %8 : s32i
-    return %12
+        %8 = alloca s32i, "__retval", align 4
+        %9 = get_global @gstate_initial : rec_gs_imager_state_s*
+        get_member
+        %11 = const 1 : s32i
+        store %11, %8
+        %12 = load %8 : s32i
+        return %12
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = call @gs_state_update_overprint() : s32i [all]
-        %5 = const 1 : s32i
-        %6 = cmp ne %4, %5 : bool
-        if %6 {
-            %7 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = call @gs_state_update_overprint() : s32i [all]
+                %5 = const 1 : s32i
+                cmp
+                if %6 {
+                        %7 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

@@ -1,69 +1,69 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/struct_field_2d_array.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%s\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[10] = "%d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%s\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[10] = ConstArray { ty: Array { element_type: Named("s8i"), size: 10 }, elts: Str("%d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn fill(%arg4: rec_table*) -> void [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg4: rec_table*):
         %137 = alloca rec_table*, "t", align 8
         store %arg4, %137
         scope {
-            %138 = alloca s32i, "i", align 4
-            %139 = const 0 : s32i
-            store %139, %138, align 4
-            for cond: {
-                %172 = load %138 : s32i, align 4
-                %173 = const 4 : s32i
-                %174 = cmp lt %172, %173 : bool
-                condition %174
-            } step: {
-                %140 = load %138 : s32i, align 4
-                %141 = inc %140 : s32i [nsw]
-                store %141, %138, align 4
-                yield
-            } do {
-                scope {
-                    %142 = const 97 : s32i
-                    %143 = load %138 : s32i, align 4
-                    %144 = add %142, %143 : s32i [nsw]
-                    %145 = cast(integral) %144 : s8i
-                    %146 = const 0 : s64i
-                    %147 = load %138 : s32i, align 4
-                    %148 = cast(integral) %147 : s64i
-                    %149 = load %137 : rec_table*, align 8
-                    %150 = get_member %149[0] "rows" : s8i[3][4]*
-                    %151 = get_element %150[%148] : s8i[3]*
-                    %152 = get_element %151[%146] : s8i*
-                    store %145, %152, align 1
-                    %153 = const 48 : s32i
-                    %154 = load %138 : s32i, align 4
-                    %155 = add %153, %154 : s32i [nsw]
-                    %156 = cast(integral) %155 : s8i
-                    %157 = const 1 : s64i
-                    %158 = load %138 : s32i, align 4
-                    %159 = cast(integral) %158 : s64i
-                    %160 = load %137 : rec_table*, align 8
-                    %161 = get_member %160[0] "rows" : s8i[3][4]*
-                    %162 = get_element %161[%159] : s8i[3]*
-                    %163 = get_element %162[%157] : s8i*
-                    store %156, %163, align 1
-                    %164 = const 0 : s8i
-                    %165 = const 2 : s64i
-                    %166 = load %138 : s32i, align 4
-                    %167 = cast(integral) %166 : s64i
-                    %168 = load %137 : rec_table*, align 8
-                    %169 = get_member %168[0] "rows" : s8i[3][4]*
-                    %170 = get_element %169[%167] : s8i[3]*
-                    %171 = get_element %170[%165] : s8i*
-                    store %164, %171, align 1
-                    yield
+                %138 = alloca s32i, "i", align 4
+                %139 = const 0 : s32i
+                store %139, %138, align 4
+                for cond {
+                        %172 = load %138 : s32i, align 4
+                        %173 = const 4 : s32i
+                        cmp
+                        condition %174
+                } step {
+                        %140 = load %138 : s32i, align 4
+                        inc
+                        store %141, %138, align 4
+                        yield
+                } body {
+                        scope {
+                                %142 = const 97 : s32i
+                                %143 = load %138 : s32i, align 4
+                                %144 = add %142, %143 : s32i [nsw]
+                                %145 = cast(integral) %144 : s8i
+                                %146 = const 0 : s64i
+                                %147 = load %138 : s32i, align 4
+                                %148 = cast(integral) %147 : s64i
+                                %149 = load %137 : rec_table*, align 8
+                                get_member
+                                get_element
+                                get_element
+                                store %145, %152, align 1
+                                %153 = const 48 : s32i
+                                %154 = load %138 : s32i, align 4
+                                %155 = add %153, %154 : s32i [nsw]
+                                %156 = cast(integral) %155 : s8i
+                                %157 = const 1 : s64i
+                                %158 = load %138 : s32i, align 4
+                                %159 = cast(integral) %158 : s64i
+                                %160 = load %137 : rec_table*, align 8
+                                get_member
+                                get_element
+                                get_element
+                                store %156, %163, align 1
+                                %164 = const 0 : s8i
+                                %165 = const 2 : s64i
+                                %166 = load %138 : s32i, align 4
+                                %167 = cast(integral) %166 : s64i
+                                %168 = load %137 : rec_table*, align 8
+                                get_member
+                                get_element
+                                get_element
+                                store %164, %171, align 1
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
@@ -75,7 +75,7 @@ fn fill_via_ptr(%arg2: rec_table*, %arg3: s32i) -> void [internal, c, no_inline,
         store %arg2, %123
         store %arg3, %124
         %126 = load %123 : rec_table*, align 8
-        %127 = get_member %126[0] "rows" : s8i[3][4]*
+        get_member
         %128 = cast(array_to_ptrdecay) %127 : s8i[3]*
         store %128, %125, align 8
         %129 = const 88 : s8i
@@ -83,9 +83,9 @@ fn fill_via_ptr(%arg2: rec_table*, %arg3: s32i) -> void [internal, c, no_inline,
         %131 = const 0 : s64i
         %132 = load %125 : s8i[3]*, align 8
         %133 = load %124 : s32i, align 4
-        %134 = ptr_stride %132, %133 : s8i[3]*
-        %135 = ptr_stride %134, %131 : s8i[3]*
-        %136 = get_element %135[%130] : s8i*
+        ptr_stride
+        ptr_stride
+        get_element
         store %129, %136, align 1
         return
 }
@@ -95,91 +95,91 @@ fn fill_cube(%arg1: rec_cube*) -> void [internal, c, no_inline, dso_local, nothr
         %81 = alloca rec_cube*, "c", align 8
         store %arg1, %81
         scope {
-            %82 = alloca s32i, "i", align 4
-            %83 = const 0 : s32i
-            store %83, %82, align 4
-            for cond: {
-                %120 = load %82 : s32i, align 4
-                %121 = const 2 : s32i
-                %122 = cmp lt %120, %121 : bool
-                condition %122
-            } step: {
-                %84 = load %82 : s32i, align 4
-                %85 = inc %84 : s32i [nsw]
-                store %85, %82, align 4
-                yield
-            } do {
-                scope {
-                    scope {
-                        %86 = alloca s32i, "j", align 4
-                        %87 = const 0 : s32i
-                        store %87, %86, align 4
-                        for cond: {
-                            %117 = load %86 : s32i, align 4
-                            %118 = const 3 : s32i
-                            %119 = cmp lt %117, %118 : bool
-                            condition %119
-                        } step: {
-                            %88 = load %86 : s32i, align 4
-                            %89 = inc %88 : s32i [nsw]
-                            store %89, %86, align 4
-                            yield
-                        } do {
-                            scope {
+                %82 = alloca s32i, "i", align 4
+                %83 = const 0 : s32i
+                store %83, %82, align 4
+                for cond {
+                        %120 = load %82 : s32i, align 4
+                        %121 = const 2 : s32i
+                        cmp
+                        condition %122
+                } step {
+                        %84 = load %82 : s32i, align 4
+                        inc
+                        store %85, %82, align 4
+                        yield
+                } body {
+                        scope {
                                 scope {
-                                    %90 = alloca s32i, "k", align 4
-                                    %91 = const 0 : s32i
-                                    store %91, %90, align 4
-                                    for cond: {
-                                        %114 = load %90 : s32i, align 4
-                                        %115 = const 4 : s32i
-                                        %116 = cmp lt %114, %115 : bool
-                                        condition %116
-                                    } step: {
-                                        %92 = load %90 : s32i, align 4
-                                        %93 = inc %92 : s32i [nsw]
-                                        store %93, %90, align 4
-                                        yield
-                                    } do {
-                                        scope {
-                                            %94 = load %82 : s32i, align 4
-                                            %95 = const 100 : s32i
-                                            %96 = mul %94, %95 : s32i [nsw]
-                                            %97 = load %86 : s32i, align 4
-                                            %98 = const 10 : s32i
-                                            %99 = mul %97, %98 : s32i [nsw]
-                                            %100 = add %96, %99 : s32i [nsw]
-                                            %101 = load %90 : s32i, align 4
-                                            %102 = add %100, %101 : s32i [nsw]
-                                            %103 = load %90 : s32i, align 4
-                                            %104 = cast(integral) %103 : s64i
-                                            %105 = load %86 : s32i, align 4
-                                            %106 = cast(integral) %105 : s64i
-                                            %107 = load %82 : s32i, align 4
-                                            %108 = cast(integral) %107 : s64i
-                                            %109 = load %81 : rec_cube*, align 8
-                                            %110 = get_member %109[0] "v" : s32i[4][3][2]*
-                                            %111 = get_element %110[%108] : s32i[4][3]*
-                                            %112 = get_element %111[%106] : s32i[4]*
-                                            %113 = get_element %112[%104] : s32i*
-                                            store %102, %113, align 4
-                                            yield
+                                        %86 = alloca s32i, "j", align 4
+                                        %87 = const 0 : s32i
+                                        store %87, %86, align 4
+                                        for cond {
+                                                %117 = load %86 : s32i, align 4
+                                                %118 = const 3 : s32i
+                                                cmp
+                                                condition %119
+                                        } step {
+                                                %88 = load %86 : s32i, align 4
+                                                inc
+                                                store %89, %86, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        scope {
+                                                                %90 = alloca s32i, "k", align 4
+                                                                %91 = const 0 : s32i
+                                                                store %91, %90, align 4
+                                                                for cond {
+                                                                        %114 = load %90 : s32i, align 4
+                                                                        %115 = const 4 : s32i
+                                                                        cmp
+                                                                        condition %116
+                                                                } step {
+                                                                        %92 = load %90 : s32i, align 4
+                                                                        inc
+                                                                        store %93, %90, align 4
+                                                                        yield
+                                                                } body {
+                                                                        scope {
+                                                                                %94 = load %82 : s32i, align 4
+                                                                                %95 = const 100 : s32i
+                                                                                mul
+                                                                                %97 = load %86 : s32i, align 4
+                                                                                %98 = const 10 : s32i
+                                                                                mul
+                                                                                %100 = add %96, %99 : s32i [nsw]
+                                                                                %101 = load %90 : s32i, align 4
+                                                                                %102 = add %100, %101 : s32i [nsw]
+                                                                                %103 = load %90 : s32i, align 4
+                                                                                %104 = cast(integral) %103 : s64i
+                                                                                %105 = load %86 : s32i, align 4
+                                                                                %106 = cast(integral) %105 : s64i
+                                                                                %107 = load %82 : s32i, align 4
+                                                                                %108 = cast(integral) %107 : s64i
+                                                                                %109 = load %81 : rec_cube*, align 8
+                                                                                get_member
+                                                                                get_element
+                                                                                get_element
+                                                                                get_element
+                                                                                store %102, %113, align 4
+                                                                                yield
+                                                                        }
+                                                                        yield
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
                                         }
                                         yield
-                                    }
-                                    yield
                                 }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
@@ -192,67 +192,67 @@ fn sum_cube_via_ptr(%arg0: rec_cube*) -> s32i [internal, c, no_inline, dso_local
         store %arg0, %44
         %48 = const 1 : s64i
         %49 = load %44 : rec_cube*, align 8
-        %50 = get_member %49[0] "v" : s32i[4][3][2]*
-        %51 = get_element %50[%48] : s32i[4][3]*
+        get_member
+        get_element
         %52 = cast(array_to_ptrdecay) %51 : s32i[4]*
         store %52, %46, align 8
         %53 = const 0 : s32i
         store %53, %47, align 4
         scope {
-            %56 = alloca s32i, "j", align 4
-            %57 = const 0 : s32i
-            store %57, %56, align 4
-            for cond: {
-                %78 = load %56 : s32i, align 4
-                %79 = const 3 : s32i
-                %80 = cmp lt %78, %79 : bool
-                condition %80
-            } step: {
-                %58 = load %56 : s32i, align 4
-                %59 = inc %58 : s32i [nsw]
-                store %59, %56, align 4
-                yield
-            } do {
-                scope {
-                    scope {
-                        %60 = alloca s32i, "k", align 4
-                        %61 = const 0 : s32i
-                        store %61, %60, align 4
-                        for cond: {
-                            %75 = load %60 : s32i, align 4
-                            %76 = const 4 : s32i
-                            %77 = cmp lt %75, %76 : bool
-                            condition %77
-                        } step: {
-                            %62 = load %60 : s32i, align 4
-                            %63 = inc %62 : s32i [nsw]
-                            store %63, %60, align 4
-                            yield
-                        } do {
-                            scope {
-                                %64 = load %60 : s32i, align 4
-                                %65 = cast(integral) %64 : s64i
-                                %66 = const 0 : s64i
-                                %67 = load %46 : s32i[4]*, align 8
-                                %68 = load %56 : s32i, align 4
-                                %69 = ptr_stride %67, %68 : s32i[4]*
-                                %70 = ptr_stride %69, %66 : s32i[4]*
-                                %71 = get_element %70[%65] : s32i*
-                                %72 = load %71 : s32i, align 4
-                                %73 = load %47 : s32i, align 4
-                                %74 = add %73, %72 : s32i [nsw]
-                                store %74, %47, align 4
+                %56 = alloca s32i, "j", align 4
+                %57 = const 0 : s32i
+                store %57, %56, align 4
+                for cond {
+                        %78 = load %56 : s32i, align 4
+                        %79 = const 3 : s32i
+                        cmp
+                        condition %80
+                } step {
+                        %58 = load %56 : s32i, align 4
+                        inc
+                        store %59, %56, align 4
+                        yield
+                } body {
+                        scope {
+                                scope {
+                                        %60 = alloca s32i, "k", align 4
+                                        %61 = const 0 : s32i
+                                        store %61, %60, align 4
+                                        for cond {
+                                                %75 = load %60 : s32i, align 4
+                                                %76 = const 4 : s32i
+                                                cmp
+                                                condition %77
+                                        } step {
+                                                %62 = load %60 : s32i, align 4
+                                                inc
+                                                store %63, %60, align 4
+                                                yield
+                                        } body {
+                                                scope {
+                                                        %64 = load %60 : s32i, align 4
+                                                        %65 = cast(integral) %64 : s64i
+                                                        %66 = const 0 : s64i
+                                                        %67 = load %46 : s32i[4]*, align 8
+                                                        %68 = load %56 : s32i, align 4
+                                                        ptr_stride
+                                                        ptr_stride
+                                                        get_element
+                                                        %72 = load %71 : s32i, align 4
+                                                        %73 = load %47 : s32i, align 4
+                                                        %74 = add %73, %72 : s32i [nsw]
+                                                        store %74, %47, align 4
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         %54 = load %47 : s32i, align 4
         store %54, %45
@@ -260,69 +260,69 @@ fn sum_cube_via_ptr(%arg0: rec_cube*) -> s32i [internal, c, no_inline, dso_local
         return %55
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_table, "t", align 1
-    %2 = alloca rec_cube, "c", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    call @fill(%1) [all]
-    %4 = const 2 : s32i
-    call @fill_via_ptr(%1, %4) [all]
-    scope {
-        %28 = alloca s32i, "i", align 4
-        %29 = const 0 : s32i
-        store %29, %28, align 4
-        for cond: {
-            %41 = load %28 : s32i, align 4
-            %42 = const 4 : s32i
-            %43 = cmp lt %41, %42 : bool
-            condition %43
-        } step: {
-            %30 = load %28 : s32i, align 4
-            %31 = inc %30 : s32i [nsw]
-            store %31, %28, align 4
-            yield
-        } do {
-            scope {
-                %32 = get_global @printf : ((s8i*, ...) -> s32i)*
-                %33 = get_global @.str : s8i[4]*
-                %34 = cast(array_to_ptrdecay) %33 : s8i*
-                %35 = load %28 : s32i, align 4
-                %36 = cast(integral) %35 : s64i
-                %37 = get_member %1[0] "rows" : s8i[3][4]*
-                %38 = get_element %37[%36] : s8i[3]*
-                %39 = cast(array_to_ptrdecay) %38 : s8i*
-                %40 = call @printf(%34, %39) : s32i [all]
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_table, "t", align 1
+        %2 = alloca rec_cube, "c", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        call @fill(%1) [all]
+        %4 = const 2 : s32i
+        call @fill_via_ptr(%1, %4) [all]
+        scope {
+                %28 = alloca s32i, "i", align 4
+                %29 = const 0 : s32i
+                store %29, %28, align 4
+                for cond {
+                        %41 = load %28 : s32i, align 4
+                        %42 = const 4 : s32i
+                        cmp
+                        condition %43
+                } step {
+                        %30 = load %28 : s32i, align 4
+                        inc
+                        store %31, %28, align 4
+                        yield
+                } body {
+                        scope {
+                                %32 = get_global @printf : (s8i*, ...) -> s32i*
+                                %33 = get_global @.str : s8i[4]*
+                                %34 = cast(array_to_ptrdecay) %33 : s8i*
+                                %35 = load %28 : s32i, align 4
+                                %36 = cast(integral) %35 : s64i
+                                get_member
+                                get_element
+                                %39 = cast(array_to_ptrdecay) %38 : s8i*
+                                %40 = call @printf(%34, %39) : s32i [all]
+                                yield
+                        }
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    call @fill_cube(%2) [all]
-    %5 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %6 = get_global @.str.1 : s8i[10]*
-    %7 = cast(array_to_ptrdecay) %6 : s8i*
-    %8 = const 0 : s64i
-    %9 = const 0 : s64i
-    %10 = const 0 : s64i
-    %11 = get_member %2[0] "v" : s32i[4][3][2]*
-    %12 = get_element %11[%10] : s32i[4][3]*
-    %13 = get_element %12[%9] : s32i[4]*
-    %14 = get_element %13[%8] : s32i*
-    %15 = load %14 : s32i, align 4
-    %16 = const 3 : s64i
-    %17 = const 2 : s64i
-    %18 = const 1 : s64i
-    %19 = get_member %2[0] "v" : s32i[4][3][2]*
-    %20 = get_element %19[%18] : s32i[4][3]*
-    %21 = get_element %20[%17] : s32i[4]*
-    %22 = get_element %21[%16] : s32i*
-    %23 = load %22 : s32i, align 4
-    %24 = call @sum_cube_via_ptr(%2) : s32i [all]
-    %25 = call @printf(%7, %15, %23, %24) : s32i [all]
-    %26 = const 0 : s32i
-    store %26, %0
-    %27 = load %0 : s32i
-    return %27
+        call @fill_cube(%2) [all]
+        %5 = get_global @printf : (s8i*, ...) -> s32i*
+        %6 = get_global @.str.1 : s8i[10]*
+        %7 = cast(array_to_ptrdecay) %6 : s8i*
+        %8 = const 0 : s64i
+        %9 = const 0 : s64i
+        %10 = const 0 : s64i
+        get_member
+        get_element
+        get_element
+        get_element
+        %15 = load %14 : s32i, align 4
+        %16 = const 3 : s64i
+        %17 = const 2 : s64i
+        %18 = const 1 : s64i
+        get_member
+        get_element
+        get_element
+        get_element
+        %23 = load %22 : s32i, align 4
+        %24 = call @sum_cube_via_ptr(%2) : s32i [all]
+        %25 = call @printf(%7, %15, %23, %24) : s32i [all]
+        %26 = const 0 : s32i
+        store %26, %0
+        %27 = load %0 : s32i
+        return %27
 }

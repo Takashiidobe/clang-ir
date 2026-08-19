@@ -1,14 +1,14 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/qsort_bsearch_fixup.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.needle : rec_Item = {4, 0} [cir_private, default, dso_local, constant]
-global __const.main.items : rec_Item[4] = [{3, 30}, {1, 10}, {4, 40}, {2, 20}] [cir_private, default, dso_local, constant]
-global __const.main.nums : s32i[5] = [4, 1, 5, 3, 2] [cir_private, default, dso_local, constant]
-global .str : s8i[13] = "%d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global __const.main.needle : rec_Item = ConstRecord { ty: Named("rec_Item"), members: Array([CirInt { ty: Named("s32i"), value: "4" }, CirInt { ty: Named("s32i"), value: "0" }]) } [cir_private, default, dso_local, constant]
+global __const.main.items : rec_Item[4] = ConstArray { ty: Array { element_type: Named("rec_Item"), size: 4 }, elts: Array([ConstRecord { ty: Named("rec_Item"), members: Array([CirInt { ty: Named("s32i"), value: "3" }, CirInt { ty: Named("s32i"), value: "30" }]) }, ConstRecord { ty: Named("rec_Item"), members: Array([CirInt { ty: Named("s32i"), value: "1" }, CirInt { ty: Named("s32i"), value: "10" }]) }, ConstRecord { ty: Named("rec_Item"), members: Array([CirInt { ty: Named("s32i"), value: "4" }, CirInt { ty: Named("s32i"), value: "40" }]) }, ConstRecord { ty: Named("rec_Item"), members: Array([CirInt { ty: Named("s32i"), value: "2" }, CirInt { ty: Named("s32i"), value: "20" }]) }]), trailing_zeros_num: 0 } [cir_private, default, dso_local, constant]
+global __const.main.nums : s32i[5] = ConstArray { ty: Array { element_type: Named("s32i"), size: 5 }, elts: Array([CirInt { ty: Named("s32i"), value: "4" }, CirInt { ty: Named("s32i"), value: "1" }, CirInt { ty: Named("s32i"), value: "5" }, CirInt { ty: Named("s32i"), value: "3" }, CirInt { ty: Named("s32i"), value: "2" }]), trailing_zeros_num: 0 } [cir_private, default, dso_local, constant]
+global .str : s8i[13] = ConstArray { ty: Array { element_type: Named("s8i"), size: 13 }, elts: Str("%d %d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
-fn qsort(%arg0: void*, %arg1: u64i, %arg2: u64i, %arg3: ((void*, void*) -> s32i)*) -> void [external, c];
+fn qsort(%arg0: void*, %arg1: u64i, %arg2: u64i, %arg3: (void*, void*) -> s32i*) -> void [external, c];
 fn cmp_int(%arg2: void*, %arg3: void*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg2: void*, %arg3: void*):
         %80 = alloca void*, "a", align 8
@@ -22,12 +22,12 @@ fn cmp_int(%arg2: void*, %arg3: void*) -> s32i [internal, c, no_inline, dso_loca
         %86 = load %81 : void*, align 8
         %87 = cast(bitcast) %86 : s32i*
         %88 = load %87 : s32i, align 4
-        %89 = sub %85, %88 : s32i [nsw]
+        sub
         store %89, %82
         %90 = load %82 : s32i
         return %90
 }
-fn bsearch(%arg0: void*, %arg1: void*, %arg2: u64i, %arg3: u64i, %arg4: ((void*, void*) -> s32i)*) -> void* [external, c];
+fn bsearch(%arg0: void*, %arg1: void*, %arg2: u64i, %arg3: u64i, %arg4: (void*, void*) -> s32i*) -> void* [external, c];
 fn cmp_item(%arg0: void*, %arg1: void*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: void*, %arg1: void*):
         %63 = alloca void*, "a", align 8
@@ -44,98 +44,98 @@ fn cmp_item(%arg0: void*, %arg1: void*) -> s32i [internal, c, no_inline, dso_loc
         %71 = cast(bitcast) %70 : rec_Item*
         store %71, %67, align 8
         %72 = load %66 : rec_Item*, align 8
-        %73 = get_member %72[0] "key" : s32i*
+        get_member
         %74 = load %73 : s32i, align 4
         %75 = load %67 : rec_Item*, align 8
-        %76 = get_member %75[0] "key" : s32i*
+        get_member
         %77 = load %76 : s32i, align 4
-        %78 = sub %74, %77 : s32i [nsw]
+        sub
         store %78, %65
         %79 = load %65 : s32i
         return %79
 }
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i[5], "nums", align 16
-    %2 = alloca s32i, "key", align 4
-    %3 = alloca s32i*, "hit", align 8
-    %4 = alloca rec_Item[4], "items", align 16
-    %5 = alloca rec_Item, "needle", align 4
-    %6 = alloca rec_Item*, "found", align 8
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = get_global @__const.main.nums : s32i[5]*
-    copy %1, %8
-    %9 = const 3 : s32i
-    store %9, %2, align 4
-    %10 = cast(array_to_ptrdecay) %1 : s32i*
-    %11 = cast(bitcast) %10 : void*
-    %12 = const 5 : u64i
-    %13 = const 4 : u64i
-    %14 = get_global @cmp_int : ((void*, void*) -> s32i)*
-    call @qsort(%11, %12, %13, %14) [all]
-    %15 = cast(bitcast) %2 : void*
-    %16 = cast(array_to_ptrdecay) %1 : s32i*
-    %17 = cast(bitcast) %16 : void*
-    %18 = const 5 : u64i
-    %19 = const 4 : u64i
-    %20 = get_global @cmp_int : ((void*, void*) -> s32i)*
-    %21 = call @bsearch(%15, %17, %18, %19, %20) : void* [all]
-    %22 = cast(bitcast) %21 : s32i*
-    store %22, %3, align 8
-    %23 = get_global @__const.main.items : rec_Item[4]*
-    copy %4, %23
-    %24 = get_global @__const.main.needle : rec_Item*
-    copy %5, %24
-    %25 = cast(array_to_ptrdecay) %4 : rec_Item*
-    %26 = cast(bitcast) %25 : void*
-    %27 = const 4 : u64i
-    %28 = const 8 : u64i
-    %29 = get_global @cmp_item : ((void*, void*) -> s32i)*
-    call @qsort(%26, %27, %28, %29) [all]
-    %30 = cast(bitcast) %5 : void*
-    %31 = cast(array_to_ptrdecay) %4 : rec_Item*
-    %32 = cast(bitcast) %31 : void*
-    %33 = const 4 : u64i
-    %34 = const 8 : u64i
-    %35 = get_global @cmp_item : ((void*, void*) -> s32i)*
-    %36 = call @bsearch(%30, %32, %33, %34, %35) : void* [all]
-    %37 = cast(bitcast) %36 : rec_Item*
-    store %37, %6, align 8
-    %38 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %39 = get_global @.str : s8i[13]*
-    %40 = cast(array_to_ptrdecay) %39 : s8i*
-    %41 = const 0 : s64i
-    %42 = get_element %1[%41] : s32i*
-    %43 = load %42 : s32i, align 16
-    %44 = const 4 : s64i
-    %45 = get_element %1[%44] : s32i*
-    %46 = load %45 : s32i, align 16
-    %47 = load %3 : s32i*, align 8
-    %48 = cast(ptr_to_bool) %47 : bool
-    %49 = ternary %48 ? { : s32i
-        %61 = load %3 : s32i*, align 8
-        %62 = load %61 : s32i, align 4
-        yield %62
-    } : {
-        %60 = const -1 : s32i
-        yield %60
-    }
-    %50 = load %6 : rec_Item*, align 8
-    %51 = cast(ptr_to_bool) %50 : bool
-    %52 = ternary %51 ? { : s32i
-        %57 = load %6 : rec_Item*, align 8
-        %58 = get_member %57[1] "value" : s32i*
-        %59 = load %58 : s32i, align 4
-        yield %59
-    } : {
-        %56 = const -1 : s32i
-        yield %56
-    }
-    %53 = call @printf(%40, %43, %46, %49, %52) : s32i [all]
-    %54 = const 0 : s32i
-    store %54, %0
-    %55 = load %0 : s32i
-    return %55
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i[5], "nums", align 16
+        %2 = alloca s32i, "key", align 4
+        %3 = alloca s32i*, "hit", align 8
+        %4 = alloca rec_Item[4], "items", align 16
+        %5 = alloca rec_Item, "needle", align 4
+        %6 = alloca rec_Item*, "found", align 8
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = get_global @__const.main.nums : s32i[5]*
+        copy
+        %9 = const 3 : s32i
+        store %9, %2, align 4
+        %10 = cast(array_to_ptrdecay) %1 : s32i*
+        %11 = cast(bitcast) %10 : void*
+        %12 = const 5 : u64i
+        %13 = const 4 : u64i
+        %14 = get_global @cmp_int : (void*, void*) -> s32i*
+        call @qsort(%11, %12, %13, %14) [all]
+        %15 = cast(bitcast) %2 : void*
+        %16 = cast(array_to_ptrdecay) %1 : s32i*
+        %17 = cast(bitcast) %16 : void*
+        %18 = const 5 : u64i
+        %19 = const 4 : u64i
+        %20 = get_global @cmp_int : (void*, void*) -> s32i*
+        %21 = call @bsearch(%15, %17, %18, %19, %20) : void* [all]
+        %22 = cast(bitcast) %21 : s32i*
+        store %22, %3, align 8
+        %23 = get_global @__const.main.items : rec_Item[4]*
+        copy
+        %24 = get_global @__const.main.needle : rec_Item*
+        copy
+        %25 = cast(array_to_ptrdecay) %4 : rec_Item*
+        %26 = cast(bitcast) %25 : void*
+        %27 = const 4 : u64i
+        %28 = const 8 : u64i
+        %29 = get_global @cmp_item : (void*, void*) -> s32i*
+        call @qsort(%26, %27, %28, %29) [all]
+        %30 = cast(bitcast) %5 : void*
+        %31 = cast(array_to_ptrdecay) %4 : rec_Item*
+        %32 = cast(bitcast) %31 : void*
+        %33 = const 4 : u64i
+        %34 = const 8 : u64i
+        %35 = get_global @cmp_item : (void*, void*) -> s32i*
+        %36 = call @bsearch(%30, %32, %33, %34, %35) : void* [all]
+        %37 = cast(bitcast) %36 : rec_Item*
+        store %37, %6, align 8
+        %38 = get_global @printf : (s8i*, ...) -> s32i*
+        %39 = get_global @.str : s8i[13]*
+        %40 = cast(array_to_ptrdecay) %39 : s8i*
+        %41 = const 0 : s64i
+        get_element
+        %43 = load %42 : s32i, align 16
+        %44 = const 4 : s64i
+        get_element
+        %46 = load %45 : s32i, align 16
+        %47 = load %3 : s32i*, align 8
+        %48 = cast(ptr_to_bool) %47 : bool
+        %49 = ternary %48 ? { : s32i
+                %61 = load %3 : s32i*, align 8
+                %62 = load %61 : s32i, align 4
+                yield %62
+        } : {
+                %60 = const -1 : s32i
+                yield %60
+        }
+        %50 = load %6 : rec_Item*, align 8
+        %51 = cast(ptr_to_bool) %50 : bool
+        %52 = ternary %51 ? { : s32i
+                %57 = load %6 : rec_Item*, align 8
+                get_member
+                %59 = load %58 : s32i, align 4
+                yield %59
+        } : {
+                %56 = const -1 : s32i
+                yield %56
+        }
+        %53 = call @printf(%40, %43, %46, %49, %52) : s32i [all]
+        %54 = const 0 : s32i
+        store %54, %0
+        %55 = load %0 : s32i
+        return %55
 }

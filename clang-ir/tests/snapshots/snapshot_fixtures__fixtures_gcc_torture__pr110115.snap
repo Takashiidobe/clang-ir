@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr110115.c" (c, x86_64-unknown-linux-gnu)
-global a : s32i = 0 [external, default, align 4, dso_local]
-global b : s8i = 0 [external, default, align 1, dso_local]
+global a : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global b : s8i = CirInt { ty: Named("s8i"), value: "0" } [external, default, align 1, dso_local]
 
 fn foo(%arg2: s8i*, %arg3: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg2: s8i*, %arg3: s32i):
@@ -15,28 +15,28 @@ fn foo(%arg2: s8i*, %arg3: s32i) -> s32i [internal, c, no_inline, dso_local, not
         store %arg2, %52
         store %arg3, %53
         scope {
-            %58 = const 0 : s32i
-            store %58, %55, align 4
-            for cond: {
-                %66 = load %55 : s32i, align 4
-                %67 = load %53 : s32i, align 4
-                %68 = cmp lt %66, %67 : bool
-                condition %68
-            } step: {
-                %59 = load %55 : s32i, align 4
-                %60 = inc %59 : s32i [nsw]
-                store %60, %55, align 4
+                %58 = const 0 : s32i
+                store %58, %55, align 4
+                for cond {
+                        %66 = load %55 : s32i, align 4
+                        %67 = load %53 : s32i, align 4
+                        cmp
+                        condition %68
+                } step {
+                        %59 = load %55 : s32i, align 4
+                        inc
+                        store %60, %55, align 4
+                        yield
+                } body {
+                        %61 = const 0 : s8i
+                        %62 = load %55 : s32i, align 4
+                        %63 = cast(integral) %62 : s64i
+                        %64 = load %52 : s8i*, align 8
+                        ptr_stride
+                        store %61, %65, align 1
+                        yield
+                }
                 yield
-            } do {
-                %61 = const 0 : s8i
-                %62 = load %55 : s32i, align 4
-                %63 = cast(integral) %62 : s64i
-                %64 = load %52 : s8i*, align 8
-                %65 = ptr_stride %64, %63 : s8i*
-                store %61, %65, align 1
-                yield
-            }
-            yield
         }
         %56 = load %55 : s32i, align 4
         store %56, %54
@@ -62,81 +62,82 @@ fn bar(%arg0: s8i, %arg1: s32i) -> s32i [external, c, no_inline, dso_local, noth
         return %51
 }
 fn baz() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %34 = alloca s32i, "__retval", align 4
-    scope {
-        %36 = get_global @a : s32i*
-        %37 = load %36 : s32i, align 4
-        switch %37 {
-            case equal 102 {
-                %40 = const 0 : s32i
-                store %40, %34
-                %41 = load %34 : s32i
-                return %41
-            }
-            case default {
-                %38 = const -1 : s32i
-                store %38, %34
-                %39 = load %34 : s32i
-                return %39
-            }
+        %34 = alloca s32i, "__retval", align 4
+        scope {
+                %36 = get_global @a : s32i*
+                %37 = load %36 : s32i, align 4
+                switch %37 {
+                        case equal [102] {
+                                %40 = const 0 : s32i
+                                store %40, %34
+                                %41 = load %34 : s32i
+                                return %41
+                        }
+                        case default [] {
+                                %38 = const -1 : s32i
+                                store %38, %34
+                                %39 = load %34 : s32i
+                                return %39
+                        }
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %35 = load %34 : s32i
-    return %35
+        %35 = load %34 : s32i
+        return %35
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %3 = alloca s8i*[3], "k", align 16
-        %4 = alloca s32i, "d", align 4
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
         scope {
-            %15 = const 0 : s32i
-            store %15, %4, align 4
-            for cond: {
-                %25 = const 8 : s8i
-                %26 = const 15 : s32i
-                %27 = call @bar(%25, %26) : s32i [all]
-                %28 = const 15 : s32i
-                %29 = sub %27, %28 : s32i [nsw]
-                %30 = load %4 : s32i, align 4
-                %31 = add %29, %30 : s32i [nsw]
-                %32 = const 1 : s32i
-                %33 = cmp lt %31, %32 : bool
-                condition %33
-            } step: {
-                %16 = load %4 : s32i, align 4
-                %17 = inc %16 : s32i [nsw]
-                store %17, %4, align 4
+                %3 = alloca s8i*[3], "k", align 16
+                %4 = alloca s32i, "d", align 4
+                scope {
+                        %15 = const 0 : s32i
+                        store %15, %4, align 4
+                        for cond {
+                                %25 = const 8 : s8i
+                                %26 = const 15 : s32i
+                                %27 = call @bar(%25, %26) : s32i [all]
+                                %28 = const 15 : s32i
+                                sub
+                                %30 = load %4 : s32i, align 4
+                                %31 = add %29, %30 : s32i [nsw]
+                                %32 = const 1 : s32i
+                                cmp
+                                condition %33
+                        } step {
+                                %16 = load %4 : s32i, align 4
+                                inc
+                                store %17, %4, align 4
+                                yield
+                        } body {
+                                %18 = get_global @b : s8i*
+                                %19 = get_global @baz : () -> s32i*
+                                %20 = call @baz() : s32i [all]
+                                %21 = const 1 : s32i
+                                %22 = add %20, %21 : s32i [nsw]
+                                %23 = cast(integral) %22 : s64i
+                                get_element
+                                store %18, %24, align 8
+                                yield
+                        }
+                        yield
+                }
+                %5 = const 0 : s64i
+                get_element
+                %7 = load %6 : s8i*, align 16
+                %8 = load %7 : s8i, align 1
+                %9 = cast(integral) %8 : s32i
+                minus
+                %11 = cast(integral) %10 : s8i
+                %12 = const 0 : s64i
+                get_element
+                %14 = load %13 : s8i*, align 16
+                store %11, %14, align 1
                 yield
-            } do {
-                %18 = get_global @b : s8i*
-                %19 = get_global @baz : (() -> s32i)*
-                %20 = call @baz() : s32i [all]
-                %21 = const 1 : s32i
-                %22 = add %20, %21 : s32i [nsw]
-                %23 = cast(integral) %22 : s64i
-                %24 = get_element %3[%23] : s8i**
-                store %18, %24, align 8
-                yield
-            }
-            yield
         }
-        %5 = const 0 : s64i
-        %6 = get_element %3[%5] : s8i**
-        %7 = load %6 : s8i*, align 16
-        %8 = load %7 : s8i, align 1
-        %9 = cast(integral) %8 : s32i
-        %10 = minus %9 : s32i [nsw]
-        %11 = cast(integral) %10 : s8i
-        %12 = const 0 : s64i
-        %13 = get_element %3[%12] : s8i**
-        %14 = load %13 : s8i*, align 16
-        store %11, %14, align 1
-        yield
-    }
-    %2 = load %0 : s32i
-    return %2
+        %2 = load %0 : s32i
+        return %2
 }

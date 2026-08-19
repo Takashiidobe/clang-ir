@@ -1,56 +1,56 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/980604-1.c" (c, x86_64-unknown-linux-gnu)
-global a : s32i = 1 [external, default, align 4, dso_local]
-global b : s32i = -1 [external, default, align 4, dso_local]
-global c : s32i = 1 [external, default, align 4, dso_local]
-global d : s32i = 0 [external, default, align 4, dso_local]
+global a : s32i = CirInt { ty: Named("s32i"), value: "1" } [external, default, align 4, dso_local]
+global b : s32i = CirInt { ty: Named("s32i"), value: "-1" } [external, default, align 4, dso_local]
+global c : s32i = CirInt { ty: Named("s32i"), value: "1" } [external, default, align 4, dso_local]
+global d : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca double, "e", align 8
-    %2 = alloca double, "f", align 8
-    %3 = alloca double, "g", align 8
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = get_global @c : s32i*
-    %6 = load %5 : s32i, align 4
-    %7 = cast(int_to_float) %6 : double
-    store %7, %2, align 8
-    %8 = get_global @d : s32i*
-    %9 = load %8 : s32i, align 4
-    %10 = cast(int_to_float) %9 : double
-    store %10, %3, align 8
-    %11 = get_global @a : s32i*
-    %12 = load %11 : s32i, align 4
-    %13 = get_global @b : s32i*
-    %14 = load %13 : s32i, align 4
-    %15 = cmp lt %12, %14 : bool
-    %16 = ternary %15 ? { : double
-        %24 = load %2 : double, align 8
-        yield %24
-    } : {
-        %23 = load %3 : double, align 8
-        yield %23
-    }
-    store %16, %1, align 8
-    scope {
-        %20 = load %1 : double, align 8
-        %21 = cast(float_to_bool) %20 : bool
-        if %21 {
-            %22 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca double, "e", align 8
+        %2 = alloca double, "f", align 8
+        %3 = alloca double, "g", align 8
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = get_global @c : s32i*
+        %6 = load %5 : s32i, align 4
+        %7 = cast(int_to_float) %6 : double
+        store %7, %2, align 8
+        %8 = get_global @d : s32i*
+        %9 = load %8 : s32i, align 4
+        %10 = cast(int_to_float) %9 : double
+        store %10, %3, align 8
+        %11 = get_global @a : s32i*
+        %12 = load %11 : s32i, align 4
+        %13 = get_global @b : s32i*
+        %14 = load %13 : s32i, align 4
+        cmp
+        %16 = ternary %15 ? { : double
+                %24 = load %2 : double, align 8
+                yield %24
+        } : {
+                %23 = load %3 : double, align 8
+                yield %23
         }
-        yield
-    }
-    %17 = get_global @exit : ((s32i) -> void)*
-    %18 = const 0 : s32i
-    call @exit(%18) [all]
-    %19 = load %0 : s32i
-    return %19
+        store %16, %1, align 8
+        scope {
+                %20 = load %1 : double, align 8
+                %21 = cast(float_to_bool) %20 : bool
+                if %21 {
+                        %22 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
+        }
+        %17 = get_global @exit : (s32i) -> void*
+        %18 = const 0 : s32i
+        call @exit(%18) [all]
+        %19 = load %0 : s32i
+        return %19
 }

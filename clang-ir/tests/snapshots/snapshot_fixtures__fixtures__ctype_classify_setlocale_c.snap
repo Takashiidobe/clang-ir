@@ -1,55 +1,55 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/ctype_classify_setlocale_c.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[2] = "C" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[5] = "yes\n" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[4] = "no\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[2] = ConstArray { ty: Array { element_type: Named("s8i"), size: 2 }, elts: Str("C"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[5] = ConstArray { ty: Array { element_type: Named("s8i"), size: 5 }, elts: Str("yes\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("no\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn setlocale(%arg0: s32i, %arg1: s8i*) -> s8i* [external, c, nothrow];
 fn __ctype_b_loc() -> u16i** [external, c, const, nothrow];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s8i, "c", align 1
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 6 : s32i
-    %4 = get_global @.str : s8i[2]*
-    %5 = cast(array_to_ptrdecay) %4 : s8i*
-    %6 = call @setlocale(%3, %5) : s8i* [all]
-    %7 = const 65 : s8i
-    store %7, %1, align 1
-    scope {
-        %10 = load %1 : s8i, align 1
-        %11 = cast(integral) %10 : s32i
-        %12 = cast(integral) %11 : s64i
-        %13 = call @__ctype_b_loc() : u16i** [const]
-        %14 = load %13 : u16i*, align 8
-        %15 = ptr_stride %14, %12 : u16i*
-        %16 = load %15 : u16i, align 2
-        %17 = cast(integral) %16 : s32i
-        %18 = const 1024 : s32i
-        %19 = and %17, %18 : s32i
-        %20 = cast(int_to_bool) %19 : bool
-        if %20 {
-            %25 = get_global @printf : ((s8i*, ...) -> s32i)*
-            %26 = get_global @.str.1 : s8i[5]*
-            %27 = cast(array_to_ptrdecay) %26 : s8i*
-            %28 = call @printf(%27) : s32i [all]
-            yield
-        } else {
-            %21 = get_global @printf : ((s8i*, ...) -> s32i)*
-            %22 = get_global @.str.2 : s8i[4]*
-            %23 = cast(array_to_ptrdecay) %22 : s8i*
-            %24 = call @printf(%23) : s32i [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s8i, "c", align 1
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 6 : s32i
+        %4 = get_global @.str : s8i[2]*
+        %5 = cast(array_to_ptrdecay) %4 : s8i*
+        %6 = call @setlocale(%3, %5) : s8i* [all]
+        %7 = const 65 : s8i
+        store %7, %1, align 1
+        scope {
+                %10 = load %1 : s8i, align 1
+                %11 = cast(integral) %10 : s32i
+                %12 = cast(integral) %11 : s64i
+                %13 = call @__ctype_b_loc() : u16i** [const]
+                %14 = load %13 : u16i*, align 8
+                ptr_stride
+                %16 = load %15 : u16i, align 2
+                %17 = cast(integral) %16 : s32i
+                %18 = const 1024 : s32i
+                and
+                %20 = cast(int_to_bool) %19 : bool
+                if %20 {
+                        %25 = get_global @printf : (s8i*, ...) -> s32i*
+                        %26 = get_global @.str.1 : s8i[5]*
+                        %27 = cast(array_to_ptrdecay) %26 : s8i*
+                        %28 = call @printf(%27) : s32i [all]
+                        yield
+                } else {
+                        %21 = get_global @printf : (s8i*, ...) -> s32i*
+                        %22 = get_global @.str.2 : s8i[4]*
+                        %23 = cast(array_to_ptrdecay) %22 : s8i*
+                        %24 = call @printf(%23) : s32i [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %8 = const 0 : s32i
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        %8 = const 0 : s32i
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

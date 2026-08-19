@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr38969.c" (c, x86_64-unknown-linux-gnu)
@@ -53,46 +53,46 @@ fn bar(%arg0: vector<2 x float>) -> vector<2 x float> [external, c, no_inline, d
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca vector<2 x float>, "coerce", align 8
-    %1 = alloca complex<float>, "coerce", align 8
-    %2 = alloca s32i, "__retval", align 4
-    %3 = alloca complex<float>, "a", align 4
-    %4 = alloca complex<float>, "b", align 4
-    %5 = alloca complex<float>, "coerce", align 4
-    %6 = const 0 : s32i
-    store %6, %2
-    %7 = const 9 : s32i
-    %8 = cast(int_to_float) %7 : float
-    %9 = complex.real_ptr %3 : float*
-    store %8, %9, align 4
-    %10 = const 42 : s32i
-    %11 = cast(int_to_float) %10 : float
-    %12 = complex.imag_ptr %3 : float*
-    store %11, %12, align 4
-    %13 = load %3 : complex<float>, align 4
-    store %13, %5, align 4
-    %14 = load %5 : complex<float>, align 4
-    store %14, %1
-    %15 = cast(bitcast) %1 : vector<2 x float>*
-    %16 = load %15 : vector<2 x float>
-    %17 = call @bar(%16) : vector<2 x float> [all]
-    store %17, %0
-    %18 = cast(bitcast) %0 : complex<float>*
-    %19 = load %18 : complex<float>
-    store %19, %4, align 4
-    scope {
-        %22 = load %3 : complex<float>, align 4
-        %23 = load %4 : complex<float>, align 4
-        %24 = cmp ne %22, %23 : bool
-        if %24 {
-            %25 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca vector<2 x float>, "coerce", align 8
+        %1 = alloca complex<float>, "coerce", align 8
+        %2 = alloca s32i, "__retval", align 4
+        %3 = alloca complex<float>, "a", align 4
+        %4 = alloca complex<float>, "b", align 4
+        %5 = alloca complex<float>, "coerce", align 4
+        %6 = const 0 : s32i
+        store %6, %2
+        %7 = const 9 : s32i
+        %8 = cast(int_to_float) %7 : float
+        complex.real_ptr
+        store %8, %9, align 4
+        %10 = const 42 : s32i
+        %11 = cast(int_to_float) %10 : float
+        complex.imag_ptr
+        store %11, %12, align 4
+        %13 = load %3 : complex<float>, align 4
+        store %13, %5, align 4
+        %14 = load %5 : complex<float>, align 4
+        store %14, %1
+        %15 = cast(bitcast) %1 : vector<2 x float>*
+        %16 = load %15 : vector<2 x float>
+        %17 = call @bar(%16) : vector<2 x float> [all]
+        store %17, %0
+        %18 = cast(bitcast) %0 : complex<float>*
+        %19 = load %18 : complex<float>
+        store %19, %4, align 4
+        scope {
+                %22 = load %3 : complex<float>, align 4
+                %23 = load %4 : complex<float>, align 4
+                cmp
+                if %24 {
+                        %25 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %20 = const 0 : s32i
-    store %20, %2
-    %21 = load %2 : s32i
-    return %21
+        %20 = const 0 : s32i
+        store %20, %2
+        %21 = load %2 : s32i
+        return %21
 }

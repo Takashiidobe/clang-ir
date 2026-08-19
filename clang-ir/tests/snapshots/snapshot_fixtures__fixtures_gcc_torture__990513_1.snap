@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/990513-1.c" (c, x86_64-unknown-linux-gnu)
@@ -14,79 +14,79 @@ fn foo(%arg0: s32i*, %arg1: s32i) -> void [external, c, no_inline, dso_local, no
         store %22, %21, align 8
         %23 = const 256 : s32i
         %24 = load %19 : s32i*, align 8
-        %25 = ptr_stride %24, %23 : s32i*
+        ptr_stride
         store %25, %19, align 8
         scope {
-            while {
-                %42 = load %21 : s32i*, align 8
-                %43 = load %19 : s32i*, align 8
-                %44 = cmp ne %42, %43 : bool
-                condition %44
-            } do {
-                scope {
-                    %26 = load %20 : s32i, align 4
-                    %27 = load %19 : s32i*, align 8
-                    %28 = const -1 : s32i
-                    %29 = ptr_stride %27, %28 : s32i*
-                    store %29, %19, align 8
-                    store %26, %29, align 4
-                    %30 = load %20 : s32i, align 4
-                    %31 = load %19 : s32i*, align 8
-                    %32 = const -1 : s32i
-                    %33 = ptr_stride %31, %32 : s32i*
-                    store %33, %19, align 8
-                    store %30, %33, align 4
-                    %34 = load %20 : s32i, align 4
-                    %35 = load %19 : s32i*, align 8
-                    %36 = const -1 : s32i
-                    %37 = ptr_stride %35, %36 : s32i*
-                    store %37, %19, align 8
-                    store %34, %37, align 4
-                    %38 = load %20 : s32i, align 4
-                    %39 = load %19 : s32i*, align 8
-                    %40 = const -1 : s32i
-                    %41 = ptr_stride %39, %40 : s32i*
-                    store %41, %19, align 8
-                    store %38, %41, align 4
-                    yield
+                while {
+                        %42 = load %21 : s32i*, align 8
+                        %43 = load %19 : s32i*, align 8
+                        cmp
+                        condition %44
+                } do {
+                        scope {
+                                %26 = load %20 : s32i, align 4
+                                %27 = load %19 : s32i*, align 8
+                                %28 = const -1 : s32i
+                                ptr_stride
+                                store %29, %19, align 8
+                                store %26, %29, align 4
+                                %30 = load %20 : s32i, align 4
+                                %31 = load %19 : s32i*, align 8
+                                %32 = const -1 : s32i
+                                ptr_stride
+                                store %33, %19, align 8
+                                store %30, %33, align 4
+                                %34 = load %20 : s32i, align 4
+                                %35 = load %19 : s32i*, align 8
+                                %36 = const -1 : s32i
+                                ptr_stride
+                                store %37, %19, align 8
+                                store %34, %37, align 4
+                                %38 = load %20 : s32i, align 4
+                                %39 = load %19 : s32i*, align 8
+                                %40 = const -1 : s32i
+                                ptr_stride
+                                store %41, %19, align 8
+                                store %38, %41, align 4
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
 fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i[256], "BM_tab", align 16
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @memset : ((void*, s32i, u64i) -> void*)*
-    %4 = cast(array_to_ptrdecay) %1 : s32i*
-    %5 = cast(bitcast) %4 : void*
-    %6 = const 0 : s32i
-    %7 = const 1024 : u64i
-    %8 = call @memset(%5, %6, %7) : void* [all]
-    %9 = cast(array_to_ptrdecay) %1 : s32i*
-    %10 = const 6 : s32i
-    call @foo(%9, %10) [all]
-    scope {
-        %13 = const 0 : s64i
-        %14 = get_element %1[%13] : s32i*
-        %15 = load %14 : s32i, align 16
-        %16 = const 6 : s32i
-        %17 = cmp ne %15, %16 : bool
-        if %17 {
-            %18 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i[256], "BM_tab", align 16
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @memset : (void*, s32i, u64i) -> void**
+        %4 = cast(array_to_ptrdecay) %1 : s32i*
+        %5 = cast(bitcast) %4 : void*
+        %6 = const 0 : s32i
+        %7 = const 1024 : u64i
+        %8 = call @memset(%5, %6, %7) : void* [all]
+        %9 = cast(array_to_ptrdecay) %1 : s32i*
+        %10 = const 6 : s32i
+        call @foo(%9, %10) [all]
+        scope {
+                %13 = const 0 : s64i
+                get_element
+                %15 = load %14 : s32i, align 16
+                %16 = const 6 : s32i
+                cmp
+                if %17 {
+                        %18 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %11 = const 0 : s32i
-    store %11, %0
-    %12 = load %0 : s32i
-    return %12
+        %11 = const 0 : s32i
+        store %11, %0
+        %12 = load %0 : s32i
+        return %12
 }

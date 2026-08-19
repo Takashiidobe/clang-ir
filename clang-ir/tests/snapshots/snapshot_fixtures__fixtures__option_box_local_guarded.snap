@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/option_box_local_guarded.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[10] = "no alloc\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[10] = ConstArray { ty: Array { element_type: Named("s8i"), size: 10 }, elts: Str("no alloc\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn malloc(%arg0: u64i) -> void* [external, c, nothrow];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
@@ -18,47 +18,47 @@ fn compute(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %11 = const #cir.ptr<null> : s32i*
         store %11, %10, align 8
         scope {
-            %33 = load %8 : s32i, align 4
-            %34 = cast(int_to_bool) %33 : bool
-            if %34 {
-                %35 = get_global @malloc : ((u64i) -> void*)*
-                %36 = const 4 : u64i
-                %37 = call @malloc(%36) : void* [all]
-                %38 = cast(bitcast) %37 : s32i*
-                store %38, %10, align 8
+                %33 = load %8 : s32i, align 4
+                %34 = cast(int_to_bool) %33 : bool
+                if %34 {
+                        %35 = get_global @malloc : (u64i) -> void**
+                        %36 = const 4 : u64i
+                        %37 = call @malloc(%36) : void* [all]
+                        %38 = cast(bitcast) %37 : s32i*
+                        store %38, %10, align 8
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %14 = load %10 : s32i*, align 8
-            %15 = cast(ptr_to_bool) %14 : bool
-            if %15 {
-                %20 = alloca s32i, "v", align 4
-                %21 = const 41 : s32i
-                %22 = load %10 : s32i*, align 8
-                store %21, %22, align 4
-                %23 = load %10 : s32i*, align 8
-                %24 = load %23 : s32i, align 4
-                store %24, %20, align 4
-                %25 = get_global @printf : ((s8i*, ...) -> s32i)*
-                %26 = get_global @.str : s8i[4]*
-                %27 = cast(array_to_ptrdecay) %26 : s8i*
-                %28 = load %20 : s32i, align 4
-                %29 = call @printf(%27, %28) : s32i [all]
-                %30 = get_global @free : ((void*) -> void)*
-                %31 = load %10 : s32i*, align 8
-                %32 = cast(bitcast) %31 : void*
-                call @free(%32) [all]
+                %14 = load %10 : s32i*, align 8
+                %15 = cast(ptr_to_bool) %14 : bool
+                if %15 {
+                        %20 = alloca s32i, "v", align 4
+                        %21 = const 41 : s32i
+                        %22 = load %10 : s32i*, align 8
+                        store %21, %22, align 4
+                        %23 = load %10 : s32i*, align 8
+                        %24 = load %23 : s32i, align 4
+                        store %24, %20, align 4
+                        %25 = get_global @printf : (s8i*, ...) -> s32i*
+                        %26 = get_global @.str : s8i[4]*
+                        %27 = cast(array_to_ptrdecay) %26 : s8i*
+                        %28 = load %20 : s32i, align 4
+                        %29 = call @printf(%27, %28) : s32i [all]
+                        %30 = get_global @free : (void*) -> void*
+                        %31 = load %10 : s32i*, align 8
+                        %32 = cast(bitcast) %31 : void*
+                        call @free(%32) [all]
+                        yield
+                } else {
+                        %16 = get_global @printf : (s8i*, ...) -> s32i*
+                        %17 = get_global @.str.1 : s8i[10]*
+                        %18 = cast(array_to_ptrdecay) %17 : s8i*
+                        %19 = call @printf(%18) : s32i [all]
+                        yield
+                }
                 yield
-            } else {
-                %16 = get_global @printf : ((s8i*, ...) -> s32i)*
-                %17 = get_global @.str.1 : s8i[10]*
-                %18 = cast(array_to_ptrdecay) %17 : s8i*
-                %19 = call @printf(%18) : s32i [all]
-                yield
-            }
-            yield
         }
         %12 = const 0 : s32i
         store %12, %9
@@ -66,15 +66,15 @@ fn compute(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         return %13
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : s32i
-    %3 = call @compute(%2) : s32i [all]
-    %4 = const 0 : s32i
-    %5 = call @compute(%4) : s32i [all]
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : s32i
+        %3 = call @compute(%2) : s32i [all]
+        %4 = const 0 : s32i
+        %5 = call @compute(%4) : s32i [all]
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

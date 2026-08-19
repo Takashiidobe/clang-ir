@@ -1,45 +1,45 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20001027-1.c" (c, x86_64-unknown-linux-gnu)
-global x : s32i = 0 [external, default, align 4, dso_local]
-global p : s32i* = @x [external, default, align 8, dso_local]
+global x : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global p : s32i* = GlobalView { ty: Pointer { pointee: Named("s32i"), addr_space: None }, symbol: "x", indices: None } [external, default, align 8, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 0 : s32i
-    store %3, %1, align 4
-    %4 = const 1 : s32i
-    %5 = get_global @x : s32i*
-    store %4, %5, align 4
-    %6 = const 2 : s32i
-    %7 = load %1 : s32i, align 4
-    %8 = cast(integral) %7 : s64i
-    %9 = get_global @p : s32i**
-    %10 = load %9 : s32i*, align 8
-    %11 = ptr_stride %10, %8 : s32i*
-    store %6, %11, align 4
-    scope {
-        %15 = get_global @x : s32i*
-        %16 = load %15 : s32i, align 4
-        %17 = const 2 : s32i
-        %18 = cmp ne %16, %17 : bool
-        if %18 {
-            %19 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 0 : s32i
+        store %3, %1, align 4
+        %4 = const 1 : s32i
+        %5 = get_global @x : s32i*
+        store %4, %5, align 4
+        %6 = const 2 : s32i
+        %7 = load %1 : s32i, align 4
+        %8 = cast(integral) %7 : s64i
+        %9 = get_global @p : s32i**
+        %10 = load %9 : s32i*, align 8
+        ptr_stride
+        store %6, %11, align 4
+        scope {
+                %15 = get_global @x : s32i*
+                %16 = load %15 : s32i, align 4
+                %17 = const 2 : s32i
+                cmp
+                if %18 {
+                        %19 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %12 = get_global @exit : ((s32i) -> void)*
-    %13 = const 0 : s32i
-    call @exit(%13) [all]
-    %14 = load %0 : s32i
-    return %14
+        %12 = get_global @exit : (s32i) -> void*
+        %13 = const 0 : s32i
+        call @exit(%13) [all]
+        %14 = load %0 : s32i
+        return %14
 }

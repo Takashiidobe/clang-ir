@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000403-1.c" (c, x86_64-unknown-linux-gnu)
-global aa : u64i[1] = [9223372036854771713] [external, default, align 8, dso_local]
-global bb : u64i[1] = [9223372036854771713] [external, default, align 8, dso_local]
+global aa : u64i[1] = ConstArray { ty: Array { element_type: Named("u64i"), size: 1 }, elts: Array([CirInt { ty: Named("u64i"), value: "9223372036854771713" }]), trailing_zeros_num: 0 } [external, default, align 8, dso_local]
+global bb : u64i[1] = ConstArray { ty: Array { element_type: Named("u64i"), size: 1 }, elts: Array([CirInt { ty: Named("u64i"), value: "9223372036854771713" }]), trailing_zeros_num: 0 } [external, default, align 8, dso_local]
 
 fn seqgt(%arg3: u64i, %arg4: u16i, %arg5: u64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg3: u64i, %arg4: u16i, %arg5: u64i):
@@ -20,10 +20,10 @@ fn seqgt(%arg3: u64i, %arg4: u16i, %arg5: u64i) -> s32i [external, c, no_inline,
         %55 = cast(integral) %54 : u64i
         %56 = add %53, %55 : u64i
         %57 = load %51 : u64i, align 8
-        %58 = sub %56, %57 : u64i
+        sub
         %59 = cast(integral) %58 : s64i
         %60 = const 0 : s64i
-        %61 = cmp gt %59, %60 : bool
+        cmp
         %62 = cast(bool_to_int) %61 : s32i
         store %62, %52
         %63 = load %52 : s32i
@@ -44,12 +44,12 @@ fn seqgt2(%arg0: u64i, %arg1: u16i, %arg2: u64i) -> s32i [external, c, no_inline
         %39 = cast(integral) %38 : u64i
         %40 = add %37, %39 : u64i
         %41 = load %34 : u64i, align 8
-        %42 = sub %40, %41 : u64i
+        sub
         %43 = cast(integral) %42 : s64i
         store %43, %36, align 8
         %44 = load %36 : s64i, align 8
         %45 = const 0 : s64i
-        %46 = cmp gt %44, %45 : bool
+        cmp
         %47 = cast(bool_to_int) %46 : s32i
         store %47, %35
         %48 = load %35 : s32i
@@ -58,50 +58,50 @@ fn seqgt2(%arg0: u64i, %arg1: u16i, %arg2: u64i) -> s32i [external, c, no_inline
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %5 = get_global @aa : u64i[1]*
-        %6 = cast(bitcast) %5 : u64i[0]*
-        %7 = cast(array_to_ptrdecay) %6 : u64i*
-        %8 = load %7 : u64i, align 8
-        %9 = const 4096 : u16i
-        %10 = get_global @bb : u64i[1]*
-        %11 = cast(bitcast) %10 : u64i[0]*
-        %12 = cast(array_to_ptrdecay) %11 : u64i*
-        %13 = load %12 : u64i, align 8
-        %14 = call @seqgt(%8, %9, %13) : s32i [all]
-        %15 = cast(int_to_bool) %14 : bool
-        %16 = not %15 : bool
-        %17 = ternary %16 ? { : bool
-            %31 = const true : bool
-            yield %31
-        } : {
-            %19 = get_global @aa : u64i[1]*
-            %20 = cast(bitcast) %19 : u64i[0]*
-            %21 = cast(array_to_ptrdecay) %20 : u64i*
-            %22 = load %21 : u64i, align 8
-            %23 = const 4096 : u16i
-            %24 = get_global @bb : u64i[1]*
-            %25 = cast(bitcast) %24 : u64i[0]*
-            %26 = cast(array_to_ptrdecay) %25 : u64i*
-            %27 = load %26 : u64i, align 8
-            %28 = call @seqgt2(%22, %23, %27) : s32i [all]
-            %29 = cast(int_to_bool) %28 : bool
-            %30 = not %29 : bool
-            yield %30
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %5 = get_global @aa : u64i[1]*
+                %6 = cast(bitcast) %5 : u64i[0]*
+                %7 = cast(array_to_ptrdecay) %6 : u64i*
+                %8 = load %7 : u64i, align 8
+                %9 = const 4096 : u16i
+                %10 = get_global @bb : u64i[1]*
+                %11 = cast(bitcast) %10 : u64i[0]*
+                %12 = cast(array_to_ptrdecay) %11 : u64i*
+                %13 = load %12 : u64i, align 8
+                %14 = call @seqgt(%8, %9, %13) : s32i [all]
+                %15 = cast(int_to_bool) %14 : bool
+                not
+                %17 = ternary %16 ? { : bool
+                        %31 = const true : bool
+                        yield %31
+                } : {
+                        %19 = get_global @aa : u64i[1]*
+                        %20 = cast(bitcast) %19 : u64i[0]*
+                        %21 = cast(array_to_ptrdecay) %20 : u64i*
+                        %22 = load %21 : u64i, align 8
+                        %23 = const 4096 : u16i
+                        %24 = get_global @bb : u64i[1]*
+                        %25 = cast(bitcast) %24 : u64i[0]*
+                        %26 = cast(array_to_ptrdecay) %25 : u64i*
+                        %27 = load %26 : u64i, align 8
+                        %28 = call @seqgt2(%22, %23, %27) : s32i [all]
+                        %29 = cast(int_to_bool) %28 : bool
+                        not
+                        yield %30
+                }
+                if %17 {
+                        %18 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %17 {
-            %18 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

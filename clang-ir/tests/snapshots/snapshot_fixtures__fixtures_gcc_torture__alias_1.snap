@@ -1,41 +1,41 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/alias-1.c" (c, x86_64-unknown-linux-gnu)
-global val : s32i = 0 [external, default, align 4, dso_local]
-global ptr : s32i* = @val [external, default, align 8, dso_local]
-global ptr2 : float* = @val [external, default, align 8, dso_local]
+global val : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global ptr : s32i* = GlobalView { ty: Pointer { pointee: Named("s32i"), addr_space: None }, symbol: "val", indices: None } [external, default, align 8, dso_local]
+global ptr2 : float* = GlobalView { ty: Pointer { pointee: Single, addr_space: None }, symbol: "val", indices: None } [external, default, align 8, dso_local]
 
 fn typepun() -> void [external, c, no_inline, dso_local, nothrow] {
-    %10 = const 0 : s32i
-    %11 = cast(int_to_float) %10 : float
-    %12 = get_global @ptr2 : float**
-    %13 = load %12 : float*, align 8
-    store %11, %13, align 4
-    return
+        %10 = const 0 : s32i
+        %11 = cast(int_to_float) %10 : float
+        %12 = get_global @ptr2 : float**
+        %13 = load %12 : float*, align 8
+        store %11, %13, align 4
+        return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : s32i
-    %3 = get_global @ptr : s32i**
-    %4 = load %3 : s32i*, align 8
-    store %2, %4, align 4
-    call @typepun() [all]
-    scope {
-        %6 = get_global @ptr : s32i**
-        %7 = load %6 : s32i*, align 8
-        %8 = load %7 : s32i, align 4
-        %9 = cast(int_to_bool) %8 : bool
-        if %9 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : s32i
+        %3 = get_global @ptr : s32i**
+        %4 = load %3 : s32i*, align 8
+        store %2, %4, align 4
+        call @typepun() [all]
+        scope {
+                %6 = get_global @ptr : s32i**
+                %7 = load %6 : s32i*, align 8
+                %8 = load %7 : s32i, align 4
+                %9 = cast(int_to_bool) %8 : bool
+                if %9 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %5 = load %0 : s32i
-    return %5
+        %5 = load %0 : s32i
+        return %5
 }

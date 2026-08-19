@@ -1,70 +1,70 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/extzvsi.c" (c, x86_64-unknown-linux-gnu)
-global x : rec_ieee = zero [external, default, align 4, dso_local]
+global x : rec_ieee = Zero { ty: Named("rec_ieee") } [external, default, align 4, dso_local]
 
 fn foo() -> u32i [external, c, no_inline, dso_local, nothrow] {
-    %12 = alloca u32i, "__retval", align 4
-    %13 = alloca u32i, "exponent", align 4
-    %14 = get_global @x : rec_ieee*
-    %15 = get_member %14[0] "exponent" : u64i*
-    %16 = get_bitfield %15, "exponent": 11 bits @1 in u64i : u32i, align 4
-    store %16, %13, align 4
-    scope {
-        %19 = load %13 : u32i, align 4
-        %20 = const 0 : u32i
-        %21 = cmp eq %19, %20 : bool
-        if %21 {
-            %27 = const 1 : u32i
-            store %27, %12
-            %28 = load %12 : u32i
-            return %28
-        } else {
-            scope {
-                %22 = load %13 : u32i, align 4
-                %23 = const 1 : u32i
-                %24 = cmp gt %22, %23 : bool
-                if %24 {
-                    %25 = const 2 : u32i
-                    store %25, %12
-                    %26 = load %12 : u32i
-                    return %26
+        %12 = alloca u32i, "__retval", align 4
+        %13 = alloca u32i, "exponent", align 4
+        %14 = get_global @x : rec_ieee*
+        get_member
+        get_bitfield
+        store %16, %13, align 4
+        scope {
+                %19 = load %13 : u32i, align 4
+                %20 = const 0 : u32i
+                cmp
+                if %21 {
+                        %27 = const 1 : u32i
+                        store %27, %12
+                        %28 = load %12 : u32i
+                        return %28
+                } else {
+                        scope {
+                                %22 = load %13 : u32i, align 4
+                                %23 = const 1 : u32i
+                                cmp
+                                if %24 {
+                                        %25 = const 2 : u32i
+                                        store %25, %12
+                                        %26 = load %12 : u32i
+                                        return %26
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %17 = const 0 : u32i
-    store %17, %12
-    %18 = load %12 : u32i
-    return %18
+        %17 = const 0 : u32i
+        store %17, %12
+        %18 = load %12 : u32i
+        return %18
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : u32i
-    %3 = get_global @x : rec_ieee*
-    %4 = get_member %3[0] "exponent" : u64i*
-    %5 = set_bitfield %4, %2, "exponent": 11 bits @1 in u64i : u32i, align 4
-    scope {
-        %8 = call @foo() : u32i [all]
-        %9 = const 0 : u32i
-        %10 = cmp ne %8, %9 : bool
-        if %10 {
-            %11 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : u32i
+        %3 = get_global @x : rec_ieee*
+        get_member
+        set_bitfield
+        scope {
+                %8 = call @foo() : u32i [all]
+                %9 = const 0 : u32i
+                cmp
+                if %10 {
+                        %11 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

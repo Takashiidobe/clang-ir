@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20090814-1.c" (c, x86_64-unknown-linux-gnu)
-global i : s32i = 0 [external, default, align 4, dso_local]
-global a : s32i[2] = zero [external, default, align 4, dso_local]
+global i : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global a : s32i[2] = Zero { ty: Array { element_type: Named("s32i"), size: 2 } } [external, default, align 4, dso_local]
 
 fn bar(%arg1: s32i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: s32i*):
@@ -26,7 +26,7 @@ fn foo(%arg0: s32i[2]*) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %22 = load %21 : s32i, align 4
         %23 = cast(integral) %22 : s64i
         %24 = load %19 : s32i[2]*, align 8
-        %25 = get_element %24[%23] : s32i*
+        get_element
         %26 = call @bar(%25) : s32i [all]
         store %26, %20
         %27 = load %20 : s32i
@@ -34,36 +34,36 @@ fn foo(%arg0: s32i[2]*) -> s32i [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const -1 : s32i
-    %3 = const 0 : s64i
-    %4 = get_global @a : s32i[2]*
-    %5 = get_element %4[%3] : s32i*
-    store %2, %5, align 4
-    %6 = const 42 : s32i
-    %7 = const 1 : s64i
-    %8 = get_global @a : s32i[2]*
-    %9 = get_element %8[%7] : s32i*
-    store %6, %9, align 4
-    %10 = const 1 : s32i
-    %11 = get_global @i : s32i*
-    store %10, %11, align 4
-    scope {
-        %14 = get_global @a : s32i[2]*
-        %15 = call @foo(%14) : s32i [all]
-        %16 = const 42 : s32i
-        %17 = cmp ne %15, %16 : bool
-        if %17 {
-            %18 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const -1 : s32i
+        %3 = const 0 : s64i
+        %4 = get_global @a : s32i[2]*
+        get_element
+        store %2, %5, align 4
+        %6 = const 42 : s32i
+        %7 = const 1 : s64i
+        %8 = get_global @a : s32i[2]*
+        get_element
+        store %6, %9, align 4
+        %10 = const 1 : s32i
+        %11 = get_global @i : s32i*
+        store %10, %11, align 4
+        scope {
+                %14 = get_global @a : s32i[2]*
+                %15 = call @foo(%14) : s32i [all]
+                %16 = const 42 : s32i
+                cmp
+                if %17 {
+                        %18 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %12 = const 0 : s32i
-    store %12, %0
-    %13 = load %0 : s32i
-    return %13
+        %12 = const 0 : s32i
+        store %12, %0
+        %13 = load %0 : s32i
+        return %13
 }

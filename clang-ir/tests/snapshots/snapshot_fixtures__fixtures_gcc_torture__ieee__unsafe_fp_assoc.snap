@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/ieee__unsafe-fp-assoc.c" (c, x86_64-unknown-linux-gnu)
-global C : double = 1.7976931348623157E+308 [internal, default, align 8, dso_local, constant]
+global C : double = CirFloat { ty: Double, value: "1.7976931348623157E+308" } [internal, default, align 8, dso_local, constant]
 
 fn foo(%arg0: double) -> double [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: double):
@@ -13,39 +13,39 @@ fn foo(%arg0: double) -> double [external, c, no_inline, dso_local, nothrow] {
         %13 = load %11 : double, align 8
         %14 = get_global @C : double*
         %15 = load %14 : double, align 8
-        %16 = fmul %13, %15 : double
+        fmul
         %17 = get_global @C : double*
         %18 = load %17 : double, align 8
-        %19 = fmul %16, %18 : double
+        fmul
         %20 = get_global @C : double*
         %21 = load %20 : double, align 8
-        %22 = fmul %19, %21 : double
+        fmul
         store %22, %12
         %23 = load %12 : double
         return %23
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca double, "d", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 0.000000e+00 : double
-    %4 = call @foo(%3) : double [all]
-    store %4, %1, align 8
-    scope {
-        %7 = load %1 : double, align 8
-        %8 = const 0.000000e+00 : double
-        %9 = cmp ne %7, %8 : bool
-        if %9 {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca double, "d", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 0.000000e+00 : double
+        %4 = call @foo(%3) : double [all]
+        store %4, %1, align 8
+        scope {
+                %7 = load %1 : double, align 8
+                %8 = const 0.000000e+00 : double
+                cmp
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = load %0 : s32i
-    return %6
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = load %0 : s32i
+        return %6
 }

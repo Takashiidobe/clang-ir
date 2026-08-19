@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr38048-2.c" (c, x86_64-unknown-linux-gnu)
@@ -15,40 +15,40 @@ fn inv_J(%arg0: s32i[2]*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         %40 = cast(float_to_int) %39 : s32i
         store %40, %38, align 4
         scope {
-            %43 = const 0 : s32i
-            store %43, %37, align 4
-            for cond: {
-                %63 = load %37 : s32i, align 4
-                %64 = const 2 : s32i
-                %65 = cmp lt %63, %64 : bool
-                condition %65
-            } step: {
-                %44 = load %37 : s32i, align 4
-                %45 = inc %44 : s32i [nsw]
-                store %45, %37, align 4
+                %43 = const 0 : s32i
+                store %43, %37, align 4
+                for cond {
+                        %63 = load %37 : s32i, align 4
+                        %64 = const 2 : s32i
+                        cmp
+                        condition %65
+                } step {
+                        %44 = load %37 : s32i, align 4
+                        inc
+                        store %45, %37, align 4
+                        yield
+                } body {
+                        %46 = const 0 : s64i
+                        %47 = load %37 : s32i, align 4
+                        %48 = cast(integral) %47 : s64i
+                        %49 = load %34 : s32i[2]*, align 8
+                        ptr_stride
+                        get_element
+                        %52 = load %51 : s32i, align 4
+                        %53 = const 1 : s64i
+                        %54 = load %37 : s32i, align 4
+                        %55 = cast(integral) %54 : s64i
+                        %56 = load %34 : s32i[2]*, align 8
+                        ptr_stride
+                        get_element
+                        %59 = load %58 : s32i, align 4
+                        %60 = add %52, %59 : s32i [nsw]
+                        %61 = load %38 : s32i, align 4
+                        %62 = add %61, %60 : s32i [nsw]
+                        store %62, %38, align 4
+                        yield
+                }
                 yield
-            } do {
-                %46 = const 0 : s64i
-                %47 = load %37 : s32i, align 4
-                %48 = cast(integral) %47 : s64i
-                %49 = load %34 : s32i[2]*, align 8
-                %50 = ptr_stride %49, %48 : s32i[2]*
-                %51 = get_element %50[%46] : s32i*
-                %52 = load %51 : s32i, align 4
-                %53 = const 1 : s64i
-                %54 = load %37 : s32i, align 4
-                %55 = cast(integral) %54 : s64i
-                %56 = load %34 : s32i[2]*, align 8
-                %57 = ptr_stride %56, %55 : s32i[2]*
-                %58 = get_element %57[%53] : s32i*
-                %59 = load %58 : s32i, align 4
-                %60 = add %52, %59 : s32i [nsw]
-                %61 = load %38 : s32i, align 4
-                %62 = add %61, %60 : s32i [nsw]
-                store %62, %38, align 4
-                yield
-            }
-            yield
         }
         %41 = load %38 : s32i, align 4
         store %41, %35
@@ -56,57 +56,57 @@ fn inv_J(%arg0: s32i[2]*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         return %42
 }
 fn foo() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %9 = alloca s32i, "__retval", align 4
-    %10 = alloca s32i[2][2], "mat", align 16
-    %11 = const 1 : s32i
-    %12 = const 0 : s64i
-    %13 = const 0 : s64i
-    %14 = get_element %10[%13] : s32i[2]*
-    %15 = get_element %14[%12] : s32i*
-    store %11, %15, align 16
-    %16 = const 2 : s32i
-    %17 = const 1 : s64i
-    %18 = const 0 : s64i
-    %19 = get_element %10[%18] : s32i[2]*
-    %20 = get_element %19[%17] : s32i*
-    store %16, %20, align 4
-    %21 = const 4 : s32i
-    %22 = const 0 : s64i
-    %23 = const 1 : s64i
-    %24 = get_element %10[%23] : s32i[2]*
-    %25 = get_element %24[%22] : s32i*
-    store %21, %25, align 8
-    %26 = const 8 : s32i
-    %27 = const 1 : s64i
-    %28 = const 1 : s64i
-    %29 = get_element %10[%28] : s32i[2]*
-    %30 = get_element %29[%27] : s32i*
-    store %26, %30, align 4
-    %31 = cast(array_to_ptrdecay) %10 : s32i[2]*
-    %32 = call @inv_J(%31) : s32i [all]
-    store %32, %9
-    %33 = load %9 : s32i
-    return %33
+        %9 = alloca s32i, "__retval", align 4
+        %10 = alloca s32i[2][2], "mat", align 16
+        %11 = const 1 : s32i
+        %12 = const 0 : s64i
+        %13 = const 0 : s64i
+        get_element
+        get_element
+        store %11, %15, align 16
+        %16 = const 2 : s32i
+        %17 = const 1 : s64i
+        %18 = const 0 : s64i
+        get_element
+        get_element
+        store %16, %20, align 4
+        %21 = const 4 : s32i
+        %22 = const 0 : s64i
+        %23 = const 1 : s64i
+        get_element
+        get_element
+        store %21, %25, align 8
+        %26 = const 8 : s32i
+        %27 = const 1 : s64i
+        %28 = const 1 : s64i
+        get_element
+        get_element
+        store %26, %30, align 4
+        %31 = cast(array_to_ptrdecay) %10 : s32i[2]*
+        %32 = call @inv_J(%31) : s32i [all]
+        store %32, %9
+        %33 = load %9 : s32i
+        return %33
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = get_global @foo : (() -> s32i)*
-        %5 = call @foo() : s32i [all]
-        %6 = const 15 : s32i
-        %7 = cmp ne %5, %6 : bool
-        if %7 {
-            %8 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = get_global @foo : () -> s32i*
+                %5 = call @foo() : s32i [all]
+                %6 = const 15 : s32i
+                cmp
+                if %7 {
+                        %8 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

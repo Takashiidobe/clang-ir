@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr60822.c" (c, x86_64-unknown-linux-gnu)
-global x : rec_X = zero [external, default, align 4, dso_local]
+global x : rec_X = Zero { ty: Named("rec_X") } [external, default, align 4, dso_local]
 
 fn Avg(%arg0: rec_X*, %arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: rec_X*, %arg1: s32i):
@@ -15,16 +15,16 @@ fn Avg(%arg0: rec_X*, %arg1: s32i) -> s32i [external, c, no_inline, dso_local, n
         %22 = load %20 : s32i, align 4
         %23 = cast(integral) %22 : s64i
         %24 = load %19 : rec_X*, align 8
-        %25 = get_member %24[1] "a" : s32i*
+        get_member
         %26 = load %25 : s32i, align 4
         %27 = load %19 : rec_X*, align 8
-        %28 = get_member %27[3] "b" : s32i*
+        get_member
         %29 = load %28 : s32i, align 4
         %30 = add %26, %29 : s32i [nsw]
         %31 = cast(integral) %30 : s64i
-        %32 = mul %23, %31 : s64i [nsw]
+        mul
         %33 = const 17 : s32i
-        %34 = shift right %32, %33 : s64i
+        shift
         %35 = cast(integral) %34 : s32i
         store %35, %21
         %36 = load %21 : s32i
@@ -32,35 +32,35 @@ fn Avg(%arg0: rec_X*, %arg1: s32i) -> s32i [external, c, no_inline, dso_local, n
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : s32i
-    %3 = const 17 : s32i
-    %4 = shift left %2, %3 : s32i
-    %5 = get_global @x : rec_X*
-    %6 = get_member %5[1] "a" : s32i*
-    store %4, %6, align 4
-    %7 = const 2 : s32i
-    %8 = const 17 : s32i
-    %9 = shift left %7, %8 : s32i
-    %10 = get_global @x : rec_X*
-    %11 = get_member %10[3] "b" : s32i*
-    store %9, %11, align 4
-    scope {
-        %14 = get_global @x : rec_X*
-        %15 = const 1 : s32i
-        %16 = call @Avg(%14, %15) : s32i [all]
-        %17 = const 3 : s32i
-        %18 = cmp ne %16, %17 : bool
-        if %18 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : s32i
+        %3 = const 17 : s32i
+        shift
+        %5 = get_global @x : rec_X*
+        get_member
+        store %4, %6, align 4
+        %7 = const 2 : s32i
+        %8 = const 17 : s32i
+        shift
+        %10 = get_global @x : rec_X*
+        get_member
+        store %9, %11, align 4
+        scope {
+                %14 = get_global @x : rec_X*
+                %15 = const 1 : s32i
+                %16 = call @Avg(%14, %15) : s32i [all]
+                %17 = const 3 : s32i
+                cmp
+                if %18 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %12 = const 0 : s32i
-    store %12, %0
-    %13 = load %0 : s32i
-    return %13
+        %12 = const 0 : s32i
+        store %12, %0
+        %13 = load %0 : s32i
+        return %13
 }

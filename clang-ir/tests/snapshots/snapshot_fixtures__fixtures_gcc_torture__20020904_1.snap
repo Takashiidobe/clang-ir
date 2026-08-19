@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20020904-1.c" (c, x86_64-unknown-linux-gnu)
@@ -12,7 +12,7 @@ fn fun(%arg0: u8i) -> u8i [external, c, no_inline, dso_local, nothrow] {
         %13 = const 255 : s32i
         %14 = load %10 : u8i, align 1
         %15 = cast(integral) %14 : s32i
-        %16 = div %13, %15 : s32i
+        div
         %17 = cast(integral) %16 : u8i
         store %17, %12, align 1
         %18 = load %12 : u8i, align 1
@@ -22,24 +22,24 @@ fn fun(%arg0: u8i) -> u8i [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const 2 : u8i
-        %5 = call @fun(%4) : u8i [all]
-        %6 = cast(integral) %5 : s32i
-        %7 = const 127 : s32i
-        %8 = cmp ne %6, %7 : bool
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const 2 : u8i
+                %5 = call @fun(%4) : u8i [all]
+                %6 = cast(integral) %5 : s32i
+                %7 = const 127 : s32i
+                cmp
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

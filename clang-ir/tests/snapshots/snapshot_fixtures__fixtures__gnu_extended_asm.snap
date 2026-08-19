@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/gnu_extended_asm.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[10] = "%d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[10] = ConstArray { ty: Array { element_type: Named("s8i"), size: 10 }, elts: Str("%d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn gnu_extended_asm(%arg2: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
@@ -15,22 +15,22 @@ fn gnu_extended_asm(%arg2: s32i) -> s32i [internal, c, no_inline, dso_local, not
         %42 = alloca s32i, "early", align 4
         store %arg2, %38
         %43 = load %38 : s32i, align 4
-        %44 = asm(x86_att, out = [], in = [%43], in_out = [], "leal 3($1), $0", "=r,r,~{cc},~{dirflag},~{fpsr},~{flags}" [side_effects] : s32i
+        asm
         store %44, %40, align 4
         %45 = load %40 : s32i, align 4
-        %46 = asm(x86_att, out = [], in = [], in_out = [%45], "addl $$2, $0", "=r,0,~{cc},~{dirflag},~{fpsr},~{flags}" [side_effects] : s32i
+        asm
         store %46, %40, align 4
         %47 = load %40 : s32i, align 4
         %48 = const 2 : s32i
-        %49 = asm(x86_att, out = [], in = [%47, %48], in_out = [], "imull $2, $0", "=r,0,r,~{cc},~{dirflag},~{fpsr},~{flags}" : s32i
+        asm
         store %49, %41, align 4
         %50 = load %41 : s32i, align 4
         %51 = const 1 : s32i
-        %52 = asm(x86_att, out = [], in = [%50, %51], in_out = [], "movl $1, $0\n\taddl $2, $0", "=&r,r,r,~{cc},~{dirflag},~{fpsr},~{flags}" : s32i
+        asm
         store %52, %42, align 4
         %53 = load %42 : s32i, align 4
         %54 = const 4 : s32i
-        %55 = asm(x86_att, out = [], in = [%54], in_out = [%53], "addl $$${1:c}, $0", "=r,i,0,~{cc},~{dirflag},~{fpsr},~{flags}" : s32i
+        asm
         store %55, %42, align 4
         %56 = load %42 : s32i, align 4
         store %56, %39
@@ -47,7 +47,7 @@ fn gnu_numeric_operands(%arg0: s32i, %arg1: s32i) -> s32i [internal, c, no_inlin
         store %arg1, %30
         %33 = load %29 : s32i, align 4
         %34 = load %30 : s32i, align 4
-        %35 = asm(x86_att, out = [], in = [%33, %34], in_out = [], "subl $2, $0", "=r,0,r,~{cc},~{dirflag},~{fpsr},~{flags}" : s32i
+        asm
         store %35, %32, align 4
         %36 = load %32 : s32i, align 4
         store %36, %31
@@ -55,43 +55,43 @@ fn gnu_numeric_operands(%arg0: s32i, %arg1: s32i) -> s32i [internal, c, no_inlin
         return %37
 }
 fn gnu_multiple_outputs() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %14 = alloca s32i, "__retval", align 4
-    %15 = alloca s32i, "left", align 4
-    %16 = alloca s32i, "right", align 4
-    %17 = alloca rec_anon_struct, "__asm_result", align 1
-    %18 = asm(x86_att, out = [], in = [], in_out = [], "movl $$3, $0\n\tmovl $$4, $1", "=r,=r,~{dirflag},~{fpsr},~{flags}" : rec_anon_struct
-    store %18, %17, align 1
-    %19 = get_member %17[0] "" : s32i*
-    %20 = load %19 : s32i, align 1
-    %21 = get_member %17[1] "" : s32i*
-    %22 = load %21 : s32i, align 1
-    store %20, %15, align 4
-    store %22, %16, align 4
-    %23 = load %15 : s32i, align 4
-    %24 = const 10 : s32i
-    %25 = mul %23, %24 : s32i [nsw]
-    %26 = load %16 : s32i, align 4
-    %27 = add %25, %26 : s32i [nsw]
-    store %27, %14
-    %28 = load %14 : s32i
-    return %28
+        %14 = alloca s32i, "__retval", align 4
+        %15 = alloca s32i, "left", align 4
+        %16 = alloca s32i, "right", align 4
+        %17 = alloca rec_anon_struct, "__asm_result", align 1
+        asm
+        store %18, %17, align 1
+        get_member
+        %20 = load %19 : s32i, align 1
+        get_member
+        %22 = load %21 : s32i, align 1
+        store %20, %15, align 4
+        store %22, %16, align 4
+        %23 = load %15 : s32i, align 4
+        %24 = const 10 : s32i
+        mul
+        %26 = load %16 : s32i, align 4
+        %27 = add %25, %26 : s32i [nsw]
+        store %27, %14
+        %28 = load %14 : s32i
+        return %28
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[10]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = const 7 : s32i
-    %6 = call @gnu_extended_asm(%5) : s32i [all]
-    %7 = const 19 : s32i
-    %8 = const 4 : s32i
-    %9 = call @gnu_numeric_operands(%7, %8) : s32i [all]
-    %10 = call @gnu_multiple_outputs() : s32i [all]
-    %11 = call @printf(%4, %6, %9, %10) : s32i [all]
-    %12 = const 0 : s32i
-    store %12, %0
-    %13 = load %0 : s32i
-    return %13
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[10]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = const 7 : s32i
+        %6 = call @gnu_extended_asm(%5) : s32i [all]
+        %7 = const 19 : s32i
+        %8 = const 4 : s32i
+        %9 = call @gnu_numeric_operands(%7, %8) : s32i [all]
+        %10 = call @gnu_multiple_outputs() : s32i [all]
+        %11 = call @printf(%4, %6, %9, %10) : s32i [all]
+        %12 = const 0 : s32i
+        store %12, %0
+        %13 = load %0 : s32i
+        return %13
 }

@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20040302-1.c" (c, x86_64-unknown-linux-gnu)
-global bar.l : void*[2] = [#cir.block_addr_info<@bar, "lab0">, #cir.block_addr_info<@bar, "end">] [internal, default, align 16, dso_local]
-global code : s32i[5] = [0, 0, 0, 0, 1] [external, default, align 16, dso_local]
+global bar.l : void*[2] = ConstArray { ty: Array { element_type: Pointer { pointee: Named("void"), addr_space: None }, size: 2 }, elts: Array([Dialect { dialect: "cir", mnemonic: "block_addr_info", raw: Some("@bar, \"lab0\""), ty: Some(Pointer { pointee: Named("void"), addr_space: None }) }, Dialect { dialect: "cir", mnemonic: "block_addr_info", raw: Some("@bar, \"end\""), ty: Some(Pointer { pointee: Named("void"), addr_space: None }) }]), trailing_zeros_num: 0 } [internal, default, align 16, dso_local]
+global code : s32i[5] = ConstArray { ty: Array { element_type: Named("s32i"), size: 5 }, elts: Array([CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "1" }]), trailing_zeros_num: 0 } [external, default, align 16, dso_local]
 
 fn foo(%arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: s32i):
@@ -12,7 +12,7 @@ fn foo(%arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %24 = alloca s32i, "b", align 4
         store %arg1, %23
         %25 = const -1 : s32i
-        store %25, %24, align 4, volatile
+        store %25, %24, align 4
         return
 }
 fn bar(%arg0: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -25,36 +25,36 @@ fn bar(%arg0: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
         %9 = load %6 : s32i*, align 8
         %10 = load %9 : s32i, align 4
         %11 = cast(integral) %10 : s64i
-        %12 = get_element %7[%11] : void**
+        get_element
         %13 = load %12 : void*, align 8
         indirect_goto %13
-    ^bb1():
+    ^bb1:
         label lab0:
         %14 = const 0 : s32i
         call @foo(%14) [all]
         %15 = load %6 : s32i*, align 8
         %16 = const 1 : s32i
-        %17 = ptr_stride %15, %16 : s32i*
+        ptr_stride
         store %17, %6, align 8
         %18 = load %6 : s32i*, align 8
         %19 = load %18 : s32i, align 4
         %20 = cast(integral) %19 : s64i
-        %21 = get_element %7[%20] : void**
+        get_element
         %22 = load %21 : void*, align 8
         indirect_goto %22
-    ^bb2():
+    ^bb2:
         label end:
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @code : s32i[5]*
-    %3 = cast(array_to_ptrdecay) %2 : s32i*
-    call @bar(%3) [all]
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @code : s32i[5]*
+        %3 = cast(array_to_ptrdecay) %2 : s32i*
+        call @bar(%3) [all]
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

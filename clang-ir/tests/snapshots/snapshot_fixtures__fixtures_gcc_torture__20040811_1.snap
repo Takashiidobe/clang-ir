@@ -1,67 +1,67 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20040811-1.c" (c, x86_64-unknown-linux-gnu)
-global p : void* = #cir.ptr<null> [external, default, align 8, dso_local]
+global p : void* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("void"), addr_space: None }) } [external, default, align 8, dso_local]
 
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "n", align 4
-    %2 = alloca u8i*, "saved_stack", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 0 : s32i
-    store %4, %1, align 4
-    br ^bb1
-    ^bb1():
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "n", align 4
+        %2 = alloca u8i*, "saved_stack", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 0 : s32i
+        store %4, %1, align 4
+        br ^bb1
+    ^bb1:
         label lab:
         %5 = load %1 : s32i, align 4
         %6 = const 1000 : s32i
-        %7 = rem %5, %6 : s32i
+        rem
         %8 = const 1 : s32i
         %9 = add %7, %8 : s32i [nsw]
         %10 = cast(integral) %9 : u64i
-        %11 = stacksave : u8i*
+        stacksave
         store %11, %2, align 8
         cleanup.scope {
-            %14 = alloca s32i, "x", align 16, dynamic %10
-            %15 = const 1 : s32i
-            %16 = const 0 : s64i
-            %17 = ptr_stride %14, %16 : s32i*
-            store %15, %17, align 16
-            %18 = const 2 : s32i
-            %19 = load %1 : s32i, align 4
-            %20 = const 1000 : s32i
-            %21 = rem %19, %20 : s32i
-            %22 = cast(integral) %21 : s64i
-            %23 = ptr_stride %14, %22 : s32i*
-            store %18, %23, align 4
-            %24 = cast(bitcast) %14 : void*
-            %25 = get_global @p : void**
-            store %24, %25, align 8, volatile
-            %26 = load %1 : s32i, align 4
-            %27 = inc %26 : s32i [nsw]
-            store %27, %1, align 4
-            scope {
-                %30 = load %1 : s32i, align 4
-                %31 = const 1000000 : s32i
-                %32 = cmp lt %30, %31 : bool
-                if %32 {
-                    goto lab
+                %14 = alloca s32i, "x", size(%10), align 16
+                %15 = const 1 : s32i
+                %16 = const 0 : s64i
+                ptr_stride
+                store %15, %17, align 16
+                %18 = const 2 : s32i
+                %19 = load %1 : s32i, align 4
+                %20 = const 1000 : s32i
+                rem
+                %22 = cast(integral) %21 : s64i
+                ptr_stride
+                store %18, %23, align 4
+                %24 = cast(bitcast) %14 : void*
+                %25 = get_global @p : void**
+                store %24, %25, align 8
+                %26 = load %1 : s32i, align 4
+                inc
+                store %27, %1, align 4
+                scope {
+                        %30 = load %1 : s32i, align 4
+                        %31 = const 1000000 : s32i
+                        cmp
+                        if %32 {
+                                goto lab
+                        }
+                        yield
                 }
-                yield
-            }
-            %28 = const 0 : s32i
-            store %28, %0
-            %29 = load %0 : s32i
-            return %29
-            ^bb1():
+                %28 = const 0 : s32i
+                store %28, %0
+                %29 = load %0 : s32i
+                return %29
+            ^bb1:
                 yield
         } cleanup normal {
-            %13 = load %2 : u8i*, align 8
-            stackrestore %13
-            yield
+                %13 = load %2 : u8i*, align 8
+                stackrestore
+                yield
         }
         %12 = load %0 : s32i
         return %12

@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr109040.c" (c, x86_64-unknown-linux-gnu)
-global a : u16i = 0 [external, default, align 2, dso_local]
-global b : u16i = 0 [external, default, align 2, dso_local]
-global c : u16i = 0 [external, default, align 2, dso_local]
-global d : u16i = 0 [external, default, align 2, dso_local]
+global a : u16i = CirInt { ty: Named("u16i"), value: "0" } [external, default, align 2, dso_local]
+global b : u16i = CirInt { ty: Named("u16i"), value: "0" } [external, default, align 2, dso_local]
+global c : u16i = CirInt { ty: Named("u16i"), value: "0" } [external, default, align 2, dso_local]
+global d : u16i = CirInt { ty: Named("u16i"), value: "0" } [external, default, align 2, dso_local]
 
 fn foo(%arg0: vector<16 x u16i>*, %arg1: u16i*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: vector<16 x u16i>*, %arg1: u16i*):
@@ -19,18 +19,18 @@ fn foo(%arg0: vector<16 x u16i>*, %arg1: u16i*) -> void [external, c, no_inline,
         store %13, %14
         store %arg1, %15
         %19 = const 6 : u16i
-        %20 = vec.splat %19 : vector<16 x u16i>
-        %21 = const [2124, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : vector<16 x u16i>
+        vec.splat
+        %21 = const [[2124, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]] : vector<16 x u16i>
         store %21, %17, align 32
         %22 = load %17 : vector<16 x u16i>, align 32
         %23 = load %14 : vector<16 x u16i>, align 32
-        %24 = and %22, %23 : vector<16 x u16i>
-        %25 = vec.cmp gt %20, %24 : vector<16 x s16i>
+        and
+        vec.cmp
         %26 = cast(bitcast) %25 : vector<16 x u16i>
         store %26, %16, align 32
         %27 = load %16 : vector<16 x u16i>, align 32
         %28 = const 0 : s32i
-        %29 = vec.extract %27[%28] : u16i
+        vec.extract
         %30 = cast(integral) %29 : s32i
         %31 = get_global @a : u16i*
         %32 = load %31 : u16i, align 2
@@ -57,30 +57,30 @@ fn foo(%arg0: vector<16 x u16i>*, %arg1: u16i*) -> void [external, c, no_inline,
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u16i, "x", align 2
-    %2 = alloca vector<16 x u16i>, ".compoundliteral", align 32
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const [0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : vector<16 x u16i>
-    store %4, %2, align 32
-    %5 = load %2 : vector<16 x u16i>, align 32
-    %6 = alloca vector<16 x u16i>, "byval", align 32
-    store %5, %6
-    call @foo(%6, %1) [all]
-    scope {
-        %9 = load %1 : u16i, align 2
-        %10 = cast(integral) %9 : s32i
-        %11 = const 65535 : s32i
-        %12 = cmp ne %10, %11 : bool
-        if %12 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u16i, "x", align 2
+        %2 = alloca vector<16 x u16i>, ".compoundliteral", align 32
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const [[0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]] : vector<16 x u16i>
+        store %4, %2, align 32
+        %5 = load %2 : vector<16 x u16i>, align 32
+        %6 = alloca vector<16 x u16i>, "byval", align 32
+        store %5, %6
+        call @foo(%6, %1) [all]
+        scope {
+                %9 = load %1 : u16i, align 2
+                %10 = cast(integral) %9 : s32i
+                %11 = const 65535 : s32i
+                cmp
+                if %12 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = load %0 : s32i
-    return %8
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = load %0 : s32i
+        return %8
 }

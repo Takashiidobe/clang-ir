@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr35472.c" (c, x86_64-unknown-linux-gnu)
-global p : rec_S* = #cir.ptr<null> [external, default, align 8, dso_local]
+global p : rec_S* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("rec_S"), addr_space: None }) } [external, default, align 8, dso_local]
 
 fn foo(%arg0: rec_S*, %arg1: rec_S*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: rec_S*, %arg1: rec_S*):
@@ -14,8 +14,8 @@ fn foo(%arg0: rec_S*, %arg1: rec_S*) -> void [external, c, no_inline, dso_local,
         %35 = const -1 : s32i
         %36 = const 0 : s64i
         %37 = load %33 : rec_S*, align 8
-        %38 = get_member %37[0] "i" : s32i[16]*
-        %39 = get_element %38[%36] : s32i*
+        get_member
+        get_element
         store %35, %39, align 4
         %40 = load %34 : rec_S*, align 8
         %41 = get_global @p : rec_S**
@@ -25,54 +25,54 @@ fn foo(%arg0: rec_S*, %arg1: rec_S*) -> void [external, c, no_inline, dso_local,
 fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
 fn abort() -> void [external, c, nothrow];
 fn test() -> void [external, c, no_inline, dso_local, nothrow] {
-    %4 = alloca rec_S, "a", align 4
-    %5 = alloca rec_S, "b", align 4
-    %6 = get_global @memset : ((void*, s32i, u64i) -> void*)*
-    %7 = const 0 : s64i
-    %8 = get_member %4[0] "i" : s32i[16]*
-    %9 = get_element %8[%7] : s32i*
-    %10 = cast(bitcast) %9 : void*
-    %11 = const 0 : s32i
-    %12 = const 64 : u64i
-    %13 = call @memset(%10, %11, %12) : void* [all]
-    %14 = get_global @memset : ((void*, s32i, u64i) -> void*)*
-    %15 = const 0 : s64i
-    %16 = get_member %5[0] "i" : s32i[16]*
-    %17 = get_element %16[%15] : s32i*
-    %18 = cast(bitcast) %17 : void*
-    %19 = const 0 : s32i
-    %20 = const 64 : u64i
-    %21 = call @memset(%18, %19, %20) : void* [all]
-    call @foo(%4, %5) [all]
-    %22 = get_global @p : rec_S**
-    %23 = load %22 : rec_S*, align 8
-    copy %23, %4
-    %24 = get_global @p : rec_S**
-    %25 = load %24 : rec_S*, align 8
-    copy %25, %5
-    scope {
-        %26 = const 0 : s64i
-        %27 = get_member %5[0] "i" : s32i[16]*
-        %28 = get_element %27[%26] : s32i*
-        %29 = load %28 : s32i, align 4
-        %30 = const -1 : s32i
-        %31 = cmp ne %29, %30 : bool
-        if %31 {
-            %32 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %4 = alloca rec_S, "a", align 4
+        %5 = alloca rec_S, "b", align 4
+        %6 = get_global @memset : (void*, s32i, u64i) -> void**
+        %7 = const 0 : s64i
+        get_member
+        get_element
+        %10 = cast(bitcast) %9 : void*
+        %11 = const 0 : s32i
+        %12 = const 64 : u64i
+        %13 = call @memset(%10, %11, %12) : void* [all]
+        %14 = get_global @memset : (void*, s32i, u64i) -> void**
+        %15 = const 0 : s64i
+        get_member
+        get_element
+        %18 = cast(bitcast) %17 : void*
+        %19 = const 0 : s32i
+        %20 = const 64 : u64i
+        %21 = call @memset(%18, %19, %20) : void* [all]
+        call @foo(%4, %5) [all]
+        %22 = get_global @p : rec_S**
+        %23 = load %22 : rec_S*, align 8
+        copy
+        %24 = get_global @p : rec_S**
+        %25 = load %24 : rec_S*, align 8
+        copy
+        scope {
+                %26 = const 0 : s64i
+                get_member
+                get_element
+                %29 = load %28 : s32i, align 4
+                %30 = const -1 : s32i
+                cmp
+                if %31 {
+                        %32 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    return
+        return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    call @test() [all]
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        call @test() [all]
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

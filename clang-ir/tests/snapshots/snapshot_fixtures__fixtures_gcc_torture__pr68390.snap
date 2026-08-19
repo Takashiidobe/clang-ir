@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr68390.c" (c, x86_64-unknown-linux-gnu)
@@ -10,55 +10,55 @@ fn direct(%arg2: s32i, ...) -> double [external, c, no_inline, dso_local, nothro
         store %arg2, %24
         %26 = load %24 : s32i, align 4
         %27 = load %24 : s32i, align 4
-        %28 = mul %26, %27 : s32i [nsw]
+        mul
         %29 = cast(int_to_float) %28 : double
         store %29, %25
         %30 = load %25 : double
         return %30
 }
-fn broken(%arg0: ((s32i, ...) -> double)*, %arg1: s32i) -> double [external, c, no_inline, dso_local, nothrow] {
-    ^bb0(%arg0: ((s32i, ...) -> double)*, %arg1: s32i):
-        %17 = alloca ((s32i, ...) -> double)*, "indirect", align 8
+fn broken(%arg0: (s32i, ...) -> double*, %arg1: s32i) -> double [external, c, no_inline, dso_local, nothrow] {
+    ^bb0(%arg0: (s32i, ...) -> double*, %arg1: s32i):
+        %17 = alloca (s32i, ...) -> double*, "indirect", align 8
         %18 = alloca s32i, "v", align 4
         %19 = alloca double, "__retval", align 8
         store %arg0, %17
         store %arg1, %18
-        %20 = load %17 : ((s32i, ...) -> double)*, align 8
+        %20 = load %17 : (s32i, ...) -> double*, align 8
         %21 = load %18 : s32i, align 4
-        %22 = call %20(%21) : double [all]
+        %22 = call (%21) : double [all]
         store %22, %19
         %23 = load %19 : double
         return %23
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca double, "d1", align 8
-    %2 = alloca double, "d2", align 8
-    %3 = alloca s32i, "i", align 4
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = const 2 : s32i
-    store %5, %3, align 4
-    %6 = get_global @direct : ((s32i, ...) -> double)*
-    %7 = load %3 : s32i, align 4
-    %8 = call @broken(%6, %7) : double [all]
-    store %8, %1, align 8
-    scope {
-        %11 = load %1 : double, align 8
-        %12 = load %3 : s32i, align 4
-        %13 = load %3 : s32i, align 4
-        %14 = mul %12, %13 : s32i [nsw]
-        %15 = cast(int_to_float) %14 : double
-        %16 = cmp ne %11, %15 : bool
-        if %16 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca double, "d1", align 8
+        %2 = alloca double, "d2", align 8
+        %3 = alloca s32i, "i", align 4
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = const 2 : s32i
+        store %5, %3, align 4
+        %6 = get_global @direct : (s32i, ...) -> double*
+        %7 = load %3 : s32i, align 4
+        %8 = call @broken(%6, %7) : double [all]
+        store %8, %1, align 8
+        scope {
+                %11 = load %1 : double, align 8
+                %12 = load %3 : s32i, align 4
+                %13 = load %3 : s32i, align 4
+                mul
+                %15 = cast(int_to_float) %14 : double
+                cmp
+                if %16 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %9 = const 0 : s32i
-    store %9, %0
-    %10 = load %0 : s32i
-    return %10
+        %9 = const 0 : s32i
+        store %9, %0
+        %10 = load %0 : s32i
+        return %10
 }

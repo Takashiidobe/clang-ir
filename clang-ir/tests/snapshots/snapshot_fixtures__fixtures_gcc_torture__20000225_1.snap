@@ -1,64 +1,64 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000225-1.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "nResult", align 4
-    %2 = alloca s32i, "b", align 4
-    %3 = alloca s32i, "i", align 4
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = const 0 : s32i
-    store %5, %2, align 4
-    %6 = const -1 : s32i
-    store %6, %3, align 4
-    scope {
-        do {
-            scope {
-                scope {
-                    %20 = load %2 : s32i, align 4
-                    %21 = const 0 : s32i
-                    %22 = cmp ne %20, %21 : bool
-                    if %22 {
-                        %24 = get_global @abort : (() -> void)*
-                        call @abort() [all]
-                        %25 = const 1 : s32i
-                        store %25, %1, align 4
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "nResult", align 4
+        %2 = alloca s32i, "b", align 4
+        %3 = alloca s32i, "i", align 4
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = const 0 : s32i
+        store %5, %2, align 4
+        %6 = const -1 : s32i
+        store %6, %3, align 4
+        scope {
+                do {
+                        scope {
+                                scope {
+                                        %20 = load %2 : s32i, align 4
+                                        %21 = const 0 : s32i
+                                        cmp
+                                        if %22 {
+                                                %24 = get_global @abort : () -> void*
+                                                call @abort() [all]
+                                                %25 = const 1 : s32i
+                                                store %25, %1, align 4
+                                                yield
+                                        } else {
+                                                %23 = const 0 : s32i
+                                                store %23, %1, align 4
+                                                yield
+                                        }
+                                        yield
+                                }
+                                %13 = load %3 : s32i, align 4
+                                inc
+                                store %14, %3, align 4
+                                %15 = load %3 : s32i, align 4
+                                %16 = const 2 : s32i
+                                %17 = add %15, %16 : s32i [nsw]
+                                %18 = const 4 : s32i
+                                mul
+                                store %19, %2, align 4
+                                yield
+                        }
                         yield
-                    } else {
-                        %23 = const 0 : s32i
-                        store %23, %1, align 4
-                        yield
-                    }
-                    yield
+                } while {
+                        %10 = load %3 : s32i, align 4
+                        %11 = const 0 : s32i
+                        cmp
+                        condition %12
                 }
-                %13 = load %3 : s32i, align 4
-                %14 = inc %13 : s32i [nsw]
-                store %14, %3, align 4
-                %15 = load %3 : s32i, align 4
-                %16 = const 2 : s32i
-                %17 = add %15, %16 : s32i [nsw]
-                %18 = const 4 : s32i
-                %19 = mul %17, %18 : s32i [nsw]
-                store %19, %2, align 4
                 yield
-            }
-            yield
-        } while {
-            %10 = load %3 : s32i, align 4
-            %11 = const 0 : s32i
-            %12 = cmp lt %10, %11 : bool
-            condition %12
         }
-        yield
-    }
-    %7 = get_global @exit : ((s32i) -> void)*
-    %8 = const 0 : s32i
-    call @exit(%8) [all]
-    %9 = load %0 : s32i
-    return %9
+        %7 = get_global @exit : (s32i) -> void*
+        %8 = const 0 : s32i
+        call @exit(%8) [all]
+        %9 = load %0 : s32i
+        return %9
 }

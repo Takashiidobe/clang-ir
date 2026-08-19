@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/arith-1.c" (c, x86_64-unknown-linux-gnu)
@@ -14,15 +14,15 @@ fn sat_add(%arg3: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         %68 = add %66, %67 : u32i
         store %68, %65, align 4
         scope {
-            %71 = load %65 : u32i, align 4
-            %72 = load %63 : u32i, align 4
-            %73 = cmp lt %71, %72 : bool
-            if %73 {
-                %74 = load %63 : u32i, align 4
-                store %74, %65, align 4
+                %71 = load %65 : u32i, align 4
+                %72 = load %63 : u32i, align 4
+                cmp
+                if %73 {
+                        %74 = load %63 : u32i, align 4
+                        store %74, %65, align 4
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %69 = load %65 : u32i, align 4
         store %69, %64
@@ -40,16 +40,16 @@ fn sat_add2(%arg2: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         %55 = add %53, %54 : u32i
         store %55, %52, align 4
         scope {
-            %58 = load %52 : u32i, align 4
-            %59 = load %50 : u32i, align 4
-            %60 = cmp gt %58, %59 : bool
-            if %60 {
-                %61 = load %52 : u32i, align 4
-                store %61, %51
-                %62 = load %51 : u32i
-                return %62
-            }
-            yield
+                %58 = load %52 : u32i, align 4
+                %59 = load %50 : u32i, align 4
+                cmp
+                if %60 {
+                        %61 = load %52 : u32i, align 4
+                        store %61, %51
+                        %62 = load %51 : u32i
+                        return %62
+                }
+                yield
         }
         %56 = load %50 : u32i, align 4
         store %56, %51
@@ -64,18 +64,18 @@ fn sat_add3(%arg1: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         store %arg1, %38
         %41 = load %38 : u32i, align 4
         %42 = const 1 : u32i
-        %43 = sub %41, %42 : u32i
+        sub
         store %43, %40, align 4
         scope {
-            %46 = load %40 : u32i, align 4
-            %47 = load %38 : u32i, align 4
-            %48 = cmp gt %46, %47 : bool
-            if %48 {
-                %49 = load %38 : u32i, align 4
-                store %49, %40, align 4
+                %46 = load %40 : u32i, align 4
+                %47 = load %38 : u32i, align 4
+                cmp
+                if %48 {
+                        %49 = load %38 : u32i, align 4
+                        store %49, %40, align 4
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %44 = load %40 : u32i, align 4
         store %44, %39
@@ -90,19 +90,19 @@ fn sat_add4(%arg0: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %25
         %28 = load %25 : u32i, align 4
         %29 = const 1 : u32i
-        %30 = sub %28, %29 : u32i
+        sub
         store %30, %27, align 4
         scope {
-            %33 = load %27 : u32i, align 4
-            %34 = load %25 : u32i, align 4
-            %35 = cmp lt %33, %34 : bool
-            if %35 {
-                %36 = load %27 : u32i, align 4
-                store %36, %26
-                %37 = load %26 : u32i
-                return %37
-            }
-            yield
+                %33 = load %27 : u32i, align 4
+                %34 = load %25 : u32i, align 4
+                cmp
+                if %35 {
+                        %36 = load %27 : u32i, align 4
+                        store %36, %26
+                        %37 = load %26 : u32i
+                        return %37
+                }
+                yield
         }
         %31 = load %25 : u32i, align 4
         store %31, %26
@@ -112,60 +112,60 @@ fn sat_add4(%arg0: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %20 = const 4294967295 : u32i
-        %21 = call @sat_add(%20) : u32i [all]
-        %22 = const 4294967295 : u32i
-        %23 = cmp ne %21, %22 : bool
-        if %23 {
-            %24 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %20 = const 4294967295 : u32i
+                %21 = call @sat_add(%20) : u32i [all]
+                %22 = const 4294967295 : u32i
+                cmp
+                if %23 {
+                        %24 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %15 = const 4294967295 : u32i
-        %16 = call @sat_add2(%15) : u32i [all]
-        %17 = const 4294967295 : u32i
-        %18 = cmp ne %16, %17 : bool
-        if %18 {
-            %19 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %15 = const 4294967295 : u32i
+                %16 = call @sat_add2(%15) : u32i [all]
+                %17 = const 4294967295 : u32i
+                cmp
+                if %18 {
+                        %19 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %10 = const 0 : u32i
-        %11 = call @sat_add3(%10) : u32i [all]
-        %12 = const 0 : u32i
-        %13 = cmp ne %11, %12 : bool
-        if %13 {
-            %14 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %10 = const 0 : u32i
+                %11 = call @sat_add3(%10) : u32i [all]
+                %12 = const 0 : u32i
+                cmp
+                if %13 {
+                        %14 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %5 = const 0 : u32i
-        %6 = call @sat_add4(%5) : u32i [all]
-        %7 = const 0 : u32i
-        %8 = cmp ne %6, %7 : bool
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %5 = const 0 : u32i
+                %6 = call @sat_add4(%5) : u32i [all]
+                %7 = const 0 : u32i
+                cmp
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

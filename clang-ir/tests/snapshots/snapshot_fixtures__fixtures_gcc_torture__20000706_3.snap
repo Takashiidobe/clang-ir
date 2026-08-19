@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000706-3.c" (c, x86_64-unknown-linux-gnu)
-global c : s32i = 0 [external, default, align 4, dso_local]
+global c : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn baz(%arg3: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg3: s32i*):
@@ -21,25 +21,25 @@ fn bar(%arg2: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %10 = alloca s32i, "b", align 4
         store %arg2, %10
         scope {
-            %11 = get_global @c : s32i*
-            %12 = load %11 : s32i, align 4
-            %13 = const 1 : s32i
-            %14 = cmp ne %12, %13 : bool
-            %15 = ternary %14 ? { : bool
-                %20 = const true : bool
-                yield %20
-            } : {
-                %17 = load %10 : s32i, align 4
-                %18 = const 2 : s32i
-                %19 = cmp ne %17, %18 : bool
-                yield %19
-            }
-            if %15 {
-                %16 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %11 = get_global @c : s32i*
+                %12 = load %11 : s32i, align 4
+                %13 = const 1 : s32i
+                cmp
+                %15 = ternary %14 ? { : bool
+                        %20 = const true : bool
+                        yield %20
+                } : {
+                        %17 = load %10 : s32i, align 4
+                        %18 = const 2 : s32i
+                        cmp
+                        yield %19
+                }
+                if %15 {
+                        %16 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -56,15 +56,15 @@ fn foo(%arg0: s32i, %arg1: s32i) -> void [external, c, no_inline, dso_local, not
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : s32i
-    %3 = const 2 : s32i
-    call @foo(%2, %3) [all]
-    %4 = get_global @exit : ((s32i) -> void)*
-    %5 = const 0 : s32i
-    call @exit(%5) [all]
-    %6 = load %0 : s32i
-    return %6
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : s32i
+        %3 = const 2 : s32i
+        call @foo(%2, %3) [all]
+        %4 = get_global @exit : (s32i) -> void*
+        %5 = const 0 : s32i
+        call @exit(%5) [all]
+        %6 = load %0 : s32i
+        return %6
 }

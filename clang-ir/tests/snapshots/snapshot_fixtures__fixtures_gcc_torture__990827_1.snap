@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/990827-1.c" (c, x86_64-unknown-linux-gnu)
@@ -14,19 +14,19 @@ fn test(%arg0: u32i, %arg1: u32i) -> u32i [external, c, no_inline, dso_local, no
         store %arg1, %25
         %29 = load %25 : u32i, align 4
         %30 = const 1 : u32i
-        %31 = and %29, %30 : u32i
+        and
         store %31, %27, align 4
         %32 = load %24 : u32i, align 4
         %33 = const 1 : s32i
-        %34 = shift right %32, %33 : u32i
+        shift
         store %34, %28, align 4
         %35 = load %27 : u32i, align 4
-        %36 = inc %35 : u32i
+        inc
         store %36, %27, align 4
         %37 = load %28 : u32i, align 4
         %38 = load %27 : u32i, align 4
         %39 = const 1 : s32i
-        %40 = shift right %38, %39 : u32i
+        shift
         %41 = add %37, %40 : u32i
         store %41, %26
         %42 = load %26 : u32i
@@ -35,53 +35,53 @@ fn test(%arg0: u32i, %arg1: u32i) -> u32i [external, c, no_inline, dso_local, no
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %18 = const 1 : u32i
-        %19 = const 0 : u32i
-        %20 = call @test(%18, %19) : u32i [all]
-        %21 = const 0 : u32i
-        %22 = cmp ne %20, %21 : bool
-        if %22 {
-            %23 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %18 = const 1 : u32i
+                %19 = const 0 : u32i
+                %20 = call @test(%18, %19) : u32i [all]
+                %21 = const 0 : u32i
+                cmp
+                if %22 {
+                        %23 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %12 = const 1 : u32i
-        %13 = const 1 : u32i
-        %14 = call @test(%12, %13) : u32i [all]
-        %15 = const 1 : u32i
-        %16 = cmp ne %14, %15 : bool
-        if %16 {
-            %17 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %12 = const 1 : u32i
+                %13 = const 1 : u32i
+                %14 = call @test(%12, %13) : u32i [all]
+                %15 = const 1 : u32i
+                cmp
+                if %16 {
+                        %17 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %6 = const 1 : u32i
-        %7 = const 65535 : u32i
-        %8 = call @test(%6, %7) : u32i [all]
-        %9 = const 1 : u32i
-        %10 = cmp ne %8, %9 : bool
-        if %10 {
-            %11 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %6 = const 1 : u32i
+                %7 = const 65535 : u32i
+                %8 = call @test(%6, %7) : u32i [all]
+                %9 = const 1 : u32i
+                cmp
+                if %10 {
+                        %11 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/ternary_function_pointer_select.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[13] = "%d %d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[13] = ConstArray { ty: Array { element_type: Named("s8i"), size: 13 }, elts: Str("%d %d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn add(%arg5: s32i, %arg6: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg5: s32i, %arg6: s32i):
@@ -28,7 +28,7 @@ fn sub(%arg3: s32i, %arg4: s32i) -> s32i [internal, c, no_inline, dso_local, not
         store %arg4, %50
         %52 = load %49 : s32i, align 4
         %53 = load %50 : s32i, align 4
-        %54 = sub %52, %53 : s32i [nsw]
+        sub
         store %54, %51
         %55 = load %51 : s32i
         return %55
@@ -45,56 +45,56 @@ fn apply(%arg0: s32i, %arg1: s32i, %arg2: s32i) -> s32i [internal, c, no_inline,
         store %arg2, %38
         %40 = load %36 : s32i, align 4
         %41 = cast(int_to_bool) %40 : bool
-        %42 = get_global @add : ((s32i, s32i) -> s32i)*
-        %43 = get_global @sub : ((s32i, s32i) -> s32i)*
-        %44 = select %41, %42, %43 : ((s32i, s32i) -> s32i)*
+        %42 = get_global @add : (s32i, s32i) -> s32i*
+        %43 = get_global @sub : (s32i, s32i) -> s32i*
+        select
         %45 = load %37 : s32i, align 4
         %46 = load %38 : s32i, align 4
-        %47 = call %44(%45, %46) : s32i [all]
+        %47 = call (%45, %46) : s32i [all]
         store %47, %39
         %48 = load %39 : s32i
         return %48
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "useAdd", align 4
-    %2 = alloca ((s32i, s32i) -> s32i)*, "op", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 1 : s32i
-    store %4, %1, align 4
-    %5 = load %1 : s32i, align 4
-    %6 = cast(int_to_bool) %5 : bool
-    %7 = get_global @add : ((s32i, s32i) -> s32i)*
-    %8 = get_global @sub : ((s32i, s32i) -> s32i)*
-    %9 = select %6, %7, %8 : ((s32i, s32i) -> s32i)*
-    store %9, %2, align 8
-    %10 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %11 = get_global @.str : s8i[13]*
-    %12 = cast(array_to_ptrdecay) %11 : s8i*
-    %13 = load %2 : ((s32i, s32i) -> s32i)*, align 8
-    %14 = const 10 : s32i
-    %15 = const 3 : s32i
-    %16 = call %13(%14, %15) : s32i [all]
-    %17 = const 0 : s32i
-    %18 = const 10 : s32i
-    %19 = const 3 : s32i
-    %20 = call @apply(%17, %18, %19) : s32i [all]
-    %21 = const 1 : s32i
-    %22 = const 4 : s32i
-    %23 = const 4 : s32i
-    %24 = call @apply(%21, %22, %23) : s32i [all]
-    %25 = load %1 : s32i, align 4
-    %26 = cast(int_to_bool) %25 : bool
-    %27 = get_global @sub : ((s32i, s32i) -> s32i)*
-    %28 = get_global @add : ((s32i, s32i) -> s32i)*
-    %29 = select %26, %27, %28 : ((s32i, s32i) -> s32i)*
-    %30 = const 9 : s32i
-    %31 = const 2 : s32i
-    %32 = call %29(%30, %31) : s32i [all]
-    %33 = call @printf(%12, %16, %20, %24, %32) : s32i [all]
-    %34 = const 0 : s32i
-    store %34, %0
-    %35 = load %0 : s32i
-    return %35
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "useAdd", align 4
+        %2 = alloca (s32i, s32i) -> s32i*, "op", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 1 : s32i
+        store %4, %1, align 4
+        %5 = load %1 : s32i, align 4
+        %6 = cast(int_to_bool) %5 : bool
+        %7 = get_global @add : (s32i, s32i) -> s32i*
+        %8 = get_global @sub : (s32i, s32i) -> s32i*
+        select
+        store %9, %2, align 8
+        %10 = get_global @printf : (s8i*, ...) -> s32i*
+        %11 = get_global @.str : s8i[13]*
+        %12 = cast(array_to_ptrdecay) %11 : s8i*
+        %13 = load %2 : (s32i, s32i) -> s32i*, align 8
+        %14 = const 10 : s32i
+        %15 = const 3 : s32i
+        %16 = call (%14, %15) : s32i [all]
+        %17 = const 0 : s32i
+        %18 = const 10 : s32i
+        %19 = const 3 : s32i
+        %20 = call @apply(%17, %18, %19) : s32i [all]
+        %21 = const 1 : s32i
+        %22 = const 4 : s32i
+        %23 = const 4 : s32i
+        %24 = call @apply(%21, %22, %23) : s32i [all]
+        %25 = load %1 : s32i, align 4
+        %26 = cast(int_to_bool) %25 : bool
+        %27 = get_global @sub : (s32i, s32i) -> s32i*
+        %28 = get_global @add : (s32i, s32i) -> s32i*
+        select
+        %30 = const 9 : s32i
+        %31 = const 2 : s32i
+        %32 = call (%30, %31) : s32i [all]
+        %33 = call @printf(%12, %16, %20, %24, %32) : s32i [all]
+        %34 = const 0 : s32i
+        store %34, %0
+        %35 = load %0 : s32i
+        return %35
 }

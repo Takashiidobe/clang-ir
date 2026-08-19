@@ -1,60 +1,60 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr61725.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "x", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    scope {
-        %5 = const -128 : s32i
-        store %5, %1, align 4
-        for cond: {
-            %19 = load %1 : s32i, align 4
-            %20 = const 128 : s32i
-            %21 = cmp le %19, %20 : bool
-            condition %21
-        } step: {
-            %6 = load %1 : s32i, align 4
-            %7 = inc %6 : s32i [nsw]
-            store %7, %1, align 4
-            yield
-        } do {
-            scope {
-                %8 = alloca s32i, "a", align 4
-                %9 = load %1 : s32i, align 4
-                %10 = ffs %9 : s32i
-                store %10, %8, align 4
-                scope {
-                    %11 = load %1 : s32i, align 4
-                    %12 = const 0 : s32i
-                    %13 = cmp eq %11, %12 : bool
-                    %14 = ternary %13 ? { : bool
-                        %16 = load %8 : s32i, align 4
-                        %17 = const 0 : s32i
-                        %18 = cmp ne %16, %17 : bool
-                        yield %18
-                    } : {
-                        %15 = const false : bool
-                        yield %15
-                    }
-                    if %14 {
-                        call @abort() [all]
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "x", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        scope {
+                %5 = const -128 : s32i
+                store %5, %1, align 4
+                for cond {
+                        %19 = load %1 : s32i, align 4
+                        %20 = const 128 : s32i
+                        cmp
+                        condition %21
+                } step {
+                        %6 = load %1 : s32i, align 4
+                        inc
+                        store %7, %1, align 4
                         yield
-                    }
-                    yield
+                } body {
+                        scope {
+                                %8 = alloca s32i, "a", align 4
+                                %9 = load %1 : s32i, align 4
+                                ffs
+                                store %10, %8, align 4
+                                scope {
+                                        %11 = load %1 : s32i, align 4
+                                        %12 = const 0 : s32i
+                                        cmp
+                                        %14 = ternary %13 ? { : bool
+                                                %16 = load %8 : s32i, align 4
+                                                %17 = const 0 : s32i
+                                                cmp
+                                                yield %18
+                                        } : {
+                                                %15 = const false : bool
+                                                yield %15
+                                        }
+                                        if %14 {
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = load %0 : s32i
-    return %4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = load %0 : s32i
+        return %4
 }

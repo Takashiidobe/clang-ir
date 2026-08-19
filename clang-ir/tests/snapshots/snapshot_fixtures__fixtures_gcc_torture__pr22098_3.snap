@@ -1,84 +1,84 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr22098-3.c" (c, x86_64-unknown-linux-gnu)
-global n : s32i = 0 [external, default, align 4, dso_local]
+global n : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn f() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %39 = alloca s32i, "__retval", align 4
-    %40 = get_global @n : s32i*
-    %41 = load %40 : s32i, align 4
-    %42 = inc %41 : s32i [nsw]
-    store %42, %40, align 4
-    store %42, %39
-    %43 = load %39 : s32i
-    return %43
+        %39 = alloca s32i, "__retval", align 4
+        %40 = get_global @n : s32i*
+        %41 = load %40 : s32i, align 4
+        inc
+        store %42, %40, align 4
+        store %42, %39
+        %43 = load %39 : s32i
+        return %43
 }
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "a", align 4
-    %2 = alloca s32i*, "p", align 8
-    %3 = alloca u64i, "b", align 8
-    %4 = alloca s32i[3], ".compoundliteral", align 4
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = const 0 : s32i
-    store %6, %1, align 4
-    %7 = const 1 : s64i
-    %8 = cast(array_to_ptrdecay) %4 : s32i*
-    %9 = const 0 : s32i
-    store %9, %8, align 4
-    %10 = const 1 : s64i
-    %11 = ptr_stride %8, %10 : s32i*
-    %12 = call @f() : s32i [all]
-    store %12, %11, align 4
-    %13 = const 2 : s64i
-    %14 = ptr_stride %8, %13 : s32i*
-    %15 = const 2 : s32i
-    store %15, %14, align 4
-    %16 = get_element %4[%7] : s32i*
-    store %16, %2, align 8
-    %17 = cast(ptr_to_int) %16 : u64i
-    store %17, %3, align 8
-    scope {
-        %21 = load %2 : s32i*, align 8
-        %22 = load %21 : s32i, align 4
-        %23 = const 1 : s32i
-        %24 = cmp ne %22, %23 : bool
-        %25 = ternary %24 ? { : bool
-            %38 = const true : bool
-            yield %38
-        } : {
-            %33 = load %3 : u64i, align 8
-            %34 = cast(int_to_ptr) %33 : s32i*
-            %35 = load %34 : s32i, align 4
-            %36 = const 1 : s32i
-            %37 = cmp ne %35, %36 : bool
-            yield %37
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "a", align 4
+        %2 = alloca s32i*, "p", align 8
+        %3 = alloca u64i, "b", align 8
+        %4 = alloca s32i[3], ".compoundliteral", align 4
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = const 0 : s32i
+        store %6, %1, align 4
+        %7 = const 1 : s64i
+        %8 = cast(array_to_ptrdecay) %4 : s32i*
+        %9 = const 0 : s32i
+        store %9, %8, align 4
+        %10 = const 1 : s64i
+        ptr_stride
+        %12 = call @f() : s32i [all]
+        store %12, %11, align 4
+        %13 = const 2 : s64i
+        ptr_stride
+        %15 = const 2 : s32i
+        store %15, %14, align 4
+        get_element
+        store %16, %2, align 8
+        %17 = cast(ptr_to_int) %16 : u64i
+        store %17, %3, align 8
+        scope {
+                %21 = load %2 : s32i*, align 8
+                %22 = load %21 : s32i, align 4
+                %23 = const 1 : s32i
+                cmp
+                %25 = ternary %24 ? { : bool
+                        %38 = const true : bool
+                        yield %38
+                } : {
+                        %33 = load %3 : u64i, align 8
+                        %34 = cast(int_to_ptr) %33 : s32i*
+                        %35 = load %34 : s32i, align 4
+                        %36 = const 1 : s32i
+                        cmp
+                        yield %37
+                }
+                %26 = ternary %25 ? { : bool
+                        %32 = const true : bool
+                        yield %32
+                } : {
+                        %28 = get_global @n : s32i*
+                        %29 = load %28 : s32i, align 4
+                        %30 = const 1 : s32i
+                        cmp
+                        yield %31
+                }
+                if %26 {
+                        %27 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        %26 = ternary %25 ? { : bool
-            %32 = const true : bool
-            yield %32
-        } : {
-            %28 = get_global @n : s32i*
-            %29 = load %28 : s32i, align 4
-            %30 = const 1 : s32i
-            %31 = cmp ne %29, %30 : bool
-            yield %31
-        }
-        if %26 {
-            %27 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %18 = get_global @exit : ((s32i) -> void)*
-    %19 = const 0 : s32i
-    call @exit(%19) [all]
-    %20 = load %0 : s32i
-    return %20
+        %18 = get_global @exit : (s32i) -> void*
+        %19 = const 0 : s32i
+        call @exit(%19) [all]
+        %20 = load %0 : s32i
+        return %20
 }

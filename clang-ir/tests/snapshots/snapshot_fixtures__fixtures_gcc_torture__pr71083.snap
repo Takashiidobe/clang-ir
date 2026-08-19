@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr71083.c" (c, x86_64-unknown-linux-gnu)
-global test : rec_lock_chain[101] = zero [external, default, align 16, dso_local]
-global test1 : rec_lock_chain1[101] = zero [external, default, align 16, dso_local]
+global test : rec_lock_chain[101] = Zero { ty: Array { element_type: Named("rec_lock_chain"), size: 101 } } [external, default, align 16, dso_local]
+global test1 : rec_lock_chain1[101] = Zero { ty: Array { element_type: Named("rec_lock_chain1"), size: 101 } } [external, default, align 16, dso_local]
 
 fn foo(%arg1: rec_lock_chain*) -> rec_lock_chain* [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: rec_lock_chain*):
@@ -13,39 +13,39 @@ fn foo(%arg1: rec_lock_chain*) -> rec_lock_chain* [external, c, no_inline, dso_l
         %36 = alloca s32i, "i", align 4
         store %arg1, %34
         scope {
-            %39 = const 0 : s32i
-            store %39, %36, align 4
-            for cond: {
-                %56 = load %36 : s32i, align 4
-                %57 = const 100 : s32i
-                %58 = cmp lt %56, %57 : bool
-                condition %58
-            } step: {
-                %40 = load %36 : s32i, align 4
-                %41 = inc %40 : s32i [nsw]
-                store %41, %36, align 4
-                yield
-            } do {
-                scope {
-                    %42 = load %36 : s32i, align 4
-                    %43 = cast(integral) %42 : s64i
-                    %44 = load %34 : rec_lock_chain*, align 8
-                    %45 = ptr_stride %44, %43 : rec_lock_chain*
-                    %46 = get_member %45[0] "base" : u32i*
-                    %47 = get_bitfield %46, "base": 24 bits @8 in u32i : u32i, align 4
-                    %48 = load %36 : s32i, align 4
-                    %49 = const 1 : s32i
-                    %50 = add %48, %49 : s32i [nsw]
-                    %51 = cast(integral) %50 : s64i
-                    %52 = load %34 : rec_lock_chain*, align 8
-                    %53 = ptr_stride %52, %51 : rec_lock_chain*
-                    %54 = get_member %53[0] "base" : u32i*
-                    %55 = set_bitfield %54, %47, "base": 24 bits @8 in u32i : u32i, align 4
-                    yield
+                %39 = const 0 : s32i
+                store %39, %36, align 4
+                for cond {
+                        %56 = load %36 : s32i, align 4
+                        %57 = const 100 : s32i
+                        cmp
+                        condition %58
+                } step {
+                        %40 = load %36 : s32i, align 4
+                        inc
+                        store %41, %36, align 4
+                        yield
+                } body {
+                        scope {
+                                %42 = load %36 : s32i, align 4
+                                %43 = cast(integral) %42 : s64i
+                                %44 = load %34 : rec_lock_chain*, align 8
+                                ptr_stride
+                                get_member
+                                get_bitfield
+                                %48 = load %36 : s32i, align 4
+                                %49 = const 1 : s32i
+                                %50 = add %48, %49 : s32i [nsw]
+                                %51 = cast(integral) %50 : s64i
+                                %52 = load %34 : rec_lock_chain*, align 8
+                                ptr_stride
+                                get_member
+                                set_bitfield
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %37 = load %34 : rec_lock_chain*, align 8
         store %37, %35
@@ -59,39 +59,39 @@ fn bar(%arg0: rec_lock_chain1*) -> rec_lock_chain1* [external, c, no_inline, dso
         %12 = alloca s32i, "i", align 4
         store %arg0, %10
         scope {
-            %15 = const 0 : s32i
-            store %15, %12, align 4
-            for cond: {
-                %31 = load %12 : s32i, align 4
-                %32 = const 100 : s32i
-                %33 = cmp lt %31, %32 : bool
-                condition %33
-            } step: {
-                %16 = load %12 : s32i, align 4
-                %17 = inc %16 : s32i [nsw]
-                store %17, %12, align 4
-                yield
-            } do {
-                scope {
-                    %18 = load %12 : s32i, align 4
-                    %19 = cast(integral) %18 : s64i
-                    %20 = load %10 : rec_lock_chain1*, align 8
-                    %21 = ptr_stride %20, %19 : rec_lock_chain1*
-                    %22 = get_member %21[1] "base" : u16i*
-                    %23 = load %22 : u16i, align 1
-                    %24 = load %12 : s32i, align 4
-                    %25 = const 1 : s32i
-                    %26 = add %24, %25 : s32i [nsw]
-                    %27 = cast(integral) %26 : s64i
-                    %28 = load %10 : rec_lock_chain1*, align 8
-                    %29 = ptr_stride %28, %27 : rec_lock_chain1*
-                    %30 = get_member %29[1] "base" : u16i*
-                    store %23, %30, align 1
-                    yield
+                %15 = const 0 : s32i
+                store %15, %12, align 4
+                for cond {
+                        %31 = load %12 : s32i, align 4
+                        %32 = const 100 : s32i
+                        cmp
+                        condition %33
+                } step {
+                        %16 = load %12 : s32i, align 4
+                        inc
+                        store %17, %12, align 4
+                        yield
+                } body {
+                        scope {
+                                %18 = load %12 : s32i, align 4
+                                %19 = cast(integral) %18 : s64i
+                                %20 = load %10 : rec_lock_chain1*, align 8
+                                ptr_stride
+                                get_member
+                                %23 = load %22 : u16i, align 1
+                                %24 = load %12 : s32i, align 4
+                                %25 = const 1 : s32i
+                                %26 = add %24, %25 : s32i [nsw]
+                                %27 = cast(integral) %26 : s64i
+                                %28 = load %10 : rec_lock_chain1*, align 8
+                                ptr_stride
+                                get_member
+                                store %23, %30, align 1
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %13 = load %10 : rec_lock_chain1*, align 8
         store %13, %11
@@ -99,17 +99,17 @@ fn bar(%arg0: rec_lock_chain1*) -> rec_lock_chain1* [external, c, no_inline, dso
         return %14
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @test : rec_lock_chain[101]*
-    %3 = cast(array_to_ptrdecay) %2 : rec_lock_chain*
-    %4 = call @foo(%3) : rec_lock_chain* [all]
-    %5 = get_global @test1 : rec_lock_chain1[101]*
-    %6 = cast(array_to_ptrdecay) %5 : rec_lock_chain1*
-    %7 = call @bar(%6) : rec_lock_chain1* [all]
-    %8 = const 0 : s32i
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @test : rec_lock_chain[101]*
+        %3 = cast(array_to_ptrdecay) %2 : rec_lock_chain*
+        %4 = call @foo(%3) : rec_lock_chain* [all]
+        %5 = get_global @test1 : rec_lock_chain1[101]*
+        %6 = cast(array_to_ptrdecay) %5 : rec_lock_chain1*
+        %7 = call @bar(%6) : rec_lock_chain1* [all]
+        %8 = const 0 : s32i
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

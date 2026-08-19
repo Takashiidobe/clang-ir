@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20030914-1.c" (c, x86_64-unknown-linux-gnu)
@@ -15,31 +15,31 @@ fn f(%arg0: s32i, %arg1: rec_s*, %arg2: long_double<f80>) -> long_double<f80> [e
         store %28, %30
         store %arg2, %31
         scope {
-            %36 = const 0 : s32i
-            store %36, %33, align 4
-            for cond: {
-                %47 = load %33 : s32i, align 4
-                %48 = const 16 : s32i
-                %49 = cmp lt %47, %48 : bool
-                condition %49
-            } step: {
-                %37 = load %33 : s32i, align 4
-                %38 = inc %37 : s32i [nsw]
-                store %38, %33, align 4
+                %36 = const 0 : s32i
+                store %36, %33, align 4
+                for cond {
+                        %47 = load %33 : s32i, align 4
+                        %48 = const 16 : s32i
+                        cmp
+                        condition %49
+                } step {
+                        %37 = load %33 : s32i, align 4
+                        inc
+                        store %38, %33, align 4
+                        yield
+                } body {
+                        %39 = load %33 : s32i, align 4
+                        %40 = cast(integral) %39 : s64i
+                        get_member
+                        get_element
+                        %43 = load %42 : s32i, align 4
+                        %44 = cast(int_to_float) %43 : long_double<f80>
+                        %45 = load %31 : long_double<f80>, align 16
+                        fadd
+                        store %46, %31, align 16
+                        yield
+                }
                 yield
-            } do {
-                %39 = load %33 : s32i, align 4
-                %40 = cast(integral) %39 : s64i
-                %41 = get_member %30[0] "val" : s32i[16]*
-                %42 = get_element %41[%40] : s32i*
-                %43 = load %42 : s32i, align 4
-                %44 = cast(int_to_float) %43 : long_double<f80>
-                %45 = load %31 : long_double<f80>, align 16
-                %46 = fadd %45, %44 : long_double<f80>
-                store %46, %31, align 16
-                yield
-            }
-            yield
         }
         %34 = load %31 : long_double<f80>, align 16
         store %34, %32
@@ -49,56 +49,56 @@ fn f(%arg0: s32i, %arg1: rec_s*, %arg2: long_double<f80>) -> long_double<f80> [e
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_s, "x", align 4
-    %2 = alloca s32i, "i", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    scope {
-        %15 = const 0 : s32i
-        store %15, %2, align 4
-        for cond: {
-            %25 = load %2 : s32i, align 4
-            %26 = const 16 : s32i
-            %27 = cmp lt %25, %26 : bool
-            condition %27
-        } step: {
-            %16 = load %2 : s32i, align 4
-            %17 = inc %16 : s32i [nsw]
-            store %17, %2, align 4
-            yield
-        } do {
-            %18 = load %2 : s32i, align 4
-            %19 = const 1 : s32i
-            %20 = add %18, %19 : s32i [nsw]
-            %21 = load %2 : s32i, align 4
-            %22 = cast(integral) %21 : s64i
-            %23 = get_member %1[0] "val" : s32i[16]*
-            %24 = get_element %23[%22] : s32i*
-            store %20, %24, align 4
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_s, "x", align 4
+        %2 = alloca s32i, "i", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        scope {
+                %15 = const 0 : s32i
+                store %15, %2, align 4
+                for cond {
+                        %25 = load %2 : s32i, align 4
+                        %26 = const 16 : s32i
+                        cmp
+                        condition %27
+                } step {
+                        %16 = load %2 : s32i, align 4
+                        inc
+                        store %17, %2, align 4
+                        yield
+                } body {
+                        %18 = load %2 : s32i, align 4
+                        %19 = const 1 : s32i
+                        %20 = add %18, %19 : s32i [nsw]
+                        %21 = load %2 : s32i, align 4
+                        %22 = cast(integral) %21 : s64i
+                        get_member
+                        get_element
+                        store %20, %24, align 4
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %7 = const 1 : s32i
-        %8 = const 1.000000e+04 : long_double<f80>
-        %9 = load %1 : rec_s, align 4
-        %10 = alloca rec_s, "byval", align 8
-        store %9, %10
-        %11 = call @f(%7, %10, %8) : long_double<f80> [all]
-        %12 = const 1.013600e+04 : long_double<f80>
-        %13 = cmp ne %11, %12 : bool
-        if %13 {
-            %14 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %7 = const 1 : s32i
+                %8 = const 1.000000e+04 : long_double<f80>
+                %9 = load %1 : rec_s, align 4
+                %10 = alloca rec_s, "byval", align 8
+                store %9, %10
+                %11 = call @f(%7, %10, %8) : long_double<f80> [all]
+                %12 = const 1.013600e+04 : long_double<f80>
+                cmp
+                if %13 {
+                        %14 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %4 = get_global @exit : ((s32i) -> void)*
-    %5 = const 0 : s32i
-    call @exit(%5) [all]
-    %6 = load %0 : s32i
-    return %6
+        %4 = get_global @exit : (s32i) -> void*
+        %5 = const 0 : s32i
+        call @exit(%5) [all]
+        %6 = load %0 : s32i
+        return %6
 }

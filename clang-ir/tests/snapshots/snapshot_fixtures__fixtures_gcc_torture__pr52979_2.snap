@@ -1,74 +1,74 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr52979-2.c" (c, x86_64-unknown-linux-gnu)
-global __const.bar.f : rec_S = zero [cir_private, default, dso_local, constant]
-global a : rec_S = {[1, 0, 0, 0, 0]} [external, default, align 1, dso_local]
-global b : rec_S = {[1, 0, 0, 0, 0]} [internal, default, align 1, dso_local]
-global e : s32i = 0 [external, default, align 4, dso_local]
-global d : s32i = 0 [external, default, align 4, dso_local]
-global c : s32i = 0 [external, default, align 4, dso_local]
+global __const.bar.f : rec_S = Zero { ty: Named("rec_S") } [cir_private, default, dso_local, constant]
+global a : rec_S = ConstRecord { ty: Named("rec_S"), members: Array([ConstArray { ty: Array { element_type: Named("u8i"), size: 5 }, elts: Array([CirInt { ty: Named("u8i"), value: "1" }, CirInt { ty: Named("u8i"), value: "0" }, CirInt { ty: Named("u8i"), value: "0" }, CirInt { ty: Named("u8i"), value: "0" }, CirInt { ty: Named("u8i"), value: "0" }]), trailing_zeros_num: 0 }]) } [external, default, align 1, dso_local]
+global b : rec_S = ConstRecord { ty: Named("rec_S"), members: Array([ConstArray { ty: Array { element_type: Named("u8i"), size: 5 }, elts: Array([CirInt { ty: Named("u8i"), value: "1" }, CirInt { ty: Named("u8i"), value: "0" }, CirInt { ty: Named("u8i"), value: "0" }, CirInt { ty: Named("u8i"), value: "0" }, CirInt { ty: Named("u8i"), value: "0" }]), trailing_zeros_num: 0 }]) } [internal, default, align 1, dso_local]
+global e : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global d : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global c : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
-    return
+        return
 }
 fn bar() -> void [external, c, no_inline, dso_local, nothrow] {
-    %11 = alloca rec_S, "f", align 1
-    %12 = const 1 : s32i
-    %13 = get_global @a : rec_S*
-    %14 = get_member %13[0] "h" : u8i[5]*
-    %15 = set_bitfield %14, %12, "h": 6 bits @31 in signed u8i[5] : s32i, align 1
-    %16 = get_global @__const.bar.f : rec_S*
-    copy %11, %16
-    %17 = get_global @b : rec_S*
-    copy %17, %11
-    %18 = const 0 : s32i
-    %19 = get_global @e : s32i*
-    store %18, %19, align 4
-    scope {
-        %20 = get_global @d : s32i*
-        %21 = load %20 : s32i, align 4
-        %22 = cast(int_to_bool) %21 : bool
-        if %22 {
-            %23 = get_global @a : rec_S*
-            %24 = get_member %23[0] "g" : u8i[5]*
-            %25 = get_bitfield %24, "g": 31 bits @0 in signed u8i[5] : s32i, align 1
-            %26 = get_global @c : s32i*
-            store %25, %26, align 4
-            yield
+        %11 = alloca rec_S, "f", align 1
+        %12 = const 1 : s32i
+        %13 = get_global @a : rec_S*
+        get_member
+        set_bitfield
+        %16 = get_global @__const.bar.f : rec_S*
+        copy
+        %17 = get_global @b : rec_S*
+        copy
+        %18 = const 0 : s32i
+        %19 = get_global @e : s32i*
+        store %18, %19, align 4
+        scope {
+                %20 = get_global @d : s32i*
+                %21 = load %20 : s32i, align 4
+                %22 = cast(int_to_bool) %21 : bool
+                if %22 {
+                        %23 = get_global @a : rec_S*
+                        get_member
+                        get_bitfield
+                        %26 = get_global @c : s32i*
+                        store %25, %26, align 4
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    return
+        return
 }
 fn baz() -> void [external, c, no_inline, dso_local, nothrow] {
-    call @bar() [all]
-    %9 = get_global @a : rec_S*
-    %10 = get_global @b : rec_S*
-    copy %9, %10
-    return
+        call @bar() [all]
+        %9 = get_global @a : rec_S*
+        %10 = get_global @b : rec_S*
+        copy
+        return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    call @baz() [all]
-    scope {
-        %4 = get_global @a : rec_S*
-        %5 = get_member %4[0] "g" : u8i[5]*
-        %6 = get_bitfield %5, "g": 31 bits @0 in signed u8i[5] : s32i, align 1
-        %7 = cast(int_to_bool) %6 : bool
-        if %7 {
-            %8 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        call @baz() [all]
+        scope {
+                %4 = get_global @a : rec_S*
+                get_member
+                get_bitfield
+                %7 = cast(int_to_bool) %6 : bool
+                if %7 {
+                        %8 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

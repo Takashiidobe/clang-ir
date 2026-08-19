@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20100805-1.c" (c, x86_64-unknown-linux-gnu)
@@ -13,37 +13,37 @@ fn foo(%arg0: u32i, %arg1: u32i) -> u32i [external, c, no_inline, dso_local, not
         store %arg1, %16
         %19 = load %15 : u32i, align 4
         %20 = const 1 : u32i
-        %21 = and %19, %20 : u32i
+        and
         store %21, %15, align 4
         scope {
-            %24 = const 0 : u32i
-            store %24, %18, align 4
-            for cond: {
-                %38 = load %18 : u32i, align 4
-                %39 = load %16 : u32i, align 4
-                %40 = cmp lt %38, %39 : bool
-                condition %40
-            } step: {
-                %25 = load %18 : u32i, align 4
-                %26 = inc %25 : u32i
-                store %26, %18, align 4
+                %24 = const 0 : u32i
+                store %24, %18, align 4
+                for cond {
+                        %38 = load %18 : u32i, align 4
+                        %39 = load %16 : u32i, align 4
+                        cmp
+                        condition %40
+                } step {
+                        %25 = load %18 : u32i, align 4
+                        inc
+                        store %26, %18, align 4
+                        yield
+                } body {
+                        %27 = load %15 : u32i, align 4
+                        %28 = const 1 : s32i
+                        shift
+                        %30 = load %15 : u32i, align 4
+                        %31 = const 4 : u64i
+                        %32 = const 8 : u64i
+                        mul
+                        %34 = const 1 : u64i
+                        sub
+                        shift
+                        or
+                        store %37, %15, align 4
+                        yield
+                }
                 yield
-            } do {
-                %27 = load %15 : u32i, align 4
-                %28 = const 1 : s32i
-                %29 = shift left %27, %28 : u32i
-                %30 = load %15 : u32i, align 4
-                %31 = const 4 : u64i
-                %32 = const 8 : u64i
-                %33 = mul %31, %32 : u64i
-                %34 = const 1 : u64i
-                %35 = sub %33, %34 : u64i
-                %36 = shift right %30, %35 : u32i
-                %37 = or %29, %36 : u32i
-                store %37, %15, align 4
-                yield
-            }
-            yield
         }
         %22 = load %15 : u32i, align 4
         store %22, %17
@@ -52,29 +52,29 @@ fn foo(%arg0: u32i, %arg1: u32i) -> u32i [external, c, no_inline, dso_local, not
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const 1 : u32i
-        %5 = const 4 : u64i
-        %6 = const 8 : u64i
-        %7 = mul %5, %6 : u64i
-        %8 = const 1 : u64i
-        %9 = add %7, %8 : u64i
-        %10 = cast(integral) %9 : u32i
-        %11 = call @foo(%4, %10) : u32i [all]
-        %12 = const 2 : u32i
-        %13 = cmp ne %11, %12 : bool
-        if %13 {
-            %14 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const 1 : u32i
+                %5 = const 4 : u64i
+                %6 = const 8 : u64i
+                mul
+                %8 = const 1 : u64i
+                %9 = add %7, %8 : u64i
+                %10 = cast(integral) %9 : u32i
+                %11 = call @foo(%4, %10) : u32i [all]
+                %12 = const 2 : u32i
+                cmp
+                if %13 {
+                        %14 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

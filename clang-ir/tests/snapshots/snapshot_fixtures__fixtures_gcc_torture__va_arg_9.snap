@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/va-arg-9.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[17] = "0123456789abcdef" [cir_private, default, align 1, dso_local, constant]
-global to_hex.hex : s8i[17] = "0123456789abcdef" [internal, default, align 16, dso_local]
+global .str : s8i[17] = ConstArray { ty: Array { element_type: Named("s8i"), size: 17 }, elts: Str("0123456789abcdef"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global to_hex.hex : s8i[17] = ConstArray { ty: Array { element_type: Named("s8i"), size: 17 }, elts: Str("0123456789abcdef"), trailing_zeros_num: 1 } [internal, default, align 16, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn to_hex(%arg139: u32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
@@ -14,19 +14,19 @@ fn to_hex(%arg139: u32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %arg139, %570
         %572 = get_global @to_hex.hex : s8i[17]*
         scope {
-            %579 = load %570 : u32i, align 4
-            %580 = const 15 : u32i
-            %581 = cmp gt %579, %580 : bool
-            if %581 {
-                %582 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %579 = load %570 : u32i, align 4
+                %580 = const 15 : u32i
+                cmp
+                if %581 {
+                        %582 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %573 = load %570 : u32i, align 4
         %574 = cast(integral) %573 : u64i
-        %575 = get_element %572[%574] : s8i*
+        get_element
         %576 = load %575 : s8i, align 1
         %577 = cast(integral) %576 : s32i
         store %577, %571
@@ -43,50 +43,50 @@ fn fap(%arg136: s32i, %arg137: s8i*, %arg138: rec___va_list_tag*) -> void [exter
         store %arg137, %545
         store %arg138, %546
         scope {
-            %561 = get_global @strlen : ((s8i*) -> u64i)*
-            %562 = load %545 : s8i*, align 8
-            %563 = call @strlen(%562) : u64i [all]
-            %564 = const 16 : s32i
-            %565 = load %544 : s32i, align 4
-            %566 = sub %564, %565 : s32i [nsw]
-            %567 = cast(integral) %566 : u64i
-            %568 = cmp ne %563, %567 : bool
-            if %568 {
-                %569 = get_global @abort : (() -> void)*
-                call @abort() [all]
-                yield
-            }
-            yield
-        }
-        scope {
-            while {
-                %558 = load %545 : s8i*, align 8
-                %559 = load %558 : s8i, align 1
-                %560 = cast(int_to_bool) %559 : bool
-                condition %560
-            } do {
-                scope {
-                    %547 = load %545 : s8i*, align 8
-                    %548 = const 1 : s32i
-                    %549 = ptr_stride %547, %548 : s8i*
-                    store %549, %545, align 8
-                    %550 = load %547 : s8i, align 1
-                    %551 = cast(integral) %550 : s32i
-                    %552 = load %546 : rec___va_list_tag*, align 8
-                    %553 = va_arg %552 : s32i
-                    %554 = cast(integral) %553 : u32i
-                    %555 = call @to_hex(%554) : s32i [all]
-                    %556 = cmp ne %551, %555 : bool
-                    if %556 {
-                        %557 = get_global @abort : (() -> void)*
+                %561 = get_global @strlen : (s8i*) -> u64i*
+                %562 = load %545 : s8i*, align 8
+                %563 = call @strlen(%562) : u64i [all]
+                %564 = const 16 : s32i
+                %565 = load %544 : s32i, align 4
+                sub
+                %567 = cast(integral) %566 : u64i
+                cmp
+                if %568 {
+                        %569 = get_global @abort : () -> void*
                         call @abort() [all]
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
+        }
+        scope {
+                while {
+                        %558 = load %545 : s8i*, align 8
+                        %559 = load %558 : s8i, align 1
+                        %560 = cast(int_to_bool) %559 : bool
+                        condition %560
+                } do {
+                        scope {
+                                %547 = load %545 : s8i*, align 8
+                                %548 = const 1 : s32i
+                                ptr_stride
+                                store %549, %545, align 8
+                                %550 = load %547 : s8i, align 1
+                                %551 = cast(integral) %550 : s32i
+                                %552 = load %546 : rec___va_list_tag*, align 8
+                                va_arg
+                                %554 = cast(integral) %553 : u32i
+                                %555 = call @to_hex(%554) : s32i [all]
+                                cmp
+                                if %556 {
+                                        %557 = get_global @abort : () -> void*
+                                        call @abort() [all]
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
+                }
+                yield
         }
         return
 }
@@ -96,13 +96,13 @@ fn f0(%arg135: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %538 = alloca rec___va_list_tag[1], "ap", align 16
         store %arg135, %537
         %539 = cast(array_to_ptrdecay) %538 : rec___va_list_tag*
-        va_start %539
+        va_start
         %540 = const 0 : s32i
         %541 = load %537 : s8i*, align 8
         %542 = cast(array_to_ptrdecay) %538 : rec___va_list_tag*
         call @fap(%540, %541, %542) [all]
         %543 = cast(array_to_ptrdecay) %538 : rec___va_list_tag*
-        va_end %543
+        va_end
         return
 }
 fn f1(%arg133: s32i, %arg134: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -113,13 +113,13 @@ fn f1(%arg133: s32i, %arg134: s8i*, ...) -> void [external, c, no_inline, dso_lo
         store %arg133, %529
         store %arg134, %530
         %532 = cast(array_to_ptrdecay) %531 : rec___va_list_tag*
-        va_start %532
+        va_start
         %533 = const 1 : s32i
         %534 = load %530 : s8i*, align 8
         %535 = cast(array_to_ptrdecay) %531 : rec___va_list_tag*
         call @fap(%533, %534, %535) [all]
         %536 = cast(array_to_ptrdecay) %531 : rec___va_list_tag*
-        va_end %536
+        va_end
         return
 }
 fn f2(%arg130: s32i, %arg131: s32i, %arg132: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -132,13 +132,13 @@ fn f2(%arg130: s32i, %arg131: s32i, %arg132: s8i*, ...) -> void [external, c, no
         store %arg131, %521
         store %arg132, %522
         %524 = cast(array_to_ptrdecay) %523 : rec___va_list_tag*
-        va_start %524
+        va_start
         %525 = const 2 : s32i
         %526 = load %522 : s8i*, align 8
         %527 = cast(array_to_ptrdecay) %523 : rec___va_list_tag*
         call @fap(%525, %526, %527) [all]
         %528 = cast(array_to_ptrdecay) %523 : rec___va_list_tag*
-        va_end %528
+        va_end
         return
 }
 fn f3(%arg126: s32i, %arg127: s32i, %arg128: s32i, %arg129: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -153,13 +153,13 @@ fn f3(%arg126: s32i, %arg127: s32i, %arg128: s32i, %arg129: s8i*, ...) -> void [
         store %arg128, %512
         store %arg129, %513
         %515 = cast(array_to_ptrdecay) %514 : rec___va_list_tag*
-        va_start %515
+        va_start
         %516 = const 3 : s32i
         %517 = load %513 : s8i*, align 8
         %518 = cast(array_to_ptrdecay) %514 : rec___va_list_tag*
         call @fap(%516, %517, %518) [all]
         %519 = cast(array_to_ptrdecay) %514 : rec___va_list_tag*
-        va_end %519
+        va_end
         return
 }
 fn f4(%arg121: s32i, %arg122: s32i, %arg123: s32i, %arg124: s32i, %arg125: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -176,13 +176,13 @@ fn f4(%arg121: s32i, %arg122: s32i, %arg123: s32i, %arg124: s32i, %arg125: s8i*,
         store %arg124, %502
         store %arg125, %503
         %505 = cast(array_to_ptrdecay) %504 : rec___va_list_tag*
-        va_start %505
+        va_start
         %506 = const 4 : s32i
         %507 = load %503 : s8i*, align 8
         %508 = cast(array_to_ptrdecay) %504 : rec___va_list_tag*
         call @fap(%506, %507, %508) [all]
         %509 = cast(array_to_ptrdecay) %504 : rec___va_list_tag*
-        va_end %509
+        va_end
         return
 }
 fn f5(%arg115: s32i, %arg116: s32i, %arg117: s32i, %arg118: s32i, %arg119: s32i, %arg120: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -201,13 +201,13 @@ fn f5(%arg115: s32i, %arg116: s32i, %arg117: s32i, %arg118: s32i, %arg119: s32i,
         store %arg119, %491
         store %arg120, %492
         %494 = cast(array_to_ptrdecay) %493 : rec___va_list_tag*
-        va_start %494
+        va_start
         %495 = const 5 : s32i
         %496 = load %492 : s8i*, align 8
         %497 = cast(array_to_ptrdecay) %493 : rec___va_list_tag*
         call @fap(%495, %496, %497) [all]
         %498 = cast(array_to_ptrdecay) %493 : rec___va_list_tag*
-        va_end %498
+        va_end
         return
 }
 fn f6(%arg108: s32i, %arg109: s32i, %arg110: s32i, %arg111: s32i, %arg112: s32i, %arg113: s32i, %arg114: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -228,13 +228,13 @@ fn f6(%arg108: s32i, %arg109: s32i, %arg110: s32i, %arg111: s32i, %arg112: s32i,
         store %arg113, %479
         store %arg114, %480
         %482 = cast(array_to_ptrdecay) %481 : rec___va_list_tag*
-        va_start %482
+        va_start
         %483 = const 6 : s32i
         %484 = load %480 : s8i*, align 8
         %485 = cast(array_to_ptrdecay) %481 : rec___va_list_tag*
         call @fap(%483, %484, %485) [all]
         %486 = cast(array_to_ptrdecay) %481 : rec___va_list_tag*
-        va_end %486
+        va_end
         return
 }
 fn f7(%arg100: s32i, %arg101: s32i, %arg102: s32i, %arg103: s32i, %arg104: s32i, %arg105: s32i, %arg106: s32i, %arg107: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -257,13 +257,13 @@ fn f7(%arg100: s32i, %arg101: s32i, %arg102: s32i, %arg103: s32i, %arg104: s32i,
         store %arg106, %466
         store %arg107, %467
         %469 = cast(array_to_ptrdecay) %468 : rec___va_list_tag*
-        va_start %469
+        va_start
         %470 = const 7 : s32i
         %471 = load %467 : s8i*, align 8
         %472 = cast(array_to_ptrdecay) %468 : rec___va_list_tag*
         call @fap(%470, %471, %472) [all]
         %473 = cast(array_to_ptrdecay) %468 : rec___va_list_tag*
-        va_end %473
+        va_end
         return
 }
 fn f8(%arg91: s32i, %arg92: s32i, %arg93: s32i, %arg94: s32i, %arg95: s32i, %arg96: s32i, %arg97: s32i, %arg98: s32i, %arg99: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -288,13 +288,13 @@ fn f8(%arg91: s32i, %arg92: s32i, %arg93: s32i, %arg94: s32i, %arg95: s32i, %arg
         store %arg98, %452
         store %arg99, %453
         %455 = cast(array_to_ptrdecay) %454 : rec___va_list_tag*
-        va_start %455
+        va_start
         %456 = const 8 : s32i
         %457 = load %453 : s8i*, align 8
         %458 = cast(array_to_ptrdecay) %454 : rec___va_list_tag*
         call @fap(%456, %457, %458) [all]
         %459 = cast(array_to_ptrdecay) %454 : rec___va_list_tag*
-        va_end %459
+        va_end
         return
 }
 fn f9(%arg81: s32i, %arg82: s32i, %arg83: s32i, %arg84: s32i, %arg85: s32i, %arg86: s32i, %arg87: s32i, %arg88: s32i, %arg89: s32i, %arg90: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -321,13 +321,13 @@ fn f9(%arg81: s32i, %arg82: s32i, %arg83: s32i, %arg84: s32i, %arg85: s32i, %arg
         store %arg89, %437
         store %arg90, %438
         %440 = cast(array_to_ptrdecay) %439 : rec___va_list_tag*
-        va_start %440
+        va_start
         %441 = const 9 : s32i
         %442 = load %438 : s8i*, align 8
         %443 = cast(array_to_ptrdecay) %439 : rec___va_list_tag*
         call @fap(%441, %442, %443) [all]
         %444 = cast(array_to_ptrdecay) %439 : rec___va_list_tag*
-        va_end %444
+        va_end
         return
 }
 fn f10(%arg70: s32i, %arg71: s32i, %arg72: s32i, %arg73: s32i, %arg74: s32i, %arg75: s32i, %arg76: s32i, %arg77: s32i, %arg78: s32i, %arg79: s32i, %arg80: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -356,13 +356,13 @@ fn f10(%arg70: s32i, %arg71: s32i, %arg72: s32i, %arg73: s32i, %arg74: s32i, %ar
         store %arg79, %421
         store %arg80, %422
         %424 = cast(array_to_ptrdecay) %423 : rec___va_list_tag*
-        va_start %424
+        va_start
         %425 = const 10 : s32i
         %426 = load %422 : s8i*, align 8
         %427 = cast(array_to_ptrdecay) %423 : rec___va_list_tag*
         call @fap(%425, %426, %427) [all]
         %428 = cast(array_to_ptrdecay) %423 : rec___va_list_tag*
-        va_end %428
+        va_end
         return
 }
 fn f11(%arg58: s32i, %arg59: s32i, %arg60: s32i, %arg61: s32i, %arg62: s32i, %arg63: s32i, %arg64: s32i, %arg65: s32i, %arg66: s32i, %arg67: s32i, %arg68: s32i, %arg69: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -393,13 +393,13 @@ fn f11(%arg58: s32i, %arg59: s32i, %arg60: s32i, %arg61: s32i, %arg62: s32i, %ar
         store %arg68, %404
         store %arg69, %405
         %407 = cast(array_to_ptrdecay) %406 : rec___va_list_tag*
-        va_start %407
+        va_start
         %408 = const 11 : s32i
         %409 = load %405 : s8i*, align 8
         %410 = cast(array_to_ptrdecay) %406 : rec___va_list_tag*
         call @fap(%408, %409, %410) [all]
         %411 = cast(array_to_ptrdecay) %406 : rec___va_list_tag*
-        va_end %411
+        va_end
         return
 }
 fn f12(%arg45: s32i, %arg46: s32i, %arg47: s32i, %arg48: s32i, %arg49: s32i, %arg50: s32i, %arg51: s32i, %arg52: s32i, %arg53: s32i, %arg54: s32i, %arg55: s32i, %arg56: s32i, %arg57: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -432,13 +432,13 @@ fn f12(%arg45: s32i, %arg46: s32i, %arg47: s32i, %arg48: s32i, %arg49: s32i, %ar
         store %arg56, %386
         store %arg57, %387
         %389 = cast(array_to_ptrdecay) %388 : rec___va_list_tag*
-        va_start %389
+        va_start
         %390 = const 12 : s32i
         %391 = load %387 : s8i*, align 8
         %392 = cast(array_to_ptrdecay) %388 : rec___va_list_tag*
         call @fap(%390, %391, %392) [all]
         %393 = cast(array_to_ptrdecay) %388 : rec___va_list_tag*
-        va_end %393
+        va_end
         return
 }
 fn f13(%arg31: s32i, %arg32: s32i, %arg33: s32i, %arg34: s32i, %arg35: s32i, %arg36: s32i, %arg37: s32i, %arg38: s32i, %arg39: s32i, %arg40: s32i, %arg41: s32i, %arg42: s32i, %arg43: s32i, %arg44: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -473,13 +473,13 @@ fn f13(%arg31: s32i, %arg32: s32i, %arg33: s32i, %arg34: s32i, %arg35: s32i, %ar
         store %arg43, %367
         store %arg44, %368
         %370 = cast(array_to_ptrdecay) %369 : rec___va_list_tag*
-        va_start %370
+        va_start
         %371 = const 13 : s32i
         %372 = load %368 : s8i*, align 8
         %373 = cast(array_to_ptrdecay) %369 : rec___va_list_tag*
         call @fap(%371, %372, %373) [all]
         %374 = cast(array_to_ptrdecay) %369 : rec___va_list_tag*
-        va_end %374
+        va_end
         return
 }
 fn f14(%arg16: s32i, %arg17: s32i, %arg18: s32i, %arg19: s32i, %arg20: s32i, %arg21: s32i, %arg22: s32i, %arg23: s32i, %arg24: s32i, %arg25: s32i, %arg26: s32i, %arg27: s32i, %arg28: s32i, %arg29: s32i, %arg30: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -516,13 +516,13 @@ fn f14(%arg16: s32i, %arg17: s32i, %arg18: s32i, %arg19: s32i, %arg20: s32i, %ar
         store %arg29, %347
         store %arg30, %348
         %350 = cast(array_to_ptrdecay) %349 : rec___va_list_tag*
-        va_start %350
+        va_start
         %351 = const 14 : s32i
         %352 = load %348 : s8i*, align 8
         %353 = cast(array_to_ptrdecay) %349 : rec___va_list_tag*
         call @fap(%351, %352, %353) [all]
         %354 = cast(array_to_ptrdecay) %349 : rec___va_list_tag*
-        va_end %354
+        va_end
         return
 }
 fn f15(%arg0: s32i, %arg1: s32i, %arg2: s32i, %arg3: s32i, %arg4: s32i, %arg5: s32i, %arg6: s32i, %arg7: s32i, %arg8: s32i, %arg9: s32i, %arg10: s32i, %arg11: s32i, %arg12: s32i, %arg13: s32i, %arg14: s32i, %arg15: s8i*, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -561,347 +561,347 @@ fn f15(%arg0: s32i, %arg1: s32i, %arg2: s32i, %arg3: s32i, %arg4: s32i, %arg5: s
         store %arg14, %326
         store %arg15, %327
         %329 = cast(array_to_ptrdecay) %328 : rec___va_list_tag*
-        va_start %329
+        va_start
         %330 = const 15 : s32i
         %331 = load %327 : s8i*, align 8
         %332 = cast(array_to_ptrdecay) %328 : rec___va_list_tag*
         call @fap(%330, %331, %332) [all]
         %333 = cast(array_to_ptrdecay) %328 : rec___va_list_tag*
-        va_end %333
+        va_end
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s8i*, "f", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @.str : s8i[17]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    store %4, %1, align 8
-    %5 = load %1 : s8i*, align 8
-    %6 = const 0 : s32i
-    %7 = ptr_stride %5, %6 : s8i*
-    %8 = const 0 : s32i
-    %9 = const 1 : s32i
-    %10 = const 2 : s32i
-    %11 = const 3 : s32i
-    %12 = const 4 : s32i
-    %13 = const 5 : s32i
-    %14 = const 6 : s32i
-    %15 = const 7 : s32i
-    %16 = const 8 : s32i
-    %17 = const 9 : s32i
-    %18 = const 10 : s32i
-    %19 = const 11 : s32i
-    %20 = const 12 : s32i
-    %21 = const 13 : s32i
-    %22 = const 14 : s32i
-    %23 = const 15 : s32i
-    call @f0(%7, %8, %9, %10, %11, %12, %13, %14, %15, %16, %17, %18, %19, %20, %21, %22, %23) [all]
-    %24 = const 0 : s32i
-    %25 = load %1 : s8i*, align 8
-    %26 = const 1 : s32i
-    %27 = ptr_stride %25, %26 : s8i*
-    %28 = const 1 : s32i
-    %29 = const 2 : s32i
-    %30 = const 3 : s32i
-    %31 = const 4 : s32i
-    %32 = const 5 : s32i
-    %33 = const 6 : s32i
-    %34 = const 7 : s32i
-    %35 = const 8 : s32i
-    %36 = const 9 : s32i
-    %37 = const 10 : s32i
-    %38 = const 11 : s32i
-    %39 = const 12 : s32i
-    %40 = const 13 : s32i
-    %41 = const 14 : s32i
-    %42 = const 15 : s32i
-    call @f1(%24, %27, %28, %29, %30, %31, %32, %33, %34, %35, %36, %37, %38, %39, %40, %41, %42) [all]
-    %43 = const 0 : s32i
-    %44 = const 1 : s32i
-    %45 = load %1 : s8i*, align 8
-    %46 = const 2 : s32i
-    %47 = ptr_stride %45, %46 : s8i*
-    %48 = const 2 : s32i
-    %49 = const 3 : s32i
-    %50 = const 4 : s32i
-    %51 = const 5 : s32i
-    %52 = const 6 : s32i
-    %53 = const 7 : s32i
-    %54 = const 8 : s32i
-    %55 = const 9 : s32i
-    %56 = const 10 : s32i
-    %57 = const 11 : s32i
-    %58 = const 12 : s32i
-    %59 = const 13 : s32i
-    %60 = const 14 : s32i
-    %61 = const 15 : s32i
-    call @f2(%43, %44, %47, %48, %49, %50, %51, %52, %53, %54, %55, %56, %57, %58, %59, %60, %61) [all]
-    %62 = const 0 : s32i
-    %63 = const 1 : s32i
-    %64 = const 2 : s32i
-    %65 = load %1 : s8i*, align 8
-    %66 = const 3 : s32i
-    %67 = ptr_stride %65, %66 : s8i*
-    %68 = const 3 : s32i
-    %69 = const 4 : s32i
-    %70 = const 5 : s32i
-    %71 = const 6 : s32i
-    %72 = const 7 : s32i
-    %73 = const 8 : s32i
-    %74 = const 9 : s32i
-    %75 = const 10 : s32i
-    %76 = const 11 : s32i
-    %77 = const 12 : s32i
-    %78 = const 13 : s32i
-    %79 = const 14 : s32i
-    %80 = const 15 : s32i
-    call @f3(%62, %63, %64, %67, %68, %69, %70, %71, %72, %73, %74, %75, %76, %77, %78, %79, %80) [all]
-    %81 = const 0 : s32i
-    %82 = const 1 : s32i
-    %83 = const 2 : s32i
-    %84 = const 3 : s32i
-    %85 = load %1 : s8i*, align 8
-    %86 = const 4 : s32i
-    %87 = ptr_stride %85, %86 : s8i*
-    %88 = const 4 : s32i
-    %89 = const 5 : s32i
-    %90 = const 6 : s32i
-    %91 = const 7 : s32i
-    %92 = const 8 : s32i
-    %93 = const 9 : s32i
-    %94 = const 10 : s32i
-    %95 = const 11 : s32i
-    %96 = const 12 : s32i
-    %97 = const 13 : s32i
-    %98 = const 14 : s32i
-    %99 = const 15 : s32i
-    call @f4(%81, %82, %83, %84, %87, %88, %89, %90, %91, %92, %93, %94, %95, %96, %97, %98, %99) [all]
-    %100 = const 0 : s32i
-    %101 = const 1 : s32i
-    %102 = const 2 : s32i
-    %103 = const 3 : s32i
-    %104 = const 4 : s32i
-    %105 = load %1 : s8i*, align 8
-    %106 = const 5 : s32i
-    %107 = ptr_stride %105, %106 : s8i*
-    %108 = const 5 : s32i
-    %109 = const 6 : s32i
-    %110 = const 7 : s32i
-    %111 = const 8 : s32i
-    %112 = const 9 : s32i
-    %113 = const 10 : s32i
-    %114 = const 11 : s32i
-    %115 = const 12 : s32i
-    %116 = const 13 : s32i
-    %117 = const 14 : s32i
-    %118 = const 15 : s32i
-    call @f5(%100, %101, %102, %103, %104, %107, %108, %109, %110, %111, %112, %113, %114, %115, %116, %117, %118) [all]
-    %119 = const 0 : s32i
-    %120 = const 1 : s32i
-    %121 = const 2 : s32i
-    %122 = const 3 : s32i
-    %123 = const 4 : s32i
-    %124 = const 5 : s32i
-    %125 = load %1 : s8i*, align 8
-    %126 = const 6 : s32i
-    %127 = ptr_stride %125, %126 : s8i*
-    %128 = const 6 : s32i
-    %129 = const 7 : s32i
-    %130 = const 8 : s32i
-    %131 = const 9 : s32i
-    %132 = const 10 : s32i
-    %133 = const 11 : s32i
-    %134 = const 12 : s32i
-    %135 = const 13 : s32i
-    %136 = const 14 : s32i
-    %137 = const 15 : s32i
-    call @f6(%119, %120, %121, %122, %123, %124, %127, %128, %129, %130, %131, %132, %133, %134, %135, %136, %137) [all]
-    %138 = const 0 : s32i
-    %139 = const 1 : s32i
-    %140 = const 2 : s32i
-    %141 = const 3 : s32i
-    %142 = const 4 : s32i
-    %143 = const 5 : s32i
-    %144 = const 6 : s32i
-    %145 = load %1 : s8i*, align 8
-    %146 = const 7 : s32i
-    %147 = ptr_stride %145, %146 : s8i*
-    %148 = const 7 : s32i
-    %149 = const 8 : s32i
-    %150 = const 9 : s32i
-    %151 = const 10 : s32i
-    %152 = const 11 : s32i
-    %153 = const 12 : s32i
-    %154 = const 13 : s32i
-    %155 = const 14 : s32i
-    %156 = const 15 : s32i
-    call @f7(%138, %139, %140, %141, %142, %143, %144, %147, %148, %149, %150, %151, %152, %153, %154, %155, %156) [all]
-    %157 = const 0 : s32i
-    %158 = const 1 : s32i
-    %159 = const 2 : s32i
-    %160 = const 3 : s32i
-    %161 = const 4 : s32i
-    %162 = const 5 : s32i
-    %163 = const 6 : s32i
-    %164 = const 7 : s32i
-    %165 = load %1 : s8i*, align 8
-    %166 = const 8 : s32i
-    %167 = ptr_stride %165, %166 : s8i*
-    %168 = const 8 : s32i
-    %169 = const 9 : s32i
-    %170 = const 10 : s32i
-    %171 = const 11 : s32i
-    %172 = const 12 : s32i
-    %173 = const 13 : s32i
-    %174 = const 14 : s32i
-    %175 = const 15 : s32i
-    call @f8(%157, %158, %159, %160, %161, %162, %163, %164, %167, %168, %169, %170, %171, %172, %173, %174, %175) [all]
-    %176 = const 0 : s32i
-    %177 = const 1 : s32i
-    %178 = const 2 : s32i
-    %179 = const 3 : s32i
-    %180 = const 4 : s32i
-    %181 = const 5 : s32i
-    %182 = const 6 : s32i
-    %183 = const 7 : s32i
-    %184 = const 8 : s32i
-    %185 = load %1 : s8i*, align 8
-    %186 = const 9 : s32i
-    %187 = ptr_stride %185, %186 : s8i*
-    %188 = const 9 : s32i
-    %189 = const 10 : s32i
-    %190 = const 11 : s32i
-    %191 = const 12 : s32i
-    %192 = const 13 : s32i
-    %193 = const 14 : s32i
-    %194 = const 15 : s32i
-    call @f9(%176, %177, %178, %179, %180, %181, %182, %183, %184, %187, %188, %189, %190, %191, %192, %193, %194) [all]
-    %195 = const 0 : s32i
-    %196 = const 1 : s32i
-    %197 = const 2 : s32i
-    %198 = const 3 : s32i
-    %199 = const 4 : s32i
-    %200 = const 5 : s32i
-    %201 = const 6 : s32i
-    %202 = const 7 : s32i
-    %203 = const 8 : s32i
-    %204 = const 9 : s32i
-    %205 = load %1 : s8i*, align 8
-    %206 = const 10 : s32i
-    %207 = ptr_stride %205, %206 : s8i*
-    %208 = const 10 : s32i
-    %209 = const 11 : s32i
-    %210 = const 12 : s32i
-    %211 = const 13 : s32i
-    %212 = const 14 : s32i
-    %213 = const 15 : s32i
-    call @f10(%195, %196, %197, %198, %199, %200, %201, %202, %203, %204, %207, %208, %209, %210, %211, %212, %213) [all]
-    %214 = const 0 : s32i
-    %215 = const 1 : s32i
-    %216 = const 2 : s32i
-    %217 = const 3 : s32i
-    %218 = const 4 : s32i
-    %219 = const 5 : s32i
-    %220 = const 6 : s32i
-    %221 = const 7 : s32i
-    %222 = const 8 : s32i
-    %223 = const 9 : s32i
-    %224 = const 10 : s32i
-    %225 = load %1 : s8i*, align 8
-    %226 = const 11 : s32i
-    %227 = ptr_stride %225, %226 : s8i*
-    %228 = const 11 : s32i
-    %229 = const 12 : s32i
-    %230 = const 13 : s32i
-    %231 = const 14 : s32i
-    %232 = const 15 : s32i
-    call @f11(%214, %215, %216, %217, %218, %219, %220, %221, %222, %223, %224, %227, %228, %229, %230, %231, %232) [all]
-    %233 = const 0 : s32i
-    %234 = const 1 : s32i
-    %235 = const 2 : s32i
-    %236 = const 3 : s32i
-    %237 = const 4 : s32i
-    %238 = const 5 : s32i
-    %239 = const 6 : s32i
-    %240 = const 7 : s32i
-    %241 = const 8 : s32i
-    %242 = const 9 : s32i
-    %243 = const 10 : s32i
-    %244 = const 11 : s32i
-    %245 = load %1 : s8i*, align 8
-    %246 = const 12 : s32i
-    %247 = ptr_stride %245, %246 : s8i*
-    %248 = const 12 : s32i
-    %249 = const 13 : s32i
-    %250 = const 14 : s32i
-    %251 = const 15 : s32i
-    call @f12(%233, %234, %235, %236, %237, %238, %239, %240, %241, %242, %243, %244, %247, %248, %249, %250, %251) [all]
-    %252 = const 0 : s32i
-    %253 = const 1 : s32i
-    %254 = const 2 : s32i
-    %255 = const 3 : s32i
-    %256 = const 4 : s32i
-    %257 = const 5 : s32i
-    %258 = const 6 : s32i
-    %259 = const 7 : s32i
-    %260 = const 8 : s32i
-    %261 = const 9 : s32i
-    %262 = const 10 : s32i
-    %263 = const 11 : s32i
-    %264 = const 12 : s32i
-    %265 = load %1 : s8i*, align 8
-    %266 = const 13 : s32i
-    %267 = ptr_stride %265, %266 : s8i*
-    %268 = const 13 : s32i
-    %269 = const 14 : s32i
-    %270 = const 15 : s32i
-    call @f13(%252, %253, %254, %255, %256, %257, %258, %259, %260, %261, %262, %263, %264, %267, %268, %269, %270) [all]
-    %271 = const 0 : s32i
-    %272 = const 1 : s32i
-    %273 = const 2 : s32i
-    %274 = const 3 : s32i
-    %275 = const 4 : s32i
-    %276 = const 5 : s32i
-    %277 = const 6 : s32i
-    %278 = const 7 : s32i
-    %279 = const 8 : s32i
-    %280 = const 9 : s32i
-    %281 = const 10 : s32i
-    %282 = const 11 : s32i
-    %283 = const 12 : s32i
-    %284 = const 13 : s32i
-    %285 = load %1 : s8i*, align 8
-    %286 = const 14 : s32i
-    %287 = ptr_stride %285, %286 : s8i*
-    %288 = const 14 : s32i
-    %289 = const 15 : s32i
-    call @f14(%271, %272, %273, %274, %275, %276, %277, %278, %279, %280, %281, %282, %283, %284, %287, %288, %289) [all]
-    %290 = const 0 : s32i
-    %291 = const 1 : s32i
-    %292 = const 2 : s32i
-    %293 = const 3 : s32i
-    %294 = const 4 : s32i
-    %295 = const 5 : s32i
-    %296 = const 6 : s32i
-    %297 = const 7 : s32i
-    %298 = const 8 : s32i
-    %299 = const 9 : s32i
-    %300 = const 10 : s32i
-    %301 = const 11 : s32i
-    %302 = const 12 : s32i
-    %303 = const 13 : s32i
-    %304 = const 14 : s32i
-    %305 = load %1 : s8i*, align 8
-    %306 = const 15 : s32i
-    %307 = ptr_stride %305, %306 : s8i*
-    %308 = const 15 : s32i
-    call @f15(%290, %291, %292, %293, %294, %295, %296, %297, %298, %299, %300, %301, %302, %303, %304, %307, %308) [all]
-    %309 = get_global @exit : ((s32i) -> void)*
-    %310 = const 0 : s32i
-    call @exit(%310) [all]
-    %311 = load %0 : s32i
-    return %311
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s8i*, "f", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @.str : s8i[17]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        store %4, %1, align 8
+        %5 = load %1 : s8i*, align 8
+        %6 = const 0 : s32i
+        ptr_stride
+        %8 = const 0 : s32i
+        %9 = const 1 : s32i
+        %10 = const 2 : s32i
+        %11 = const 3 : s32i
+        %12 = const 4 : s32i
+        %13 = const 5 : s32i
+        %14 = const 6 : s32i
+        %15 = const 7 : s32i
+        %16 = const 8 : s32i
+        %17 = const 9 : s32i
+        %18 = const 10 : s32i
+        %19 = const 11 : s32i
+        %20 = const 12 : s32i
+        %21 = const 13 : s32i
+        %22 = const 14 : s32i
+        %23 = const 15 : s32i
+        call @f0(%7, %8, %9, %10, %11, %12, %13, %14, %15, %16, %17, %18, %19, %20, %21, %22, %23) [all]
+        %24 = const 0 : s32i
+        %25 = load %1 : s8i*, align 8
+        %26 = const 1 : s32i
+        ptr_stride
+        %28 = const 1 : s32i
+        %29 = const 2 : s32i
+        %30 = const 3 : s32i
+        %31 = const 4 : s32i
+        %32 = const 5 : s32i
+        %33 = const 6 : s32i
+        %34 = const 7 : s32i
+        %35 = const 8 : s32i
+        %36 = const 9 : s32i
+        %37 = const 10 : s32i
+        %38 = const 11 : s32i
+        %39 = const 12 : s32i
+        %40 = const 13 : s32i
+        %41 = const 14 : s32i
+        %42 = const 15 : s32i
+        call @f1(%24, %27, %28, %29, %30, %31, %32, %33, %34, %35, %36, %37, %38, %39, %40, %41, %42) [all]
+        %43 = const 0 : s32i
+        %44 = const 1 : s32i
+        %45 = load %1 : s8i*, align 8
+        %46 = const 2 : s32i
+        ptr_stride
+        %48 = const 2 : s32i
+        %49 = const 3 : s32i
+        %50 = const 4 : s32i
+        %51 = const 5 : s32i
+        %52 = const 6 : s32i
+        %53 = const 7 : s32i
+        %54 = const 8 : s32i
+        %55 = const 9 : s32i
+        %56 = const 10 : s32i
+        %57 = const 11 : s32i
+        %58 = const 12 : s32i
+        %59 = const 13 : s32i
+        %60 = const 14 : s32i
+        %61 = const 15 : s32i
+        call @f2(%43, %44, %47, %48, %49, %50, %51, %52, %53, %54, %55, %56, %57, %58, %59, %60, %61) [all]
+        %62 = const 0 : s32i
+        %63 = const 1 : s32i
+        %64 = const 2 : s32i
+        %65 = load %1 : s8i*, align 8
+        %66 = const 3 : s32i
+        ptr_stride
+        %68 = const 3 : s32i
+        %69 = const 4 : s32i
+        %70 = const 5 : s32i
+        %71 = const 6 : s32i
+        %72 = const 7 : s32i
+        %73 = const 8 : s32i
+        %74 = const 9 : s32i
+        %75 = const 10 : s32i
+        %76 = const 11 : s32i
+        %77 = const 12 : s32i
+        %78 = const 13 : s32i
+        %79 = const 14 : s32i
+        %80 = const 15 : s32i
+        call @f3(%62, %63, %64, %67, %68, %69, %70, %71, %72, %73, %74, %75, %76, %77, %78, %79, %80) [all]
+        %81 = const 0 : s32i
+        %82 = const 1 : s32i
+        %83 = const 2 : s32i
+        %84 = const 3 : s32i
+        %85 = load %1 : s8i*, align 8
+        %86 = const 4 : s32i
+        ptr_stride
+        %88 = const 4 : s32i
+        %89 = const 5 : s32i
+        %90 = const 6 : s32i
+        %91 = const 7 : s32i
+        %92 = const 8 : s32i
+        %93 = const 9 : s32i
+        %94 = const 10 : s32i
+        %95 = const 11 : s32i
+        %96 = const 12 : s32i
+        %97 = const 13 : s32i
+        %98 = const 14 : s32i
+        %99 = const 15 : s32i
+        call @f4(%81, %82, %83, %84, %87, %88, %89, %90, %91, %92, %93, %94, %95, %96, %97, %98, %99) [all]
+        %100 = const 0 : s32i
+        %101 = const 1 : s32i
+        %102 = const 2 : s32i
+        %103 = const 3 : s32i
+        %104 = const 4 : s32i
+        %105 = load %1 : s8i*, align 8
+        %106 = const 5 : s32i
+        ptr_stride
+        %108 = const 5 : s32i
+        %109 = const 6 : s32i
+        %110 = const 7 : s32i
+        %111 = const 8 : s32i
+        %112 = const 9 : s32i
+        %113 = const 10 : s32i
+        %114 = const 11 : s32i
+        %115 = const 12 : s32i
+        %116 = const 13 : s32i
+        %117 = const 14 : s32i
+        %118 = const 15 : s32i
+        call @f5(%100, %101, %102, %103, %104, %107, %108, %109, %110, %111, %112, %113, %114, %115, %116, %117, %118) [all]
+        %119 = const 0 : s32i
+        %120 = const 1 : s32i
+        %121 = const 2 : s32i
+        %122 = const 3 : s32i
+        %123 = const 4 : s32i
+        %124 = const 5 : s32i
+        %125 = load %1 : s8i*, align 8
+        %126 = const 6 : s32i
+        ptr_stride
+        %128 = const 6 : s32i
+        %129 = const 7 : s32i
+        %130 = const 8 : s32i
+        %131 = const 9 : s32i
+        %132 = const 10 : s32i
+        %133 = const 11 : s32i
+        %134 = const 12 : s32i
+        %135 = const 13 : s32i
+        %136 = const 14 : s32i
+        %137 = const 15 : s32i
+        call @f6(%119, %120, %121, %122, %123, %124, %127, %128, %129, %130, %131, %132, %133, %134, %135, %136, %137) [all]
+        %138 = const 0 : s32i
+        %139 = const 1 : s32i
+        %140 = const 2 : s32i
+        %141 = const 3 : s32i
+        %142 = const 4 : s32i
+        %143 = const 5 : s32i
+        %144 = const 6 : s32i
+        %145 = load %1 : s8i*, align 8
+        %146 = const 7 : s32i
+        ptr_stride
+        %148 = const 7 : s32i
+        %149 = const 8 : s32i
+        %150 = const 9 : s32i
+        %151 = const 10 : s32i
+        %152 = const 11 : s32i
+        %153 = const 12 : s32i
+        %154 = const 13 : s32i
+        %155 = const 14 : s32i
+        %156 = const 15 : s32i
+        call @f7(%138, %139, %140, %141, %142, %143, %144, %147, %148, %149, %150, %151, %152, %153, %154, %155, %156) [all]
+        %157 = const 0 : s32i
+        %158 = const 1 : s32i
+        %159 = const 2 : s32i
+        %160 = const 3 : s32i
+        %161 = const 4 : s32i
+        %162 = const 5 : s32i
+        %163 = const 6 : s32i
+        %164 = const 7 : s32i
+        %165 = load %1 : s8i*, align 8
+        %166 = const 8 : s32i
+        ptr_stride
+        %168 = const 8 : s32i
+        %169 = const 9 : s32i
+        %170 = const 10 : s32i
+        %171 = const 11 : s32i
+        %172 = const 12 : s32i
+        %173 = const 13 : s32i
+        %174 = const 14 : s32i
+        %175 = const 15 : s32i
+        call @f8(%157, %158, %159, %160, %161, %162, %163, %164, %167, %168, %169, %170, %171, %172, %173, %174, %175) [all]
+        %176 = const 0 : s32i
+        %177 = const 1 : s32i
+        %178 = const 2 : s32i
+        %179 = const 3 : s32i
+        %180 = const 4 : s32i
+        %181 = const 5 : s32i
+        %182 = const 6 : s32i
+        %183 = const 7 : s32i
+        %184 = const 8 : s32i
+        %185 = load %1 : s8i*, align 8
+        %186 = const 9 : s32i
+        ptr_stride
+        %188 = const 9 : s32i
+        %189 = const 10 : s32i
+        %190 = const 11 : s32i
+        %191 = const 12 : s32i
+        %192 = const 13 : s32i
+        %193 = const 14 : s32i
+        %194 = const 15 : s32i
+        call @f9(%176, %177, %178, %179, %180, %181, %182, %183, %184, %187, %188, %189, %190, %191, %192, %193, %194) [all]
+        %195 = const 0 : s32i
+        %196 = const 1 : s32i
+        %197 = const 2 : s32i
+        %198 = const 3 : s32i
+        %199 = const 4 : s32i
+        %200 = const 5 : s32i
+        %201 = const 6 : s32i
+        %202 = const 7 : s32i
+        %203 = const 8 : s32i
+        %204 = const 9 : s32i
+        %205 = load %1 : s8i*, align 8
+        %206 = const 10 : s32i
+        ptr_stride
+        %208 = const 10 : s32i
+        %209 = const 11 : s32i
+        %210 = const 12 : s32i
+        %211 = const 13 : s32i
+        %212 = const 14 : s32i
+        %213 = const 15 : s32i
+        call @f10(%195, %196, %197, %198, %199, %200, %201, %202, %203, %204, %207, %208, %209, %210, %211, %212, %213) [all]
+        %214 = const 0 : s32i
+        %215 = const 1 : s32i
+        %216 = const 2 : s32i
+        %217 = const 3 : s32i
+        %218 = const 4 : s32i
+        %219 = const 5 : s32i
+        %220 = const 6 : s32i
+        %221 = const 7 : s32i
+        %222 = const 8 : s32i
+        %223 = const 9 : s32i
+        %224 = const 10 : s32i
+        %225 = load %1 : s8i*, align 8
+        %226 = const 11 : s32i
+        ptr_stride
+        %228 = const 11 : s32i
+        %229 = const 12 : s32i
+        %230 = const 13 : s32i
+        %231 = const 14 : s32i
+        %232 = const 15 : s32i
+        call @f11(%214, %215, %216, %217, %218, %219, %220, %221, %222, %223, %224, %227, %228, %229, %230, %231, %232) [all]
+        %233 = const 0 : s32i
+        %234 = const 1 : s32i
+        %235 = const 2 : s32i
+        %236 = const 3 : s32i
+        %237 = const 4 : s32i
+        %238 = const 5 : s32i
+        %239 = const 6 : s32i
+        %240 = const 7 : s32i
+        %241 = const 8 : s32i
+        %242 = const 9 : s32i
+        %243 = const 10 : s32i
+        %244 = const 11 : s32i
+        %245 = load %1 : s8i*, align 8
+        %246 = const 12 : s32i
+        ptr_stride
+        %248 = const 12 : s32i
+        %249 = const 13 : s32i
+        %250 = const 14 : s32i
+        %251 = const 15 : s32i
+        call @f12(%233, %234, %235, %236, %237, %238, %239, %240, %241, %242, %243, %244, %247, %248, %249, %250, %251) [all]
+        %252 = const 0 : s32i
+        %253 = const 1 : s32i
+        %254 = const 2 : s32i
+        %255 = const 3 : s32i
+        %256 = const 4 : s32i
+        %257 = const 5 : s32i
+        %258 = const 6 : s32i
+        %259 = const 7 : s32i
+        %260 = const 8 : s32i
+        %261 = const 9 : s32i
+        %262 = const 10 : s32i
+        %263 = const 11 : s32i
+        %264 = const 12 : s32i
+        %265 = load %1 : s8i*, align 8
+        %266 = const 13 : s32i
+        ptr_stride
+        %268 = const 13 : s32i
+        %269 = const 14 : s32i
+        %270 = const 15 : s32i
+        call @f13(%252, %253, %254, %255, %256, %257, %258, %259, %260, %261, %262, %263, %264, %267, %268, %269, %270) [all]
+        %271 = const 0 : s32i
+        %272 = const 1 : s32i
+        %273 = const 2 : s32i
+        %274 = const 3 : s32i
+        %275 = const 4 : s32i
+        %276 = const 5 : s32i
+        %277 = const 6 : s32i
+        %278 = const 7 : s32i
+        %279 = const 8 : s32i
+        %280 = const 9 : s32i
+        %281 = const 10 : s32i
+        %282 = const 11 : s32i
+        %283 = const 12 : s32i
+        %284 = const 13 : s32i
+        %285 = load %1 : s8i*, align 8
+        %286 = const 14 : s32i
+        ptr_stride
+        %288 = const 14 : s32i
+        %289 = const 15 : s32i
+        call @f14(%271, %272, %273, %274, %275, %276, %277, %278, %279, %280, %281, %282, %283, %284, %287, %288, %289) [all]
+        %290 = const 0 : s32i
+        %291 = const 1 : s32i
+        %292 = const 2 : s32i
+        %293 = const 3 : s32i
+        %294 = const 4 : s32i
+        %295 = const 5 : s32i
+        %296 = const 6 : s32i
+        %297 = const 7 : s32i
+        %298 = const 8 : s32i
+        %299 = const 9 : s32i
+        %300 = const 10 : s32i
+        %301 = const 11 : s32i
+        %302 = const 12 : s32i
+        %303 = const 13 : s32i
+        %304 = const 14 : s32i
+        %305 = load %1 : s8i*, align 8
+        %306 = const 15 : s32i
+        ptr_stride
+        %308 = const 15 : s32i
+        call @f15(%290, %291, %292, %293, %294, %295, %296, %297, %298, %299, %300, %301, %302, %303, %304, %307, %308) [all]
+        %309 = get_global @exit : (s32i) -> void*
+        %310 = const 0 : s32i
+        call @exit(%310) [all]
+        %311 = load %0 : s32i
+        return %311
 }

@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr104604.c" (c, x86_64-unknown-linux-gnu)
-global g : u8i = 0 [external, default, align 1, dso_local]
+global g : u8i = CirInt { ty: Named("u8i"), value: "0" } [external, default, align 1, dso_local]
 
 fn foo(%arg1: u64i) -> u8i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: u64i):
@@ -21,34 +21,34 @@ fn foo(%arg1: u64i) -> u8i [external, c, no_inline, dso_local, nothrow] {
         store %75, %72, align 1
         %76 = const 3 : u32i
         %77 = const 0 : u32i
-        %78 = complex.create %76, %77 : complex<u32i>
+        complex.create
         store %78, %73, align 4
         %79 = load %70 : complex<u32i>, align 4
         %80 = load %73 : complex<u32i>, align 4
-        %81 = complex.real %80 : u32i
-        %82 = complex.imag %80 : u32i
-        %83 = complex.real %79 : u32i
-        %84 = complex.imag %79 : u32i
-        %85 = mul %81, %83 : u32i
-        %86 = mul %82, %84 : u32i
-        %87 = mul %83, %83 : u32i
-        %88 = mul %84, %84 : u32i
+        complex.real
+        complex.imag
+        complex.real
+        complex.imag
+        mul
+        mul
+        mul
+        mul
         %89 = add %85, %86 : u32i
         %90 = add %87, %88 : u32i
-        %91 = div %89, %90 : u32i
-        %92 = mul %82, %83 : u32i
-        %93 = mul %81, %84 : u32i
-        %94 = sub %92, %93 : u32i
-        %95 = div %94, %90 : u32i
-        %96 = complex.create %91, %95 : complex<u32i>
+        div
+        mul
+        mul
+        sub
+        div
+        complex.create
         store %96, %73, align 4
         %97 = load %72 : u8i, align 1
         %98 = cast(integral) %97 : u32i
         %99 = const 0 : u32i
-        %100 = complex.create %98, %99 : complex<u32i>
+        complex.create
         %101 = load %73 : complex<u32i>, align 4
-        %102 = complex.add %100, %101 : complex<u32i>
-        %103 = complex.real %102 : u32i
+        complex.add
+        complex.real
         %104 = cast(integral) %103 : u8i
         store %104, %71
         %105 = load %71 : u8i
@@ -70,34 +70,34 @@ fn bar(%arg0: u64i) -> u8i [external, c, no_inline, dso_local, nothrow] {
         store %36, %33, align 1
         %37 = const 42 : u32i
         %38 = const 0 : u32i
-        %39 = complex.create %37, %38 : complex<u32i>
+        complex.create
         store %39, %34, align 4
         %40 = load %31 : complex<u32i>, align 4
         %41 = load %34 : complex<u32i>, align 4
-        %42 = complex.real %41 : u32i
-        %43 = complex.imag %41 : u32i
-        %44 = complex.real %40 : u32i
-        %45 = complex.imag %40 : u32i
-        %46 = mul %42, %44 : u32i
-        %47 = mul %43, %45 : u32i
-        %48 = mul %44, %44 : u32i
-        %49 = mul %45, %45 : u32i
+        complex.real
+        complex.imag
+        complex.real
+        complex.imag
+        mul
+        mul
+        mul
+        mul
         %50 = add %46, %47 : u32i
         %51 = add %48, %49 : u32i
-        %52 = div %50, %51 : u32i
-        %53 = mul %43, %44 : u32i
-        %54 = mul %42, %45 : u32i
-        %55 = sub %53, %54 : u32i
-        %56 = div %55, %51 : u32i
-        %57 = complex.create %52, %56 : complex<u32i>
+        div
+        mul
+        mul
+        sub
+        div
+        complex.create
         store %57, %34, align 4
         %58 = load %33 : u8i, align 1
         %59 = cast(integral) %58 : u32i
         %60 = const 0 : u32i
-        %61 = complex.create %59, %60 : complex<u32i>
+        complex.create
         %62 = load %34 : complex<u32i>, align 4
-        %63 = complex.add %61, %62 : complex<u32i>
-        %64 = complex.real %63 : u32i
+        complex.add
+        complex.real
         %65 = cast(integral) %64 : u8i
         store %65, %32
         %66 = load %32 : u8i
@@ -105,54 +105,54 @@ fn bar(%arg0: u64i) -> u8i [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca complex<u32i>, "coerce", align 8
-    %1 = alloca complex<u32i>, "coerce", align 8
-    %2 = alloca s32i, "__retval", align 4
-    %3 = alloca u8i, "x", align 1
-    %4 = alloca complex<u32i>, "coerce", align 4
-    %5 = const 0 : s32i
-    store %5, %2
-    %6 = const 7 : u32i
-    %7 = const 0 : u32i
-    %8 = complex.create %6, %7 : complex<u32i>
-    store %8, %4, align 4
-    %9 = load %4 : complex<u32i>, align 4
-    store %9, %1
-    %10 = cast(bitcast) %1 : u64i*
-    %11 = load %10 : u64i
-    %12 = call @foo(%11) : u8i [all]
-    store %12, %3, align 1
-    scope {
-        %26 = load %3 : u8i, align 1
-        %27 = cast(int_to_bool) %26 : bool
-        if %27 {
-            call @abort() [all]
-            yield
+        %0 = alloca complex<u32i>, "coerce", align 8
+        %1 = alloca complex<u32i>, "coerce", align 8
+        %2 = alloca s32i, "__retval", align 4
+        %3 = alloca u8i, "x", align 1
+        %4 = alloca complex<u32i>, "coerce", align 4
+        %5 = const 0 : s32i
+        store %5, %2
+        %6 = const 7 : u32i
+        %7 = const 0 : u32i
+        complex.create
+        store %8, %4, align 4
+        %9 = load %4 : complex<u32i>, align 4
+        store %9, %1
+        %10 = cast(bitcast) %1 : u64i*
+        %11 = load %10 : u64i
+        %12 = call @foo(%11) : u8i [all]
+        store %12, %3, align 1
+        scope {
+                %26 = load %3 : u8i, align 1
+                %27 = cast(int_to_bool) %26 : bool
+                if %27 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %15 = alloca complex<u32i>, "coerce", align 4
-        %16 = const 7 : u32i
-        %17 = const 0 : u32i
-        %18 = complex.create %16, %17 : complex<u32i>
-        store %18, %15, align 4
-        %19 = load %15 : complex<u32i>, align 4
-        store %19, %0
-        %20 = cast(bitcast) %0 : u64i*
-        %21 = load %20 : u64i
-        %22 = call @bar(%21) : u8i [all]
-        %23 = cast(integral) %22 : s32i
-        %24 = const 6 : s32i
-        %25 = cmp ne %23, %24 : bool
-        if %25 {
-            call @abort() [all]
-            yield
+        scope {
+                %15 = alloca complex<u32i>, "coerce", align 4
+                %16 = const 7 : u32i
+                %17 = const 0 : u32i
+                complex.create
+                store %18, %15, align 4
+                %19 = load %15 : complex<u32i>, align 4
+                store %19, %0
+                %20 = cast(bitcast) %0 : u64i*
+                %21 = load %20 : u64i
+                %22 = call @bar(%21) : u8i [all]
+                %23 = cast(integral) %22 : s32i
+                %24 = const 6 : s32i
+                cmp
+                if %25 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %13 = const 0 : s32i
-    store %13, %2
-    %14 = load %2 : s32i
-    return %14
+        %13 = const 0 : s32i
+        store %13, %2
+        %14 = load %2 : s32i
+        return %14
 }

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20101013-1.c" (c, x86_64-unknown-linux-gnu)
@@ -26,15 +26,15 @@ fn build_int_cst(%arg2: void*, %arg3: s64i) -> void* [internal, c, no_inline, ds
         store %arg2, %26
         store %arg3, %27
         scope {
-            %31 = load %27 : s64i, align 8
-            %32 = const 4 : s64i
-            %33 = cmp ne %31, %32 : bool
-            if %33 {
-                %34 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %31 = load %27 : s64i, align 8
+                %32 = const 4 : s64i
+                cmp
+                if %33 {
+                        %34 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %29 = load %26 : void*, align 8
         store %29, %28
@@ -56,7 +56,7 @@ fn build_ref_for_offset(%arg0: void*, %arg1: s64i) -> void* [internal, c, no_inl
         %19 = load %15 : s64i, align 8
         %20 = load %13 : s64i, align 8
         %21 = const 8 : s64i
-        %22 = div %20, %21 : s64i
+        div
         %23 = add %19, %22 : s64i [nsw]
         %24 = call @build_int_cst(%18, %23) : void* [all]
         store %24, %14
@@ -65,27 +65,27 @@ fn build_ref_for_offset(%arg0: void*, %arg1: s64i) -> void* [internal, c, no_inl
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca void*, "ret", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const #cir.ptr<null> : void*
-    %4 = const 32 : s64i
-    %5 = call @build_ref_for_offset(%3, %4) : void* [all]
-    store %5, %1, align 8
-    scope {
-        %8 = load %1 : void*, align 8
-        %9 = const #cir.ptr<null> : void*
-        %10 = cmp ne %8, %9 : bool
-        if %10 {
-            %11 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca void*, "ret", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const #cir.ptr<null> : void*
+        %4 = const 32 : s64i
+        %5 = call @build_ref_for_offset(%3, %4) : void* [all]
+        store %5, %1, align 8
+        scope {
+                %8 = load %1 : void*, align 8
+                %9 = const #cir.ptr<null> : void*
+                cmp
+                if %10 {
+                        %11 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

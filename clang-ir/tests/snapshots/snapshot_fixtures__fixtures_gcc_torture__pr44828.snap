@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr44828.c" (c, x86_64-unknown-linux-gnu)
-global a : s32i = 274686410 [external, default, align 4, dso_local]
+global a : s32i = CirInt { ty: Named("s32i"), value: "274686410" } [external, default, align 4, dso_local]
 
 fn foo(%arg0: s8i, %arg1: s8i) -> s8i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s8i, %arg1: s8i):
@@ -16,7 +16,7 @@ fn foo(%arg0: s8i, %arg1: s8i) -> s8i [internal, c, no_inline, dso_local, nothro
         %20 = cast(integral) %19 : s32i
         %21 = load %17 : s8i, align 1
         %22 = cast(integral) %21 : s32i
-        %23 = mul %20, %22 : s32i [nsw]
+        mul
         %24 = cast(integral) %23 : s8i
         store %24, %18
         %25 = load %18 : s8i
@@ -24,31 +24,31 @@ fn foo(%arg0: s8i, %arg1: s8i) -> s8i [internal, c, no_inline, dso_local, nothro
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "b", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 53671368 : s32i
-    store %3, %1, align 4
-    scope {
-        %6 = load %1 : s32i, align 4
-        %7 = cast(integral) %6 : s8i
-        %8 = get_global @a : s32i*
-        %9 = load %8 : s32i, align 4
-        %10 = cast(integral) %9 : s8i
-        %11 = call @foo(%7, %10) : s8i [all]
-        %12 = cast(integral) %11 : s32i
-        %13 = const 0 : s32i
-        %14 = cmp gt %12, %13 : bool
-        if %14 {
-            %15 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "b", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 53671368 : s32i
+        store %3, %1, align 4
+        scope {
+                %6 = load %1 : s32i, align 4
+                %7 = cast(integral) %6 : s8i
+                %8 = get_global @a : s32i*
+                %9 = load %8 : s32i, align 4
+                %10 = cast(integral) %9 : s8i
+                %11 = call @foo(%7, %10) : s8i [all]
+                %12 = cast(integral) %11 : s32i
+                %13 = const 0 : s32i
+                cmp
+                if %14 {
+                        %15 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

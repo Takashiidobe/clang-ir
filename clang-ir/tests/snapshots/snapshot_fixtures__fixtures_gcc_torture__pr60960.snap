@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr60960.c" (c, x86_64-unknown-linux-gnu)
@@ -15,8 +15,8 @@ fn f1(%arg3: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         store %88, %89
         %91 = load %89 : vector<4 x u8i>, align 4
         %92 = const 2 : u8i
-        %93 = vec.splat %92 : vector<4 x u8i>
-        %94 = div %91, %93 : vector<4 x u8i>
+        vec.splat
+        div
         store %94, %90
         %95 = load %90 : vector<4 x u8i>
         store %95, %85
@@ -36,10 +36,10 @@ fn f2(%arg2: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         %77 = alloca vector<4 x u8i>, ".compoundliteral", align 4
         store %74, %75
         %78 = load %75 : vector<4 x u8i>, align 4
-        %79 = const [2, 2, 2, 2] : vector<4 x u8i>
+        %79 = const [[2, 2, 2, 2]] : vector<4 x u8i>
         store %79, %77, align 4
         %80 = load %77 : vector<4 x u8i>, align 4
-        %81 = div %78, %80 : vector<4 x u8i>
+        div
         store %81, %76
         %82 = load %76 : vector<4 x u8i>
         store %82, %71
@@ -65,7 +65,7 @@ fn f3(%arg0: u32i, %arg1: u32i) -> u32i [external, c, no_inline, dso_local, noth
         store %58, %63
         %65 = load %62 : vector<4 x u8i>, align 4
         %66 = load %63 : vector<4 x u8i>, align 4
-        %67 = div %65, %66 : vector<4 x u8i>
+        div
         store %67, %64
         %68 = load %64 : vector<4 x u8i>
         store %68, %55
@@ -76,95 +76,95 @@ fn f3(%arg0: u32i, %arg1: u32i) -> u32i [external, c, no_inline, dso_local, noth
 fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c, nothrow];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca u32i, "coerce", align 4
-    %1 = alloca vector<4 x u8i>, "coerce", align 4
-    %2 = alloca vector<4 x u8i>, "coerce", align 4
-    %3 = alloca u32i, "coerce", align 4
-    %4 = alloca vector<4 x u8i>, "coerce", align 4
-    %5 = alloca u32i, "coerce", align 4
-    %6 = alloca vector<4 x u8i>, "coerce", align 4
-    %7 = alloca s32i, "__retval", align 4
-    %8 = alloca vector<4 x u8i>, "x", align 4
-    %9 = alloca vector<4 x u8i>, "y", align 4
-    %10 = alloca vector<4 x u8i>, "z", align 4
-    %11 = const 0 : s32i
-    store %11, %7
-    %12 = const [5, 5, 5, 5] : vector<4 x u8i>
-    store %12, %8, align 4
-    %13 = const [2, 2, 2, 2] : vector<4 x u8i>
-    store %13, %9, align 4
-    %14 = load %8 : vector<4 x u8i>, align 4
-    store %14, %6
-    %15 = cast(bitcast) %6 : u32i*
-    %16 = load %15 : u32i
-    %17 = call @f1(%16) : u32i [all]
-    store %17, %5
-    %18 = cast(bitcast) %5 : vector<4 x u8i>*
-    %19 = load %18 : vector<4 x u8i>
-    store %19, %10, align 4
-    scope {
-        %49 = cast(bitcast) %9 : void*
-        %50 = cast(bitcast) %10 : void*
-        %51 = const 4 : u64i
-        %52 = call @memcmp(%49, %50, %51) : s32i [all]
-        %53 = const 0 : s32i
-        %54 = cmp ne %52, %53 : bool
-        if %54 {
-            call @abort() [all]
-            yield
+        %0 = alloca u32i, "coerce", align 4
+        %1 = alloca vector<4 x u8i>, "coerce", align 4
+        %2 = alloca vector<4 x u8i>, "coerce", align 4
+        %3 = alloca u32i, "coerce", align 4
+        %4 = alloca vector<4 x u8i>, "coerce", align 4
+        %5 = alloca u32i, "coerce", align 4
+        %6 = alloca vector<4 x u8i>, "coerce", align 4
+        %7 = alloca s32i, "__retval", align 4
+        %8 = alloca vector<4 x u8i>, "x", align 4
+        %9 = alloca vector<4 x u8i>, "y", align 4
+        %10 = alloca vector<4 x u8i>, "z", align 4
+        %11 = const 0 : s32i
+        store %11, %7
+        %12 = const [[5, 5, 5, 5]] : vector<4 x u8i>
+        store %12, %8, align 4
+        %13 = const [[2, 2, 2, 2]] : vector<4 x u8i>
+        store %13, %9, align 4
+        %14 = load %8 : vector<4 x u8i>, align 4
+        store %14, %6
+        %15 = cast(bitcast) %6 : u32i*
+        %16 = load %15 : u32i
+        %17 = call @f1(%16) : u32i [all]
+        store %17, %5
+        %18 = cast(bitcast) %5 : vector<4 x u8i>*
+        %19 = load %18 : vector<4 x u8i>
+        store %19, %10, align 4
+        scope {
+                %49 = cast(bitcast) %9 : void*
+                %50 = cast(bitcast) %10 : void*
+                %51 = const 4 : u64i
+                %52 = call @memcmp(%49, %50, %51) : s32i [all]
+                %53 = const 0 : s32i
+                cmp
+                if %54 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %20 = load %8 : vector<4 x u8i>, align 4
-    store %20, %4
-    %21 = cast(bitcast) %4 : u32i*
-    %22 = load %21 : u32i
-    %23 = call @f2(%22) : u32i [all]
-    store %23, %3
-    %24 = cast(bitcast) %3 : vector<4 x u8i>*
-    %25 = load %24 : vector<4 x u8i>
-    store %25, %10, align 4
-    scope {
-        %43 = cast(bitcast) %9 : void*
-        %44 = cast(bitcast) %10 : void*
-        %45 = const 4 : u64i
-        %46 = call @memcmp(%43, %44, %45) : s32i [all]
-        %47 = const 0 : s32i
-        %48 = cmp ne %46, %47 : bool
-        if %48 {
-            call @abort() [all]
-            yield
+        %20 = load %8 : vector<4 x u8i>, align 4
+        store %20, %4
+        %21 = cast(bitcast) %4 : u32i*
+        %22 = load %21 : u32i
+        %23 = call @f2(%22) : u32i [all]
+        store %23, %3
+        %24 = cast(bitcast) %3 : vector<4 x u8i>*
+        %25 = load %24 : vector<4 x u8i>
+        store %25, %10, align 4
+        scope {
+                %43 = cast(bitcast) %9 : void*
+                %44 = cast(bitcast) %10 : void*
+                %45 = const 4 : u64i
+                %46 = call @memcmp(%43, %44, %45) : s32i [all]
+                %47 = const 0 : s32i
+                cmp
+                if %48 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %26 = load %8 : vector<4 x u8i>, align 4
-    %27 = load %9 : vector<4 x u8i>, align 4
-    store %26, %2
-    %28 = cast(bitcast) %2 : u32i*
-    %29 = load %28 : u32i
-    store %27, %1
-    %30 = cast(bitcast) %1 : u32i*
-    %31 = load %30 : u32i
-    %32 = call @f3(%29, %31) : u32i [all]
-    store %32, %0
-    %33 = cast(bitcast) %0 : vector<4 x u8i>*
-    %34 = load %33 : vector<4 x u8i>
-    store %34, %10, align 4
-    scope {
-        %37 = cast(bitcast) %9 : void*
-        %38 = cast(bitcast) %10 : void*
-        %39 = const 4 : u64i
-        %40 = call @memcmp(%37, %38, %39) : s32i [all]
-        %41 = const 0 : s32i
-        %42 = cmp ne %40, %41 : bool
-        if %42 {
-            call @abort() [all]
-            yield
+        %26 = load %8 : vector<4 x u8i>, align 4
+        %27 = load %9 : vector<4 x u8i>, align 4
+        store %26, %2
+        %28 = cast(bitcast) %2 : u32i*
+        %29 = load %28 : u32i
+        store %27, %1
+        %30 = cast(bitcast) %1 : u32i*
+        %31 = load %30 : u32i
+        %32 = call @f3(%29, %31) : u32i [all]
+        store %32, %0
+        %33 = cast(bitcast) %0 : vector<4 x u8i>*
+        %34 = load %33 : vector<4 x u8i>
+        store %34, %10, align 4
+        scope {
+                %37 = cast(bitcast) %9 : void*
+                %38 = cast(bitcast) %10 : void*
+                %39 = const 4 : u64i
+                %40 = call @memcmp(%37, %38, %39) : s32i [all]
+                %41 = const 0 : s32i
+                cmp
+                if %42 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %35 = const 0 : s32i
-    store %35, %7
-    %36 = load %7 : s32i
-    return %36
+        %35 = const 0 : s32i
+        store %35, %7
+        %36 = load %7 : s32i
+        return %36
 }

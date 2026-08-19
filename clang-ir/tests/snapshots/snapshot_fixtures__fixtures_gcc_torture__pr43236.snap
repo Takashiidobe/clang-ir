@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr43236.c" (c, x86_64-unknown-linux-gnu)
@@ -7,101 +7,101 @@ fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow
 fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s8i[30], "A", align 16
-    %2 = alloca s8i[30], "B", align 16
-    %3 = alloca s8i[30], "C", align 16
-    %4 = alloca s32i, "i", align 4
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = get_global @memset : ((void*, s32i, u64i) -> void*)*
-    %7 = cast(array_to_ptrdecay) %1 : s8i*
-    %8 = cast(bitcast) %7 : void*
-    %9 = const 1 : s32i
-    %10 = const 30 : u64i
-    %11 = call @memset(%8, %9, %10) : void* [all]
-    %12 = get_global @memset : ((void*, s32i, u64i) -> void*)*
-    %13 = cast(array_to_ptrdecay) %2 : s8i*
-    %14 = cast(bitcast) %13 : void*
-    %15 = const 1 : s32i
-    %16 = const 30 : u64i
-    %17 = call @memset(%14, %15, %16) : void* [all]
-    scope {
-        %53 = const 20 : s32i
-        store %53, %4, align 4
-        for cond: {
-            %62 = load %4 : s32i, align 4
-            %63 = dec %62 : s32i [nsw]
-            store %63, %4, align 4
-            %64 = const 10 : s32i
-            %65 = cmp gt %62, %64 : bool
-            condition %65
-        } step: {
-            yield
-        } do {
-            scope {
-                %54 = const 0 : s8i
-                %55 = load %4 : s32i, align 4
-                %56 = cast(integral) %55 : s64i
-                %57 = get_element %1[%56] : s8i*
-                store %54, %57, align 1
-                %58 = const 0 : s8i
-                %59 = load %4 : s32i, align 4
-                %60 = cast(integral) %59 : s64i
-                %61 = get_element %2[%60] : s8i*
-                store %58, %61, align 1
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s8i[30], "A", align 16
+        %2 = alloca s8i[30], "B", align 16
+        %3 = alloca s8i[30], "C", align 16
+        %4 = alloca s32i, "i", align 4
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = get_global @memset : (void*, s32i, u64i) -> void**
+        %7 = cast(array_to_ptrdecay) %1 : s8i*
+        %8 = cast(bitcast) %7 : void*
+        %9 = const 1 : s32i
+        %10 = const 30 : u64i
+        %11 = call @memset(%8, %9, %10) : void* [all]
+        %12 = get_global @memset : (void*, s32i, u64i) -> void**
+        %13 = cast(array_to_ptrdecay) %2 : s8i*
+        %14 = cast(bitcast) %13 : void*
+        %15 = const 1 : s32i
+        %16 = const 30 : u64i
+        %17 = call @memset(%14, %15, %16) : void* [all]
+        scope {
+                %53 = const 20 : s32i
+                store %53, %4, align 4
+                for cond {
+                        %62 = load %4 : s32i, align 4
+                        dec
+                        store %63, %4, align 4
+                        %64 = const 10 : s32i
+                        cmp
+                        condition %65
+                } step {
+                        yield
+                } body {
+                        scope {
+                                %54 = const 0 : s8i
+                                %55 = load %4 : s32i, align 4
+                                %56 = cast(integral) %55 : s64i
+                                get_element
+                                store %54, %57, align 1
+                                %58 = const 0 : s8i
+                                %59 = load %4 : s32i, align 4
+                                %60 = cast(integral) %59 : s64i
+                                get_element
+                                store %58, %61, align 1
+                                yield
+                        }
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %18 = get_global @memset : ((void*, s32i, u64i) -> void*)*
-    %19 = cast(array_to_ptrdecay) %3 : s8i*
-    %20 = cast(bitcast) %19 : void*
-    %21 = const 1 : s32i
-    %22 = const 30 : u64i
-    %23 = call @memset(%20, %21, %22) : void* [all]
-    %24 = get_global @memset : ((void*, s32i, u64i) -> void*)*
-    %25 = cast(array_to_ptrdecay) %3 : s8i*
-    %26 = const 10 : s32i
-    %27 = ptr_stride %25, %26 : s8i*
-    %28 = cast(bitcast) %27 : void*
-    %29 = const 0 : s32i
-    %30 = const 10 : u64i
-    %31 = call @memset(%28, %29, %30) : void* [all]
-    scope {
-        %34 = get_global @memcmp : ((void*, void*, u64i) -> s32i)*
-        %35 = cast(array_to_ptrdecay) %1 : s8i*
-        %36 = cast(bitcast) %35 : void*
-        %37 = cast(array_to_ptrdecay) %3 : s8i*
-        %38 = cast(bitcast) %37 : void*
-        %39 = const 30 : u64i
-        %40 = call @memcmp(%36, %38, %39) : s32i [all]
-        %41 = cast(int_to_bool) %40 : bool
-        %42 = ternary %41 ? { : bool
-            %52 = const true : bool
-            yield %52
-        } : {
-            %44 = get_global @memcmp : ((void*, void*, u64i) -> s32i)*
-            %45 = cast(array_to_ptrdecay) %2 : s8i*
-            %46 = cast(bitcast) %45 : void*
-            %47 = cast(array_to_ptrdecay) %3 : s8i*
-            %48 = cast(bitcast) %47 : void*
-            %49 = const 30 : u64i
-            %50 = call @memcmp(%46, %48, %49) : s32i [all]
-            %51 = cast(int_to_bool) %50 : bool
-            yield %51
+        %18 = get_global @memset : (void*, s32i, u64i) -> void**
+        %19 = cast(array_to_ptrdecay) %3 : s8i*
+        %20 = cast(bitcast) %19 : void*
+        %21 = const 1 : s32i
+        %22 = const 30 : u64i
+        %23 = call @memset(%20, %21, %22) : void* [all]
+        %24 = get_global @memset : (void*, s32i, u64i) -> void**
+        %25 = cast(array_to_ptrdecay) %3 : s8i*
+        %26 = const 10 : s32i
+        ptr_stride
+        %28 = cast(bitcast) %27 : void*
+        %29 = const 0 : s32i
+        %30 = const 10 : u64i
+        %31 = call @memset(%28, %29, %30) : void* [all]
+        scope {
+                %34 = get_global @memcmp : (void*, void*, u64i) -> s32i*
+                %35 = cast(array_to_ptrdecay) %1 : s8i*
+                %36 = cast(bitcast) %35 : void*
+                %37 = cast(array_to_ptrdecay) %3 : s8i*
+                %38 = cast(bitcast) %37 : void*
+                %39 = const 30 : u64i
+                %40 = call @memcmp(%36, %38, %39) : s32i [all]
+                %41 = cast(int_to_bool) %40 : bool
+                %42 = ternary %41 ? { : bool
+                        %52 = const true : bool
+                        yield %52
+                } : {
+                        %44 = get_global @memcmp : (void*, void*, u64i) -> s32i*
+                        %45 = cast(array_to_ptrdecay) %2 : s8i*
+                        %46 = cast(bitcast) %45 : void*
+                        %47 = cast(array_to_ptrdecay) %3 : s8i*
+                        %48 = cast(bitcast) %47 : void*
+                        %49 = const 30 : u64i
+                        %50 = call @memcmp(%46, %48, %49) : s32i [all]
+                        %51 = cast(int_to_bool) %50 : bool
+                        yield %51
+                }
+                if %42 {
+                        %43 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %42 {
-            %43 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %32 = const 0 : s32i
-    store %32, %0
-    %33 = load %0 : s32i
-    return %33
+        %32 = const 0 : s32i
+        store %32, %0
+        %33 = load %0 : s32i
+        return %33
 }

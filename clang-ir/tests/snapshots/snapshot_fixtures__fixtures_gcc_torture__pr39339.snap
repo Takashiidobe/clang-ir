@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr39339.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.e : rec_E = {5, 0, {6, {1434451967}}} [cir_private, default, dso_local, constant]
+global __const.main.e : rec_E = ConstRecord { ty: Named("rec_E"), members: Array([CirInt { ty: Named("s64i"), value: "5" }, CirInt { ty: Named("s64i"), value: "0" }, ConstRecord { ty: Named("rec_C"), members: Array([CirInt { ty: Named("u32i"), value: "6" }, ConstRecord { ty: Named("rec_D"), members: Array([CirInt { ty: Named("u32i"), value: "1434451967" }]) }]) }]) } [cir_private, default, dso_local, constant]
 
 fn foo(%arg0: rec_E*, %arg1: u32i, %arg2: s32i, %arg3: rec_B*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: rec_E*, %arg1: u32i, %arg2: s32i, %arg3: rec_B*):
@@ -19,84 +19,84 @@ fn foo(%arg0: rec_E*, %arg1: u32i, %arg2: s32i, %arg3: rec_B*) -> void [external
         store %arg2, %50
         store %arg3, %51
         %55 = load %48 : rec_E*, align 8
-        %56 = get_member %55[1] "col" : s64i*
+        get_member
         %57 = load %56 : s64i, align 8
         store %57, %53, align 8
         %58 = load %48 : rec_E*, align 8
-        %59 = get_member %58[2] "defaults" : rec_C*
-        %60 = get_member %59[1] "attr" : rec_D*
-        copy %52, %60
+        get_member
+        get_member
+        copy
         %61 = load %50 : s32i, align 4
         %62 = cast(integral) %61 : u32i
-        %63 = get_member %52[0] "columns" : u32i*
-        %64 = set_bitfield %63, %62, "columns": 4 bits @0 in u32i : u32i, align 4
+        get_member
+        set_bitfield
         %65 = load %49 : u32i, align 4
         %66 = load %53 : s64i, align 8
         %67 = load %51 : rec_B*, align 8
-        %68 = get_member %67[0] "cells" : rec_A**
+        get_member
         %69 = load %68 : rec_A*, align 8
-        %70 = get_member %69[0] "data" : rec_C**
+        get_member
         %71 = load %70 : rec_C*, align 8
-        %72 = ptr_stride %71, %66 : rec_C*
-        %73 = get_member %72[0] "c" : u32i*
+        ptr_stride
+        get_member
         store %65, %73, align 4
         %74 = load %53 : s64i, align 8
         %75 = load %51 : rec_B*, align 8
-        %76 = get_member %75[0] "cells" : rec_A**
+        get_member
         %77 = load %76 : rec_A*, align 8
-        %78 = get_member %77[0] "data" : rec_C**
+        get_member
         %79 = load %78 : rec_C*, align 8
-        %80 = ptr_stride %79, %74 : rec_C*
-        %81 = get_member %80[1] "attr" : rec_D*
-        copy %81, %52
+        ptr_stride
+        get_member
+        copy
         %82 = load %53 : s64i, align 8
-        %83 = inc %82 : s64i [nsw]
+        inc
         store %83, %53, align 8
         %84 = const 1 : u32i
-        %85 = get_member %52[0] "fragment" : u32i*
-        %86 = set_bitfield %85, %84, "fragment": 1 bits @22 in u32i : u32i, align 4
+        get_member
+        set_bitfield
         scope {
-            %87 = const 1 : s32i
-            store %87, %54, align 4
-            for cond: {
-                %109 = load %54 : s32i, align 4
-                %110 = load %50 : s32i, align 4
-                %111 = cmp lt %109, %110 : bool
-                condition %111
-            } step: {
-                %88 = load %54 : s32i, align 4
-                %89 = inc %88 : s32i [nsw]
-                store %89, %54, align 4
-                yield
-            } do {
-                scope {
-                    %90 = load %49 : u32i, align 4
-                    %91 = load %53 : s64i, align 8
-                    %92 = load %51 : rec_B*, align 8
-                    %93 = get_member %92[0] "cells" : rec_A**
-                    %94 = load %93 : rec_A*, align 8
-                    %95 = get_member %94[0] "data" : rec_C**
-                    %96 = load %95 : rec_C*, align 8
-                    %97 = ptr_stride %96, %91 : rec_C*
-                    %98 = get_member %97[0] "c" : u32i*
-                    store %90, %98, align 4
-                    %99 = load %53 : s64i, align 8
-                    %100 = load %51 : rec_B*, align 8
-                    %101 = get_member %100[0] "cells" : rec_A**
-                    %102 = load %101 : rec_A*, align 8
-                    %103 = get_member %102[0] "data" : rec_C**
-                    %104 = load %103 : rec_C*, align 8
-                    %105 = ptr_stride %104, %99 : rec_C*
-                    %106 = get_member %105[1] "attr" : rec_D*
-                    copy %106, %52
-                    %107 = load %53 : s64i, align 8
-                    %108 = inc %107 : s64i [nsw]
-                    store %108, %53, align 8
-                    yield
+                %87 = const 1 : s32i
+                store %87, %54, align 4
+                for cond {
+                        %109 = load %54 : s32i, align 4
+                        %110 = load %50 : s32i, align 4
+                        cmp
+                        condition %111
+                } step {
+                        %88 = load %54 : s32i, align 4
+                        inc
+                        store %89, %54, align 4
+                        yield
+                } body {
+                        scope {
+                                %90 = load %49 : u32i, align 4
+                                %91 = load %53 : s64i, align 8
+                                %92 = load %51 : rec_B*, align 8
+                                get_member
+                                %94 = load %93 : rec_A*, align 8
+                                get_member
+                                %96 = load %95 : rec_C*, align 8
+                                ptr_stride
+                                get_member
+                                store %90, %98, align 4
+                                %99 = load %53 : s64i, align 8
+                                %100 = load %51 : rec_B*, align 8
+                                get_member
+                                %102 = load %101 : rec_A*, align 8
+                                get_member
+                                %104 = load %103 : rec_C*, align 8
+                                ptr_stride
+                                get_member
+                                copy
+                                %107 = load %53 : s64i, align 8
+                                inc
+                                store %108, %53, align 8
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
@@ -104,75 +104,75 @@ fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow
 fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c, nothrow];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_E, "e", align 8
-    %2 = alloca rec_C[4], "c", align 16
-    %3 = alloca rec_A, "a", align 8
-    %4 = alloca rec_B, "b", align 8
-    %5 = alloca rec_D, "d", align 4
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = get_global @__const.main.e : rec_E*
-    copy %1, %7
-    %8 = get_member %3[0] "data" : rec_C**
-    %9 = cast(array_to_ptrdecay) %2 : rec_C*
-    store %9, %8, align 8
-    %10 = get_member %3[1] "len" : u32i*
-    %11 = const 4 : u32i
-    store %11, %10, align 8
-    %12 = get_member %4[0] "cells" : rec_A**
-    store %3, %12, align 8
-    %13 = get_member %4[1] "soft_wrapped" : u8i*
-    %14 = const 1 : u8i
-    %15 = set_bitfield %13, %14, "soft_wrapped": 1 bits @0 in u8i : u8i, align 8
-    %16 = cast(bitcast) %2 : void*
-    %17 = const 0 : s32i
-    %18 = const 32 : u64i
-    %19 = call @memset(%16, %17, %18) : void* [all]
-    %20 = const 65 : u32i
-    %21 = const 2 : s32i
-    call @foo(%1, %20, %21, %4) [all]
-    %22 = get_member %1[2] "defaults" : rec_C*
-    %23 = get_member %22[1] "attr" : rec_D*
-    copy %5, %23
-    %24 = const 2 : u32i
-    %25 = get_member %5[0] "columns" : u32i*
-    %26 = set_bitfield %25, %24, "columns": 4 bits @0 in u32i : u32i, align 4
-    scope {
-        %40 = cast(bitcast) %5 : void*
-        %41 = const 0 : s64i
-        %42 = get_element %2[%41] : rec_C*
-        %43 = get_member %42[1] "attr" : rec_D*
-        %44 = cast(bitcast) %43 : void*
-        %45 = const 4 : u64i
-        %46 = call @memcmp(%40, %44, %45) : s32i [all]
-        %47 = cast(int_to_bool) %46 : bool
-        if %47 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_E, "e", align 8
+        %2 = alloca rec_C[4], "c", align 16
+        %3 = alloca rec_A, "a", align 8
+        %4 = alloca rec_B, "b", align 8
+        %5 = alloca rec_D, "d", align 4
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = get_global @__const.main.e : rec_E*
+        copy
+        get_member
+        %9 = cast(array_to_ptrdecay) %2 : rec_C*
+        store %9, %8, align 8
+        get_member
+        %11 = const 4 : u32i
+        store %11, %10, align 8
+        get_member
+        store %3, %12, align 8
+        get_member
+        %14 = const 1 : u8i
+        set_bitfield
+        %16 = cast(bitcast) %2 : void*
+        %17 = const 0 : s32i
+        %18 = const 32 : u64i
+        %19 = call @memset(%16, %17, %18) : void* [all]
+        %20 = const 65 : u32i
+        %21 = const 2 : s32i
+        call @foo(%1, %20, %21, %4) [all]
+        get_member
+        get_member
+        copy
+        %24 = const 2 : u32i
+        get_member
+        set_bitfield
+        scope {
+                %40 = cast(bitcast) %5 : void*
+                %41 = const 0 : s64i
+                get_element
+                get_member
+                %44 = cast(bitcast) %43 : void*
+                %45 = const 4 : u64i
+                %46 = call @memcmp(%40, %44, %45) : s32i [all]
+                %47 = cast(int_to_bool) %46 : bool
+                if %47 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %27 = const 1 : u32i
-    %28 = get_member %5[0] "fragment" : u32i*
-    %29 = set_bitfield %28, %27, "fragment": 1 bits @22 in u32i : u32i, align 4
-    scope {
-        %32 = cast(bitcast) %5 : void*
-        %33 = const 1 : s64i
-        %34 = get_element %2[%33] : rec_C*
-        %35 = get_member %34[1] "attr" : rec_D*
-        %36 = cast(bitcast) %35 : void*
-        %37 = const 4 : u64i
-        %38 = call @memcmp(%32, %36, %37) : s32i [all]
-        %39 = cast(int_to_bool) %38 : bool
-        if %39 {
-            call @abort() [all]
-            yield
+        %27 = const 1 : u32i
+        get_member
+        set_bitfield
+        scope {
+                %32 = cast(bitcast) %5 : void*
+                %33 = const 1 : s64i
+                get_element
+                get_member
+                %36 = cast(bitcast) %35 : void*
+                %37 = const 4 : u64i
+                %38 = call @memcmp(%32, %36, %37) : s32i [all]
+                %39 = cast(int_to_bool) %38 : bool
+                if %39 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %30 = const 0 : s32i
-    store %30, %0
-    %31 = load %0 : s32i
-    return %31
+        %30 = const 0 : s32i
+        store %30, %0
+        %31 = load %0 : s32i
+        return %31
 }

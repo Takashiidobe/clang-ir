@@ -1,106 +1,106 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr81423.c" (c, x86_64-unknown-linux-gnu)
-global ll : u64i = 0 [external, default, align 8, dso_local]
-global ull1 : u64i = 1 [external, default, align 8, dso_local]
-global ull2 : u64i = 12008284144813806346 [external, default, align 8, dso_local]
-global ull3 : u64i = 0 [external, default, align 8, dso_local]
+global ll : u64i = CirInt { ty: Named("u64i"), value: "0" } [external, default, align 8, dso_local]
+global ull1 : u64i = CirInt { ty: Named("u64i"), value: "1" } [external, default, align 8, dso_local]
+global ull2 : u64i = CirInt { ty: Named("u64i"), value: "12008284144813806346" } [external, default, align 8, dso_local]
+global ull3 : u64i = CirInt { ty: Named("u64i"), value: "0" } [external, default, align 8, dso_local]
 
 fn foo() -> u64i [external, c, no_inline, dso_local, nothrow] {
-    %25 = alloca u64i, "__retval", align 8
-    %26 = alloca u64i, "ull3", align 8
-    %27 = const 12848745572334057626 : u64i
-    %28 = get_global @ll : u64i*
-    store %27, %28, align 8
-    %29 = const 5677365550390624949 : u64i
-    %30 = get_global @ll : u64i*
-    %31 = load %30 : u64i, align 8
-    %32 = sub %29, %31 : u64i
-    %33 = cast(integral) %32 : u32i
-    %34 = get_global @ull1 : u64i*
-    %35 = load %34 : u64i, align 8
-    %36 = const 0 : u64i
-    %37 = cmp gt %35, %36 : bool
-    %38 = cast(bool_to_int) %37 : s32i
-    %39 = cast(integral) %38 : u32i
-    %40 = sub %33, %39 : u32i
-    %41 = cast(integral) %40 : u64i
-    %42 = get_global @ll : u64i*
-    store %41, %42, align 8
-    %43 = const 2067854353 : s64i
-    %44 = get_global @ll : u64i*
-    %45 = load %44 : u64i, align 8
-    %46 = const 18446744071580446485 : u64i
-    %47 = add %45, %46 : u64i
-    %48 = const 10280750144413668236 : u64i
-    %49 = xor %47, %48 : u64i
-    %50 = const 10280750143997242009 : u64i
-    %51 = sub %49, %50 : u64i
-    %52 = shift left %43, %51 : s64i
-    %53 = cast(integral) %52 : u32i
-    %54 = const 2873442921854271231 : u64i
-    %55 = get_global @ull2 : u64i*
-    %56 = load %55 : u64i, align 8
-    %57 = or %56, %54 : u64i
-    %58 = const 12098357307243495419 : u64i
-    %59 = sub %57, %58 : u64i
-    %60 = shift right %53, %59 : u32i
-    %61 = cast(integral) %60 : u64i
-    store %61, %26, align 8
-    %62 = load %26 : u64i, align 8
-    store %62, %25
-    %63 = load %25 : u64i
-    return %63
+        %25 = alloca u64i, "__retval", align 8
+        %26 = alloca u64i, "ull3", align 8
+        %27 = const 12848745572334057626 : u64i
+        %28 = get_global @ll : u64i*
+        store %27, %28, align 8
+        %29 = const 5677365550390624949 : u64i
+        %30 = get_global @ll : u64i*
+        %31 = load %30 : u64i, align 8
+        sub
+        %33 = cast(integral) %32 : u32i
+        %34 = get_global @ull1 : u64i*
+        %35 = load %34 : u64i, align 8
+        %36 = const 0 : u64i
+        cmp
+        %38 = cast(bool_to_int) %37 : s32i
+        %39 = cast(integral) %38 : u32i
+        sub
+        %41 = cast(integral) %40 : u64i
+        %42 = get_global @ll : u64i*
+        store %41, %42, align 8
+        %43 = const 2067854353 : s64i
+        %44 = get_global @ll : u64i*
+        %45 = load %44 : u64i, align 8
+        %46 = const 18446744071580446485 : u64i
+        %47 = add %45, %46 : u64i
+        %48 = const 10280750144413668236 : u64i
+        xor
+        %50 = const 10280750143997242009 : u64i
+        sub
+        shift
+        %53 = cast(integral) %52 : u32i
+        %54 = const 2873442921854271231 : u64i
+        %55 = get_global @ull2 : u64i*
+        %56 = load %55 : u64i, align 8
+        or
+        %58 = const 12098357307243495419 : u64i
+        sub
+        shift
+        %61 = cast(integral) %60 : u64i
+        store %61, %26, align 8
+        %62 = load %26 : u64i, align 8
+        store %62, %25
+        %63 = load %25 : u64i
+        return %63
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %11 = const 8 : s32i
-        %12 = const 8 : s32i
-        %13 = mul %11, %12 : s32i [nsw]
-        %14 = const 64 : s32i
-        %15 = cmp ne %13, %14 : bool
-        %16 = ternary %15 ? { : bool
-            %24 = const true : bool
-            yield %24
-        } : {
-            %19 = const 4 : s32i
-            %20 = const 8 : s32i
-            %21 = mul %19, %20 : s32i [nsw]
-            %22 = const 32 : s32i
-            %23 = cmp ne %21, %22 : bool
-            yield %23
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %11 = const 8 : s32i
+                %12 = const 8 : s32i
+                mul
+                %14 = const 64 : s32i
+                cmp
+                %16 = ternary %15 ? { : bool
+                        %24 = const true : bool
+                        yield %24
+                } : {
+                        %19 = const 4 : s32i
+                        %20 = const 8 : s32i
+                        mul
+                        %22 = const 32 : s32i
+                        cmp
+                        yield %23
+                }
+                if %16 {
+                        %17 = const 0 : s32i
+                        store %17, %0
+                        %18 = load %0 : s32i
+                        return %18
+                }
+                yield
         }
-        if %16 {
-            %17 = const 0 : s32i
-            store %17, %0
-            %18 = load %0 : s32i
-            return %18
+        %2 = call @foo() : u64i [all]
+        %3 = get_global @ull3 : u64i*
+        store %2, %3, align 8
+        scope {
+                %6 = get_global @ull3 : u64i*
+                %7 = load %6 : u64i, align 8
+                %8 = const 3998784 : u64i
+                cmp
+                if %9 {
+                        %10 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = call @foo() : u64i [all]
-    %3 = get_global @ull3 : u64i*
-    store %2, %3, align 8
-    scope {
-        %6 = get_global @ull3 : u64i*
-        %7 = load %6 : u64i, align 8
-        %8 = const 3998784 : u64i
-        %9 = cmp ne %7, %8 : bool
-        if %9 {
-            %10 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

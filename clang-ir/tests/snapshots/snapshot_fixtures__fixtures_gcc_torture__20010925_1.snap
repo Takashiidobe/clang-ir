@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20010925-1.c" (c, x86_64-unknown-linux-gnu)
-global dst : s32i[10] = zero [external, default, align 16, dso_local]
-global src : s32i[10] = zero [external, default, align 16, dso_local]
+global dst : s32i[10] = Zero { ty: Array { element_type: Named("s32i"), size: 10 } } [external, default, align 16, dso_local]
+global src : s32i[10] = Zero { ty: Array { element_type: Named("s32i"), size: 10 } } [external, default, align 16, dso_local]
 
 fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
 fn foo(%arg0: void*, %arg1: void*, %arg2: u32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
@@ -17,18 +17,18 @@ fn foo(%arg0: void*, %arg1: void*, %arg2: u32i) -> s32i [external, c, no_inline,
         store %arg1, %17
         store %arg2, %18
         scope {
-            %28 = load %18 : u32i, align 4
-            %29 = const 0 : u32i
-            %30 = cmp eq %28, %29 : bool
-            if %30 {
-                %31 = const 1 : s32i
-                store %31, %19
-                %32 = load %19 : s32i
-                return %32
-            }
-            yield
+                %28 = load %18 : u32i, align 4
+                %29 = const 0 : u32i
+                cmp
+                if %30 {
+                        %31 = const 1 : s32i
+                        store %31, %19
+                        %32 = load %19 : s32i
+                        return %32
+                }
+                yield
         }
-        %20 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
+        %20 = get_global @memcpy : (void*, void*, u64i) -> void**
         %21 = load %16 : void*, align 8
         %22 = load %17 : void*, align 8
         %23 = load %18 : u32i, align 4
@@ -42,30 +42,30 @@ fn foo(%arg0: void*, %arg1: void*, %arg2: u32i) -> s32i [external, c, no_inline,
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %5 = get_global @dst : s32i[10]*
-        %6 = cast(array_to_ptrdecay) %5 : s32i*
-        %7 = cast(bitcast) %6 : void*
-        %8 = get_global @src : s32i[10]*
-        %9 = cast(array_to_ptrdecay) %8 : s32i*
-        %10 = cast(bitcast) %9 : void*
-        %11 = const 10 : u32i
-        %12 = call @foo(%7, %10, %11) : s32i [all]
-        %13 = const 0 : s32i
-        %14 = cmp ne %12, %13 : bool
-        if %14 {
-            %15 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %5 = get_global @dst : s32i[10]*
+                %6 = cast(array_to_ptrdecay) %5 : s32i*
+                %7 = cast(bitcast) %6 : void*
+                %8 = get_global @src : s32i[10]*
+                %9 = cast(array_to_ptrdecay) %8 : s32i*
+                %10 = cast(bitcast) %9 : void*
+                %11 = const 10 : u32i
+                %12 = call @foo(%7, %10, %11) : s32i [all]
+                %13 = const 0 : s32i
+                cmp
+                if %14 {
+                        %15 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

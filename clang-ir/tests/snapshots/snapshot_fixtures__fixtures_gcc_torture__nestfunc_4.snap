@@ -1,72 +1,72 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/nestfunc-4.c" (c, x86_64-unknown-linux-gnu)
-global level : s64i = 0 [external, default, align 8, dso_local]
+global level : s64i = CirInt { ty: Named("s64i"), value: "0" } [external, default, align 8, dso_local]
 
 fn bar() -> s64i [external, c, no_inline, dso_local, nothrow] {
-    %18 = alloca s64i, "__retval", align 8
-    %19 = alloca s64i, "tmp", align 8
-    %20 = get_global @level : s64i*
-    %21 = load %20 : s64i, align 8
-    store %21, %19, align 8
-    %22 = load %19 : s64i, align 8
-    %23 = const 500 : s32i
-    %24 = const 1 : s32i
-    %25 = sub %23, %24 : s32i [nsw]
-    %26 = cast(integral) %25 : s64i
-    %27 = cmp gt %22, %26 : bool
-    %28 = ternary %27 ? { : s64i
-        %33 = const -42 : s64i
-        %34 = load %19 : s64i, align 8
-        %35 = sub %33, %34 : s64i [nsw]
-        yield %35
-    } : {
-        %30 = call @foo() : s64i [all]
-        %31 = load %19 : s64i, align 8
-        %32 = sub %30, %31 : s64i [nsw]
-        yield %32
-    }
-    store %28, %18
-    %29 = load %18 : s64i
-    return %29
+        %18 = alloca s64i, "__retval", align 8
+        %19 = alloca s64i, "tmp", align 8
+        %20 = get_global @level : s64i*
+        %21 = load %20 : s64i, align 8
+        store %21, %19, align 8
+        %22 = load %19 : s64i, align 8
+        %23 = const 500 : s32i
+        %24 = const 1 : s32i
+        sub
+        %26 = cast(integral) %25 : s64i
+        cmp
+        %28 = ternary %27 ? { : s64i
+                %33 = const -42 : s64i
+                %34 = load %19 : s64i, align 8
+                sub
+                yield %35
+        } : {
+                %30 = call @foo() : s64i [all]
+                %31 = load %19 : s64i, align 8
+                sub
+                yield %32
+        }
+        store %28, %18
+        %29 = load %18 : s64i
+        return %29
 }
 fn foo() -> s64i [external, c, no_inline, dso_local, nothrow] {
-    %9 = alloca s64i, "__retval", align 8
-    %10 = alloca s64i, "tmp", align 8
-    %11 = get_global @level : s64i*
-    %12 = load %11 : s64i, align 8
-    %13 = inc %12 : s64i [nsw]
-    store %13, %11, align 8
-    store %13, %10, align 8
-    %14 = call @bar() : s64i [all]
-    %15 = load %10 : s64i, align 8
-    %16 = add %14, %15 : s64i [nsw]
-    store %16, %9
-    %17 = load %9 : s64i
-    return %17
+        %9 = alloca s64i, "__retval", align 8
+        %10 = alloca s64i, "tmp", align 8
+        %11 = get_global @level : s64i*
+        %12 = load %11 : s64i, align 8
+        inc
+        store %13, %11, align 8
+        store %13, %10, align 8
+        %14 = call @bar() : s64i [all]
+        %15 = load %10 : s64i, align 8
+        %16 = add %14, %15 : s64i [nsw]
+        store %16, %9
+        %17 = load %9 : s64i
+        return %17
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = call @foo() : s64i [all]
-        %5 = const -42 : s64i
-        %6 = cmp eq %4, %5 : bool
-        if %6 {
-            %7 = get_global @exit : ((s32i) -> void)*
-            %8 = const 0 : s32i
-            call @exit(%8) [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = call @foo() : s64i [all]
+                %5 = const -42 : s64i
+                cmp
+                if %6 {
+                        %7 = get_global @exit : (s32i) -> void*
+                        %8 = const 0 : s32i
+                        call @exit(%8) [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @abort : (() -> void)*
-    call @abort() [all]
-    %3 = load %0 : s32i
-    return %3
+        %2 = get_global @abort : () -> void*
+        call @abort() [all]
+        %3 = load %0 : s32i
+        return %3
 }

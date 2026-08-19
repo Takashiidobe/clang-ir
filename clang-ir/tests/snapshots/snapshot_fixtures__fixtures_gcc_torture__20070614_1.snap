@@ -1,18 +1,18 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20070614-1.c" (c, x86_64-unknown-linux-gnu)
-global v : complex<double> = (3.000000e+00, 1.000000e+00) [external, default, align 8, dso_local]
+global v : complex<double> = ConstComplex { ty: Complex { element_type: Double }, real: CirFloat { ty: Double, value: "3.000000e+00" }, imag: CirFloat { ty: Double, value: "1.000000e+00" } } [external, default, align 8, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn foo(%arg2: double, %arg3: double, %arg4: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg2: double, %arg3: double, %arg4: s32i*):
         %63 = alloca rec_anon_struct, "coerce", align 8
         %64 = alloca rec_anon_struct, "coerce", align 8
-        %65 = get_member %64[0] "" : double*
+        get_member
         store %arg2, %65
-        %66 = get_member %64[1] "" : double*
+        get_member
         store %arg3, %66
         %67 = load %64 : rec_anon_struct
         store %67, %63
@@ -23,16 +23,16 @@ fn foo(%arg2: double, %arg3: double, %arg4: s32i*) -> void [external, c, no_inli
         store %69, %70
         store %arg4, %71
         scope {
-            %72 = load %70 : complex<double>, align 8
-            %73 = get_global @v : complex<double>*
-            %74 = load %73 : complex<double>, align 8
-            %75 = cmp ne %72, %74 : bool
-            if %75 {
-                %76 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %72 = load %70 : complex<double>, align 8
+                %73 = get_global @v : complex<double>*
+                %74 = load %73 : complex<double>, align 8
+                cmp
+                if %75 {
+                        %76 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -41,9 +41,9 @@ fn bar(%arg0: double, %arg1: double) -> rec_anon_struct [external, c, no_inline,
         %48 = alloca complex<double>, "coerce", align 8
         %49 = alloca rec_anon_struct, "coerce", align 8
         %50 = alloca rec_anon_struct, "coerce", align 8
-        %51 = get_member %50[0] "" : double*
+        get_member
         store %arg0, %51
-        %52 = get_member %50[1] "" : double*
+        get_member
         store %arg1, %52
         %53 = load %50 : rec_anon_struct
         store %53, %49
@@ -62,77 +62,77 @@ fn bar(%arg0: double, %arg1: double) -> rec_anon_struct [external, c, no_inline,
         return %62
 }
 fn baz() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %5 = alloca rec_anon_struct, "coerce", align 8
-    %6 = alloca complex<double>, "coerce", align 8
-    %7 = alloca complex<double>, "coerce", align 8
-    %8 = alloca s32i, "__retval", align 4
-    %9 = alloca s32i, "a", align 4
-    %10 = alloca s32i, "i", align 4
-    scope {
-        %13 = alloca complex<double>, "coerce", align 8
-        %14 = alloca complex<double>, "coerce", align 8
-        %15 = const 0 : s32i
-        store %15, %10, align 4
-        for cond: {
-            %45 = load %10 : s32i, align 4
-            %46 = const 6 : s32i
-            %47 = cmp lt %45, %46 : bool
-            condition %47
-        } step: {
-            %16 = load %10 : s32i, align 4
-            %17 = inc %16 : s32i [nsw]
-            store %17, %10, align 4
-            yield
-        } do {
-            %18 = load %10 : s32i, align 4
-            %19 = cast(int_to_float) %18 : float
-            %20 = const 0.000000e+00 : float
-            %21 = const 1.000000e+00 : float
-            %22 = fmul %20, %19 : float
-            %23 = fmul %21, %19 : float
-            %24 = complex.create %22, %23 : complex<float>
-            %25 = complex.real %24 : float
-            %26 = complex.imag %24 : float
-            %27 = cast(floating) %25 : double
-            %28 = cast(floating) %26 : double
-            %29 = complex.create %27, %28 : complex<double>
-            store %29, %13, align 8
-            %30 = load %13 : complex<double>, align 8
-            store %30, %6
-            %31 = cast(bitcast) %6 : rec_anon_struct*
-            %32 = get_member %31[0] "" : double*
-            %33 = load %32 : double
-            %34 = get_member %31[1] "" : double*
-            %35 = load %34 : double
-            %36 = call @bar(%33, %35) : rec_anon_struct [all]
-            store %36, %5
-            %37 = cast(bitcast) %5 : complex<double>*
-            %38 = load %37 : complex<double>
-            store %38, %14, align 8
-            %39 = load %14 : complex<double>, align 8
-            store %39, %7
-            %40 = cast(bitcast) %7 : rec_anon_struct*
-            %41 = get_member %40[0] "" : double*
-            %42 = load %41 : double
-            %43 = get_member %40[1] "" : double*
-            %44 = load %43 : double
-            call @foo(%42, %44, %9) [all]
-            yield
+        %5 = alloca rec_anon_struct, "coerce", align 8
+        %6 = alloca complex<double>, "coerce", align 8
+        %7 = alloca complex<double>, "coerce", align 8
+        %8 = alloca s32i, "__retval", align 4
+        %9 = alloca s32i, "a", align 4
+        %10 = alloca s32i, "i", align 4
+        scope {
+                %13 = alloca complex<double>, "coerce", align 8
+                %14 = alloca complex<double>, "coerce", align 8
+                %15 = const 0 : s32i
+                store %15, %10, align 4
+                for cond {
+                        %45 = load %10 : s32i, align 4
+                        %46 = const 6 : s32i
+                        cmp
+                        condition %47
+                } step {
+                        %16 = load %10 : s32i, align 4
+                        inc
+                        store %17, %10, align 4
+                        yield
+                } body {
+                        %18 = load %10 : s32i, align 4
+                        %19 = cast(int_to_float) %18 : float
+                        %20 = const 0.000000e+00 : float
+                        %21 = const 1.000000e+00 : float
+                        fmul
+                        fmul
+                        complex.create
+                        complex.real
+                        complex.imag
+                        %27 = cast(floating) %25 : double
+                        %28 = cast(floating) %26 : double
+                        complex.create
+                        store %29, %13, align 8
+                        %30 = load %13 : complex<double>, align 8
+                        store %30, %6
+                        %31 = cast(bitcast) %6 : rec_anon_struct*
+                        get_member
+                        %33 = load %32 : double
+                        get_member
+                        %35 = load %34 : double
+                        %36 = call @bar(%33, %35) : rec_anon_struct [all]
+                        store %36, %5
+                        %37 = cast(bitcast) %5 : complex<double>*
+                        %38 = load %37 : complex<double>
+                        store %38, %14, align 8
+                        %39 = load %14 : complex<double>, align 8
+                        store %39, %7
+                        %40 = cast(bitcast) %7 : rec_anon_struct*
+                        get_member
+                        %42 = load %41 : double
+                        get_member
+                        %44 = load %43 : double
+                        call @foo(%42, %44, %9) [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %11 = const 0 : s32i
-    store %11, %8
-    %12 = load %8 : s32i
-    return %12
+        %11 = const 0 : s32i
+        store %11, %8
+        %12 = load %8 : s32i
+        return %12
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = call @baz() : s32i [all]
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = load %0 : s32i
-    return %4
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = call @baz() : s32i [all]
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = load %0 : s32i
+        return %4
 }

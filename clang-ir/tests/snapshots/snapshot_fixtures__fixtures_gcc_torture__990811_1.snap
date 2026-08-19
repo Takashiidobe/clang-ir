@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/990811-1.c" (c, x86_64-unknown-linux-gnu)
@@ -12,140 +12,141 @@ fn foo(%arg0: s32i, %arg1: void*) -> s32i [external, c, no_inline, dso_local, no
         store %arg0, %53
         store %arg1, %54
         scope {
-            %58 = load %53 : s32i, align 4
-            switch %58 {
-                case equal 0 {
-                    %69 = load %54 : void*, align 8
-                    %70 = cast(bitcast) %69 : rec_s*
-                    %71 = get_member %70[0] "a" : s64i*
-                    %72 = load %71 : s64i, align 8
-                    %73 = cast(integral) %72 : s32i
-                    store %73, %55
-                    %74 = load %55 : s32i
-                    return %74
+                %58 = load %53 : s32i, align 4
+                switch %58 {
+                        case equal [0] {
+                                %69 = load %54 : void*, align 8
+                                %70 = cast(bitcast) %69 : rec_s*
+                                get_member
+                                %72 = load %71 : s64i, align 8
+                                %73 = cast(integral) %72 : s32i
+                                store %73, %55
+                                %74 = load %55 : s32i
+                                return %74
+                        }
+                        case equal [1] {
+                                %64 = load %54 : void*, align 8
+                                %65 = cast(bitcast) %64 : s8i*
+                                %66 = load %65 : s8i, align 1
+                                %67 = cast(integral) %66 : s32i
+                                store %67, %55
+                                %68 = load %55 : s32i
+                                return %68
+                        }
+                        case equal [2] {
+                                %59 = load %54 : void*, align 8
+                                %60 = cast(bitcast) %59 : s16i*
+                                %61 = load %60 : s16i, align 2
+                                %62 = cast(integral) %61 : s32i
+                                store %62, %55
+                                %63 = load %55 : s32i
+                                return %63
+                        }
+                        yield
                 }
-                case equal 1 {
-                    %64 = load %54 : void*, align 8
-                    %65 = cast(bitcast) %64 : s8i*
-                    %66 = load %65 : s8i, align 1
-                    %67 = cast(integral) %66 : s32i
-                    store %67, %55
-                    %68 = load %55 : s32i
-                    return %68
-                }
-                case equal 2 {
-                    %59 = load %54 : void*, align 8
-                    %60 = cast(bitcast) %59 : s16i*
-                    %61 = load %60 : s16i, align 2
-                    %62 = cast(integral) %61 : s32i
-                    store %62, %55
-                    %63 = load %55 : s32i
-                    return %63
-                }
-            }
-            yield
+                yield
         }
-        %56 = get_global @abort : (() -> void)*
+        %56 = get_global @abort : () -> void*
         call @abort() [all]
         %57 = load %55 : s32i
         return %57
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_s, "s", align 8
-    %2 = alloca s16i[10], "sh", align 16
-    %3 = alloca s8i[10], "c", align 1
-    %4 = alloca s32i, "i", align 4
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = const 1 : s64i
-    %7 = get_member %1[0] "a" : s64i*
-    store %6, %7, align 8
-    %8 = const 2 : s32i
-    %9 = get_member %1[1] "b" : s32i*
-    store %8, %9, align 8
-    scope {
-        %37 = const 0 : s32i
-        store %37, %4, align 4
-        for cond: {
-            %50 = load %4 : s32i, align 4
-            %51 = const 10 : s32i
-            %52 = cmp lt %50, %51 : bool
-            condition %52
-        } step: {
-            %38 = load %4 : s32i, align 4
-            %39 = inc %38 : s32i [nsw]
-            store %39, %4, align 4
-            yield
-        } do {
-            scope {
-                %40 = load %4 : s32i, align 4
-                %41 = cast(integral) %40 : s16i
-                %42 = load %4 : s32i, align 4
-                %43 = cast(integral) %42 : s64i
-                %44 = get_element %2[%43] : s16i*
-                store %41, %44, align 2
-                %45 = load %4 : s32i, align 4
-                %46 = cast(integral) %45 : s8i
-                %47 = load %4 : s32i, align 4
-                %48 = cast(integral) %47 : s64i
-                %49 = get_element %3[%48] : s8i*
-                store %46, %49, align 1
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_s, "s", align 8
+        %2 = alloca s16i[10], "sh", align 16
+        %3 = alloca s8i[10], "c", align 1
+        %4 = alloca s32i, "i", align 4
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = const 1 : s64i
+        get_member
+        store %6, %7, align 8
+        %8 = const 2 : s32i
+        get_member
+        store %8, %9, align 8
+        scope {
+                %37 = const 0 : s32i
+                store %37, %4, align 4
+                for cond {
+                        %50 = load %4 : s32i, align 4
+                        %51 = const 10 : s32i
+                        cmp
+                        condition %52
+                } step {
+                        %38 = load %4 : s32i, align 4
+                        inc
+                        store %39, %4, align 4
+                        yield
+                } body {
+                        scope {
+                                %40 = load %4 : s32i, align 4
+                                %41 = cast(integral) %40 : s16i
+                                %42 = load %4 : s32i, align 4
+                                %43 = cast(integral) %42 : s64i
+                                get_element
+                                store %41, %44, align 2
+                                %45 = load %4 : s32i, align 4
+                                %46 = cast(integral) %45 : s8i
+                                %47 = load %4 : s32i, align 4
+                                %48 = cast(integral) %47 : s64i
+                                get_element
+                                store %46, %49, align 1
+                                yield
+                        }
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    scope {
-        %31 = const 0 : s32i
-        %32 = cast(bitcast) %1 : void*
-        %33 = call @foo(%31, %32) : s32i [all]
-        %34 = const 1 : s32i
-        %35 = cmp ne %33, %34 : bool
-        if %35 {
-            %36 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %31 = const 0 : s32i
+                %32 = cast(bitcast) %1 : void*
+                %33 = call @foo(%31, %32) : s32i [all]
+                %34 = const 1 : s32i
+                cmp
+                if %35 {
+                        %36 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %22 = const 1 : s32i
-        %23 = cast(array_to_ptrdecay) %3 : s8i*
-        %24 = const 3 : s32i
-        %25 = ptr_stride %23, %24 : s8i*
-        %26 = cast(bitcast) %25 : void*
-        %27 = call @foo(%22, %26) : s32i [all]
-        %28 = const 3 : s32i
-        %29 = cmp ne %27, %28 : bool
-        if %29 {
-            %30 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %22 = const 1 : s32i
+                %23 = cast(array_to_ptrdecay) %3 : s8i*
+                %24 = const 3 : s32i
+                ptr_stride
+                %26 = cast(bitcast) %25 : void*
+                %27 = call @foo(%22, %26) : s32i [all]
+                %28 = const 3 : s32i
+                cmp
+                if %29 {
+                        %30 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %13 = const 2 : s32i
-        %14 = cast(array_to_ptrdecay) %2 : s16i*
-        %15 = const 3 : s32i
-        %16 = ptr_stride %14, %15 : s16i*
-        %17 = cast(bitcast) %16 : void*
-        %18 = call @foo(%13, %17) : s32i [all]
-        %19 = const 3 : s32i
-        %20 = cmp ne %18, %19 : bool
-        if %20 {
-            %21 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %13 = const 2 : s32i
+                %14 = cast(array_to_ptrdecay) %2 : s16i*
+                %15 = const 3 : s32i
+                ptr_stride
+                %17 = cast(bitcast) %16 : void*
+                %18 = call @foo(%13, %17) : s32i [all]
+                %19 = const 3 : s32i
+                cmp
+                if %20 {
+                        %21 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %10 = get_global @exit : ((s32i) -> void)*
-    %11 = const 0 : s32i
-    call @exit(%11) [all]
-    %12 = load %0 : s32i
-    return %12
+        %10 = get_global @exit : (s32i) -> void*
+        %11 = const 0 : s32i
+        call @exit(%11) [all]
+        %12 = load %0 : s32i
+        return %12
 }

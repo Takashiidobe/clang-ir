@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr41395-2.c" (c, x86_64-unknown-linux-gnu)
@@ -15,15 +15,15 @@ fn foo(%arg0: rec_VEC_char_base*, %arg1: s32i) -> s16i [external, c, no_inline, 
         %23 = load %19 : s32i, align 4
         %24 = cast(integral) %23 : s64i
         %25 = load %18 : rec_VEC_char_base*, align 8
-        %26 = get_member %25[2] "u" : rec_anon2E0*
-        %27 = get_member %26[0] "vec" : s16i[1]*
-        %28 = get_element %27[%24] : s16i*
+        get_member
+        get_member
+        get_element
         store %22, %28, align 2
         %29 = const 16 : s64i
         %30 = load %18 : rec_VEC_char_base*, align 8
-        %31 = get_member %30[2] "u" : rec_anon2E0*
-        %32 = get_member %31[0] "vec" : s16i[1]*
-        %33 = get_element %32[%29] : s16i*
+        get_member
+        get_member
+        get_element
         store %33, %21, align 8
         %34 = const 1 : s16i
         %35 = load %21 : s16i*, align 8
@@ -31,9 +31,9 @@ fn foo(%arg0: rec_VEC_char_base*, %arg1: s32i) -> s16i [external, c, no_inline, 
         %36 = load %19 : s32i, align 4
         %37 = cast(integral) %36 : s64i
         %38 = load %18 : rec_VEC_char_base*, align 8
-        %39 = get_member %38[2] "u" : rec_anon2E0*
-        %40 = get_member %39[0] "vec" : s16i[1]*
-        %41 = get_element %40[%37] : s16i*
+        get_member
+        get_member
+        get_element
         %42 = load %41 : s16i, align 2
         store %42, %20
         %43 = load %20 : s16i
@@ -42,33 +42,33 @@ fn foo(%arg0: rec_VEC_char_base*, %arg1: s32i) -> s16i [external, c, no_inline, 
 fn malloc(%arg0: u64i) -> void* [external, c];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_VEC_char_base*, "p", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @malloc : ((u64i) -> void*)*
-    %4 = const 20 : u64i
-    %5 = const 256 : u64i
-    %6 = add %4, %5 : u64i
-    %7 = call @malloc(%6) : void* [all]
-    %8 = cast(bitcast) %7 : rec_VEC_char_base*
-    store %8, %1, align 8
-    scope {
-        %11 = load %1 : rec_VEC_char_base*, align 8
-        %12 = const 16 : s32i
-        %13 = call @foo(%11, %12) : s16i [all]
-        %14 = cast(integral) %13 : s32i
-        %15 = const 1 : s32i
-        %16 = cmp ne %14, %15 : bool
-        if %16 {
-            %17 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_VEC_char_base*, "p", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @malloc : (u64i) -> void**
+        %4 = const 20 : u64i
+        %5 = const 256 : u64i
+        %6 = add %4, %5 : u64i
+        %7 = call @malloc(%6) : void* [all]
+        %8 = cast(bitcast) %7 : rec_VEC_char_base*
+        store %8, %1, align 8
+        scope {
+                %11 = load %1 : rec_VEC_char_base*, align 8
+                %12 = const 16 : s32i
+                %13 = call @foo(%11, %12) : s16i [all]
+                %14 = cast(integral) %13 : s32i
+                %15 = const 1 : s32i
+                cmp
+                if %16 {
+                        %17 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %9 = const 0 : s32i
-    store %9, %0
-    %10 = load %0 : s32i
-    return %10
+        %9 = const 0 : s32i
+        store %9, %0
+        %10 = load %0 : s32i
+        return %10
 }

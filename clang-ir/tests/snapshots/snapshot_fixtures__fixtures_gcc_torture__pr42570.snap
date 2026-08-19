@@ -1,28 +1,28 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr42570.c" (c, x86_64-unknown-linux-gnu)
-global foo : u8i[0][1] = zero [external, default, align 1, dso_local]
+global foo : u8i[0][1] = Zero { ty: Array { element_type: Array { element_type: Named("u8i"), size: 0 }, size: 1 } } [external, default, align 1, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const 0 : u64i
-        %5 = const 0 : u64i
-        %6 = cmp ne %4, %5 : bool
-        if %6 {
-            %7 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const 0 : u64i
+                %5 = const 0 : u64i
+                cmp
+                if %6 {
+                        %7 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

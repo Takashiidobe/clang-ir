@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20080522-1.c" (c, x86_64-unknown-linux-gnu)
-global p : s32i* = @i [internal, default, align 8, dso_local]
-global i : s32i = 0 [internal, default, align 4, dso_local]
+global p : s32i* = GlobalView { ty: Pointer { pointee: Named("s32i"), addr_space: None }, symbol: "i", indices: None } [internal, default, align 8, dso_local]
+global i : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
 
 fn foo(%arg1: s32i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: s32i*):
@@ -45,82 +45,82 @@ fn bar(%arg0: s32i*) -> s32i [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "j", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 0 : s32i
-    store %3, %1, align 4
-    scope {
-        %27 = get_global @i : s32i*
-        %28 = call @foo(%27) : s32i [all]
-        %29 = const 2 : s32i
-        %30 = cmp ne %28, %29 : bool
-        if %30 {
-            %31 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "j", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 0 : s32i
+        store %3, %1, align 4
+        scope {
+                %27 = get_global @i : s32i*
+                %28 = call @foo(%27) : s32i [all]
+                %29 = const 2 : s32i
+                cmp
+                if %30 {
+                        %31 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %22 = get_global @i : s32i*
-        %23 = call @bar(%22) : s32i [all]
-        %24 = const 1 : s32i
-        %25 = cmp ne %23, %24 : bool
-        if %25 {
-            %26 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %22 = get_global @i : s32i*
+                %23 = call @bar(%22) : s32i [all]
+                %24 = const 1 : s32i
+                cmp
+                if %25 {
+                        %26 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %18 = call @foo(%1) : s32i [all]
-        %19 = const 1 : s32i
-        %20 = cmp ne %18, %19 : bool
-        if %20 {
-            %21 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %18 = call @foo(%1) : s32i [all]
+                %19 = const 1 : s32i
+                cmp
+                if %20 {
+                        %21 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %14 = load %1 : s32i, align 4
-        %15 = const 2 : s32i
-        %16 = cmp ne %14, %15 : bool
-        if %16 {
-            %17 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %14 = load %1 : s32i, align 4
+                %15 = const 2 : s32i
+                cmp
+                if %16 {
+                        %17 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %10 = call @bar(%1) : s32i [all]
-        %11 = const 2 : s32i
-        %12 = cmp ne %10, %11 : bool
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %10 = call @bar(%1) : s32i [all]
+                %11 = const 2 : s32i
+                cmp
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %6 = load %1 : s32i, align 4
-        %7 = const 2 : s32i
-        %8 = cmp ne %6, %7 : bool
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %6 = load %1 : s32i, align 4
+                %7 = const 2 : s32i
+                cmp
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

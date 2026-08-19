@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/switch_no_default.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[10] = "%d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[10] = ConstArray { ty: Array { element_type: Named("s8i"), size: 10 }, elts: Str("%d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn pick(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i):
@@ -14,24 +14,25 @@ fn pick(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %17 = const 5 : s32i
         store %17, %16, align 4
         scope {
-            %20 = load %14 : s32i, align 4
-            switch %20 {
-                case equal 4 {
-                    %24 = const 4 : s32i
-                    %25 = load %16 : s32i, align 4
-                    %26 = add %25, %24 : s32i [nsw]
-                    store %26, %16, align 4
-                    break
+                %20 = load %14 : s32i, align 4
+                switch %20 {
+                        case equal [4] {
+                                %24 = const 4 : s32i
+                                %25 = load %16 : s32i, align 4
+                                %26 = add %25, %24 : s32i [nsw]
+                                store %26, %16, align 4
+                                break
+                        }
+                        case equal [9] {
+                                %21 = const 9 : s32i
+                                %22 = load %16 : s32i, align 4
+                                %23 = add %22, %21 : s32i [nsw]
+                                store %23, %16, align 4
+                                break
+                        }
+                        yield
                 }
-                case equal 9 {
-                    %21 = const 9 : s32i
-                    %22 = load %16 : s32i, align 4
-                    %23 = add %22, %21 : s32i [nsw]
-                    store %23, %16, align 4
-                    break
-                }
-            }
-            yield
+                yield
         }
         %18 = load %16 : s32i, align 4
         store %18, %15
@@ -40,21 +41,21 @@ fn pick(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
 }
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[10]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = const 4 : s32i
-    %6 = call @pick(%5) : s32i [all]
-    %7 = const 9 : s32i
-    %8 = call @pick(%7) : s32i [all]
-    %9 = const 2 : s32i
-    %10 = call @pick(%9) : s32i [all]
-    %11 = call @printf(%4, %6, %8, %10) : s32i [all]
-    %12 = const 0 : s32i
-    store %12, %0
-    %13 = load %0 : s32i
-    return %13
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[10]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = const 4 : s32i
+        %6 = call @pick(%5) : s32i [all]
+        %7 = const 9 : s32i
+        %8 = call @pick(%7) : s32i [all]
+        %9 = const 2 : s32i
+        %10 = call @pick(%9) : s32i [all]
+        %11 = call @printf(%4, %6, %8, %10) : s32i [all]
+        %12 = const 0 : s32i
+        store %12, %0
+        %13 = load %0 : s32i
+        return %13
 }

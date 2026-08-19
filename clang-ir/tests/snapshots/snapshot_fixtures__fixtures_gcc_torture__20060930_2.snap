@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20060930-2.c" (c, x86_64-unknown-linux-gnu)
-global s : rec_S = zero [external, default, align 8, dso_local]
-global t : rec_T = zero [external, default, align 8, dso_local]
+global s : rec_S = Zero { ty: Named("rec_S") } [external, default, align 8, dso_local]
+global t : rec_T = Zero { ty: Named("rec_T") } [external, default, align 8, dso_local]
 
 fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
 fn foo(%arg2: void*) -> void [internal, c, no_inline, dso_local, nothrow] {
@@ -16,10 +16,10 @@ fn foo(%arg2: void*) -> void [internal, c, no_inline, dso_local, nothrow] {
         %30 = cast(bitcast) %29 : rec_T*
         store %30, %28, align 8
         %31 = load %28 : rec_T*, align 8
-        %32 = get_member %31[0] "t" : rec_T**
+        get_member
         %33 = cast(bitcast) %32 : void*
         %34 = get_global @t : rec_T*
-        %35 = get_member %34[0] "t" : rec_T**
+        get_member
         %36 = cast(bitcast) %35 : void*
         %37 = const 8 : u64i
         %38 = call @memcpy(%33, %36, %37) : void* [all]
@@ -34,12 +34,12 @@ fn bar(%arg0: void*, %arg1: rec_S*) -> void* [external, c, no_inline, dso_local,
         store %arg1, %16
         %18 = get_global @s : rec_S*
         %19 = load %16 : rec_S*, align 8
-        %20 = get_member %19[0] "s" : rec_S**
+        get_member
         store %18, %20, align 8
         %21 = load %15 : void*, align 8
         call @foo(%21) [all]
         %22 = load %16 : rec_S*, align 8
-        %23 = get_member %22[0] "s" : rec_S**
+        get_member
         %24 = load %23 : rec_S*, align 8
         %25 = cast(bitcast) %24 : void*
         store %25, %17
@@ -48,30 +48,30 @@ fn bar(%arg0: void*, %arg1: rec_S*) -> void* [external, c, no_inline, dso_local,
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @t : rec_T*
-    %3 = get_global @t : rec_T*
-    %4 = get_member %3[0] "t" : rec_T**
-    store %2, %4, align 8
-    scope {
-        %7 = get_global @s : rec_S*
-        %8 = cast(bitcast) %7 : void*
-        %9 = get_global @s : rec_S*
-        %10 = call @bar(%8, %9) : void* [all]
-        %11 = get_global @t : rec_T*
-        %12 = cast(bitcast) %11 : void*
-        %13 = cmp ne %10, %12 : bool
-        if %13 {
-            %14 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @t : rec_T*
+        %3 = get_global @t : rec_T*
+        get_member
+        store %2, %4, align 8
+        scope {
+                %7 = get_global @s : rec_S*
+                %8 = cast(bitcast) %7 : void*
+                %9 = get_global @s : rec_S*
+                %10 = call @bar(%8, %9) : void* [all]
+                %11 = get_global @t : rec_T*
+                %12 = cast(bitcast) %11 : void*
+                cmp
+                if %13 {
+                        %14 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = load %0 : s32i
-    return %6
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = load %0 : s32i
+        return %6
 }

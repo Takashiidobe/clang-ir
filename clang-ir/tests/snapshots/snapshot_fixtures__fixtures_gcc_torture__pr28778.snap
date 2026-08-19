@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr28778.c" (c, x86_64-unknown-linux-gnu)
@@ -13,18 +13,18 @@ fn aglChoosePixelFormat(%arg1: s64i*) -> void [external, c, no_inline, dso_local
         %20 = cast(bitcast) %19 : s32i*
         store %20, %18, align 8
         scope {
-            %21 = const 3 : s64i
-            %22 = load %18 : s32i*, align 8
-            %23 = ptr_stride %22, %21 : s32i*
-            %24 = load %23 : s32i, align 4
-            %25 = const 42 : s32i
-            %26 = cmp ne %24, %25 : bool
-            if %26 {
-                %27 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %21 = const 3 : s64i
+                %22 = load %18 : s32i*, align 8
+                ptr_stride
+                %24 = load %23 : s32i, align 4
+                %25 = const 42 : s32i
+                cmp
+                if %26 {
+                        %27 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -35,22 +35,22 @@ fn find(%arg0: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
         %7 = alloca s32i[32], "list", align 16
         store %arg0, %5
         scope {
-            %10 = load %5 : s32i*, align 8
-            %11 = cast(ptr_to_bool) %10 : bool
-            if %11 {
-                %16 = load %5 : s32i*, align 8
-                store %16, %6, align 8
+                %10 = load %5 : s32i*, align 8
+                %11 = cast(ptr_to_bool) %10 : bool
+                if %11 {
+                        %16 = load %5 : s32i*, align 8
+                        store %16, %6, align 8
+                        yield
+                } else {
+                        %12 = const 42 : s32i
+                        %13 = const 3 : s64i
+                        get_element
+                        store %12, %14, align 4
+                        %15 = cast(array_to_ptrdecay) %7 : s32i*
+                        store %15, %6, align 8
+                        yield
+                }
                 yield
-            } else {
-                %12 = const 42 : s32i
-                %13 = const 3 : s64i
-                %14 = get_element %7[%13] : s32i*
-                store %12, %14, align 4
-                %15 = cast(array_to_ptrdecay) %7 : s32i*
-                store %15, %6, align 8
-                yield
-            }
-            yield
         }
         %8 = load %6 : s32i*, align 8
         %9 = cast(bitcast) %8 : s64i*
@@ -58,13 +58,13 @@ fn find(%arg0: s32i*) -> void [external, c, no_inline, dso_local, nothrow] {
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const #cir.ptr<null> : s32i*
-    call @find(%2) [all]
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = load %0 : s32i
-    return %4
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const #cir.ptr<null> : s32i*
+        call @find(%2) [all]
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = load %0 : s32i
+        return %4
 }

@@ -1,36 +1,36 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr122000.c" (c, x86_64-unknown-linux-gnu)
-global c : s8i = 1 [external, default, align 1, dso_local]
-global ll : u64i = 0 [external, default, align 8, dso_local]
+global c : s8i = CirInt { ty: Named("s8i"), value: "1" } [external, default, align 1, dso_local]
+global ll : u64i = CirInt { ty: Named("u64i"), value: "0" } [external, default, align 8, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u64i, "x", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @ll : u64i*
-    %4 = get_global @c : s8i*
-    %5 = load %4 : s8i, align 1
-    %6 = cast(integral) %5 : u64i
-    %7 = const 18364758544493064720 : u64i
-    %8 = add %6, %7 : u64i
-    %9 = atomic.fetch add seq_cst syncscope(system) %3, %8 : u64i [fetch_first]
-    %10 = add %9, %8 : u64i
-    store %10, %1, align 8
-    scope {
-        %12 = load %1 : u64i, align 8
-        %13 = const 18364758544493064721 : u64i
-        %14 = cmp ne %12, %13 : bool
-        if %14 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u64i, "x", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @ll : u64i*
+        %4 = get_global @c : s8i*
+        %5 = load %4 : s8i, align 1
+        %6 = cast(integral) %5 : u64i
+        %7 = const 18364758544493064720 : u64i
+        %8 = add %6, %7 : u64i
+        atomic.fetch
+        %10 = add %9, %8 : u64i
+        store %10, %1, align 8
+        scope {
+                %12 = load %1 : u64i, align 8
+                %13 = const 18364758544493064721 : u64i
+                cmp
+                if %14 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %11 = load %0 : s32i
-    return %11
+        %11 = load %0 : s32i
+        return %11
 }

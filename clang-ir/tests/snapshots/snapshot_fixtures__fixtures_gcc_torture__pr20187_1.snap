@@ -1,49 +1,49 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr20187-1.c" (c, x86_64-unknown-linux-gnu)
-global a : s32i = 257 [external, default, align 4, dso_local]
-global b : s32i = 256 [external, default, align 4, dso_local]
+global a : s32i = CirInt { ty: Named("s32i"), value: "257" } [external, default, align 4, dso_local]
+global b : s32i = CirInt { ty: Named("s32i"), value: "256" } [external, default, align 4, dso_local]
 
 fn test() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %6 = alloca s32i, "__retval", align 4
-    %7 = get_global @a : s32i*
-    %8 = load %7 : s32i, align 4
-    %9 = cast(int_to_bool) %8 : bool
-    %10 = ternary %9 ? { : s32i
-        %26 = get_global @a : s32i*
-        %27 = load %26 : s32i, align 4
-        yield %27
-    } : {
-        %25 = const 1 : s32i
-        yield %25
-    }
-    %11 = get_global @a : s32i*
-    %12 = load %11 : s32i, align 4
-    %13 = get_global @b : s32i*
-    %14 = load %13 : s32i, align 4
-    %15 = mul %12, %14 : s32i [nsw]
-    %16 = and %10, %15 : s32i
-    %17 = cast(integral) %16 : u64i
-    %18 = cast(integral) %17 : u8i
-    %19 = cast(integral) %18 : s32i
-    %20 = cast(int_to_bool) %19 : bool
-    %21 = const 0 : s32i
-    %22 = const 1 : s32i
-    %23 = select %20, %21, %22 : s32i
-    store %23, %6
-    %24 = load %6 : s32i
-    return %24
+        %6 = alloca s32i, "__retval", align 4
+        %7 = get_global @a : s32i*
+        %8 = load %7 : s32i, align 4
+        %9 = cast(int_to_bool) %8 : bool
+        %10 = ternary %9 ? { : s32i
+                %26 = get_global @a : s32i*
+                %27 = load %26 : s32i, align 4
+                yield %27
+        } : {
+                %25 = const 1 : s32i
+                yield %25
+        }
+        %11 = get_global @a : s32i*
+        %12 = load %11 : s32i, align 4
+        %13 = get_global @b : s32i*
+        %14 = load %13 : s32i, align 4
+        mul
+        and
+        %17 = cast(integral) %16 : u64i
+        %18 = cast(integral) %17 : u8i
+        %19 = cast(integral) %18 : s32i
+        %20 = cast(int_to_bool) %19 : bool
+        %21 = const 0 : s32i
+        %22 = const 1 : s32i
+        select
+        store %23, %6
+        %24 = load %6 : s32i
+        return %24
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : s32i
-    %3 = call @test() : s32i [all]
-    %4 = sub %2, %3 : s32i [nsw]
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : s32i
+        %3 = call @test() : s32i [all]
+        sub
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

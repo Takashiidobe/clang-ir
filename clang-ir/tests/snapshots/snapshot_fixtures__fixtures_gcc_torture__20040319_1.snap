@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20040319-1.c" (c, x86_64-unknown-linux-gnu)
@@ -10,27 +10,27 @@ fn blah(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %12 = alloca s32i, "foo", align 4
         store %arg0, %10
         scope {
-            %22 = load %10 : s32i, align 4
-            %23 = const 0 : s32i
-            %24 = cmp ge %22, %23 : bool
-            if %24 {
-                %25 = const 1 : s32i
-                store %25, %11
-                %26 = load %11 : s32i
-                return %26
-            }
-            yield
+                %22 = load %10 : s32i, align 4
+                %23 = const 0 : s32i
+                cmp
+                if %24 {
+                        %25 = const 1 : s32i
+                        store %25, %11
+                        %26 = load %11 : s32i
+                        return %26
+                }
+                yield
         }
         %13 = load %10 : s32i, align 4
         %14 = const 0 : s32i
-        %15 = cmp ge %13, %14 : bool
+        cmp
         %16 = ternary %15 ? { : s32i
-            %21 = load %10 : s32i, align 4
-            yield %21
+                %21 = load %10 : s32i, align 4
+                yield %21
         } : {
-            %19 = load %10 : s32i, align 4
-            %20 = minus %19 : s32i [nsw]
-            yield %20
+                %19 = load %10 : s32i, align 4
+                minus
+                yield %20
         }
         store %16, %12, align 4
         %17 = load %12 : s32i, align 4
@@ -41,26 +41,26 @@ fn blah(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %3 = const -1 : s32i
-        %4 = call @blah(%3) : s32i [all]
-        %5 = const 1 : s32i
-        %6 = cmp ne %4, %5 : bool
-        if %6 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        } else {
-            %7 = get_global @exit : ((s32i) -> void)*
-            %8 = const 0 : s32i
-            call @exit(%8) [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %3 = const -1 : s32i
+                %4 = call @blah(%3) : s32i [all]
+                %5 = const 1 : s32i
+                cmp
+                if %6 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                } else {
+                        %7 = get_global @exit : (s32i) -> void*
+                        %8 = const 0 : s32i
+                        call @exit(%8) [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = load %0 : s32i
-    return %2
+        %2 = load %0 : s32i
+        return %2
 }

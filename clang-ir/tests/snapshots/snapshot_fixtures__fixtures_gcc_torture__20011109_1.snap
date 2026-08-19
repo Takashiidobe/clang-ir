@@ -1,114 +1,116 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20011109-1.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn fail1() -> void [external, c, no_inline, dso_local, nothrow] {
-    %13 = get_global @abort : (() -> void)*
-    call @abort() [all]
-    return
+        %13 = get_global @abort : () -> void*
+        call @abort() [all]
+        return
 }
 fn fail2() -> void [external, c, no_inline, dso_local, nothrow] {
-    %12 = get_global @abort : (() -> void)*
-    call @abort() [all]
-    return
+        %12 = get_global @abort : () -> void*
+        call @abort() [all]
+        return
 }
 fn fail3() -> void [external, c, no_inline, dso_local, nothrow] {
-    %11 = get_global @abort : (() -> void)*
-    call @abort() [all]
-    return
+        %11 = get_global @abort : () -> void*
+        call @abort() [all]
+        return
 }
 fn fail4() -> void [external, c, no_inline, dso_local, nothrow] {
-    %10 = get_global @abort : (() -> void)*
-    call @abort() [all]
-    return
+        %10 = get_global @abort : () -> void*
+        call @abort() [all]
+        return
 }
 fn foo(%arg0: s64i) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s64i):
         %6 = alloca s64i, "x", align 8
         store %arg0, %6
         scope {
-            %9 = load %6 : s64i, align 8
-            switch %9 {
-                case equal -6 {
-                    call @fail1() [all]
-                    break
+                %9 = load %6 : s64i, align 8
+                switch %9 {
+                        case equal [-6] {
+                                call @fail1() [all]
+                                break
+                        }
+                        case equal [0] {
+                                call @fail2() [all]
+                                break
+                        }
+                        case equal [1] {
+                                yield
+                        }
+                        case equal [2] {
+                                break
+                        }
+                        case equal [3] {
+                                yield
+                        }
+                        case equal [4] {
+                                yield
+                        }
+                        case equal [5] {
+                                call @fail3() [all]
+                                break
+                        }
+                        case default [] {
+                                call @fail4() [all]
+                                break
+                        }
+                        yield
                 }
-                case equal 0 {
-                    call @fail2() [all]
-                    break
-                }
-                case equal 1 {
-                    yield
-                }
-                case equal 2 {
-                    break
-                }
-                case equal 3 {
-                    yield
-                }
-                case equal 4 {
-                    yield
-                }
-                case equal 5 {
-                    call @fail3() [all]
-                    break
-                }
-                case default {
-                    call @fail4() [all]
-                    break
-                }
-            }
-            yield
+                yield
         }
         scope {
-            %7 = load %6 : s64i, align 8
-            switch %7 {
-                case equal -3 {
-                    call @fail1() [all]
-                    break
+                %7 = load %6 : s64i, align 8
+                switch %7 {
+                        case equal [-3] {
+                                call @fail1() [all]
+                                break
+                        }
+                        case equal [0] {
+                                yield
+                        }
+                        case equal [4] {
+                                call @fail2() [all]
+                                break
+                        }
+                        case equal [1] {
+                                yield
+                        }
+                        case equal [3] {
+                                break
+                        }
+                        case equal [2] {
+                                yield
+                        }
+                        case equal [8] {
+                                %8 = get_global @abort : () -> void*
+                                call @abort() [all]
+                                break
+                        }
+                        case default [] {
+                                call @fail4() [all]
+                                break
+                        }
+                        yield
                 }
-                case equal 0 {
-                    yield
-                }
-                case equal 4 {
-                    call @fail2() [all]
-                    break
-                }
-                case equal 1 {
-                    yield
-                }
-                case equal 3 {
-                    break
-                }
-                case equal 2 {
-                    yield
-                }
-                case equal 8 {
-                    %8 = get_global @abort : (() -> void)*
-                    call @abort() [all]
-                    break
-                }
-                case default {
-                    call @fail4() [all]
-                    break
-                }
-            }
-            yield
+                yield
         }
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : s64i
-    call @foo(%2) [all]
-    %3 = get_global @exit : ((s32i) -> void)*
-    %4 = const 0 : s32i
-    call @exit(%4) [all]
-    %5 = load %0 : s32i
-    return %5
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : s64i
+        call @foo(%2) [all]
+        %3 = get_global @exit : (s32i) -> void*
+        %4 = const 0 : s32i
+        call @exit(%4) [all]
+        %5 = load %0 : s32i
+        return %5
 }

@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20060910-1.c" (c, x86_64-unknown-linux-gnu)
-global b : u8i[6] = zero [external, default, align 1, dso_local]
-global s : rec_input_ty = zero [external, default, align 8, dso_local]
+global b : u8i[6] = Zero { ty: Array { element_type: Named("u8i"), size: 6 } } [external, default, align 1, dso_local]
+global s : rec_input_ty = Zero { ty: Named("rec_input_ty") } [external, default, align 8, dso_local]
 
 fn input_getc_complicated(%arg1: rec_input_ty*) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: rec_input_ty*):
@@ -23,55 +23,55 @@ fn check_header(%arg0: rec_input_ty*) -> s32i [external, c, no_inline, dso_local
         %29 = alloca u32i, "len", align 4
         store %arg0, %27
         scope {
-            %32 = const 0 : u32i
-            store %32, %29, align 4
-            for cond: {
-                %56 = load %29 : u32i, align 4
-                %57 = const 6 : u32i
-                %58 = cmp lt %56, %57 : bool
-                condition %58
-            } step: {
-                %33 = load %29 : u32i, align 4
-                %34 = inc %33 : u32i
-                store %34, %29, align 4
-                yield
-            } do {
-                scope {
-                    %35 = load %27 : rec_input_ty*, align 8
-                    %36 = get_member %35[0] "buffer_position" : u8i**
-                    %37 = load %36 : u8i*, align 8
-                    %38 = load %27 : rec_input_ty*, align 8
-                    %39 = get_member %38[1] "buffer_end" : u8i**
-                    %40 = load %39 : u8i*, align 8
-                    %41 = cmp lt %37, %40 : bool
-                    %42 = ternary %41 ? { : s32i
-                        %49 = load %27 : rec_input_ty*, align 8
-                        %50 = get_member %49[0] "buffer_position" : u8i**
-                        %51 = load %50 : u8i*, align 8
-                        %52 = const 1 : s32i
-                        %53 = ptr_stride %51, %52 : u8i*
-                        store %53, %50, align 8
-                        %54 = load %51 : u8i, align 1
-                        %55 = cast(integral) %54 : s32i
-                        yield %55
-                    } : {
-                        %47 = load %27 : rec_input_ty*, align 8
-                        %48 = call @input_getc_complicated(%47) : s32i [all]
-                        yield %48
-                    }
-                    %43 = const 0 : s32i
-                    %44 = cmp lt %42, %43 : bool
-                    if %44 {
-                        %45 = const 0 : s32i
-                        store %45, %28
-                        %46 = load %28 : s32i
-                        return %46
-                    }
-                    yield
+                %32 = const 0 : u32i
+                store %32, %29, align 4
+                for cond {
+                        %56 = load %29 : u32i, align 4
+                        %57 = const 6 : u32i
+                        cmp
+                        condition %58
+                } step {
+                        %33 = load %29 : u32i, align 4
+                        inc
+                        store %34, %29, align 4
+                        yield
+                } body {
+                        scope {
+                                %35 = load %27 : rec_input_ty*, align 8
+                                get_member
+                                %37 = load %36 : u8i*, align 8
+                                %38 = load %27 : rec_input_ty*, align 8
+                                get_member
+                                %40 = load %39 : u8i*, align 8
+                                cmp
+                                %42 = ternary %41 ? { : s32i
+                                        %49 = load %27 : rec_input_ty*, align 8
+                                        get_member
+                                        %51 = load %50 : u8i*, align 8
+                                        %52 = const 1 : s32i
+                                        ptr_stride
+                                        store %53, %50, align 8
+                                        %54 = load %51 : u8i, align 1
+                                        %55 = cast(integral) %54 : s32i
+                                        yield %55
+                                } : {
+                                        %47 = load %27 : rec_input_ty*, align 8
+                                        %48 = call @input_getc_complicated(%47) : s32i [all]
+                                        yield %48
+                                }
+                                %43 = const 0 : s32i
+                                cmp
+                                if %44 {
+                                        %45 = const 0 : s32i
+                                        store %45, %28
+                                        %46 = load %28 : s32i
+                                        return %46
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %30 = const 1 : s32i
         store %30, %28
@@ -80,50 +80,50 @@ fn check_header(%arg0: rec_input_ty*) -> s32i [external, c, no_inline, dso_local
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @b : u8i[6]*
-    %3 = cast(array_to_ptrdecay) %2 : u8i*
-    %4 = get_global @s : rec_input_ty*
-    %5 = get_member %4[0] "buffer_position" : u8i**
-    store %3, %5, align 8
-    %6 = get_global @b : u8i[6]*
-    %7 = cast(array_to_ptrdecay) %6 : u8i*
-    %8 = const 6 : u64i
-    %9 = ptr_stride %7, %8 : u8i*
-    %10 = get_global @s : rec_input_ty*
-    %11 = get_member %10[1] "buffer_end" : u8i**
-    store %9, %11, align 8
-    scope {
-        %22 = get_global @s : rec_input_ty*
-        %23 = call @check_header(%22) : s32i [all]
-        %24 = cast(int_to_bool) %23 : bool
-        %25 = not %24 : bool
-        if %25 {
-            %26 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @b : u8i[6]*
+        %3 = cast(array_to_ptrdecay) %2 : u8i*
+        %4 = get_global @s : rec_input_ty*
+        get_member
+        store %3, %5, align 8
+        %6 = get_global @b : u8i[6]*
+        %7 = cast(array_to_ptrdecay) %6 : u8i*
+        %8 = const 6 : u64i
+        ptr_stride
+        %10 = get_global @s : rec_input_ty*
+        get_member
+        store %9, %11, align 8
+        scope {
+                %22 = get_global @s : rec_input_ty*
+                %23 = call @check_header(%22) : s32i [all]
+                %24 = cast(int_to_bool) %23 : bool
+                not
+                if %25 {
+                        %26 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %14 = get_global @s : rec_input_ty*
-        %15 = get_member %14[0] "buffer_position" : u8i**
-        %16 = load %15 : u8i*, align 8
-        %17 = get_global @s : rec_input_ty*
-        %18 = get_member %17[1] "buffer_end" : u8i**
-        %19 = load %18 : u8i*, align 8
-        %20 = cmp ne %16, %19 : bool
-        if %20 {
-            %21 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %14 = get_global @s : rec_input_ty*
+                get_member
+                %16 = load %15 : u8i*, align 8
+                %17 = get_global @s : rec_input_ty*
+                get_member
+                %19 = load %18 : u8i*, align 8
+                cmp
+                if %20 {
+                        %21 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %12 = const 0 : s32i
-    store %12, %0
-    %13 = load %0 : s32i
-    return %13
+        %12 = const 0 : s32i
+        store %12, %0
+        %13 = load %0 : s32i
+        return %13
 }

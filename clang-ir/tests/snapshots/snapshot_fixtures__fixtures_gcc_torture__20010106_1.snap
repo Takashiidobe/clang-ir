@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20010106-1.c" (c, x86_64-unknown-linux-gnu)
@@ -10,80 +10,81 @@ fn f(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %10 = alloca s32i, "__retval", align 4
         store %arg0, %9
         scope {
-            %12 = load %9 : s32i, align 4
-            switch %12 {
-                case equal -2 {
-                    %26 = const 33 : s32i
-                    store %26, %10
-                    %27 = load %10 : s32i
-                    return %27
+                %12 = load %9 : s32i, align 4
+                switch %12 {
+                        case equal [-2] {
+                                %26 = const 33 : s32i
+                                store %26, %10
+                                %27 = load %10 : s32i
+                                return %27
+                        }
+                        case equal [-1] {
+                                %24 = const 0 : s32i
+                                store %24, %10
+                                %25 = load %10 : s32i
+                                return %25
+                        }
+                        case equal [0] {
+                                %22 = const 7 : s32i
+                                store %22, %10
+                                %23 = load %10 : s32i
+                                return %23
+                        }
+                        case equal [1] {
+                                %20 = const 4 : s32i
+                                store %20, %10
+                                %21 = load %10 : s32i
+                                return %21
+                        }
+                        case equal [2] {
+                                %18 = const 3 : s32i
+                                store %18, %10
+                                %19 = load %10 : s32i
+                                return %19
+                        }
+                        case equal [3] {
+                                %16 = const 15 : s32i
+                                store %16, %10
+                                %17 = load %10 : s32i
+                                return %17
+                        }
+                        case equal [4] {
+                                %14 = const 9 : s32i
+                                store %14, %10
+                                %15 = load %10 : s32i
+                                return %15
+                        }
+                        case default [] {
+                                %13 = get_global @abort : () -> void*
+                                call @abort() [all]
+                                yield
+                        }
+                        yield
                 }
-                case equal -1 {
-                    %24 = const 0 : s32i
-                    store %24, %10
-                    %25 = load %10 : s32i
-                    return %25
-                }
-                case equal 0 {
-                    %22 = const 7 : s32i
-                    store %22, %10
-                    %23 = load %10 : s32i
-                    return %23
-                }
-                case equal 1 {
-                    %20 = const 4 : s32i
-                    store %20, %10
-                    %21 = load %10 : s32i
-                    return %21
-                }
-                case equal 2 {
-                    %18 = const 3 : s32i
-                    store %18, %10
-                    %19 = load %10 : s32i
-                    return %19
-                }
-                case equal 3 {
-                    %16 = const 15 : s32i
-                    store %16, %10
-                    %17 = load %10 : s32i
-                    return %17
-                }
-                case equal 4 {
-                    %14 = const 9 : s32i
-                    store %14, %10
-                    %15 = load %10 : s32i
-                    return %15
-                }
-                case default {
-                    %13 = get_global @abort : (() -> void)*
-                    call @abort() [all]
-                    yield
-                }
-            }
-            yield
+                yield
         }
         %11 = load %10 : s32i
         return %11
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %5 = const -1 : s32i
-        %6 = call @f(%5) : s32i [all]
-        %7 = cast(int_to_bool) %6 : bool
-        if %7 {
-            %8 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %5 = const -1 : s32i
+                %6 = call @f(%5) : s32i [all]
+                %7 = cast(int_to_bool) %6 : bool
+                if %7 {
+                        %8 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr57321.c" (c, x86_64-unknown-linux-gnu)
-global __const.foo.i : s32i*[5][7] = zero [cir_private, default, dso_local, constant]
-global a : s32i = 1 [external, default, align 4, dso_local]
-global b : s32i* = #cir.ptr<null> [external, default, align 8, dso_local]
-global c : s32i** = #cir.ptr<null> [external, default, align 8, dso_local]
+global __const.foo.i : s32i*[5][7] = Zero { ty: Array { element_type: Array { element_type: Pointer { pointee: Named("s32i"), addr_space: None }, size: 5 }, size: 7 } } [cir_private, default, dso_local, constant]
+global a : s32i = CirInt { ty: Named("s32i"), value: "1" } [external, default, align 4, dso_local]
+global b : s32i* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("s32i"), addr_space: None }) } [external, default, align 8, dso_local]
+global c : s32i** = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Pointer { pointee: Named("s32i"), addr_space: None }, addr_space: None }) } [external, default, align 8, dso_local]
 
 fn foo(%arg0: s32i*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i*):
@@ -14,35 +14,35 @@ fn foo(%arg0: s32i*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         %8 = alloca s32i, "__retval", align 4
         store %arg0, %7
         scope {
-            %11 = load %7 : s32i*, align 8
-            %12 = load %11 : s32i, align 4
-            %13 = get_global @a : s32i*
-            %14 = load %13 : s32i, align 4
-            %15 = cmp eq %12, %14 : bool
-            if %15 {
-                %16 = alloca s32i*[5][7], "i", align 16
-                %17 = alloca s32i**[1][1], "j", align 8
-                %18 = get_global @__const.foo.i : s32i*[5][7]*
-                copy %16, %18
-                %19 = const 0 : s64i
-                %20 = const 0 : s64i
-                %21 = get_element %16[%20] : s32i*[5]*
-                %22 = get_element %21[%19] : s32i**
-                %23 = const 0 : s64i
-                %24 = const 0 : s64i
-                %25 = get_element %17[%24] : s32i**[1]*
-                %26 = get_element %25[%23] : s32i***
-                store %22, %26, align 8
-                %27 = get_global @c : s32i***
-                %28 = load %27 : s32i**, align 8
-                %29 = cmp ne %7, %28 : bool
-                %30 = cast(bool_to_int) %29 : s32i
-                %31 = get_global @b : s32i**
-                %32 = load %31 : s32i*, align 8
-                store %30, %32, align 4
+                %11 = load %7 : s32i*, align 8
+                %12 = load %11 : s32i, align 4
+                %13 = get_global @a : s32i*
+                %14 = load %13 : s32i, align 4
+                cmp
+                if %15 {
+                        %16 = alloca s32i*[5][7], "i", align 16
+                        %17 = alloca s32i**[1][1], "j", align 8
+                        %18 = get_global @__const.foo.i : s32i*[5][7]*
+                        copy
+                        %19 = const 0 : s64i
+                        %20 = const 0 : s64i
+                        get_element
+                        get_element
+                        %23 = const 0 : s64i
+                        %24 = const 0 : s64i
+                        get_element
+                        get_element
+                        store %22, %26, align 8
+                        %27 = get_global @c : s32i***
+                        %28 = load %27 : s32i**, align 8
+                        cmp
+                        %30 = cast(bool_to_int) %29 : s32i
+                        %31 = get_global @b : s32i**
+                        %32 = load %31 : s32i*, align 8
+                        store %30, %32, align 4
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %9 = const 0 : s32i
         store %9, %8
@@ -50,15 +50,15 @@ fn foo(%arg0: s32i*) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         return %10
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 0 : s32i
-    store %3, %1, align 4
-    %4 = call @foo(%1) : s32i [all]
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = load %0 : s32i
-    return %6
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 0 : s32i
+        store %3, %1, align 4
+        %4 = call @foo(%1) : s32i [all]
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = load %0 : s32i
+        return %6
 }

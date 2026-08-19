@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20030307-1.c" (c, x86_64-unknown-linux-gnu)
@@ -48,28 +48,28 @@ fn vfswrap_lock(%arg0: s8i*, %arg1: s32i, %arg2: s32i, %arg3: s64i, %arg4: s64i,
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const #cir.ptr<null> : s8i*
-        %5 = const 1 : s32i
-        %6 = const 2 : s32i
-        %7 = const 3 : s64i
-        %8 = const 4 : s64i
-        %9 = const 5 : s32i
-        %10 = call @vfswrap_lock(%4, %5, %6, %7, %8, %9) : s32i [all]
-        %11 = const 5 : s32i
-        %12 = cmp ne %10, %11 : bool
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const #cir.ptr<null> : s8i*
+                %5 = const 1 : s32i
+                %6 = const 2 : s32i
+                %7 = const 3 : s64i
+                %8 = const 4 : s64i
+                %9 = const 5 : s32i
+                %10 = call @vfswrap_lock(%4, %5, %6, %7, %8, %9) : s32i [all]
+                %11 = const 5 : s32i
+                cmp
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

@@ -1,34 +1,34 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/921016-1.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "j", align 4
-    %2 = alloca rec_anon2E0, "l", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 1081 : s32i
-    store %4, %1, align 4
-    scope {
-        %8 = load %1 : s32i, align 4
-        %9 = get_member %2[0] "m" : u16i*
-        %10 = set_bitfield %9, %8, "m": 11 bits @0 in signed u16i : s32i, align 4
-        %11 = load %1 : s32i, align 4
-        %12 = cmp eq %10, %11 : bool
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "j", align 4
+        %2 = alloca rec_anon2E0, "l", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 1081 : s32i
+        store %4, %1, align 4
+        scope {
+                %8 = load %1 : s32i, align 4
+                get_member
+                set_bitfield
+                %11 = load %1 : s32i, align 4
+                cmp
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %5 = get_global @exit : ((s32i) -> void)*
-    %6 = const 0 : s32i
-    call @exit(%6) [all]
-    %7 = load %0 : s32i
-    return %7
+        %5 = get_global @exit : (s32i) -> void*
+        %6 = const 0 : s32i
+        call @exit(%6) [all]
+        %7 = load %0 : s32i
+        return %7
 }

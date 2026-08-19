@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000706-5.c" (c, x86_64-unknown-linux-gnu)
-global c : rec_baz* = #cir.ptr<null> [external, default, align 8, dso_local]
+global c : rec_baz* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("rec_baz"), addr_space: None }) } [external, default, align 8, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn bar(%arg3: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -11,51 +11,51 @@ fn bar(%arg3: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %31 = alloca s32i, "b", align 4
         store %arg3, %31
         scope {
-            %32 = get_global @c : rec_baz**
-            %33 = load %32 : rec_baz*, align 8
-            %34 = get_member %33[0] "a" : s32i*
-            %35 = load %34 : s32i, align 4
-            %36 = const 1 : s32i
-            %37 = cmp ne %35, %36 : bool
-            %38 = ternary %37 ? { : bool
-                %59 = const true : bool
-                yield %59
-            } : {
-                %53 = get_global @c : rec_baz**
-                %54 = load %53 : rec_baz*, align 8
-                %55 = get_member %54[1] "b" : s32i*
-                %56 = load %55 : s32i, align 4
-                %57 = const 2 : s32i
-                %58 = cmp ne %56, %57 : bool
-                yield %58
-            }
-            %39 = ternary %38 ? { : bool
-                %52 = const true : bool
-                yield %52
-            } : {
-                %46 = get_global @c : rec_baz**
-                %47 = load %46 : rec_baz*, align 8
-                %48 = get_member %47[2] "c" : s32i*
-                %49 = load %48 : s32i, align 4
-                %50 = const 3 : s32i
-                %51 = cmp ne %49, %50 : bool
-                yield %51
-            }
-            %40 = ternary %39 ? { : bool
-                %45 = const true : bool
-                yield %45
-            } : {
-                %42 = load %31 : s32i, align 4
-                %43 = const 4 : s32i
-                %44 = cmp ne %42, %43 : bool
-                yield %44
-            }
-            if %40 {
-                %41 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %32 = get_global @c : rec_baz**
+                %33 = load %32 : rec_baz*, align 8
+                get_member
+                %35 = load %34 : s32i, align 4
+                %36 = const 1 : s32i
+                cmp
+                %38 = ternary %37 ? { : bool
+                        %59 = const true : bool
+                        yield %59
+                } : {
+                        %53 = get_global @c : rec_baz**
+                        %54 = load %53 : rec_baz*, align 8
+                        get_member
+                        %56 = load %55 : s32i, align 4
+                        %57 = const 2 : s32i
+                        cmp
+                        yield %58
+                }
+                %39 = ternary %38 ? { : bool
+                        %52 = const true : bool
+                        yield %52
+                } : {
+                        %46 = get_global @c : rec_baz**
+                        %47 = load %46 : rec_baz*, align 8
+                        get_member
+                        %49 = load %48 : s32i, align 4
+                        %50 = const 3 : s32i
+                        cmp
+                        yield %51
+                }
+                %40 = ternary %39 ? { : bool
+                        %45 = const true : bool
+                        yield %45
+                } : {
+                        %42 = load %31 : s32i, align 4
+                        %43 = const 4 : s32i
+                        cmp
+                        yield %44
+                }
+                if %40 {
+                        %41 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -63,9 +63,9 @@ fn foo(%arg0: u64i, %arg1: s32i, %arg2: s32i) -> void [external, c, no_inline, d
     ^bb0(%arg0: u64i, %arg1: s32i, %arg2: s32i):
         %20 = alloca rec_anon_struct, "coerce", align 8
         %21 = alloca rec_anon_struct, "coerce", align 8
-        %22 = get_member %21[0] "" : u64i*
+        get_member
         store %arg0, %22
-        %23 = get_member %21[1] "" : s32i*
+        get_member
         store %arg1, %23
         %24 = load %21 : rec_anon_struct
         store %24, %20
@@ -83,32 +83,32 @@ fn foo(%arg0: u64i, %arg1: s32i, %arg2: s32i) -> void [external, c, no_inline, d
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca rec_anon_struct, "coerce", align 8
-    %1 = alloca s32i, "__retval", align 4
-    %2 = alloca rec_baz, "a", align 4
-    %3 = const 0 : s32i
-    store %3, %1
-    %4 = const 1 : s32i
-    %5 = get_member %2[0] "a" : s32i*
-    store %4, %5, align 4
-    %6 = const 2 : s32i
-    %7 = get_member %2[1] "b" : s32i*
-    store %6, %7, align 4
-    %8 = const 3 : s32i
-    %9 = get_member %2[2] "c" : s32i*
-    store %8, %9, align 4
-    %10 = const 4 : s32i
-    %11 = load %2 : rec_baz, align 4
-    %12 = cast(bitcast) %0 : rec_baz*
-    store %11, %12
-    %13 = get_member %0[0] "" : u64i*
-    %14 = load %13 : u64i
-    %15 = get_member %0[1] "" : s32i*
-    %16 = load %15 : s32i
-    call @foo(%14, %16, %10) [all]
-    %17 = get_global @exit : ((s32i) -> void)*
-    %18 = const 0 : s32i
-    call @exit(%18) [all]
-    %19 = load %1 : s32i
-    return %19
+        %0 = alloca rec_anon_struct, "coerce", align 8
+        %1 = alloca s32i, "__retval", align 4
+        %2 = alloca rec_baz, "a", align 4
+        %3 = const 0 : s32i
+        store %3, %1
+        %4 = const 1 : s32i
+        get_member
+        store %4, %5, align 4
+        %6 = const 2 : s32i
+        get_member
+        store %6, %7, align 4
+        %8 = const 3 : s32i
+        get_member
+        store %8, %9, align 4
+        %10 = const 4 : s32i
+        %11 = load %2 : rec_baz, align 4
+        %12 = cast(bitcast) %0 : rec_baz*
+        store %11, %12
+        get_member
+        %14 = load %13 : u64i
+        get_member
+        %16 = load %15 : s32i
+        call @foo(%14, %16, %10) [all]
+        %17 = get_global @exit : (s32i) -> void*
+        %18 = const 0 : s32i
+        call @exit(%18) [all]
+        %19 = load %1 : s32i
+        return %19
 }

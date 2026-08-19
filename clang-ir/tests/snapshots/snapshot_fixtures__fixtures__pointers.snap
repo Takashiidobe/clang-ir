@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/pointers.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn bump_through_pointer(%arg3: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
@@ -57,60 +57,60 @@ fn pick_with_pointer_arithmetic(%arg0: s32i) -> s32i [internal, c, no_inline, ds
         store %33, %32, align 8
         %34 = const 4 : s32i
         %35 = const 0 : s64i
-        %36 = get_element %31[%35] : s32i*
+        get_element
         store %34, %36, align 16
         %37 = const 8 : s32i
         %38 = const 1 : s64i
-        %39 = get_element %31[%38] : s32i*
+        get_element
         store %37, %39, align 4
         %40 = const 12 : s32i
         %41 = const 2 : s64i
-        %42 = get_element %31[%41] : s32i*
+        get_element
         store %40, %42, align 8
         %43 = const 16 : s32i
         %44 = const 3 : s64i
-        %45 = get_element %31[%44] : s32i*
+        get_element
         store %43, %45, align 4
         %46 = load %32 : s32i*, align 8
         %47 = load %29 : s32i, align 4
-        %48 = ptr_stride %46, %47 : s32i*
+        ptr_stride
         %49 = load %48 : s32i, align 4
         store %49, %30
         %50 = load %30 : s32i
         return %50
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "total", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 10 : s32i
-    store %3, %1, align 4
-    %4 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %5 = get_global @.str : s8i[4]*
-    %6 = cast(array_to_ptrdecay) %5 : s8i*
-    %7 = const 5 : s32i
-    %8 = call @bump_through_pointer(%7) : s32i [all]
-    %9 = call @printf(%6, %8) : s32i [all]
-    %10 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %11 = get_global @.str : s8i[4]*
-    %12 = cast(array_to_ptrdecay) %11 : s8i*
-    %13 = const 7 : s32i
-    %14 = call @add_into_pointer(%1, %13) : s32i [all]
-    %15 = call @printf(%12, %14) : s32i [all]
-    %16 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %17 = get_global @.str : s8i[4]*
-    %18 = cast(array_to_ptrdecay) %17 : s8i*
-    %19 = load %1 : s32i, align 4
-    %20 = call @printf(%18, %19) : s32i [all]
-    %21 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %22 = get_global @.str : s8i[4]*
-    %23 = cast(array_to_ptrdecay) %22 : s8i*
-    %24 = const 2 : s32i
-    %25 = call @pick_with_pointer_arithmetic(%24) : s32i [all]
-    %26 = call @printf(%23, %25) : s32i [all]
-    %27 = const 0 : s32i
-    store %27, %0
-    %28 = load %0 : s32i
-    return %28
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "total", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 10 : s32i
+        store %3, %1, align 4
+        %4 = get_global @printf : (s8i*, ...) -> s32i*
+        %5 = get_global @.str : s8i[4]*
+        %6 = cast(array_to_ptrdecay) %5 : s8i*
+        %7 = const 5 : s32i
+        %8 = call @bump_through_pointer(%7) : s32i [all]
+        %9 = call @printf(%6, %8) : s32i [all]
+        %10 = get_global @printf : (s8i*, ...) -> s32i*
+        %11 = get_global @.str : s8i[4]*
+        %12 = cast(array_to_ptrdecay) %11 : s8i*
+        %13 = const 7 : s32i
+        %14 = call @add_into_pointer(%1, %13) : s32i [all]
+        %15 = call @printf(%12, %14) : s32i [all]
+        %16 = get_global @printf : (s8i*, ...) -> s32i*
+        %17 = get_global @.str : s8i[4]*
+        %18 = cast(array_to_ptrdecay) %17 : s8i*
+        %19 = load %1 : s32i, align 4
+        %20 = call @printf(%18, %19) : s32i [all]
+        %21 = get_global @printf : (s8i*, ...) -> s32i*
+        %22 = get_global @.str : s8i[4]*
+        %23 = cast(array_to_ptrdecay) %22 : s8i*
+        %24 = const 2 : s32i
+        %25 = call @pick_with_pointer_arithmetic(%24) : s32i [all]
+        %26 = call @printf(%23, %25) : s32i [all]
+        %27 = const 0 : s32i
+        store %27, %0
+        %28 = load %0 : s32i
+        return %28
 }

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr93402.c" (c, x86_64-unknown-linux-gnu)
@@ -10,14 +10,14 @@ fn foo(%arg0: u64i) -> rec_anon_struct [external, c, no_inline, dso_local, nothr
         %22 = alloca rec_S, "__retval", align 8
         store %arg0, %21
         %23 = const 0 : u32i
-        %24 = get_member %22[0] "a" : u32i*
+        get_member
         store %23, %24, align 8
         %25 = load %21 : u64i, align 8
         %26 = const 11111111111 : u64i
-        %27 = mul %25, %26 : u64i
+        mul
         %28 = const 111111111111 : u64i
         %29 = add %27, %28 : u64i
-        %30 = get_member %22[1] "b" : u64i*
+        get_member
         store %29, %30, align 8
         %31 = load %22 : rec_S
         store %31, %20
@@ -27,40 +27,40 @@ fn foo(%arg0: u64i) -> rec_anon_struct [external, c, no_inline, dso_local, nothr
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca rec_anon_struct, "coerce", align 8
-    %1 = alloca s32i, "__retval", align 4
-    %2 = alloca rec_S, "a", align 8
-    %3 = const 0 : s32i
-    store %3, %1
-    %4 = const 1 : u64i
-    %5 = call @foo(%4) : rec_anon_struct [all]
-    store %5, %0
-    %6 = cast(bitcast) %0 : rec_S*
-    %7 = load %6 : rec_S
-    store %7, %2, align 8
-    scope {
-        %10 = get_member %2[0] "a" : u32i*
-        %11 = load %10 : u32i, align 8
-        %12 = const 0 : u32i
-        %13 = cmp ne %11, %12 : bool
-        %14 = ternary %13 ? { : bool
-            %19 = const true : bool
-            yield %19
-        } : {
-            %15 = get_member %2[1] "b" : u64i*
-            %16 = load %15 : u64i, align 8
-            %17 = const 122222222222 : u64i
-            %18 = cmp ne %16, %17 : bool
-            yield %18
+        %0 = alloca rec_anon_struct, "coerce", align 8
+        %1 = alloca s32i, "__retval", align 4
+        %2 = alloca rec_S, "a", align 8
+        %3 = const 0 : s32i
+        store %3, %1
+        %4 = const 1 : u64i
+        %5 = call @foo(%4) : rec_anon_struct [all]
+        store %5, %0
+        %6 = cast(bitcast) %0 : rec_S*
+        %7 = load %6 : rec_S
+        store %7, %2, align 8
+        scope {
+                get_member
+                %11 = load %10 : u32i, align 8
+                %12 = const 0 : u32i
+                cmp
+                %14 = ternary %13 ? { : bool
+                        %19 = const true : bool
+                        yield %19
+                } : {
+                        get_member
+                        %16 = load %15 : u64i, align 8
+                        %17 = const 122222222222 : u64i
+                        cmp
+                        yield %18
+                }
+                if %14 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %14 {
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %8 = const 0 : s32i
-    store %8, %1
-    %9 = load %1 : s32i
-    return %9
+        %8 = const 0 : s32i
+        store %8, %1
+        %9 = load %1 : s32i
+        return %9
 }

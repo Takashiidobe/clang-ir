@@ -1,72 +1,72 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.chibicc/supported/file_line/file_line.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[95] = "tests/fixtures.chibicc/supported/file_line/file_line_include.h" [cir_private, default, align 1, dso_local, constant]
-global include_filename : s8i* = @.str [external, default, align 8, dso_local]
-global include_line : s32i = 2 [external, default, align 4, dso_local]
-global .str.1 : s8i[87] = "tests/fixtures.chibicc/supported/file_line/file_line.c" [cir_private, default, align 1, dso_local, constant]
-global main_filename1 : s8i* = @.str.1 [external, default, align 8, dso_local]
-global main_line1 : s32i = 5 [external, default, align 4, dso_local]
-global main_line2 : s32i = 7 [external, default, align 4, dso_local]
-global .str.2 : s8i[19] = "./test/file_line.c" [cir_private, default, align 1, dso_local, constant]
-global .str.3 : s8i[45] = "strcmp(main_filename1, \"./test/file_line.c\")" [cir_private, default, align 1, dso_local, constant]
-global .str.4 : s8i[11] = "main_line1" [cir_private, default, align 1, dso_local, constant]
-global .str.5 : s8i[11] = "main_line2" [cir_private, default, align 1, dso_local, constant]
-global .str.6 : s8i[27] = "./test/file_line_include.h" [cir_private, default, align 1, dso_local, constant]
-global .str.7 : s8i[55] = "strcmp(include_filename, \"./test/file_line_include.h\")" [cir_private, default, align 1, dso_local, constant]
-global .str.8 : s8i[13] = "include_line" [cir_private, default, align 1, dso_local, constant]
-global .str.9 : s8i[4] = "OK\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[104] = ConstArray { ty: Array { element_type: Named("s8i"), size: 104 }, elts: Str("tests/fixtures.chibicc/supported/file_line/file_line_include.h"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global include_filename : s8i* = GlobalView { ty: Pointer { pointee: Named("s8i"), addr_space: None }, symbol: ".str", indices: None } [external, default, align 8, dso_local]
+global include_line : s32i = CirInt { ty: Named("s32i"), value: "2" } [external, default, align 4, dso_local]
+global .str.1 : s8i[96] = ConstArray { ty: Array { element_type: Named("s8i"), size: 96 }, elts: Str("tests/fixtures.chibicc/supported/file_line/file_line.c"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global main_filename1 : s8i* = GlobalView { ty: Pointer { pointee: Named("s8i"), addr_space: None }, symbol: ".str.1", indices: None } [external, default, align 8, dso_local]
+global main_line1 : s32i = CirInt { ty: Named("s32i"), value: "5" } [external, default, align 4, dso_local]
+global main_line2 : s32i = CirInt { ty: Named("s32i"), value: "7" } [external, default, align 4, dso_local]
+global .str.2 : s8i[19] = ConstArray { ty: Array { element_type: Named("s8i"), size: 19 }, elts: Str("./test/file_line.c"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[45] = ConstArray { ty: Array { element_type: Named("s8i"), size: 45 }, elts: Str("strcmp(main_filename1, \"./test/file_line.c\")"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[11] = ConstArray { ty: Array { element_type: Named("s8i"), size: 11 }, elts: Str("main_line1"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[11] = ConstArray { ty: Array { element_type: Named("s8i"), size: 11 }, elts: Str("main_line2"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.6 : s8i[27] = ConstArray { ty: Array { element_type: Named("s8i"), size: 27 }, elts: Str("./test/file_line_include.h"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.7 : s8i[55] = ConstArray { ty: Array { element_type: Named("s8i"), size: 55 }, elts: Str("strcmp(include_filename, \"./test/file_line_include.h\")"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.8 : s8i[13] = ConstArray { ty: Array { element_type: Named("s8i"), size: 13 }, elts: Str("include_line"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.9 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("OK\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn assert(%arg0: s32i, %arg1: s32i, %arg2: s8i*) -> void [external, c];
 fn strcmp(%arg0: s8i*, %arg1: s8i*) -> s32i [external, c];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 0 : s32i
-    %3 = get_global @main_filename1 : s8i**
-    %4 = load %3 : s8i*, align 8
-    %5 = get_global @.str.2 : s8i[19]*
-    %6 = cast(array_to_ptrdecay) %5 : s8i*
-    %7 = call @strcmp(%4, %6) : s32i [all]
-    %8 = get_global @.str.3 : s8i[45]*
-    %9 = cast(array_to_ptrdecay) %8 : s8i*
-    call @assert(%2, %7, %9) [all]
-    %10 = const 5 : s32i
-    %11 = get_global @main_line1 : s32i*
-    %12 = load %11 : s32i, align 4
-    %13 = get_global @.str.4 : s8i[11]*
-    %14 = cast(array_to_ptrdecay) %13 : s8i*
-    call @assert(%10, %12, %14) [all]
-    %15 = const 7 : s32i
-    %16 = get_global @main_line2 : s32i*
-    %17 = load %16 : s32i, align 4
-    %18 = get_global @.str.5 : s8i[11]*
-    %19 = cast(array_to_ptrdecay) %18 : s8i*
-    call @assert(%15, %17, %19) [all]
-    %20 = const 0 : s32i
-    %21 = get_global @include_filename : s8i**
-    %22 = load %21 : s8i*, align 8
-    %23 = get_global @.str.6 : s8i[27]*
-    %24 = cast(array_to_ptrdecay) %23 : s8i*
-    %25 = call @strcmp(%22, %24) : s32i [all]
-    %26 = get_global @.str.7 : s8i[55]*
-    %27 = cast(array_to_ptrdecay) %26 : s8i*
-    call @assert(%20, %25, %27) [all]
-    %28 = const 2 : s32i
-    %29 = get_global @include_line : s32i*
-    %30 = load %29 : s32i, align 4
-    %31 = get_global @.str.8 : s8i[13]*
-    %32 = cast(array_to_ptrdecay) %31 : s8i*
-    call @assert(%28, %30, %32) [all]
-    %33 = get_global @.str.9 : s8i[4]*
-    %34 = cast(array_to_ptrdecay) %33 : s8i*
-    %35 = call @printf(%34) : s32i [all]
-    %36 = const 0 : s32i
-    store %36, %0
-    %37 = load %0 : s32i
-    return %37
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 0 : s32i
+        %3 = get_global @main_filename1 : s8i**
+        %4 = load %3 : s8i*, align 8
+        %5 = get_global @.str.2 : s8i[19]*
+        %6 = cast(array_to_ptrdecay) %5 : s8i*
+        %7 = call @strcmp(%4, %6) : s32i [all]
+        %8 = get_global @.str.3 : s8i[45]*
+        %9 = cast(array_to_ptrdecay) %8 : s8i*
+        call @assert(%2, %7, %9) [all]
+        %10 = const 5 : s32i
+        %11 = get_global @main_line1 : s32i*
+        %12 = load %11 : s32i, align 4
+        %13 = get_global @.str.4 : s8i[11]*
+        %14 = cast(array_to_ptrdecay) %13 : s8i*
+        call @assert(%10, %12, %14) [all]
+        %15 = const 7 : s32i
+        %16 = get_global @main_line2 : s32i*
+        %17 = load %16 : s32i, align 4
+        %18 = get_global @.str.5 : s8i[11]*
+        %19 = cast(array_to_ptrdecay) %18 : s8i*
+        call @assert(%15, %17, %19) [all]
+        %20 = const 0 : s32i
+        %21 = get_global @include_filename : s8i**
+        %22 = load %21 : s8i*, align 8
+        %23 = get_global @.str.6 : s8i[27]*
+        %24 = cast(array_to_ptrdecay) %23 : s8i*
+        %25 = call @strcmp(%22, %24) : s32i [all]
+        %26 = get_global @.str.7 : s8i[55]*
+        %27 = cast(array_to_ptrdecay) %26 : s8i*
+        call @assert(%20, %25, %27) [all]
+        %28 = const 2 : s32i
+        %29 = get_global @include_line : s32i*
+        %30 = load %29 : s32i, align 4
+        %31 = get_global @.str.8 : s8i[13]*
+        %32 = cast(array_to_ptrdecay) %31 : s8i*
+        call @assert(%28, %30, %32) [all]
+        %33 = get_global @.str.9 : s8i[4]*
+        %34 = cast(array_to_ptrdecay) %33 : s8i*
+        %35 = call @printf(%34) : s32i [all]
+        %36 = const 0 : s32i
+        store %36, %0
+        %37 = load %0 : s32i
+        return %37
 }

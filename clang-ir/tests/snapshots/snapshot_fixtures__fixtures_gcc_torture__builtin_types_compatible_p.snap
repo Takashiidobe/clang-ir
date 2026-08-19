@@ -1,122 +1,122 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/builtin-types-compatible-p.c" (c, x86_64-unknown-linux-gnu)
-global i : s32i = 0 [external, default, align 4, dso_local]
-global d : double = 0.000000e+00 [external, default, align 8, dso_local]
-global rootbeer : float[1] = zero [external, default, align 4, dso_local]
+global i : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global d : double = CirFloat { ty: Double, value: "0.000000e+00" } [external, default, align 8, dso_local]
+global rootbeer : float[1] = Zero { ty: Array { element_type: Single, size: 1 } } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %32 = const 1 : s32i
-        %33 = cast(int_to_bool) %32 : bool
-        %34 = ternary %33 ? { : bool
-            %50 = const 1 : s32i
-            %51 = cast(int_to_bool) %50 : bool
-            yield %51
-        } : {
-            %49 = const false : bool
-            yield %49
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %32 = const 1 : s32i
+                %33 = cast(int_to_bool) %32 : bool
+                %34 = ternary %33 ? { : bool
+                        %50 = const 1 : s32i
+                        %51 = cast(int_to_bool) %50 : bool
+                        yield %51
+                } : {
+                        %49 = const false : bool
+                        yield %49
+                }
+                %35 = ternary %34 ? { : bool
+                        %47 = const 1 : s32i
+                        %48 = cast(int_to_bool) %47 : bool
+                        yield %48
+                } : {
+                        %46 = const false : bool
+                        yield %46
+                }
+                %36 = ternary %35 ? { : bool
+                        %44 = const 1 : s32i
+                        %45 = cast(int_to_bool) %44 : bool
+                        yield %45
+                } : {
+                        %43 = const false : bool
+                        yield %43
+                }
+                %37 = ternary %36 ? { : bool
+                        %41 = const 1 : s32i
+                        %42 = cast(int_to_bool) %41 : bool
+                        yield %42
+                } : {
+                        %40 = const false : bool
+                        yield %40
+                }
+                not
+                if %38 {
+                        %39 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        %35 = ternary %34 ? { : bool
-            %47 = const 1 : s32i
-            %48 = cast(int_to_bool) %47 : bool
-            yield %48
-        } : {
-            %46 = const false : bool
-            yield %46
+        scope {
+                %5 = const 0 : s32i
+                %6 = cast(int_to_bool) %5 : bool
+                %7 = ternary %6 ? { : bool
+                        %31 = const true : bool
+                        yield %31
+                } : {
+                        %29 = const 0 : s32i
+                        %30 = cast(int_to_bool) %29 : bool
+                        yield %30
+                }
+                %8 = ternary %7 ? { : bool
+                        %28 = const true : bool
+                        yield %28
+                } : {
+                        %26 = const 0 : s32i
+                        %27 = cast(int_to_bool) %26 : bool
+                        yield %27
+                }
+                %9 = ternary %8 ? { : bool
+                        %25 = const true : bool
+                        yield %25
+                } : {
+                        %23 = const 0 : s32i
+                        %24 = cast(int_to_bool) %23 : bool
+                        yield %24
+                }
+                %10 = ternary %9 ? { : bool
+                        %22 = const true : bool
+                        yield %22
+                } : {
+                        %20 = const 0 : s32i
+                        %21 = cast(int_to_bool) %20 : bool
+                        yield %21
+                }
+                %11 = ternary %10 ? { : bool
+                        %19 = const true : bool
+                        yield %19
+                } : {
+                        %17 = const 0 : s32i
+                        %18 = cast(int_to_bool) %17 : bool
+                        yield %18
+                }
+                %12 = ternary %11 ? { : bool
+                        %16 = const true : bool
+                        yield %16
+                } : {
+                        %14 = const 0 : s32i
+                        %15 = cast(int_to_bool) %14 : bool
+                        yield %15
+                }
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        %36 = ternary %35 ? { : bool
-            %44 = const 1 : s32i
-            %45 = cast(int_to_bool) %44 : bool
-            yield %45
-        } : {
-            %43 = const false : bool
-            yield %43
-        }
-        %37 = ternary %36 ? { : bool
-            %41 = const 1 : s32i
-            %42 = cast(int_to_bool) %41 : bool
-            yield %42
-        } : {
-            %40 = const false : bool
-            yield %40
-        }
-        %38 = not %37 : bool
-        if %38 {
-            %39 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    scope {
-        %5 = const 0 : s32i
-        %6 = cast(int_to_bool) %5 : bool
-        %7 = ternary %6 ? { : bool
-            %31 = const true : bool
-            yield %31
-        } : {
-            %29 = const 0 : s32i
-            %30 = cast(int_to_bool) %29 : bool
-            yield %30
-        }
-        %8 = ternary %7 ? { : bool
-            %28 = const true : bool
-            yield %28
-        } : {
-            %26 = const 0 : s32i
-            %27 = cast(int_to_bool) %26 : bool
-            yield %27
-        }
-        %9 = ternary %8 ? { : bool
-            %25 = const true : bool
-            yield %25
-        } : {
-            %23 = const 0 : s32i
-            %24 = cast(int_to_bool) %23 : bool
-            yield %24
-        }
-        %10 = ternary %9 ? { : bool
-            %22 = const true : bool
-            yield %22
-        } : {
-            %20 = const 0 : s32i
-            %21 = cast(int_to_bool) %20 : bool
-            yield %21
-        }
-        %11 = ternary %10 ? { : bool
-            %19 = const true : bool
-            yield %19
-        } : {
-            %17 = const 0 : s32i
-            %18 = cast(int_to_bool) %17 : bool
-            yield %18
-        }
-        %12 = ternary %11 ? { : bool
-            %16 = const true : bool
-            yield %16
-        } : {
-            %14 = const 0 : s32i
-            %15 = cast(int_to_bool) %14 : bool
-            yield %15
-        }
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

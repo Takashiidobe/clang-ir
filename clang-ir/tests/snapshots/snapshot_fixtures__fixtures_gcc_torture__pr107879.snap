@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr107879.c" (c, x86_64-unknown-linux-gnu)
@@ -15,57 +15,57 @@ fn foo(%arg0: double*) -> double [internal, c, no_inline, dso_local, nothrow] {
         %15 = alloca double, "omww", align 8
         store %arg0, %8
         %16 = const 0 : s32i
-        store %16, %10, align 4, volatile
+        store %16, %10, align 4
         %17 = const 1.000000e+00 : double
-        store %17, %11, align 8, volatile
-        %18 = load %11 : double, align 8, volatile
+        store %17, %11, align 8
+        %18 = load %11 : double, align 8
         store %18, %12, align 8
-        %19 = load %10 : s32i, align 4, volatile
+        %19 = load %10 : s32i, align 4
         %20 = cast(int_to_float) %19 : double
-        %21 = fneg %20 : double
+        fneg
         %22 = load %12 : double, align 8
-        %23 = fmul %21, %22 : double
+        fmul
         store %23, %13, align 8
         scope {
-            %40 = load %13 : double, align 8
-            %41 = const 0 : s32i
-            %42 = cast(int_to_float) %41 : double
-            %43 = cmp eq %40, %42 : bool
-            if %43 {
-                %48 = const 1.000000e+00 : double
-                %49 = load %8 : double*, align 8
-                store %48, %49, align 8
+                %40 = load %13 : double, align 8
+                %41 = const 0 : s32i
+                %42 = cast(int_to_float) %41 : double
+                cmp
+                if %43 {
+                        %48 = const 1.000000e+00 : double
+                        %49 = load %8 : double*, align 8
+                        store %48, %49, align 8
+                        yield
+                } else {
+                        %44 = const 1.000000e+00 : double
+                        %45 = load %13 : double, align 8
+                        fdiv
+                        %47 = load %8 : double*, align 8
+                        store %46, %47, align 8
+                        yield
+                }
                 yield
-            } else {
-                %44 = const 1.000000e+00 : double
-                %45 = load %13 : double, align 8
-                %46 = fdiv %44, %45 : double
-                %47 = load %8 : double*, align 8
-                store %46, %47, align 8
-                yield
-            }
-            yield
         }
         %24 = const 2.000000e+00 : double
         %25 = load %13 : double, align 8
-        %26 = fmul %24, %25 : double
+        fmul
         %27 = load %12 : double, align 8
-        %28 = fdiv %26, %27 : double
+        fdiv
         store %28, %14, align 8
         %29 = const 1 : s32i
         %30 = cast(int_to_float) %29 : double
         %31 = load %14 : double, align 8
-        %32 = fsub %30, %31 : double
+        fsub
         store %32, %15, align 8
         %33 = load %15 : double, align 8
         %34 = const 0.000000e+00 : double
-        %35 = cmp gt %33, %34 : bool
+        cmp
         %36 = ternary %35 ? { : double
-            %39 = load %15 : double, align 8
-            yield %39
+                %39 = load %15 : double, align 8
+                yield %39
         } : {
-            %38 = const 0.000000e+00 : double
-            yield %38
+                %38 = const 0.000000e+00 : double
+                yield %38
         }
         store %36, %9
         %37 = load %9 : double
@@ -73,22 +73,22 @@ fn foo(%arg0: double*) -> double [internal, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca double, "y", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 4.200000e+01 : double
-    store %3, %1, align 8
-    scope {
-        %5 = call @foo(%1) : double [all]
-        %6 = const 1.000000e+00 : double
-        %7 = cmp ne %5, %6 : bool
-        if %7 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca double, "y", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 4.200000e+01 : double
+        store %3, %1, align 8
+        scope {
+                %5 = call @foo(%1) : double [all]
+                %6 = const 1.000000e+00 : double
+                cmp
+                if %7 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %4 = load %0 : s32i
-    return %4
+        %4 = load %0 : s32i
+        return %4
 }

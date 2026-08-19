@@ -1,47 +1,47 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr93494.c" (c, x86_64-unknown-linux-gnu)
-global a : u16i = 0 [external, default, align 2, dso_local]
+global a : u16i = CirInt { ty: Named("u16i"), value: "0" } [external, default, align 2, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u64i, "y", align 8
-    %2 = alloca s32i, "x", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 0 : u64i
-    store %4, %1, align 8
-    %5 = load %1 : u64i, align 8
-    %6 = const 0 : u64i
-    %7 = get_global @a : u16i*
-    %8#0, %8#1 = add.overflow %5, %6 : u16i
-    store %8#0, %7, align 2
-    %9 = cast(bool_to_int) %8#1 : s32i
-    store %9, %2, align 4
-    scope {
-        %12 = load %2 : s32i, align 4
-        %13 = cast(int_to_bool) %12 : bool
-        %14 = ternary %13 ? { : bool
-            %19 = const true : bool
-            yield %19
-        } : {
-            %15 = get_global @a : u16i*
-            %16 = load %15 : u16i, align 2
-            %17 = cast(integral) %16 : s32i
-            %18 = cast(int_to_bool) %17 : bool
-            yield %18
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u64i, "y", align 8
+        %2 = alloca s32i, "x", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 0 : u64i
+        store %4, %1, align 8
+        %5 = load %1 : u64i, align 8
+        %6 = const 0 : u64i
+        %7 = get_global @a : u16i*
+        add.overflow
+        store %8#0, %7, align 2
+        %9 = cast(bool_to_int) %8#1 : s32i
+        store %9, %2, align 4
+        scope {
+                %12 = load %2 : s32i, align 4
+                %13 = cast(int_to_bool) %12 : bool
+                %14 = ternary %13 ? { : bool
+                        %19 = const true : bool
+                        yield %19
+                } : {
+                        %15 = get_global @a : u16i*
+                        %16 = load %15 : u16i, align 2
+                        %17 = cast(integral) %16 : s32i
+                        %18 = cast(int_to_bool) %17 : bool
+                        yield %18
+                }
+                if %14 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %14 {
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %10 = const 0 : s32i
-    store %10, %0
-    %11 = load %0 : s32i
-    return %11
+        %10 = const 0 : s32i
+        store %10, %0
+        %11 = load %0 : s32i
+        return %11
 }

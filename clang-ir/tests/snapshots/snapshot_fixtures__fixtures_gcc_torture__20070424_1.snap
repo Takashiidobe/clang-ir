@@ -1,20 +1,20 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20070424-1.c" (c, x86_64-unknown-linux-gnu)
 fn exit(%arg0: s32i) -> void [external, c];
 fn do_exit() -> void [external, c, no_inline, dso_local, nothrow] {
-    %15 = get_global @exit : ((s32i) -> void)*
-    %16 = const 0 : s32i
-    call @exit(%16) [all]
-    return
+        %15 = get_global @exit : (s32i) -> void*
+        %16 = const 0 : s32i
+        call @exit(%16) [all]
+        return
 }
 fn abort() -> void [external, c, nothrow];
 fn do_abort() -> void [external, c, no_inline, dso_local, nothrow] {
-    %14 = get_global @abort : (() -> void)*
-    call @abort() [all]
-    return
+        %14 = get_global @abort : () -> void*
+        call @abort() [all]
+        return
 }
 fn foo(%arg0: s32i, %arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i, %arg1: s32i):
@@ -23,40 +23,40 @@ fn foo(%arg0: s32i, %arg1: s32i) -> void [external, c, no_inline, dso_local, not
         store %arg0, %6
         store %arg1, %7
         scope {
-            %11 = load %6 : s32i, align 4
-            %12 = load %7 : s32i, align 4
-            %13 = cmp lt %11, %12 : bool
-            if %13 {
-                goto doit
-            }
-            yield
+                %11 = load %6 : s32i, align 4
+                %12 = load %7 : s32i, align 4
+                cmp
+                if %13 {
+                        goto doit
+                }
+                yield
         }
         call @do_exit() [all]
         scope {
-            %8 = load %6 : s32i, align 4
-            %9 = load %7 : s32i, align 4
-            %10 = cmp ne %8, %9 : bool
-            if %10 {
-                goto doit
-            }
-            yield
+                %8 = load %6 : s32i, align 4
+                %9 = load %7 : s32i, align 4
+                cmp
+                if %10 {
+                        goto doit
+                }
+                yield
         }
         call @do_abort() [all]
         return
-    ^bb1():
+    ^bb1:
         label doit:
         call @do_abort() [all]
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : s32i
-    %3 = const 0 : s32i
-    call @foo(%2, %3) [all]
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : s32i
+        %3 = const 0 : s32i
+        call @foo(%2, %3) [all]
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

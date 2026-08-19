@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/930126-1.c" (c, x86_64-unknown-linux-gnu)
-global main.i : rec_s = zero [internal, default, align 8, dso_local]
+global main.i : rec_s = Zero { ty: Named("rec_s") } [internal, default, align 8, dso_local]
 
 fn f(%arg0: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: u64i):
@@ -16,9 +16,9 @@ fn f(%arg0: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
         %35 = alloca rec_s, "__retval", align 8
         store %33, %34
         %36 = const 3454997044 : u64i
-        %37 = get_member %34[0] "b" : u64i*
-        %38 = set_bitfield %37, %36, "b": 32 bits @8 in u64i : u64i, align 8
-        copy %35, %34
+        get_member
+        set_bitfield
+        copy
         %39 = load %35 : rec_s
         store %39, %30
         %40 = cast(bitcast) %30 : u64i*
@@ -28,51 +28,51 @@ fn f(%arg0: u64i) -> u64i [external, c, no_inline, dso_local, nothrow] {
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca u64i, "coerce", align 8
-    %1 = alloca rec_s, "coerce", align 8
-    %2 = alloca s32i, "__retval", align 4
-    %3 = const 0 : s32i
-    store %3, %2
-    %4 = get_global @main.i : rec_s*
-    %5 = const 12 : u64i
-    %6 = get_member %4[0] "a" : u64i*
-    %7 = set_bitfield %6, %5, "a": 8 bits @0 in u64i : u64i, align 8
-    %8 = load %4 : rec_s, align 8
-    store %8, %1
-    %9 = cast(bitcast) %1 : u64i*
-    %10 = load %9 : u64i
-    %11 = call @f(%10) : u64i [all]
-    store %11, %0
-    %12 = cast(bitcast) %0 : rec_s*
-    %13 = load %12 : rec_s
-    store %13, %4, align 8
-    scope {
-        %17 = get_member %4[0] "a" : u64i*
-        %18 = get_bitfield %17, "a": 8 bits @0 in u64i : u64i, align 8
-        %19 = cast(integral) %18 : s32i
-        %20 = const 12 : s32i
-        %21 = cmp ne %19, %20 : bool
-        %22 = ternary %21 ? { : bool
-            %29 = const true : bool
-            yield %29
-        } : {
-            %24 = get_member %4[0] "b" : u64i*
-            %25 = get_bitfield %24, "b": 32 bits @8 in u64i : u64i, align 8
-            %26 = cast(integral) %25 : u32i
-            %27 = const 3454997044 : u32i
-            %28 = cmp ne %26, %27 : bool
-            yield %28
+        %0 = alloca u64i, "coerce", align 8
+        %1 = alloca rec_s, "coerce", align 8
+        %2 = alloca s32i, "__retval", align 4
+        %3 = const 0 : s32i
+        store %3, %2
+        %4 = get_global @main.i : rec_s*
+        %5 = const 12 : u64i
+        get_member
+        set_bitfield
+        %8 = load %4 : rec_s, align 8
+        store %8, %1
+        %9 = cast(bitcast) %1 : u64i*
+        %10 = load %9 : u64i
+        %11 = call @f(%10) : u64i [all]
+        store %11, %0
+        %12 = cast(bitcast) %0 : rec_s*
+        %13 = load %12 : rec_s
+        store %13, %4, align 8
+        scope {
+                get_member
+                get_bitfield
+                %19 = cast(integral) %18 : s32i
+                %20 = const 12 : s32i
+                cmp
+                %22 = ternary %21 ? { : bool
+                        %29 = const true : bool
+                        yield %29
+                } : {
+                        get_member
+                        get_bitfield
+                        %26 = cast(integral) %25 : u32i
+                        %27 = const 3454997044 : u32i
+                        cmp
+                        yield %28
+                }
+                if %22 {
+                        %23 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %22 {
-            %23 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %14 = get_global @exit : ((s32i) -> void)*
-    %15 = const 0 : s32i
-    call @exit(%15) [all]
-    %16 = load %2 : s32i
-    return %16
+        %14 = get_global @exit : (s32i) -> void*
+        %15 = const 0 : s32i
+        call @exit(%15) [all]
+        %16 = load %2 : s32i
+        return %16
 }

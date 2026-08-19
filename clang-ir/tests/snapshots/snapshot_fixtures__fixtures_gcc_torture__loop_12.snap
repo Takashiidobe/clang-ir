@@ -1,78 +1,78 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/loop-12.c" (c, x86_64-unknown-linux-gnu)
-global p : s8i* = #cir.ptr<null> [external, default, align 8, dso_local]
-global .str : s8i[5] = "abc\n" [cir_private, default, align 1, dso_local, constant]
+global p : s8i* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Named("s8i"), addr_space: None }) } [external, default, align 8, dso_local]
+global .str : s8i[5] = ConstArray { ty: Array { element_type: Named("s8i"), size: 5 }, elts: Str("abc\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn is_end_of_statement() -> s32i [internal, c, no_inline, pure, dso_local, nothrow] {
-    %14 = alloca s32i, "__retval", align 4
-    %15 = get_global @p : s8i**
-    %16 = load %15 : s8i*, align 8
-    %17 = load %16 : s8i, align 1
-    %18 = cast(integral) %17 : s32i
-    %19 = const 10 : s32i
-    %20 = cmp eq %18, %19 : bool
-    %21 = ternary %20 ? { : bool
-        %38 = const true : bool
-        yield %38
-    } : {
-        %32 = get_global @p : s8i**
-        %33 = load %32 : s8i*, align 8
-        %34 = load %33 : s8i, align 1
-        %35 = cast(integral) %34 : s32i
-        %36 = const 59 : s32i
-        %37 = cmp eq %35, %36 : bool
-        yield %37
-    }
-    %22 = ternary %21 ? { : bool
-        %31 = const true : bool
-        yield %31
-    } : {
-        %25 = get_global @p : s8i**
-        %26 = load %25 : s8i*, align 8
-        %27 = load %26 : s8i, align 1
-        %28 = cast(integral) %27 : s32i
-        %29 = const 33 : s32i
-        %30 = cmp eq %28, %29 : bool
-        yield %30
-    }
-    %23 = cast(bool_to_int) %22 : s32i
-    store %23, %14
-    %24 = load %14 : s32i
-    return %24
+        %14 = alloca s32i, "__retval", align 4
+        %15 = get_global @p : s8i**
+        %16 = load %15 : s8i*, align 8
+        %17 = load %16 : s8i, align 1
+        %18 = cast(integral) %17 : s32i
+        %19 = const 10 : s32i
+        cmp
+        %21 = ternary %20 ? { : bool
+                %38 = const true : bool
+                yield %38
+        } : {
+                %32 = get_global @p : s8i**
+                %33 = load %32 : s8i*, align 8
+                %34 = load %33 : s8i, align 1
+                %35 = cast(integral) %34 : s32i
+                %36 = const 59 : s32i
+                cmp
+                yield %37
+        }
+        %22 = ternary %21 ? { : bool
+                %31 = const true : bool
+                yield %31
+        } : {
+                %25 = get_global @p : s8i**
+                %26 = load %25 : s8i*, align 8
+                %27 = load %26 : s8i, align 1
+                %28 = cast(integral) %27 : s32i
+                %29 = const 33 : s32i
+                cmp
+                yield %30
+        }
+        %23 = cast(bool_to_int) %22 : s32i
+        store %23, %14
+        %24 = load %14 : s32i
+        return %24
 }
 fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
-    scope {
-        while {
-            %11 = call @is_end_of_statement() : s32i [pure]
-            %12 = cast(int_to_bool) %11 : bool
-            %13 = not %12 : bool
-            condition %13
-        } do {
-            %7 = get_global @p : s8i**
-            %8 = load %7 : s8i*, align 8
-            %9 = const 1 : s32i
-            %10 = ptr_stride %8, %9 : s8i*
-            store %10, %7, align 8
-            yield
+        scope {
+                while {
+                        %11 = call @is_end_of_statement() : s32i [pure]
+                        %12 = cast(int_to_bool) %11 : bool
+                        not
+                        condition %13
+                } do {
+                        %7 = get_global @p : s8i**
+                        %8 = load %7 : s8i*, align 8
+                        %9 = const 1 : s32i
+                        ptr_stride
+                        store %10, %7, align 8
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    return
+        return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @.str : s8i[5]*
-    %3 = cast(array_to_ptrdecay) %2 : s8i*
-    %4 = get_global @p : s8i**
-    store %3, %4, align 8
-    call @foo() [all]
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = load %0 : s32i
-    return %6
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @.str : s8i[5]*
+        %3 = cast(array_to_ptrdecay) %2 : s8i*
+        %4 = get_global @p : s8i**
+        store %3, %4, align 8
+        call @foo() [all]
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = load %0 : s32i
+        return %6
 }

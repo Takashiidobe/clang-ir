@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20060929-1.c" (c, x86_64-unknown-linux-gnu)
@@ -11,16 +11,16 @@ fn foo(%arg4: s32i**, %arg5: s32i*) -> void [external, c, no_inline, dso_local, 
         store %arg5, %86
         %87 = load %86 : s32i*, align 8
         %88 = const 1 : s32i
-        %89 = ptr_stride %87, %88 : s32i*
+        ptr_stride
         store %89, %86, align 8
         %90 = load %87 : s32i, align 4
         %91 = load %85 : s32i**, align 8
         %92 = const 1 : s32i
-        %93 = ptr_stride %91, %92 : s32i**
+        ptr_stride
         store %93, %85, align 8
         %94 = load %91 : s32i*, align 8
         %95 = const 1 : s32i
-        %96 = ptr_stride %94, %95 : s32i*
+        ptr_stride
         store %96, %91, align 8
         store %90, %94, align 4
         return
@@ -33,7 +33,7 @@ fn bar(%arg2: s32i**, %arg3: s32i*) -> void [external, c, no_inline, dso_local, 
         store %arg3, %71
         %72 = load %71 : s32i*, align 8
         %73 = const 1 : s32i
-        %74 = ptr_stride %72, %73 : s32i*
+        ptr_stride
         store %74, %71, align 8
         %75 = load %72 : s32i, align 4
         %76 = load %70 : s32i**, align 8
@@ -41,11 +41,11 @@ fn bar(%arg2: s32i**, %arg3: s32i*) -> void [external, c, no_inline, dso_local, 
         store %75, %77, align 4
         %78 = load %70 : s32i**, align 8
         %79 = const 1 : s32i
-        %80 = ptr_stride %78, %79 : s32i**
+        ptr_stride
         store %80, %70, align 8
         %81 = load %78 : s32i*, align 8
         %82 = const 1 : s32i
-        %83 = ptr_stride %81, %82 : s32i*
+        ptr_stride
         store %83, %78, align 8
         %84 = load %81 : s32i, align 4
         return
@@ -58,7 +58,7 @@ fn baz(%arg0: s32i**, %arg1: s32i*) -> void [external, c, no_inline, dso_local, 
         store %arg1, %57
         %58 = load %57 : s32i*, align 8
         %59 = const 1 : s32i
-        %60 = ptr_stride %58, %59 : s32i*
+        ptr_stride
         store %60, %57, align 8
         %61 = load %58 : s32i, align 4
         %62 = load %56 : s32i**, align 8
@@ -66,128 +66,128 @@ fn baz(%arg0: s32i**, %arg1: s32i*) -> void [external, c, no_inline, dso_local, 
         store %61, %63, align 4
         %64 = load %56 : s32i**, align 8
         %65 = const 1 : s32i
-        %66 = ptr_stride %64, %65 : s32i**
+        ptr_stride
         store %66, %56, align 8
         %67 = load %64 : s32i*, align 8
         %68 = const 1 : s32i
-        %69 = ptr_stride %67, %68 : s32i*
+        ptr_stride
         store %69, %64, align 8
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = alloca s32i, "j", align 4
-    %3 = alloca s32i*, "p", align 8
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = const 42 : s32i
-    store %5, %1, align 4
-    %6 = const 0 : s32i
-    store %6, %2, align 4
-    store %1, %3, align 8
-    call @foo(%3, %2) [all]
-    scope {
-        %41 = load %3 : s32i*, align 8
-        %42 = const -1 : s32i
-        %43 = ptr_stride %41, %42 : s32i*
-        %44 = cmp ne %43, %1 : bool
-        %45 = ternary %44 ? { : bool
-            %55 = const true : bool
-            yield %55
-        } : {
-            %52 = load %2 : s32i, align 4
-            %53 = const 0 : s32i
-            %54 = cmp ne %52, %53 : bool
-            yield %54
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = alloca s32i, "j", align 4
+        %3 = alloca s32i*, "p", align 8
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = const 42 : s32i
+        store %5, %1, align 4
+        %6 = const 0 : s32i
+        store %6, %2, align 4
+        store %1, %3, align 8
+        call @foo(%3, %2) [all]
+        scope {
+                %41 = load %3 : s32i*, align 8
+                %42 = const -1 : s32i
+                ptr_stride
+                cmp
+                %45 = ternary %44 ? { : bool
+                        %55 = const true : bool
+                        yield %55
+                } : {
+                        %52 = load %2 : s32i, align 4
+                        %53 = const 0 : s32i
+                        cmp
+                        yield %54
+                }
+                %46 = ternary %45 ? { : bool
+                        %51 = const true : bool
+                        yield %51
+                } : {
+                        %48 = load %1 : s32i, align 4
+                        %49 = const 0 : s32i
+                        cmp
+                        yield %50
+                }
+                if %46 {
+                        %47 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        %46 = ternary %45 ? { : bool
-            %51 = const true : bool
-            yield %51
-        } : {
-            %48 = load %1 : s32i, align 4
-            %49 = const 0 : s32i
-            %50 = cmp ne %48, %49 : bool
-            yield %50
+        %7 = const 43 : s32i
+        store %7, %1, align 4
+        store %1, %3, align 8
+        call @bar(%3, %2) [all]
+        scope {
+                %26 = load %3 : s32i*, align 8
+                %27 = const -1 : s32i
+                ptr_stride
+                cmp
+                %30 = ternary %29 ? { : bool
+                        %40 = const true : bool
+                        yield %40
+                } : {
+                        %37 = load %2 : s32i, align 4
+                        %38 = const 0 : s32i
+                        cmp
+                        yield %39
+                }
+                %31 = ternary %30 ? { : bool
+                        %36 = const true : bool
+                        yield %36
+                } : {
+                        %33 = load %1 : s32i, align 4
+                        %34 = const 0 : s32i
+                        cmp
+                        yield %35
+                }
+                if %31 {
+                        %32 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %46 {
-            %47 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %8 = const 44 : s32i
+        store %8, %1, align 4
+        store %1, %3, align 8
+        call @baz(%3, %2) [all]
+        scope {
+                %11 = load %3 : s32i*, align 8
+                %12 = const -1 : s32i
+                ptr_stride
+                cmp
+                %15 = ternary %14 ? { : bool
+                        %25 = const true : bool
+                        yield %25
+                } : {
+                        %22 = load %2 : s32i, align 4
+                        %23 = const 0 : s32i
+                        cmp
+                        yield %24
+                }
+                %16 = ternary %15 ? { : bool
+                        %21 = const true : bool
+                        yield %21
+                } : {
+                        %18 = load %1 : s32i, align 4
+                        %19 = const 0 : s32i
+                        cmp
+                        yield %20
+                }
+                if %16 {
+                        %17 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = const 43 : s32i
-    store %7, %1, align 4
-    store %1, %3, align 8
-    call @bar(%3, %2) [all]
-    scope {
-        %26 = load %3 : s32i*, align 8
-        %27 = const -1 : s32i
-        %28 = ptr_stride %26, %27 : s32i*
-        %29 = cmp ne %28, %1 : bool
-        %30 = ternary %29 ? { : bool
-            %40 = const true : bool
-            yield %40
-        } : {
-            %37 = load %2 : s32i, align 4
-            %38 = const 0 : s32i
-            %39 = cmp ne %37, %38 : bool
-            yield %39
-        }
-        %31 = ternary %30 ? { : bool
-            %36 = const true : bool
-            yield %36
-        } : {
-            %33 = load %1 : s32i, align 4
-            %34 = const 0 : s32i
-            %35 = cmp ne %33, %34 : bool
-            yield %35
-        }
-        if %31 {
-            %32 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %8 = const 44 : s32i
-    store %8, %1, align 4
-    store %1, %3, align 8
-    call @baz(%3, %2) [all]
-    scope {
-        %11 = load %3 : s32i*, align 8
-        %12 = const -1 : s32i
-        %13 = ptr_stride %11, %12 : s32i*
-        %14 = cmp ne %13, %1 : bool
-        %15 = ternary %14 ? { : bool
-            %25 = const true : bool
-            yield %25
-        } : {
-            %22 = load %2 : s32i, align 4
-            %23 = const 0 : s32i
-            %24 = cmp ne %22, %23 : bool
-            yield %24
-        }
-        %16 = ternary %15 ? { : bool
-            %21 = const true : bool
-            yield %21
-        } : {
-            %18 = load %1 : s32i, align 4
-            %19 = const 0 : s32i
-            %20 = cmp ne %18, %19 : bool
-            yield %20
-        }
-        if %16 {
-            %17 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %9 = const 0 : s32i
-    store %9, %0
-    %10 = load %0 : s32i
-    return %10
+        %9 = const 0 : s32i
+        store %9, %0
+        %10 = load %0 : s32i
+        return %10
 }

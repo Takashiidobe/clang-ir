@@ -1,67 +1,67 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr93213.c" (c, x86_64-unknown-linux-gnu)
-global __const.bar.c : s8i[1] = [2] [cir_private, default, dso_local, constant]
-global __const.bar.b : s8i[2] = zero [cir_private, default, dso_local, constant]
-global __const.bar.a : s8i[2] = [1, 2] [cir_private, default, dso_local, constant]
+global __const.bar.c : s8i[1] = ConstArray { ty: Array { element_type: Named("s8i"), size: 1 }, elts: Array([CirInt { ty: Named("s8i"), value: "2" }]), trailing_zeros_num: 0 } [cir_private, default, dso_local, constant]
+global __const.bar.b : s8i[2] = Zero { ty: Array { element_type: Named("s8i"), size: 2 } } [cir_private, default, dso_local, constant]
+global __const.bar.a : s8i[2] = ConstArray { ty: Array { element_type: Named("s8i"), size: 2 }, elts: Array([CirInt { ty: Named("s8i"), value: "1" }, CirInt { ty: Named("s8i"), value: "2" }]), trailing_zeros_num: 0 } [cir_private, default, dso_local, constant]
 
 fn memcpy(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
 fn abort() -> void [external, c, nothrow];
 fn bar() -> void [external, c, no_inline, dso_local, nothrow] {
-    %38 = alloca s8i[2], "a", align 1
-    %39 = alloca s8i[2], "b", align 1
-    %40 = alloca s8i[1], "c", align 1
-    %41 = alloca s8i*, "p", align 8
-    %42 = get_global @__const.bar.a : s8i[2]*
-    copy %38, %42
-    %43 = get_global @__const.bar.b : s8i[2]*
-    copy %39, %43
-    %44 = get_global @__const.bar.c : s8i[1]*
-    copy %40, %44
-    %45 = cast(array_to_ptrdecay) %38 : s8i*
-    %46 = cast(bitcast) %45 : void*
-    %47 = cast(array_to_ptrdecay) %39 : s8i*
-    %48 = cast(bitcast) %47 : void*
-    %49 = const 2 : u64i
-    %50 = call @memcpy(%46, %48, %49) : void* [all]
-    %51 = cast(array_to_ptrdecay) %38 : s8i*
-    %52 = cast(bitcast) %51 : void*
-    %53 = cast(array_to_ptrdecay) %40 : s8i*
-    %54 = cast(bitcast) %53 : void*
-    %55 = const 1 : u64i
-    %56 = call @memcpy(%52, %54, %55) : void* [all]
-    %57 = cast(array_to_ptrdecay) %38 : s8i*
-    store %57, %41, align 8
-    scope {
-        %58 = const 0 : s64i
-        %59 = load %41 : s8i*, align 8
-        %60 = ptr_stride %59, %58 : s8i*
-        %61 = load %60 : s8i, align 1, volatile
-        %62 = cast(integral) %61 : s32i
-        %63 = const 2 : s32i
-        %64 = cmp ne %62, %63 : bool
-        %65 = ternary %64 ? { : bool
-            %73 = const true : bool
-            yield %73
-        } : {
-            %66 = const 1 : s64i
-            %67 = load %41 : s8i*, align 8
-            %68 = ptr_stride %67, %66 : s8i*
-            %69 = load %68 : s8i, align 1, volatile
-            %70 = cast(integral) %69 : s32i
-            %71 = const 0 : s32i
-            %72 = cmp ne %70, %71 : bool
-            yield %72
+        %38 = alloca s8i[2], "a", align 1
+        %39 = alloca s8i[2], "b", align 1
+        %40 = alloca s8i[1], "c", align 1
+        %41 = alloca s8i*, "p", align 8
+        %42 = get_global @__const.bar.a : s8i[2]*
+        copy
+        %43 = get_global @__const.bar.b : s8i[2]*
+        copy
+        %44 = get_global @__const.bar.c : s8i[1]*
+        copy
+        %45 = cast(array_to_ptrdecay) %38 : s8i*
+        %46 = cast(bitcast) %45 : void*
+        %47 = cast(array_to_ptrdecay) %39 : s8i*
+        %48 = cast(bitcast) %47 : void*
+        %49 = const 2 : u64i
+        %50 = call @memcpy(%46, %48, %49) : void* [all]
+        %51 = cast(array_to_ptrdecay) %38 : s8i*
+        %52 = cast(bitcast) %51 : void*
+        %53 = cast(array_to_ptrdecay) %40 : s8i*
+        %54 = cast(bitcast) %53 : void*
+        %55 = const 1 : u64i
+        %56 = call @memcpy(%52, %54, %55) : void* [all]
+        %57 = cast(array_to_ptrdecay) %38 : s8i*
+        store %57, %41, align 8
+        scope {
+                %58 = const 0 : s64i
+                %59 = load %41 : s8i*, align 8
+                ptr_stride
+                %61 = load %60 : s8i, align 1
+                %62 = cast(integral) %61 : s32i
+                %63 = const 2 : s32i
+                cmp
+                %65 = ternary %64 ? { : bool
+                        %73 = const true : bool
+                        yield %73
+                } : {
+                        %66 = const 1 : s64i
+                        %67 = load %41 : s8i*, align 8
+                        ptr_stride
+                        %69 = load %68 : s8i, align 1
+                        %70 = cast(integral) %69 : s32i
+                        %71 = const 0 : s32i
+                        cmp
+                        yield %72
+                }
+                if %65 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %65 {
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    return
+        return
 }
 fn memmove(%arg0: void*, %arg1: void*, %arg2: u64i) -> void* [external, c, nothrow];
 fn foo(%arg0: u16i, %arg1: u32i, %arg2: u128i) -> u128i [internal, c, no_inline, dso_local, nothrow] {
@@ -79,11 +79,11 @@ fn foo(%arg0: u16i, %arg1: u32i, %arg2: u128i) -> u128i [internal, c, no_inline,
         %20 = load %15 : u32i, align 4
         %21 = load %14 : u16i, align 2
         %22 = cast(integral) %21 : u32i
-        %23#0, %23#1 = mul.overflow %20, %22 : u32i
+        mul.overflow
         store %23#0, %15, align 4
         %24 = cast(bool_to_int) %23#1 : u128i
         %25 = load %16 : u128i, align 16
-        %26 = sub %25, %24 : u128i
+        sub
         store %26, %16, align 16
         %27 = cast(bitcast) %14 : void*
         %28 = cast(bitcast) %18 : void*
@@ -100,30 +100,30 @@ fn foo(%arg0: u16i, %arg1: u32i, %arg2: u128i) -> u128i [internal, c, no_inline,
         return %37
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u16i, "x", align 2
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 65535 : u16i
-    %4 = const 4294967295 : u32i
-    %5 = const 0 : u128i
-    %6 = call @foo(%3, %4, %5) : u128i [all]
-    %7 = cast(integral) %6 : u16i
-    store %7, %1, align 2
-    scope {
-        %10 = load %1 : u16i, align 2
-        %11 = cast(integral) %10 : s32i
-        %12 = const 255 : s32i
-        %13 = cmp ne %11, %12 : bool
-        if %13 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u16i, "x", align 2
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 65535 : u16i
+        %4 = const 4294967295 : u32i
+        %5 = const 0 : u128i
+        %6 = call @foo(%3, %4, %5) : u128i [all]
+        %7 = cast(integral) %6 : u16i
+        store %7, %1, align 2
+        scope {
+                %10 = load %1 : u16i, align 2
+                %11 = cast(integral) %10 : s32i
+                %12 = const 255 : s32i
+                cmp
+                if %13 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    call @bar() [all]
-    %8 = const 0 : s32i
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        call @bar() [all]
+        %8 = const 0 : s32i
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

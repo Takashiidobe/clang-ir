@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/stdio/tmpfile_fscanf.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.word : s8i[3] = zero [cir_private, default, dso_local, constant]
-global .str : s8i[10] = "12 xy 4.5" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[11] = "%d %2s %lf" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[15] = "%d %d %s %.1f\n" [cir_private, default, align 1, dso_local, constant]
+global __const.main.word : s8i[3] = Zero { ty: Array { element_type: Named("s8i"), size: 3 } } [cir_private, default, dso_local, constant]
+global .str : s8i[10] = ConstArray { ty: Array { element_type: Named("s8i"), size: 10 }, elts: Str("12 xy 4.5"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[11] = ConstArray { ty: Array { element_type: Named("s8i"), size: 11 }, elts: Str("%d %2s %lf"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[15] = ConstArray { ty: Array { element_type: Named("s8i"), size: 15 }, elts: Str("%d %d %s %.1f\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn tmpfile() -> rec__IO_FILE* [external, c];
 fn fputs(%arg0: s8i*, %arg1: rec__IO_FILE*) -> s32i [external, c];
@@ -15,47 +15,47 @@ fn __isoc99_fscanf(%arg0: rec__IO_FILE*, %arg1: s8i*, ...) -> s32i [external, c]
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn fclose(%arg0: rec__IO_FILE*) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec__IO_FILE*, "f", align 8
-    %2 = alloca s32i, "i", align 4
-    %3 = alloca s8i[3], "word", align 1
-    %4 = alloca double, "d", align 8
-    %5 = alloca s32i, "n", align 4
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = call @tmpfile() : rec__IO_FILE* [all]
-    store %7, %1, align 8
-    %8 = get_global @.str : s8i[10]*
-    %9 = cast(array_to_ptrdecay) %8 : s8i*
-    %10 = load %1 : rec__IO_FILE*, align 8
-    %11 = call @fputs(%9, %10) : s32i [all]
-    %12 = load %1 : rec__IO_FILE*, align 8
-    call @rewind(%12) [all]
-    %13 = const 0 : s32i
-    store %13, %2, align 4
-    %14 = get_global @__const.main.word : s8i[3]*
-    copy %3, %14
-    %15 = const 0.000000e+00 : double
-    store %15, %4, align 8
-    %16 = get_global @__isoc99_fscanf : ((rec__IO_FILE*, s8i*, ...) -> s32i)*
-    %17 = load %1 : rec__IO_FILE*, align 8
-    %18 = get_global @.str.1 : s8i[11]*
-    %19 = cast(array_to_ptrdecay) %18 : s8i*
-    %20 = cast(array_to_ptrdecay) %3 : s8i*
-    %21 = call @__isoc99_fscanf(%17, %19, %2, %20, %4) : s32i [all]
-    store %21, %5, align 4
-    %22 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %23 = get_global @.str.2 : s8i[15]*
-    %24 = cast(array_to_ptrdecay) %23 : s8i*
-    %25 = load %5 : s32i, align 4
-    %26 = load %2 : s32i, align 4
-    %27 = cast(array_to_ptrdecay) %3 : s8i*
-    %28 = load %4 : double, align 8
-    %29 = call @printf(%24, %25, %26, %27, %28) : s32i [all]
-    %30 = load %1 : rec__IO_FILE*, align 8
-    %31 = call @fclose(%30) : s32i [all]
-    %32 = const 0 : s32i
-    store %32, %0
-    %33 = load %0 : s32i
-    return %33
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec__IO_FILE*, "f", align 8
+        %2 = alloca s32i, "i", align 4
+        %3 = alloca s8i[3], "word", align 1
+        %4 = alloca double, "d", align 8
+        %5 = alloca s32i, "n", align 4
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = call @tmpfile() : rec__IO_FILE* [all]
+        store %7, %1, align 8
+        %8 = get_global @.str : s8i[10]*
+        %9 = cast(array_to_ptrdecay) %8 : s8i*
+        %10 = load %1 : rec__IO_FILE*, align 8
+        %11 = call @fputs(%9, %10) : s32i [all]
+        %12 = load %1 : rec__IO_FILE*, align 8
+        call @rewind(%12) [all]
+        %13 = const 0 : s32i
+        store %13, %2, align 4
+        %14 = get_global @__const.main.word : s8i[3]*
+        copy
+        %15 = const 0.000000e+00 : double
+        store %15, %4, align 8
+        %16 = get_global @__isoc99_fscanf : (rec__IO_FILE*, s8i*, ...) -> s32i*
+        %17 = load %1 : rec__IO_FILE*, align 8
+        %18 = get_global @.str.1 : s8i[11]*
+        %19 = cast(array_to_ptrdecay) %18 : s8i*
+        %20 = cast(array_to_ptrdecay) %3 : s8i*
+        %21 = call @__isoc99_fscanf(%17, %19, %2, %20, %4) : s32i [all]
+        store %21, %5, align 4
+        %22 = get_global @printf : (s8i*, ...) -> s32i*
+        %23 = get_global @.str.2 : s8i[15]*
+        %24 = cast(array_to_ptrdecay) %23 : s8i*
+        %25 = load %5 : s32i, align 4
+        %26 = load %2 : s32i, align 4
+        %27 = cast(array_to_ptrdecay) %3 : s8i*
+        %28 = load %4 : double, align 8
+        %29 = call @printf(%24, %25, %26, %27, %28) : s32i [all]
+        %30 = load %1 : rec__IO_FILE*, align 8
+        %31 = call @fclose(%30) : s32i [all]
+        %32 = const 0 : s32i
+        store %32, %0
+        %33 = load %0 : s32i
+        return %33
 }

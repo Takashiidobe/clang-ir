@@ -1,32 +1,32 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/gnu_builtin_debugtrap.c" (c, x86_64-unknown-linux-gnu)
-global debugtrap_never : s32i = 0 [internal, default, align 4, dso_local]
-global .str : s8i[4] = "ok\n" [cir_private, default, align 1, dso_local, constant]
+global debugtrap_never : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("ok\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %8 = get_global @debugtrap_never : s32i*
-        %9 = load %8 : s32i, align 4, volatile
-        %10 = cast(int_to_bool) %9 : bool
-        if %10 {
-            %11 = call_llvm_intrinsic debugtrap() : void
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %8 = get_global @debugtrap_never : s32i*
+                %9 = load %8 : s32i, align 4
+                %10 = cast(int_to_bool) %9 : bool
+                if %10 {
+                        call_llvm_intrinsic
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[4]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = call @printf(%4) : s32i [all]
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[4]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = call @printf(%4) : s32i [all]
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

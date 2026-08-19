@@ -1,58 +1,58 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr58570.c" (c, x86_64-unknown-linux-gnu)
-global e : s32i = 1 [external, default, align 4, dso_local]
-global i : s32i = 0 [external, default, align 4, dso_local]
-global d : rec_S[6] = zero [internal, default, align 16, dso_local]
+global e : s32i = CirInt { ty: Named("s32i"), value: "1" } [external, default, align 4, dso_local]
+global i : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global d : rec_S[6] = Zero { ty: Array { element_type: Named("rec_S"), size: 6 } } [internal, default, align 16, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %11 = get_global @e : s32i*
-        %12 = load %11 : s32i, align 4
-        %13 = cast(int_to_bool) %12 : bool
-        if %13 {
-            %14 = const 1 : s32i
-            %15 = get_global @i : s32i*
-            %16 = load %15 : s32i, align 4
-            %17 = cast(integral) %16 : s64i
-            %18 = get_global @d : rec_S[6]*
-            %19 = get_element %18[%17] : rec_S*
-            %20 = get_member %19[0] "f0" : u8i[6]*
-            %21 = set_bitfield %20, %14, "f0": 15 bits @0 in signed u8i[6] : s32i, align 2
-            %22 = const 1 : s32i
-            %23 = get_global @i : s32i*
-            %24 = load %23 : s32i, align 4
-            %25 = cast(integral) %24 : s64i
-            %26 = get_global @d : rec_S[6]*
-            %27 = get_element %26[%25] : rec_S*
-            %28 = get_member %27[0] "f1" : u8i[6]*
-            %29 = set_bitfield %28, %22, "f1": 29 bits @15 in signed u8i[6] : s32i, align 2
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %11 = get_global @e : s32i*
+                %12 = load %11 : s32i, align 4
+                %13 = cast(int_to_bool) %12 : bool
+                if %13 {
+                        %14 = const 1 : s32i
+                        %15 = get_global @i : s32i*
+                        %16 = load %15 : s32i, align 4
+                        %17 = cast(integral) %16 : s64i
+                        %18 = get_global @d : rec_S[6]*
+                        get_element
+                        get_member
+                        set_bitfield
+                        %22 = const 1 : s32i
+                        %23 = get_global @i : s32i*
+                        %24 = load %23 : s32i, align 4
+                        %25 = cast(integral) %24 : s64i
+                        %26 = get_global @d : rec_S[6]*
+                        get_element
+                        get_member
+                        set_bitfield
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %4 = const 0 : s64i
-        %5 = get_global @d : rec_S[6]*
-        %6 = get_element %5[%4] : rec_S*
-        %7 = get_member %6[0] "f1" : u8i[6]*
-        %8 = get_bitfield %7, "f1": 29 bits @15 in signed u8i[6] : s32i, align 16
-        %9 = const 1 : s32i
-        %10 = cmp ne %8, %9 : bool
-        if %10 {
-            call @abort() [all]
-            yield
+        scope {
+                %4 = const 0 : s64i
+                %5 = get_global @d : rec_S[6]*
+                get_element
+                get_member
+                get_bitfield
+                %9 = const 1 : s32i
+                cmp
+                if %10 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

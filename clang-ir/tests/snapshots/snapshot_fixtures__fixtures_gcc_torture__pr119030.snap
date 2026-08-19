@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr119030.c" (c, x86_64-unknown-linux-gnu)
-global x : s64i = -131072 [external, default, align 8, dso_local]
+global x : s64i = CirInt { ty: Named("s64i"), value: "-131072" } [external, default, align 8, dso_local]
 
 fn foo(%arg1: s64i) -> u32i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: s64i):
@@ -12,7 +12,7 @@ fn foo(%arg1: s64i) -> u32i [internal, c, no_inline, dso_local, nothrow] {
         store %arg1, %21
         %23 = load %21 : s64i, align 8
         %24 = const 32768 : s64i
-        %25 = and %23, %24 : s64i
+        and
         %26 = cast(integral) %25 : u32i
         store %26, %22
         %27 = load %22 : u32i
@@ -24,46 +24,46 @@ fn bar(%arg0: s64i) -> s64i [internal, c, no_inline, dso_local, nothrow] {
         %10 = alloca s64i, "__retval", align 8
         store %arg0, %9
         scope {
-            %12 = load %9 : s64i, align 8
-            %13 = call @foo(%12) : u32i [all]
-            %14 = cast(int_to_bool) %13 : bool
-            if %14 {
-                %19 = const -1000 : s64i
-                store %19, %10
-                %20 = load %10 : s64i
-                return %20
-            } else {
-                %15 = load %9 : s64i, align 8
-                %16 = const 16 : s32i
-                %17 = shift right %15, %16 : s64i
-                store %17, %10
-                %18 = load %10 : s64i
-                return %18
-            }
-            yield
+                %12 = load %9 : s64i, align 8
+                %13 = call @foo(%12) : u32i [all]
+                %14 = cast(int_to_bool) %13 : bool
+                if %14 {
+                        %19 = const -1000 : s64i
+                        store %19, %10
+                        %20 = load %10 : s64i
+                        return %20
+                } else {
+                        %15 = load %9 : s64i, align 8
+                        %16 = const 16 : s32i
+                        shift
+                        store %17, %10
+                        %18 = load %10 : s64i
+                        return %18
+                }
+                yield
         }
         %11 = load %10 : s64i
         return %11
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = get_global @x : s64i*
-        %5 = load %4 : s64i, align 8
-        %6 = call @bar(%5) : s64i [all]
-        %7 = const 0 : s64i
-        %8 = cmp ge %6, %7 : bool
-        if %8 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = get_global @x : s64i*
+                %5 = load %4 : s64i, align 8
+                %6 = call @bar(%5) : s64i [all]
+                %7 = const 0 : s64i
+                cmp
+                if %8 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

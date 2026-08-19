@@ -1,23 +1,23 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.multi/shared_record/main.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.pair : rec_Pair = {20, 22} [cir_private, default, dso_local, constant]
+global __const.main.pair : rec_Pair = ConstRecord { ty: Named("rec_Pair"), members: Array([CirInt { ty: Named("s32i"), value: "20" }, CirInt { ty: Named("s32i"), value: "22" }]) } [cir_private, default, dso_local, constant]
 
 fn read_pair(%arg0: rec_Pair*) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_Pair, "pair", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @__const.main.pair : rec_Pair*
-    copy %1, %3
-    %4 = call @read_pair(%1) : s32i [all]
-    %5 = const 42 : s32i
-    %6 = cmp ne %4, %5 : bool
-    %7 = cast(bool_to_int) %6 : s32i
-    store %7, %0
-    %8 = load %0 : s32i
-    return %8
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_Pair, "pair", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @__const.main.pair : rec_Pair*
+        copy
+        %4 = call @read_pair(%1) : s32i [all]
+        %5 = const 42 : s32i
+        cmp
+        %7 = cast(bool_to_int) %6 : s32i
+        store %7, %0
+        %8 = load %0 : s32i
+        return %8
 }

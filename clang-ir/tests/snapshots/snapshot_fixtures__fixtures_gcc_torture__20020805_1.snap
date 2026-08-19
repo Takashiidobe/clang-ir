@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20020805-1.c" (c, x86_64-unknown-linux-gnu)
-global n : u32i = 1 [external, default, align 4, dso_local]
+global n : u32i = CirInt { ty: Named("u32i"), value: "1" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn check(%arg0: u32i) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -11,40 +11,40 @@ fn check(%arg0: u32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %17 = alloca u32i, "m", align 4
         store %arg0, %17
         scope {
-            %18 = load %17 : u32i, align 4
-            %19 = const 4294967295 : u32i
-            %20 = cmp ne %18, %19 : bool
-            if %20 {
-                %21 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %18 = load %17 : u32i, align 4
+                %19 = const 4294967295 : u32i
+                cmp
+                if %20 {
+                        %21 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u32i, "m", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 1 : u32i
-    %4 = const 2 : u32i
-    %5 = get_global @n : u32i*
-    %6 = load %5 : u32i, align 4
-    %7 = sub %4, %6 : u32i
-    %8 = or %7, %3 : u32i
-    %9 = get_global @n : u32i*
-    %10 = load %9 : u32i, align 4
-    %11 = minus %10 : u32i
-    %12 = or %8, %11 : u32i
-    store %12, %1, align 4
-    %13 = load %1 : u32i, align 4
-    call @check(%13) [all]
-    %14 = get_global @exit : ((s32i) -> void)*
-    %15 = const 0 : s32i
-    call @exit(%15) [all]
-    %16 = load %0 : s32i
-    return %16
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u32i, "m", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 1 : u32i
+        %4 = const 2 : u32i
+        %5 = get_global @n : u32i*
+        %6 = load %5 : u32i, align 4
+        sub
+        or
+        %9 = get_global @n : u32i*
+        %10 = load %9 : u32i, align 4
+        minus
+        or
+        store %12, %1, align 4
+        %13 = load %1 : u32i, align 4
+        call @check(%13) [all]
+        %14 = get_global @exit : (s32i) -> void*
+        %15 = const 0 : s32i
+        call @exit(%15) [all]
+        %16 = load %0 : s32i
+        return %16
 }

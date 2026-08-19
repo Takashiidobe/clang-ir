@@ -1,36 +1,36 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/noreturn_unproven_shape.c" (c, x86_64-unknown-linux-gnu)
-global unused_spin : (() -> void)* = @spin [external, default, align 8, dso_local]
-global .str : s8i[6] = "main\n" [cir_private, default, align 1, dso_local, constant]
+global unused_spin : () -> void* = GlobalView { ty: Pointer { pointee: Func { inputs: [], optional_return_type: None, var_arg: false }, addr_space: None }, symbol: "spin", indices: None } [external, default, align 8, dso_local]
+global .str : s8i[6] = ConstArray { ty: Array { element_type: Named("s8i"), size: 6 }, elts: Str("main\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn spin() -> void [internal, c, no_inline, dso_local, nothrow] {
-    scope {
-        for cond: {
-            %8 = const true : bool
-            condition %8
-        } step: {
-            yield
-        } do {
-            yield
+        scope {
+                for cond {
+                        %8 = const true : bool
+                        condition %8
+                } step {
+                        yield
+                } body {
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    return
+        return
 }
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[6]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = call @printf(%4) : s32i [all]
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[6]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = call @printf(%4) : s32i [all]
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

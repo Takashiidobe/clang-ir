@@ -1,35 +1,35 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/stdlib/lldiv.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[11] = "%lld %lld\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[11] = ConstArray { ty: Array { element_type: Named("s8i"), size: 11 }, elts: Str("%lld %lld\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn lldiv(%arg0: s64i, %arg1: s64i) -> rec_anon_struct [external, c, const, nothrow];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca rec_anon_struct, "coerce", align 8
-    %1 = alloca s32i, "__retval", align 4
-    %2 = alloca rec_lldiv_t, "d", align 8
-    %3 = const 0 : s32i
-    store %3, %1
-    %4 = const 17 : s64i
-    %5 = const 5 : s64i
-    %6 = call @lldiv(%4, %5) : rec_anon_struct [all]
-    store %6, %0
-    %7 = cast(bitcast) %0 : rec_lldiv_t*
-    %8 = load %7 : rec_lldiv_t
-    store %8, %2, align 8
-    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %10 = get_global @.str : s8i[11]*
-    %11 = cast(array_to_ptrdecay) %10 : s8i*
-    %12 = get_member %2[0] "quot" : s64i*
-    %13 = load %12 : s64i, align 8
-    %14 = get_member %2[1] "rem" : s64i*
-    %15 = load %14 : s64i, align 8
-    %16 = call @printf(%11, %13, %15) : s32i [all]
-    %17 = const 0 : s32i
-    store %17, %1
-    %18 = load %1 : s32i
-    return %18
+        %0 = alloca rec_anon_struct, "coerce", align 8
+        %1 = alloca s32i, "__retval", align 4
+        %2 = alloca rec_lldiv_t, "d", align 8
+        %3 = const 0 : s32i
+        store %3, %1
+        %4 = const 17 : s64i
+        %5 = const 5 : s64i
+        %6 = call @lldiv(%4, %5) : rec_anon_struct [all]
+        store %6, %0
+        %7 = cast(bitcast) %0 : rec_lldiv_t*
+        %8 = load %7 : rec_lldiv_t
+        store %8, %2, align 8
+        %9 = get_global @printf : (s8i*, ...) -> s32i*
+        %10 = get_global @.str : s8i[11]*
+        %11 = cast(array_to_ptrdecay) %10 : s8i*
+        get_member
+        %13 = load %12 : s64i, align 8
+        get_member
+        %15 = load %14 : s64i, align 8
+        %16 = call @printf(%11, %13, %15) : s32i [all]
+        %17 = const 0 : s32i
+        store %17, %1
+        %18 = load %1 : s32i
+        return %18
 }

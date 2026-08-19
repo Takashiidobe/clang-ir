@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr54937.c" (c, x86_64-unknown-linux-gnu)
-global terminate_me : ((s32i) -> void)* = #cir.ptr<null> [external, default, align 8, dso_local]
-global a : s32i[1] = zero [external, default, align 4, dso_local]
+global terminate_me : (s32i) -> void* = Dialect { dialect: "cir", mnemonic: "ptr", raw: Some("null"), ty: Some(Pointer { pointee: Func { inputs: [Named("s32i")], optional_return_type: None, var_arg: false }, addr_space: None }) } [external, default, align 8, dso_local]
+global a : s32i[1] = Zero { ty: Array { element_type: Named("s32i"), size: 1 } } [external, default, align 4, dso_local]
 
 fn t(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i):
@@ -12,59 +12,59 @@ fn t(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %8 = alloca s32i, "i", align 4
         store %arg0, %7
         scope {
-            %9 = const 0 : s32i
-            store %9, %8, align 4
-            for cond: {
-                %22 = load %8 : s32i, align 4
-                %23 = load %7 : s32i, align 4
-                %24 = cmp lt %22, %23 : bool
-                condition %24
-            } step: {
-                %10 = load %8 : s32i, align 4
-                %11 = inc %10 : s32i [nsw]
-                store %11, %8, align 4
-                yield
-            } do {
-                scope {
-                    scope {
-                        %17 = load %8 : s32i, align 4
-                        %18 = cast(int_to_bool) %17 : bool
-                        if %18 {
-                            %19 = get_global @terminate_me : ((s32i) -> void)**
-                            %20 = load %19 : ((s32i) -> void)*, align 8
-                            %21 = const 0 : s32i
-                            call %20(%21) [all]
-                            yield
+                %9 = const 0 : s32i
+                store %9, %8, align 4
+                for cond {
+                        %22 = load %8 : s32i, align 4
+                        %23 = load %7 : s32i, align 4
+                        cmp
+                        condition %24
+                } step {
+                        %10 = load %8 : s32i, align 4
+                        inc
+                        store %11, %8, align 4
+                        yield
+                } body {
+                        scope {
+                                scope {
+                                        %17 = load %8 : s32i, align 4
+                                        %18 = cast(int_to_bool) %17 : bool
+                                        if %18 {
+                                                %19 = get_global @terminate_me : (s32i) -> void**
+                                                %20 = load %19 : (s32i) -> void*, align 8
+                                                %21 = const 0 : s32i
+                                                call (%21) [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                %12 = const 0 : s32i
+                                %13 = load %8 : s32i, align 4
+                                %14 = cast(integral) %13 : s64i
+                                %15 = get_global @a : s32i[1]*
+                                get_element
+                                store %12, %16, align 4
+                                yield
                         }
                         yield
-                    }
-                    %12 = const 0 : s32i
-                    %13 = load %8 : s32i, align 4
-                    %14 = cast(integral) %13 : s64i
-                    %15 = get_global @a : s32i[1]*
-                    %16 = get_element %15[%14] : s32i*
-                    store %12, %16, align 4
-                    yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = get_global @terminate_me : ((s32i) -> void)**
-    store %2, %3, align 8
-    %4 = const 100 : s32i
-    call @t(%4) [all]
-    %5 = get_global @abort : (() -> void)*
-    call @abort() [all]
-    %6 = load %0 : s32i
-    return %6
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = get_global @terminate_me : (s32i) -> void**
+        store %2, %3, align 8
+        %4 = const 100 : s32i
+        call @t(%4) [all]
+        %5 = get_global @abort : () -> void*
+        call @abort() [all]
+        %6 = load %0 : s32i
+        return %6
 }

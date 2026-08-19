@@ -1,19 +1,19 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.multi/used_retain/main.c" (c, x86_64-unknown-linux-gnu)
-global used_only : s32i = 11 [internal, default, align 4, dso_local]
-global used_and_retained : s32i = 22 [internal, default, align 4, dso_local]
-global llvm.used : void*[1] = [@used_and_retained] [appending, default, dso_local]
-global llvm.compiler.used : void*[2] = [@used_only, @used_and_retained] [appending, default, dso_local]
+global used_only : s32i = CirInt { ty: Named("s32i"), value: "11" } [internal, default, align 4, dso_local]
+global used_and_retained : s32i = CirInt { ty: Named("s32i"), value: "22" } [internal, default, align 4, dso_local]
+global llvm.used : void*[1] = ConstArray { ty: Array { element_type: Pointer { pointee: Named("void"), addr_space: None }, size: 1 }, elts: Array([GlobalView { ty: Pointer { pointee: Named("void"), addr_space: None }, symbol: "used_and_retained", indices: None }]), trailing_zeros_num: 0 } [appending, default, dso_local]
+global llvm.compiler.used : void*[2] = ConstArray { ty: Array { element_type: Pointer { pointee: Named("void"), addr_space: None }, size: 2 }, elts: Array([GlobalView { ty: Pointer { pointee: Named("void"), addr_space: None }, symbol: "used_only", indices: None }, GlobalView { ty: Pointer { pointee: Named("void"), addr_space: None }, symbol: "used_and_retained", indices: None }]), trailing_zeros_num: 0 } [appending, default, dso_local]
 
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

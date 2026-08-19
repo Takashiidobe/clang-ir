@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/991202-3.c" (c, x86_64-unknown-linux-gnu)
@@ -10,9 +10,9 @@ fn f(%arg2: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         store %arg2, %24
         %26 = load %24 : u32i, align 4
         %27 = const 65536 : u32i
-        %28 = mul %26, %27 : u32i
+        mul
         %29 = const 8 : u32i
-        %30 = div %28, %29 : u32i
+        div
         store %30, %25
         %31 = load %25 : u32i
         return %31
@@ -24,7 +24,7 @@ fn g(%arg1: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         store %arg1, %18
         %20 = load %18 : u32i, align 4
         %21 = const 65536 : u32i
-        %22 = mul %20, %21 : u32i
+        mul
         store %22, %19
         %23 = load %19 : u32i
         return %23
@@ -36,7 +36,7 @@ fn h(%arg0: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %12
         %14 = load %12 : u32i, align 4
         %15 = const 8 : u32i
-        %16 = div %14, %15 : u32i
+        div
         store %16, %13
         %17 = load %13 : u32i
         return %17
@@ -44,26 +44,26 @@ fn h(%arg0: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %5 = const 65536 : u32i
-        %6 = call @f(%5) : u32i [all]
-        %7 = const 65536 : u32i
-        %8 = call @g(%7) : u32i [all]
-        %9 = call @h(%8) : u32i [all]
-        %10 = cmp ne %6, %9 : bool
-        if %10 {
-            %11 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %5 = const 65536 : u32i
+                %6 = call @f(%5) : u32i [all]
+                %7 = const 65536 : u32i
+                %8 = call @g(%7) : u32i [all]
+                %9 = call @h(%8) : u32i [all]
+                cmp
+                if %10 {
+                        %11 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

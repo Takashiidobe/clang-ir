@@ -1,62 +1,62 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.chibicc/supported/extern/extern.c" (c, x86_64-unknown-linux-gnu)
 global ext1 : s32i [external, default, align 4, dso_local]
-global .str : s8i[5] = "ext1" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[5] = ConstArray { ty: Array { element_type: Named("s8i"), size: 5 }, elts: Str("ext1"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 global ext2 : s32i* [external, default, align 8, dso_local]
-global .str.1 : s8i[6] = "*ext2" [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[6] = ConstArray { ty: Array { element_type: Named("s8i"), size: 6 }, elts: Str("*ext2"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 global ext3 : s32i [external, default, align 4, dso_local]
-global .str.2 : s8i[5] = "ext3" [cir_private, default, align 1, dso_local, constant]
-global .str.3 : s8i[11] = "ext_fn1(5)" [cir_private, default, align 1, dso_local, constant]
-global .str.4 : s8i[11] = "ext_fn2(8)" [cir_private, default, align 1, dso_local, constant]
-global .str.5 : s8i[4] = "OK\n" [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[5] = ConstArray { ty: Array { element_type: Named("s8i"), size: 5 }, elts: Str("ext3"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[11] = ConstArray { ty: Array { element_type: Named("s8i"), size: 11 }, elts: Str("ext_fn1(5)"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[11] = ConstArray { ty: Array { element_type: Named("s8i"), size: 11 }, elts: Str("ext_fn2(8)"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("OK\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn assert(%arg0: s32i, %arg1: s32i, %arg2: s8i*) -> void [external, c];
 fn ext_fn1(%arg0: s32i) -> s32i [external, c];
 fn ext_fn2(%arg0: s32i) -> s32i [external, c];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 5 : s32i
-    %3 = get_global @ext1 : s32i*
-    %4 = load %3 : s32i, align 4
-    %5 = get_global @.str : s8i[5]*
-    %6 = cast(array_to_ptrdecay) %5 : s8i*
-    call @assert(%2, %4, %6) [all]
-    %7 = const 5 : s32i
-    %8 = get_global @ext2 : s32i**
-    %9 = load %8 : s32i*, align 8
-    %10 = load %9 : s32i, align 4
-    %11 = get_global @.str.1 : s8i[6]*
-    %12 = cast(array_to_ptrdecay) %11 : s8i*
-    call @assert(%7, %10, %12) [all]
-    %13 = const 7 : s32i
-    %14 = get_global @ext3 : s32i*
-    %15 = load %14 : s32i, align 4
-    %16 = get_global @.str.2 : s8i[5]*
-    %17 = cast(array_to_ptrdecay) %16 : s8i*
-    call @assert(%13, %15, %17) [all]
-    %18 = const 5 : s32i
-    %19 = const 5 : s32i
-    %20 = call @ext_fn1(%19) : s32i [all]
-    %21 = get_global @.str.3 : s8i[11]*
-    %22 = cast(array_to_ptrdecay) %21 : s8i*
-    call @assert(%18, %20, %22) [all]
-    %23 = const 8 : s32i
-    %24 = const 8 : s32i
-    %25 = call @ext_fn2(%24) : s32i [all]
-    %26 = get_global @.str.4 : s8i[11]*
-    %27 = cast(array_to_ptrdecay) %26 : s8i*
-    call @assert(%23, %25, %27) [all]
-    %28 = get_global @.str.5 : s8i[4]*
-    %29 = cast(array_to_ptrdecay) %28 : s8i*
-    %30 = call @printf(%29) : s32i [all]
-    %31 = const 0 : s32i
-    store %31, %0
-    %32 = load %0 : s32i
-    return %32
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 5 : s32i
+        %3 = get_global @ext1 : s32i*
+        %4 = load %3 : s32i, align 4
+        %5 = get_global @.str : s8i[5]*
+        %6 = cast(array_to_ptrdecay) %5 : s8i*
+        call @assert(%2, %4, %6) [all]
+        %7 = const 5 : s32i
+        %8 = get_global @ext2 : s32i**
+        %9 = load %8 : s32i*, align 8
+        %10 = load %9 : s32i, align 4
+        %11 = get_global @.str.1 : s8i[6]*
+        %12 = cast(array_to_ptrdecay) %11 : s8i*
+        call @assert(%7, %10, %12) [all]
+        %13 = const 7 : s32i
+        %14 = get_global @ext3 : s32i*
+        %15 = load %14 : s32i, align 4
+        %16 = get_global @.str.2 : s8i[5]*
+        %17 = cast(array_to_ptrdecay) %16 : s8i*
+        call @assert(%13, %15, %17) [all]
+        %18 = const 5 : s32i
+        %19 = const 5 : s32i
+        %20 = call @ext_fn1(%19) : s32i [all]
+        %21 = get_global @.str.3 : s8i[11]*
+        %22 = cast(array_to_ptrdecay) %21 : s8i*
+        call @assert(%18, %20, %22) [all]
+        %23 = const 8 : s32i
+        %24 = const 8 : s32i
+        %25 = call @ext_fn2(%24) : s32i [all]
+        %26 = get_global @.str.4 : s8i[11]*
+        %27 = cast(array_to_ptrdecay) %26 : s8i*
+        call @assert(%23, %25, %27) [all]
+        %28 = get_global @.str.5 : s8i[4]*
+        %29 = cast(array_to_ptrdecay) %28 : s8i*
+        %30 = call @printf(%29) : s32i [all]
+        %31 = const 0 : s32i
+        store %31, %0
+        %32 = load %0 : s32i
+        return %32
 }

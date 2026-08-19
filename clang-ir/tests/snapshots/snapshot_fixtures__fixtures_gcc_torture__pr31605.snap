@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr31605.c" (c, x86_64-unknown-linux-gnu)
@@ -15,35 +15,35 @@ fn put_field(%arg0: u32i, %arg1: u32i) -> void [external, c, no_inline, dso_loca
         %10 = load %7 : u32i, align 4
         %11 = add %9, %10 : u32i
         %12 = const 8 : u32i
-        %13 = rem %11, %12 : u32i
+        rem
         %14 = const 8 : u32i
-        %15 = sub %13, %14 : u32i
+        sub
         %16 = cast(integral) %15 : s32i
         store %16, %8, align 4
         scope {
-            %17 = load %8 : s32i, align 4
-            %18 = const -8 : s32i
-            %19 = cmp gt %17, %18 : bool
-            if %19 {
-                %20 = get_global @exit : ((s32i) -> void)*
-                %21 = const 0 : s32i
-                call @exit(%21) [all]
+                %17 = load %8 : s32i, align 4
+                %18 = const -8 : s32i
+                cmp
+                if %19 {
+                        %20 = get_global @exit : (s32i) -> void*
+                        %21 = const 0 : s32i
+                        call @exit(%21) [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 0 : u32i
-    %3 = const 1 : u32i
-    call @put_field(%2, %3) [all]
-    %4 = get_global @abort : (() -> void)*
-    call @abort() [all]
-    %5 = load %0 : s32i
-    return %5
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 0 : u32i
+        %3 = const 1 : u32i
+        call @put_field(%2, %3) [all]
+        %4 = get_global @abort : () -> void*
+        call @abort() [all]
+        %5 = load %0 : s32i
+        return %5
 }

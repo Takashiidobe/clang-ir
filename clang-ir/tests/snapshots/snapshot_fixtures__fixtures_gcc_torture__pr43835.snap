@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr43835.c" (c, x86_64-unknown-linux-gnu)
@@ -10,7 +10,7 @@ fn Parrot_gc_mark_PMC_alive_fun(%arg4: s32i*, %arg5: rec_PMC*) -> void [external
         %48 = alloca rec_PMC*, "pmc", align 8
         store %arg4, %47
         store %arg5, %48
-        %49 = get_global @abort : (() -> void)*
+        %49 = get_global @abort : () -> void*
         call @abort() [all]
         return
 }
@@ -21,48 +21,48 @@ fn mark_cell(%arg2: s32i*, %arg3: rec_Pcc_cell*) -> void [internal, c, no_inline
         store %arg2, %16
         store %arg3, %17
         scope {
-            %18 = load %17 : rec_Pcc_cell*, align 8
-            %19 = get_member %18[2] "type" : s64i*
-            %20 = load %19 : s64i, align 8
-            %21 = const 4 : s64i
-            %22 = cmp eq %20, %21 : bool
-            %23 = ternary %22 ? { : bool
-                %43 = load %17 : rec_Pcc_cell*, align 8
-                %44 = get_member %43[0] "p" : rec_PMC**
-                %45 = load %44 : rec_PMC*, align 8
-                %46 = cast(ptr_to_bool) %45 : bool
-                yield %46
-            } : {
-                %42 = const false : bool
-                yield %42
-            }
-            %24 = ternary %23 ? { : bool
-                %30 = load %17 : rec_Pcc_cell*, align 8
-                %31 = get_member %30[0] "p" : rec_PMC**
-                %32 = load %31 : rec_PMC*, align 8
-                %33 = get_member %32[0] "flags" : u32i*
-                %34 = load %33 : u32i, align 4
-                %35 = const 1 : s32i
-                %36 = const 18 : s32i
-                %37 = shift left %35, %36 : s32i
-                %38 = cast(integral) %37 : u32i
-                %39 = and %34, %38 : u32i
-                %40 = cast(int_to_bool) %39 : bool
-                %41 = not %40 : bool
-                yield %41
-            } : {
-                %29 = const false : bool
-                yield %29
-            }
-            if %24 {
-                %25 = load %16 : s32i*, align 8
-                %26 = load %17 : rec_Pcc_cell*, align 8
-                %27 = get_member %26[0] "p" : rec_PMC**
-                %28 = load %27 : rec_PMC*, align 8
-                call @Parrot_gc_mark_PMC_alive_fun(%25, %28) [all]
+                %18 = load %17 : rec_Pcc_cell*, align 8
+                get_member
+                %20 = load %19 : s64i, align 8
+                %21 = const 4 : s64i
+                cmp
+                %23 = ternary %22 ? { : bool
+                        %43 = load %17 : rec_Pcc_cell*, align 8
+                        get_member
+                        %45 = load %44 : rec_PMC*, align 8
+                        %46 = cast(ptr_to_bool) %45 : bool
+                        yield %46
+                } : {
+                        %42 = const false : bool
+                        yield %42
+                }
+                %24 = ternary %23 ? { : bool
+                        %30 = load %17 : rec_Pcc_cell*, align 8
+                        get_member
+                        %32 = load %31 : rec_PMC*, align 8
+                        get_member
+                        %34 = load %33 : u32i, align 4
+                        %35 = const 1 : s32i
+                        %36 = const 18 : s32i
+                        shift
+                        %38 = cast(integral) %37 : u32i
+                        and
+                        %40 = cast(int_to_bool) %39 : bool
+                        not
+                        yield %41
+                } : {
+                        %29 = const false : bool
+                        yield %29
+                }
+                if %24 {
+                        %25 = load %16 : s32i*, align 8
+                        %26 = load %17 : rec_Pcc_cell*, align 8
+                        get_member
+                        %28 = load %27 : rec_PMC*, align 8
+                        call @Parrot_gc_mark_PMC_alive_fun(%25, %28) [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -78,23 +78,23 @@ fn foo(%arg0: s32i*, %arg1: rec_Pcc_cell*) -> void [external, c, no_inline, dso_
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = alloca rec_Pcc_cell, "c", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const #cir.ptr<null> : rec_PMC*
-    %5 = get_member %2[0] "p" : rec_PMC**
-    store %4, %5, align 8
-    %6 = const 42 : s64i
-    %7 = get_member %2[1] "bla" : s64i*
-    store %6, %7, align 8
-    %8 = const 4 : s64i
-    %9 = get_member %2[2] "type" : s64i*
-    store %8, %9, align 8
-    call @foo(%1, %2) [all]
-    %10 = const 0 : s32i
-    store %10, %0
-    %11 = load %0 : s32i
-    return %11
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = alloca rec_Pcc_cell, "c", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const #cir.ptr<null> : rec_PMC*
+        get_member
+        store %4, %5, align 8
+        %6 = const 42 : s64i
+        get_member
+        store %6, %7, align 8
+        %8 = const 4 : s64i
+        get_member
+        store %8, %9, align 8
+        call @foo(%1, %2) [all]
+        %10 = const 0 : s32i
+        store %10, %0
+        %11 = load %0 : s32i
+        return %11
 }

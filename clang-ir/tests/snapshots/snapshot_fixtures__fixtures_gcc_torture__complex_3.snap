@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/complex-3.c" (c, x86_64-unknown-linux-gnu)
@@ -12,10 +12,10 @@ fn f(%arg0: float, %arg1: float) -> vector<2 x float> [external, c, no_inline, d
         store %arg0, %28
         store %arg1, %29
         %31 = load %28 : float, align 4
-        %32 = get_member %30[0] "r" : float*
+        get_member
         store %31, %32, align 4
         %33 = load %29 : float, align 4
-        %34 = get_member %30[1] "i" : float*
+        get_member
         store %33, %34, align 4
         %35 = load %30 : rec_complex
         store %35, %27
@@ -26,47 +26,47 @@ fn f(%arg0: float, %arg1: float) -> vector<2 x float> [external, c, no_inline, d
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca vector<2 x float>, "coerce", align 8
-    %1 = alloca s32i, "__retval", align 4
-    %2 = alloca rec_complex, "z", align 4
-    %3 = const 0 : s32i
-    store %3, %1
-    %4 = const 1.000000e+00 : double
-    %5 = cast(floating) %4 : float
-    %6 = const 0.000000e+00 : double
-    %7 = cast(floating) %6 : float
-    %8 = call @f(%5, %7) : vector<2 x float> [all]
-    store %8, %0
-    %9 = cast(bitcast) %0 : rec_complex*
-    %10 = load %9 : rec_complex
-    store %10, %2, align 4
-    scope {
-        %14 = get_member %2[0] "r" : float*
-        %15 = load %14 : float, align 4
-        %16 = cast(floating) %15 : double
-        %17 = const 1.000000e+00 : double
-        %18 = cmp ne %16, %17 : bool
-        %19 = ternary %18 ? { : bool
-            %26 = const true : bool
-            yield %26
-        } : {
-            %21 = get_member %2[1] "i" : float*
-            %22 = load %21 : float, align 4
-            %23 = cast(floating) %22 : double
-            %24 = const 0.000000e+00 : double
-            %25 = cmp ne %23, %24 : bool
-            yield %25
+        %0 = alloca vector<2 x float>, "coerce", align 8
+        %1 = alloca s32i, "__retval", align 4
+        %2 = alloca rec_complex, "z", align 4
+        %3 = const 0 : s32i
+        store %3, %1
+        %4 = const 1.000000e+00 : double
+        %5 = cast(floating) %4 : float
+        %6 = const 0.000000e+00 : double
+        %7 = cast(floating) %6 : float
+        %8 = call @f(%5, %7) : vector<2 x float> [all]
+        store %8, %0
+        %9 = cast(bitcast) %0 : rec_complex*
+        %10 = load %9 : rec_complex
+        store %10, %2, align 4
+        scope {
+                get_member
+                %15 = load %14 : float, align 4
+                %16 = cast(floating) %15 : double
+                %17 = const 1.000000e+00 : double
+                cmp
+                %19 = ternary %18 ? { : bool
+                        %26 = const true : bool
+                        yield %26
+                } : {
+                        get_member
+                        %22 = load %21 : float, align 4
+                        %23 = cast(floating) %22 : double
+                        %24 = const 0.000000e+00 : double
+                        cmp
+                        yield %25
+                }
+                if %19 {
+                        %20 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %19 {
-            %20 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %11 = get_global @exit : ((s32i) -> void)*
-    %12 = const 0 : s32i
-    call @exit(%12) [all]
-    %13 = load %1 : s32i
-    return %13
+        %11 = get_global @exit : (s32i) -> void*
+        %12 = const 0 : s32i
+        call @exit(%12) [all]
+        %13 = load %1 : s32i
+        return %13
 }

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000622-1.c" (c, x86_64-unknown-linux-gnu)
@@ -14,33 +14,33 @@ fn foo(%arg5: s64i, %arg6: s64i, %arg7: s64i) -> s64i [external, c, no_inline, d
         store %arg6, %27
         store %arg7, %28
         scope {
-            %32 = load %26 : s64i, align 8
-            %33 = const 12 : s64i
-            %34 = cmp ne %32, %33 : bool
-            %35 = ternary %34 ? { : bool
-                %45 = const true : bool
-                yield %45
-            } : {
-                %42 = load %27 : s64i, align 8
-                %43 = const 1 : s64i
-                %44 = cmp ne %42, %43 : bool
-                yield %44
-            }
-            %36 = ternary %35 ? { : bool
-                %41 = const true : bool
-                yield %41
-            } : {
-                %38 = load %28 : s64i, align 8
-                %39 = const 11 : s64i
-                %40 = cmp ne %38, %39 : bool
-                yield %40
-            }
-            if %36 {
-                %37 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %32 = load %26 : s64i, align 8
+                %33 = const 12 : s64i
+                cmp
+                %35 = ternary %34 ? { : bool
+                        %45 = const true : bool
+                        yield %45
+                } : {
+                        %42 = load %27 : s64i, align 8
+                        %43 = const 1 : s64i
+                        cmp
+                        yield %44
+                }
+                %36 = ternary %35 ? { : bool
+                        %41 = const true : bool
+                        yield %41
+                } : {
+                        %38 = load %28 : s64i, align 8
+                        %39 = const 11 : s64i
+                        cmp
+                        yield %40
+                }
+                if %36 {
+                        %37 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %30 = const 0 : s64i
         store %30, %29
@@ -81,17 +81,17 @@ fn baz(%arg0: s64i, %arg1: s64i, %arg2: void*) -> void [external, c, no_inline, 
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 10 : s64i
-    %3 = const 11 : s64i
-    %4 = const 12 : u64i
-    %5 = cast(int_to_ptr) %4 : void*
-    call @baz(%2, %3, %5) [all]
-    %6 = get_global @exit : ((s32i) -> void)*
-    %7 = const 0 : s32i
-    call @exit(%7) [all]
-    %8 = load %0 : s32i
-    return %8
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 10 : s64i
+        %3 = const 11 : s64i
+        %4 = const 12 : u64i
+        %5 = cast(int_to_ptr) %4 : void*
+        call @baz(%2, %3, %5) [all]
+        %6 = get_global @exit : (s32i) -> void*
+        %7 = const 0 : s32i
+        call @exit(%7) [all]
+        %8 = load %0 : s32i
+        return %8
 }

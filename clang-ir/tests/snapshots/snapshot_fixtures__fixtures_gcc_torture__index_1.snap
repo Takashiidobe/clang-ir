@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/index-1.c" (c, x86_64-unknown-linux-gnu)
-global a : s32i[40] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39] [external, default, align 16, dso_local]
+global a : s32i[40] = ConstArray { ty: Array { element_type: Named("s32i"), size: 40 }, elts: Array([CirInt { ty: Named("s32i"), value: "0" }, CirInt { ty: Named("s32i"), value: "1" }, CirInt { ty: Named("s32i"), value: "2" }, CirInt { ty: Named("s32i"), value: "3" }, CirInt { ty: Named("s32i"), value: "4" }, CirInt { ty: Named("s32i"), value: "5" }, CirInt { ty: Named("s32i"), value: "6" }, CirInt { ty: Named("s32i"), value: "7" }, CirInt { ty: Named("s32i"), value: "8" }, CirInt { ty: Named("s32i"), value: "9" }, CirInt { ty: Named("s32i"), value: "10" }, CirInt { ty: Named("s32i"), value: "11" }, CirInt { ty: Named("s32i"), value: "12" }, CirInt { ty: Named("s32i"), value: "13" }, CirInt { ty: Named("s32i"), value: "14" }, CirInt { ty: Named("s32i"), value: "15" }, CirInt { ty: Named("s32i"), value: "16" }, CirInt { ty: Named("s32i"), value: "17" }, CirInt { ty: Named("s32i"), value: "18" }, CirInt { ty: Named("s32i"), value: "19" }, CirInt { ty: Named("s32i"), value: "20" }, CirInt { ty: Named("s32i"), value: "21" }, CirInt { ty: Named("s32i"), value: "22" }, CirInt { ty: Named("s32i"), value: "23" }, CirInt { ty: Named("s32i"), value: "24" }, CirInt { ty: Named("s32i"), value: "25" }, CirInt { ty: Named("s32i"), value: "26" }, CirInt { ty: Named("s32i"), value: "27" }, CirInt { ty: Named("s32i"), value: "28" }, CirInt { ty: Named("s32i"), value: "29" }, CirInt { ty: Named("s32i"), value: "30" }, CirInt { ty: Named("s32i"), value: "31" }, CirInt { ty: Named("s32i"), value: "32" }, CirInt { ty: Named("s32i"), value: "33" }, CirInt { ty: Named("s32i"), value: "34" }, CirInt { ty: Named("s32i"), value: "35" }, CirInt { ty: Named("s32i"), value: "36" }, CirInt { ty: Named("s32i"), value: "37" }, CirInt { ty: Named("s32i"), value: "38" }, CirInt { ty: Named("s32i"), value: "39" }]), trailing_zeros_num: 0 } [external, default, align 16, dso_local]
 
 fn f(%arg0: s64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s64i):
@@ -12,9 +12,9 @@ fn f(%arg0: s64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %10
         %12 = load %10 : s64i, align 8
         %13 = const 100000 : s64i
-        %14 = sub %12, %13 : s64i [nsw]
+        sub
         %15 = get_global @a : s32i[40]*
-        %16 = get_element %15[%14] : s32i*
+        get_element
         %17 = load %16 : s32i, align 4
         store %17, %11
         %18 = load %11 : s32i
@@ -23,24 +23,24 @@ fn f(%arg0: s64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %5 = const 100030 : s64i
-        %6 = call @f(%5) : s32i [all]
-        %7 = const 30 : s32i
-        %8 = cmp ne %6, %7 : bool
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %5 = const 100030 : s64i
+                %6 = call @f(%5) : s32i [all]
+                %7 = const 30 : s32i
+                cmp
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

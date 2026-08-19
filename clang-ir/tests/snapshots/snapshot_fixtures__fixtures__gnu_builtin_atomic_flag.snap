@@ -1,48 +1,48 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/gnu_builtin_atomic_flag.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[10] = "%d %d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[10] = ConstArray { ty: Array { element_type: Named("s8i"), size: 10 }, elts: Str("%d %d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca bool, "flag", align 1
-    %2 = alloca s32i, "first", align 4
-    %3 = alloca bool, "test_and_set.bool", align 1
-    %4 = alloca s32i, "second", align 4
-    %5 = alloca bool, "test_and_set.bool", align 1
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = const 0 : s32i
-    %8 = cast(int_to_bool) %7 : bool
-    store %8, %1, align 1
-    %9 = cast(bitcast) %1 : s8i*
-    %10 = atomic.test_and_set seq_cst %9, align 1 : bool
-    store %10, %3, align 1
-    %11 = load %3 : bool, align 1
-    %12 = cast(bool_to_int) %11 : s32i
-    store %12, %2, align 4
-    %13 = cast(bitcast) %1 : s8i*
-    %14 = atomic.test_and_set seq_cst %13, align 1 : bool
-    store %14, %5, align 1
-    %15 = load %5 : bool, align 1
-    %16 = cast(bool_to_int) %15 : s32i
-    store %16, %4, align 4
-    %17 = cast(bitcast) %1 : s8i*
-    atomic.clear seq_cst %17, align 1
-    %18 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %19 = get_global @.str : s8i[10]*
-    %20 = cast(array_to_ptrdecay) %19 : s8i*
-    %21 = load %2 : s32i, align 4
-    %22 = load %4 : s32i, align 4
-    %23 = load %1 : bool, align 1
-    %24 = not %23 : bool
-    %25 = cast(bool_to_int) %24 : s32i
-    %26 = call @printf(%20, %21, %22, %25) : s32i [all]
-    %27 = const 0 : s32i
-    store %27, %0
-    %28 = load %0 : s32i
-    return %28
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca bool, "flag", align 1
+        %2 = alloca s32i, "first", align 4
+        %3 = alloca bool, "test_and_set.bool", align 1
+        %4 = alloca s32i, "second", align 4
+        %5 = alloca bool, "test_and_set.bool", align 1
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = const 0 : s32i
+        %8 = cast(int_to_bool) %7 : bool
+        store %8, %1, align 1
+        %9 = cast(bitcast) %1 : s8i*
+        atomic.test_and_set
+        store %10, %3, align 1
+        %11 = load %3 : bool, align 1
+        %12 = cast(bool_to_int) %11 : s32i
+        store %12, %2, align 4
+        %13 = cast(bitcast) %1 : s8i*
+        atomic.test_and_set
+        store %14, %5, align 1
+        %15 = load %5 : bool, align 1
+        %16 = cast(bool_to_int) %15 : s32i
+        store %16, %4, align 4
+        %17 = cast(bitcast) %1 : s8i*
+        atomic.clear
+        %18 = get_global @printf : (s8i*, ...) -> s32i*
+        %19 = get_global @.str : s8i[10]*
+        %20 = cast(array_to_ptrdecay) %19 : s8i*
+        %21 = load %2 : s32i, align 4
+        %22 = load %4 : s32i, align 4
+        %23 = load %1 : bool, align 1
+        not
+        %25 = cast(bool_to_int) %24 : s32i
+        %26 = call @printf(%20, %21, %22, %25) : s32i [all]
+        %27 = const 0 : s32i
+        store %27, %0
+        %28 = load %0 : s32i
+        return %28
 }

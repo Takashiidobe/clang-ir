@@ -1,140 +1,140 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/aggregate_array_literal_typed_elements.c" (c, x86_64-unknown-linux-gnu)
-global __const.count_true_flags.values : bool[2] = [true] [cir_private, default, dso_local, constant]
-global __const.count_null_pairs.pairs : rec_pair[1] = zero [cir_private, default, dso_local, constant]
-global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+global __const.count_true_flags.values : bool[2] = ConstArray { ty: Array { element_type: Bool, size: 2 }, elts: Array([CirBool { ty: Bool, value: true }]), trailing_zeros_num: 1 } [cir_private, default, dso_local, constant]
+global __const.count_null_pairs.pairs : rec_pair[1] = Zero { ty: Array { element_type: Named("rec_pair"), size: 1 } } [cir_private, default, dso_local, constant]
+global .str : s8i[7] = ConstArray { ty: Array { element_type: Named("s8i"), size: 7 }, elts: Str("%d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn count_null_pairs() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %31 = alloca s32i, "__retval", align 4
-    %32 = alloca rec_pair[1], "pairs", align 16
-    %33 = alloca s32i, "total", align 4
-    %34 = get_global @__const.count_null_pairs.pairs : rec_pair[1]*
-    copy %32, %34
-    %35 = const 0 : s32i
-    store %35, %33, align 4
-    scope {
-        %38 = alloca s32i, "i", align 4
-        %39 = const 0 : s32i
-        store %39, %38, align 4
-        for cond: {
-            %62 = load %38 : s32i, align 4
-            %63 = const 1 : s32i
-            %64 = cmp lt %62, %63 : bool
-            condition %64
-        } step: {
-            %40 = load %38 : s32i, align 4
-            %41 = inc %40 : s32i [nsw]
-            store %41, %38, align 4
-            yield
-        } do {
-            scope {
-                scope {
-                    %42 = load %38 : s32i, align 4
-                    %43 = cast(integral) %42 : s64i
-                    %44 = get_element %32[%43] : rec_pair*
-                    %45 = get_member %44[0] "name" : s8i**
-                    %46 = load %45 : s8i*, align 16
-                    %47 = const #cir.ptr<null> : void*
-                    %48 = cast(bitcast) %47 : s8i*
-                    %49 = cmp eq %46, %48 : bool
-                    %50 = ternary %49 ? { : bool
-                        %54 = load %38 : s32i, align 4
-                        %55 = cast(integral) %54 : s64i
-                        %56 = get_element %32[%55] : rec_pair*
-                        %57 = get_member %56[1] "value" : s8i**
-                        %58 = load %57 : s8i*, align 8
-                        %59 = const #cir.ptr<null> : void*
-                        %60 = cast(bitcast) %59 : s8i*
-                        %61 = cmp eq %58, %60 : bool
-                        yield %61
-                    } : {
-                        %53 = const false : bool
-                        yield %53
-                    }
-                    if %50 {
-                        %51 = load %33 : s32i, align 4
-                        %52 = inc %51 : s32i [nsw]
-                        store %52, %33, align 4
+        %31 = alloca s32i, "__retval", align 4
+        %32 = alloca rec_pair[1], "pairs", align 16
+        %33 = alloca s32i, "total", align 4
+        %34 = get_global @__const.count_null_pairs.pairs : rec_pair[1]*
+        copy
+        %35 = const 0 : s32i
+        store %35, %33, align 4
+        scope {
+                %38 = alloca s32i, "i", align 4
+                %39 = const 0 : s32i
+                store %39, %38, align 4
+                for cond {
+                        %62 = load %38 : s32i, align 4
+                        %63 = const 1 : s32i
+                        cmp
+                        condition %64
+                } step {
+                        %40 = load %38 : s32i, align 4
+                        inc
+                        store %41, %38, align 4
                         yield
-                    }
-                    yield
+                } body {
+                        scope {
+                                scope {
+                                        %42 = load %38 : s32i, align 4
+                                        %43 = cast(integral) %42 : s64i
+                                        get_element
+                                        get_member
+                                        %46 = load %45 : s8i*, align 16
+                                        %47 = const #cir.ptr<null> : void*
+                                        %48 = cast(bitcast) %47 : s8i*
+                                        cmp
+                                        %50 = ternary %49 ? { : bool
+                                                %54 = load %38 : s32i, align 4
+                                                %55 = cast(integral) %54 : s64i
+                                                get_element
+                                                get_member
+                                                %58 = load %57 : s8i*, align 8
+                                                %59 = const #cir.ptr<null> : void*
+                                                %60 = cast(bitcast) %59 : s8i*
+                                                cmp
+                                                yield %61
+                                        } : {
+                                                %53 = const false : bool
+                                                yield %53
+                                        }
+                                        if %50 {
+                                                %51 = load %33 : s32i, align 4
+                                                inc
+                                                store %52, %33, align 4
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %36 = load %33 : s32i, align 4
-    store %36, %31
-    %37 = load %31 : s32i
-    return %37
+        %36 = load %33 : s32i, align 4
+        store %36, %31
+        %37 = load %31 : s32i
+        return %37
 }
 fn count_true_flags() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %10 = alloca s32i, "__retval", align 4
-    %11 = alloca bool[2], "values", align 1
-    %12 = alloca s32i, "total", align 4
-    %13 = get_global @__const.count_true_flags.values : bool[2]*
-    copy %11, %13
-    %14 = const 0 : s32i
-    store %14, %12, align 4
-    scope {
-        %17 = alloca u64i, "i", align 8
-        %18 = const 0 : u64i
-        store %18, %17, align 8
-        for cond: {
-            %26 = load %17 : u64i, align 8
-            %27 = const 2 : u64i
-            %28 = const 1 : u64i
-            %29 = div %27, %28 : u64i
-            %30 = cmp lt %26, %29 : bool
-            condition %30
-        } step: {
-            %19 = load %17 : u64i, align 8
-            %20 = inc %19 : u64i
-            store %20, %17, align 8
-            yield
-        } do {
-            scope {
-                scope {
-                    %21 = load %17 : u64i, align 8
-                    %22 = get_element %11[%21] : bool*
-                    %23 = load %22 : bool, align 1
-                    if %23 {
-                        %24 = load %12 : s32i, align 4
-                        %25 = inc %24 : s32i [nsw]
-                        store %25, %12, align 4
+        %10 = alloca s32i, "__retval", align 4
+        %11 = alloca bool[2], "values", align 1
+        %12 = alloca s32i, "total", align 4
+        %13 = get_global @__const.count_true_flags.values : bool[2]*
+        copy
+        %14 = const 0 : s32i
+        store %14, %12, align 4
+        scope {
+                %17 = alloca u64i, "i", align 8
+                %18 = const 0 : u64i
+                store %18, %17, align 8
+                for cond {
+                        %26 = load %17 : u64i, align 8
+                        %27 = const 2 : u64i
+                        %28 = const 1 : u64i
+                        div
+                        cmp
+                        condition %30
+                } step {
+                        %19 = load %17 : u64i, align 8
+                        inc
+                        store %20, %17, align 8
                         yield
-                    }
-                    yield
+                } body {
+                        scope {
+                                scope {
+                                        %21 = load %17 : u64i, align 8
+                                        get_element
+                                        %23 = load %22 : bool, align 1
+                                        if %23 {
+                                                %24 = load %12 : s32i, align 4
+                                                inc
+                                                store %25, %12, align 4
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %15 = load %12 : s32i, align 4
-    store %15, %10
-    %16 = load %10 : s32i
-    return %16
+        %15 = load %12 : s32i, align 4
+        store %15, %10
+        %16 = load %10 : s32i
+        return %16
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[7]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = call @count_null_pairs() : s32i [all]
-    %6 = call @count_true_flags() : s32i [all]
-    %7 = call @printf(%4, %5, %6) : s32i [all]
-    %8 = const 0 : s32i
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[7]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = call @count_null_pairs() : s32i [all]
+        %6 = call @count_true_flags() : s32i [all]
+        %7 = call @printf(%4, %5, %6) : s32i [all]
+        %8 = const 0 : s32i
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

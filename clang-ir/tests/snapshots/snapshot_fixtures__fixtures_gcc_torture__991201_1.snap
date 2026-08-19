@@ -1,13 +1,13 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/991201-1.c" (c, x86_64-unknown-linux-gnu)
-global a_con : rec_vc_data = zero [external, default, align 8, dso_local]
-global vc_cons : rec_vc[63] = [{@a_con}] [external, default, align 16, dso_local]
-global default_red : s32i[16] = zero [external, default, align 16, dso_local]
-global default_grn : s32i[16] = zero [external, default, align 16, dso_local]
-global default_blu : s32i[16] = zero [external, default, align 16, dso_local]
+global a_con : rec_vc_data = Zero { ty: Named("rec_vc_data") } [external, default, align 8, dso_local]
+global vc_cons : rec_vc[63] = ConstArray { ty: Array { element_type: Named("rec_vc"), size: 63 }, elts: Array([ConstRecord { ty: Named("rec_vc"), members: Array([GlobalView { ty: Pointer { pointee: Named("rec_vc_data"), addr_space: None }, symbol: "a_con", indices: None }]) }]), trailing_zeros_num: 1 } [external, default, align 16, dso_local]
+global default_red : s32i[16] = Zero { ty: Array { element_type: Named("s32i"), size: 16 } } [external, default, align 16, dso_local]
+global default_grn : s32i[16] = Zero { ty: Array { element_type: Named("s32i"), size: 16 } } [external, default, align 16, dso_local]
+global default_blu : s32i[16] = Zero { ty: Array { element_type: Named("s32i"), size: 16 } } [external, default, align 16, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn bar(%arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -15,17 +15,17 @@ fn bar(%arg1: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %67 = alloca s32i, "k", align 4
         store %arg1, %67
         scope {
-            %68 = load %67 : s32i, align 4
-            %69 = const 16 : s32i
-            %70 = const 3 : s32i
-            %71 = mul %69, %70 : s32i [nsw]
-            %72 = cmp ne %68, %71 : bool
-            if %72 {
-                %73 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %68 = load %67 : s32i, align 4
+                %69 = const 16 : s32i
+                %70 = const 3 : s32i
+                mul
+                cmp
+                if %72 {
+                        %73 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -36,83 +36,83 @@ fn reset_palette(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothro
         %8 = alloca s32i, "k", align 4
         store %arg0, %6
         scope {
-            %10 = const 0 : s32i
-            store %10, %8, align 4
-            store %10, %7, align 4
-            for cond: {
-                %64 = load %7 : s32i, align 4
-                %65 = const 16 : s32i
-                %66 = cmp lt %64, %65 : bool
-                condition %66
-            } step: {
-                %11 = load %7 : s32i, align 4
-                %12 = inc %11 : s32i [nsw]
-                store %12, %7, align 4
-                yield
-            } do {
-                scope {
-                    %13 = load %7 : s32i, align 4
-                    %14 = cast(integral) %13 : s64i
-                    %15 = get_global @default_red : s32i[16]*
-                    %16 = get_element %15[%14] : s32i*
-                    %17 = load %16 : s32i, align 4
-                    %18 = cast(integral) %17 : u8i
-                    %19 = load %8 : s32i, align 4
-                    %20 = inc %19 : s32i [nsw]
-                    store %20, %8, align 4
-                    %21 = cast(integral) %19 : s64i
-                    %22 = load %6 : s32i, align 4
-                    %23 = cast(integral) %22 : s64i
-                    %24 = get_global @vc_cons : rec_vc[63]*
-                    %25 = get_element %24[%23] : rec_vc*
-                    %26 = get_member %25[0] "d" : rec_vc_data**
-                    %27 = load %26 : rec_vc_data*, align 8
-                    %28 = get_member %27[1] "vc_palette" : u8i[48]*
-                    %29 = get_element %28[%21] : u8i*
-                    store %18, %29, align 1
-                    %30 = load %7 : s32i, align 4
-                    %31 = cast(integral) %30 : s64i
-                    %32 = get_global @default_grn : s32i[16]*
-                    %33 = get_element %32[%31] : s32i*
-                    %34 = load %33 : s32i, align 4
-                    %35 = cast(integral) %34 : u8i
-                    %36 = load %8 : s32i, align 4
-                    %37 = inc %36 : s32i [nsw]
-                    store %37, %8, align 4
-                    %38 = cast(integral) %36 : s64i
-                    %39 = load %6 : s32i, align 4
-                    %40 = cast(integral) %39 : s64i
-                    %41 = get_global @vc_cons : rec_vc[63]*
-                    %42 = get_element %41[%40] : rec_vc*
-                    %43 = get_member %42[0] "d" : rec_vc_data**
-                    %44 = load %43 : rec_vc_data*, align 8
-                    %45 = get_member %44[1] "vc_palette" : u8i[48]*
-                    %46 = get_element %45[%38] : u8i*
-                    store %35, %46, align 1
-                    %47 = load %7 : s32i, align 4
-                    %48 = cast(integral) %47 : s64i
-                    %49 = get_global @default_blu : s32i[16]*
-                    %50 = get_element %49[%48] : s32i*
-                    %51 = load %50 : s32i, align 4
-                    %52 = cast(integral) %51 : u8i
-                    %53 = load %8 : s32i, align 4
-                    %54 = inc %53 : s32i [nsw]
-                    store %54, %8, align 4
-                    %55 = cast(integral) %53 : s64i
-                    %56 = load %6 : s32i, align 4
-                    %57 = cast(integral) %56 : s64i
-                    %58 = get_global @vc_cons : rec_vc[63]*
-                    %59 = get_element %58[%57] : rec_vc*
-                    %60 = get_member %59[0] "d" : rec_vc_data**
-                    %61 = load %60 : rec_vc_data*, align 8
-                    %62 = get_member %61[1] "vc_palette" : u8i[48]*
-                    %63 = get_element %62[%55] : u8i*
-                    store %52, %63, align 1
-                    yield
+                %10 = const 0 : s32i
+                store %10, %8, align 4
+                store %10, %7, align 4
+                for cond {
+                        %64 = load %7 : s32i, align 4
+                        %65 = const 16 : s32i
+                        cmp
+                        condition %66
+                } step {
+                        %11 = load %7 : s32i, align 4
+                        inc
+                        store %12, %7, align 4
+                        yield
+                } body {
+                        scope {
+                                %13 = load %7 : s32i, align 4
+                                %14 = cast(integral) %13 : s64i
+                                %15 = get_global @default_red : s32i[16]*
+                                get_element
+                                %17 = load %16 : s32i, align 4
+                                %18 = cast(integral) %17 : u8i
+                                %19 = load %8 : s32i, align 4
+                                inc
+                                store %20, %8, align 4
+                                %21 = cast(integral) %19 : s64i
+                                %22 = load %6 : s32i, align 4
+                                %23 = cast(integral) %22 : s64i
+                                %24 = get_global @vc_cons : rec_vc[63]*
+                                get_element
+                                get_member
+                                %27 = load %26 : rec_vc_data*, align 8
+                                get_member
+                                get_element
+                                store %18, %29, align 1
+                                %30 = load %7 : s32i, align 4
+                                %31 = cast(integral) %30 : s64i
+                                %32 = get_global @default_grn : s32i[16]*
+                                get_element
+                                %34 = load %33 : s32i, align 4
+                                %35 = cast(integral) %34 : u8i
+                                %36 = load %8 : s32i, align 4
+                                inc
+                                store %37, %8, align 4
+                                %38 = cast(integral) %36 : s64i
+                                %39 = load %6 : s32i, align 4
+                                %40 = cast(integral) %39 : s64i
+                                %41 = get_global @vc_cons : rec_vc[63]*
+                                get_element
+                                get_member
+                                %44 = load %43 : rec_vc_data*, align 8
+                                get_member
+                                get_element
+                                store %35, %46, align 1
+                                %47 = load %7 : s32i, align 4
+                                %48 = cast(integral) %47 : s64i
+                                %49 = get_global @default_blu : s32i[16]*
+                                get_element
+                                %51 = load %50 : s32i, align 4
+                                %52 = cast(integral) %51 : u8i
+                                %53 = load %8 : s32i, align 4
+                                inc
+                                store %54, %8, align 4
+                                %55 = cast(integral) %53 : s64i
+                                %56 = load %6 : s32i, align 4
+                                %57 = cast(integral) %56 : s64i
+                                %58 = get_global @vc_cons : rec_vc[63]*
+                                get_element
+                                get_member
+                                %61 = load %60 : rec_vc_data*, align 8
+                                get_member
+                                get_element
+                                store %52, %63, align 1
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %9 = load %8 : s32i, align 4
         call @bar(%9) [all]
@@ -120,14 +120,14 @@ fn reset_palette(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothro
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 0 : s32i
-    call @reset_palette(%2) [all]
-    %3 = get_global @exit : ((s32i) -> void)*
-    %4 = const 0 : s32i
-    call @exit(%4) [all]
-    %5 = load %0 : s32i
-    return %5
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 0 : s32i
+        call @reset_palette(%2) [all]
+        %3 = get_global @exit : (s32i) -> void*
+        %4 = const 0 : s32i
+        call @exit(%4) [all]
+        %5 = load %0 : s32i
+        return %5
 }

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20030717-1.c" (c, x86_64-unknown-linux-gnu)
@@ -10,14 +10,14 @@ fn foo(%arg2: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         store %arg2, %101
         %103 = load %101 : s32i, align 4
         %104 = const 0 : s32i
-        %105 = cmp lt %103, %104 : bool
+        cmp
         %106 = ternary %105 ? { : s32i
-            %109 = load %101 : s32i, align 4
-            %110 = minus %109 : s32i [nsw]
-            yield %110
+                %109 = load %101 : s32i, align 4
+                minus
+                yield %110
         } : {
-            %108 = load %101 : s32i, align 4
-            yield %108
+                %108 = load %101 : s32i, align 4
+                yield %108
         }
         store %106, %102
         %107 = load %102 : s32i
@@ -37,18 +37,18 @@ fn bar(%arg0: rec_C*, %arg1: rec_A*) -> s32i [external, c, no_inline, dso_local,
         store %arg0, %23
         store %arg1, %24
         %32 = load %23 : rec_C*, align 8
-        %33 = get_member %32[2] "c3" : s32i*
+        get_member
         %34 = load %33 : s32i, align 4
         store %34, %26, align 4
         %35 = load %24 : rec_A*, align 8
-        %36 = get_member %35[0] "a1" : u16i*
+        get_member
         %37 = load %36 : u16i, align 8
         %38 = cast(integral) %37 : s32i
         %39 = const 9 : s32i
-        %40 = shift right %38, %39 : s32i
+        shift
         store %40, %27, align 4
         %41 = load %24 : rec_A*, align 8
-        %42 = get_member %41[1] "a2" : u64i*
+        get_member
         %43 = load %42 : u64i, align 8
         store %43, %28, align 8
         %44 = load %26 : s32i, align 4
@@ -57,72 +57,72 @@ fn bar(%arg0: rec_C*, %arg1: rec_A*) -> s32i [external, c, no_inline, dso_local,
         %46 = load %29 : s32i, align 4
         %47 = cast(integral) %46 : s64i
         %48 = load %23 : rec_C*, align 8
-        %49 = get_member %48[0] "c1" : rec_B[1]*
-        %50 = get_element %49[%47] : rec_B*
-        %51 = get_member %50[3] "b4" : s32i*
+        get_member
+        get_element
+        get_member
         %52 = load %51 : s32i, align 4
         %53 = cast(integral) %52 : u64i
-        %54 = sub %45, %53 : u64i
+        sub
         %55 = cast(integral) %54 : s32i
         %56 = call @foo(%55) : s32i [all]
         %57 = cast(integral) %56 : u64i
         store %57, %31, align 8
         scope {
-            do {
-                scope {
-                    scope {
-                        %95 = load %29 : s32i, align 4
-                        %96 = const 0 : s32i
-                        %97 = cmp le %95, %96 : bool
-                        if %97 {
-                            %98 = load %23 : rec_C*, align 8
-                            %99 = get_member %98[1] "c2" : s32i*
-                            %100 = load %99 : s32i, align 4
-                            store %100, %29, align 4
-                            yield
+                do {
+                        scope {
+                                scope {
+                                        %95 = load %29 : s32i, align 4
+                                        %96 = const 0 : s32i
+                                        cmp
+                                        if %97 {
+                                                %98 = load %23 : rec_C*, align 8
+                                                get_member
+                                                %100 = load %99 : s32i, align 4
+                                                store %100, %29, align 4
+                                                yield
+                                        }
+                                        yield
+                                }
+                                %76 = load %29 : s32i, align 4
+                                dec
+                                store %77, %29, align 4
+                                %78 = load %28 : u64i, align 8
+                                %79 = load %29 : s32i, align 4
+                                %80 = cast(integral) %79 : s64i
+                                %81 = load %23 : rec_C*, align 8
+                                get_member
+                                get_element
+                                get_member
+                                %85 = load %84 : s32i, align 4
+                                %86 = cast(integral) %85 : u64i
+                                sub
+                                %88 = cast(integral) %87 : s32i
+                                %89 = call @foo(%88) : s32i [all]
+                                %90 = cast(integral) %89 : u64i
+                                store %90, %30, align 8
+                                scope {
+                                        %91 = load %30 : u64i, align 8
+                                        %92 = load %31 : u64i, align 8
+                                        cmp
+                                        if %93 {
+                                                %94 = load %29 : s32i, align 4
+                                                store %94, %26, align 4
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
                         }
                         yield
-                    }
-                    %76 = load %29 : s32i, align 4
-                    %77 = dec %76 : s32i [nsw]
-                    store %77, %29, align 4
-                    %78 = load %28 : u64i, align 8
-                    %79 = load %29 : s32i, align 4
-                    %80 = cast(integral) %79 : s64i
-                    %81 = load %23 : rec_C*, align 8
-                    %82 = get_member %81[0] "c1" : rec_B[1]*
-                    %83 = get_element %82[%80] : rec_B*
-                    %84 = get_member %83[3] "b4" : s32i*
-                    %85 = load %84 : s32i, align 4
-                    %86 = cast(integral) %85 : u64i
-                    %87 = sub %78, %86 : u64i
-                    %88 = cast(integral) %87 : s32i
-                    %89 = call @foo(%88) : s32i [all]
-                    %90 = cast(integral) %89 : u64i
-                    store %90, %30, align 8
-                    scope {
-                        %91 = load %30 : u64i, align 8
-                        %92 = load %31 : u64i, align 8
-                        %93 = cmp lt %91, %92 : bool
-                        if %93 {
-                            %94 = load %29 : s32i, align 4
-                            store %94, %26, align 4
-                            yield
-                        }
-                        yield
-                    }
-                    yield
+                } while {
+                        %71 = load %29 : s32i, align 4
+                        %72 = load %23 : rec_C*, align 8
+                        get_member
+                        %74 = load %73 : s32i, align 4
+                        cmp
+                        condition %75
                 }
                 yield
-            } while {
-                %71 = load %29 : s32i, align 4
-                %72 = load %23 : rec_C*, align 8
-                %73 = get_member %72[2] "c3" : s32i*
-                %74 = load %73 : s32i, align 4
-                %75 = cmp ne %71, %74 : bool
-                condition %75
-            }
-            yield
         }
         %58 = load %28 : u64i, align 8
         %59 = load %27 : s32i, align 4
@@ -132,9 +132,9 @@ fn bar(%arg0: rec_C*, %arg1: rec_A*) -> s32i [external, c, no_inline, dso_local,
         %63 = load %26 : s32i, align 4
         %64 = cast(integral) %63 : s64i
         %65 = load %23 : rec_C*, align 8
-        %66 = get_member %65[0] "c1" : rec_B[1]*
-        %67 = get_element %66[%64] : rec_B*
-        %68 = get_member %67[3] "b4" : s32i*
+        get_member
+        get_element
+        get_member
         store %62, %68, align 4
         %69 = load %26 : s32i, align 4
         store %69, %25
@@ -143,35 +143,35 @@ fn bar(%arg0: rec_C*, %arg1: rec_A*) -> s32i [external, c, no_inline, dso_local,
 }
 fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_A, "a", align 8
-    %2 = alloca rec_C, "b", align 4
-    %3 = alloca s32i, "c", align 4
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = const 512 : u16i
-    %6 = get_member %1[0] "a1" : u16i*
-    store %5, %6, align 8
-    %7 = const 4242 : u64i
-    %8 = get_member %1[1] "a2" : u64i*
-    store %7, %8, align 8
-    %9 = cast(bitcast) %2 : void*
-    %10 = const 0 : s32i
-    %11 = const 28 : u64i
-    %12 = call @memset(%9, %10, %11) : void* [all]
-    %13 = const 424242 : s32i
-    %14 = const 0 : s64i
-    %15 = get_member %2[0] "c1" : rec_B[1]*
-    %16 = get_element %15[%14] : rec_B*
-    %17 = get_member %16[2] "b3" : s32i*
-    store %13, %17, align 4
-    %18 = const 1 : s32i
-    %19 = get_member %2[1] "c2" : s32i*
-    store %18, %19, align 4
-    %20 = call @bar(%2, %1) : s32i [all]
-    store %20, %3, align 4
-    %21 = const 0 : s32i
-    store %21, %0
-    %22 = load %0 : s32i
-    return %22
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_A, "a", align 8
+        %2 = alloca rec_C, "b", align 4
+        %3 = alloca s32i, "c", align 4
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = const 512 : u16i
+        get_member
+        store %5, %6, align 8
+        %7 = const 4242 : u64i
+        get_member
+        store %7, %8, align 8
+        %9 = cast(bitcast) %2 : void*
+        %10 = const 0 : s32i
+        %11 = const 28 : u64i
+        %12 = call @memset(%9, %10, %11) : void* [all]
+        %13 = const 424242 : s32i
+        %14 = const 0 : s64i
+        get_member
+        get_element
+        get_member
+        store %13, %17, align 4
+        %18 = const 1 : s32i
+        get_member
+        store %18, %19, align 4
+        %20 = call @bar(%2, %1) : s32i [all]
+        store %20, %3, align 4
+        %21 = const 0 : s32i
+        store %21, %0
+        %22 = load %0 : s32i
+        return %22
 }

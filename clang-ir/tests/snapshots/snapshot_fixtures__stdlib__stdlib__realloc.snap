@@ -1,84 +1,84 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/stdlib/realloc.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn malloc(%arg0: u64i) -> void* [external, c, nothrow];
 fn realloc(%arg0: void*, %arg1: u64i) -> void* [external, c, nothrow];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn free(%arg0: void*) -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i*, "p", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @malloc : ((u64i) -> void*)*
-    %4 = const 4 : u64i
-    %5 = const 2 : u64i
-    %6 = mul %4, %5 : u64i
-    %7 = call @malloc(%6) : void* [all]
-    %8 = cast(bitcast) %7 : s32i*
-    store %8, %1, align 8
-    %9 = const 1 : s32i
-    %10 = const 0 : s64i
-    %11 = load %1 : s32i*, align 8
-    %12 = ptr_stride %11, %10 : s32i*
-    store %9, %12, align 4
-    %13 = const 2 : s32i
-    %14 = const 1 : s64i
-    %15 = load %1 : s32i*, align 8
-    %16 = ptr_stride %15, %14 : s32i*
-    store %13, %16, align 4
-    %17 = get_global @realloc : ((void*, u64i) -> void*)*
-    %18 = load %1 : s32i*, align 8
-    %19 = cast(bitcast) %18 : void*
-    %20 = const 4 : u64i
-    %21 = const 4 : u64i
-    %22 = mul %20, %21 : u64i
-    %23 = call @realloc(%19, %22) : void* [all]
-    %24 = cast(bitcast) %23 : s32i*
-    store %24, %1, align 8
-    %25 = const 3 : s32i
-    %26 = const 2 : s64i
-    %27 = load %1 : s32i*, align 8
-    %28 = ptr_stride %27, %26 : s32i*
-    store %25, %28, align 4
-    %29 = const 4 : s32i
-    %30 = const 3 : s64i
-    %31 = load %1 : s32i*, align 8
-    %32 = ptr_stride %31, %30 : s32i*
-    store %29, %32, align 4
-    %33 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %34 = get_global @.str : s8i[4]*
-    %35 = cast(array_to_ptrdecay) %34 : s8i*
-    %36 = const 0 : s64i
-    %37 = load %1 : s32i*, align 8
-    %38 = ptr_stride %37, %36 : s32i*
-    %39 = load %38 : s32i, align 4
-    %40 = const 1 : s64i
-    %41 = load %1 : s32i*, align 8
-    %42 = ptr_stride %41, %40 : s32i*
-    %43 = load %42 : s32i, align 4
-    %44 = add %39, %43 : s32i [nsw]
-    %45 = const 2 : s64i
-    %46 = load %1 : s32i*, align 8
-    %47 = ptr_stride %46, %45 : s32i*
-    %48 = load %47 : s32i, align 4
-    %49 = add %44, %48 : s32i [nsw]
-    %50 = const 3 : s64i
-    %51 = load %1 : s32i*, align 8
-    %52 = ptr_stride %51, %50 : s32i*
-    %53 = load %52 : s32i, align 4
-    %54 = add %49, %53 : s32i [nsw]
-    %55 = call @printf(%35, %54) : s32i [all]
-    %56 = get_global @free : ((void*) -> void)*
-    %57 = load %1 : s32i*, align 8
-    %58 = cast(bitcast) %57 : void*
-    call @free(%58) [all]
-    %59 = const 0 : s32i
-    store %59, %0
-    %60 = load %0 : s32i
-    return %60
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i*, "p", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @malloc : (u64i) -> void**
+        %4 = const 4 : u64i
+        %5 = const 2 : u64i
+        mul
+        %7 = call @malloc(%6) : void* [all]
+        %8 = cast(bitcast) %7 : s32i*
+        store %8, %1, align 8
+        %9 = const 1 : s32i
+        %10 = const 0 : s64i
+        %11 = load %1 : s32i*, align 8
+        ptr_stride
+        store %9, %12, align 4
+        %13 = const 2 : s32i
+        %14 = const 1 : s64i
+        %15 = load %1 : s32i*, align 8
+        ptr_stride
+        store %13, %16, align 4
+        %17 = get_global @realloc : (void*, u64i) -> void**
+        %18 = load %1 : s32i*, align 8
+        %19 = cast(bitcast) %18 : void*
+        %20 = const 4 : u64i
+        %21 = const 4 : u64i
+        mul
+        %23 = call @realloc(%19, %22) : void* [all]
+        %24 = cast(bitcast) %23 : s32i*
+        store %24, %1, align 8
+        %25 = const 3 : s32i
+        %26 = const 2 : s64i
+        %27 = load %1 : s32i*, align 8
+        ptr_stride
+        store %25, %28, align 4
+        %29 = const 4 : s32i
+        %30 = const 3 : s64i
+        %31 = load %1 : s32i*, align 8
+        ptr_stride
+        store %29, %32, align 4
+        %33 = get_global @printf : (s8i*, ...) -> s32i*
+        %34 = get_global @.str : s8i[4]*
+        %35 = cast(array_to_ptrdecay) %34 : s8i*
+        %36 = const 0 : s64i
+        %37 = load %1 : s32i*, align 8
+        ptr_stride
+        %39 = load %38 : s32i, align 4
+        %40 = const 1 : s64i
+        %41 = load %1 : s32i*, align 8
+        ptr_stride
+        %43 = load %42 : s32i, align 4
+        %44 = add %39, %43 : s32i [nsw]
+        %45 = const 2 : s64i
+        %46 = load %1 : s32i*, align 8
+        ptr_stride
+        %48 = load %47 : s32i, align 4
+        %49 = add %44, %48 : s32i [nsw]
+        %50 = const 3 : s64i
+        %51 = load %1 : s32i*, align 8
+        ptr_stride
+        %53 = load %52 : s32i, align 4
+        %54 = add %49, %53 : s32i [nsw]
+        %55 = call @printf(%35, %54) : s32i [all]
+        %56 = get_global @free : (void*) -> void*
+        %57 = load %1 : s32i*, align 8
+        %58 = cast(bitcast) %57 : void*
+        call @free(%58) [all]
+        %59 = const 0 : s32i
+        store %59, %0
+        %60 = load %0 : s32i
+        return %60
 }

@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/switch_break_inside_if.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn classify(%arg0: s32i, %arg1: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i, %arg1: s32i):
@@ -16,35 +16,36 @@ fn classify(%arg0: s32i, %arg1: s32i) -> s32i [external, c, no_inline, dso_local
         %36 = const -1 : s32i
         store %36, %35, align 4
         scope {
-            %39 = load %32 : s32i, align 4
-            switch %39 {
-                case equal 0 {
-                    scope {
-                        %43 = load %33 : s32i, align 4
-                        %44 = cast(int_to_bool) %43 : bool
-                        if %44 {
-                            %45 = const 10 : s32i
-                            store %45, %35, align 4
-                            break
+                %39 = load %32 : s32i, align 4
+                switch %39 {
+                        case equal [0] {
+                                scope {
+                                        %43 = load %33 : s32i, align 4
+                                        %44 = cast(int_to_bool) %43 : bool
+                                        if %44 {
+                                                %45 = const 10 : s32i
+                                                store %45, %35, align 4
+                                                break
+                                        }
+                                        yield
+                                }
+                                %42 = const 11 : s32i
+                                store %42, %35, align 4
+                                break
+                        }
+                        case equal [1] {
+                                %41 = const 20 : s32i
+                                store %41, %35, align 4
+                                break
+                        }
+                        case default [] {
+                                %40 = const -2 : s32i
+                                store %40, %35, align 4
+                                break
                         }
                         yield
-                    }
-                    %42 = const 11 : s32i
-                    store %42, %35, align 4
-                    break
                 }
-                case equal 1 {
-                    %41 = const 20 : s32i
-                    store %41, %35, align 4
-                    break
-                }
-                case default {
-                    %40 = const -2 : s32i
-                    store %40, %35, align 4
-                    break
-                }
-            }
-            yield
+                yield
         }
         %37 = load %35 : s32i, align 4
         store %37, %34
@@ -53,39 +54,39 @@ fn classify(%arg0: s32i, %arg1: s32i) -> s32i [external, c, no_inline, dso_local
 }
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[4]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = const 0 : s32i
-    %6 = const 1 : s32i
-    %7 = call @classify(%5, %6) : s32i [all]
-    %8 = call @printf(%4, %7) : s32i [all]
-    %9 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %10 = get_global @.str : s8i[4]*
-    %11 = cast(array_to_ptrdecay) %10 : s8i*
-    %12 = const 0 : s32i
-    %13 = const 0 : s32i
-    %14 = call @classify(%12, %13) : s32i [all]
-    %15 = call @printf(%11, %14) : s32i [all]
-    %16 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %17 = get_global @.str : s8i[4]*
-    %18 = cast(array_to_ptrdecay) %17 : s8i*
-    %19 = const 1 : s32i
-    %20 = const 0 : s32i
-    %21 = call @classify(%19, %20) : s32i [all]
-    %22 = call @printf(%18, %21) : s32i [all]
-    %23 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %24 = get_global @.str : s8i[4]*
-    %25 = cast(array_to_ptrdecay) %24 : s8i*
-    %26 = const 5 : s32i
-    %27 = const 0 : s32i
-    %28 = call @classify(%26, %27) : s32i [all]
-    %29 = call @printf(%25, %28) : s32i [all]
-    %30 = const 0 : s32i
-    store %30, %0
-    %31 = load %0 : s32i
-    return %31
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[4]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = const 0 : s32i
+        %6 = const 1 : s32i
+        %7 = call @classify(%5, %6) : s32i [all]
+        %8 = call @printf(%4, %7) : s32i [all]
+        %9 = get_global @printf : (s8i*, ...) -> s32i*
+        %10 = get_global @.str : s8i[4]*
+        %11 = cast(array_to_ptrdecay) %10 : s8i*
+        %12 = const 0 : s32i
+        %13 = const 0 : s32i
+        %14 = call @classify(%12, %13) : s32i [all]
+        %15 = call @printf(%11, %14) : s32i [all]
+        %16 = get_global @printf : (s8i*, ...) -> s32i*
+        %17 = get_global @.str : s8i[4]*
+        %18 = cast(array_to_ptrdecay) %17 : s8i*
+        %19 = const 1 : s32i
+        %20 = const 0 : s32i
+        %21 = call @classify(%19, %20) : s32i [all]
+        %22 = call @printf(%18, %21) : s32i [all]
+        %23 = get_global @printf : (s8i*, ...) -> s32i*
+        %24 = get_global @.str : s8i[4]*
+        %25 = cast(array_to_ptrdecay) %24 : s8i*
+        %26 = const 5 : s32i
+        %27 = const 0 : s32i
+        %28 = call @classify(%26, %27) : s32i [all]
+        %29 = call @printf(%25, %28) : s32i [all]
+        %30 = const 0 : s32i
+        store %30, %0
+        %31 = load %0 : s32i
+        return %31
 }

@@ -1,19 +1,19 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/980526-1.c" (c, x86_64-unknown-linux-gnu)
-global expect_do1 : s32i = 1 [external, default, align 4, dso_local]
-global expect_do2 : s32i = 2 [external, default, align 4, dso_local]
+global expect_do1 : s32i = CirInt { ty: Named("s32i"), value: "1" } [external, default, align 4, dso_local]
+global expect_do2 : s32i = CirInt { ty: Named("s32i"), value: "2" } [external, default, align 4, dso_local]
 
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

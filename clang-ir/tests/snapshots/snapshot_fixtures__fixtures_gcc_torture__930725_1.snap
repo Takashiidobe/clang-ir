@@ -1,67 +1,67 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/930725-1.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[1] = zero [cir_private, default, align 1, dso_local, constant]
-global v : s32i = 0 [external, default, align 4, dso_local]
-global .str.1 : s8i[4] = "abc" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[1] = Zero { ty: Array { element_type: Named("s8i"), size: 1 } } [cir_private, default, align 1, dso_local, constant]
+global v : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global .str.1 : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("abc"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn g() -> s8i* [external, c, no_inline, dso_local, nothrow] {
-    %26 = alloca s8i*, "__retval", align 8
-    %27 = get_global @.str : s8i[1]*
-    %28 = cast(array_to_ptrdecay) %27 : s8i*
-    store %28, %26
-    %29 = load %26 : s8i*
-    return %29
+        %26 = alloca s8i*, "__retval", align 8
+        %27 = get_global @.str : s8i[1]*
+        %28 = cast(array_to_ptrdecay) %27 : s8i*
+        store %28, %26
+        %29 = load %26 : s8i*
+        return %29
 }
 fn f() -> s8i* [external, c, no_inline, dso_local, nothrow] {
-    %15 = alloca s8i*, "__retval", align 8
-    %16 = get_global @v : s32i*
-    %17 = load %16 : s32i, align 4
-    %18 = const 0 : s32i
-    %19 = cmp eq %17, %18 : bool
-    %20 = ternary %19 ? { : s8i*
-        %24 = get_global @g : (() -> s8i*)*
-        %25 = call @g() : s8i* [all]
-        yield %25
-    } : {
-        %22 = get_global @.str.1 : s8i[4]*
-        %23 = cast(array_to_ptrdecay) %22 : s8i*
-        yield %23
-    }
-    store %20, %15
-    %21 = load %15 : s8i*
-    return %21
+        %15 = alloca s8i*, "__retval", align 8
+        %16 = get_global @v : s32i*
+        %17 = load %16 : s32i, align 4
+        %18 = const 0 : s32i
+        cmp
+        %20 = ternary %19 ? { : s8i*
+                %24 = get_global @g : () -> s8i**
+                %25 = call @g() : s8i* [all]
+                yield %25
+        } : {
+                %22 = get_global @.str.1 : s8i[4]*
+                %23 = cast(array_to_ptrdecay) %22 : s8i*
+                yield %23
+        }
+        store %20, %15
+        %21 = load %15 : s8i*
+        return %21
 }
 fn strcmp(%arg0: s8i*, %arg1: s8i*) -> s32i [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : s32i
-    %3 = get_global @v : s32i*
-    store %2, %3, align 4
-    scope {
-        %6 = get_global @f : (() -> s8i*)*
-        %7 = call @f() : s8i* [all]
-        %8 = get_global @.str.1 : s8i[4]*
-        %9 = cast(array_to_ptrdecay) %8 : s8i*
-        %10 = call @strcmp(%7, %9) : s32i [all]
-        %11 = cast(int_to_bool) %10 : bool
-        %12 = not %11 : bool
-        if %12 {
-            %13 = get_global @exit : ((s32i) -> void)*
-            %14 = const 0 : s32i
-            call @exit(%14) [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : s32i
+        %3 = get_global @v : s32i*
+        store %2, %3, align 4
+        scope {
+                %6 = get_global @f : () -> s8i**
+                %7 = call @f() : s8i* [all]
+                %8 = get_global @.str.1 : s8i[4]*
+                %9 = cast(array_to_ptrdecay) %8 : s8i*
+                %10 = call @strcmp(%7, %9) : s32i [all]
+                %11 = cast(int_to_bool) %10 : bool
+                not
+                if %12 {
+                        %13 = get_global @exit : (s32i) -> void*
+                        %14 = const 0 : s32i
+                        call @exit(%14) [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %4 = get_global @abort : (() -> void)*
-    call @abort() [all]
-    %5 = load %0 : s32i
-    return %5
+        %4 = get_global @abort : () -> void*
+        call @abort() [all]
+        %5 = load %0 : s32i
+        return %5
 }

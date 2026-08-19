@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/void_ptr_function_pointer_cast.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[7] = ConstArray { ty: Array { element_type: Named("s8i"), size: 7 }, elts: Str("%d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn add_one(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i):
@@ -19,38 +19,38 @@ fn add_one(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
 }
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_FnBox, "box", align 8
-    %2 = alloca void*, "slot", align 8
-    %3 = alloca ((s32i) -> s32i)*, "cb", align 8
-    %4 = alloca ((s32i) -> s32i)*, "none", align 8
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = get_global @add_one : ((s32i) -> s32i)*
-    %7 = get_member %1[0] "fn" : ((s32i) -> s32i)**
-    store %6, %7, align 8
-    %8 = get_member %1[1] "ptr" : void**
-    %9 = load %8 : void*, align 8
-    store %9, %2, align 8
-    %10 = load %2 : void*, align 8
-    %11 = cast(bitcast) %10 : ((s32i) -> s32i)*
-    store %11, %3, align 8
-    %12 = const #cir.ptr<null> : ((s32i) -> s32i)*
-    store %12, %4, align 8
-    %13 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %14 = get_global @.str : s8i[7]*
-    %15 = cast(array_to_ptrdecay) %14 : s8i*
-    %16 = load %3 : ((s32i) -> s32i)*, align 8
-    %17 = const 41 : s32i
-    %18 = call %16(%17) : s32i [all]
-    %19 = load %4 : ((s32i) -> s32i)*, align 8
-    %20 = const #cir.ptr<null> : void*
-    %21 = cast(bitcast) %20 : ((s32i) -> s32i)*
-    %22 = cmp ne %19, %21 : bool
-    %23 = cast(bool_to_int) %22 : s32i
-    %24 = call @printf(%15, %18, %23) : s32i [all]
-    %25 = const 0 : s32i
-    store %25, %0
-    %26 = load %0 : s32i
-    return %26
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_FnBox, "box", align 8
+        %2 = alloca void*, "slot", align 8
+        %3 = alloca (s32i) -> s32i*, "cb", align 8
+        %4 = alloca (s32i) -> s32i*, "none", align 8
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = get_global @add_one : (s32i) -> s32i*
+        get_member
+        store %6, %7, align 8
+        get_member
+        %9 = load %8 : void*, align 8
+        store %9, %2, align 8
+        %10 = load %2 : void*, align 8
+        %11 = cast(bitcast) %10 : (s32i) -> s32i*
+        store %11, %3, align 8
+        %12 = const #cir.ptr<null> : (s32i) -> s32i*
+        store %12, %4, align 8
+        %13 = get_global @printf : (s8i*, ...) -> s32i*
+        %14 = get_global @.str : s8i[7]*
+        %15 = cast(array_to_ptrdecay) %14 : s8i*
+        %16 = load %3 : (s32i) -> s32i*, align 8
+        %17 = const 41 : s32i
+        %18 = call (%17) : s32i [all]
+        %19 = load %4 : (s32i) -> s32i*, align 8
+        %20 = const #cir.ptr<null> : void*
+        %21 = cast(bitcast) %20 : (s32i) -> s32i*
+        cmp
+        %23 = cast(bool_to_int) %22 : s32i
+        %24 = call @printf(%15, %18, %23) : s32i [all]
+        %25 = const 0 : s32i
+        store %25, %0
+        %26 = load %0 : s32i
+        return %26
 }

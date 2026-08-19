@@ -1,87 +1,87 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr77718.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[7] = "bbbbbb" [cir_private, default, align 1, dso_local, constant]
-global a : s8i[64] = zero [external, default, align 8, dso_local]
+global .str : s8i[7] = ConstArray { ty: Array { element_type: Named("s8i"), size: 7 }, elts: Str("bbbbbb"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global a : s8i[64] = Zero { ty: Array { element_type: Named("s8i"), size: 64 } } [external, default, align 8, dso_local]
 
 fn memcmp(%arg0: void*, %arg1: void*, %arg2: u64i) -> s32i [external, c, nothrow];
 fn foo() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %42 = alloca s32i, "__retval", align 4
-    %43 = get_global @.str : s8i[7]*
-    %44 = cast(array_to_ptrdecay) %43 : s8i*
-    %45 = cast(bitcast) %44 : void*
-    %46 = get_global @a : s8i[64]*
-    %47 = cast(array_to_ptrdecay) %46 : s8i*
-    %48 = cast(bitcast) %47 : void*
-    %49 = const 6 : u64i
-    %50 = call @memcmp(%45, %48, %49) : s32i [all]
-    store %50, %42
-    %51 = load %42 : s32i
-    return %51
+        %42 = alloca s32i, "__retval", align 4
+        %43 = get_global @.str : s8i[7]*
+        %44 = cast(array_to_ptrdecay) %43 : s8i*
+        %45 = cast(bitcast) %44 : void*
+        %46 = get_global @a : s8i[64]*
+        %47 = cast(array_to_ptrdecay) %46 : s8i*
+        %48 = cast(bitcast) %47 : void*
+        %49 = const 6 : u64i
+        %50 = call @memcmp(%45, %48, %49) : s32i [all]
+        store %50, %42
+        %51 = load %42 : s32i
+        return %51
 }
 fn bar() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %32 = alloca s32i, "__retval", align 4
-    %33 = get_global @a : s8i[64]*
-    %34 = cast(array_to_ptrdecay) %33 : s8i*
-    %35 = cast(bitcast) %34 : void*
-    %36 = get_global @.str : s8i[7]*
-    %37 = cast(array_to_ptrdecay) %36 : s8i*
-    %38 = cast(bitcast) %37 : void*
-    %39 = const 6 : u64i
-    %40 = call @memcmp(%35, %38, %39) : s32i [all]
-    store %40, %32
-    %41 = load %32 : s32i
-    return %41
+        %32 = alloca s32i, "__retval", align 4
+        %33 = get_global @a : s8i[64]*
+        %34 = cast(array_to_ptrdecay) %33 : s8i*
+        %35 = cast(bitcast) %34 : void*
+        %36 = get_global @.str : s8i[7]*
+        %37 = cast(array_to_ptrdecay) %36 : s8i*
+        %38 = cast(bitcast) %37 : void*
+        %39 = const 6 : u64i
+        %40 = call @memcmp(%35, %38, %39) : s32i [all]
+        store %40, %32
+        %41 = load %32 : s32i
+        return %41
 }
 fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @a : s8i[64]*
-    %3 = cast(array_to_ptrdecay) %2 : s8i*
-    %4 = cast(bitcast) %3 : void*
-    %5 = const 97 : s32i
-    %6 = const 64 : u64i
-    %7 = call @memset(%4, %5, %6) : void* [all]
-    scope {
-        %10 = call @foo() : s32i [all]
-        %11 = const 0 : s32i
-        %12 = cmp lt %10, %11 : bool
-        %13 = cast(bool_to_int) %12 : s32i
-        %14 = const 97 : s32i
-        %15 = const 98 : s32i
-        %16 = cmp gt %14, %15 : bool
-        %17 = cast(bool_to_int) %16 : s32i
-        %18 = xor %13, %17 : s32i
-        %19 = cast(int_to_bool) %18 : bool
-        %20 = ternary %19 ? { : bool
-            %31 = const true : bool
-            yield %31
-        } : {
-            %21 = call @bar() : s32i [all]
-            %22 = const 0 : s32i
-            %23 = cmp lt %21, %22 : bool
-            %24 = cast(bool_to_int) %23 : s32i
-            %25 = const 97 : s32i
-            %26 = const 98 : s32i
-            %27 = cmp lt %25, %26 : bool
-            %28 = cast(bool_to_int) %27 : s32i
-            %29 = xor %24, %28 : s32i
-            %30 = cast(int_to_bool) %29 : bool
-            yield %30
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @a : s8i[64]*
+        %3 = cast(array_to_ptrdecay) %2 : s8i*
+        %4 = cast(bitcast) %3 : void*
+        %5 = const 97 : s32i
+        %6 = const 64 : u64i
+        %7 = call @memset(%4, %5, %6) : void* [all]
+        scope {
+                %10 = call @foo() : s32i [all]
+                %11 = const 0 : s32i
+                cmp
+                %13 = cast(bool_to_int) %12 : s32i
+                %14 = const 97 : s32i
+                %15 = const 98 : s32i
+                cmp
+                %17 = cast(bool_to_int) %16 : s32i
+                xor
+                %19 = cast(int_to_bool) %18 : bool
+                %20 = ternary %19 ? { : bool
+                        %31 = const true : bool
+                        yield %31
+                } : {
+                        %21 = call @bar() : s32i [all]
+                        %22 = const 0 : s32i
+                        cmp
+                        %24 = cast(bool_to_int) %23 : s32i
+                        %25 = const 97 : s32i
+                        %26 = const 98 : s32i
+                        cmp
+                        %28 = cast(bool_to_int) %27 : s32i
+                        xor
+                        %30 = cast(int_to_bool) %29 : bool
+                        yield %30
+                }
+                if %20 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %20 {
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %8 = const 0 : s32i
-    store %8, %0
-    %9 = load %0 : s32i
-    return %9
+        %8 = const 0 : s32i
+        store %8, %0
+        %9 = load %0 : s32i
+        return %9
 }

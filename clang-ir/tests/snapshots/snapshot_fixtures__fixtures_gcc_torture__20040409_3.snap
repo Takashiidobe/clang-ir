@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20040409-3.c" (c, x86_64-unknown-linux-gnu)
@@ -11,9 +11,9 @@ fn test1(%arg11: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %151 = load %149 : s32i, align 4
         %152 = const -2147483647 : s32i
         %153 = const 1 : s32i
-        %154 = sub %152, %153 : s32i [nsw]
-        %155 = xor %151, %154 : s32i
-        %156 = not %155 : s32i
+        sub
+        xor
+        not
         store %156, %150
         %157 = load %150 : s32i
         return %157
@@ -26,10 +26,10 @@ fn test1u(%arg10: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         %141 = load %139 : u32i, align 4
         %142 = const -2147483647 : s32i
         %143 = const 1 : s32i
-        %144 = sub %142, %143 : s32i [nsw]
+        sub
         %145 = cast(integral) %144 : u32i
-        %146 = xor %141, %145 : u32i
-        %147 = not %146 : u32i
+        xor
+        not
         store %147, %140
         %148 = load %140 : u32i
         return %148
@@ -42,10 +42,10 @@ fn test2u(%arg9: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         %131 = load %129 : u32i, align 4
         %132 = const -2147483647 : s32i
         %133 = const 1 : s32i
-        %134 = sub %132, %133 : s32i [nsw]
+        sub
         %135 = cast(integral) %134 : u32i
         %136 = add %131, %135 : u32i
-        %137 = not %136 : u32i
+        not
         store %137, %130
         %138 = load %130 : u32i
         return %138
@@ -58,10 +58,10 @@ fn test3u(%arg8: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         %121 = load %119 : u32i, align 4
         %122 = const -2147483647 : s32i
         %123 = const 1 : s32i
-        %124 = sub %122, %123 : s32i [nsw]
+        sub
         %125 = cast(integral) %124 : u32i
-        %126 = sub %121, %125 : u32i
-        %127 = not %126 : u32i
+        sub
+        not
         store %127, %120
         %128 = load %120 : u32i
         return %128
@@ -74,12 +74,12 @@ fn test4(%arg7: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %arg7, %108
         %111 = const -2147483647 : s32i
         %112 = const 1 : s32i
-        %113 = sub %111, %112 : s32i [nsw]
+        sub
         store %113, %110, align 4
         %114 = load %108 : s32i, align 4
         %115 = load %110 : s32i, align 4
-        %116 = xor %114, %115 : s32i
-        %117 = not %116 : s32i
+        xor
+        not
         store %117, %109
         %118 = load %109 : s32i
         return %118
@@ -92,13 +92,13 @@ fn test4u(%arg6: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         store %arg6, %96
         %99 = const -2147483647 : s32i
         %100 = const 1 : s32i
-        %101 = sub %99, %100 : s32i [nsw]
+        sub
         %102 = cast(integral) %101 : u32i
         store %102, %98, align 4
         %103 = load %96 : u32i, align 4
         %104 = load %98 : u32i, align 4
-        %105 = xor %103, %104 : u32i
-        %106 = not %105 : u32i
+        xor
+        not
         store %106, %97
         %107 = load %97 : u32i
         return %107
@@ -111,13 +111,13 @@ fn test5u(%arg5: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         store %arg5, %84
         %87 = const -2147483647 : s32i
         %88 = const 1 : s32i
-        %89 = sub %87, %88 : s32i [nsw]
+        sub
         %90 = cast(integral) %89 : u32i
         store %90, %86, align 4
         %91 = load %84 : u32i, align 4
         %92 = load %86 : u32i, align 4
         %93 = add %91, %92 : u32i
-        %94 = not %93 : u32i
+        not
         store %94, %85
         %95 = load %85 : u32i
         return %95
@@ -130,13 +130,13 @@ fn test6u(%arg4: u32i) -> u32i [external, c, no_inline, dso_local, nothrow] {
         store %arg4, %72
         %75 = const -2147483647 : s32i
         %76 = const 1 : s32i
-        %77 = sub %75, %76 : s32i [nsw]
+        sub
         %78 = cast(integral) %77 : u32i
         store %78, %74, align 4
         %79 = load %72 : u32i, align 4
         %80 = load %74 : u32i, align 4
-        %81 = sub %79, %80 : u32i
-        %82 = not %81 : u32i
+        sub
+        not
         store %82, %73
         %83 = load %73 : u32i
         return %83
@@ -149,28 +149,28 @@ fn test(%arg2: s32i, %arg3: s32i) -> void [external, c, no_inline, dso_local, no
         store %arg2, %60
         store %arg3, %61
         scope {
-            %67 = load %60 : s32i, align 4
-            %68 = call @test1(%67) : s32i [all]
-            %69 = load %61 : s32i, align 4
-            %70 = cmp ne %68, %69 : bool
-            if %70 {
-                %71 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %67 = load %60 : s32i, align 4
+                %68 = call @test1(%67) : s32i [all]
+                %69 = load %61 : s32i, align 4
+                cmp
+                if %70 {
+                        %71 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %62 = load %60 : s32i, align 4
-            %63 = call @test4(%62) : s32i [all]
-            %64 = load %61 : s32i, align 4
-            %65 = cmp ne %63, %64 : bool
-            if %65 {
-                %66 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %62 = load %60 : s32i, align 4
+                %63 = call @test4(%62) : s32i [all]
+                %64 = load %61 : s32i, align 4
+                cmp
+                if %65 {
+                        %66 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -181,121 +181,121 @@ fn testu(%arg0: u32i, %arg1: u32i) -> void [external, c, no_inline, dso_local, n
         store %arg0, %28
         store %arg1, %29
         scope {
-            %55 = load %28 : u32i, align 4
-            %56 = call @test1u(%55) : u32i [all]
-            %57 = load %29 : u32i, align 4
-            %58 = cmp ne %56, %57 : bool
-            if %58 {
-                %59 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %55 = load %28 : u32i, align 4
+                %56 = call @test1u(%55) : u32i [all]
+                %57 = load %29 : u32i, align 4
+                cmp
+                if %58 {
+                        %59 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %50 = load %28 : u32i, align 4
-            %51 = call @test2u(%50) : u32i [all]
-            %52 = load %29 : u32i, align 4
-            %53 = cmp ne %51, %52 : bool
-            if %53 {
-                %54 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %50 = load %28 : u32i, align 4
+                %51 = call @test2u(%50) : u32i [all]
+                %52 = load %29 : u32i, align 4
+                cmp
+                if %53 {
+                        %54 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %45 = load %28 : u32i, align 4
-            %46 = call @test3u(%45) : u32i [all]
-            %47 = load %29 : u32i, align 4
-            %48 = cmp ne %46, %47 : bool
-            if %48 {
-                %49 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %45 = load %28 : u32i, align 4
+                %46 = call @test3u(%45) : u32i [all]
+                %47 = load %29 : u32i, align 4
+                cmp
+                if %48 {
+                        %49 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %40 = load %28 : u32i, align 4
-            %41 = call @test4u(%40) : u32i [all]
-            %42 = load %29 : u32i, align 4
-            %43 = cmp ne %41, %42 : bool
-            if %43 {
-                %44 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %40 = load %28 : u32i, align 4
+                %41 = call @test4u(%40) : u32i [all]
+                %42 = load %29 : u32i, align 4
+                cmp
+                if %43 {
+                        %44 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %35 = load %28 : u32i, align 4
-            %36 = call @test5u(%35) : u32i [all]
-            %37 = load %29 : u32i, align 4
-            %38 = cmp ne %36, %37 : bool
-            if %38 {
-                %39 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %35 = load %28 : u32i, align 4
+                %36 = call @test5u(%35) : u32i [all]
+                %37 = load %29 : u32i, align 4
+                cmp
+                if %38 {
+                        %39 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            %30 = load %28 : u32i, align 4
-            %31 = call @test6u(%30) : u32i [all]
-            %32 = load %29 : u32i, align 4
-            %33 = cmp ne %31, %32 : bool
-            if %33 {
-                %34 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %30 = load %28 : u32i, align 4
+                %31 = call @test6u(%30) : u32i [all]
+                %32 = load %29 : u32i, align 4
+                cmp
+                if %33 {
+                        %34 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 0 : s32i
-    %3 = const 2147483647 : s32i
-    call @test(%2, %3) [all]
-    %4 = const -2147483648 : s32i
-    %5 = const -1 : s32i
-    call @test(%4, %5) [all]
-    %6 = const 305419896 : s32i
-    %7 = const 1842063751 : s32i
-    call @test(%6, %7) [all]
-    %8 = const -1842063752 : s32i
-    %9 = const -305419897 : s32i
-    call @test(%8, %9) [all]
-    %10 = const 2147483647 : s32i
-    %11 = const 0 : s32i
-    call @test(%10, %11) [all]
-    %12 = const -1 : s32i
-    %13 = const -2147483648 : s32i
-    call @test(%12, %13) [all]
-    %14 = const 0 : u32i
-    %15 = const 2147483647 : u32i
-    call @testu(%14, %15) [all]
-    %16 = const 2147483648 : u32i
-    %17 = const 4294967295 : u32i
-    call @testu(%16, %17) [all]
-    %18 = const 305419896 : u32i
-    %19 = const 1842063751 : u32i
-    call @testu(%18, %19) [all]
-    %20 = const 2452903544 : u32i
-    %21 = const 3989547399 : u32i
-    call @testu(%20, %21) [all]
-    %22 = const 2147483647 : u32i
-    %23 = const 0 : u32i
-    call @testu(%22, %23) [all]
-    %24 = const 4294967295 : u32i
-    %25 = const 2147483648 : u32i
-    call @testu(%24, %25) [all]
-    %26 = const 0 : s32i
-    store %26, %0
-    %27 = load %0 : s32i
-    return %27
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 0 : s32i
+        %3 = const 2147483647 : s32i
+        call @test(%2, %3) [all]
+        %4 = const -2147483648 : s32i
+        %5 = const -1 : s32i
+        call @test(%4, %5) [all]
+        %6 = const 305419896 : s32i
+        %7 = const 1842063751 : s32i
+        call @test(%6, %7) [all]
+        %8 = const -1842063752 : s32i
+        %9 = const -305419897 : s32i
+        call @test(%8, %9) [all]
+        %10 = const 2147483647 : s32i
+        %11 = const 0 : s32i
+        call @test(%10, %11) [all]
+        %12 = const -1 : s32i
+        %13 = const -2147483648 : s32i
+        call @test(%12, %13) [all]
+        %14 = const 0 : u32i
+        %15 = const 2147483647 : u32i
+        call @testu(%14, %15) [all]
+        %16 = const 2147483648 : u32i
+        %17 = const 4294967295 : u32i
+        call @testu(%16, %17) [all]
+        %18 = const 305419896 : u32i
+        %19 = const 1842063751 : u32i
+        call @testu(%18, %19) [all]
+        %20 = const 2452903544 : u32i
+        %21 = const 3989547399 : u32i
+        call @testu(%20, %21) [all]
+        %22 = const 2147483647 : u32i
+        %23 = const 0 : u32i
+        call @testu(%22, %23) [all]
+        %24 = const 4294967295 : u32i
+        %25 = const 2147483648 : u32i
+        call @testu(%24, %25) [all]
+        %26 = const 0 : s32i
+        store %26, %0
+        %27 = load %0 : s32i
+        return %27
 }

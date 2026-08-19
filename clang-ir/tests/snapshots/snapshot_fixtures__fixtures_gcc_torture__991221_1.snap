@@ -1,74 +1,74 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/991221-1.c" (c, x86_64-unknown-linux-gnu)
 fn exit(%arg0: s32i) -> void [external, c];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u64i, "totalsize", align 8
-    %2 = alloca u64i, "msize", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 80 : u64i
-    store %4, %1, align 8
-    %5 = const 64 : u64i
-    store %5, %2, align 8
-    scope {
-        %33 = const 8 : u64i
-        %34 = const 4 : u64i
-        %35 = cmp ne %33, %34 : bool
-        if %35 {
-            %36 = get_global @exit : ((s32i) -> void)*
-            %37 = const 0 : s32i
-            call @exit(%37) [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u64i, "totalsize", align 8
+        %2 = alloca u64i, "msize", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 80 : u64i
+        store %4, %1, align 8
+        %5 = const 64 : u64i
+        store %5, %2, align 8
+        scope {
+                %33 = const 8 : u64i
+                %34 = const 4 : u64i
+                cmp
+                if %35 {
+                        %36 = get_global @exit : (s32i) -> void*
+                        %37 = const 0 : s32i
+                        call @exit(%37) [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %9 = load %1 : u64i, align 8
-        %10 = const 2147483647 : u64i
-        %11 = const 2 : u64i
-        %12 = mul %10, %11 : u64i
-        %13 = const 1 : u64i
-        %14 = add %12, %13 : u64i
-        %15 = cmp gt %9, %14 : bool
-        %16 = ternary %15 ? { : bool
-            %32 = const true : bool
-            yield %32
-        } : {
-            %18 = load %2 : u64i, align 8
-            %19 = const 0 : u64i
-            %20 = cmp ne %18, %19 : bool
-            %21 = ternary %20 ? { : bool
-                %23 = load %2 : u64i, align 8
-                %24 = const 1 : u64i
-                %25 = sub %23, %24 : u64i
-                %26 = const 2147483647 : u64i
-                %27 = const 2 : u64i
-                %28 = mul %26, %27 : u64i
-                %29 = const 1 : u64i
-                %30 = add %28, %29 : u64i
-                %31 = cmp gt %25, %30 : bool
-                yield %31
-            } : {
-                %22 = const false : bool
-                yield %22
-            }
-            yield %21
+        scope {
+                %9 = load %1 : u64i, align 8
+                %10 = const 2147483647 : u64i
+                %11 = const 2 : u64i
+                mul
+                %13 = const 1 : u64i
+                %14 = add %12, %13 : u64i
+                cmp
+                %16 = ternary %15 ? { : bool
+                        %32 = const true : bool
+                        yield %32
+                } : {
+                        %18 = load %2 : u64i, align 8
+                        %19 = const 0 : u64i
+                        cmp
+                        %21 = ternary %20 ? { : bool
+                                %23 = load %2 : u64i, align 8
+                                %24 = const 1 : u64i
+                                sub
+                                %26 = const 2147483647 : u64i
+                                %27 = const 2 : u64i
+                                mul
+                                %29 = const 1 : u64i
+                                %30 = add %28, %29 : u64i
+                                cmp
+                                yield %31
+                        } : {
+                                %22 = const false : bool
+                                yield %22
+                        }
+                        yield %21
+                }
+                if %16 {
+                        %17 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %16 {
-            %17 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %6 = get_global @exit : ((s32i) -> void)*
-    %7 = const 0 : s32i
-    call @exit(%7) [all]
-    %8 = load %0 : s32i
-    return %8
+        %6 = get_global @exit : (s32i) -> void*
+        %7 = const 0 : s32i
+        call @exit(%7) [all]
+        %8 = load %0 : s32i
+        return %8
 }

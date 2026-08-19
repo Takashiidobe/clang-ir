@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr91450-1.c" (c, x86_64-unknown-linux-gnu)
@@ -13,18 +13,18 @@ fn foo(%arg8: s32i, %arg9: s32i) -> u64i [external, c, no_inline, dso_local, not
         store %arg8, %142
         store %arg9, %143
         scope {
-            %148 = load %142 : s32i, align 4
-            %149 = load %143 : s32i, align 4
-            %150 = cast(integral) %148 : s65
-            %151 = cast(integral) %149 : s65
-            %152#0, %152#1 = mul.overflow %150, %151 : u64i
-            store %152#0, %145, align 8
-            %153 = not %152#1 : bool
-            if %153 {
-                call @abort() [all]
+                %148 = load %142 : s32i, align 4
+                %149 = load %143 : s32i, align 4
+                %150 = cast(integral) %148 : s65
+                %151 = cast(integral) %149 : s65
+                mul.overflow
+                store %152#0, %145, align 8
+                not
+                if %153 {
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %146 = load %145 : u64i, align 8
         store %146, %144
@@ -40,30 +40,30 @@ fn bar(%arg6: s32i, %arg7: s32i) -> u64i [external, c, no_inline, dso_local, not
         store %arg6, %125
         store %arg7, %126
         scope {
-            %137 = load %125 : s32i, align 4
-            %138 = const 0 : s32i
-            %139 = cmp ge %137, %138 : bool
-            if %139 {
-                %140 = const 0 : u64i
-                store %140, %127
-                %141 = load %127 : u64i
-                return %141
-            }
-            yield
+                %137 = load %125 : s32i, align 4
+                %138 = const 0 : s32i
+                cmp
+                if %139 {
+                        %140 = const 0 : u64i
+                        store %140, %127
+                        %141 = load %127 : u64i
+                        return %141
+                }
+                yield
         }
         scope {
-            %131 = load %125 : s32i, align 4
-            %132 = load %126 : s32i, align 4
-            %133 = cast(integral) %131 : s65
-            %134 = cast(integral) %132 : s65
-            %135#0, %135#1 = mul.overflow %133, %134 : u64i
-            store %135#0, %128, align 8
-            %136 = not %135#1 : bool
-            if %136 {
-                call @abort() [all]
+                %131 = load %125 : s32i, align 4
+                %132 = load %126 : s32i, align 4
+                %133 = cast(integral) %131 : s65
+                %134 = cast(integral) %132 : s65
+                mul.overflow
+                store %135#0, %128, align 8
+                not
+                if %136 {
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %129 = load %128 : u64i, align 8
         store %129, %127
@@ -79,30 +79,30 @@ fn baz(%arg4: s32i, %arg5: s32i) -> u64i [external, c, no_inline, dso_local, not
         store %arg4, %108
         store %arg5, %109
         scope {
-            %120 = load %109 : s32i, align 4
-            %121 = const 0 : s32i
-            %122 = cmp ge %120, %121 : bool
-            if %122 {
-                %123 = const 0 : u64i
-                store %123, %110
-                %124 = load %110 : u64i
-                return %124
-            }
-            yield
+                %120 = load %109 : s32i, align 4
+                %121 = const 0 : s32i
+                cmp
+                if %122 {
+                        %123 = const 0 : u64i
+                        store %123, %110
+                        %124 = load %110 : u64i
+                        return %124
+                }
+                yield
         }
         scope {
-            %114 = load %108 : s32i, align 4
-            %115 = load %109 : s32i, align 4
-            %116 = cast(integral) %114 : s65
-            %117 = cast(integral) %115 : s65
-            %118#0, %118#1 = mul.overflow %116, %117 : u64i
-            store %118#0, %111, align 8
-            %119 = not %118#1 : bool
-            if %119 {
-                call @abort() [all]
+                %114 = load %108 : s32i, align 4
+                %115 = load %109 : s32i, align 4
+                %116 = cast(integral) %114 : s65
+                %117 = cast(integral) %115 : s65
+                mul.overflow
+                store %118#0, %111, align 8
+                not
+                if %119 {
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %112 = load %111 : u64i, align 8
         store %112, %110
@@ -118,42 +118,42 @@ fn qux(%arg2: s32i, %arg3: s32i) -> u64i [external, c, no_inline, dso_local, not
         store %arg2, %86
         store %arg3, %87
         scope {
-            %103 = load %86 : s32i, align 4
-            %104 = const 0 : s32i
-            %105 = cmp ge %103, %104 : bool
-            if %105 {
-                %106 = const 0 : u64i
-                store %106, %88
-                %107 = load %88 : u64i
-                return %107
-            }
-            yield
-        }
-        scope {
-            %98 = load %87 : s32i, align 4
-            %99 = const 0 : s32i
-            %100 = cmp lt %98, %99 : bool
-            if %100 {
-                %101 = const 0 : u64i
-                store %101, %88
-                %102 = load %88 : u64i
-                return %102
-            }
-            yield
-        }
-        scope {
-            %92 = load %86 : s32i, align 4
-            %93 = load %87 : s32i, align 4
-            %94 = cast(integral) %92 : s65
-            %95 = cast(integral) %93 : s65
-            %96#0, %96#1 = mul.overflow %94, %95 : u64i
-            store %96#0, %89, align 8
-            %97 = not %96#1 : bool
-            if %97 {
-                call @abort() [all]
+                %103 = load %86 : s32i, align 4
+                %104 = const 0 : s32i
+                cmp
+                if %105 {
+                        %106 = const 0 : u64i
+                        store %106, %88
+                        %107 = load %88 : u64i
+                        return %107
+                }
                 yield
-            }
-            yield
+        }
+        scope {
+                %98 = load %87 : s32i, align 4
+                %99 = const 0 : s32i
+                cmp
+                if %100 {
+                        %101 = const 0 : u64i
+                        store %101, %88
+                        %102 = load %88 : u64i
+                        return %102
+                }
+                yield
+        }
+        scope {
+                %92 = load %86 : s32i, align 4
+                %93 = load %87 : s32i, align 4
+                %94 = cast(integral) %92 : s65
+                %95 = cast(integral) %93 : s65
+                mul.overflow
+                store %96#0, %89, align 8
+                not
+                if %97 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
         %90 = load %89 : u64i, align 8
         store %90, %88
@@ -169,42 +169,42 @@ fn quux(%arg0: s32i, %arg1: s32i) -> u64i [external, c, no_inline, dso_local, no
         store %arg0, %64
         store %arg1, %65
         scope {
-            %81 = load %64 : s32i, align 4
-            %82 = const 0 : s32i
-            %83 = cmp lt %81, %82 : bool
-            if %83 {
-                %84 = const 0 : u64i
-                store %84, %66
-                %85 = load %66 : u64i
-                return %85
-            }
-            yield
-        }
-        scope {
-            %76 = load %65 : s32i, align 4
-            %77 = const 0 : s32i
-            %78 = cmp ge %76, %77 : bool
-            if %78 {
-                %79 = const 0 : u64i
-                store %79, %66
-                %80 = load %66 : u64i
-                return %80
-            }
-            yield
-        }
-        scope {
-            %70 = load %64 : s32i, align 4
-            %71 = load %65 : s32i, align 4
-            %72 = cast(integral) %70 : s65
-            %73 = cast(integral) %71 : s65
-            %74#0, %74#1 = mul.overflow %72, %73 : u64i
-            store %74#0, %67, align 8
-            %75 = not %74#1 : bool
-            if %75 {
-                call @abort() [all]
+                %81 = load %64 : s32i, align 4
+                %82 = const 0 : s32i
+                cmp
+                if %83 {
+                        %84 = const 0 : u64i
+                        store %84, %66
+                        %85 = load %66 : u64i
+                        return %85
+                }
                 yield
-            }
-            yield
+        }
+        scope {
+                %76 = load %65 : s32i, align 4
+                %77 = const 0 : s32i
+                cmp
+                if %78 {
+                        %79 = const 0 : u64i
+                        store %79, %66
+                        %80 = load %66 : u64i
+                        return %80
+                }
+                yield
+        }
+        scope {
+                %70 = load %64 : s32i, align 4
+                %71 = load %65 : s32i, align 4
+                %72 = cast(integral) %70 : s65
+                %73 = cast(integral) %71 : s65
+                mul.overflow
+                store %74#0, %67, align 8
+                not
+                if %75 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
         %68 = load %67 : u64i, align 8
         store %68, %66
@@ -212,155 +212,155 @@ fn quux(%arg0: s32i, %arg1: s32i) -> u64i [external, c, no_inline, dso_local, no
         return %69
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %59 = const -4 : s32i
-        %60 = const 2 : s32i
-        %61 = call @foo(%59, %60) : u64i [all]
-        %62 = const 18446744073709551608 : u64i
-        %63 = cmp ne %61, %62 : bool
-        if %63 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %59 = const -4 : s32i
+                %60 = const 2 : s32i
+                %61 = call @foo(%59, %60) : u64i [all]
+                %62 = const 18446744073709551608 : u64i
+                cmp
+                if %63 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %54 = const 2 : s32i
-        %55 = const -4 : s32i
-        %56 = call @foo(%54, %55) : u64i [all]
-        %57 = const 18446744073709551608 : u64i
-        %58 = cmp ne %56, %57 : bool
-        if %58 {
-            call @abort() [all]
-            yield
+        scope {
+                %54 = const 2 : s32i
+                %55 = const -4 : s32i
+                %56 = call @foo(%54, %55) : u64i [all]
+                %57 = const 18446744073709551608 : u64i
+                cmp
+                if %58 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %49 = const -4 : s32i
-        %50 = const 2 : s32i
-        %51 = call @bar(%49, %50) : u64i [all]
-        %52 = const 18446744073709551608 : u64i
-        %53 = cmp ne %51, %52 : bool
-        if %53 {
-            call @abort() [all]
-            yield
+        scope {
+                %49 = const -4 : s32i
+                %50 = const 2 : s32i
+                %51 = call @bar(%49, %50) : u64i [all]
+                %52 = const 18446744073709551608 : u64i
+                cmp
+                if %53 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %44 = const 2 : s32i
-        %45 = const -4 : s32i
-        %46 = call @baz(%44, %45) : u64i [all]
-        %47 = const 18446744073709551608 : u64i
-        %48 = cmp ne %46, %47 : bool
-        if %48 {
-            call @abort() [all]
-            yield
+        scope {
+                %44 = const 2 : s32i
+                %45 = const -4 : s32i
+                %46 = call @baz(%44, %45) : u64i [all]
+                %47 = const 18446744073709551608 : u64i
+                cmp
+                if %48 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %39 = const -4 : s32i
-        %40 = const 2 : s32i
-        %41 = call @qux(%39, %40) : u64i [all]
-        %42 = const 18446744073709551608 : u64i
-        %43 = cmp ne %41, %42 : bool
-        if %43 {
-            call @abort() [all]
-            yield
+        scope {
+                %39 = const -4 : s32i
+                %40 = const 2 : s32i
+                %41 = call @qux(%39, %40) : u64i [all]
+                %42 = const 18446744073709551608 : u64i
+                cmp
+                if %43 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %34 = const 2 : s32i
-        %35 = const -4 : s32i
-        %36 = call @quux(%34, %35) : u64i [all]
-        %37 = const 18446744073709551608 : u64i
-        %38 = cmp ne %36, %37 : bool
-        if %38 {
-            call @abort() [all]
-            yield
+        scope {
+                %34 = const 2 : s32i
+                %35 = const -4 : s32i
+                %36 = call @quux(%34, %35) : u64i [all]
+                %37 = const 18446744073709551608 : u64i
+                cmp
+                if %38 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %29 = const -2 : s32i
-        %30 = const 1 : s32i
-        %31 = call @foo(%29, %30) : u64i [all]
-        %32 = const 18446744073709551614 : u64i
-        %33 = cmp ne %31, %32 : bool
-        if %33 {
-            call @abort() [all]
-            yield
+        scope {
+                %29 = const -2 : s32i
+                %30 = const 1 : s32i
+                %31 = call @foo(%29, %30) : u64i [all]
+                %32 = const 18446744073709551614 : u64i
+                cmp
+                if %33 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %24 = const 1 : s32i
-        %25 = const -2 : s32i
-        %26 = call @foo(%24, %25) : u64i [all]
-        %27 = const 18446744073709551614 : u64i
-        %28 = cmp ne %26, %27 : bool
-        if %28 {
-            call @abort() [all]
-            yield
+        scope {
+                %24 = const 1 : s32i
+                %25 = const -2 : s32i
+                %26 = call @foo(%24, %25) : u64i [all]
+                %27 = const 18446744073709551614 : u64i
+                cmp
+                if %28 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %19 = const -2 : s32i
-        %20 = const 1 : s32i
-        %21 = call @bar(%19, %20) : u64i [all]
-        %22 = const 18446744073709551614 : u64i
-        %23 = cmp ne %21, %22 : bool
-        if %23 {
-            call @abort() [all]
-            yield
+        scope {
+                %19 = const -2 : s32i
+                %20 = const 1 : s32i
+                %21 = call @bar(%19, %20) : u64i [all]
+                %22 = const 18446744073709551614 : u64i
+                cmp
+                if %23 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %14 = const 1 : s32i
-        %15 = const -2 : s32i
-        %16 = call @baz(%14, %15) : u64i [all]
-        %17 = const 18446744073709551614 : u64i
-        %18 = cmp ne %16, %17 : bool
-        if %18 {
-            call @abort() [all]
-            yield
+        scope {
+                %14 = const 1 : s32i
+                %15 = const -2 : s32i
+                %16 = call @baz(%14, %15) : u64i [all]
+                %17 = const 18446744073709551614 : u64i
+                cmp
+                if %18 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %9 = const -2 : s32i
-        %10 = const 1 : s32i
-        %11 = call @qux(%9, %10) : u64i [all]
-        %12 = const 18446744073709551614 : u64i
-        %13 = cmp ne %11, %12 : bool
-        if %13 {
-            call @abort() [all]
-            yield
+        scope {
+                %9 = const -2 : s32i
+                %10 = const 1 : s32i
+                %11 = call @qux(%9, %10) : u64i [all]
+                %12 = const 18446744073709551614 : u64i
+                cmp
+                if %13 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %4 = const 1 : s32i
-        %5 = const -2 : s32i
-        %6 = call @quux(%4, %5) : u64i [all]
-        %7 = const 18446744073709551614 : u64i
-        %8 = cmp ne %6, %7 : bool
-        if %8 {
-            call @abort() [all]
-            yield
+        scope {
+                %4 = const 1 : s32i
+                %5 = const -2 : s32i
+                %6 = call @quux(%4, %5) : u64i [all]
+                %7 = const 18446744073709551614 : u64i
+                cmp
+                if %8 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

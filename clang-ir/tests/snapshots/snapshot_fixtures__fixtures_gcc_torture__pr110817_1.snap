@@ -1,31 +1,31 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr110817-1.c" (c, x86_64-unknown-linux-gnu)
-global c : vector<1 x u64i> = zero [external, default, align 8, dso_local]
+global c : vector<1 x u64i> = Zero { ty: Vector { element_type: Named("u64i"), size: 1, is_scalable: None } } [external, default, align 8, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca vector<1 x u64i>, "v", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const [0] : vector<1 x u64i>
-    store %3, %1, align 8
-    scope {
-        %6 = load %1 : vector<1 x u64i>, align 8
-        %7 = const 0 : s32i
-        %8 = vec.extract %6[%7] : u64i
-        %9 = cast(int_to_bool) %8 : bool
-        if %9 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca vector<1 x u64i>, "v", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const [[0]] : vector<1 x u64i>
+        store %3, %1, align 8
+        scope {
+                %6 = load %1 : vector<1 x u64i>, align 8
+                %7 = const 0 : s32i
+                vec.extract
+                %9 = cast(int_to_bool) %8 : bool
+                if %9 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

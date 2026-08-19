@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20111227-1.c" (c, x86_64-unknown-linux-gnu)
-global v : s16i = -1 [external, default, align 2, dso_local]
+global v : s16i = CirInt { ty: Named("s16i"), value: "-1" } [external, default, align 2, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn bar(%arg2: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -11,15 +11,15 @@ fn bar(%arg2: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %18 = alloca s32i, "a", align 4
         store %arg2, %18
         scope {
-            %19 = load %18 : s32i, align 4
-            %20 = const -1 : s32i
-            %21 = cmp ne %19, %20 : bool
-            if %21 {
-                %22 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %19 = load %18 : s32i, align 4
+                %20 = const -1 : s32i
+                cmp
+                if %21 {
+                        %22 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -34,33 +34,33 @@ fn foo(%arg0: s16i*, %arg1: s32i) -> void [external, c, no_inline, dso_local, no
         %10 = load %9 : s16i, align 2
         store %10, %8, align 2
         scope {
-            %11 = load %7 : s32i, align 4
-            %12 = cast(int_to_bool) %11 : bool
-            if %12 {
-                %15 = load %8 : s16i, align 2
-                %16 = cast(integral) %15 : u16i
-                %17 = cast(integral) %16 : s32i
-                call @bar(%17) [all]
+                %11 = load %7 : s32i, align 4
+                %12 = cast(int_to_bool) %11 : bool
+                if %12 {
+                        %15 = load %8 : s16i, align 2
+                        %16 = cast(integral) %15 : u16i
+                        %17 = cast(integral) %16 : s32i
+                        call @bar(%17) [all]
+                        yield
+                } else {
+                        %13 = load %8 : s16i, align 2
+                        %14 = cast(integral) %13 : s32i
+                        call @bar(%14) [all]
+                        yield
+                }
                 yield
-            } else {
-                %13 = load %8 : s16i, align 2
-                %14 = cast(integral) %13 : s32i
-                call @bar(%14) [all]
-                yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @v : s16i*
-    %3 = const 0 : s32i
-    call @foo(%2, %3) [all]
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = load %0 : s32i
-    return %5
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @v : s16i*
+        %3 = const 0 : s32i
+        call @foo(%2, %3) [all]
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = load %0 : s32i
+        return %5
 }

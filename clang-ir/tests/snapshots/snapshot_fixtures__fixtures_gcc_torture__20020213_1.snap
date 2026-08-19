@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20020213-1.c" (c, x86_64-unknown-linux-gnu)
-global a : rec_A = zero [external, default, align 4, dso_local]
-global b : s32i = 0 [external, default, align 4, dso_local]
+global a : rec_A = Zero { ty: Named("rec_A") } [external, default, align 4, dso_local]
+global b : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn bar(%arg0: float) -> s32i [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: float):
@@ -18,68 +18,68 @@ fn bar(%arg0: float) -> s32i [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
-    %9 = get_global @a : rec_A*
-    %10 = get_member %9[0] "a1" : float*
-    %11 = load %10 : float, align 4
-    %12 = call @bar(%11) : s32i [all]
-    %13 = get_global @a : rec_A*
-    %14 = get_member %13[1] "a2" : s32i*
-    store %12, %14, align 4
-    %15 = get_global @a : rec_A*
-    %16 = get_member %15[1] "a2" : s32i*
-    %17 = load %16 : s32i, align 4
-    %18 = get_global @b : s32i*
-    %19 = load %18 : s32i, align 4
-    %20 = const 1 : s32i
-    %21 = sub %19, %20 : s32i [nsw]
-    %22 = cmp lt %17, %21 : bool
-    %23 = ternary %22 ? { : s32i
-        %39 = get_global @a : rec_A*
-        %40 = get_member %39[1] "a2" : s32i*
-        %41 = load %40 : s32i, align 4
-        yield %41
-    } : {
-        %35 = get_global @b : s32i*
-        %36 = load %35 : s32i, align 4
-        %37 = const 1 : s32i
-        %38 = sub %36, %37 : s32i [nsw]
-        yield %38
-    }
-    %24 = get_global @a : rec_A*
-    %25 = get_member %24[1] "a2" : s32i*
-    store %23, %25, align 4
-    scope {
-        %26 = get_global @a : rec_A*
-        %27 = get_member %26[1] "a2" : s32i*
-        %28 = load %27 : s32i, align 4
-        %29 = get_global @b : s32i*
-        %30 = load %29 : s32i, align 4
-        %31 = const 1 : s32i
-        %32 = sub %30, %31 : s32i [nsw]
-        %33 = cmp ge %28, %32 : bool
-        if %33 {
-            %34 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %9 = get_global @a : rec_A*
+        get_member
+        %11 = load %10 : float, align 4
+        %12 = call @bar(%11) : s32i [all]
+        %13 = get_global @a : rec_A*
+        get_member
+        store %12, %14, align 4
+        %15 = get_global @a : rec_A*
+        get_member
+        %17 = load %16 : s32i, align 4
+        %18 = get_global @b : s32i*
+        %19 = load %18 : s32i, align 4
+        %20 = const 1 : s32i
+        sub
+        cmp
+        %23 = ternary %22 ? { : s32i
+                %39 = get_global @a : rec_A*
+                get_member
+                %41 = load %40 : s32i, align 4
+                yield %41
+        } : {
+                %35 = get_global @b : s32i*
+                %36 = load %35 : s32i, align 4
+                %37 = const 1 : s32i
+                sub
+                yield %38
         }
-        yield
-    }
-    return
+        %24 = get_global @a : rec_A*
+        get_member
+        store %23, %25, align 4
+        scope {
+                %26 = get_global @a : rec_A*
+                get_member
+                %28 = load %27 : s32i, align 4
+                %29 = get_global @b : s32i*
+                %30 = load %29 : s32i, align 4
+                %31 = const 1 : s32i
+                sub
+                cmp
+                if %33 {
+                        %34 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
+        }
+        return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1.000000e+00 : float
-    %3 = get_global @a : rec_A*
-    %4 = get_member %3[0] "a1" : float*
-    store %2, %4, align 4
-    %5 = const 3384 : s32i
-    %6 = get_global @b : s32i*
-    store %5, %6, align 4
-    call @foo() [all]
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = load %0 : s32i
-    return %8
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1.000000e+00 : float
+        %3 = get_global @a : rec_A*
+        get_member
+        store %2, %4, align 4
+        %5 = const 3384 : s32i
+        %6 = get_global @b : s32i*
+        store %5, %6, align 4
+        call @foo() [all]
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = load %0 : s32i
+        return %8
 }

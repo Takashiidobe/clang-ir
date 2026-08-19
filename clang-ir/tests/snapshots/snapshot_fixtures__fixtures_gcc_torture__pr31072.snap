@@ -1,28 +1,28 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr31072.c" (c, x86_64-unknown-linux-gnu)
-global ReadyFlag_NotProperlyInitialized : s32i = 1 [external, default, align 4, dso_local]
+global ReadyFlag_NotProperlyInitialized : s32i = CirInt { ty: Named("s32i"), value: "1" } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = get_global @ReadyFlag_NotProperlyInitialized : s32i*
-        %5 = load %4 : s32i, align 4, volatile
-        %6 = const 1 : s32i
-        %7 = cmp ne %5, %6 : bool
-        if %7 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = get_global @ReadyFlag_NotProperlyInitialized : s32i*
+                %5 = load %4 : s32i, align 4
+                %6 = const 1 : s32i
+                cmp
+                if %7 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

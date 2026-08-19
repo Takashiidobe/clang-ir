@@ -1,11 +1,11 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/980716-1.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[3] = "ab" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[3] = "bc" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[3] = "cx" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[3] = ConstArray { ty: Array { element_type: Named("s8i"), size: 3 }, elts: Str("ab"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[3] = ConstArray { ty: Array { element_type: Named("s8i"), size: 3 }, elts: Str("bc"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[3] = ConstArray { ty: Array { element_type: Named("s8i"), size: 3 }, elts: Str("cx"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn stub(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s32i):
@@ -15,74 +15,74 @@ fn stub(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %16 = alloca s32i, "i", align 4
         store %arg0, %13
         scope {
-            %17 = const 0 : s32i
-            store %17, %16, align 4
-            for cond: {
-                %29 = load %16 : s32i, align 4
-                %30 = const 2 : s32i
-                %31 = cmp lt %29, %30 : bool
-                condition %31
-            } step: {
-                %18 = load %16 : s32i, align 4
-                %19 = inc %18 : s32i [nsw]
-                store %19, %16, align 4
-                yield
-            } do {
-                scope {
-                    %20 = cast(array_to_ptrdecay) %14 : rec___va_list_tag*
-                    va_start %20
-                    scope {
-                        while {
-                            %27 = const 1 : s32i
-                            %28 = cast(int_to_bool) %27 : bool
-                            condition %28
-                        } do {
-                            scope {
-                                %22 = cast(array_to_ptrdecay) %14 : rec___va_list_tag*
-                                %23 = va_arg %22 : s8i*
-                                store %23, %15, align 8
+                %17 = const 0 : s32i
+                store %17, %16, align 4
+                for cond {
+                        %29 = load %16 : s32i, align 4
+                        %30 = const 2 : s32i
+                        cmp
+                        condition %31
+                } step {
+                        %18 = load %16 : s32i, align 4
+                        inc
+                        store %19, %16, align 4
+                        yield
+                } body {
+                        scope {
+                                %20 = cast(array_to_ptrdecay) %14 : rec___va_list_tag*
+                                va_start
                                 scope {
-                                    %24 = load %15 : s8i*, align 8
-                                    %25 = cast(ptr_to_bool) %24 : bool
-                                    %26 = not %25 : bool
-                                    if %26 {
-                                        break
-                                    }
-                                    yield
+                                        while {
+                                                %27 = const 1 : s32i
+                                                %28 = cast(int_to_bool) %27 : bool
+                                                condition %28
+                                        } do {
+                                                scope {
+                                                        %22 = cast(array_to_ptrdecay) %14 : rec___va_list_tag*
+                                                        va_arg
+                                                        store %23, %15, align 8
+                                                        scope {
+                                                                %24 = load %15 : s8i*, align 8
+                                                                %25 = cast(ptr_to_bool) %24 : bool
+                                                                not
+                                                                if %26 {
+                                                                        break
+                                                                }
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        yield
                                 }
+                                %21 = cast(array_to_ptrdecay) %14 : rec___va_list_tag*
+                                va_end
                                 yield
-                            }
-                            yield
                         }
                         yield
-                    }
-                    %21 = cast(array_to_ptrdecay) %14 : rec___va_list_tag*
-                    va_end %21
-                    yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : s32i
-    %3 = get_global @.str : s8i[3]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = get_global @.str.1 : s8i[3]*
-    %6 = cast(array_to_ptrdecay) %5 : s8i*
-    %7 = get_global @.str.2 : s8i[3]*
-    %8 = cast(array_to_ptrdecay) %7 : s8i*
-    %9 = const #cir.ptr<null> : s8i*
-    call @stub(%2, %4, %6, %8, %9) [all]
-    %10 = get_global @exit : ((s32i) -> void)*
-    %11 = const 0 : s32i
-    call @exit(%11) [all]
-    %12 = load %0 : s32i
-    return %12
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : s32i
+        %3 = get_global @.str : s8i[3]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = get_global @.str.1 : s8i[3]*
+        %6 = cast(array_to_ptrdecay) %5 : s8i*
+        %7 = get_global @.str.2 : s8i[3]*
+        %8 = cast(array_to_ptrdecay) %7 : s8i*
+        %9 = const #cir.ptr<null> : s8i*
+        call @stub(%2, %4, %6, %8, %9) [all]
+        %10 = get_global @exit : (s32i) -> void*
+        %11 = const 0 : s32i
+        call @exit(%11) [all]
+        %12 = load %0 : s32i
+        return %12
 }

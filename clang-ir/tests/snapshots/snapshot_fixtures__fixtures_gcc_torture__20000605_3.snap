@@ -1,69 +1,69 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000605-3.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "timeout", align 4
-    %2 = alloca s32i, "x", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 0 : s32i
-    store %4, %1, align 4
-    %5 = const 0 : s32i
-    store %5, %2, align 4
-    scope {
-        while {
-            %24 = const 1 : s32i
-            %25 = cast(int_to_bool) %24 : bool
-            condition %25
-        } do {
-            scope {
-                %10 = alloca rec_F, "i", align 4
-                %11 = get_member %10[0] "x" : s32i*
-                %12 = load %2 : s32i, align 4
-                %13 = inc %12 : s32i [nsw]
-                store %13, %2, align 4
-                store %12, %11, align 4
-                %14 = get_member %10[1] "y" : s32i*
-                %15 = const 0 : s32i
-                store %15, %14, align 4
-                scope {
-                    %20 = get_member %10[0] "x" : s32i*
-                    %21 = load %20 : s32i, align 4
-                    %22 = const 0 : s32i
-                    %23 = cmp gt %21, %22 : bool
-                    if %23 {
-                        break
-                    }
-                    yield
-                }
-                scope {
-                    %16 = load %1 : s32i, align 4
-                    %17 = inc %16 : s32i [nsw]
-                    store %17, %1, align 4
-                    %18 = const 5 : s32i
-                    %19 = cmp gt %17, %18 : bool
-                    if %19 {
-                        goto die
-                    }
-                    yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "timeout", align 4
+        %2 = alloca s32i, "x", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 0 : s32i
+        store %4, %1, align 4
+        %5 = const 0 : s32i
+        store %5, %2, align 4
+        scope {
+                while {
+                        %24 = const 1 : s32i
+                        %25 = cast(int_to_bool) %24 : bool
+                        condition %25
+                } do {
+                        scope {
+                                %10 = alloca rec_F, "i", align 4
+                                get_member
+                                %12 = load %2 : s32i, align 4
+                                inc
+                                store %13, %2, align 4
+                                store %12, %11, align 4
+                                get_member
+                                %15 = const 0 : s32i
+                                store %15, %14, align 4
+                                scope {
+                                        get_member
+                                        %21 = load %20 : s32i, align 4
+                                        %22 = const 0 : s32i
+                                        cmp
+                                        if %23 {
+                                                break
+                                        }
+                                        yield
+                                }
+                                scope {
+                                        %16 = load %1 : s32i, align 4
+                                        inc
+                                        store %17, %1, align 4
+                                        %18 = const 5 : s32i
+                                        cmp
+                                        if %19 {
+                                                goto die
+                                        }
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
-    ^bb1():
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
+    ^bb1:
         label die:
-        %8 = get_global @abort : (() -> void)*
+        %8 = get_global @abort : () -> void*
         call @abort() [all]
         %9 = load %0 : s32i
         return %9

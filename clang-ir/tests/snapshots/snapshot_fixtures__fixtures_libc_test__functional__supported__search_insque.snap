@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.libc-test/functional/supported/search_insque.c" (c, x86_64-unknown-linux-gnu)
-global t_status : s32i = 0 [external, default, align 4, dso_local]
-global .str : s8i[132] = "tests/fixtures.libc-test/functional/supported/search_insque.c:91: walking queue: got %d, wanted %d\n" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[125] = "tests/fixtures.libc-test/functional/supported/search_insque.c:96: remque: got %d, wanted %d\n" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[125] = "tests/fixtures.libc-test/functional/supported/search_insque.c:98: remque: got %d, wanted %d\n" [cir_private, default, align 1, dso_local, constant]
+global t_status : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global .str : s8i[141] = ConstArray { ty: Array { element_type: Named("s8i"), size: 141 }, elts: Str("tests/fixtures.libc-test/functional/supported/search_insque.c:91: walking queue: got %d, wanted %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[134] = ConstArray { ty: Array { element_type: Named("s8i"), size: 134 }, elts: Str("tests/fixtures.libc-test/functional/supported/search_insque.c:96: remque: got %d, wanted %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[134] = ConstArray { ty: Array { element_type: Named("s8i"), size: 134 }, elts: Str("tests/fixtures.libc-test/functional/supported/search_insque.c:98: remque: got %d, wanted %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn vsnprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec___va_list_tag*) -> s32i [external, c, nothrow];
 fn write(%arg0: s32i, %arg1: void*, %arg2: u64i) -> s64i [external, c];
@@ -20,10 +20,10 @@ fn t_printf(%arg1: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         store %arg1, %110
         %115 = const 1 : s32i
         %116 = get_global @t_status : s32i*
-        store %115, %116, align 4, volatile
+        store %115, %116, align 4
         %117 = cast(array_to_ptrdecay) %112 : rec___va_list_tag*
-        va_start %117
-        %118 = get_global @vsnprintf : ((s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i)*
+        va_start
+        %118 = get_global @vsnprintf : (s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i*
         %119 = cast(array_to_ptrdecay) %113 : s8i*
         %120 = const 512 : u64i
         %121 = load %110 : s8i*, align 8
@@ -31,59 +31,59 @@ fn t_printf(%arg1: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %123 = call @vsnprintf(%119, %120, %121, %122) : s32i [all]
         store %123, %114, align 4
         %124 = cast(array_to_ptrdecay) %112 : rec___va_list_tag*
-        va_end %124
+        va_end
         scope {
-            %133 = load %114 : s32i, align 4
-            %134 = const 0 : s32i
-            %135 = cmp lt %133, %134 : bool
-            if %135 {
-                %165 = const 0 : s32i
-                store %165, %114, align 4
-                yield
-            } else {
-                scope {
-                    %136 = load %114 : s32i, align 4
-                    %137 = cast(integral) %136 : u64i
-                    %138 = const 512 : u64i
-                    %139 = cmp ge %137, %138 : bool
-                    if %139 {
-                        %140 = const 512 : s32i
-                        store %140, %114, align 4
-                        %141 = const 10 : s8i
-                        %142 = load %114 : s32i, align 4
-                        %143 = const 1 : s32i
-                        %144 = sub %142, %143 : s32i [nsw]
-                        %145 = cast(integral) %144 : s64i
-                        %146 = get_element %113[%145] : s8i*
-                        store %141, %146, align 1
-                        %147 = const 46 : s8i
-                        %148 = load %114 : s32i, align 4
-                        %149 = const 2 : s32i
-                        %150 = sub %148, %149 : s32i [nsw]
-                        %151 = cast(integral) %150 : s64i
-                        %152 = get_element %113[%151] : s8i*
-                        store %147, %152, align 1
-                        %153 = const 46 : s8i
-                        %154 = load %114 : s32i, align 4
-                        %155 = const 3 : s32i
-                        %156 = sub %154, %155 : s32i [nsw]
-                        %157 = cast(integral) %156 : s64i
-                        %158 = get_element %113[%157] : s8i*
-                        store %153, %158, align 1
-                        %159 = const 46 : s8i
-                        %160 = load %114 : s32i, align 4
-                        %161 = const 4 : s32i
-                        %162 = sub %160, %161 : s32i [nsw]
-                        %163 = cast(integral) %162 : s64i
-                        %164 = get_element %113[%163] : s8i*
-                        store %159, %164, align 1
+                %133 = load %114 : s32i, align 4
+                %134 = const 0 : s32i
+                cmp
+                if %135 {
+                        %165 = const 0 : s32i
+                        store %165, %114, align 4
                         yield
-                    }
-                    yield
+                } else {
+                        scope {
+                                %136 = load %114 : s32i, align 4
+                                %137 = cast(integral) %136 : u64i
+                                %138 = const 512 : u64i
+                                cmp
+                                if %139 {
+                                        %140 = const 512 : s32i
+                                        store %140, %114, align 4
+                                        %141 = const 10 : s8i
+                                        %142 = load %114 : s32i, align 4
+                                        %143 = const 1 : s32i
+                                        sub
+                                        %145 = cast(integral) %144 : s64i
+                                        get_element
+                                        store %141, %146, align 1
+                                        %147 = const 46 : s8i
+                                        %148 = load %114 : s32i, align 4
+                                        %149 = const 2 : s32i
+                                        sub
+                                        %151 = cast(integral) %150 : s64i
+                                        get_element
+                                        store %147, %152, align 1
+                                        %153 = const 46 : s8i
+                                        %154 = load %114 : s32i, align 4
+                                        %155 = const 3 : s32i
+                                        sub
+                                        %157 = cast(integral) %156 : s64i
+                                        get_element
+                                        store %153, %158, align 1
+                                        %159 = const 46 : s8i
+                                        %160 = load %114 : s32i, align 4
+                                        %161 = const 4 : s32i
+                                        sub
+                                        %163 = cast(integral) %162 : s64i
+                                        get_element
+                                        store %159, %164, align 1
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %125 = const 1 : s32i
         %126 = cast(array_to_ptrdecay) %113 : s8i*
@@ -103,14 +103,14 @@ fn new(%arg0: s32i) -> rec_q* [internal, c, no_inline, dso_local, nothrow] {
         %99 = alloca rec_q*, "__retval", align 8
         %100 = alloca rec_q*, "q", align 8
         store %arg0, %98
-        %101 = get_global @malloc : ((u64i) -> void*)*
+        %101 = get_global @malloc : (u64i) -> void**
         %102 = const 24 : u64i
         %103 = call @malloc(%102) : void* [all]
         %104 = cast(bitcast) %103 : rec_q*
         store %104, %100, align 8
         %105 = load %98 : s32i, align 4
         %106 = load %100 : rec_q*, align 8
-        %107 = get_member %106[2] "i" : s32i*
+        get_member
         store %105, %107, align 8
         %108 = load %100 : rec_q*, align 8
         store %108, %99
@@ -120,157 +120,157 @@ fn new(%arg0: s32i) -> rec_q* [internal, c, no_inline, dso_local, nothrow] {
 fn insque(%arg0: void*, %arg1: void*) -> void [external, c, nothrow];
 fn remque(%arg0: void*) -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_q*, "q", align 8
-    %2 = alloca rec_q*, "p", align 8
-    %3 = alloca s32i, "i", align 4
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = const 0 : s32i
-    %6 = call @new(%5) : rec_q* [all]
-    store %6, %1, align 8
-    %7 = load %1 : rec_q*, align 8
-    %8 = cast(bitcast) %7 : void*
-    %9 = const #cir.ptr<null> : void*
-    call @insque(%8, %9) [all]
-    scope {
-        %84 = const 1 : s32i
-        store %84, %3, align 4
-        for cond: {
-            %95 = load %3 : s32i, align 4
-            %96 = const 10 : s32i
-            %97 = cmp lt %95, %96 : bool
-            condition %97
-        } step: {
-            %85 = load %3 : s32i, align 4
-            %86 = inc %85 : s32i [nsw]
-            store %86, %3, align 4
-            yield
-        } do {
-            scope {
-                %87 = load %3 : s32i, align 4
-                %88 = call @new(%87) : rec_q* [all]
-                %89 = cast(bitcast) %88 : void*
-                %90 = load %1 : rec_q*, align 8
-                %91 = cast(bitcast) %90 : void*
-                call @insque(%89, %91) [all]
-                %92 = load %1 : rec_q*, align 8
-                %93 = get_member %92[0] "n" : rec_q**
-                %94 = load %93 : rec_q*, align 8
-                store %94, %1, align 8
-                yield
-            }
-            yield
-        }
-        yield
-    }
-    %10 = load %1 : rec_q*, align 8
-    store %10, %2, align 8
-    scope {
-        while {
-            %82 = load %1 : rec_q*, align 8
-            %83 = cast(ptr_to_bool) %82 : bool
-            condition %83
-        } do {
-            scope {
-                scope {
-                    %69 = load %1 : rec_q*, align 8
-                    %70 = get_member %69[2] "i" : s32i*
-                    %71 = load %70 : s32i, align 8
-                    %72 = load %3 : s32i, align 4
-                    %73 = dec %72 : s32i [nsw]
-                    store %73, %3, align 4
-                    %74 = cmp ne %71, %73 : bool
-                    if %74 {
-                        %75 = get_global @.str : s8i[132]*
-                        %76 = cast(array_to_ptrdecay) %75 : s8i*
-                        %77 = load %1 : rec_q*, align 8
-                        %78 = get_member %77[2] "i" : s32i*
-                        %79 = load %78 : s32i, align 8
-                        %80 = load %3 : s32i, align 4
-                        %81 = call @t_printf(%76, %79, %80) : s32i [all]
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_q*, "q", align 8
+        %2 = alloca rec_q*, "p", align 8
+        %3 = alloca s32i, "i", align 4
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = const 0 : s32i
+        %6 = call @new(%5) : rec_q* [all]
+        store %6, %1, align 8
+        %7 = load %1 : rec_q*, align 8
+        %8 = cast(bitcast) %7 : void*
+        %9 = const #cir.ptr<null> : void*
+        call @insque(%8, %9) [all]
+        scope {
+                %84 = const 1 : s32i
+                store %84, %3, align 4
+                for cond {
+                        %95 = load %3 : s32i, align 4
+                        %96 = const 10 : s32i
+                        cmp
+                        condition %97
+                } step {
+                        %85 = load %3 : s32i, align 4
+                        inc
+                        store %86, %3, align 4
                         yield
-                    }
-                    yield
+                } body {
+                        scope {
+                                %87 = load %3 : s32i, align 4
+                                %88 = call @new(%87) : rec_q* [all]
+                                %89 = cast(bitcast) %88 : void*
+                                %90 = load %1 : rec_q*, align 8
+                                %91 = cast(bitcast) %90 : void*
+                                call @insque(%89, %91) [all]
+                                %92 = load %1 : rec_q*, align 8
+                                get_member
+                                %94 = load %93 : rec_q*, align 8
+                                store %94, %1, align 8
+                                yield
+                        }
+                        yield
                 }
-                %66 = load %1 : rec_q*, align 8
-                %67 = get_member %66[1] "p" : rec_q**
-                %68 = load %67 : rec_q*, align 8
-                store %68, %1, align 8
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %11 = load %2 : rec_q*, align 8
-    %12 = get_member %11[1] "p" : rec_q**
-    %13 = load %12 : rec_q*, align 8
-    %14 = cast(bitcast) %13 : void*
-    call @remque(%14) [all]
-    scope {
-        %42 = load %2 : rec_q*, align 8
-        %43 = get_member %42[1] "p" : rec_q**
-        %44 = load %43 : rec_q*, align 8
-        %45 = get_member %44[2] "i" : s32i*
-        %46 = load %45 : s32i, align 8
-        %47 = load %2 : rec_q*, align 8
-        %48 = get_member %47[2] "i" : s32i*
-        %49 = load %48 : s32i, align 8
-        %50 = const 2 : s32i
-        %51 = sub %49, %50 : s32i [nsw]
-        %52 = cmp ne %46, %51 : bool
-        if %52 {
-            %53 = get_global @.str.1 : s8i[125]*
-            %54 = cast(array_to_ptrdecay) %53 : s8i*
-            %55 = load %2 : rec_q*, align 8
-            %56 = get_member %55[1] "p" : rec_q**
-            %57 = load %56 : rec_q*, align 8
-            %58 = get_member %57[2] "i" : s32i*
-            %59 = load %58 : s32i, align 8
-            %60 = load %2 : rec_q*, align 8
-            %61 = get_member %60[2] "i" : s32i*
-            %62 = load %61 : s32i, align 8
-            %63 = const 2 : s32i
-            %64 = sub %62, %63 : s32i [nsw]
-            %65 = call @t_printf(%54, %59, %64) : s32i [all]
-            yield
+        %10 = load %1 : rec_q*, align 8
+        store %10, %2, align 8
+        scope {
+                while {
+                        %82 = load %1 : rec_q*, align 8
+                        %83 = cast(ptr_to_bool) %82 : bool
+                        condition %83
+                } do {
+                        scope {
+                                scope {
+                                        %69 = load %1 : rec_q*, align 8
+                                        get_member
+                                        %71 = load %70 : s32i, align 8
+                                        %72 = load %3 : s32i, align 4
+                                        dec
+                                        store %73, %3, align 4
+                                        cmp
+                                        if %74 {
+                                                %75 = get_global @.str : s8i[141]*
+                                                %76 = cast(array_to_ptrdecay) %75 : s8i*
+                                                %77 = load %1 : rec_q*, align 8
+                                                get_member
+                                                %79 = load %78 : s32i, align 8
+                                                %80 = load %3 : s32i, align 4
+                                                %81 = call @t_printf(%76, %79, %80) : s32i [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                %66 = load %1 : rec_q*, align 8
+                                get_member
+                                %68 = load %67 : rec_q*, align 8
+                                store %68, %1, align 8
+                                yield
+                        }
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %18 = load %2 : rec_q*, align 8
-        %19 = get_member %18[1] "p" : rec_q**
-        %20 = load %19 : rec_q*, align 8
-        %21 = get_member %20[0] "n" : rec_q**
-        %22 = load %21 : rec_q*, align 8
-        %23 = get_member %22[2] "i" : s32i*
-        %24 = load %23 : s32i, align 8
-        %25 = load %2 : rec_q*, align 8
-        %26 = get_member %25[2] "i" : s32i*
-        %27 = load %26 : s32i, align 8
-        %28 = cmp ne %24, %27 : bool
-        if %28 {
-            %29 = get_global @.str.2 : s8i[125]*
-            %30 = cast(array_to_ptrdecay) %29 : s8i*
-            %31 = load %2 : rec_q*, align 8
-            %32 = get_member %31[1] "p" : rec_q**
-            %33 = load %32 : rec_q*, align 8
-            %34 = get_member %33[0] "n" : rec_q**
-            %35 = load %34 : rec_q*, align 8
-            %36 = get_member %35[2] "i" : s32i*
-            %37 = load %36 : s32i, align 8
-            %38 = load %2 : rec_q*, align 8
-            %39 = get_member %38[2] "i" : s32i*
-            %40 = load %39 : s32i, align 8
-            %41 = call @t_printf(%30, %37, %40) : s32i [all]
-            yield
+        %11 = load %2 : rec_q*, align 8
+        get_member
+        %13 = load %12 : rec_q*, align 8
+        %14 = cast(bitcast) %13 : void*
+        call @remque(%14) [all]
+        scope {
+                %42 = load %2 : rec_q*, align 8
+                get_member
+                %44 = load %43 : rec_q*, align 8
+                get_member
+                %46 = load %45 : s32i, align 8
+                %47 = load %2 : rec_q*, align 8
+                get_member
+                %49 = load %48 : s32i, align 8
+                %50 = const 2 : s32i
+                sub
+                cmp
+                if %52 {
+                        %53 = get_global @.str.1 : s8i[134]*
+                        %54 = cast(array_to_ptrdecay) %53 : s8i*
+                        %55 = load %2 : rec_q*, align 8
+                        get_member
+                        %57 = load %56 : rec_q*, align 8
+                        get_member
+                        %59 = load %58 : s32i, align 8
+                        %60 = load %2 : rec_q*, align 8
+                        get_member
+                        %62 = load %61 : s32i, align 8
+                        %63 = const 2 : s32i
+                        sub
+                        %65 = call @t_printf(%54, %59, %64) : s32i [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %15 = get_global @t_status : s32i*
-    %16 = load %15 : s32i, align 4, volatile
-    store %16, %0
-    %17 = load %0 : s32i
-    return %17
+        scope {
+                %18 = load %2 : rec_q*, align 8
+                get_member
+                %20 = load %19 : rec_q*, align 8
+                get_member
+                %22 = load %21 : rec_q*, align 8
+                get_member
+                %24 = load %23 : s32i, align 8
+                %25 = load %2 : rec_q*, align 8
+                get_member
+                %27 = load %26 : s32i, align 8
+                cmp
+                if %28 {
+                        %29 = get_global @.str.2 : s8i[134]*
+                        %30 = cast(array_to_ptrdecay) %29 : s8i*
+                        %31 = load %2 : rec_q*, align 8
+                        get_member
+                        %33 = load %32 : rec_q*, align 8
+                        get_member
+                        %35 = load %34 : rec_q*, align 8
+                        get_member
+                        %37 = load %36 : s32i, align 8
+                        %38 = load %2 : rec_q*, align 8
+                        get_member
+                        %40 = load %39 : s32i, align 8
+                        %41 = call @t_printf(%30, %37, %40) : s32i [all]
+                        yield
+                }
+                yield
+        }
+        %15 = get_global @t_status : s32i*
+        %16 = load %15 : s32i, align 4
+        store %16, %0
+        %17 = load %0 : s32i
+        return %17
 }

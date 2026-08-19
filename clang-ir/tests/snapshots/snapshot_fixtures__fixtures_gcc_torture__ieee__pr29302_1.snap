@@ -1,46 +1,46 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/ieee__pr29302-1.c" (c, x86_64-unknown-linux-gnu)
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "n", align 4
-    %2 = alloca long_double<f80>, "x", align 16
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 1 : s32i
-    %5 = cast(int_to_float) %4 : double
-    %6 = const 0.000000e+00 : double
-    %7 = fdiv %5, %6 : double
-    %8 = cast(floating) %7 : long_double<f80>
-    store %8, %2, align 16
-    %9 = load %2 : long_double<f80>, align 16
-    %10 = const 1 : s32i
-    %11 = cast(int_to_float) %10 : double
-    %12 = const 0.000000e+00 : double
-    %13 = fdiv %11, %12 : double
-    %14 = cast(floating) %13 : long_double<f80>
-    %15 = cmp eq %9, %14 : bool
-    %16 = cast(bool_to_int) %15 : s32i
-    store %16, %1, align 4
-    scope {
-        %18 = load %1 : s32i, align 4
-        %19 = const 1 : s32i
-        %20 = cmp eq %18, %19 : bool
-        if %20 {
-            %22 = const 0 : s32i
-            store %22, %0
-            %23 = load %0 : s32i
-            return %23
-        } else {
-            %21 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "n", align 4
+        %2 = alloca long_double<f80>, "x", align 16
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 1 : s32i
+        %5 = cast(int_to_float) %4 : double
+        %6 = const 0.000000e+00 : double
+        fdiv
+        %8 = cast(floating) %7 : long_double<f80>
+        store %8, %2, align 16
+        %9 = load %2 : long_double<f80>, align 16
+        %10 = const 1 : s32i
+        %11 = cast(int_to_float) %10 : double
+        %12 = const 0.000000e+00 : double
+        fdiv
+        %14 = cast(floating) %13 : long_double<f80>
+        cmp
+        %16 = cast(bool_to_int) %15 : s32i
+        store %16, %1, align 4
+        scope {
+                %18 = load %1 : s32i, align 4
+                %19 = const 1 : s32i
+                cmp
+                if %20 {
+                        %22 = const 0 : s32i
+                        store %22, %0
+                        %23 = load %0 : s32i
+                        return %23
+                } else {
+                        %21 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %17 = load %0 : s32i
-    return %17
+        %17 = load %0 : s32i
+        return %17
 }

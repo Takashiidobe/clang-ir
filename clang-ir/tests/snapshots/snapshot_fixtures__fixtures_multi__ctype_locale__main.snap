@@ -1,37 +1,37 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.multi/ctype_locale/main.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[7] = "%d %d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[7] = ConstArray { ty: Array { element_type: Named("s8i"), size: 7 }, elts: Str("%d %d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn set_project_locale() -> void [external, c];
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn toupper(%arg0: s32i) -> s32i [external, c, pure, nothrow];
 fn tolower(%arg0: s32i) -> s32i [external, c, pure, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "lower", align 4
-    %2 = alloca s32i, "upper", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    call @set_project_locale() [all]
-    %4 = const 113 : s32i
-    store %4, %1, align 4
-    %5 = const 81 : s32i
-    store %5, %2, align 4
-    %6 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %7 = get_global @.str : s8i[7]*
-    %8 = cast(array_to_ptrdecay) %7 : s8i*
-    %9 = get_global @toupper : ((s32i) -> s32i)*
-    %10 = load %1 : s32i, align 4
-    %11 = call @toupper(%10) : s32i [pure]
-    %12 = get_global @tolower : ((s32i) -> s32i)*
-    %13 = load %2 : s32i, align 4
-    %14 = call @tolower(%13) : s32i [pure]
-    %15 = call @printf(%8, %11, %14) : s32i [all]
-    %16 = const 0 : s32i
-    store %16, %0
-    %17 = load %0 : s32i
-    return %17
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "lower", align 4
+        %2 = alloca s32i, "upper", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        call @set_project_locale() [all]
+        %4 = const 113 : s32i
+        store %4, %1, align 4
+        %5 = const 81 : s32i
+        store %5, %2, align 4
+        %6 = get_global @printf : (s8i*, ...) -> s32i*
+        %7 = get_global @.str : s8i[7]*
+        %8 = cast(array_to_ptrdecay) %7 : s8i*
+        %9 = get_global @toupper : (s32i) -> s32i*
+        %10 = load %1 : s32i, align 4
+        %11 = call @toupper(%10) : s32i [pure]
+        %12 = get_global @tolower : (s32i) -> s32i*
+        %13 = load %2 : s32i, align 4
+        %14 = call @tolower(%13) : s32i [pure]
+        %15 = call @printf(%8, %11, %14) : s32i [all]
+        %16 = const 0 : s32i
+        store %16, %0
+        %17 = load %0 : s32i
+        return %17
 }

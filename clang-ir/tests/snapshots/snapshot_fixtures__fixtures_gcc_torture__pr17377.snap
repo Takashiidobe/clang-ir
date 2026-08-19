@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr17377.c" (c, x86_64-unknown-linux-gnu)
-global calls : s32i = 0 [external, default, align 4, dso_local]
-global x : s32i = 0 [external, default, align 4, dso_local]
+global calls : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global x : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn f(%arg1: s32i) -> void* [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: s32i):
@@ -12,40 +12,41 @@ fn f(%arg1: s32i) -> void* [external, c, no_inline, dso_local, nothrow] {
         %52 = alloca void*, "__retval", align 8
         store %arg1, %51
         scope {
-            %62 = get_global @calls : s32i*
-            %63 = load %62 : s32i, align 4
-            %64 = inc %63 : s32i [nsw]
-            store %64, %62, align 4
-            %65 = const 0 : s32i
-            %66 = cmp eq %63, %65 : bool
-            if %66 {
-                %67 = const 0 : u32i
-                %68 = return_address(%67) : void*
-                store %68, %52
-                %69 = load %52 : void*
-                return %69
-            }
-            yield
+                %62 = get_global @calls : s32i*
+                %63 = load %62 : s32i, align 4
+                inc
+                store %64, %62, align 4
+                %65 = const 0 : s32i
+                cmp
+                if %66 {
+                        %67 = const 0 : u32i
+                        return_address
+                        store %68, %52
+                        %69 = load %52 : void*
+                        return %69
+                }
+                yield
         }
         scope {
-            %55 = load %51 : s32i, align 4
-            switch %55 {
-                case equal 1 {
-                    %59 = get_global @f : ((s32i) -> void*)*
-                    %60 = cast(bitcast) %59 : void*
-                    store %60, %52
-                    %61 = load %52 : void*
-                    return %61
+                %55 = load %51 : s32i, align 4
+                switch %55 {
+                        case equal [1] {
+                                %59 = get_global @f : (s32i) -> void**
+                                %60 = cast(bitcast) %59 : void*
+                                store %60, %52
+                                %61 = load %52 : void*
+                                return %61
+                        }
+                        case equal [0] {
+                                %56 = const 0 : u32i
+                                return_address
+                                store %57, %52
+                                %58 = load %52 : void*
+                                return %58
+                        }
+                        yield
                 }
-                case equal 0 {
-                    %56 = const 0 : u32i
-                    %57 = return_address(%56) : void*
-                    store %57, %52
-                    %58 = load %52 : void*
-                    return %58
-                }
-            }
-            yield
+                yield
         }
         %53 = const #cir.ptr<null> : void*
         store %53, %52
@@ -59,15 +60,15 @@ fn y(%arg0: s32i) -> void* [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %38
         %40 = const 0 : s32i
         %41 = get_global @x : s32i*
-        store %40, %41, align 4, volatile
+        store %40, %41, align 4
         %42 = load %38 : s32i, align 4
         %43 = call @f(%42) : void* [all]
         %44 = cast(bitcast) %43 : s8i*
         %45 = get_global @x : s32i*
-        %46 = load %45 : s32i, align 4, volatile
-        %47 = inc %46 : s32i [nsw]
-        store %47, %45, align 4, volatile
-        %48 = ptr_stride %44, %46 : s8i*
+        %46 = load %45 : s32i, align 4
+        inc
+        store %47, %45, align 4
+        ptr_stride
         %49 = cast(bitcast) %48 : void*
         store %49, %39
         %50 = load %39 : void*
@@ -76,69 +77,69 @@ fn y(%arg0: s32i) -> void* [external, c, no_inline, dso_local, nothrow] {
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca void*, "v", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 4 : s32i
-    %4 = call @y(%3) : void* [all]
-    store %4, %1, align 8
-    scope {
-        %8 = const 1 : s32i
-        %9 = call @y(%8) : void* [all]
-        %10 = get_global @f : ((s32i) -> void*)*
-        %11 = cast(bitcast) %10 : void*
-        %12 = cmp ne %9, %11 : bool
-        %13 = ternary %12 ? { : bool
-            %37 = const true : bool
-            yield %37
-        } : {
-            %33 = const 0 : s32i
-            %34 = call @y(%33) : void* [all]
-            %35 = load %1 : void*, align 8
-            %36 = cmp ne %34, %35 : bool
-            yield %36
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca void*, "v", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 4 : s32i
+        %4 = call @y(%3) : void* [all]
+        store %4, %1, align 8
+        scope {
+                %8 = const 1 : s32i
+                %9 = call @y(%8) : void* [all]
+                %10 = get_global @f : (s32i) -> void**
+                %11 = cast(bitcast) %10 : void*
+                cmp
+                %13 = ternary %12 ? { : bool
+                        %37 = const true : bool
+                        yield %37
+                } : {
+                        %33 = const 0 : s32i
+                        %34 = call @y(%33) : void* [all]
+                        %35 = load %1 : void*, align 8
+                        cmp
+                        yield %36
+                }
+                %14 = ternary %13 ? { : bool
+                        %32 = const true : bool
+                        yield %32
+                } : {
+                        %28 = const 3 : s32i
+                        %29 = call @y(%28) : void* [all]
+                        %30 = const #cir.ptr<null> : void*
+                        cmp
+                        yield %31
+                }
+                %15 = ternary %14 ? { : bool
+                        %27 = const true : bool
+                        yield %27
+                } : {
+                        %23 = const -1 : s32i
+                        %24 = call @y(%23) : void* [all]
+                        %25 = const #cir.ptr<null> : void*
+                        cmp
+                        yield %26
+                }
+                %16 = ternary %15 ? { : bool
+                        %22 = const true : bool
+                        yield %22
+                } : {
+                        %18 = get_global @calls : s32i*
+                        %19 = load %18 : s32i, align 4
+                        %20 = const 5 : s32i
+                        cmp
+                        yield %21
+                }
+                if %16 {
+                        %17 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        %14 = ternary %13 ? { : bool
-            %32 = const true : bool
-            yield %32
-        } : {
-            %28 = const 3 : s32i
-            %29 = call @y(%28) : void* [all]
-            %30 = const #cir.ptr<null> : void*
-            %31 = cmp ne %29, %30 : bool
-            yield %31
-        }
-        %15 = ternary %14 ? { : bool
-            %27 = const true : bool
-            yield %27
-        } : {
-            %23 = const -1 : s32i
-            %24 = call @y(%23) : void* [all]
-            %25 = const #cir.ptr<null> : void*
-            %26 = cmp ne %24, %25 : bool
-            yield %26
-        }
-        %16 = ternary %15 ? { : bool
-            %22 = const true : bool
-            yield %22
-        } : {
-            %18 = get_global @calls : s32i*
-            %19 = load %18 : s32i, align 4
-            %20 = const 5 : s32i
-            %21 = cmp ne %19, %20 : bool
-            yield %21
-        }
-        if %16 {
-            %17 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %5 = get_global @exit : ((s32i) -> void)*
-    %6 = const 0 : s32i
-    call @exit(%6) [all]
-    %7 = load %0 : s32i
-    return %7
+        %5 = get_global @exit : (s32i) -> void*
+        %6 = const 0 : s32i
+        call @exit(%6) [all]
+        %7 = load %0 : s32i
+        return %7
 }

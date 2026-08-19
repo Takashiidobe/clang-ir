@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20051113-1.c" (c, x86_64-unknown-linux-gnu)
@@ -13,38 +13,38 @@ fn Sum(%arg1: rec_Struct3*) -> u64i [external, c, no_inline, dso_local, nothrow]
         %117 = const 0 : u64i
         store %117, %115, align 8
         scope {
-            %120 = const 0 : s32i
-            store %120, %116, align 4
-            for cond: {
-                %133 = load %116 : s32i, align 4
-                %134 = load %113 : rec_Struct3*, align 8
-                %135 = get_member %134[0] "Count" : s32i*
-                %136 = load %135 : s32i, align 1
-                %137 = cmp lt %133, %136 : bool
-                condition %137
-            } step: {
-                %121 = load %116 : s32i, align 4
-                %122 = inc %121 : s32i [nsw]
-                store %122, %116, align 4
-                yield
-            } do {
-                scope {
-                    %123 = load %116 : s32i, align 4
-                    %124 = cast(integral) %123 : s64i
-                    %125 = load %113 : rec_Struct3*, align 8
-                    %126 = get_member %125[1] "List" : rec_Union[0]*
-                    %127 = get_element %126[%124] : rec_Union*
-                    %128 = get_member %127[0] "a" : rec_Struct1*
-                    %129 = get_member %128[3] "Count" : u64i*
-                    %130 = load %129 : u64i, align 1
-                    %131 = load %115 : u64i, align 8
-                    %132 = add %131, %130 : u64i
-                    store %132, %115, align 8
-                    yield
+                %120 = const 0 : s32i
+                store %120, %116, align 4
+                for cond {
+                        %133 = load %116 : s32i, align 4
+                        %134 = load %113 : rec_Struct3*, align 8
+                        get_member
+                        %136 = load %135 : s32i, align 1
+                        cmp
+                        condition %137
+                } step {
+                        %121 = load %116 : s32i, align 4
+                        inc
+                        store %122, %116, align 4
+                        yield
+                } body {
+                        scope {
+                                %123 = load %116 : s32i, align 4
+                                %124 = cast(integral) %123 : s64i
+                                %125 = load %113 : rec_Struct3*, align 8
+                                get_member
+                                get_element
+                                get_member
+                                get_member
+                                %130 = load %129 : u64i, align 1
+                                %131 = load %115 : u64i, align 8
+                                %132 = add %131, %130 : u64i
+                                store %132, %115, align 8
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %118 = load %115 : u64i, align 8
         store %118, %114
@@ -61,38 +61,38 @@ fn Sum2(%arg0: rec_Struct3*) -> s64i [external, c, no_inline, dso_local, nothrow
         %92 = const 0 : s64i
         store %92, %90, align 8
         scope {
-            %95 = const 0 : s32i
-            store %95, %91, align 4
-            for cond: {
-                %108 = load %91 : s32i, align 4
-                %109 = load %88 : rec_Struct3*, align 8
-                %110 = get_member %109[0] "Count" : s32i*
-                %111 = load %110 : s32i, align 1
-                %112 = cmp lt %108, %111 : bool
-                condition %112
-            } step: {
-                %96 = load %91 : s32i, align 4
-                %97 = inc %96 : s32i [nsw]
-                store %97, %91, align 4
-                yield
-            } do {
-                scope {
-                    %98 = load %91 : s32i, align 4
-                    %99 = cast(integral) %98 : s64i
-                    %100 = load %88 : rec_Struct3*, align 8
-                    %101 = get_member %100[1] "List" : rec_Union[0]*
-                    %102 = get_element %101[%99] : rec_Union*
-                    %103 = get_member %102[0] "a" : rec_Struct1*
-                    %104 = get_member %103[4] "Count2" : s64i*
-                    %105 = load %104 : s64i, align 1
-                    %106 = load %90 : s64i, align 8
-                    %107 = add %106, %105 : s64i [nsw]
-                    store %107, %90, align 8
-                    yield
+                %95 = const 0 : s32i
+                store %95, %91, align 4
+                for cond {
+                        %108 = load %91 : s32i, align 4
+                        %109 = load %88 : rec_Struct3*, align 8
+                        get_member
+                        %111 = load %110 : s32i, align 1
+                        cmp
+                        condition %112
+                } step {
+                        %96 = load %91 : s32i, align 4
+                        inc
+                        store %97, %91, align 4
+                        yield
+                } body {
+                        scope {
+                                %98 = load %91 : s32i, align 4
+                                %99 = cast(integral) %98 : s64i
+                                %100 = load %88 : rec_Struct3*, align 8
+                                get_member
+                                get_element
+                                get_member
+                                get_member
+                                %105 = load %104 : s64i, align 1
+                                %106 = load %90 : s64i, align 8
+                                %107 = add %106, %105 : s64i [nsw]
+                                store %107, %90, align 8
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %93 = load %90 : s64i, align 8
         store %93, %89
@@ -103,117 +103,117 @@ fn malloc(%arg0: u64i) -> void* [external, c];
 fn memset(%arg0: void*, %arg1: s32i, %arg2: u64i) -> void* [external, c, nothrow];
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_Struct3*, "p", align 8
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @malloc : ((u64i) -> void*)*
-    %4 = const 4 : u64i
-    %5 = const 3 : u64i
-    %6 = const 30 : u64i
-    %7 = mul %5, %6 : u64i
-    %8 = add %4, %7 : u64i
-    %9 = call @malloc(%8) : void* [all]
-    %10 = cast(bitcast) %9 : rec_Struct3*
-    store %10, %1, align 8
-    %11 = get_global @memset : ((void*, s32i, u64i) -> void*)*
-    %12 = load %1 : rec_Struct3*, align 8
-    %13 = cast(bitcast) %12 : void*
-    %14 = const 0 : s32i
-    %15 = const 4 : u64i
-    %16 = const 3 : u64i
-    %17 = const 30 : u64i
-    %18 = mul %16, %17 : u64i
-    %19 = add %15, %18 : u64i
-    %20 = call @memset(%13, %14, %19) : void* [all]
-    %21 = const 3 : s32i
-    %22 = load %1 : rec_Struct3*, align 8
-    %23 = get_member %22[0] "Count" : s32i*
-    store %21, %23, align 1
-    %24 = const 555 : u64i
-    %25 = const 0 : s64i
-    %26 = load %1 : rec_Struct3*, align 8
-    %27 = get_member %26[1] "List" : rec_Union[0]*
-    %28 = get_element %27[%25] : rec_Union*
-    %29 = get_member %28[0] "a" : rec_Struct1*
-    %30 = get_member %29[3] "Count" : u64i*
-    store %24, %30, align 1
-    %31 = const 999 : u64i
-    %32 = const 1 : s64i
-    %33 = load %1 : rec_Struct3*, align 8
-    %34 = get_member %33[1] "List" : rec_Union[0]*
-    %35 = get_element %34[%32] : rec_Union*
-    %36 = get_member %35[0] "a" : rec_Struct1*
-    %37 = get_member %36[3] "Count" : u64i*
-    store %31, %37, align 1
-    %38 = const 4311810305 : u64i
-    %39 = const 2 : s64i
-    %40 = load %1 : rec_Struct3*, align 8
-    %41 = get_member %40[1] "List" : rec_Union[0]*
-    %42 = get_element %41[%39] : rec_Union*
-    %43 = get_member %42[0] "a" : rec_Struct1*
-    %44 = get_member %43[3] "Count" : u64i*
-    store %38, %44, align 1
-    %45 = const 555 : s64i
-    %46 = const 0 : s64i
-    %47 = load %1 : rec_Struct3*, align 8
-    %48 = get_member %47[1] "List" : rec_Union[0]*
-    %49 = get_element %48[%46] : rec_Union*
-    %50 = get_member %49[0] "a" : rec_Struct1*
-    %51 = get_member %50[4] "Count2" : s64i*
-    store %45, %51, align 1
-    %52 = const 999 : s64i
-    %53 = const 1 : s64i
-    %54 = load %1 : rec_Struct3*, align 8
-    %55 = get_member %54[1] "List" : rec_Union[0]*
-    %56 = get_element %55[%53] : rec_Union*
-    %57 = get_member %56[0] "a" : rec_Struct1*
-    %58 = get_member %57[4] "Count2" : s64i*
-    store %52, %58, align 1
-    %59 = const 4311810305 : s64i
-    %60 = const 2 : s64i
-    %61 = load %1 : rec_Struct3*, align 8
-    %62 = get_member %61[1] "List" : rec_Union[0]*
-    %63 = get_element %62[%60] : rec_Union*
-    %64 = get_member %63[0] "a" : rec_Struct1*
-    %65 = get_member %64[4] "Count2" : s64i*
-    store %59, %65, align 1
-    scope {
-        %78 = load %1 : rec_Struct3*, align 8
-        %79 = call @Sum(%78) : u64i [all]
-        %80 = const 555 : s32i
-        %81 = const 999 : s32i
-        %82 = add %80, %81 : s32i [nsw]
-        %83 = cast(integral) %82 : u64i
-        %84 = const 4311810305 : u64i
-        %85 = add %83, %84 : u64i
-        %86 = cmp ne %79, %85 : bool
-        if %86 {
-            %87 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_Struct3*, "p", align 8
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @malloc : (u64i) -> void**
+        %4 = const 4 : u64i
+        %5 = const 3 : u64i
+        %6 = const 30 : u64i
+        mul
+        %8 = add %4, %7 : u64i
+        %9 = call @malloc(%8) : void* [all]
+        %10 = cast(bitcast) %9 : rec_Struct3*
+        store %10, %1, align 8
+        %11 = get_global @memset : (void*, s32i, u64i) -> void**
+        %12 = load %1 : rec_Struct3*, align 8
+        %13 = cast(bitcast) %12 : void*
+        %14 = const 0 : s32i
+        %15 = const 4 : u64i
+        %16 = const 3 : u64i
+        %17 = const 30 : u64i
+        mul
+        %19 = add %15, %18 : u64i
+        %20 = call @memset(%13, %14, %19) : void* [all]
+        %21 = const 3 : s32i
+        %22 = load %1 : rec_Struct3*, align 8
+        get_member
+        store %21, %23, align 1
+        %24 = const 555 : u64i
+        %25 = const 0 : s64i
+        %26 = load %1 : rec_Struct3*, align 8
+        get_member
+        get_element
+        get_member
+        get_member
+        store %24, %30, align 1
+        %31 = const 999 : u64i
+        %32 = const 1 : s64i
+        %33 = load %1 : rec_Struct3*, align 8
+        get_member
+        get_element
+        get_member
+        get_member
+        store %31, %37, align 1
+        %38 = const 4311810305 : u64i
+        %39 = const 2 : s64i
+        %40 = load %1 : rec_Struct3*, align 8
+        get_member
+        get_element
+        get_member
+        get_member
+        store %38, %44, align 1
+        %45 = const 555 : s64i
+        %46 = const 0 : s64i
+        %47 = load %1 : rec_Struct3*, align 8
+        get_member
+        get_element
+        get_member
+        get_member
+        store %45, %51, align 1
+        %52 = const 999 : s64i
+        %53 = const 1 : s64i
+        %54 = load %1 : rec_Struct3*, align 8
+        get_member
+        get_element
+        get_member
+        get_member
+        store %52, %58, align 1
+        %59 = const 4311810305 : s64i
+        %60 = const 2 : s64i
+        %61 = load %1 : rec_Struct3*, align 8
+        get_member
+        get_element
+        get_member
+        get_member
+        store %59, %65, align 1
+        scope {
+                %78 = load %1 : rec_Struct3*, align 8
+                %79 = call @Sum(%78) : u64i [all]
+                %80 = const 555 : s32i
+                %81 = const 999 : s32i
+                %82 = add %80, %81 : s32i [nsw]
+                %83 = cast(integral) %82 : u64i
+                %84 = const 4311810305 : u64i
+                %85 = add %83, %84 : u64i
+                cmp
+                if %86 {
+                        %87 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %68 = load %1 : rec_Struct3*, align 8
-        %69 = call @Sum2(%68) : s64i [all]
-        %70 = const 555 : s32i
-        %71 = const 999 : s32i
-        %72 = add %70, %71 : s32i [nsw]
-        %73 = cast(integral) %72 : s64i
-        %74 = const 4311810305 : s64i
-        %75 = add %73, %74 : s64i [nsw]
-        %76 = cmp ne %69, %75 : bool
-        if %76 {
-            %77 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %68 = load %1 : rec_Struct3*, align 8
+                %69 = call @Sum2(%68) : s64i [all]
+                %70 = const 555 : s32i
+                %71 = const 999 : s32i
+                %72 = add %70, %71 : s32i [nsw]
+                %73 = cast(integral) %72 : s64i
+                %74 = const 4311810305 : s64i
+                %75 = add %73, %74 : s64i [nsw]
+                cmp
+                if %76 {
+                        %77 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %66 = const 0 : s32i
-    store %66, %0
-    %67 = load %0 : s32i
-    return %67
+        %66 = const 0 : s32i
+        store %66, %0
+        %67 = load %0 : s32i
+        return %67
 }

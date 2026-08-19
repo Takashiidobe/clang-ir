@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr54471.c" (c, x86_64-unknown-linux-gnu)
@@ -18,42 +18,42 @@ fn foo(%arg0: s128i, %arg1: u32i) -> u128i [external, c, no_inline, dso_local, n
         %14 = load %8 : s128i, align 16
         store %14, %12, align 16
         scope {
-            for cond: {
-                %30 = load %9 : u32i, align 4
-                %31 = cast(int_to_bool) %30 : bool
-                condition %31
-            } step: {
-                %21 = load %9 : u32i, align 4
-                %22 = dec %21 : u32i
-                store %22, %9, align 4
-                yield
-            } do {
-                scope {
-                    %23 = load %12 : s128i, align 16
-                    %24 = cast(integral) %23 : u128i
-                    %25 = load %11 : u128i, align 16
-                    %26 = mul %25, %24 : u128i
-                    store %26, %11, align 16
-                    %27 = load %12 : s128i, align 16
-                    %28 = load %12 : s128i, align 16
-                    %29 = mul %28, %27 : s128i [nsw]
-                    store %29, %12, align 16
-                    yield
+                for cond {
+                        %30 = load %9 : u32i, align 4
+                        %31 = cast(int_to_bool) %30 : bool
+                        condition %31
+                } step {
+                        %21 = load %9 : u32i, align 4
+                        dec
+                        store %22, %9, align 4
+                        yield
+                } body {
+                        scope {
+                                %23 = load %12 : s128i, align 16
+                                %24 = cast(integral) %23 : u128i
+                                %25 = load %11 : u128i, align 16
+                                mul
+                                store %26, %11, align 16
+                                %27 = load %12 : s128i, align 16
+                                %28 = load %12 : s128i, align 16
+                                mul
+                                store %29, %12, align 16
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         scope {
-            %17 = load %11 : u128i, align 16
-            %18 = const 14348907 : u128i
-            %19 = cmp ne %17, %18 : bool
-            if %19 {
-                %20 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %17 = load %11 : u128i, align 16
+                %18 = const 14348907 : u128i
+                cmp
+                if %19 {
+                        %20 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %15 = load %11 : u128i, align 16
         store %15, %10
@@ -61,16 +61,16 @@ fn foo(%arg0: s128i, %arg1: u32i) -> u128i [external, c, no_inline, dso_local, n
         return %16
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u128i, "res", align 16
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 3 : s128i
-    %4 = const 4 : u32i
-    %5 = call @foo(%3, %4) : u128i [all]
-    store %5, %1, align 16
-    %6 = const 0 : s32i
-    store %6, %0
-    %7 = load %0 : s32i
-    return %7
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u128i, "res", align 16
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 3 : s128i
+        %4 = const 4 : u32i
+        %5 = call @foo(%3, %4) : u128i [all]
+        store %5, %1, align 16
+        %6 = const 0 : s32i
+        store %6, %0
+        %7 = load %0 : s32i
+        return %7
 }

@@ -1,23 +1,23 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/goto_backward_loop.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = alloca s32i, "sum", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const 0 : s32i
-    store %4, %1, align 4
-    %5 = const 0 : s32i
-    store %5, %2, align 4
-    br ^bb1
-    ^bb1():
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = alloca s32i, "sum", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const 0 : s32i
+        store %4, %1, align 4
+        %5 = const 0 : s32i
+        store %5, %2, align 4
+        br ^bb1
+    ^bb1:
         label loop:
         %6 = load %2 : s32i, align 4
         %7 = load %1 : s32i, align 4
@@ -28,15 +28,15 @@ fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
         %11 = add %9, %10 : s32i [nsw]
         store %11, %1, align 4
         scope {
-            %19 = load %1 : s32i, align 4
-            %20 = const 5 : s32i
-            %21 = cmp lt %19, %20 : bool
-            if %21 {
-                goto loop
-            }
-            yield
+                %19 = load %1 : s32i, align 4
+                %20 = const 5 : s32i
+                cmp
+                if %21 {
+                        goto loop
+                }
+                yield
         }
-        %12 = get_global @printf : ((s8i*, ...) -> s32i)*
+        %12 = get_global @printf : (s8i*, ...) -> s32i*
         %13 = get_global @.str : s8i[4]*
         %14 = cast(array_to_ptrdecay) %13 : s8i*
         %15 = load %2 : s32i, align 4

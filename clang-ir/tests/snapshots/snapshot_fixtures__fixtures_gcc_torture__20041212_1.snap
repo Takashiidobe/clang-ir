@@ -1,37 +1,37 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20041212-1.c" (c, x86_64-unknown-linux-gnu)
 fn f() -> void* [external, c, no_inline, dso_local, nothrow] {
-    %10 = alloca void*, "__retval", align 8
-    %11 = get_global @f : (() -> void*)*
-    %12 = cast(bitcast) %11 : void*
-    store %12, %10
-    %13 = load %10 : void*
-    return %13
+        %10 = alloca void*, "__retval", align 8
+        %11 = get_global @f : () -> void**
+        %12 = cast(bitcast) %11 : void*
+        store %12, %10
+        %13 = load %10 : void*
+        return %13
 }
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %5 = call @f() : void* [all]
-        %6 = get_global @f : (() -> void*)*
-        %7 = cast(bitcast) %6 : void*
-        %8 = cmp ne %5, %7 : bool
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %5 = call @f() : void* [all]
+                %6 = get_global @f : () -> void**
+                %7 = cast(bitcast) %6 : void*
+                cmp
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

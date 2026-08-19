@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr22493-1.c" (c, x86_64-unknown-linux-gnu)
@@ -9,29 +9,29 @@ fn f(%arg2: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %10 = alloca s32i, "i", align 4
         store %arg2, %10
         scope {
-            %17 = load %10 : s32i, align 4
-            %18 = const 0 : s32i
-            %19 = cmp gt %17, %18 : bool
-            if %19 {
-                %20 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %17 = load %10 : s32i, align 4
+                %18 = const 0 : s32i
+                cmp
+                if %19 {
+                        %20 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %11 = load %10 : s32i, align 4
-        %12 = minus %11 : s32i [nsw]
+        minus
         store %12, %10, align 4
         scope {
-            %14 = load %10 : s32i, align 4
-            %15 = const 0 : s32i
-            %16 = cmp lt %14, %15 : bool
-            if %16 {
-                return
-            }
-            yield
+                %14 = load %10 : s32i, align 4
+                %15 = const 0 : s32i
+                cmp
+                if %16 {
+                        return
+                }
+                yield
         }
-        %13 = get_global @abort : (() -> void)*
+        %13 = get_global @abort : () -> void*
         call @abort() [all]
         return
 }
@@ -47,9 +47,9 @@ fn main(%arg0: s32i, %arg1: s8i**) -> s32i [external, c, no_inline, dso_local, n
         store %3, %2
         %4 = const -2147483647 : s32i
         %5 = const 1 : s32i
-        %6 = sub %4, %5 : s32i [nsw]
+        sub
         call @f(%6) [all]
-        %7 = get_global @exit : ((s32i) -> void)*
+        %7 = get_global @exit : (s32i) -> void*
         %8 = const 0 : s32i
         call @exit(%8) [all]
         %9 = load %2 : s32i

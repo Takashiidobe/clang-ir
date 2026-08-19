@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20020418-1.c" (c, x86_64-unknown-linux-gnu)
@@ -8,50 +8,50 @@ fn gcc_crash(%arg0: rec_foo*) -> void [external, c, no_inline, dso_local, nothro
         %8 = alloca rec_foo*, "p", align 8
         store %arg0, %8
         scope {
-            %18 = load %8 : rec_foo*, align 8
-            %19 = get_member %18[0] "a" : s32i*
-            %20 = load %19 : s32i, align 4
-            %21 = const 52 : s32i
-            %22 = cmp lt %20, %21 : bool
-            if %22 {
-                trap
-            }
-            yield
+                %18 = load %8 : rec_foo*, align 8
+                get_member
+                %20 = load %19 : s32i, align 4
+                %21 = const 52 : s32i
+                cmp
+                if %22 {
+                        trap
+                }
+                yield
         }
         br ^bb1
-    ^bb1():
+    ^bb1:
         label top:
         %9 = load %8 : rec_foo*, align 8
-        %10 = get_member %9[0] "a" : s32i*
+        get_member
         %11 = load %10 : s32i, align 4
-        %12 = inc %11 : s32i [nsw]
+        inc
         store %12, %10, align 4
         scope {
-            %13 = load %8 : rec_foo*, align 8
-            %14 = get_member %13[0] "a" : s32i*
-            %15 = load %14 : s32i, align 4
-            %16 = const 62 : s32i
-            %17 = cmp ge %15, %16 : bool
-            if %17 {
-                goto top
-            }
-            yield
+                %13 = load %8 : rec_foo*, align 8
+                get_member
+                %15 = load %14 : s32i, align 4
+                %16 = const 62 : s32i
+                cmp
+                if %17 {
+                        goto top
+                }
+                yield
         }
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_foo, "x", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 53 : s32i
-    %4 = get_member %1[0] "a" : s32i*
-    store %3, %4, align 4
-    call @gcc_crash(%1) [all]
-    %5 = get_global @exit : ((s32i) -> void)*
-    %6 = const 0 : s32i
-    call @exit(%6) [all]
-    %7 = load %0 : s32i
-    return %7
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_foo, "x", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 53 : s32i
+        get_member
+        store %3, %4, align 4
+        call @gcc_crash(%1) [all]
+        %5 = get_global @exit : (s32i) -> void*
+        %6 = const 0 : s32i
+        call @exit(%6) [all]
+        %7 = load %0 : s32i
+        return %7
 }

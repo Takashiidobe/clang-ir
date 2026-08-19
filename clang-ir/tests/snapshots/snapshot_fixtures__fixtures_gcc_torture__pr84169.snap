@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr84169.c" (c, x86_64-unknown-linux-gnu)
-global b : u128i = 0 [external, default, align 16, dso_local]
+global b : u128i = CirInt { ty: Named("u128i"), value: "0" } [external, default, align 16, dso_local]
 
 fn foo(%arg0: u128i, %arg1: u128i, %arg2: u128i, %arg3: u128i, %arg4: u128i, %arg5: u128i) -> u128i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: u128i, %arg1: u128i, %arg2: u128i, %arg3: u128i, %arg4: u128i, %arg5: u128i):
@@ -24,7 +24,7 @@ fn foo(%arg0: u128i, %arg1: u128i, %arg2: u128i, %arg3: u128i, %arg4: u128i, %ar
         %23 = cast(integral) %22 : u8i
         %24 = cast(integral) %23 : s129
         %25 = const -16 : s129
-        %26#0, %26#1 = mul.overflow %24, %25 : u128i
+        mul.overflow
         store %26#0, %20, align 16
         %27 = get_global @b : u128i*
         %28 = load %27 : u128i, align 16
@@ -36,30 +36,30 @@ fn foo(%arg0: u128i, %arg1: u128i, %arg2: u128i, %arg3: u128i, %arg4: u128i, %ar
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca u128i, "x", align 16
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 0 : u128i
-    %4 = const 0 : u128i
-    %5 = const 0 : u128i
-    %6 = const 0 : u128i
-    %7 = const 0 : u128i
-    %8 = const 4 : u128i
-    %9 = call @foo(%3, %4, %5, %6, %7, %8) : u128i [all]
-    store %9, %1, align 16
-    scope {
-        %12 = load %1 : u128i, align 16
-        %13 = const 340282366920938463463374607431768211392 : u128i
-        %14 = cmp ne %12, %13 : bool
-        if %14 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca u128i, "x", align 16
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 0 : u128i
+        %4 = const 0 : u128i
+        %5 = const 0 : u128i
+        %6 = const 0 : u128i
+        %7 = const 0 : u128i
+        %8 = const 4 : u128i
+        %9 = call @foo(%3, %4, %5, %6, %7, %8) : u128i [all]
+        store %9, %1, align 16
+        scope {
+                %12 = load %1 : u128i, align 16
+                %13 = const 340282366920938463463374607431768211392 : u128i
+                cmp
+                if %14 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %10 = const 0 : s32i
-    store %10, %0
-    %11 = load %0 : s32i
-    return %11
+        %10 = const 0 : s32i
+        store %10, %0
+        %11 = load %0 : s32i
+        return %11
 }

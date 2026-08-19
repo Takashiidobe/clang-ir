@@ -1,79 +1,79 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/ieee__hugeval.c" (c, x86_64-unknown-linux-gnu)
-global pinf : double = 0x7FF0000000000000 [internal, default, align 8, dso_local, constant]
-global pone : double = 1.000000e+00 [internal, default, align 8, dso_local, constant]
-global zero : double = 0.000000e+00 [internal, default, align 8, dso_local, constant]
-global ninf : double = 0xFFF0000000000000 [internal, default, align 8, dso_local, constant]
-global none : double = -1.000000e+00 [internal, default, align 8, dso_local, constant]
+global pinf : double = CirFloat { ty: Double, value: "0x7FF0000000000000" } [internal, default, align 8, dso_local, constant]
+global pone : double = CirFloat { ty: Double, value: "1.000000e+00" } [internal, default, align 8, dso_local, constant]
+global zero : double = CirFloat { ty: Double, value: "0.000000e+00" } [internal, default, align 8, dso_local, constant]
+global ninf : double = CirFloat { ty: Double, value: "0xFFF0000000000000" } [internal, default, align 8, dso_local, constant]
+global none : double = CirFloat { ty: Double, value: "-1.000000e+00" } [internal, default, align 8, dso_local, constant]
 
 fn abort() -> void [external, c, nothrow];
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %24 = get_global @pinf : double*
-        %25 = load %24 : double, align 8
-        %26 = get_global @pone : double*
-        %27 = load %26 : double, align 8
-        %28 = get_global @zero : double*
-        %29 = load %28 : double, align 8
-        %30 = fdiv %27, %29 : double
-        %31 = cmp ne %25, %30 : bool
-        if %31 {
-            %32 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %24 = get_global @pinf : double*
+                %25 = load %24 : double, align 8
+                %26 = get_global @pone : double*
+                %27 = load %26 : double, align 8
+                %28 = get_global @zero : double*
+                %29 = load %28 : double, align 8
+                fdiv
+                cmp
+                if %31 {
+                        %32 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %15 = get_global @ninf : double*
-        %16 = load %15 : double, align 8
-        %17 = get_global @none : double*
-        %18 = load %17 : double, align 8
-        %19 = get_global @zero : double*
-        %20 = load %19 : double, align 8
-        %21 = fdiv %18, %20 : double
-        %22 = cmp ne %16, %21 : bool
-        if %22 {
-            %23 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %15 = get_global @ninf : double*
+                %16 = load %15 : double, align 8
+                %17 = get_global @none : double*
+                %18 = load %17 : double, align 8
+                %19 = get_global @zero : double*
+                %20 = load %19 : double, align 8
+                fdiv
+                cmp
+                if %22 {
+                        %23 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %10 = const 0x7FF0000000000000 : double
-        %11 = get_global @pinf : double*
-        %12 = load %11 : double, align 8
-        %13 = cmp ne %10, %12 : bool
-        if %13 {
-            %14 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %10 = const 0x7FF0000000000000 : double
+                %11 = get_global @pinf : double*
+                %12 = load %11 : double, align 8
+                cmp
+                if %13 {
+                        %14 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    scope {
-        %5 = const 0xFFF0000000000000 : double
-        %6 = get_global @ninf : double*
-        %7 = load %6 : double, align 8
-        %8 = cmp ne %5, %7 : bool
-        if %8 {
-            %9 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        scope {
+                %5 = const 0xFFF0000000000000 : double
+                %6 = get_global @ninf : double*
+                %7 = load %6 : double, align 8
+                cmp
+                if %8 {
+                        %9 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = get_global @exit : ((s32i) -> void)*
-    %3 = const 0 : s32i
-    call @exit(%3) [all]
-    %4 = load %0 : s32i
-    return %4
+        %2 = get_global @exit : (s32i) -> void*
+        %3 = const 0 : s32i
+        call @exit(%3) [all]
+        %4 = load %0 : s32i
+        return %4
 }

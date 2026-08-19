@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20021015-1.c" (c, x86_64-unknown-linux-gnu)
-global g_list : s8i[1] = [49] [external, default, align 1, dso_local]
+global g_list : s8i[1] = ConstArray { ty: Array { element_type: Named("s8i"), size: 1 }, elts: Array([CirInt { ty: Named("s8i"), value: "49" }]), trailing_zeros_num: 0 } [external, default, align 1, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn g(%arg0: void*, %arg1: s8i*, %arg2: s32i, %arg3: s8i**, %arg4: s8i**) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -19,17 +19,17 @@ fn g(%arg0: void*, %arg1: s8i*, %arg2: s32i, %arg3: s8i**, %arg4: s8i**) -> void
         store %arg3, %34
         store %arg4, %35
         scope {
-            %39 = load %35 : s8i**, align 8
-            %40 = load %39 : s8i*, align 8
-            %41 = get_global @g_list : s8i[1]*
-            %42 = cast(array_to_ptrdecay) %41 : s8i*
-            %43 = cmp ne %40, %42 : bool
-            if %43 {
-                %44 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %39 = load %35 : s8i**, align 8
+                %40 = load %39 : s8i*, align 8
+                %41 = get_global @g_list : s8i[1]*
+                %42 = cast(array_to_ptrdecay) %41 : s8i*
+                cmp
+                if %43 {
+                        %44 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %36 = const 0 : s8i
         %37 = load %35 : s8i**, align 8
@@ -38,58 +38,58 @@ fn g(%arg0: void*, %arg1: s8i*, %arg2: s32i, %arg3: s8i**, %arg4: s8i**) -> void
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s8i*, "list", align 8
-    %2 = alloca s8i*, "element", align 8
-    %3 = alloca s32i, "i", align 4
-    %4 = alloca s32i, "length", align 4
-    %5 = const 0 : s32i
-    store %5, %0
-    %6 = get_global @g_list : s8i[1]*
-    %7 = cast(array_to_ptrdecay) %6 : s8i*
-    store %7, %1, align 8
-    %8 = const 100 : s32i
-    store %8, %4, align 4
-    scope {
-        %11 = const 0 : s32i
-        store %11, %3, align 4
-        for cond: {
-            %26 = load %1 : s8i*, align 8
-            %27 = load %26 : s8i, align 1
-            %28 = cast(integral) %27 : s32i
-            %29 = const 0 : s32i
-            %30 = cmp ne %28, %29 : bool
-            condition %30
-        } step: {
-            %12 = load %3 : s32i, align 4
-            %13 = inc %12 : s32i [nsw]
-            store %13, %3, align 4
-            yield
-        } do {
-            scope {
-                %14 = alloca s8i*, "prevList", align 8
-                %15 = load %1 : s8i*, align 8
-                store %15, %14, align 8
-                %16 = const #cir.ptr<null> : void*
-                %17 = load %1 : s8i*, align 8
-                %18 = load %4 : s32i, align 4
-                call @g(%16, %17, %18, %2, %1) [all]
-                %19 = load %1 : s8i*, align 8
-                %20 = load %14 : s8i*, align 8
-                %21 = ptr_diff %19, %20 : s64i
-                %22 = load %4 : s32i, align 4
-                %23 = cast(integral) %22 : s64i
-                %24 = sub %23, %21 : s64i [nsw]
-                %25 = cast(integral) %24 : s32i
-                store %25, %4, align 4
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s8i*, "list", align 8
+        %2 = alloca s8i*, "element", align 8
+        %3 = alloca s32i, "i", align 4
+        %4 = alloca s32i, "length", align 4
+        %5 = const 0 : s32i
+        store %5, %0
+        %6 = get_global @g_list : s8i[1]*
+        %7 = cast(array_to_ptrdecay) %6 : s8i*
+        store %7, %1, align 8
+        %8 = const 100 : s32i
+        store %8, %4, align 4
+        scope {
+                %11 = const 0 : s32i
+                store %11, %3, align 4
+                for cond {
+                        %26 = load %1 : s8i*, align 8
+                        %27 = load %26 : s8i, align 1
+                        %28 = cast(integral) %27 : s32i
+                        %29 = const 0 : s32i
+                        cmp
+                        condition %30
+                } step {
+                        %12 = load %3 : s32i, align 4
+                        inc
+                        store %13, %3, align 4
+                        yield
+                } body {
+                        scope {
+                                %14 = alloca s8i*, "prevList", align 8
+                                %15 = load %1 : s8i*, align 8
+                                store %15, %14, align 8
+                                %16 = const #cir.ptr<null> : void*
+                                %17 = load %1 : s8i*, align 8
+                                %18 = load %4 : s32i, align 4
+                                call @g(%16, %17, %18, %2, %1) [all]
+                                %19 = load %1 : s8i*, align 8
+                                %20 = load %14 : s8i*, align 8
+                                ptr_diff
+                                %22 = load %4 : s32i, align 4
+                                %23 = cast(integral) %22 : s64i
+                                sub
+                                %25 = cast(integral) %24 : s32i
+                                store %25, %4, align 4
+                                yield
+                        }
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %9 = const 0 : s32i
-    store %9, %0
-    %10 = load %0 : s32i
-    return %10
+        %9 = const 0 : s32i
+        store %9, %0
+        %10 = load %0 : s32i
+        return %10
 }

@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/computed_goto_ops.c" (c, x86_64-unknown-linux-gnu)
-global jump_probe.targets : void*[3] = [#cir.block_addr_info<@jump_probe, "zero">, #cir.block_addr_info<@jump_probe, "one">, #cir.block_addr_info<@jump_probe, "two">] [internal, default, align 16, dso_local]
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global jump_probe.targets : void*[3] = ConstArray { ty: Array { element_type: Pointer { pointee: Named("void"), addr_space: None }, size: 3 }, elts: Array([Dialect { dialect: "cir", mnemonic: "block_addr_info", raw: Some("@jump_probe, \"zero\""), ty: Some(Pointer { pointee: Named("void"), addr_space: None }) }, Dialect { dialect: "cir", mnemonic: "block_addr_info", raw: Some("@jump_probe, \"one\""), ty: Some(Pointer { pointee: Named("void"), addr_space: None }) }, Dialect { dialect: "cir", mnemonic: "block_addr_info", raw: Some("@jump_probe, \"two\""), ty: Some(Pointer { pointee: Named("void"), addr_space: None }) }]), trailing_zeros_num: 0 } [internal, default, align 16, dso_local]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn jump_probe(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
@@ -14,44 +14,44 @@ fn jump_probe(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] 
         store %arg0, %12
         %14 = get_global @jump_probe.targets : void*[3]*
         scope {
-            %25 = load %12 : s32i, align 4
-            %26 = const 0 : s32i
-            %27 = cmp lt %25, %26 : bool
-            %28 = ternary %27 ? { : bool
-                %34 = const true : bool
-                yield %34
-            } : {
-                %31 = load %12 : s32i, align 4
-                %32 = const 2 : s32i
-                %33 = cmp gt %31, %32 : bool
-                yield %33
-            }
-            if %28 {
-                %29 = const -1 : s32i
-                store %29, %13
-                %30 = load %13 : s32i
-                return %30
-            }
-            yield
+                %25 = load %12 : s32i, align 4
+                %26 = const 0 : s32i
+                cmp
+                %28 = ternary %27 ? { : bool
+                        %34 = const true : bool
+                        yield %34
+                } : {
+                        %31 = load %12 : s32i, align 4
+                        %32 = const 2 : s32i
+                        cmp
+                        yield %33
+                }
+                if %28 {
+                        %29 = const -1 : s32i
+                        store %29, %13
+                        %30 = load %13 : s32i
+                        return %30
+                }
+                yield
         }
         %15 = load %12 : s32i, align 4
         %16 = cast(integral) %15 : s64i
-        %17 = get_element %14[%16] : void**
+        get_element
         %18 = load %17 : void*, align 8
         indirect_goto %18
-    ^bb1():
+    ^bb1:
         label zero:
         %19 = const 10 : s32i
         store %19, %13
         %20 = load %13 : s32i
         return %20
-    ^bb2():
+    ^bb2:
         label one:
         %21 = const 20 : s32i
         store %21, %13
         %22 = load %13 : s32i
         return %22
-    ^bb3():
+    ^bb3:
         label two:
         %23 = const 30 : s32i
         store %23, %13
@@ -59,20 +59,20 @@ fn jump_probe(%arg0: s32i) -> s32i [internal, c, no_inline, dso_local, nothrow] 
         return %24
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "input", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 2 : s32i
-    store %3, %1, align 4, volatile
-    %4 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %5 = get_global @.str : s8i[4]*
-    %6 = cast(array_to_ptrdecay) %5 : s8i*
-    %7 = load %1 : s32i, align 4, volatile
-    %8 = call @jump_probe(%7) : s32i [all]
-    %9 = call @printf(%6, %8) : s32i [all]
-    %10 = const 0 : s32i
-    store %10, %0
-    %11 = load %0 : s32i
-    return %11
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "input", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 2 : s32i
+        store %3, %1, align 4
+        %4 = get_global @printf : (s8i*, ...) -> s32i*
+        %5 = get_global @.str : s8i[4]*
+        %6 = cast(array_to_ptrdecay) %5 : s8i*
+        %7 = load %1 : s32i, align 4
+        %8 = call @jump_probe(%7) : s32i [all]
+        %9 = call @printf(%6, %8) : s32i [all]
+        %10 = const 0 : s32i
+        store %10, %0
+        %11 = load %0 : s32i
+        return %11
 }

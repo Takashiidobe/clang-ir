@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr119291.c" (c, x86_64-unknown-linux-gnu)
-global a : s32i = 0 [external, default, align 4, dso_local]
-global c : s64i = 0 [external, default, align 8, dso_local]
+global a : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global c : s64i = CirInt { ty: Named("s64i"), value: "0" } [external, default, align 8, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn foo(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -12,14 +12,14 @@ fn foo(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %56 = alloca s32i, "x", align 4
         store %arg0, %56
         scope {
-            %59 = load %56 : s32i, align 4
-            %60 = const 0 : s32i
-            %61 = cmp ne %59, %60 : bool
-            if %61 {
-                call @abort() [all]
+                %59 = load %56 : s32i, align 4
+                %60 = const 0 : s32i
+                cmp
+                if %61 {
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %57 = const 42 : s32i
         %58 = get_global @a : s32i*
@@ -27,81 +27,81 @@ fn foo(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "e", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 1 : s32i
-    store %3, %1, align 4
-    br ^bb1
-    ^bb1():
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "e", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 1 : s32i
+        store %3, %1, align 4
+        br ^bb1
+    ^bb1:
         label lab:
         scope {
-            %5 = get_global @a : s32i*
-            %6 = load %5 : s32i, align 4
-            %7 = const 2 : s32i
-            %8 = cmp lt %6, %7 : bool
-            if %8 {
-                %9 = alloca s32i, "b", align 4
-                %10 = alloca bool, "d", align 1
-                %11 = alloca bool, "f", align 1
-                %12 = alloca u64i, "g", align 8
-                %13 = alloca u64i, "h", align 8
-                %14 = alloca u64i, "i", align 8
-                %15 = load %1 : s32i, align 4
-                store %15, %9, align 4
-                %16 = get_global @a : s32i*
-                %17 = load %16 : s32i, align 4
-                %18 = const 0 : s32i
-                %19 = cmp ne %17, %18 : bool
-                store %19, %10, align 1
-                %20 = load %9 : s32i, align 4
-                %21 = const 0 : s32i
-                %22 = cmp ne %20, %21 : bool
-                store %22, %11, align 1
-                %23 = load %10 : bool, align 1
-                %24 = cast(bool_to_int) %23 : s32i
-                %25 = load %11 : bool, align 1
-                %26 = cast(bool_to_int) %25 : s32i
-                %27 = and %24, %26 : s32i
-                %28 = minus %27 : s32i [nsw]
-                %29 = cast(integral) %28 : u64i
-                store %29, %12, align 8
-                %30 = get_global @c : s64i*
-                %31 = load %30 : s64i, align 8
-                %32 = cast(integral) %31 : u64i
-                %33 = load %12 : u64i, align 8
-                %34 = and %32, %33 : u64i
-                store %34, %13, align 8
-                %35 = get_global @c : s64i*
-                %36 = load %35 : s64i, align 8
-                %37 = not %36 : s64i
-                %38 = cast(integral) %37 : u64i
-                store %38, %14, align 8
-                %39 = load %14 : u64i, align 8
-                %40 = load %13 : u64i, align 8
-                %41 = and %39, %40 : u64i
-                %42 = minus %41 : u64i
-                %43 = cast(integral) %42 : s32i
-                store %43, %1, align 4
-                %44 = load %1 : s32i, align 4
-                %45 = const 0 : s32i
-                %46 = cmp ne %44, %45 : bool
-                %47 = cast(bool_to_int) %46 : s32i
-                %48 = cast(integral) %47 : s64i
-                %49 = get_global @c : s64i*
-                store %48, %49, align 8
-                %50 = load %1 : s32i, align 4
-                %51 = not %50 : s32i
-                %52 = load %9 : s32i, align 4
-                %53 = add %51, %52 : s32i [nsw]
-                %54 = get_global @a : s32i*
-                store %53, %54, align 4
-                %55 = load %1 : s32i, align 4
-                call @foo(%55) [all]
-                goto lab
-            }
-            yield
+                %5 = get_global @a : s32i*
+                %6 = load %5 : s32i, align 4
+                %7 = const 2 : s32i
+                cmp
+                if %8 {
+                        %9 = alloca s32i, "b", align 4
+                        %10 = alloca bool, "d", align 1
+                        %11 = alloca bool, "f", align 1
+                        %12 = alloca u64i, "g", align 8
+                        %13 = alloca u64i, "h", align 8
+                        %14 = alloca u64i, "i", align 8
+                        %15 = load %1 : s32i, align 4
+                        store %15, %9, align 4
+                        %16 = get_global @a : s32i*
+                        %17 = load %16 : s32i, align 4
+                        %18 = const 0 : s32i
+                        cmp
+                        store %19, %10, align 1
+                        %20 = load %9 : s32i, align 4
+                        %21 = const 0 : s32i
+                        cmp
+                        store %22, %11, align 1
+                        %23 = load %10 : bool, align 1
+                        %24 = cast(bool_to_int) %23 : s32i
+                        %25 = load %11 : bool, align 1
+                        %26 = cast(bool_to_int) %25 : s32i
+                        and
+                        minus
+                        %29 = cast(integral) %28 : u64i
+                        store %29, %12, align 8
+                        %30 = get_global @c : s64i*
+                        %31 = load %30 : s64i, align 8
+                        %32 = cast(integral) %31 : u64i
+                        %33 = load %12 : u64i, align 8
+                        and
+                        store %34, %13, align 8
+                        %35 = get_global @c : s64i*
+                        %36 = load %35 : s64i, align 8
+                        not
+                        %38 = cast(integral) %37 : u64i
+                        store %38, %14, align 8
+                        %39 = load %14 : u64i, align 8
+                        %40 = load %13 : u64i, align 8
+                        and
+                        minus
+                        %43 = cast(integral) %42 : s32i
+                        store %43, %1, align 4
+                        %44 = load %1 : s32i, align 4
+                        %45 = const 0 : s32i
+                        cmp
+                        %47 = cast(bool_to_int) %46 : s32i
+                        %48 = cast(integral) %47 : s64i
+                        %49 = get_global @c : s64i*
+                        store %48, %49, align 8
+                        %50 = load %1 : s32i, align 4
+                        not
+                        %52 = load %9 : s32i, align 4
+                        %53 = add %51, %52 : s32i [nsw]
+                        %54 = get_global @a : s32i*
+                        store %53, %54, align 4
+                        %55 = load %1 : s32i, align 4
+                        call @foo(%55) [all]
+                        goto lab
+                }
+                yield
         }
         %4 = load %0 : s32i
         return %4

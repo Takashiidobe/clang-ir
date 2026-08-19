@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/stdlib/stdio/tmpfile_fread.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.out : s8i[4] = zero [cir_private, default, dso_local, constant]
-global __const.main.in : s8i[4] = "abc" [cir_private, default, dso_local, constant]
+global __const.main.out : s8i[4] = Zero { ty: Array { element_type: Named("s8i"), size: 4 } } [cir_private, default, dso_local, constant]
+global __const.main.in : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("abc"), trailing_zeros_num: 1 } [cir_private, default, dso_local, constant]
 
 fn tmpfile() -> rec__IO_FILE* [external, c];
 fn fwrite(%arg0: void*, %arg1: u64i, %arg2: u64i, %arg3: rec__IO_FILE*) -> u64i [external, c];
@@ -13,40 +13,40 @@ fn fread(%arg0: void*, %arg1: u64i, %arg2: u64i, %arg3: rec__IO_FILE*) -> u64i [
 fn puts(%arg0: s8i*) -> s32i [external, c];
 fn fclose(%arg0: rec__IO_FILE*) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec__IO_FILE*, "f", align 8
-    %2 = alloca s8i[4], "in", align 1
-    %3 = alloca s8i[4], "out", align 1
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = call @tmpfile() : rec__IO_FILE* [all]
-    store %5, %1, align 8
-    %6 = get_global @__const.main.in : s8i[4]*
-    copy %2, %6
-    %7 = get_global @__const.main.out : s8i[4]*
-    copy %3, %7
-    %8 = get_global @fwrite : ((void*, u64i, u64i, rec__IO_FILE*) -> u64i)*
-    %9 = cast(array_to_ptrdecay) %2 : s8i*
-    %10 = cast(bitcast) %9 : void*
-    %11 = const 1 : u64i
-    %12 = const 3 : u64i
-    %13 = load %1 : rec__IO_FILE*, align 8
-    %14 = call @fwrite(%10, %11, %12, %13) : u64i [all]
-    %15 = load %1 : rec__IO_FILE*, align 8
-    call @rewind(%15) [all]
-    %16 = get_global @fread : ((void*, u64i, u64i, rec__IO_FILE*) -> u64i)*
-    %17 = cast(array_to_ptrdecay) %3 : s8i*
-    %18 = cast(bitcast) %17 : void*
-    %19 = const 1 : u64i
-    %20 = const 3 : u64i
-    %21 = load %1 : rec__IO_FILE*, align 8
-    %22 = call @fread(%18, %19, %20, %21) : u64i [all]
-    %23 = cast(array_to_ptrdecay) %3 : s8i*
-    %24 = call @puts(%23) : s32i [all]
-    %25 = load %1 : rec__IO_FILE*, align 8
-    %26 = call @fclose(%25) : s32i [all]
-    %27 = const 0 : s32i
-    store %27, %0
-    %28 = load %0 : s32i
-    return %28
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec__IO_FILE*, "f", align 8
+        %2 = alloca s8i[4], "in", align 1
+        %3 = alloca s8i[4], "out", align 1
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = call @tmpfile() : rec__IO_FILE* [all]
+        store %5, %1, align 8
+        %6 = get_global @__const.main.in : s8i[4]*
+        copy
+        %7 = get_global @__const.main.out : s8i[4]*
+        copy
+        %8 = get_global @fwrite : (void*, u64i, u64i, rec__IO_FILE*) -> u64i*
+        %9 = cast(array_to_ptrdecay) %2 : s8i*
+        %10 = cast(bitcast) %9 : void*
+        %11 = const 1 : u64i
+        %12 = const 3 : u64i
+        %13 = load %1 : rec__IO_FILE*, align 8
+        %14 = call @fwrite(%10, %11, %12, %13) : u64i [all]
+        %15 = load %1 : rec__IO_FILE*, align 8
+        call @rewind(%15) [all]
+        %16 = get_global @fread : (void*, u64i, u64i, rec__IO_FILE*) -> u64i*
+        %17 = cast(array_to_ptrdecay) %3 : s8i*
+        %18 = cast(bitcast) %17 : void*
+        %19 = const 1 : u64i
+        %20 = const 3 : u64i
+        %21 = load %1 : rec__IO_FILE*, align 8
+        %22 = call @fread(%18, %19, %20, %21) : u64i [all]
+        %23 = cast(array_to_ptrdecay) %3 : s8i*
+        %24 = call @puts(%23) : s32i [all]
+        %25 = load %1 : rec__IO_FILE*, align 8
+        %26 = call @fclose(%25) : s32i [all]
+        %27 = const 0 : s32i
+        store %27, %0
+        %28 = load %0 : s32i
+        return %28
 }

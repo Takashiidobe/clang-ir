@@ -1,12 +1,12 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/aggregate_value_member_ops.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.w : rec_WithArray = {[8, 9, 10], 11} [cir_private, default, dso_local, constant]
-global __const.main.n : rec_Nested = {{4, 5}, 6} [cir_private, default, dso_local, constant]
-global __const.main.p : rec_Pair = {2, 3} [cir_private, default, dso_local, constant]
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global __const.main.w : rec_WithArray = ConstRecord { ty: Named("rec_WithArray"), members: Array([ConstArray { ty: Array { element_type: Named("s32i"), size: 3 }, elts: Array([CirInt { ty: Named("s32i"), value: "8" }, CirInt { ty: Named("s32i"), value: "9" }, CirInt { ty: Named("s32i"), value: "10" }]), trailing_zeros_num: 0 }, CirInt { ty: Named("s32i"), value: "11" }]) } [cir_private, default, dso_local, constant]
+global __const.main.n : rec_Nested = ConstRecord { ty: Named("rec_Nested"), members: Array([ConstRecord { ty: Named("rec_Pair"), members: Array([CirInt { ty: Named("s32i"), value: "4" }, CirInt { ty: Named("s32i"), value: "5" }]) }, CirInt { ty: Named("s32i"), value: "6" }]) } [cir_private, default, dso_local, constant]
+global __const.main.p : rec_Pair = ConstRecord { ty: Named("rec_Pair"), members: Array([CirInt { ty: Named("s32i"), value: "2" }, CirInt { ty: Named("s32i"), value: "3" }]) } [cir_private, default, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn replace_left(%arg5: u64i, %arg6: s32i) -> u64i [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg5: u64i, %arg6: s32i):
@@ -21,9 +21,9 @@ fn replace_left(%arg5: u64i, %arg6: s32i) -> u64i [internal, c, no_inline, dso_l
         store %115, %116
         store %arg6, %117
         %119 = load %117 : s32i, align 4
-        %120 = get_member %116[0] "left" : s32i*
+        get_member
         store %119, %120, align 4
-        copy %118, %116
+        copy
         %121 = load %118 : rec_Pair
         store %121, %112
         %122 = cast(bitcast) %112 : u64i*
@@ -40,11 +40,11 @@ fn take_pair(%arg4: u64i) -> s32i [internal, c, no_inline, dso_local, nothrow] {
         %102 = alloca rec_Pair, "p", align 4
         %103 = alloca s32i, "__retval", align 4
         store %101, %102
-        %104 = get_member %102[0] "left" : s32i*
+        get_member
         %105 = load %104 : s32i, align 4
         %106 = const 10 : s32i
-        %107 = mul %105, %106 : s32i [nsw]
-        %108 = get_member %102[1] "right" : s32i*
+        mul
+        get_member
         %109 = load %108 : s32i, align 4
         %110 = add %107, %109 : s32i [nsw]
         store %110, %103
@@ -55,9 +55,9 @@ fn nested_total(%arg2: u64i, %arg3: s32i) -> s32i [internal, c, no_inline, dso_l
     ^bb0(%arg2: u64i, %arg3: s32i):
         %79 = alloca rec_anon_struct, "coerce", align 8
         %80 = alloca rec_anon_struct, "coerce", align 8
-        %81 = get_member %80[0] "" : u64i*
+        get_member
         store %arg2, %81
-        %82 = get_member %80[1] "" : s32i*
+        get_member
         store %arg3, %82
         %83 = load %80 : rec_anon_struct
         store %83, %79
@@ -66,14 +66,14 @@ fn nested_total(%arg2: u64i, %arg3: s32i) -> s32i [internal, c, no_inline, dso_l
         %86 = alloca rec_Nested, "n", align 4
         %87 = alloca s32i, "__retval", align 4
         store %85, %86
-        %88 = get_member %86[0] "inner" : rec_Pair*
-        %89 = get_member %88[0] "left" : s32i*
+        get_member
+        get_member
         %90 = load %89 : s32i, align 4
-        %91 = get_member %86[0] "inner" : rec_Pair*
-        %92 = get_member %91[1] "right" : s32i*
+        get_member
+        get_member
         %93 = load %92 : s32i, align 4
         %94 = add %90, %93 : s32i [nsw]
-        %95 = get_member %86[1] "tag" : s32i*
+        get_member
         %96 = load %95 : s32i, align 4
         %97 = add %94, %96 : s32i [nsw]
         store %97, %87
@@ -84,9 +84,9 @@ fn array_value(%arg0: u64i, %arg1: u64i) -> s32i [internal, c, no_inline, dso_lo
     ^bb0(%arg0: u64i, %arg1: u64i):
         %62 = alloca rec_anon_struct1, "coerce", align 8
         %63 = alloca rec_anon_struct1, "coerce", align 8
-        %64 = get_member %63[0] "" : u64i*
+        get_member
         store %arg0, %64
-        %65 = get_member %63[1] "" : u64i*
+        get_member
         store %arg1, %65
         %66 = load %63 : rec_anon_struct1
         store %66, %62
@@ -96,10 +96,10 @@ fn array_value(%arg0: u64i, %arg1: u64i) -> s32i [internal, c, no_inline, dso_lo
         %70 = alloca s32i, "__retval", align 4
         store %68, %69
         %71 = const 1 : s64i
-        %72 = get_member %69[0] "data" : s32i[3]*
-        %73 = get_element %72[%71] : s32i*
+        get_member
+        get_element
         %74 = load %73 : s32i, align 4
-        %75 = get_member %69[1] "marker" : s32i*
+        get_member
         %76 = load %75 : s32i, align 4
         %77 = add %74, %76 : s32i [nsw]
         store %77, %70
@@ -107,79 +107,79 @@ fn array_value(%arg0: u64i, %arg1: u64i) -> s32i [internal, c, no_inline, dso_lo
         return %78
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca rec_WithArray, "coerce", align 8
-    %1 = alloca rec_anon_struct, "coerce", align 8
-    %2 = alloca rec_Pair, "coerce", align 8
-    %3 = alloca rec_Pair, "coerce", align 8
-    %4 = alloca u64i, "coerce", align 8
-    %5 = alloca rec_Pair, "coerce", align 8
-    %6 = alloca s32i, "__retval", align 4
-    %7 = alloca rec_Pair, "p", align 4
-    %8 = alloca rec_Pair, "q", align 4
-    %9 = alloca rec_Nested, "n", align 4
-    %10 = alloca rec_WithArray, "w", align 4
-    %11 = const 0 : s32i
-    store %11, %6
-    %12 = get_global @__const.main.p : rec_Pair*
-    copy %7, %12
-    %13 = const 7 : s32i
-    %14 = load %7 : rec_Pair, align 4
-    store %14, %5
-    %15 = cast(bitcast) %5 : u64i*
-    %16 = load %15 : u64i
-    %17 = call @replace_left(%16, %13) : u64i [all]
-    store %17, %4
-    %18 = cast(bitcast) %4 : rec_Pair*
-    %19 = load %18 : rec_Pair
-    store %19, %8, align 4
-    %20 = get_global @__const.main.n : rec_Nested*
-    copy %9, %20
-    %21 = get_global @__const.main.w : rec_WithArray*
-    copy %10, %21
-    %22 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %23 = get_global @.str : s8i[4]*
-    %24 = cast(array_to_ptrdecay) %23 : s8i*
-    %25 = load %7 : rec_Pair, align 4
-    store %25, %3
-    %26 = cast(bitcast) %3 : u64i*
-    %27 = load %26 : u64i
-    %28 = call @take_pair(%27) : s32i [all]
-    %29 = call @printf(%24, %28) : s32i [all]
-    %30 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %31 = get_global @.str : s8i[4]*
-    %32 = cast(array_to_ptrdecay) %31 : s8i*
-    %33 = load %8 : rec_Pair, align 4
-    store %33, %2
-    %34 = cast(bitcast) %2 : u64i*
-    %35 = load %34 : u64i
-    %36 = call @take_pair(%35) : s32i [all]
-    %37 = call @printf(%32, %36) : s32i [all]
-    %38 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %39 = get_global @.str : s8i[4]*
-    %40 = cast(array_to_ptrdecay) %39 : s8i*
-    %41 = load %9 : rec_Nested, align 4
-    %42 = cast(bitcast) %1 : rec_Nested*
-    store %41, %42
-    %43 = get_member %1[0] "" : u64i*
-    %44 = load %43 : u64i
-    %45 = get_member %1[1] "" : s32i*
-    %46 = load %45 : s32i
-    %47 = call @nested_total(%44, %46) : s32i [all]
-    %48 = call @printf(%40, %47) : s32i [all]
-    %49 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %50 = get_global @.str : s8i[4]*
-    %51 = cast(array_to_ptrdecay) %50 : s8i*
-    %52 = load %10 : rec_WithArray, align 4
-    store %52, %0
-    %53 = cast(bitcast) %0 : rec_anon_struct1*
-    %54 = get_member %53[0] "" : u64i*
-    %55 = load %54 : u64i
-    %56 = get_member %53[1] "" : u64i*
-    %57 = load %56 : u64i
-    %58 = call @array_value(%55, %57) : s32i [all]
-    %59 = call @printf(%51, %58) : s32i [all]
-    %60 = const 0 : s32i
-    store %60, %6
-    %61 = load %6 : s32i
-    return %61
+        %0 = alloca rec_WithArray, "coerce", align 8
+        %1 = alloca rec_anon_struct, "coerce", align 8
+        %2 = alloca rec_Pair, "coerce", align 8
+        %3 = alloca rec_Pair, "coerce", align 8
+        %4 = alloca u64i, "coerce", align 8
+        %5 = alloca rec_Pair, "coerce", align 8
+        %6 = alloca s32i, "__retval", align 4
+        %7 = alloca rec_Pair, "p", align 4
+        %8 = alloca rec_Pair, "q", align 4
+        %9 = alloca rec_Nested, "n", align 4
+        %10 = alloca rec_WithArray, "w", align 4
+        %11 = const 0 : s32i
+        store %11, %6
+        %12 = get_global @__const.main.p : rec_Pair*
+        copy
+        %13 = const 7 : s32i
+        %14 = load %7 : rec_Pair, align 4
+        store %14, %5
+        %15 = cast(bitcast) %5 : u64i*
+        %16 = load %15 : u64i
+        %17 = call @replace_left(%16, %13) : u64i [all]
+        store %17, %4
+        %18 = cast(bitcast) %4 : rec_Pair*
+        %19 = load %18 : rec_Pair
+        store %19, %8, align 4
+        %20 = get_global @__const.main.n : rec_Nested*
+        copy
+        %21 = get_global @__const.main.w : rec_WithArray*
+        copy
+        %22 = get_global @printf : (s8i*, ...) -> s32i*
+        %23 = get_global @.str : s8i[4]*
+        %24 = cast(array_to_ptrdecay) %23 : s8i*
+        %25 = load %7 : rec_Pair, align 4
+        store %25, %3
+        %26 = cast(bitcast) %3 : u64i*
+        %27 = load %26 : u64i
+        %28 = call @take_pair(%27) : s32i [all]
+        %29 = call @printf(%24, %28) : s32i [all]
+        %30 = get_global @printf : (s8i*, ...) -> s32i*
+        %31 = get_global @.str : s8i[4]*
+        %32 = cast(array_to_ptrdecay) %31 : s8i*
+        %33 = load %8 : rec_Pair, align 4
+        store %33, %2
+        %34 = cast(bitcast) %2 : u64i*
+        %35 = load %34 : u64i
+        %36 = call @take_pair(%35) : s32i [all]
+        %37 = call @printf(%32, %36) : s32i [all]
+        %38 = get_global @printf : (s8i*, ...) -> s32i*
+        %39 = get_global @.str : s8i[4]*
+        %40 = cast(array_to_ptrdecay) %39 : s8i*
+        %41 = load %9 : rec_Nested, align 4
+        %42 = cast(bitcast) %1 : rec_Nested*
+        store %41, %42
+        get_member
+        %44 = load %43 : u64i
+        get_member
+        %46 = load %45 : s32i
+        %47 = call @nested_total(%44, %46) : s32i [all]
+        %48 = call @printf(%40, %47) : s32i [all]
+        %49 = get_global @printf : (s8i*, ...) -> s32i*
+        %50 = get_global @.str : s8i[4]*
+        %51 = cast(array_to_ptrdecay) %50 : s8i*
+        %52 = load %10 : rec_WithArray, align 4
+        store %52, %0
+        %53 = cast(bitcast) %0 : rec_anon_struct1*
+        get_member
+        %55 = load %54 : u64i
+        get_member
+        %57 = load %56 : u64i
+        %58 = call @array_value(%55, %57) : s32i [all]
+        %59 = call @printf(%51, %58) : s32i [all]
+        %60 = const 0 : s32i
+        store %60, %6
+        %61 = load %6 : s32i
+        return %61
 }

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.cxx/virtual_dispatch.cpp" (cxx, x86_64-unknown-linux-gnu)
@@ -9,11 +9,11 @@ fn _Z7call_itP4Base(%arg0: rec_Base*) -> s32i [external, c, no_inline, dso_local
         %1 = alloca s32i, "__retval", align 4
         store %arg0, %0
         %2 = load %0 : rec_Base*, align 8
-        %3 = vtable.get_vptr %2 : cir.vptr*
-        %4 = load %3 : cir.vptr, align 8
-        %5 = vtable.get_virtual_fn_addr %4[0] : ((rec_Base*) -> s32i)**
-        %6 = load %5 : ((rec_Base*) -> s32i)*, align 8
-        %7 = call %6(%2) : s32i [all]
+        vtable.get_vptr
+        %4 = load %3 : vptr, align 8
+        vtable.get_virtual_fn_addr
+        %6 = load %5 : (rec_Base*) -> s32i*, align 8
+        %7 = call (%2) : s32i [all]
         store %7, %1
         %8 = load %1 : s32i
         return %8

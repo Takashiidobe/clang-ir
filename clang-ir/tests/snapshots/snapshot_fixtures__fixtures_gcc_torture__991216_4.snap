@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/991216-4.c" (c, x86_64-unknown-linux-gnu)
@@ -14,53 +14,53 @@ fn bug(%arg0: s32i, %arg1: s32i) -> void [internal, c, no_inline, dso_local, not
         %11 = const 0 : s32i
         store %11, %10, align 4
         scope {
-            while {
-                %20 = load %10 : s32i, align 4
-                %21 = load %7 : s32i, align 4
-                %22 = cmp lt %20, %21 : bool
-                condition %22
-            } do {
-                scope {
-                    scope {
-                        %12 = const 1 : s32i
-                        store %12, %9, align 4
-                        for cond: {
-                            %17 = load %9 : s32i, align 4
-                            %18 = load %8 : s32i, align 4
-                            %19 = cmp lt %17, %18 : bool
-                            condition %19
-                        } step: {
-                            %13 = load %9 : s32i, align 4
-                            %14 = inc %13 : s32i [nsw]
-                            store %14, %9, align 4
-                            yield
-                        } do {
-                            %15 = load %10 : s32i, align 4
-                            %16 = inc %15 : s32i [nsw]
-                            store %16, %10, align 4
-                            yield
+                while {
+                        %20 = load %10 : s32i, align 4
+                        %21 = load %7 : s32i, align 4
+                        cmp
+                        condition %22
+                } do {
+                        scope {
+                                scope {
+                                        %12 = const 1 : s32i
+                                        store %12, %9, align 4
+                                        for cond {
+                                                %17 = load %9 : s32i, align 4
+                                                %18 = load %8 : s32i, align 4
+                                                cmp
+                                                condition %19
+                                        } step {
+                                                %13 = load %9 : s32i, align 4
+                                                inc
+                                                store %14, %9, align 4
+                                                yield
+                                        } body {
+                                                %15 = load %10 : s32i, align 4
+                                                inc
+                                                store %16, %10, align 4
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
                         }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         return
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 5 : s32i
-    %3 = const 10 : s32i
-    call @bug(%2, %3) [all]
-    %4 = get_global @exit : ((s32i) -> void)*
-    %5 = const 0 : s32i
-    call @exit(%5) [all]
-    %6 = load %0 : s32i
-    return %6
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 5 : s32i
+        %3 = const 10 : s32i
+        call @bug(%2, %3) [all]
+        %4 = get_global @exit : (s32i) -> void*
+        %5 = const 0 : s32i
+        call @exit(%5) [all]
+        %6 = load %0 : s32i
+        return %6
 }

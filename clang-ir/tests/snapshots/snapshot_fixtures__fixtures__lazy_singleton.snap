@@ -1,60 +1,60 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/lazy_singleton.c" (c, x86_64-unknown-linux-gnu)
-global computed : s32i = 0 [internal, default, align 4, dso_local]
-global cached_value : s32i = 0 [internal, default, align 4, dso_local]
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global computed : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
+global cached_value : s32i = CirInt { ty: Named("s32i"), value: "0" } [internal, default, align 4, dso_local]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn compute() -> s32i [internal, c, no_inline, dso_local, nothrow] {
-    %26 = alloca s32i, "__retval", align 4
-    %27 = const 42 : s32i
-    store %27, %26
-    %28 = load %26 : s32i
-    return %28
+        %26 = alloca s32i, "__retval", align 4
+        %27 = const 42 : s32i
+        store %27, %26
+        %28 = load %26 : s32i
+        return %28
 }
 fn get_value() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %14 = alloca s32i, "__retval", align 4
-    scope {
-        %18 = get_global @computed : s32i*
-        %19 = load %18 : s32i, align 4
-        %20 = cast(int_to_bool) %19 : bool
-        %21 = not %20 : bool
-        if %21 {
-            %22 = call @compute() : s32i [all]
-            %23 = get_global @cached_value : s32i*
-            store %22, %23, align 4
-            %24 = const 1 : s32i
-            %25 = get_global @computed : s32i*
-            store %24, %25, align 4
-            yield
+        %14 = alloca s32i, "__retval", align 4
+        scope {
+                %18 = get_global @computed : s32i*
+                %19 = load %18 : s32i, align 4
+                %20 = cast(int_to_bool) %19 : bool
+                not
+                if %21 {
+                        %22 = call @compute() : s32i [all]
+                        %23 = get_global @cached_value : s32i*
+                        store %22, %23, align 4
+                        %24 = const 1 : s32i
+                        %25 = get_global @computed : s32i*
+                        store %24, %25, align 4
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %15 = get_global @cached_value : s32i*
-    %16 = load %15 : s32i, align 4
-    store %16, %14
-    %17 = load %14 : s32i
-    return %17
+        %15 = get_global @cached_value : s32i*
+        %16 = load %15 : s32i, align 4
+        store %16, %14
+        %17 = load %14 : s32i
+        return %17
 }
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %3 = get_global @.str : s8i[4]*
-    %4 = cast(array_to_ptrdecay) %3 : s8i*
-    %5 = call @get_value() : s32i [all]
-    %6 = call @printf(%4, %5) : s32i [all]
-    %7 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %8 = get_global @.str : s8i[4]*
-    %9 = cast(array_to_ptrdecay) %8 : s8i*
-    %10 = call @get_value() : s32i [all]
-    %11 = call @printf(%9, %10) : s32i [all]
-    %12 = const 0 : s32i
-    store %12, %0
-    %13 = load %0 : s32i
-    return %13
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = get_global @printf : (s8i*, ...) -> s32i*
+        %3 = get_global @.str : s8i[4]*
+        %4 = cast(array_to_ptrdecay) %3 : s8i*
+        %5 = call @get_value() : s32i [all]
+        %6 = call @printf(%4, %5) : s32i [all]
+        %7 = get_global @printf : (s8i*, ...) -> s32i*
+        %8 = get_global @.str : s8i[4]*
+        %9 = cast(array_to_ptrdecay) %8 : s8i*
+        %10 = call @get_value() : s32i [all]
+        %11 = call @printf(%9, %10) : s32i [all]
+        %12 = const 0 : s32i
+        store %12, %0
+        %13 = load %0 : s32i
+        return %13
 }

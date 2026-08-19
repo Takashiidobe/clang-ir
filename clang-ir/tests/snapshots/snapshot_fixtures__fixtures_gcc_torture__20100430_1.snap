@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20100430-1.c" (c, x86_64-unknown-linux-gnu)
-global g : u16i = 0 [internal, default, align 2, dso_local]
+global g : u16i = CirInt { ty: Named("u16i"), value: "0" } [internal, default, align 2, dso_local]
 
 fn dummy(%arg1: u16i) -> void [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg1: u16i):
@@ -22,65 +22,65 @@ fn foo(%arg0: rec_info_t*) -> s32i [internal, c, no_inline, dso_local, nothrow] 
         %23 = alloca s32i, "j", align 4
         store %arg0, %20
         scope {
-            %26 = const 0 : s32i
-            store %26, %22, align 4
-            for cond: {
-                %54 = load %22 : s32i, align 4
-                %55 = load %20 : rec_info_t*, align 8
-                %56 = get_member %55[1] "buf" : rec_packed_struct*
-                %57 = get_member %56[0] "pst1" : rec_packed_struct1*
-                %58 = get_member %57[0] "cc11" : u8i*
-                %59 = load %58 : u8i, align 4
-                %60 = cast(integral) %59 : s32i
-                %61 = cmp lt %54, %60 : bool
-                condition %61
-            } step: {
-                %27 = load %22 : s32i, align 4
-                %28 = inc %27 : s32i [nsw]
-                store %28, %22, align 4
-                yield
-            } do {
-                scope {
-                    %29 = const 0 : s32i
-                    store %29, %23, align 4
-                    for cond: {
-                        %43 = load %23 : s32i, align 4
-                        %44 = load %22 : s32i, align 4
-                        %45 = cast(integral) %44 : s64i
-                        %46 = load %20 : rec_info_t*, align 8
-                        %47 = get_member %46[1] "buf" : rec_packed_struct*
-                        %48 = get_member %47[1] "pst2" : rec_packed_struct2[4]*
-                        %49 = get_element %48[%45] : rec_packed_struct2*
-                        %50 = get_member %49[1] "cc22" : u8i*
-                        %51 = load %50 : u8i, align 1
-                        %52 = cast(integral) %51 : s32i
-                        %53 = cmp lt %43, %52 : bool
-                        condition %53
-                    } step: {
-                        %30 = load %23 : s32i, align 4
-                        %31 = inc %30 : s32i [nsw]
-                        store %31, %23, align 4
+                %26 = const 0 : s32i
+                store %26, %22, align 4
+                for cond {
+                        %54 = load %22 : s32i, align 4
+                        %55 = load %20 : rec_info_t*, align 8
+                        get_member
+                        get_member
+                        get_member
+                        %59 = load %58 : u8i, align 4
+                        %60 = cast(integral) %59 : s32i
+                        cmp
+                        condition %61
+                } step {
+                        %27 = load %22 : s32i, align 4
+                        inc
+                        store %28, %22, align 4
                         yield
-                    } do {
-                        %32 = load %23 : s32i, align 4
-                        %33 = cast(integral) %32 : s64i
-                        %34 = load %22 : s32i, align 4
-                        %35 = cast(integral) %34 : s64i
-                        %36 = load %20 : rec_info_t*, align 8
-                        %37 = get_member %36[1] "buf" : rec_packed_struct*
-                        %38 = get_member %37[1] "pst2" : rec_packed_struct2[4]*
-                        %39 = get_element %38[%35] : rec_packed_struct2*
-                        %40 = get_member %39[2] "ss" : u16i[104]*
-                        %41 = get_element %40[%33] : u16i*
-                        %42 = load %41 : u16i, align 1
-                        call @dummy(%42) [all]
+                } body {
+                        scope {
+                                %29 = const 0 : s32i
+                                store %29, %23, align 4
+                                for cond {
+                                        %43 = load %23 : s32i, align 4
+                                        %44 = load %22 : s32i, align 4
+                                        %45 = cast(integral) %44 : s64i
+                                        %46 = load %20 : rec_info_t*, align 8
+                                        get_member
+                                        get_member
+                                        get_element
+                                        get_member
+                                        %51 = load %50 : u8i, align 1
+                                        %52 = cast(integral) %51 : s32i
+                                        cmp
+                                        condition %53
+                                } step {
+                                        %30 = load %23 : s32i, align 4
+                                        inc
+                                        store %31, %23, align 4
+                                        yield
+                                } body {
+                                        %32 = load %23 : s32i, align 4
+                                        %33 = cast(integral) %32 : s64i
+                                        %34 = load %22 : s32i, align 4
+                                        %35 = cast(integral) %34 : s64i
+                                        %36 = load %20 : rec_info_t*, align 8
+                                        get_member
+                                        get_member
+                                        get_element
+                                        get_member
+                                        get_element
+                                        %42 = load %41 : u16i, align 1
+                                        call @dummy(%42) [all]
+                                        yield
+                                }
+                                yield
+                        }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         %24 = const 0 : s32i
         store %24, %21
@@ -88,30 +88,30 @@ fn foo(%arg0: rec_info_t*) -> s32i [internal, c, no_inline, dso_local, nothrow] 
         return %25
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_info_t, "info", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = const 2 : u8i
-    %4 = get_member %1[1] "buf" : rec_packed_struct*
-    %5 = get_member %4[0] "pst1" : rec_packed_struct1*
-    %6 = get_member %5[0] "cc11" : u8i*
-    store %3, %6, align 4
-    %7 = const 8 : u8i
-    %8 = const 1 : s64i
-    %9 = get_member %1[1] "buf" : rec_packed_struct*
-    %10 = get_member %9[1] "pst2" : rec_packed_struct2[4]*
-    %11 = get_element %10[%8] : rec_packed_struct2*
-    %12 = get_member %11[1] "cc22" : u8i*
-    store %7, %12, align 1
-    %13 = const 0 : s64i
-    %14 = get_member %1[1] "buf" : rec_packed_struct*
-    %15 = get_member %14[1] "pst2" : rec_packed_struct2[4]*
-    %16 = get_element %15[%13] : rec_packed_struct2*
-    %17 = get_member %16[1] "cc22" : u8i*
-    store %7, %17, align 1
-    %18 = call @foo(%1) : s32i [all]
-    store %18, %0
-    %19 = load %0 : s32i
-    return %19
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_info_t, "info", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = const 2 : u8i
+        get_member
+        get_member
+        get_member
+        store %3, %6, align 4
+        %7 = const 8 : u8i
+        %8 = const 1 : s64i
+        get_member
+        get_member
+        get_element
+        get_member
+        store %7, %12, align 1
+        %13 = const 0 : s64i
+        get_member
+        get_member
+        get_element
+        get_member
+        store %7, %17, align 1
+        %18 = call @foo(%1) : s32i [all]
+        store %18, %0
+        %19 = load %0 : s32i
+        return %19
 }

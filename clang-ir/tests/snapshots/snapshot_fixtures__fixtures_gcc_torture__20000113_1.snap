@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000113-1.c" (c, x86_64-unknown-linux-gnu)
@@ -16,88 +16,88 @@ fn foobar(%arg0: s32i, %arg1: s32i, %arg2: s32i) -> void [external, c, no_inline
         store %arg0, %6
         store %arg1, %7
         store %arg2, %8
-        %12 = get_member %9[0] "x1" : u8i*
+        get_member
         %13 = load %6 : s32i, align 4
         %14 = cast(integral) %13 : u32i
-        %15 = set_bitfield %12, %14, "x1": 1 bits @0 in u8i : u32i, align 4
-        %16 = get_member %9[0] "x2" : u8i*
+        set_bitfield
+        get_member
         %17 = load %7 : s32i, align 4
         %18 = cast(integral) %17 : u32i
-        %19 = set_bitfield %16, %18, "x2": 2 bits @1 in u8i : u32i, align 4
-        %20 = get_member %9[0] "x3" : u8i*
+        set_bitfield
+        get_member
         %21 = load %8 : s32i, align 4
         %22 = cast(integral) %21 : u32i
-        %23 = set_bitfield %20, %22, "x3": 3 bits @3 in u8i : u32i, align 4
-        %24 = get_member %10[0] "x1" : u8i*
+        set_bitfield
+        get_member
         %25 = load %6 : s32i, align 4
         %26 = cast(integral) %25 : u32i
-        %27 = set_bitfield %24, %26, "x1": 1 bits @0 in u8i : u32i, align 4
-        %28 = get_member %10[0] "x2" : u8i*
+        set_bitfield
+        get_member
         %29 = load %7 : s32i, align 4
         %30 = cast(integral) %29 : u32i
-        %31 = set_bitfield %28, %30, "x2": 2 bits @1 in u8i : u32i, align 4
-        %32 = get_member %10[0] "x3" : u8i*
+        set_bitfield
+        get_member
         %33 = load %8 : s32i, align 4
         %34 = cast(integral) %33 : u32i
-        %35 = set_bitfield %32, %34, "x3": 3 bits @3 in u8i : u32i, align 4
+        set_bitfield
         store %10, %11, align 8
-        %36 = get_member %9[0] "x2" : u8i*
-        %37 = get_bitfield %36, "x2": 2 bits @1 in u8i : u32i, align 4
+        get_member
+        get_bitfield
         %38 = cast(integral) %37 : s32i
-        %39 = get_member %9[0] "x1" : u8i*
-        %40 = get_bitfield %39, "x1": 1 bits @0 in u8i : u32i, align 4
+        get_member
+        get_bitfield
         %41 = cast(integral) %40 : s32i
-        %42 = sub %38, %41 : s32i [nsw]
+        sub
         %43 = load %11 : rec_x*, align 8
-        %44 = get_member %43[0] "x2" : u8i*
-        %45 = get_bitfield %44, "x2": 2 bits @1 in u8i : u32i, align 4
+        get_member
+        get_bitfield
         %46 = cast(integral) %45 : s32i
-        %47 = mul %42, %46 : s32i [nsw]
+        mul
         %48 = load %11 : rec_x*, align 8
-        %49 = get_member %48[0] "x3" : u8i*
-        %50 = get_bitfield %49, "x3": 3 bits @3 in u8i : u32i, align 4
+        get_member
+        get_bitfield
         %51 = cast(integral) %50 : s32i
         %52 = add %51, %47 : s32i [nsw]
         %53 = cast(integral) %52 : u32i
-        %54 = set_bitfield %49, %53, "x3": 3 bits @3 in u8i : u32i, align 4
+        set_bitfield
         scope {
-            %57 = get_member %9[0] "x1" : u8i*
-            %58 = get_bitfield %57, "x1": 1 bits @0 in u8i : u32i, align 4
-            %59 = cast(integral) %58 : s32i
-            %60 = const 1 : s32i
-            %61 = cmp ne %59, %60 : bool
-            %62 = ternary %61 ? { : bool
-                %70 = const true : bool
-                yield %70
-            } : {
-                %64 = load %11 : rec_x*, align 8
-                %65 = get_member %64[0] "x3" : u8i*
-                %66 = get_bitfield %65, "x3": 3 bits @3 in u8i : u32i, align 4
-                %67 = cast(integral) %66 : s32i
-                %68 = const 5 : s32i
-                %69 = cmp ne %67, %68 : bool
-                yield %69
-            }
-            if %62 {
-                %63 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                get_member
+                get_bitfield
+                %59 = cast(integral) %58 : s32i
+                %60 = const 1 : s32i
+                cmp
+                %62 = ternary %61 ? { : bool
+                        %70 = const true : bool
+                        yield %70
+                } : {
+                        %64 = load %11 : rec_x*, align 8
+                        get_member
+                        get_bitfield
+                        %67 = cast(integral) %66 : s32i
+                        %68 = const 5 : s32i
+                        cmp
+                        yield %69
+                }
+                if %62 {
+                        %63 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
-        %55 = get_global @exit : ((s32i) -> void)*
+        %55 = get_global @exit : (s32i) -> void*
         %56 = const 0 : s32i
         call @exit(%56) [all]
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : s32i
-    %3 = const 2 : s32i
-    %4 = const 3 : s32i
-    call @foobar(%2, %3, %4) [all]
-    %5 = load %0 : s32i
-    return %5
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : s32i
+        %3 = const 2 : s32i
+        %4 = const 3 : s32i
+        call @foobar(%2, %3, %4) [all]
+        %5 = load %0 : s32i
+        return %5
 }

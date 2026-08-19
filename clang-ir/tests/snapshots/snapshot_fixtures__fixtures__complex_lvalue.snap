@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/complex_lvalue.c" (c, x86_64-unknown-linux-gnu)
-global .str : s8i[4] = "%d\n" [cir_private, default, align 1, dso_local, constant]
+global .str : s8i[4] = ConstArray { ty: Array { element_type: Named("s8i"), size: 4 }, elts: Str("%d\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn pick(%arg0: double*) -> double [internal, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: double*):
@@ -13,7 +13,7 @@ fn pick(%arg0: double*) -> double [internal, c, no_inline, dso_local, nothrow] {
         %44 = load %42 : double*, align 8
         %45 = load %44 : double, align 8
         %46 = const 5.000000e+00 : double
-        %47 = fadd %45, %46 : double
+        fadd
         %48 = load %42 : double*, align 8
         store %47, %48, align 8
         %49 = load %42 : double*, align 8
@@ -24,54 +24,54 @@ fn pick(%arg0: double*) -> double [internal, c, no_inline, dso_local, nothrow] {
 }
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca complex<double>, "z", align 8
-    %2 = alloca double, "r", align 8
-    %3 = alloca double, "i", align 8
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = const (1.000000e+00, 2.000000e+00) : complex<double>
-    store %5, %1, align 8
-    %6 = const 7.000000e+00 : double
-    %7 = complex.real_ptr %1 : double*
-    store %6, %7, align 8
-    %8 = const 1.100000e+01 : double
-    %9 = complex.imag_ptr %1 : double*
-    store %8, %9, align 8
-    %10 = complex.real_ptr %1 : double*
-    %11 = call @pick(%10) : double [all]
-    store %11, %2, align 8
-    %12 = complex.imag_ptr %1 : double*
-    %13 = call @pick(%12) : double [all]
-    store %13, %3, align 8
-    %14 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %15 = get_global @.str : s8i[4]*
-    %16 = cast(array_to_ptrdecay) %15 : s8i*
-    %17 = load %1 : complex<double>, align 8
-    %18 = complex.real %17 : double
-    %19 = cast(float_to_int) %18 : s32i
-    %20 = call @printf(%16, %19) : s32i [all]
-    %21 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %22 = get_global @.str : s8i[4]*
-    %23 = cast(array_to_ptrdecay) %22 : s8i*
-    %24 = load %1 : complex<double>, align 8
-    %25 = complex.imag %24 : double
-    %26 = cast(float_to_int) %25 : s32i
-    %27 = call @printf(%23, %26) : s32i [all]
-    %28 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %29 = get_global @.str : s8i[4]*
-    %30 = cast(array_to_ptrdecay) %29 : s8i*
-    %31 = load %2 : double, align 8
-    %32 = cast(float_to_int) %31 : s32i
-    %33 = call @printf(%30, %32) : s32i [all]
-    %34 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %35 = get_global @.str : s8i[4]*
-    %36 = cast(array_to_ptrdecay) %35 : s8i*
-    %37 = load %3 : double, align 8
-    %38 = cast(float_to_int) %37 : s32i
-    %39 = call @printf(%36, %38) : s32i [all]
-    %40 = const 0 : s32i
-    store %40, %0
-    %41 = load %0 : s32i
-    return %41
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca complex<double>, "z", align 8
+        %2 = alloca double, "r", align 8
+        %3 = alloca double, "i", align 8
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = const (1.000000e+00, 2.000000e+00) : complex<double>
+        store %5, %1, align 8
+        %6 = const 7.000000e+00 : double
+        complex.real_ptr
+        store %6, %7, align 8
+        %8 = const 1.100000e+01 : double
+        complex.imag_ptr
+        store %8, %9, align 8
+        complex.real_ptr
+        %11 = call @pick(%10) : double [all]
+        store %11, %2, align 8
+        complex.imag_ptr
+        %13 = call @pick(%12) : double [all]
+        store %13, %3, align 8
+        %14 = get_global @printf : (s8i*, ...) -> s32i*
+        %15 = get_global @.str : s8i[4]*
+        %16 = cast(array_to_ptrdecay) %15 : s8i*
+        %17 = load %1 : complex<double>, align 8
+        complex.real
+        %19 = cast(float_to_int) %18 : s32i
+        %20 = call @printf(%16, %19) : s32i [all]
+        %21 = get_global @printf : (s8i*, ...) -> s32i*
+        %22 = get_global @.str : s8i[4]*
+        %23 = cast(array_to_ptrdecay) %22 : s8i*
+        %24 = load %1 : complex<double>, align 8
+        complex.imag
+        %26 = cast(float_to_int) %25 : s32i
+        %27 = call @printf(%23, %26) : s32i [all]
+        %28 = get_global @printf : (s8i*, ...) -> s32i*
+        %29 = get_global @.str : s8i[4]*
+        %30 = cast(array_to_ptrdecay) %29 : s8i*
+        %31 = load %2 : double, align 8
+        %32 = cast(float_to_int) %31 : s32i
+        %33 = call @printf(%30, %32) : s32i [all]
+        %34 = get_global @printf : (s8i*, ...) -> s32i*
+        %35 = get_global @.str : s8i[4]*
+        %36 = cast(array_to_ptrdecay) %35 : s8i*
+        %37 = load %3 : double, align 8
+        %38 = cast(float_to_int) %37 : s32i
+        %39 = call @printf(%36, %38) : s32i [all]
+        %40 = const 0 : s32i
+        store %40, %0
+        %41 = load %0 : s32i
+        return %41
 }

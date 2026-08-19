@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/bswap-3.c" (c, x86_64-unknown-linux-gnu)
@@ -9,11 +9,11 @@ fn f(%arg1: u32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %26 = alloca s32i, "__retval", align 4
         store %arg1, %25
         %27 = load %25 : u32i, align 4
-        %28 = byte_swap %27 : u32i
+        byte_swap
         %29 = const 24 : s32i
-        %30 = shift right %28, %29 : u32i
+        shift
         %31 = const 3 : u32i
-        %32 = and %30, %31 : u32i
+        and
         %33 = cast(integral) %32 : s32i
         store %33, %26
         %34 = load %26 : s32i
@@ -26,7 +26,7 @@ fn g(%arg0: u32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %18
         %20 = load %18 : u32i, align 4
         %21 = const 3 : u32i
-        %22 = and %20, %21 : u32i
+        and
         %23 = cast(integral) %22 : s32i
         store %23, %19
         %24 = load %19 : s32i
@@ -34,47 +34,47 @@ fn g(%arg0: u32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = alloca s32i, "b", align 4
-        %5 = const 0 : s32i
-        store %5, %4, align 4
-        for cond: {
-            %15 = load %4 : s32i, align 4
-            %16 = const 15 : s32i
-            %17 = cmp le %15, %16 : bool
-            condition %17
-        } step: {
-            %6 = load %4 : s32i, align 4
-            %7 = inc %6 : s32i [nsw]
-            store %7, %4, align 4
-            yield
-        } do {
-            scope {
-                scope {
-                    %8 = load %4 : s32i, align 4
-                    %9 = cast(integral) %8 : u32i
-                    %10 = call @f(%9) : s32i [all]
-                    %11 = load %4 : s32i, align 4
-                    %12 = cast(integral) %11 : u32i
-                    %13 = call @g(%12) : s32i [all]
-                    %14 = cmp ne %10, %13 : bool
-                    if %14 {
-                        call @abort() [all]
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = alloca s32i, "b", align 4
+                %5 = const 0 : s32i
+                store %5, %4, align 4
+                for cond {
+                        %15 = load %4 : s32i, align 4
+                        %16 = const 15 : s32i
+                        cmp
+                        condition %17
+                } step {
+                        %6 = load %4 : s32i, align 4
+                        inc
+                        store %7, %4, align 4
                         yield
-                    }
-                    yield
+                } body {
+                        scope {
+                                scope {
+                                        %8 = load %4 : s32i, align 4
+                                        %9 = cast(integral) %8 : u32i
+                                        %10 = call @f(%9) : s32i [all]
+                                        %11 = load %4 : s32i, align 4
+                                        %12 = cast(integral) %11 : u32i
+                                        %13 = call @g(%12) : s32i [all]
+                                        cmp
+                                        if %14 {
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }

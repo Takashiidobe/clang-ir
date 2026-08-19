@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20051110-2.c" (c, x86_64-unknown-linux-gnu)
-global bytes : u8i[5] = zero [external, default, align 1, dso_local]
-global flag : s32i = 0 [external, default, align 4, dso_local]
+global bytes : u8i[5] = Zero { ty: Array { element_type: Named("u8i"), size: 5 } } [external, default, align 1, dso_local]
+global flag : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
 
 fn add_unwind_adjustsp(%arg0: s64i) -> void [external, c, no_inline, dso_local, nothrow] {
     ^bb0(%arg0: s64i):
@@ -14,111 +14,111 @@ fn add_unwind_adjustsp(%arg0: s64i) -> void [external, c, no_inline, dso_local, 
         store %arg0, %22
         %25 = load %22 : s64i, align 8
         %26 = const 516 : s64i
-        %27 = sub %25, %26 : s64i [nsw]
+        sub
         %28 = const 2 : s32i
-        %29 = shift right %27, %28 : s64i
+        shift
         %30 = cast(integral) %29 : u64i
         store %30, %24, align 8
         %31 = const 0 : s32i
         store %31, %23, align 4
         scope {
-            do {
-                scope {
-                    br ^bb1
-                    ^bb1():
-                        label a:
-                        %34 = load %24 : u64i, align 8
-                        %35 = const 127 : u64i
-                        %36 = and %34, %35 : u64i
-                        %37 = cast(integral) %36 : u8i
-                        %38 = load %23 : s32i, align 4
-                        %39 = cast(integral) %38 : s64i
-                        %40 = get_global @bytes : u8i[5]*
-                        %41 = get_element %40[%39] : u8i*
-                        store %37, %41, align 1
-                        %42 = const 7 : s32i
-                        %43 = load %24 : u64i, align 8
-                        %44 = shift right %43, %42 : u64i
-                        store %44, %24, align 8
+                do {
                         scope {
-                            %47 = load %24 : u64i, align 8
-                            %48 = cast(int_to_bool) %47 : bool
-                            if %48 {
-                                %49 = const 128 : s32i
-                                %50 = load %23 : s32i, align 4
-                                %51 = cast(integral) %50 : s64i
-                                %52 = get_global @bytes : u8i[5]*
-                                %53 = get_element %52[%51] : u8i*
-                                %54 = load %53 : u8i, align 1
-                                %55 = cast(integral) %54 : s32i
-                                %56 = or %55, %49 : s32i
-                                %57 = cast(integral) %56 : u8i
-                                store %57, %53, align 1
+                                br ^bb1
+                            ^bb1:
+                                label a:
+                                %34 = load %24 : u64i, align 8
+                                %35 = const 127 : u64i
+                                and
+                                %37 = cast(integral) %36 : u8i
+                                %38 = load %23 : s32i, align 4
+                                %39 = cast(integral) %38 : s64i
+                                %40 = get_global @bytes : u8i[5]*
+                                get_element
+                                store %37, %41, align 1
+                                %42 = const 7 : s32i
+                                %43 = load %24 : u64i, align 8
+                                shift
+                                store %44, %24, align 8
                                 scope {
-                                    %58 = get_global @flag : s32i*
-                                    %59 = load %58 : s32i, align 4
-                                    %60 = cast(int_to_bool) %59 : bool
-                                    if %60 {
-                                        goto a
-                                    }
-                                    yield
+                                        %47 = load %24 : u64i, align 8
+                                        %48 = cast(int_to_bool) %47 : bool
+                                        if %48 {
+                                                %49 = const 128 : s32i
+                                                %50 = load %23 : s32i, align 4
+                                                %51 = cast(integral) %50 : s64i
+                                                %52 = get_global @bytes : u8i[5]*
+                                                get_element
+                                                %54 = load %53 : u8i, align 1
+                                                %55 = cast(integral) %54 : s32i
+                                                or
+                                                %57 = cast(integral) %56 : u8i
+                                                store %57, %53, align 1
+                                                scope {
+                                                        %58 = get_global @flag : s32i*
+                                                        %59 = load %58 : s32i, align 4
+                                                        %60 = cast(int_to_bool) %59 : bool
+                                                        if %60 {
+                                                                goto a
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        yield
                                 }
+                                %45 = load %23 : s32i, align 4
+                                inc
+                                store %46, %23, align 4
                                 yield
-                            }
-                            yield
                         }
-                        %45 = load %23 : s32i, align 4
-                        %46 = inc %45 : s32i [nsw]
-                        store %46, %23, align 4
                         yield
+                } while {
+                        %32 = load %24 : u64i, align 8
+                        %33 = cast(int_to_bool) %32 : bool
+                        condition %33
                 }
                 yield
-            } while {
-                %32 = load %24 : u64i, align 8
-                %33 = cast(int_to_bool) %32 : bool
-                condition %33
-            }
-            yield
         }
         return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 4132 : s64i
-    call @add_unwind_adjustsp(%2) [all]
-    scope {
-        %5 = const 0 : s64i
-        %6 = get_global @bytes : u8i[5]*
-        %7 = get_element %6[%5] : u8i*
-        %8 = load %7 : u8i, align 1
-        %9 = cast(integral) %8 : s32i
-        %10 = const 136 : s32i
-        %11 = cmp ne %9, %10 : bool
-        %12 = ternary %11 ? { : bool
-            %21 = const true : bool
-            yield %21
-        } : {
-            %14 = const 1 : s64i
-            %15 = get_global @bytes : u8i[5]*
-            %16 = get_element %15[%14] : u8i*
-            %17 = load %16 : u8i, align 1
-            %18 = cast(integral) %17 : s32i
-            %19 = const 7 : s32i
-            %20 = cmp ne %18, %19 : bool
-            yield %20
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 4132 : s64i
+        call @add_unwind_adjustsp(%2) [all]
+        scope {
+                %5 = const 0 : s64i
+                %6 = get_global @bytes : u8i[5]*
+                get_element
+                %8 = load %7 : u8i, align 1
+                %9 = cast(integral) %8 : s32i
+                %10 = const 136 : s32i
+                cmp
+                %12 = ternary %11 ? { : bool
+                        %21 = const true : bool
+                        yield %21
+                } : {
+                        %14 = const 1 : s64i
+                        %15 = get_global @bytes : u8i[5]*
+                        get_element
+                        %17 = load %16 : u8i, align 1
+                        %18 = cast(integral) %17 : s32i
+                        %19 = const 7 : s32i
+                        cmp
+                        yield %20
+                }
+                if %12 {
+                        %13 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        if %12 {
-            %13 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
-        }
-        yield
-    }
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = load %0 : s32i
-    return %4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = load %0 : s32i
+        return %4
 }

@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20020503-1.c" (c, x86_64-unknown-linux-gnu)
@@ -17,62 +17,62 @@ fn inttostr(%arg0: s64i, %arg1: s8i*) -> s8i* [internal, c, no_inline, dso_local
         store %21, %18, align 8
         %22 = load %16 : s8i*, align 8
         %23 = const 127 : s32i
-        %24 = ptr_stride %22, %23 : s8i*
+        ptr_stride
         store %24, %19, align 8
         %25 = const 0 : s8i
         %26 = load %19 : s8i*, align 8
         store %25, %26, align 1
         scope {
-            %50 = load %15 : s64i, align 8
-            %51 = const 0 : s64i
-            %52 = cmp lt %50, %51 : bool
-            if %52 {
-                %53 = load %18 : u64i, align 8
-                %54 = minus %53 : u64i
-                store %54, %18, align 8
+                %50 = load %15 : s64i, align 8
+                %51 = const 0 : s64i
+                cmp
+                if %52 {
+                        %53 = load %18 : u64i, align 8
+                        minus
+                        store %54, %18, align 8
+                        yield
+                }
                 yield
-            }
-            yield
         }
         scope {
-            do {
-                %41 = const 48 : u64i
-                %42 = load %18 : u64i, align 8
-                %43 = const 10 : u64i
-                %44 = rem %42, %43 : u64i
-                %45 = add %41, %44 : u64i
-                %46 = cast(integral) %45 : s8i
-                %47 = load %19 : s8i*, align 8
-                %48 = const -1 : s32i
-                %49 = ptr_stride %47, %48 : s8i*
-                store %49, %19, align 8
-                store %46, %49, align 1
+                do {
+                        %41 = const 48 : u64i
+                        %42 = load %18 : u64i, align 8
+                        %43 = const 10 : u64i
+                        rem
+                        %45 = add %41, %44 : u64i
+                        %46 = cast(integral) %45 : s8i
+                        %47 = load %19 : s8i*, align 8
+                        %48 = const -1 : s32i
+                        ptr_stride
+                        store %49, %19, align 8
+                        store %46, %49, align 1
+                        yield
+                } while {
+                        %36 = const 10 : u64i
+                        %37 = load %18 : u64i, align 8
+                        div
+                        store %38, %18, align 8
+                        %39 = const 0 : u64i
+                        cmp
+                        condition %40
+                }
                 yield
-            } while {
-                %36 = const 10 : u64i
-                %37 = load %18 : u64i, align 8
-                %38 = div %37, %36 : u64i
-                store %38, %18, align 8
-                %39 = const 0 : u64i
-                %40 = cmp ne %38, %39 : bool
-                condition %40
-            }
-            yield
         }
         scope {
-            %29 = load %15 : s64i, align 8
-            %30 = const 0 : s64i
-            %31 = cmp lt %29, %30 : bool
-            if %31 {
-                %32 = const 45 : s8i
-                %33 = load %19 : s8i*, align 8
-                %34 = const -1 : s32i
-                %35 = ptr_stride %33, %34 : s8i*
-                store %35, %19, align 8
-                store %32, %35, align 1
+                %29 = load %15 : s64i, align 8
+                %30 = const 0 : s64i
+                cmp
+                if %31 {
+                        %32 = const 45 : s8i
+                        %33 = load %19 : s8i*, align 8
+                        %34 = const -1 : s32i
+                        ptr_stride
+                        store %35, %19, align 8
+                        store %32, %35, align 1
+                        yield
+                }
                 yield
-            }
-            yield
         }
         %27 = load %19 : s8i*, align 8
         store %27, %17
@@ -81,30 +81,30 @@ fn inttostr(%arg0: s64i, %arg1: s8i*) -> s8i* [internal, c, no_inline, dso_local
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s8i[128], "buf", align 16
-    %2 = alloca s8i*, "p", align 8
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const -1 : s64i
-    %5 = cast(array_to_ptrdecay) %1 : s8i*
-    %6 = call @inttostr(%4, %5) : s8i* [all]
-    store %6, %2, align 8
-    scope {
-        %9 = load %2 : s8i*, align 8
-        %10 = load %9 : s8i, align 1
-        %11 = cast(integral) %10 : s32i
-        %12 = const 45 : s32i
-        %13 = cmp ne %11, %12 : bool
-        if %13 {
-            %14 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s8i[128], "buf", align 16
+        %2 = alloca s8i*, "p", align 8
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const -1 : s64i
+        %5 = cast(array_to_ptrdecay) %1 : s8i*
+        %6 = call @inttostr(%4, %5) : s8i* [all]
+        store %6, %2, align 8
+        scope {
+                %9 = load %2 : s8i*, align 8
+                %10 = load %9 : s8i, align 1
+                %11 = cast(integral) %10 : s32i
+                %12 = const 45 : s32i
+                cmp
+                if %13 {
+                        %14 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = load %0 : s32i
-    return %8
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = load %0 : s32i
+        return %8
 }

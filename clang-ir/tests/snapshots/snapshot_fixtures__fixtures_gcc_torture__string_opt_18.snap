@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/string-opt-18.c" (c, x86_64-unknown-linux-gnu)
@@ -10,19 +10,19 @@ fn test1(%arg6: void*) -> void [external, c, no_inline, dso_local, nothrow] {
         %72 = alloca void*, "ptr", align 8
         store %arg6, %72
         scope {
-            %73 = get_global @memcpy : ((void*, void*, u64i) -> void*)*
-            %74 = load %72 : void*, align 8
-            %75 = load %72 : void*, align 8
-            %76 = const 8 : u64i
-            %77 = call @memcpy(%74, %75, %76) : void* [all]
-            %78 = load %72 : void*, align 8
-            %79 = cmp ne %77, %78 : bool
-            if %79 {
-                %80 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %73 = get_global @memcpy : (void*, void*, u64i) -> void**
+                %74 = load %72 : void*, align 8
+                %75 = load %72 : void*, align 8
+                %76 = const 8 : u64i
+                %77 = call @memcpy(%74, %75, %76) : void* [all]
+                %78 = load %72 : void*, align 8
+                cmp
+                if %79 {
+                        %80 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -32,24 +32,24 @@ fn test2(%arg5: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
         %58 = alloca s8i*, "ptr", align 8
         store %arg5, %58
         scope {
-            %59 = get_global @mempcpy : ((void*, void*, u64i) -> void*)*
-            %60 = load %58 : s8i*, align 8
-            %61 = cast(bitcast) %60 : void*
-            %62 = load %58 : s8i*, align 8
-            %63 = cast(bitcast) %62 : void*
-            %64 = const 8 : u64i
-            %65 = call @mempcpy(%61, %63, %64) : void* [all]
-            %66 = load %58 : s8i*, align 8
-            %67 = const 8 : s32i
-            %68 = ptr_stride %66, %67 : s8i*
-            %69 = cast(bitcast) %68 : void*
-            %70 = cmp ne %65, %69 : bool
-            if %70 {
-                %71 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %59 = get_global @mempcpy : (void*, void*, u64i) -> void**
+                %60 = load %58 : s8i*, align 8
+                %61 = cast(bitcast) %60 : void*
+                %62 = load %58 : s8i*, align 8
+                %63 = cast(bitcast) %62 : void*
+                %64 = const 8 : u64i
+                %65 = call @mempcpy(%61, %63, %64) : void* [all]
+                %66 = load %58 : s8i*, align 8
+                %67 = const 8 : s32i
+                ptr_stride
+                %69 = cast(bitcast) %68 : void*
+                cmp
+                if %70 {
+                        %71 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -59,19 +59,19 @@ fn test3(%arg4: void*) -> void [external, c, no_inline, dso_local, nothrow] {
         %49 = alloca void*, "ptr", align 8
         store %arg4, %49
         scope {
-            %50 = get_global @memmove : ((void*, void*, u64i) -> void*)*
-            %51 = load %49 : void*, align 8
-            %52 = load %49 : void*, align 8
-            %53 = const 8 : u64i
-            %54 = call @memmove(%51, %52, %53) : void* [all]
-            %55 = load %49 : void*, align 8
-            %56 = cmp ne %54, %55 : bool
-            if %56 {
-                %57 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %50 = get_global @memmove : (void*, void*, u64i) -> void**
+                %51 = load %49 : void*, align 8
+                %52 = load %49 : void*, align 8
+                %53 = const 8 : u64i
+                %54 = call @memmove(%51, %52, %53) : void* [all]
+                %55 = load %49 : void*, align 8
+                cmp
+                if %56 {
+                        %57 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -81,18 +81,18 @@ fn test4(%arg3: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
         %41 = alloca s8i*, "ptr", align 8
         store %arg3, %41
         scope {
-            %42 = get_global @strcpy : ((s8i*, s8i*) -> s8i*)*
-            %43 = load %41 : s8i*, align 8
-            %44 = load %41 : s8i*, align 8
-            %45 = call @strcpy(%43, %44) : s8i* [all]
-            %46 = load %41 : s8i*, align 8
-            %47 = cmp ne %45, %46 : bool
-            if %47 {
-                %48 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %42 = get_global @strcpy : (s8i*, s8i*) -> s8i**
+                %43 = load %41 : s8i*, align 8
+                %44 = load %41 : s8i*, align 8
+                %45 = call @strcpy(%43, %44) : s8i* [all]
+                %46 = load %41 : s8i*, align 8
+                cmp
+                if %47 {
+                        %48 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -102,19 +102,19 @@ fn test5(%arg2: void*) -> void [external, c, no_inline, dso_local, nothrow] {
         %32 = alloca void*, "ptr", align 8
         store %arg2, %32
         scope {
-            %33 = get_global @memcmp : ((void*, void*, u64i) -> s32i)*
-            %34 = load %32 : void*, align 8
-            %35 = load %32 : void*, align 8
-            %36 = const 8 : u64i
-            %37 = call @memcmp(%34, %35, %36) : s32i [all]
-            %38 = const 0 : s32i
-            %39 = cmp ne %37, %38 : bool
-            if %39 {
-                %40 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %33 = get_global @memcmp : (void*, void*, u64i) -> s32i*
+                %34 = load %32 : void*, align 8
+                %35 = load %32 : void*, align 8
+                %36 = const 8 : u64i
+                %37 = call @memcmp(%34, %35, %36) : s32i [all]
+                %38 = const 0 : s32i
+                cmp
+                if %39 {
+                        %40 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -124,18 +124,18 @@ fn test6(%arg1: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
         %24 = alloca s8i*, "ptr", align 8
         store %arg1, %24
         scope {
-            %25 = get_global @strcmp : ((s8i*, s8i*) -> s32i)*
-            %26 = load %24 : s8i*, align 8
-            %27 = load %24 : s8i*, align 8
-            %28 = call @strcmp(%26, %27) : s32i [all]
-            %29 = const 0 : s32i
-            %30 = cmp ne %28, %29 : bool
-            if %30 {
-                %31 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %25 = get_global @strcmp : (s8i*, s8i*) -> s32i*
+                %26 = load %24 : s8i*, align 8
+                %27 = load %24 : s8i*, align 8
+                %28 = call @strcmp(%26, %27) : s32i [all]
+                %29 = const 0 : s32i
+                cmp
+                if %30 {
+                        %31 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -145,46 +145,46 @@ fn test7(%arg0: s8i*) -> void [external, c, no_inline, dso_local, nothrow] {
         %15 = alloca s8i*, "ptr", align 8
         store %arg0, %15
         scope {
-            %16 = get_global @strncmp : ((s8i*, s8i*, u64i) -> s32i)*
-            %17 = load %15 : s8i*, align 8
-            %18 = load %15 : s8i*, align 8
-            %19 = const 8 : u64i
-            %20 = call @strncmp(%17, %18, %19) : s32i [all]
-            %21 = const 0 : s32i
-            %22 = cmp ne %20, %21 : bool
-            if %22 {
-                %23 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %16 = get_global @strncmp : (s8i*, s8i*, u64i) -> s32i*
+                %17 = load %15 : s8i*, align 8
+                %18 = load %15 : s8i*, align 8
+                %19 = const 8 : u64i
+                %20 = call @strncmp(%17, %18, %19) : s32i [all]
+                %21 = const 0 : s32i
+                cmp
+                if %22 {
+                        %23 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s8i[10], "buf", align 1
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = cast(array_to_ptrdecay) %1 : s8i*
-    %4 = cast(bitcast) %3 : void*
-    call @test1(%4) [all]
-    %5 = cast(array_to_ptrdecay) %1 : s8i*
-    call @test2(%5) [all]
-    %6 = cast(array_to_ptrdecay) %1 : s8i*
-    %7 = cast(bitcast) %6 : void*
-    call @test3(%7) [all]
-    %8 = cast(array_to_ptrdecay) %1 : s8i*
-    call @test4(%8) [all]
-    %9 = cast(array_to_ptrdecay) %1 : s8i*
-    %10 = cast(bitcast) %9 : void*
-    call @test5(%10) [all]
-    %11 = cast(array_to_ptrdecay) %1 : s8i*
-    call @test6(%11) [all]
-    %12 = cast(array_to_ptrdecay) %1 : s8i*
-    call @test7(%12) [all]
-    %13 = const 0 : s32i
-    store %13, %0
-    %14 = load %0 : s32i
-    return %14
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s8i[10], "buf", align 1
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = cast(array_to_ptrdecay) %1 : s8i*
+        %4 = cast(bitcast) %3 : void*
+        call @test1(%4) [all]
+        %5 = cast(array_to_ptrdecay) %1 : s8i*
+        call @test2(%5) [all]
+        %6 = cast(array_to_ptrdecay) %1 : s8i*
+        %7 = cast(bitcast) %6 : void*
+        call @test3(%7) [all]
+        %8 = cast(array_to_ptrdecay) %1 : s8i*
+        call @test4(%8) [all]
+        %9 = cast(array_to_ptrdecay) %1 : s8i*
+        %10 = cast(bitcast) %9 : void*
+        call @test5(%10) [all]
+        %11 = cast(array_to_ptrdecay) %1 : s8i*
+        call @test6(%11) [all]
+        %12 = cast(array_to_ptrdecay) %1 : s8i*
+        call @test7(%12) [all]
+        %13 = const 0 : s32i
+        store %13, %0
+        %14 = load %0 : s32i
+        return %14
 }

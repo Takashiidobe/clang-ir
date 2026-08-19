@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr45070.c" (c, x86_64-unknown-linux-gnu)
@@ -9,7 +9,7 @@ fn fetch(%arg1: rec_source*) -> void [internal, c, no_inline, dso_local, nothrow
         store %arg1, %88
         %89 = const 128 : s32i
         %90 = load %88 : rec_source*, align 8
-        %91 = get_member %90[1] "length" : s32i*
+        get_member
         store %89, %91, align 4
         return
 }
@@ -24,60 +24,60 @@ fn next(%arg0: rec_source*) -> u16i [internal, c, no_inline, dso_local, nothrow]
         %52 = alloca rec_packed_ushort, "rv", align 1
         store %arg0, %50
         scope {
-            %58 = load %50 : rec_source*, align 8
-            %59 = get_member %58[0] "pos" : s32i*
-            %60 = load %59 : s32i, align 4
-            %61 = load %50 : rec_source*, align 8
-            %62 = get_member %61[1] "length" : s32i*
-            %63 = load %62 : s32i, align 4
-            %64 = cmp ge %60, %63 : bool
-            if %64 {
-                scope {
-                    %73 = load %50 : rec_source*, align 8
-                    %74 = get_member %73[2] "flag" : s32i*
-                    %75 = load %74 : s32i, align 4
-                    %76 = cast(int_to_bool) %75 : bool
-                    if %76 {
-                        %77 = const 0 : s32i
-                        %78 = load %50 : rec_source*, align 8
-                        %79 = get_member %78[2] "flag" : s32i*
-                        store %77, %79, align 4
-                        %80 = load %50 : rec_source*, align 8
-                        call @fetch(%80) [all]
-                        %81 = load %50 : rec_source*, align 8
-                        %82 = call @next(%81) : u16i [all]
-                        store %82, %46
-                        %83 = cast(bitcast) %46 : rec_packed_ushort*
-                        %84 = load %83 : rec_packed_ushort
-                        store %84, %51, align 1
-                        %85 = load %51 : rec_packed_ushort
-                        store %85, %49
-                        %86 = cast(bitcast) %49 : u16i*
-                        %87 = load %86 : u16i
-                        return %87
-                    }
-                    yield
+                %58 = load %50 : rec_source*, align 8
+                get_member
+                %60 = load %59 : s32i, align 4
+                %61 = load %50 : rec_source*, align 8
+                get_member
+                %63 = load %62 : s32i, align 4
+                cmp
+                if %64 {
+                        scope {
+                                %73 = load %50 : rec_source*, align 8
+                                get_member
+                                %75 = load %74 : s32i, align 4
+                                %76 = cast(int_to_bool) %75 : bool
+                                if %76 {
+                                        %77 = const 0 : s32i
+                                        %78 = load %50 : rec_source*, align 8
+                                        get_member
+                                        store %77, %79, align 4
+                                        %80 = load %50 : rec_source*, align 8
+                                        call @fetch(%80) [all]
+                                        %81 = load %50 : rec_source*, align 8
+                                        %82 = call @next(%81) : u16i [all]
+                                        store %82, %46
+                                        %83 = cast(bitcast) %46 : rec_packed_ushort*
+                                        %84 = load %83 : rec_packed_ushort
+                                        store %84, %51, align 1
+                                        %85 = load %51 : rec_packed_ushort
+                                        store %85, %49
+                                        %86 = cast(bitcast) %49 : u16i*
+                                        %87 = load %86 : u16i
+                                        return %87
+                                }
+                                yield
+                        }
+                        %65 = const 1 : s32i
+                        %66 = load %50 : rec_source*, align 8
+                        get_member
+                        store %65, %67, align 4
+                        %68 = const 65535 : u16i
+                        get_member
+                        store %68, %69, align 1
+                        copy
+                        %70 = load %51 : rec_packed_ushort
+                        store %70, %48
+                        %71 = cast(bitcast) %48 : u16i*
+                        %72 = load %71 : u16i
+                        return %72
                 }
-                %65 = const 1 : s32i
-                %66 = load %50 : rec_source*, align 8
-                %67 = get_member %66[2] "flag" : s32i*
-                store %65, %67, align 4
-                %68 = const 65535 : u16i
-                %69 = get_member %52[0] "ucs" : u16i*
-                store %68, %69, align 1
-                copy %51, %52
-                %70 = load %51 : rec_packed_ushort
-                store %70, %48
-                %71 = cast(bitcast) %48 : u16i*
-                %72 = load %71 : u16i
-                return %72
-            }
-            yield
+                yield
         }
         %53 = const 0 : u16i
-        %54 = get_member %52[0] "ucs" : u16i*
+        get_member
         store %53, %54, align 1
-        copy %51, %52
+        copy
         %55 = load %51 : rec_packed_ushort
         store %55, %47
         %56 = cast(bitcast) %47 : u16i*
@@ -86,92 +86,92 @@ fn next(%arg0: rec_source*) -> u16i [internal, c, no_inline, dso_local, nothrow]
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca u16i, "coerce", align 2
-    %1 = alloca s32i, "__retval", align 4
-    %2 = alloca rec_source, "s", align 4
-    %3 = alloca s32i, "i", align 4
-    %4 = const 0 : s32i
-    store %4, %1
-    %5 = const 0 : s32i
-    %6 = get_member %2[0] "pos" : s32i*
-    store %5, %6, align 4
-    %7 = const 0 : s32i
-    %8 = get_member %2[1] "length" : s32i*
-    store %7, %8, align 4
-    %9 = const 0 : s32i
-    %10 = get_member %2[2] "flag" : s32i*
-    store %9, %10, align 4
-    scope {
-        %13 = const 0 : s32i
-        store %13, %3, align 4
-        for cond: {
-            %43 = load %3 : s32i, align 4
-            %44 = const 16 : s32i
-            %45 = cmp lt %43, %44 : bool
-            condition %45
-        } step: {
-            %14 = load %3 : s32i, align 4
-            %15 = inc %14 : s32i [nsw]
-            store %15, %3, align 4
-            yield
-        } do {
-            scope {
-                %16 = alloca rec_packed_ushort, "rv", align 1
-                %17 = call @next(%2) : u16i [all]
-                store %17, %0
-                %18 = cast(bitcast) %0 : rec_packed_ushort*
-                %19 = load %18 : rec_packed_ushort
-                store %19, %16, align 1
-                scope {
-                    %20 = load %3 : s32i, align 4
-                    %21 = const 0 : s32i
-                    %22 = cmp eq %20, %21 : bool
-                    %23 = ternary %22 ? { : bool
-                        %38 = get_member %16[0] "ucs" : u16i*
-                        %39 = load %38 : u16i, align 1
-                        %40 = cast(integral) %39 : s32i
-                        %41 = const 65535 : s32i
-                        %42 = cmp ne %40, %41 : bool
-                        yield %42
-                    } : {
-                        %37 = const false : bool
-                        yield %37
-                    }
-                    %24 = ternary %23 ? { : bool
-                        %36 = const true : bool
-                        yield %36
-                    } : {
-                        %26 = load %3 : s32i, align 4
-                        %27 = const 0 : s32i
-                        %28 = cmp gt %26, %27 : bool
-                        %29 = ternary %28 ? { : bool
-                            %31 = get_member %16[0] "ucs" : u16i*
-                            %32 = load %31 : u16i, align 1
-                            %33 = cast(integral) %32 : s32i
-                            %34 = const 0 : s32i
-                            %35 = cmp ne %33, %34 : bool
-                            yield %35
-                        } : {
-                            %30 = const false : bool
-                            yield %30
-                        }
-                        yield %29
-                    }
-                    if %24 {
-                        %25 = get_global @abort : (() -> void)*
-                        call @abort() [all]
+        %0 = alloca u16i, "coerce", align 2
+        %1 = alloca s32i, "__retval", align 4
+        %2 = alloca rec_source, "s", align 4
+        %3 = alloca s32i, "i", align 4
+        %4 = const 0 : s32i
+        store %4, %1
+        %5 = const 0 : s32i
+        get_member
+        store %5, %6, align 4
+        %7 = const 0 : s32i
+        get_member
+        store %7, %8, align 4
+        %9 = const 0 : s32i
+        get_member
+        store %9, %10, align 4
+        scope {
+                %13 = const 0 : s32i
+                store %13, %3, align 4
+                for cond {
+                        %43 = load %3 : s32i, align 4
+                        %44 = const 16 : s32i
+                        cmp
+                        condition %45
+                } step {
+                        %14 = load %3 : s32i, align 4
+                        inc
+                        store %15, %3, align 4
                         yield
-                    }
-                    yield
+                } body {
+                        scope {
+                                %16 = alloca rec_packed_ushort, "rv", align 1
+                                %17 = call @next(%2) : u16i [all]
+                                store %17, %0
+                                %18 = cast(bitcast) %0 : rec_packed_ushort*
+                                %19 = load %18 : rec_packed_ushort
+                                store %19, %16, align 1
+                                scope {
+                                        %20 = load %3 : s32i, align 4
+                                        %21 = const 0 : s32i
+                                        cmp
+                                        %23 = ternary %22 ? { : bool
+                                                get_member
+                                                %39 = load %38 : u16i, align 1
+                                                %40 = cast(integral) %39 : s32i
+                                                %41 = const 65535 : s32i
+                                                cmp
+                                                yield %42
+                                        } : {
+                                                %37 = const false : bool
+                                                yield %37
+                                        }
+                                        %24 = ternary %23 ? { : bool
+                                                %36 = const true : bool
+                                                yield %36
+                                        } : {
+                                                %26 = load %3 : s32i, align 4
+                                                %27 = const 0 : s32i
+                                                cmp
+                                                %29 = ternary %28 ? { : bool
+                                                        get_member
+                                                        %32 = load %31 : u16i, align 1
+                                                        %33 = cast(integral) %32 : s32i
+                                                        %34 = const 0 : s32i
+                                                        cmp
+                                                        yield %35
+                                                } : {
+                                                        %30 = const false : bool
+                                                        yield %30
+                                                }
+                                                yield %29
+                                        }
+                                        if %24 {
+                                                %25 = get_global @abort : () -> void*
+                                                call @abort() [all]
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %11 = const 0 : s32i
-    store %11, %1
-    %12 = load %1 : s32i
-    return %12
+        %11 = const 0 : s32i
+        store %11, %1
+        %12 = load %1 : s32i
+        return %12
 }

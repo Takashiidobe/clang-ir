@@ -1,15 +1,15 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c" (c, x86_64-unknown-linux-gnu)
-global t_status : s32i = 0 [external, default, align 4, dso_local]
-global .str : s8i[32] = "src/functional/tls_align_dso.so" [cir_private, default, align 1, dso_local, constant]
-global .str.1 : s8i[118] = "tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:74: dlopen failed\n" [cir_private, default, align 1, dso_local, constant]
-global .str.2 : s8i[2] = "t" [cir_private, default, align 1, dso_local, constant]
-global .str.3 : s8i[117] = "tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:77: dlsym failed\n" [cir_private, default, align 1, dso_local, constant]
-global .str.4 : s8i[130] = "tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:81: name is not set for t[%d]\n" [cir_private, default, align 1, dso_local, constant]
-global .str.5 : s8i[156] = "tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:84: bad alignment: %s, size: %u, align: %u, addr: 0x%lx\n" [cir_private, default, align 1, dso_local, constant]
+global t_status : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global .str : s8i[32] = ConstArray { ty: Array { element_type: Named("s8i"), size: 32 }, elts: Str("src/functional/tls_align_dso.so"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.1 : s8i[127] = ConstArray { ty: Array { element_type: Named("s8i"), size: 127 }, elts: Str("tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:74: dlopen failed\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.2 : s8i[2] = ConstArray { ty: Array { element_type: Named("s8i"), size: 2 }, elts: Str("t"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.3 : s8i[126] = ConstArray { ty: Array { element_type: Named("s8i"), size: 126 }, elts: Str("tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:77: dlsym failed\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.4 : s8i[139] = ConstArray { ty: Array { element_type: Named("s8i"), size: 139 }, elts: Str("tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:81: name is not set for t[%d]\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
+global .str.5 : s8i[165] = ConstArray { ty: Array { element_type: Named("s8i"), size: 165 }, elts: Str("tests/fixtures.libc-test/functional/unsupported/tls_align_dlopen.c:84: bad alignment: %s, size: %u, align: %u, addr: 0x%lx\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn vsnprintf(%arg0: s8i*, %arg1: u64i, %arg2: s8i*, %arg3: rec___va_list_tag*) -> s32i [external, c, nothrow];
 fn write(%arg0: s32i, %arg1: void*, %arg2: u64i) -> s64i [external, c];
@@ -23,10 +23,10 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         store %arg0, %91
         %96 = const 1 : s32i
         %97 = get_global @t_status : s32i*
-        store %96, %97, align 4, volatile
+        store %96, %97, align 4
         %98 = cast(array_to_ptrdecay) %93 : rec___va_list_tag*
-        va_start %98
-        %99 = get_global @vsnprintf : ((s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i)*
+        va_start
+        %99 = get_global @vsnprintf : (s8i*, u64i, s8i*, rec___va_list_tag*) -> s32i*
         %100 = cast(array_to_ptrdecay) %94 : s8i*
         %101 = const 512 : u64i
         %102 = load %91 : s8i*, align 8
@@ -34,59 +34,59 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
         %104 = call @vsnprintf(%100, %101, %102, %103) : s32i [all]
         store %104, %95, align 4
         %105 = cast(array_to_ptrdecay) %93 : rec___va_list_tag*
-        va_end %105
+        va_end
         scope {
-            %114 = load %95 : s32i, align 4
-            %115 = const 0 : s32i
-            %116 = cmp lt %114, %115 : bool
-            if %116 {
-                %146 = const 0 : s32i
-                store %146, %95, align 4
-                yield
-            } else {
-                scope {
-                    %117 = load %95 : s32i, align 4
-                    %118 = cast(integral) %117 : u64i
-                    %119 = const 512 : u64i
-                    %120 = cmp ge %118, %119 : bool
-                    if %120 {
-                        %121 = const 512 : s32i
-                        store %121, %95, align 4
-                        %122 = const 10 : s8i
-                        %123 = load %95 : s32i, align 4
-                        %124 = const 1 : s32i
-                        %125 = sub %123, %124 : s32i [nsw]
-                        %126 = cast(integral) %125 : s64i
-                        %127 = get_element %94[%126] : s8i*
-                        store %122, %127, align 1
-                        %128 = const 46 : s8i
-                        %129 = load %95 : s32i, align 4
-                        %130 = const 2 : s32i
-                        %131 = sub %129, %130 : s32i [nsw]
-                        %132 = cast(integral) %131 : s64i
-                        %133 = get_element %94[%132] : s8i*
-                        store %128, %133, align 1
-                        %134 = const 46 : s8i
-                        %135 = load %95 : s32i, align 4
-                        %136 = const 3 : s32i
-                        %137 = sub %135, %136 : s32i [nsw]
-                        %138 = cast(integral) %137 : s64i
-                        %139 = get_element %94[%138] : s8i*
-                        store %134, %139, align 1
-                        %140 = const 46 : s8i
-                        %141 = load %95 : s32i, align 4
-                        %142 = const 4 : s32i
-                        %143 = sub %141, %142 : s32i [nsw]
-                        %144 = cast(integral) %143 : s64i
-                        %145 = get_element %94[%144] : s8i*
-                        store %140, %145, align 1
+                %114 = load %95 : s32i, align 4
+                %115 = const 0 : s32i
+                cmp
+                if %116 {
+                        %146 = const 0 : s32i
+                        store %146, %95, align 4
                         yield
-                    }
-                    yield
+                } else {
+                        scope {
+                                %117 = load %95 : s32i, align 4
+                                %118 = cast(integral) %117 : u64i
+                                %119 = const 512 : u64i
+                                cmp
+                                if %120 {
+                                        %121 = const 512 : s32i
+                                        store %121, %95, align 4
+                                        %122 = const 10 : s8i
+                                        %123 = load %95 : s32i, align 4
+                                        %124 = const 1 : s32i
+                                        sub
+                                        %126 = cast(integral) %125 : s64i
+                                        get_element
+                                        store %122, %127, align 1
+                                        %128 = const 46 : s8i
+                                        %129 = load %95 : s32i, align 4
+                                        %130 = const 2 : s32i
+                                        sub
+                                        %132 = cast(integral) %131 : s64i
+                                        get_element
+                                        store %128, %133, align 1
+                                        %134 = const 46 : s8i
+                                        %135 = load %95 : s32i, align 4
+                                        %136 = const 3 : s32i
+                                        sub
+                                        %138 = cast(integral) %137 : s64i
+                                        get_element
+                                        store %134, %139, align 1
+                                        %140 = const 46 : s8i
+                                        %141 = load %95 : s32i, align 4
+                                        %142 = const 4 : s32i
+                                        sub
+                                        %144 = cast(integral) %143 : s64i
+                                        get_element
+                                        store %140, %145, align 1
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
         %106 = const 1 : s32i
         %107 = cast(array_to_ptrdecay) %94 : s8i*
@@ -102,141 +102,141 @@ fn t_printf(%arg0: s8i*, ...) -> s32i [external, c, no_inline, dso_local, nothro
 fn dlopen(%arg0: s8i*, %arg1: s32i) -> void* [external, c, nothrow];
 fn dlsym(%arg0: void*, %arg1: s8i*) -> void* [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = alloca void*, "h", align 8
-    %3 = alloca rec_anon2E0*, "t", align 8
-    %4 = const 0 : s32i
-    store %4, %0
-    %5 = get_global @.str : s8i[32]*
-    %6 = cast(array_to_ptrdecay) %5 : s8i*
-    %7 = const 1 : s32i
-    %8 = call @dlopen(%6, %7) : void* [all]
-    store %8, %2, align 8
-    scope {
-        %85 = load %2 : void*, align 8
-        %86 = cast(ptr_to_bool) %85 : bool
-        %87 = not %86 : bool
-        if %87 {
-            %88 = get_global @.str.1 : s8i[118]*
-            %89 = cast(array_to_ptrdecay) %88 : s8i*
-            %90 = call @t_printf(%89) : s32i [all]
-            yield
-        }
-        yield
-    }
-    %9 = load %2 : void*, align 8
-    %10 = get_global @.str.2 : s8i[2]*
-    %11 = cast(array_to_ptrdecay) %10 : s8i*
-    %12 = call @dlsym(%9, %11) : void* [all]
-    %13 = cast(bitcast) %12 : rec_anon2E0*
-    store %13, %3, align 8
-    scope {
-        %17 = load %3 : rec_anon2E0*, align 8
-        %18 = cast(ptr_to_bool) %17 : bool
-        %19 = not %18 : bool
-        if %19 {
-            %82 = get_global @.str.3 : s8i[117]*
-            %83 = cast(array_to_ptrdecay) %82 : s8i*
-            %84 = call @t_printf(%83) : s32i [all]
-            yield
-        } else {
-            scope {
-                %20 = const 0 : s32i
-                store %20, %1, align 4
-                for cond: {
-                    %79 = load %1 : s32i, align 4
-                    %80 = const 4 : s32i
-                    %81 = cmp lt %79, %80 : bool
-                    condition %81
-                } step: {
-                    %21 = load %1 : s32i, align 4
-                    %22 = inc %21 : s32i [nsw]
-                    store %22, %1, align 4
-                    yield
-                } do {
-                    scope {
-                        scope {
-                            %67 = load %1 : s32i, align 4
-                            %68 = cast(integral) %67 : s64i
-                            %69 = load %3 : rec_anon2E0*, align 8
-                            %70 = ptr_stride %69, %68 : rec_anon2E0*
-                            %71 = get_member %70[0] "name" : s8i**
-                            %72 = load %71 : s8i*, align 8
-                            %73 = cast(ptr_to_bool) %72 : bool
-                            %74 = not %73 : bool
-                            if %74 {
-                                %75 = get_global @.str.4 : s8i[130]*
-                                %76 = cast(array_to_ptrdecay) %75 : s8i*
-                                %77 = load %1 : s32i, align 4
-                                %78 = call @t_printf(%76, %77) : s32i [all]
-                                yield
-                            }
-                            yield
-                        }
-                        scope {
-                            %23 = load %1 : s32i, align 4
-                            %24 = cast(integral) %23 : s64i
-                            %25 = load %3 : rec_anon2E0*, align 8
-                            %26 = ptr_stride %25, %24 : rec_anon2E0*
-                            %27 = get_member %26[3] "addr" : u64i*
-                            %28 = load %27 : u64i, align 8
-                            %29 = load %1 : s32i, align 4
-                            %30 = cast(integral) %29 : s64i
-                            %31 = load %3 : rec_anon2E0*, align 8
-                            %32 = ptr_stride %31, %30 : rec_anon2E0*
-                            %33 = get_member %32[2] "align" : u32i*
-                            %34 = load %33 : u32i, align 4
-                            %35 = const 1 : u32i
-                            %36 = sub %34, %35 : u32i
-                            %37 = cast(integral) %36 : u64i
-                            %38 = and %28, %37 : u64i
-                            %39 = cast(int_to_bool) %38 : bool
-                            if %39 {
-                                %40 = get_global @.str.5 : s8i[156]*
-                                %41 = cast(array_to_ptrdecay) %40 : s8i*
-                                %42 = load %1 : s32i, align 4
-                                %43 = cast(integral) %42 : s64i
-                                %44 = load %3 : rec_anon2E0*, align 8
-                                %45 = ptr_stride %44, %43 : rec_anon2E0*
-                                %46 = get_member %45[0] "name" : s8i**
-                                %47 = load %46 : s8i*, align 8
-                                %48 = load %1 : s32i, align 4
-                                %49 = cast(integral) %48 : s64i
-                                %50 = load %3 : rec_anon2E0*, align 8
-                                %51 = ptr_stride %50, %49 : rec_anon2E0*
-                                %52 = get_member %51[1] "size" : u32i*
-                                %53 = load %52 : u32i, align 8
-                                %54 = load %1 : s32i, align 4
-                                %55 = cast(integral) %54 : s64i
-                                %56 = load %3 : rec_anon2E0*, align 8
-                                %57 = ptr_stride %56, %55 : rec_anon2E0*
-                                %58 = get_member %57[2] "align" : u32i*
-                                %59 = load %58 : u32i, align 4
-                                %60 = load %1 : s32i, align 4
-                                %61 = cast(integral) %60 : s64i
-                                %62 = load %3 : rec_anon2E0*, align 8
-                                %63 = ptr_stride %62, %61 : rec_anon2E0*
-                                %64 = get_member %63[3] "addr" : u64i*
-                                %65 = load %64 : u64i, align 8
-                                %66 = call @t_printf(%41, %47, %53, %59, %65) : s32i [all]
-                                yield
-                            }
-                            yield
-                        }
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = alloca void*, "h", align 8
+        %3 = alloca rec_anon2E0*, "t", align 8
+        %4 = const 0 : s32i
+        store %4, %0
+        %5 = get_global @.str : s8i[32]*
+        %6 = cast(array_to_ptrdecay) %5 : s8i*
+        %7 = const 1 : s32i
+        %8 = call @dlopen(%6, %7) : void* [all]
+        store %8, %2, align 8
+        scope {
+                %85 = load %2 : void*, align 8
+                %86 = cast(ptr_to_bool) %85 : bool
+                not
+                if %87 {
+                        %88 = get_global @.str.1 : s8i[127]*
+                        %89 = cast(array_to_ptrdecay) %88 : s8i*
+                        %90 = call @t_printf(%89) : s32i [all]
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %14 = get_global @t_status : s32i*
-    %15 = load %14 : s32i, align 4, volatile
-    store %15, %0
-    %16 = load %0 : s32i
-    return %16
+        %9 = load %2 : void*, align 8
+        %10 = get_global @.str.2 : s8i[2]*
+        %11 = cast(array_to_ptrdecay) %10 : s8i*
+        %12 = call @dlsym(%9, %11) : void* [all]
+        %13 = cast(bitcast) %12 : rec_anon2E0*
+        store %13, %3, align 8
+        scope {
+                %17 = load %3 : rec_anon2E0*, align 8
+                %18 = cast(ptr_to_bool) %17 : bool
+                not
+                if %19 {
+                        %82 = get_global @.str.3 : s8i[126]*
+                        %83 = cast(array_to_ptrdecay) %82 : s8i*
+                        %84 = call @t_printf(%83) : s32i [all]
+                        yield
+                } else {
+                        scope {
+                                %20 = const 0 : s32i
+                                store %20, %1, align 4
+                                for cond {
+                                        %79 = load %1 : s32i, align 4
+                                        %80 = const 4 : s32i
+                                        cmp
+                                        condition %81
+                                } step {
+                                        %21 = load %1 : s32i, align 4
+                                        inc
+                                        store %22, %1, align 4
+                                        yield
+                                } body {
+                                        scope {
+                                                scope {
+                                                        %67 = load %1 : s32i, align 4
+                                                        %68 = cast(integral) %67 : s64i
+                                                        %69 = load %3 : rec_anon2E0*, align 8
+                                                        ptr_stride
+                                                        get_member
+                                                        %72 = load %71 : s8i*, align 8
+                                                        %73 = cast(ptr_to_bool) %72 : bool
+                                                        not
+                                                        if %74 {
+                                                                %75 = get_global @.str.4 : s8i[139]*
+                                                                %76 = cast(array_to_ptrdecay) %75 : s8i*
+                                                                %77 = load %1 : s32i, align 4
+                                                                %78 = call @t_printf(%76, %77) : s32i [all]
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                scope {
+                                                        %23 = load %1 : s32i, align 4
+                                                        %24 = cast(integral) %23 : s64i
+                                                        %25 = load %3 : rec_anon2E0*, align 8
+                                                        ptr_stride
+                                                        get_member
+                                                        %28 = load %27 : u64i, align 8
+                                                        %29 = load %1 : s32i, align 4
+                                                        %30 = cast(integral) %29 : s64i
+                                                        %31 = load %3 : rec_anon2E0*, align 8
+                                                        ptr_stride
+                                                        get_member
+                                                        %34 = load %33 : u32i, align 4
+                                                        %35 = const 1 : u32i
+                                                        sub
+                                                        %37 = cast(integral) %36 : u64i
+                                                        and
+                                                        %39 = cast(int_to_bool) %38 : bool
+                                                        if %39 {
+                                                                %40 = get_global @.str.5 : s8i[165]*
+                                                                %41 = cast(array_to_ptrdecay) %40 : s8i*
+                                                                %42 = load %1 : s32i, align 4
+                                                                %43 = cast(integral) %42 : s64i
+                                                                %44 = load %3 : rec_anon2E0*, align 8
+                                                                ptr_stride
+                                                                get_member
+                                                                %47 = load %46 : s8i*, align 8
+                                                                %48 = load %1 : s32i, align 4
+                                                                %49 = cast(integral) %48 : s64i
+                                                                %50 = load %3 : rec_anon2E0*, align 8
+                                                                ptr_stride
+                                                                get_member
+                                                                %53 = load %52 : u32i, align 8
+                                                                %54 = load %1 : s32i, align 4
+                                                                %55 = cast(integral) %54 : s64i
+                                                                %56 = load %3 : rec_anon2E0*, align 8
+                                                                ptr_stride
+                                                                get_member
+                                                                %59 = load %58 : u32i, align 4
+                                                                %60 = load %1 : s32i, align 4
+                                                                %61 = cast(integral) %60 : s64i
+                                                                %62 = load %3 : rec_anon2E0*, align 8
+                                                                ptr_stride
+                                                                get_member
+                                                                %65 = load %64 : u64i, align 8
+                                                                %66 = call @t_printf(%41, %47, %53, %59, %65) : s32i [all]
+                                                                yield
+                                                        }
+                                                        yield
+                                                }
+                                                yield
+                                        }
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
+                }
+                yield
+        }
+        %14 = get_global @t_status : s32i*
+        %15 = load %14 : s32i, align 4
+        store %15, %0
+        %16 = load %0 : s32i
+        return %16
 }

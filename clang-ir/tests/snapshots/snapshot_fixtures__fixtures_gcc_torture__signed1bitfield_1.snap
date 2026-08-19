@@ -1,10 +1,10 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/signed1bitfield-1.c" (c, x86_64-unknown-linux-gnu)
-global i : s32i = 55 [external, default, align 4, dso_local]
-global f : rec_anon2E0 = zero [external, default, align 4, dso_local]
+global i : s32i = CirInt { ty: Named("s32i"), value: "55" } [external, default, align 4, dso_local]
+global f : rec_anon2E0 = Zero { ty: Named("rec_anon2E0") } [external, default, align 4, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn check(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -12,45 +12,45 @@ fn check(%arg0: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %23 = alloca s32i, "a", align 4
         store %arg0, %23
         scope {
-            %24 = load %23 : s32i, align 4
-            %25 = cast(int_to_bool) %24 : bool
-            %26 = not %25 : bool
-            if %26 {
-                call @abort() [all]
+                %24 = load %23 : s32i, align 4
+                %25 = cast(int_to_bool) %24 : bool
+                not
+                if %26 {
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "t", align 4
-    %2 = alloca s32i, "tt", align 4
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = get_global @i : s32i*
-    %5 = load %4 : s32i, align 4
-    %6 = const 5 : s32i
-    %7 = cmp ne %5, %6 : bool
-    %8 = cast(bool_to_int) %7 : s32i
-    store %8, %1, align 4
-    %9 = load %1 : s32i, align 4
-    %10 = const 5 : s32i
-    %11 = mul %9, %10 : s32i [nsw]
-    store %11, %1, align 4
-    %12 = load %1 : s32i, align 4
-    %13 = get_global @f : rec_anon2E0*
-    %14 = get_member %13[0] "b" : u8i*
-    %15 = set_bitfield %14, %12, "b": 1 bits @0 in signed u8i : s32i, align 4
-    %16 = get_global @f : rec_anon2E0*
-    %17 = get_member %16[0] "b" : u8i*
-    %18 = get_bitfield %17, "b": 1 bits @0 in signed u8i : s32i, align 4
-    store %18, %2, align 4
-    %19 = get_global @f : rec_anon2E0*
-    %20 = get_member %19[0] "b" : u8i*
-    %21 = get_bitfield %20, "b": 1 bits @0 in signed u8i : s32i, align 4
-    call @check(%21) [all]
-    %22 = load %0 : s32i
-    return %22
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "t", align 4
+        %2 = alloca s32i, "tt", align 4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = get_global @i : s32i*
+        %5 = load %4 : s32i, align 4
+        %6 = const 5 : s32i
+        cmp
+        %8 = cast(bool_to_int) %7 : s32i
+        store %8, %1, align 4
+        %9 = load %1 : s32i, align 4
+        %10 = const 5 : s32i
+        mul
+        store %11, %1, align 4
+        %12 = load %1 : s32i, align 4
+        %13 = get_global @f : rec_anon2E0*
+        get_member
+        set_bitfield
+        %16 = get_global @f : rec_anon2E0*
+        get_member
+        get_bitfield
+        store %18, %2, align 4
+        %19 = get_global @f : rec_anon2E0*
+        get_member
+        get_bitfield
+        call @check(%21) [all]
+        %22 = load %0 : s32i
+        return %22
 }

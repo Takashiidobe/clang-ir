@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr85529-2.c" (c, x86_64-unknown-linux-gnu)
@@ -11,43 +11,43 @@ fn foo(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         store %arg0, %15
         %18 = const 63 : s32i
         %19 = load %15 : s32i, align 4
-        %20 = and %19, %18 : s32i
+        and
         store %20, %15, align 4
         %21 = const 50 : s32i
         %22 = load %15 : s32i, align 4
-        %23 = sub %22, %21 : s32i [nsw]
+        sub
         store %23, %15, align 4
         %24 = const 1 : s32i
         %25 = load %15 : s32i, align 4
-        %26 = or %25, %24 : s32i
+        or
         store %26, %15, align 4
         scope {
-            %37 = load %15 : s32i, align 4
-            %38 = const 0 : s32i
-            %39 = cmp lt %37, %38 : bool
-            if %39 {
-                %40 = const 1 : s32i
-                store %40, %16
-                %41 = load %16 : s32i
-                return %41
-            }
-            yield
+                %37 = load %15 : s32i, align 4
+                %38 = const 0 : s32i
+                cmp
+                if %39 {
+                        %40 = const 1 : s32i
+                        store %40, %16
+                        %41 = load %16 : s32i
+                        return %41
+                }
+                yield
         }
         %27 = load %15 : s32i, align 4
         %28 = const 2 : s32i
-        %29 = shift right %27, %28 : s32i
+        shift
         store %29, %17, align 4
         scope {
-            %32 = load %15 : s32i, align 4
-            %33 = load %17 : s32i, align 4
-            %34 = cmp ge %32, %33 : bool
-            if %34 {
-                %35 = const 1 : s32i
-                store %35, %16
-                %36 = load %16 : s32i
-                return %36
-            }
-            yield
+                %32 = load %15 : s32i, align 4
+                %33 = load %17 : s32i, align 4
+                cmp
+                if %34 {
+                        %35 = const 1 : s32i
+                        store %35, %16
+                        %36 = load %16 : s32i
+                        return %36
+                }
+                yield
         }
         %30 = const 0 : s32i
         store %30, %16
@@ -56,41 +56,41 @@ fn foo(%arg0: s32i) -> s32i [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    scope {
-        %5 = const 0 : s32i
-        store %5, %1, align 4
-        for cond: {
-            %12 = load %1 : s32i, align 4
-            %13 = const 63 : s32i
-            %14 = cmp lt %12, %13 : bool
-            condition %14
-        } step: {
-            %6 = load %1 : s32i, align 4
-            %7 = inc %6 : s32i [nsw]
-            store %7, %1, align 4
-            yield
-        } do {
-            scope {
-                %8 = load %1 : s32i, align 4
-                %9 = call @foo(%8) : s32i [all]
-                %10 = const 1 : s32i
-                %11 = cmp ne %9, %10 : bool
-                if %11 {
-                    call @abort() [all]
-                    yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        scope {
+                %5 = const 0 : s32i
+                store %5, %1, align 4
+                for cond {
+                        %12 = load %1 : s32i, align 4
+                        %13 = const 63 : s32i
+                        cmp
+                        condition %14
+                } step {
+                        %6 = load %1 : s32i, align 4
+                        inc
+                        store %7, %1, align 4
+                        yield
+                } body {
+                        scope {
+                                %8 = load %1 : s32i, align 4
+                                %9 = call @foo(%8) : s32i [all]
+                                %10 = const 1 : s32i
+                                cmp
+                                if %11 {
+                                        call @abort() [all]
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = load %0 : s32i
-    return %4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = load %0 : s32i
+        return %4
 }

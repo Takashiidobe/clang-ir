@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr81281.c" (c, x86_64-unknown-linux-gnu)
@@ -20,17 +20,17 @@ fn foo(%arg2: u32i, %arg3: u32i, %arg4: u32i) -> void [external, c, no_inline, d
         %49 = add %47, %48 : u32i
         store %49, %44, align 4
         scope {
-            %63 = load %42 : u32i, align 4
-            %64 = const 1 : u32i
-            %65 = const 2147483647 : u32i
-            %66 = add %64, %65 : u32i
-            %67 = sub %63, %66 : u32i
-            %68 = const 2 : u32i
-            %69 = cmp ge %67, %68 : bool
-            if %69 {
-                unreachable
-            }
-            yield
+                %63 = load %42 : u32i, align 4
+                %64 = const 1 : u32i
+                %65 = const 2147483647 : u32i
+                %66 = add %64, %65 : u32i
+                sub
+                %68 = const 2 : u32i
+                cmp
+                if %69 {
+                        unreachable
+                }
+                yield
         }
         %50 = load %41 : u32i, align 4
         %51 = load %43 : u32i, align 4
@@ -43,16 +43,16 @@ fn foo(%arg2: u32i, %arg3: u32i, %arg4: u32i) -> void [external, c, no_inline, d
         %57 = cast(integral) %56 : s32i
         store %57, %46, align 4
         scope {
-            %58 = load %46 : s32i, align 4
-            %59 = load %45 : s32i, align 4
-            %60 = sub %58, %59 : s32i [nsw]
-            %61 = const 2147483647 : s32i
-            %62 = cmp ne %60, %61 : bool
-            if %62 {
-                call @abort() [all]
+                %58 = load %46 : s32i, align 4
+                %59 = load %45 : s32i, align 4
+                sub
+                %61 = const 2147483647 : s32i
+                cmp
+                if %62 {
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -70,17 +70,17 @@ fn bar(%arg0: u32i, %arg1: u32i) -> void [external, c, no_inline, dso_local, not
         %20 = add %18, %19 : u32i
         store %20, %15, align 4
         scope {
-            %34 = load %14 : u32i, align 4
-            %35 = const 1 : u32i
-            %36 = const 2147483647 : u32i
-            %37 = add %35, %36 : u32i
-            %38 = sub %34, %37 : u32i
-            %39 = const 2 : u32i
-            %40 = cmp ge %38, %39 : bool
-            if %40 {
-                unreachable
-            }
-            yield
+                %34 = load %14 : u32i, align 4
+                %35 = const 1 : u32i
+                %36 = const 2147483647 : u32i
+                %37 = add %35, %36 : u32i
+                sub
+                %39 = const 2 : u32i
+                cmp
+                if %40 {
+                        unreachable
+                }
+                yield
         }
         %21 = load %13 : u32i, align 4
         %22 = cast(integral) %21 : s32i
@@ -91,38 +91,38 @@ fn bar(%arg0: u32i, %arg1: u32i) -> void [external, c, no_inline, dso_local, not
         %26 = cast(integral) %25 : s32i
         store %26, %17, align 4
         scope {
-            %27 = load %16 : s32i, align 4
-            %28 = load %17 : s32i, align 4
-            %29 = sub %27, %28 : s32i [nsw]
-            %30 = const -2147483647 : s32i
-            %31 = const 1 : s32i
-            %32 = sub %30, %31 : s32i [nsw]
-            %33 = cmp ne %29, %32 : bool
-            if %33 {
-                call @abort() [all]
+                %27 = load %16 : s32i, align 4
+                %28 = load %17 : s32i, align 4
+                sub
+                %30 = const -2147483647 : s32i
+                %31 = const 1 : s32i
+                sub
+                cmp
+                if %33 {
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 4294967295 : u32i
-    %3 = const 1 : u32i
-    %4 = const 2147483647 : u32i
-    %5 = add %3, %4 : u32i
-    %6 = const 1 : u32i
-    call @foo(%2, %5, %6) [all]
-    %7 = const 4294967295 : u32i
-    %8 = const 1 : u32i
-    %9 = const 2147483647 : u32i
-    %10 = add %8, %9 : u32i
-    call @bar(%7, %10) [all]
-    %11 = const 0 : s32i
-    store %11, %0
-    %12 = load %0 : s32i
-    return %12
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 4294967295 : u32i
+        %3 = const 1 : u32i
+        %4 = const 2147483647 : u32i
+        %5 = add %3, %4 : u32i
+        %6 = const 1 : u32i
+        call @foo(%2, %5, %6) [all]
+        %7 = const 4294967295 : u32i
+        %8 = const 1 : u32i
+        %9 = const 2147483647 : u32i
+        %10 = add %8, %9 : u32i
+        call @bar(%7, %10) [all]
+        %11 = const 0 : s32i
+        store %11, %0
+        %12 = load %0 : s32i
+        return %12
 }

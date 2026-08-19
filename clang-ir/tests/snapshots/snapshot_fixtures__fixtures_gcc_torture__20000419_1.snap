@@ -1,9 +1,9 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/20000419-1.c" (c, x86_64-unknown-linux-gnu)
-global __const.main.f : rec_foo = {7, 8, 9} [cir_private, default, dso_local, constant]
+global __const.main.f : rec_foo = ConstRecord { ty: Named("rec_foo"), members: Array([CirInt { ty: Named("s32i"), value: "7" }, CirInt { ty: Named("s32i"), value: "8" }, CirInt { ty: Named("s32i"), value: "9" }]) } [cir_private, default, dso_local, constant]
 
 fn abort() -> void [external, c, nothrow];
 fn brother(%arg4: s32i, %arg5: s32i, %arg6: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -15,14 +15,14 @@ fn brother(%arg4: s32i, %arg5: s32i, %arg6: s32i) -> void [external, c, no_inlin
         store %arg5, %34
         store %arg6, %35
         scope {
-            %36 = load %33 : s32i, align 4
-            %37 = cast(int_to_bool) %36 : bool
-            if %37 {
-                %38 = get_global @abort : (() -> void)*
-                call @abort() [all]
+                %36 = load %33 : s32i, align 4
+                %37 = cast(int_to_bool) %36 : bool
+                if %37 {
+                        %38 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
                 yield
-            }
-            yield
         }
         return
 }
@@ -30,9 +30,9 @@ fn sister(%arg0: u64i, %arg1: s32i, %arg2: s32i, %arg3: s32i) -> void [external,
     ^bb0(%arg0: u64i, %arg1: s32i, %arg2: s32i, %arg3: s32i):
         %16 = alloca rec_anon_struct, "coerce", align 8
         %17 = alloca rec_anon_struct, "coerce", align 8
-        %18 = get_member %17[0] "" : u64i*
+        get_member
         store %arg0, %18
-        %19 = get_member %17[1] "" : s32i*
+        get_member
         store %arg1, %19
         %20 = load %17 : rec_anon_struct
         store %20, %16
@@ -44,10 +44,10 @@ fn sister(%arg0: u64i, %arg1: s32i, %arg2: s32i, %arg3: s32i) -> void [external,
         store %22, %23
         store %arg2, %24
         store %arg3, %25
-        %26 = get_member %23[1] "b" : s32i*
+        get_member
         %27 = load %26 : s32i, align 4
         %28 = load %24 : s32i, align 4
-        %29 = cmp eq %27, %28 : bool
+        cmp
         %30 = cast(bool_to_int) %29 : s32i
         %31 = load %24 : s32i, align 4
         %32 = load %25 : s32i, align 4
@@ -56,26 +56,26 @@ fn sister(%arg0: u64i, %arg1: s32i, %arg2: s32i, %arg3: s32i) -> void [external,
 }
 fn exit(%arg0: s32i) -> void [external, c];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca rec_anon_struct, "coerce", align 8
-    %1 = alloca s32i, "__retval", align 4
-    %2 = alloca rec_foo, "f", align 4
-    %3 = const 0 : s32i
-    store %3, %1
-    %4 = get_global @__const.main.f : rec_foo*
-    copy %2, %4
-    %5 = const 1 : s32i
-    %6 = const 2 : s32i
-    %7 = load %2 : rec_foo, align 4
-    %8 = cast(bitcast) %0 : rec_foo*
-    store %7, %8
-    %9 = get_member %0[0] "" : u64i*
-    %10 = load %9 : u64i
-    %11 = get_member %0[1] "" : s32i*
-    %12 = load %11 : s32i
-    call @sister(%10, %12, %5, %6) [all]
-    %13 = get_global @exit : ((s32i) -> void)*
-    %14 = const 0 : s32i
-    call @exit(%14) [all]
-    %15 = load %1 : s32i
-    return %15
+        %0 = alloca rec_anon_struct, "coerce", align 8
+        %1 = alloca s32i, "__retval", align 4
+        %2 = alloca rec_foo, "f", align 4
+        %3 = const 0 : s32i
+        store %3, %1
+        %4 = get_global @__const.main.f : rec_foo*
+        copy
+        %5 = const 1 : s32i
+        %6 = const 2 : s32i
+        %7 = load %2 : rec_foo, align 4
+        %8 = cast(bitcast) %0 : rec_foo*
+        store %7, %8
+        get_member
+        %10 = load %9 : u64i
+        get_member
+        %12 = load %11 : s32i
+        call @sister(%10, %12, %5, %6) [all]
+        %13 = get_global @exit : (s32i) -> void*
+        %14 = const 0 : s32i
+        call @exit(%14) [all]
+        %15 = load %1 : s32i
+        return %15
 }

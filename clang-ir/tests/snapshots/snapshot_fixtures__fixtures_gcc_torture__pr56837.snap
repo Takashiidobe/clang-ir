@@ -1,84 +1,84 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr56837.c" (c, x86_64-unknown-linux-gnu)
-global a : complex<s32i>[1024] = zero [external, default, align 16, dso_local]
+global a : complex<s32i>[1024] = Zero { ty: Array { element_type: Complex { element_type: Named("s32i") }, size: 1024 } } [external, default, align 16, dso_local]
 
 fn foo() -> void [external, c, no_inline, dso_local, nothrow] {
-    %21 = alloca s32i, "i", align 4
-    scope {
-        %22 = const 0 : s32i
-        store %22, %21, align 4
-        for cond: {
-            %32 = load %21 : s32i, align 4
-            %33 = const 1024 : s32i
-            %34 = cmp lt %32, %33 : bool
-            condition %34
-        } step: {
-            %23 = load %21 : s32i, align 4
-            %24 = inc %23 : s32i [nsw]
-            store %24, %21, align 4
-            yield
-        } do {
-            %25 = const -1 : s32i
-            %26 = const 0 : s32i
-            %27 = complex.create %25, %26 : complex<s32i>
-            %28 = load %21 : s32i, align 4
-            %29 = cast(integral) %28 : s64i
-            %30 = get_global @a : complex<s32i>[1024]*
-            %31 = get_element %30[%29] : complex<s32i>*
-            store %27, %31, align 8
-            yield
+        %21 = alloca s32i, "i", align 4
+        scope {
+                %22 = const 0 : s32i
+                store %22, %21, align 4
+                for cond {
+                        %32 = load %21 : s32i, align 4
+                        %33 = const 1024 : s32i
+                        cmp
+                        condition %34
+                } step {
+                        %23 = load %21 : s32i, align 4
+                        inc
+                        store %24, %21, align 4
+                        yield
+                } body {
+                        %25 = const -1 : s32i
+                        %26 = const 0 : s32i
+                        complex.create
+                        %28 = load %21 : s32i, align 4
+                        %29 = cast(integral) %28 : s64i
+                        %30 = get_global @a : complex<s32i>[1024]*
+                        get_element
+                        store %27, %31, align 8
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    return
+        return
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca s32i, "i", align 4
-    %2 = const 0 : s32i
-    store %2, %0
-    call @foo() [all]
-    scope {
-        %5 = const 0 : s32i
-        store %5, %1, align 4
-        for cond: {
-            %18 = load %1 : s32i, align 4
-            %19 = const 1024 : s32i
-            %20 = cmp lt %18, %19 : bool
-            condition %20
-        } step: {
-            %6 = load %1 : s32i, align 4
-            %7 = inc %6 : s32i [nsw]
-            store %7, %1, align 4
-            yield
-        } do {
-            scope {
-                %8 = load %1 : s32i, align 4
-                %9 = cast(integral) %8 : s64i
-                %10 = get_global @a : complex<s32i>[1024]*
-                %11 = get_element %10[%9] : complex<s32i>*
-                %12 = load %11 : complex<s32i>, align 8
-                %13 = const -1 : s32i
-                %14 = const 0 : s32i
-                %15 = complex.create %13, %14 : complex<s32i>
-                %16 = cmp ne %12, %15 : bool
-                if %16 {
-                    %17 = get_global @abort : (() -> void)*
-                    call @abort() [all]
-                    yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca s32i, "i", align 4
+        %2 = const 0 : s32i
+        store %2, %0
+        call @foo() [all]
+        scope {
+                %5 = const 0 : s32i
+                store %5, %1, align 4
+                for cond {
+                        %18 = load %1 : s32i, align 4
+                        %19 = const 1024 : s32i
+                        cmp
+                        condition %20
+                } step {
+                        %6 = load %1 : s32i, align 4
+                        inc
+                        store %7, %1, align 4
+                        yield
+                } body {
+                        scope {
+                                %8 = load %1 : s32i, align 4
+                                %9 = cast(integral) %8 : s64i
+                                %10 = get_global @a : complex<s32i>[1024]*
+                                get_element
+                                %12 = load %11 : complex<s32i>, align 8
+                                %13 = const -1 : s32i
+                                %14 = const 0 : s32i
+                                complex.create
+                                cmp
+                                if %16 {
+                                        %17 = get_global @abort : () -> void*
+                                        call @abort() [all]
+                                        yield
+                                }
+                                yield
+                        }
+                        yield
                 }
                 yield
-            }
-            yield
         }
-        yield
-    }
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = load %0 : s32i
-    return %4
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = load %0 : s32i
+        return %4
 }

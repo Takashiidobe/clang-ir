@@ -1,36 +1,36 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures/gnu_empty_struct.c" (c, x86_64-unknown-linux-gnu)
-global __const.empty_size.value : rec_GNUEmpty = poison [cir_private, default, dso_local, constant]
-global .str : s8i[9] = "%zu %zu\n" [cir_private, default, align 1, dso_local, constant]
+global __const.empty_size.value : rec_GNUEmpty = Poison { ty: Named("rec_GNUEmpty") } [cir_private, default, dso_local, constant]
+global .str : s8i[9] = ConstArray { ty: Array { element_type: Named("s8i"), size: 9 }, elts: Str("%zu %zu\n"), trailing_zeros_num: 1 } [cir_private, default, align 1, dso_local, constant]
 
 fn printf(%arg0: s8i*, ...) -> s32i [external, c];
 fn empty_size() -> u64i [internal, c, no_inline, dso_local, nothrow] {
-    %12 = alloca rec_GNUEmpty, "value", align 1
-    %13 = alloca u64i, "__retval", align 8
-    %14 = get_global @__const.empty_size.value : rec_GNUEmpty*
-    copy %12, %14
-    %15 = const 0 : u64i
-    store %15, %13
-    %16 = load %13 : u64i
-    return %16
+        %12 = alloca rec_GNUEmpty, "value", align 1
+        %13 = alloca u64i, "__retval", align 8
+        %14 = get_global @__const.empty_size.value : rec_GNUEmpty*
+        copy
+        %15 = const 0 : u64i
+        store %15, %13
+        %16 = load %13 : u64i
+        return %16
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca rec_GNUEmpty, "value", align 1
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = get_global @printf : ((s8i*, ...) -> s32i)*
-    %4 = get_global @.str : s8i[9]*
-    %5 = cast(array_to_ptrdecay) %4 : s8i*
-    %6 = const 0 : u64i
-    %7 = load %1 : rec_GNUEmpty, align 1
-    %8 = call @empty_size() : u64i [all]
-    %9 = call @printf(%5, %6, %8) : s32i [all]
-    %10 = const 0 : s32i
-    store %10, %0
-    %11 = load %0 : s32i
-    return %11
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca rec_GNUEmpty, "value", align 1
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = get_global @printf : (s8i*, ...) -> s32i*
+        %4 = get_global @.str : s8i[9]*
+        %5 = cast(array_to_ptrdecay) %4 : s8i*
+        %6 = const 0 : u64i
+        %7 = load %1 : rec_GNUEmpty, align 1
+        %8 = call @empty_size() : u64i [all]
+        %9 = call @printf(%5, %6, %8) : s32i [all]
+        %10 = const 0 : s32i
+        store %10, %0
+        %11 = load %0 : s32i
+        return %11
 }

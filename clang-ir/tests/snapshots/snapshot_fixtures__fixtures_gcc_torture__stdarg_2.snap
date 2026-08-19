@@ -1,13 +1,13 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/stdarg-2.c" (c, x86_64-unknown-linux-gnu)
-global foo_arg : s32i = 0 [external, default, align 4, dso_local]
-global gap : rec___va_list_tag[1] = zero [external, default, align 16, dso_local]
-global bar_arg : s32i = 0 [external, default, align 4, dso_local]
-global x : s64i = 0 [external, default, align 8, dso_local]
-global d : double = 0.000000e+00 [external, default, align 8, dso_local]
+global foo_arg : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global gap : rec___va_list_tag[1] = Zero { ty: Array { element_type: Named("rec___va_list_tag"), size: 1 } } [external, default, align 16, dso_local]
+global bar_arg : s32i = CirInt { ty: Named("s32i"), value: "0" } [external, default, align 4, dso_local]
+global x : s64i = CirInt { ty: Named("s64i"), value: "0" } [external, default, align 8, dso_local]
+global d : double = CirFloat { ty: Double, value: "0.000000e+00" } [external, default, align 8, dso_local]
 
 fn abort() -> void [external, c, nothrow];
 fn foo(%arg12: s32i, %arg13: rec___va_list_tag*) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -17,69 +17,70 @@ fn foo(%arg12: s32i, %arg13: rec___va_list_tag*) -> void [external, c, no_inline
         store %arg12, %220
         store %arg13, %221
         scope {
-            %222 = load %220 : s32i, align 4
-            switch %222 {
-                case equal 5 {
-                    %245 = load %221 : rec___va_list_tag*, align 8
-                    %246 = va_arg %245 : s32i
-                    %247 = get_global @foo_arg : s32i*
-                    store %246, %247, align 4
-                    %248 = load %221 : rec___va_list_tag*, align 8
-                    %249 = va_arg %248 : double
-                    %250 = get_global @foo_arg : s32i*
-                    %251 = load %250 : s32i, align 4
-                    %252 = cast(int_to_float) %251 : double
-                    %253 = fadd %252, %249 : double
-                    %254 = cast(float_to_int) %253 : s32i
-                    store %254, %250, align 4
-                    %255 = load %221 : rec___va_list_tag*, align 8
-                    %256 = va_arg %255 : s64i
-                    %257 = get_global @foo_arg : s32i*
-                    %258 = load %257 : s32i, align 4
-                    %259 = cast(integral) %258 : s64i
-                    %260 = add %259, %256 : s64i [nsw]
-                    %261 = cast(integral) %260 : s32i
-                    store %261, %257, align 4
-                    break
+                %222 = load %220 : s32i, align 4
+                switch %222 {
+                        case equal [5] {
+                                %245 = load %221 : rec___va_list_tag*, align 8
+                                va_arg
+                                %247 = get_global @foo_arg : s32i*
+                                store %246, %247, align 4
+                                %248 = load %221 : rec___va_list_tag*, align 8
+                                va_arg
+                                %250 = get_global @foo_arg : s32i*
+                                %251 = load %250 : s32i, align 4
+                                %252 = cast(int_to_float) %251 : double
+                                fadd
+                                %254 = cast(float_to_int) %253 : s32i
+                                store %254, %250, align 4
+                                %255 = load %221 : rec___va_list_tag*, align 8
+                                va_arg
+                                %257 = get_global @foo_arg : s32i*
+                                %258 = load %257 : s32i, align 4
+                                %259 = cast(integral) %258 : s64i
+                                %260 = add %259, %256 : s64i [nsw]
+                                %261 = cast(integral) %260 : s32i
+                                store %261, %257, align 4
+                                break
+                        }
+                        case equal [8] {
+                                %234 = load %221 : rec___va_list_tag*, align 8
+                                va_arg
+                                %236 = cast(integral) %235 : s32i
+                                %237 = get_global @foo_arg : s32i*
+                                store %236, %237, align 4
+                                %238 = load %221 : rec___va_list_tag*, align 8
+                                va_arg
+                                %240 = get_global @foo_arg : s32i*
+                                %241 = load %240 : s32i, align 4
+                                %242 = cast(int_to_float) %241 : double
+                                fadd
+                                %244 = cast(float_to_int) %243 : s32i
+                                store %244, %240, align 4
+                                break
+                        }
+                        case equal [11] {
+                                %224 = load %221 : rec___va_list_tag*, align 8
+                                va_arg
+                                %226 = get_global @foo_arg : s32i*
+                                store %225, %226, align 4
+                                %227 = load %221 : rec___va_list_tag*, align 8
+                                va_arg
+                                %229 = get_global @foo_arg : s32i*
+                                %230 = load %229 : s32i, align 4
+                                %231 = cast(int_to_float) %230 : long_double<f80>
+                                fadd
+                                %233 = cast(float_to_int) %232 : s32i
+                                store %233, %229, align 4
+                                break
+                        }
+                        case default [] {
+                                %223 = get_global @abort : () -> void*
+                                call @abort() [all]
+                                yield
+                        }
+                        yield
                 }
-                case equal 8 {
-                    %234 = load %221 : rec___va_list_tag*, align 8
-                    %235 = va_arg %234 : s64i
-                    %236 = cast(integral) %235 : s32i
-                    %237 = get_global @foo_arg : s32i*
-                    store %236, %237, align 4
-                    %238 = load %221 : rec___va_list_tag*, align 8
-                    %239 = va_arg %238 : double
-                    %240 = get_global @foo_arg : s32i*
-                    %241 = load %240 : s32i, align 4
-                    %242 = cast(int_to_float) %241 : double
-                    %243 = fadd %242, %239 : double
-                    %244 = cast(float_to_int) %243 : s32i
-                    store %244, %240, align 4
-                    break
-                }
-                case equal 11 {
-                    %224 = load %221 : rec___va_list_tag*, align 8
-                    %225 = va_arg %224 : s32i
-                    %226 = get_global @foo_arg : s32i*
-                    store %225, %226, align 4
-                    %227 = load %221 : rec___va_list_tag*, align 8
-                    %228 = va_arg %227 : long_double<f80>
-                    %229 = get_global @foo_arg : s32i*
-                    %230 = load %229 : s32i, align 4
-                    %231 = cast(int_to_float) %230 : long_double<f80>
-                    %232 = fadd %231, %228 : long_double<f80>
-                    %233 = cast(float_to_int) %232 : s32i
-                    store %233, %229, align 4
-                    break
-                }
-                case default {
-                    %223 = get_global @abort : (() -> void)*
-                    call @abort() [all]
-                    yield
-                }
-            }
-            yield
+                yield
         }
         return
 }
@@ -88,37 +89,37 @@ fn bar(%arg11: s32i) -> void [external, c, no_inline, dso_local, nothrow] {
         %201 = alloca s32i, "v", align 4
         store %arg11, %201
         scope {
-            %204 = load %201 : s32i, align 4
-            %205 = const 16386 : s32i
-            %206 = cmp eq %204, %205 : bool
-            if %206 {
-                scope {
-                    %207 = get_global @gap : rec___va_list_tag[1]*
-                    %208 = cast(array_to_ptrdecay) %207 : rec___va_list_tag*
-                    %209 = va_arg %208 : s32i
-                    %210 = const 13 : s32i
-                    %211 = cmp ne %209, %210 : bool
-                    %212 = ternary %211 ? { : bool
-                        %219 = const true : bool
-                        yield %219
-                    } : {
-                        %214 = get_global @gap : rec___va_list_tag[1]*
-                        %215 = cast(array_to_ptrdecay) %214 : rec___va_list_tag*
-                        %216 = va_arg %215 : double
-                        %217 = const -1.400000e+01 : double
-                        %218 = cmp ne %216, %217 : bool
-                        yield %218
-                    }
-                    if %212 {
-                        %213 = get_global @abort : (() -> void)*
-                        call @abort() [all]
+                %204 = load %201 : s32i, align 4
+                %205 = const 16386 : s32i
+                cmp
+                if %206 {
+                        scope {
+                                %207 = get_global @gap : rec___va_list_tag[1]*
+                                %208 = cast(array_to_ptrdecay) %207 : rec___va_list_tag*
+                                va_arg
+                                %210 = const 13 : s32i
+                                cmp
+                                %212 = ternary %211 ? { : bool
+                                        %219 = const true : bool
+                                        yield %219
+                                } : {
+                                        %214 = get_global @gap : rec___va_list_tag[1]*
+                                        %215 = cast(array_to_ptrdecay) %214 : rec___va_list_tag*
+                                        va_arg
+                                        %217 = const -1.400000e+01 : double
+                                        cmp
+                                        yield %218
+                                }
+                                if %212 {
+                                        %213 = get_global @abort : () -> void*
+                                        call @abort() [all]
+                                        yield
+                                }
+                                yield
+                        }
                         yield
-                    }
-                    yield
                 }
                 yield
-            }
-            yield
         }
         %202 = load %201 : s32i, align 4
         %203 = get_global @bar_arg : s32i*
@@ -131,15 +132,15 @@ fn f1(%arg10: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         store %arg10, %192
         %193 = get_global @gap : rec___va_list_tag[1]*
         %194 = cast(array_to_ptrdecay) %193 : rec___va_list_tag*
-        va_start %194
+        va_start
         %195 = get_global @gap : rec___va_list_tag[1]*
         %196 = cast(array_to_ptrdecay) %195 : rec___va_list_tag*
-        %197 = va_arg %196 : s64i
+        va_arg
         %198 = get_global @x : s64i*
         store %197, %198, align 8
         %199 = get_global @gap : rec___va_list_tag[1]*
         %200 = cast(array_to_ptrdecay) %199 : rec___va_list_tag*
-        va_end %200
+        va_end
         return
 }
 fn f2(%arg9: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -148,12 +149,12 @@ fn f2(%arg9: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         store %arg9, %186
         %187 = get_global @gap : rec___va_list_tag[1]*
         %188 = cast(array_to_ptrdecay) %187 : rec___va_list_tag*
-        va_start %188
+        va_start
         %189 = load %186 : s32i, align 4
         call @bar(%189) [all]
         %190 = get_global @gap : rec___va_list_tag[1]*
         %191 = cast(array_to_ptrdecay) %190 : rec___va_list_tag*
-        va_end %191
+        va_end
         return
 }
 fn f3(%arg8: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -162,19 +163,19 @@ fn f3(%arg8: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %174 = alloca rec___va_list_tag[1][10], "aps", align 16
         store %arg8, %173
         %175 = const 4 : s64i
-        %176 = get_element %174[%175] : rec___va_list_tag[1]*
+        get_element
         %177 = cast(array_to_ptrdecay) %176 : rec___va_list_tag*
-        va_start %177
+        va_start
         %178 = const 4 : s64i
-        %179 = get_element %174[%178] : rec___va_list_tag[1]*
+        get_element
         %180 = cast(array_to_ptrdecay) %179 : rec___va_list_tag*
-        %181 = va_arg %180 : s64i
+        va_arg
         %182 = get_global @x : s64i*
         store %181, %182, align 8
         %183 = const 4 : s64i
-        %184 = get_element %174[%183] : rec___va_list_tag[1]*
+        get_element
         %185 = cast(array_to_ptrdecay) %184 : rec___va_list_tag*
-        va_end %185
+        va_end
         return
 }
 fn f4(%arg7: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -183,15 +184,15 @@ fn f4(%arg7: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %165 = alloca rec___va_list_tag[1][10], "aps", align 16
         store %arg7, %164
         %166 = const 4 : s64i
-        %167 = get_element %165[%166] : rec___va_list_tag[1]*
+        get_element
         %168 = cast(array_to_ptrdecay) %167 : rec___va_list_tag*
-        va_start %168
+        va_start
         %169 = load %164 : s32i, align 4
         call @bar(%169) [all]
         %170 = const 4 : s64i
-        %171 = get_element %165[%170] : rec___va_list_tag[1]*
+        get_element
         %172 = cast(array_to_ptrdecay) %171 : rec___va_list_tag*
-        va_end %172
+        va_end
         return
 }
 fn f5(%arg6: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -200,18 +201,18 @@ fn f5(%arg6: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %153 = alloca rec___va_list_tag[1][10], "aps", align 16
         store %arg6, %152
         %154 = const 4 : s64i
-        %155 = get_element %153[%154] : rec___va_list_tag[1]*
+        get_element
         %156 = cast(array_to_ptrdecay) %155 : rec___va_list_tag*
-        va_start %156
+        va_start
         %157 = load %152 : s32i, align 4
         %158 = const 4 : s64i
-        %159 = get_element %153[%158] : rec___va_list_tag[1]*
+        get_element
         %160 = cast(array_to_ptrdecay) %159 : rec___va_list_tag*
         call @foo(%157, %160) [all]
         %161 = const 4 : s64i
-        %162 = get_element %153[%161] : rec___va_list_tag[1]*
+        get_element
         %163 = cast(array_to_ptrdecay) %162 : rec___va_list_tag*
-        va_end %163
+        va_end
         return
 }
 fn f6(%arg5: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -219,17 +220,17 @@ fn f6(%arg5: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %142 = alloca s32i, "i", align 4
         %143 = alloca rec_A, "a", align 8
         store %arg5, %142
-        %144 = get_member %143[1] "g" : rec___va_list_tag[1]*
+        get_member
         %145 = cast(array_to_ptrdecay) %144 : rec___va_list_tag*
-        va_start %145
-        %146 = get_member %143[1] "g" : rec___va_list_tag[1]*
+        va_start
+        get_member
         %147 = cast(array_to_ptrdecay) %146 : rec___va_list_tag*
-        %148 = va_arg %147 : s64i
+        va_arg
         %149 = get_global @x : s64i*
         store %148, %149, align 8
-        %150 = get_member %143[1] "g" : rec___va_list_tag[1]*
+        get_member
         %151 = cast(array_to_ptrdecay) %150 : rec___va_list_tag*
-        va_end %151
+        va_end
         return
 }
 fn f7(%arg4: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -237,14 +238,14 @@ fn f7(%arg4: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %135 = alloca s32i, "i", align 4
         %136 = alloca rec_A, "a", align 8
         store %arg4, %135
-        %137 = get_member %136[1] "g" : rec___va_list_tag[1]*
+        get_member
         %138 = cast(array_to_ptrdecay) %137 : rec___va_list_tag*
-        va_start %138
+        va_start
         %139 = load %135 : s32i, align 4
         call @bar(%139) [all]
-        %140 = get_member %136[1] "g" : rec___va_list_tag[1]*
+        get_member
         %141 = cast(array_to_ptrdecay) %140 : rec___va_list_tag*
-        va_end %141
+        va_end
         return
 }
 fn f8(%arg3: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -252,16 +253,16 @@ fn f8(%arg3: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %126 = alloca s32i, "i", align 4
         %127 = alloca rec_A, "a", align 8
         store %arg3, %126
-        %128 = get_member %127[1] "g" : rec___va_list_tag[1]*
+        get_member
         %129 = cast(array_to_ptrdecay) %128 : rec___va_list_tag*
-        va_start %129
+        va_start
         %130 = load %126 : s32i, align 4
-        %131 = get_member %127[1] "g" : rec___va_list_tag[1]*
+        get_member
         %132 = cast(array_to_ptrdecay) %131 : rec___va_list_tag*
         call @foo(%130, %132) [all]
-        %133 = get_member %127[1] "g" : rec___va_list_tag[1]*
+        get_member
         %134 = cast(array_to_ptrdecay) %133 : rec___va_list_tag*
-        va_end %134
+        va_end
         return
 }
 fn f10(%arg2: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -270,22 +271,22 @@ fn f10(%arg2: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %111 = alloca rec_A, "a", align 8
         store %arg2, %110
         %112 = const 1 : s64i
-        %113 = get_member %111[2] "h" : rec___va_list_tag[1][2]*
-        %114 = get_element %113[%112] : rec___va_list_tag[1]*
+        get_member
+        get_element
         %115 = cast(array_to_ptrdecay) %114 : rec___va_list_tag*
-        va_start %115
+        va_start
         %116 = const 1 : s64i
-        %117 = get_member %111[2] "h" : rec___va_list_tag[1][2]*
-        %118 = get_element %117[%116] : rec___va_list_tag[1]*
+        get_member
+        get_element
         %119 = cast(array_to_ptrdecay) %118 : rec___va_list_tag*
-        %120 = va_arg %119 : s64i
+        va_arg
         %121 = get_global @x : s64i*
         store %120, %121, align 8
         %122 = const 1 : s64i
-        %123 = get_member %111[2] "h" : rec___va_list_tag[1][2]*
-        %124 = get_element %123[%122] : rec___va_list_tag[1]*
+        get_member
+        get_element
         %125 = cast(array_to_ptrdecay) %124 : rec___va_list_tag*
-        va_end %125
+        va_end
         return
 }
 fn f11(%arg1: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -294,17 +295,17 @@ fn f11(%arg1: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %100 = alloca rec_A, "a", align 8
         store %arg1, %99
         %101 = const 1 : s64i
-        %102 = get_member %100[2] "h" : rec___va_list_tag[1][2]*
-        %103 = get_element %102[%101] : rec___va_list_tag[1]*
+        get_member
+        get_element
         %104 = cast(array_to_ptrdecay) %103 : rec___va_list_tag*
-        va_start %104
+        va_start
         %105 = load %99 : s32i, align 4
         call @bar(%105) [all]
         %106 = const 1 : s64i
-        %107 = get_member %100[2] "h" : rec___va_list_tag[1][2]*
-        %108 = get_element %107[%106] : rec___va_list_tag[1]*
+        get_member
+        get_element
         %109 = cast(array_to_ptrdecay) %108 : rec___va_list_tag*
-        va_end %109
+        va_end
         return
 }
 fn f12(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
@@ -313,197 +314,197 @@ fn f12(%arg0: s32i, ...) -> void [external, c, no_inline, dso_local, nothrow] {
         %85 = alloca rec_A, "a", align 8
         store %arg0, %84
         %86 = const 1 : s64i
-        %87 = get_member %85[2] "h" : rec___va_list_tag[1][2]*
-        %88 = get_element %87[%86] : rec___va_list_tag[1]*
+        get_member
+        get_element
         %89 = cast(array_to_ptrdecay) %88 : rec___va_list_tag*
-        va_start %89
+        va_start
         %90 = load %84 : s32i, align 4
         %91 = const 1 : s64i
-        %92 = get_member %85[2] "h" : rec___va_list_tag[1][2]*
-        %93 = get_element %92[%91] : rec___va_list_tag[1]*
+        get_member
+        get_element
         %94 = cast(array_to_ptrdecay) %93 : rec___va_list_tag*
         call @foo(%90, %94) [all]
         %95 = const 1 : s64i
-        %96 = get_member %85[2] "h" : rec___va_list_tag[1][2]*
-        %97 = get_element %96[%95] : rec___va_list_tag[1]*
+        get_member
+        get_element
         %98 = cast(array_to_ptrdecay) %97 : rec___va_list_tag*
-        va_end %98
+        va_end
         return
 }
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    %2 = const 1 : s32i
-    %3 = const 79 : s64i
-    call @f1(%2, %3) [all]
-    scope {
-        %79 = get_global @x : s64i*
-        %80 = load %79 : s64i, align 8
-        %81 = const 79 : s64i
-        %82 = cmp ne %80, %81 : bool
-        if %82 {
-            %83 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        %2 = const 1 : s32i
+        %3 = const 79 : s64i
+        call @f1(%2, %3) [all]
+        scope {
+                %79 = get_global @x : s64i*
+                %80 = load %79 : s64i, align 8
+                %81 = const 79 : s64i
+                cmp
+                if %82 {
+                        %83 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %4 = const 16386 : s32i
-    %5 = const 13 : s32i
-    %6 = const -1.400000e+01 : double
-    call @f2(%4, %5, %6) [all]
-    scope {
-        %74 = get_global @bar_arg : s32i*
-        %75 = load %74 : s32i, align 4
-        %76 = const 16386 : s32i
-        %77 = cmp ne %75, %76 : bool
-        if %77 {
-            %78 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %4 = const 16386 : s32i
+        %5 = const 13 : s32i
+        %6 = const -1.400000e+01 : double
+        call @f2(%4, %5, %6) [all]
+        scope {
+                %74 = get_global @bar_arg : s32i*
+                %75 = load %74 : s32i, align 4
+                %76 = const 16386 : s32i
+                cmp
+                if %77 {
+                        %78 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = const 3 : s32i
-    %8 = const 2031 : s64i
-    call @f3(%7, %8) [all]
-    scope {
-        %69 = get_global @x : s64i*
-        %70 = load %69 : s64i, align 8
-        %71 = const 2031 : s64i
-        %72 = cmp ne %70, %71 : bool
-        if %72 {
-            %73 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %7 = const 3 : s32i
+        %8 = const 2031 : s64i
+        call @f3(%7, %8) [all]
+        scope {
+                %69 = get_global @x : s64i*
+                %70 = load %69 : s64i, align 8
+                %71 = const 2031 : s64i
+                cmp
+                if %72 {
+                        %73 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %9 = const 4 : s32i
-    %10 = const 18 : s32i
-    call @f4(%9, %10) [all]
-    scope {
-        %64 = get_global @bar_arg : s32i*
-        %65 = load %64 : s32i, align 4
-        %66 = const 4 : s32i
-        %67 = cmp ne %65, %66 : bool
-        if %67 {
-            %68 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %9 = const 4 : s32i
+        %10 = const 18 : s32i
+        call @f4(%9, %10) [all]
+        scope {
+                %64 = get_global @bar_arg : s32i*
+                %65 = load %64 : s32i, align 4
+                %66 = const 4 : s32i
+                cmp
+                if %67 {
+                        %68 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %11 = const 5 : s32i
-    %12 = const 1 : s32i
-    %13 = const 1.900000e+01 : double
-    %14 = const 18 : s64i
-    call @f5(%11, %12, %13, %14) [all]
-    scope {
-        %59 = get_global @foo_arg : s32i*
-        %60 = load %59 : s32i, align 4
-        %61 = const 38 : s32i
-        %62 = cmp ne %60, %61 : bool
-        if %62 {
-            %63 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %11 = const 5 : s32i
+        %12 = const 1 : s32i
+        %13 = const 1.900000e+01 : double
+        %14 = const 18 : s64i
+        call @f5(%11, %12, %13, %14) [all]
+        scope {
+                %59 = get_global @foo_arg : s32i*
+                %60 = load %59 : s32i, align 4
+                %61 = const 38 : s32i
+                cmp
+                if %62 {
+                        %63 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %15 = const 6 : s32i
-    %16 = const 18 : s64i
-    call @f6(%15, %16) [all]
-    scope {
-        %54 = get_global @x : s64i*
-        %55 = load %54 : s64i, align 8
-        %56 = const 18 : s64i
-        %57 = cmp ne %55, %56 : bool
-        if %57 {
-            %58 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %15 = const 6 : s32i
+        %16 = const 18 : s64i
+        call @f6(%15, %16) [all]
+        scope {
+                %54 = get_global @x : s64i*
+                %55 = load %54 : s64i, align 8
+                %56 = const 18 : s64i
+                cmp
+                if %57 {
+                        %58 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %17 = const 7 : s32i
-    call @f7(%17) [all]
-    scope {
-        %49 = get_global @bar_arg : s32i*
-        %50 = load %49 : s32i, align 4
-        %51 = const 7 : s32i
-        %52 = cmp ne %50, %51 : bool
-        if %52 {
-            %53 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %17 = const 7 : s32i
+        call @f7(%17) [all]
+        scope {
+                %49 = get_global @bar_arg : s32i*
+                %50 = load %49 : s32i, align 4
+                %51 = const 7 : s32i
+                cmp
+                if %52 {
+                        %53 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %18 = const 8 : s32i
-    %19 = const 2031 : s64i
-    %20 = const 1.300000e+01 : double
-    call @f8(%18, %19, %20) [all]
-    scope {
-        %44 = get_global @foo_arg : s32i*
-        %45 = load %44 : s32i, align 4
-        %46 = const 2044 : s32i
-        %47 = cmp ne %45, %46 : bool
-        if %47 {
-            %48 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %18 = const 8 : s32i
+        %19 = const 2031 : s64i
+        %20 = const 1.300000e+01 : double
+        call @f8(%18, %19, %20) [all]
+        scope {
+                %44 = get_global @foo_arg : s32i*
+                %45 = load %44 : s32i, align 4
+                %46 = const 2044 : s32i
+                cmp
+                if %47 {
+                        %48 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %21 = const 9 : s32i
-    %22 = const 180 : s64i
-    call @f10(%21, %22) [all]
-    scope {
-        %39 = get_global @x : s64i*
-        %40 = load %39 : s64i, align 8
-        %41 = const 180 : s64i
-        %42 = cmp ne %40, %41 : bool
-        if %42 {
-            %43 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %21 = const 9 : s32i
+        %22 = const 180 : s64i
+        call @f10(%21, %22) [all]
+        scope {
+                %39 = get_global @x : s64i*
+                %40 = load %39 : s64i, align 8
+                %41 = const 180 : s64i
+                cmp
+                if %42 {
+                        %43 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %23 = const 10 : s32i
-    call @f11(%23) [all]
-    scope {
-        %34 = get_global @bar_arg : s32i*
-        %35 = load %34 : s32i, align 4
-        %36 = const 10 : s32i
-        %37 = cmp ne %35, %36 : bool
-        if %37 {
-            %38 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %23 = const 10 : s32i
+        call @f11(%23) [all]
+        scope {
+                %34 = get_global @bar_arg : s32i*
+                %35 = load %34 : s32i, align 4
+                %36 = const 10 : s32i
+                cmp
+                if %37 {
+                        %38 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %24 = const 11 : s32i
-    %25 = const 2030 : s32i
-    %26 = const 1.200000e+01 : long_double<f80>
-    call @f12(%24, %25, %26) [all]
-    scope {
-        %29 = get_global @foo_arg : s32i*
-        %30 = load %29 : s32i, align 4
-        %31 = const 2042 : s32i
-        %32 = cmp ne %30, %31 : bool
-        if %32 {
-            %33 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %24 = const 11 : s32i
+        %25 = const 2030 : s32i
+        %26 = const 1.200000e+01 : long_double<f80>
+        call @f12(%24, %25, %26) [all]
+        scope {
+                %29 = get_global @foo_arg : s32i*
+                %30 = load %29 : s32i, align 4
+                %31 = const 2042 : s32i
+                cmp
+                if %32 {
+                        %33 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %27 = const 0 : s32i
-    store %27, %0
-    %28 = load %0 : s32i
-    return %28
+        %27 = const 0 : s32i
+        store %27, %0
+        %28 = load %0 : s32i
+        return %28
 }

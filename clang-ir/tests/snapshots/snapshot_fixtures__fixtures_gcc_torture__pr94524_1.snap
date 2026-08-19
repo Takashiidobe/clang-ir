@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr94524-1.c" (c, x86_64-unknown-linux-gnu)
@@ -9,9 +9,9 @@ fn foo(%arg0: vector<16 x s8i>) -> vector<16 x s8i> [internal, c, no_inline, dso
         %16 = alloca vector<16 x s8i>, "__retval", align 16
         store %arg0, %15
         %17 = const -19 : s8i
-        %18 = vec.splat %17 : vector<16 x s8i>
+        vec.splat
         %19 = load %15 : vector<16 x s8i>, align 16
-        %20 = rem %19, %18 : vector<16 x s8i>
+        rem
         store %20, %15, align 16
         %21 = load %15 : vector<16 x s8i>, align 16
         store %21, %16
@@ -20,31 +20,31 @@ fn foo(%arg0: vector<16 x s8i>) -> vector<16 x s8i> [internal, c, no_inline, dso
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = alloca vector<16 x s8i>, "x", align 16
-    %2 = alloca vector<16 x s8i>, ".compoundliteral", align 16
-    %3 = const 0 : s32i
-    store %3, %0
-    %4 = const [31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : vector<16 x s8i>
-    store %4, %2, align 16
-    %5 = load %2 : vector<16 x s8i>, align 16
-    %6 = call @foo(%5) : vector<16 x s8i> [all]
-    store %6, %1, align 16
-    scope {
-        %9 = load %1 : vector<16 x s8i>, align 16
-        %10 = const 0 : s32i
-        %11 = vec.extract %9[%10] : s8i
-        %12 = cast(integral) %11 : s32i
-        %13 = const 12 : s32i
-        %14 = cmp ne %12, %13 : bool
-        if %14 {
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = alloca vector<16 x s8i>, "x", align 16
+        %2 = alloca vector<16 x s8i>, ".compoundliteral", align 16
+        %3 = const 0 : s32i
+        store %3, %0
+        %4 = const [[31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]] : vector<16 x s8i>
+        store %4, %2, align 16
+        %5 = load %2 : vector<16 x s8i>, align 16
+        %6 = call @foo(%5) : vector<16 x s8i> [all]
+        store %6, %1, align 16
+        scope {
+                %9 = load %1 : vector<16 x s8i>, align 16
+                %10 = const 0 : s32i
+                vec.extract
+                %12 = cast(integral) %11 : s32i
+                %13 = const 12 : s32i
+                cmp
+                if %14 {
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %7 = const 0 : s32i
-    store %7, %0
-    %8 = load %0 : s32i
-    return %8
+        %7 = const 0 : s32i
+        store %7, %0
+        %8 = load %0 : s32i
+        return %8
 }

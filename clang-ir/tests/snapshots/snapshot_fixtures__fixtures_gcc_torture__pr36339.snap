@@ -1,5 +1,5 @@
 ---
-source: tests/snapshot_fixtures.rs
+source: clang-ir/tests/snapshot_fixtures.rs
 expression: snapshot
 ---
 module "tests/fixtures.gcc-torture/pr36339.c" (c, x86_64-unknown-linux-gnu)
@@ -12,36 +12,36 @@ fn check_a(%arg1: u64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %33 = load %30 : u64i, align 8
         %34 = cast(int_to_ptr) %33 : s8i*
         %35 = const -1 : s32i
-        %36 = ptr_stride %34, %35 : s8i*
+        ptr_stride
         %37 = cast(bitcast) %36 : void*
         %38 = cast(bitcast) %37 : u64i*
         store %38, %32, align 8
         scope {
-            %41 = const 0 : s64i
-            %42 = load %32 : u64i*, align 8
-            %43 = ptr_stride %42, %41 : u64i*
-            %44 = load %43 : u64i, align 8
-            %45 = const 42 : u64i
-            %46 = cmp eq %44, %45 : bool
-            %47 = ternary %46 ? { : bool
-                %51 = const 1 : s64i
-                %52 = load %32 : u64i*, align 8
-                %53 = ptr_stride %52, %51 : u64i*
-                %54 = load %53 : u64i, align 8
-                %55 = const 0 : u64i
-                %56 = cmp eq %54, %55 : bool
-                yield %56
-            } : {
-                %50 = const false : bool
-                yield %50
-            }
-            if %47 {
-                %48 = const 0 : s32i
-                store %48, %31
-                %49 = load %31 : s32i
-                return %49
-            }
-            yield
+                %41 = const 0 : s64i
+                %42 = load %32 : u64i*, align 8
+                ptr_stride
+                %44 = load %43 : u64i, align 8
+                %45 = const 42 : u64i
+                cmp
+                %47 = ternary %46 ? { : bool
+                        %51 = const 1 : s64i
+                        %52 = load %32 : u64i*, align 8
+                        ptr_stride
+                        %54 = load %53 : u64i, align 8
+                        %55 = const 0 : u64i
+                        cmp
+                        yield %56
+                } : {
+                        %50 = const false : bool
+                        yield %50
+                }
+                if %47 {
+                        %48 = const 0 : s32i
+                        store %48, %31
+                        %49 = load %31 : s32i
+                        return %49
+                }
+                yield
         }
         %39 = const -1 : s32i
         store %39, %31
@@ -60,17 +60,17 @@ fn try_a(%arg0: u64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
         %14 = load %9 : u64i, align 8
         %15 = const 0 : s64i
         %16 = load %12 : u64i*, align 8
-        %17 = ptr_stride %16, %15 : u64i*
+        ptr_stride
         store %14, %17, align 8
         %18 = const 0 : u64i
         %19 = const 1 : s64i
         %20 = load %12 : u64i*, align 8
-        %21 = ptr_stride %20, %19 : u64i*
+        ptr_stride
         store %18, %21, align 8
         %22 = load %12 : u64i*, align 8
         %23 = cast(bitcast) %22 : s8i*
         %24 = const 1 : s32i
-        %25 = ptr_stride %23, %24 : s8i*
+        ptr_stride
         %26 = cast(bitcast) %25 : void*
         %27 = cast(ptr_to_int) %26 : u64i
         %28 = call @check_a(%27) : s32i [all]
@@ -80,23 +80,23 @@ fn try_a(%arg0: u64i) -> s32i [external, c, no_inline, dso_local, nothrow] {
 }
 fn abort() -> void [external, c, nothrow];
 fn main() -> s32i [external, c, no_inline, dso_local, nothrow] {
-    %0 = alloca s32i, "__retval", align 4
-    %1 = const 0 : s32i
-    store %1, %0
-    scope {
-        %4 = const 42 : u64i
-        %5 = call @try_a(%4) : s32i [all]
-        %6 = const 0 : s32i
-        %7 = cmp lt %5, %6 : bool
-        if %7 {
-            %8 = get_global @abort : (() -> void)*
-            call @abort() [all]
-            yield
+        %0 = alloca s32i, "__retval", align 4
+        %1 = const 0 : s32i
+        store %1, %0
+        scope {
+                %4 = const 42 : u64i
+                %5 = call @try_a(%4) : s32i [all]
+                %6 = const 0 : s32i
+                cmp
+                if %7 {
+                        %8 = get_global @abort : () -> void*
+                        call @abort() [all]
+                        yield
+                }
+                yield
         }
-        yield
-    }
-    %2 = const 0 : s32i
-    store %2, %0
-    %3 = load %0 : s32i
-    return %3
+        %2 = const 0 : s32i
+        store %2, %0
+        %3 = load %0 : s32i
+        return %3
 }
