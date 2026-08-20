@@ -4779,6 +4779,593 @@ impl Op {
             _ => None,
         }
     }
+    pub fn for_each_result(&self, mut visit: impl FnMut(&ValueId, &crate::types::Type)) {
+        match self {
+            Op::Abs(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Acos(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Add(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::AddOverflow(value) => {
+                visit(&value.result, &value.result_ty);
+                visit(&value.overflow, &value.overflow_ty);
+            }
+            Op::AddressOfReturnAddress(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::AllocException(value) => {
+                visit(&value.addr, &value.addr_ty);
+            }
+            Op::Alloca(value) => {
+                visit(&value.addr, &value.addr_ty);
+            }
+            Op::And(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ArrayCtor(_value) => {}
+            Op::ArrayDtor(_value) => {}
+            Op::Asin(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Asm(value) => {
+                if let (Some(id), Some(ty)) = (&value.res, &value.res_ty) {
+                    visit(id, ty);
+                }
+            }
+            Op::Assume(_value) => {}
+            Op::Atan(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Atan2(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::AtomicClear(_value) => {}
+            Op::AtomicCmpxchg(value) => {
+                visit(&value.old, &value.old_ty);
+                visit(&value.success, &value.success_ty);
+            }
+            Op::AtomicFence(_value) => {}
+            Op::AtomicFetch(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::AtomicTestAndSet(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::AtomicXchg(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Await(_value) => {}
+            Op::BaseClassAddr(value) => {
+                visit(&value.base_addr, &value.base_addr_ty);
+            }
+            Op::BaseDataMember(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::BaseMethod(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::BeginCatch(value) => {
+                visit(&value.catch_token, &value.catch_token_ty);
+                visit(&value.exn_ptr, &value.exn_ptr_ty);
+            }
+            Op::BeginCleanup(value) => {
+                visit(&value.cleanup_token, &value.cleanup_token_ty);
+            }
+            Op::Bitreverse(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::BlockAddress(value) => {
+                visit(&value.addr, &value.addr_ty);
+            }
+            Op::Br(_value) => {}
+            Op::Brcond(_value) => {}
+            Op::Break(_value) => {}
+            Op::BuiltinIntCast(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ByteSwap(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Call(value) => {
+                if let (Some(id), Some(ty)) = (&value.result, &value.result_ty) {
+                    visit(id, ty);
+                }
+            }
+            Op::CallLlvmIntrinsic(value) => {
+                if let (Some(id), Some(ty)) = (&value.result, &value.result_ty) {
+                    visit(id, ty);
+                }
+            }
+            Op::Case(_value) => {}
+            Op::Cast(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::CatchParam(value) => {
+                if let (Some(id), Some(ty)) = (&value.param, &value.param_ty) {
+                    visit(id, ty);
+                }
+            }
+            Op::Ceil(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::CleanupScope(_value) => {}
+            Op::ClearCache(_value) => {}
+            Op::ClearPadding(_value) => {}
+            Op::Clrsb(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Clz(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Cmp(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Cmp3way(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::CoReturn(_value) => {}
+            Op::ComplexAdd(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ComplexConj(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ComplexCreate(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ComplexDiv(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ComplexImag(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ComplexImagPtr(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ComplexMul(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ComplexReal(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ComplexRealPtr(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ComplexSub(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Condition(_value) => {}
+            Op::Const(value) => {
+                visit(&value.res, &value.res_ty);
+            }
+            Op::ConstructCatchParam(_value) => {}
+            Op::Continue(_value) => {}
+            Op::Copy(_value) => {}
+            Op::Copysign(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::CoroBody(_value) => {}
+            Op::CoroIntrinsicAlloc(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::CoroIntrinsicBegin(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::CoroIntrinsicEnd(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::CoroIntrinsicFree(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::CoroIntrinsicId(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::CoroIntrinsicSize(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Cos(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Cosh(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Cpuid(_value) => {}
+            Op::Ctz(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Dec(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::DeleteArray(_value) => {}
+            Op::DerivedClassAddr(value) => {
+                visit(&value.derived_addr, &value.derived_addr_ty);
+            }
+            Op::DerivedDataMember(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::DerivedMethod(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Div(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Do(_value) => {}
+            Op::DynCast(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::EhDispatch(_value) => {}
+            Op::EhInflightException(value) => {
+                visit(&value.exception_ptr, &value.exception_ptr_ty);
+                visit(&value.type_id, &value.type_id_ty);
+            }
+            Op::EhInitiate(value) => {
+                visit(&value.eh_token, &value.eh_token_ty);
+            }
+            Op::EhLongjmp(_value) => {}
+            Op::EhSetjmp(value) => {
+                visit(&value.res, &value.res_ty);
+            }
+            Op::EhTerminate(_value) => {}
+            Op::EhTypeid(value) => {
+                visit(&value.type_id, &value.type_id_ty);
+            }
+            Op::EndCatch(_value) => {}
+            Op::EndCleanup(_value) => {}
+            Op::Exp(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Exp10(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Exp2(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Expect(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ExtractMember(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Fabs(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Fadd(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Fdiv(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Ffs(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Floor(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Fma(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Fmaximum(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Fmaxnum(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Fminimum(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Fminnum(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Fmod(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Fmul(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Fmuladd(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Fneg(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::For(_value) => {}
+            Op::FrameAddress(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Freeze(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Frem(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Frexp(value) => {
+                visit(&value.result, &value.result_ty);
+                visit(&value.exp, &value.exp_ty);
+            }
+            Op::Fsub(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Func(_value) => {}
+            Op::GetBitfield(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::GetElement(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::GetGlobal(value) => {
+                visit(&value.addr, &value.addr_ty);
+            }
+            Op::GetMember(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::GetMethod(value) => {
+                visit(&value.callee, &value.callee_ty);
+                visit(&value.adjusted_this, &value.adjusted_this_ty);
+            }
+            Op::GetRuntimeMember(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Global(_value) => {}
+            Op::Goto(_value) => {}
+            Op::If(_value) => {}
+            Op::Inc(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::IndirectBr(_value) => {}
+            Op::IndirectGoto(_value) => {}
+            Op::InitCatchParam(_value) => {}
+            Op::InsertMember(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::IsConstant(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::IsFpClass(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Label(_value) => {}
+            Op::Launder(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::LibcMemchr(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::LibcMemcpy(_value) => {}
+            Op::LibcMemmove(_value) => {}
+            Op::LibcMemset(_value) => {}
+            Op::LifetimeEnd(_value) => {}
+            Op::LifetimeStart(_value) => {}
+            Op::Llrint(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Llround(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Load(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::LocalInit(_value) => {}
+            Op::Log(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Log10(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Log2(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Lrint(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Lround(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Max(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Min(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Minus(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Modf(value) => {
+                visit(&value.fractional, &value.fractional_ty);
+                visit(&value.integral, &value.integral_ty);
+            }
+            Op::Mul(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::MulOverflow(value) => {
+                visit(&value.result, &value.result_ty);
+                visit(&value.overflow, &value.overflow_ty);
+            }
+            Op::Nearbyint(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Not(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Objsize(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Or(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Parity(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Popcount(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Pow(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Prefetch(_value) => {}
+            Op::PtrDiff(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::PtrStride(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Rem(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Resume(_value) => {}
+            Op::ResumeFlat(_value) => {}
+            Op::Return(_value) => {}
+            Op::ReturnAddress(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Rint(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Rotate(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Round(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Roundeven(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Scope(value) => {
+                if let (Some(id), Some(ty)) = (&value.results, &value.results_ty) {
+                    visit(id, ty);
+                }
+            }
+            Op::Select(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::SetBitfield(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Shift(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Signbit(value) => {
+                visit(&value.res, &value.res_ty);
+            }
+            Op::Sin(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Sinh(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Sqrt(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Stackrestore(_value) => {}
+            Op::Stacksave(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::StdFind(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::StdStrlen(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Store(_value) => {}
+            Op::Sub(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::SubOverflow(value) => {
+                visit(&value.result, &value.result_ty);
+                visit(&value.overflow, &value.overflow_ty);
+            }
+            Op::Switch(_value) => {}
+            Op::SwitchFlat(_value) => {}
+            Op::Tan(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Tanh(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Ternary(value) => {
+                if let (Some(id), Some(ty)) = (&value.result, &value.result_ty) {
+                    visit(id, ty);
+                }
+            }
+            Op::Throw(_value) => {}
+            Op::TokenNone(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Trap(_value) => {}
+            Op::Trunc(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Try(_value) => {}
+            Op::TryCall(value) => {
+                if let (Some(id), Some(ty)) = (&value.result, &value.result_ty) {
+                    visit(id, ty);
+                }
+            }
+            Op::TryThrow(_value) => {}
+            Op::Unreachable(_value) => {}
+            Op::VaArg(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VaCopy(_value) => {}
+            Op::VaEnd(_value) => {}
+            Op::VaStart(_value) => {}
+            Op::VecCmp(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecCreate(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecExtract(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecInsert(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecMaskedLoad(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecShuffle(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecShuffleDynamic(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecSplat(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecTernary(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VtableAddressPoint(value) => {
+                visit(&value.addr, &value.addr_ty);
+            }
+            Op::VtableGetTypeInfo(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VtableGetVirtualFnAddr(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VtableGetVptr(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VttAddressPoint(value) => {
+                visit(&value.addr, &value.addr_ty);
+            }
+            Op::While(_value) => {}
+            Op::Xor(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Yield(_value) => {}
+            Op::Other(op) => {
+                for (id, ty) in &op.results {
+                    visit(id, ty);
+                }
+            }
+        }
+    }
 }
 fn lower_abs(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;

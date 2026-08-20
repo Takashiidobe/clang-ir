@@ -15,6 +15,13 @@ pub(crate) struct OpFieldInit {
     value: TokenStream,
 }
 
+pub(crate) struct OpResult {
+    value: Ident,
+    ty: Ident,
+    variadic: bool,
+    optional: bool,
+}
+
 pub(crate) struct OpEnumEntry {
     mnemonic: String,
     doc: TokenStream,
@@ -22,13 +29,17 @@ pub(crate) struct OpEnumEntry {
     module: &'static str,
     struct_ident: Ident,
     field_inits: Vec<OpFieldInit>,
+    results: Vec<OpResult>,
     display_arm: TokenStream,
 }
 
+type OpModules = BTreeMap<&'static str, Vec<TokenStream>>;
+type CollectedOps = (OpModules, Vec<OpEnumEntry>);
+type GeneratedOp = (TokenStream, Vec<OpFieldInit>, Vec<OpResult>);
+
 pub(crate) fn collect_ops(
     keeper: &RecordKeeper<'_>,
-) -> Result<(BTreeMap<&'static str, Vec<TokenStream>>, Vec<OpEnumEntry>), Box<dyn std::error::Error>>
-{
+) -> Result<CollectedOps, Box<dyn std::error::Error>> {
     let mut ops = keeper.all_derived_definitions("CIR_Op").collect::<Vec<_>>();
     ops.sort_by_key(|rec| {
         rec.str_value("opName")
@@ -44,7 +55,8 @@ pub(crate) fn collect_ops(
         let mnemonic = rec.str_value("opName").unwrap_or(name).to_string();
         let module = op_module(&mnemonic);
         let struct_ident = op_struct_ident(&mnemonic);
-        let (struct_tokens, field_inits) = generate_op_struct(rec, &mnemonic, &struct_ident)?;
+        let (struct_tokens, field_inits, results) =
+            generate_op_struct(rec, &mnemonic, &struct_ident)?;
         let doc = record_doc(rec, Some(&format!("`cir.{mnemonic}`")))?;
         let display_arm = generate_op_display_arm(rec, &mnemonic, &struct_ident, module)?;
 
@@ -59,6 +71,7 @@ pub(crate) fn collect_ops(
             module,
             struct_ident,
             field_inits,
+            results,
             display_arm,
         });
     }
@@ -140,6 +153,36 @@ fn generate_ops_mod(
             }
         }
     });
+    let result_visit_arms = variants.iter().map(|entry| {
+        let variant = &entry.variant;
+        let binding = if entry.results.is_empty() {
+            format_ident!("_value")
+        } else {
+            format_ident!("value")
+        };
+        let visits = entry.results.iter().map(|result| {
+            let value = &result.value;
+            let ty = &result.ty;
+            if result.variadic {
+                quote! {
+                    for (id, ty) in #binding.#value.iter().zip(&#binding.#ty) {
+                        visit(id, ty);
+                    }
+                }
+            } else if result.optional {
+                quote! {
+                    if let (Some(id), Some(ty)) = (&#binding.#value, &#binding.#ty) {
+                        visit(id, ty);
+                    }
+                }
+            } else {
+                quote! { visit(&#binding.#value, &#binding.#ty); }
+            }
+        });
+        quote! {
+            Op::#variant(#binding) => { #(#visits)* }
+        }
+    });
     let display_arms = variants.iter().map(|entry| &entry.display_arm);
     let helpers = lowering_helpers();
 
@@ -180,6 +223,20 @@ fn generate_ops_mod(
                 match op.mnemonic() {
                     #(#lowering_arms)*
                     _ => None,
+                }
+            }
+
+            pub fn for_each_result(
+                &self,
+                mut visit: impl FnMut(&ValueId, &crate::types::Type),
+            ) {
+                match self {
+                    #(#result_visit_arms)*
+                    Op::Other(op) => {
+                        for (id, ty) in &op.results {
+                            visit(id, ty);
+                        }
+                    }
                 }
             }
         }
@@ -451,10 +508,11 @@ fn generate_op_struct(
     rec: Record<'_>,
     mnemonic: &str,
     struct_ident: &Ident,
-) -> Result<(TokenStream, Vec<OpFieldInit>), Box<dyn std::error::Error>> {
+) -> Result<GeneratedOp, Box<dyn std::error::Error>> {
     let doc = record_doc(rec, Some(&format!("`cir.{mnemonic}`")))?;
     let mut fields = Vec::new();
     let mut field_inits = Vec::new();
+    let mut results_out = Vec::new();
 
     if rec.has_field("results") {
         let results = rec.dag_value("results")?;
@@ -487,6 +545,12 @@ fn generate_op_struct(
             fields.push(quote! {
                 pub #value_field: #value_ty,
                 pub #ty_field: #ty_ty,
+            });
+            results_out.push(OpResult {
+                value: value_field.clone(),
+                ty: ty_field.clone(),
+                variadic: is_variadic,
+                optional: is_optional,
             });
             let index = Index::from(i);
             if is_variadic {
@@ -595,6 +659,7 @@ fn generate_op_struct(
             }
         },
         field_inits,
+        results_out,
     ))
 }
 

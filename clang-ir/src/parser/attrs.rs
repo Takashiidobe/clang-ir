@@ -197,7 +197,10 @@ impl<'a> Parser<'a> {
                 self.expect(Tok::Colon)?;
                 let _elem_ty = self.parse_type()?;
                 Attribute::Str(
-                    String::from_utf8_lossy(&crate::lexer::decode_escaped_bytes(body)).into_owned(),
+                    crate::lexer::decode_escaped_bytes(body)
+                        .into_iter()
+                        .map(char::from)
+                        .collect(),
                 )
             }
             Tok::LBracket => {
@@ -386,5 +389,26 @@ impl<'a> Parser<'a> {
         } else {
             Err(self.err(format!("expected `{want}`, found `{id}`")))
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_const_array_bytes_losslessly() {
+        let mut parser =
+            Parser::new(r#"<"\7F\FF" : !s8i, trailing_zeros> : !cir.array<!s8i x 3>"#).unwrap();
+        let Attribute::ConstArray { elts, .. } = parser.parse_cir_const_array().unwrap() else {
+            panic!("expected a constant array")
+        };
+        let Attribute::Str(value) = *elts else {
+            panic!("expected a string constant array")
+        };
+        assert_eq!(
+            value.chars().map(u32::from).collect::<Vec<_>>(),
+            [0x7f, 0xff]
+        );
     }
 }
