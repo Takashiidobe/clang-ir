@@ -30,12 +30,20 @@ pub(crate) struct OpEnumEntry {
     struct_ident: Ident,
     field_inits: Vec<OpFieldInit>,
     results: Vec<OpResult>,
+    operand_visits: Vec<TokenStream>,
+    region_visits: Vec<TokenStream>,
     display_arm: TokenStream,
 }
 
 type OpModules = BTreeMap<&'static str, Vec<TokenStream>>;
 type CollectedOps = (OpModules, Vec<OpEnumEntry>);
-type GeneratedOp = (TokenStream, Vec<OpFieldInit>, Vec<OpResult>);
+type GeneratedOp = (
+    TokenStream,
+    Vec<OpFieldInit>,
+    Vec<OpResult>,
+    Vec<TokenStream>,
+    Vec<TokenStream>,
+);
 
 pub(crate) fn collect_ops(
     keeper: &RecordKeeper<'_>,
@@ -55,7 +63,7 @@ pub(crate) fn collect_ops(
         let mnemonic = rec.str_value("opName").unwrap_or(name).to_string();
         let module = op_module(&mnemonic);
         let struct_ident = op_struct_ident(&mnemonic);
-        let (struct_tokens, field_inits, results) =
+        let (struct_tokens, field_inits, results, operand_visits, region_visits) =
             generate_op_struct(rec, &mnemonic, &struct_ident)?;
         let doc = record_doc(rec, Some(&format!("`cir.{mnemonic}`")))?;
         let display_arm = generate_op_display_arm(rec, &mnemonic, &struct_ident, module)?;
@@ -72,6 +80,8 @@ pub(crate) fn collect_ops(
             struct_ident,
             field_inits,
             results,
+            operand_visits,
+            region_visits,
             display_arm,
         });
     }
@@ -183,6 +193,26 @@ fn generate_ops_mod(
             Op::#variant(#binding) => { #(#visits)* }
         }
     });
+    let operand_visit_arms = variants.iter().map(|entry| {
+        let variant = &entry.variant;
+        let visits = &entry.operand_visits;
+        quote! {
+            Op::#variant(value) => {
+                let _ = value;
+                #(#visits)*
+            }
+        }
+    });
+    let region_visit_arms = variants.iter().map(|entry| {
+        let variant = &entry.variant;
+        let visits = &entry.region_visits;
+        quote! {
+            Op::#variant(value) => {
+                let _ = value;
+                #(#visits)*
+            }
+        }
+    });
     let display_arms = variants.iter().map(|entry| &entry.display_arm);
     let helpers = lowering_helpers();
 
@@ -235,6 +265,28 @@ fn generate_ops_mod(
                     Op::Other(op) => {
                         for (id, ty) in &op.results {
                             visit(id, ty);
+                        }
+                    }
+                }
+            }
+
+            pub fn for_each_operand(&self, mut visit: impl FnMut(&ValueId)) {
+                match self {
+                    #(#operand_visit_arms)*
+                    Op::Other(op) => {
+                        for operand in &op.operands {
+                            visit(operand);
+                        }
+                    }
+                }
+            }
+
+            pub fn for_each_region(&self, mut visit: impl FnMut(&Region)) {
+                match self {
+                    #(#region_visit_arms)*
+                    Op::Other(op) => {
+                        for region in &op.regions {
+                            visit(&lower_region(region));
                         }
                     }
                 }
@@ -513,6 +565,8 @@ fn generate_op_struct(
     let mut fields = Vec::new();
     let mut field_inits = Vec::new();
     let mut results_out = Vec::new();
+    let mut operand_visits = Vec::new();
+    let mut region_visits = Vec::new();
 
     if rec.has_field("results") {
         let results = rec.dag_value("results")?;
@@ -584,6 +638,24 @@ fn generate_op_struct(
         }
     }
 
+    if mnemonic == "call" {
+        let field = safe_field_ident("indirect_callee");
+        fields.push(quote! {
+            pub #field: Option<super::ValueId>,
+        });
+        field_inits.push(OpFieldInit {
+            field: field.clone(),
+            value: quote! {
+                op.attr("callee").is_none().then(|| op.operands.first().cloned()).flatten()
+            },
+        });
+        operand_visits.push(quote! {
+            if let Some(operand) = &value.#field {
+                visit(operand);
+            }
+        });
+    }
+
     if rec.has_field("arguments") {
         let args = rec.dag_value("arguments")?;
         let mut operand_group = 0usize;
@@ -592,6 +664,9 @@ fn generate_op_struct(
             let field = safe_field_ident(name);
             let ty = op_arg_type_tokens(init)?;
             let doc = init_doc(init);
+            if let Some(visit) = operand_visit_tokens(init, &field)? {
+                operand_visits.push(visit);
+            }
             let (value, is_operand) = op_arg_initializer(init, name, mnemonic, operand_group)?;
             if is_operand {
                 operand_group += 1;
@@ -624,6 +699,15 @@ fn generate_op_struct(
             } else {
                 quote! { lower_region(op.regions.get(#index)?) }
             };
+            if is_variadic {
+                region_visits.push(quote! {
+                    for region in &value.#field {
+                        visit(region);
+                    }
+                });
+            } else {
+                region_visits.push(quote! { visit(&value.#field); });
+            }
             field_inits.push(OpFieldInit { field, value });
         }
     }
@@ -660,7 +744,48 @@ fn generate_op_struct(
         },
         field_inits,
         results_out,
+        operand_visits,
+        region_visits,
     ))
+}
+
+fn operand_visit_tokens(
+    init: TypedInit<'_>,
+    field: &Ident,
+) -> Result<Option<TokenStream>, Box<dyn std::error::Error>> {
+    let resolved = resolve_op_arg(init)?;
+    let TypedInit::Def(def) = resolved else {
+        return Ok(None);
+    };
+    let rec: Record = def.into();
+    let classes = record_classes(rec)?;
+    if classes.iter().any(|class| class == "VariadicOfVariadic") {
+        return Ok(Some(quote! {
+            for operands in &value.#field {
+                for operand in operands {
+                    visit(operand);
+                }
+            }
+        }));
+    }
+    if classes.iter().any(|class| class == "Variadic") {
+        return Ok(Some(quote! {
+            for operand in &value.#field {
+                visit(operand);
+            }
+        }));
+    }
+    if classes.iter().any(|class| class == "Optional") {
+        return Ok(Some(quote! {
+            if let Some(operand) = &value.#field {
+                visit(operand);
+            }
+        }));
+    }
+    if is_type_constraint(&classes) {
+        return Ok(Some(quote! { visit(&value.#field); }));
+    }
+    Ok(None)
 }
 
 fn generate_op_display_arm(
@@ -1122,9 +1247,9 @@ fn op_arg_initializer(
 
     if classes.iter().any(|c| c == "VariadicOfVariadic") {
         let segments_key = match (mnemonic, arg_name) {
-            ("asm", "asm_operands") => "operands_segments",
-            ("switch.flat", "case_operands") => "case_operand_segments",
-            ("indirectbr", "succ_operands") => "operand_segments",
+            ("asm", "asm_operands" | "asmOperands") => "operands_segments",
+            ("switch.flat", "case_operands" | "caseOperands") => "case_operand_segments",
+            ("indirectbr", "succ_operands" | "succOperands") => "operand_segments",
             _ => "operand_segments",
         };
         return Ok((

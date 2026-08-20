@@ -77,6 +77,10 @@ impl Function {
             .unwrap_or_default();
         let params = if entry_args.len() == inputs.len() {
             entry_args
+                .into_iter()
+                .zip(inputs.iter().cloned())
+                .map(|((id, _), ty)| (id, ty))
+                .collect()
         } else {
             // Declarations have no body/block args; fall back to the
             // function type's input list with synthetic names.
@@ -178,5 +182,48 @@ impl fmt::Display for Function {
                 writeln!(f, "}}")
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ast::{Block, Region};
+
+    #[test]
+    fn parameter_types_come_from_function_signature() {
+        let signature_ty = Type::Named("source_param".into());
+        let body_ty = Type::Named("abi_param".into());
+        let op = Operation {
+            name: "cir.func".into(),
+            results: Vec::new(),
+            operands: Vec::new(),
+            successors: Vec::new(),
+            properties: vec![
+                ("sym_name".into(), Attribute::Str("f".into())),
+                (
+                    "function_type".into(),
+                    Attribute::Type(Type::Func {
+                        inputs: vec![signature_ty.clone()],
+                        optional_return_type: None,
+                        var_arg: false,
+                    }),
+                ),
+            ],
+            regions: vec![Region {
+                blocks: vec![Block {
+                    label: None,
+                    args: vec![("arg".into(), body_ty)],
+                    ops: Vec::new(),
+                }],
+            }],
+            attributes: Vec::new(),
+            operand_types: Vec::new(),
+            loc: None,
+        };
+
+        let function = Function::from_op(&op).unwrap();
+
+        assert_eq!(function.params, vec![("arg".into(), signature_ty)]);
     }
 }

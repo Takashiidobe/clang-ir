@@ -5366,6 +5366,1746 @@ impl Op {
             }
         }
     }
+    pub fn for_each_operand(&self, mut visit: impl FnMut(&ValueId)) {
+        match self {
+            Op::Abs(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Acos(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Add(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::AddOverflow(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::AddressOfReturnAddress(value) => {
+                let _ = value;
+            }
+            Op::AllocException(value) => {
+                let _ = value;
+            }
+            Op::Alloca(value) => {
+                let _ = value;
+                if let Some(operand) = &value.dyn_alloc_size {
+                    visit(operand);
+                }
+            }
+            Op::And(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::ArrayCtor(value) => {
+                let _ = value;
+                visit(&value.addr);
+                if let Some(operand) = &value.num_elements {
+                    visit(operand);
+                }
+            }
+            Op::ArrayDtor(value) => {
+                let _ = value;
+                visit(&value.addr);
+                if let Some(operand) = &value.num_elements {
+                    visit(operand);
+                }
+            }
+            Op::Asin(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Asm(value) => {
+                let _ = value;
+                for operands in &value.asm_operands {
+                    for operand in operands {
+                        visit(operand);
+                    }
+                }
+            }
+            Op::Assume(value) => {
+                let _ = value;
+                visit(&value.predicate);
+                for operand in &value.bundle_args {
+                    visit(operand);
+                }
+            }
+            Op::Atan(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Atan2(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::AtomicClear(value) => {
+                let _ = value;
+                visit(&value.ptr);
+            }
+            Op::AtomicCmpxchg(value) => {
+                let _ = value;
+                visit(&value.ptr);
+                visit(&value.expected);
+                visit(&value.desired);
+            }
+            Op::AtomicFence(value) => {
+                let _ = value;
+            }
+            Op::AtomicFetch(value) => {
+                let _ = value;
+                visit(&value.ptr);
+                visit(&value.val);
+            }
+            Op::AtomicTestAndSet(value) => {
+                let _ = value;
+                visit(&value.ptr);
+            }
+            Op::AtomicXchg(value) => {
+                let _ = value;
+                visit(&value.ptr);
+                visit(&value.val);
+            }
+            Op::Await(value) => {
+                let _ = value;
+            }
+            Op::BaseClassAddr(value) => {
+                let _ = value;
+                visit(&value.derived_addr);
+            }
+            Op::BaseDataMember(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::BaseMethod(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::BeginCatch(value) => {
+                let _ = value;
+                visit(&value.eh_token);
+            }
+            Op::BeginCleanup(value) => {
+                let _ = value;
+                visit(&value.eh_token);
+            }
+            Op::Bitreverse(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::BlockAddress(value) => {
+                let _ = value;
+            }
+            Op::Br(value) => {
+                let _ = value;
+                for operand in &value.dest_operands {
+                    visit(operand);
+                }
+            }
+            Op::Brcond(value) => {
+                let _ = value;
+                visit(&value.cond);
+                for operand in &value.dest_operands_true {
+                    visit(operand);
+                }
+                for operand in &value.dest_operands_false {
+                    visit(operand);
+                }
+            }
+            Op::Break(value) => {
+                let _ = value;
+            }
+            Op::BuiltinIntCast(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::ByteSwap(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::Call(value) => {
+                let _ = value;
+                if let Some(operand) = &value.indirect_callee {
+                    visit(operand);
+                }
+                for operand in &value.args {
+                    visit(operand);
+                }
+            }
+            Op::CallLlvmIntrinsic(value) => {
+                let _ = value;
+                for operand in &value.arg_ops {
+                    visit(operand);
+                }
+            }
+            Op::Case(value) => {
+                let _ = value;
+            }
+            Op::Cast(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::CatchParam(value) => {
+                let _ = value;
+            }
+            Op::Ceil(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::CleanupScope(value) => {
+                let _ = value;
+            }
+            Op::ClearCache(value) => {
+                let _ = value;
+                visit(&value.begin);
+                visit(&value.end);
+            }
+            Op::ClearPadding(value) => {
+                let _ = value;
+                visit(&value.arg);
+            }
+            Op::Clrsb(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::Clz(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::Cmp(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Cmp3way(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::CoReturn(value) => {
+                let _ = value;
+            }
+            Op::ComplexAdd(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::ComplexConj(value) => {
+                let _ = value;
+                visit(&value.operand);
+            }
+            Op::ComplexCreate(value) => {
+                let _ = value;
+                visit(&value.real);
+                visit(&value.imag);
+            }
+            Op::ComplexDiv(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::ComplexImag(value) => {
+                let _ = value;
+                visit(&value.operand);
+            }
+            Op::ComplexImagPtr(value) => {
+                let _ = value;
+                visit(&value.operand);
+            }
+            Op::ComplexMul(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::ComplexReal(value) => {
+                let _ = value;
+                visit(&value.operand);
+            }
+            Op::ComplexRealPtr(value) => {
+                let _ = value;
+                visit(&value.operand);
+            }
+            Op::ComplexSub(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Condition(value) => {
+                let _ = value;
+                visit(&value.condition);
+            }
+            Op::Const(value) => {
+                let _ = value;
+            }
+            Op::ConstructCatchParam(value) => {
+                let _ = value;
+                visit(&value.eh_token);
+                visit(&value.param_addr);
+            }
+            Op::Continue(value) => {
+                let _ = value;
+            }
+            Op::Copy(value) => {
+                let _ = value;
+                visit(&value.dst);
+                visit(&value.src);
+            }
+            Op::Copysign(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::CoroBody(value) => {
+                let _ = value;
+            }
+            Op::CoroIntrinsicAlloc(value) => {
+                let _ = value;
+                visit(&value.id);
+            }
+            Op::CoroIntrinsicBegin(value) => {
+                let _ = value;
+                visit(&value.id);
+                visit(&value.coroframe_addr);
+            }
+            Op::CoroIntrinsicEnd(value) => {
+                let _ = value;
+                visit(&value.handle);
+                visit(&value.unwind);
+                visit(&value.result_token);
+            }
+            Op::CoroIntrinsicFree(value) => {
+                let _ = value;
+                visit(&value.id);
+                visit(&value.coroframe);
+            }
+            Op::CoroIntrinsicId(value) => {
+                let _ = value;
+                visit(&value.align);
+                visit(&value.promise);
+                visit(&value.coroaddr);
+                visit(&value.fnaddrs);
+            }
+            Op::CoroIntrinsicSize(value) => {
+                let _ = value;
+            }
+            Op::Cos(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Cosh(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Cpuid(value) => {
+                let _ = value;
+                visit(&value.cpu_info);
+                visit(&value.function_id);
+                visit(&value.sub_function_id);
+            }
+            Op::Ctz(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::Dec(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::DeleteArray(value) => {
+                let _ = value;
+                visit(&value.address);
+            }
+            Op::DerivedClassAddr(value) => {
+                let _ = value;
+                visit(&value.base_addr);
+            }
+            Op::DerivedDataMember(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::DerivedMethod(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Div(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Do(value) => {
+                let _ = value;
+            }
+            Op::DynCast(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::EhDispatch(value) => {
+                let _ = value;
+                visit(&value.eh_token);
+            }
+            Op::EhInflightException(value) => {
+                let _ = value;
+            }
+            Op::EhInitiate(value) => {
+                let _ = value;
+            }
+            Op::EhLongjmp(value) => {
+                let _ = value;
+                visit(&value.env);
+            }
+            Op::EhSetjmp(value) => {
+                let _ = value;
+                visit(&value.env);
+            }
+            Op::EhTerminate(value) => {
+                let _ = value;
+                visit(&value.eh_token);
+            }
+            Op::EhTypeid(value) => {
+                let _ = value;
+            }
+            Op::EndCatch(value) => {
+                let _ = value;
+                visit(&value.catch_token);
+            }
+            Op::EndCleanup(value) => {
+                let _ = value;
+                visit(&value.cleanup_token);
+            }
+            Op::Exp(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Exp10(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Exp2(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Expect(value) => {
+                let _ = value;
+                visit(&value.val);
+                visit(&value.expected);
+            }
+            Op::ExtractMember(value) => {
+                let _ = value;
+                visit(&value.record);
+            }
+            Op::Fabs(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Fadd(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Fdiv(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Ffs(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::Floor(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Fma(value) => {
+                let _ = value;
+                visit(&value.a);
+                visit(&value.b);
+                visit(&value.c);
+            }
+            Op::Fmaximum(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Fmaxnum(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Fminimum(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Fminnum(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Fmod(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Fmul(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Fmuladd(value) => {
+                let _ = value;
+                visit(&value.a);
+                visit(&value.b);
+                visit(&value.c);
+            }
+            Op::Fneg(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::For(value) => {
+                let _ = value;
+            }
+            Op::FrameAddress(value) => {
+                let _ = value;
+                visit(&value.level);
+            }
+            Op::Freeze(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::Frem(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Frexp(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Fsub(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Func(value) => {
+                let _ = value;
+            }
+            Op::GetBitfield(value) => {
+                let _ = value;
+                visit(&value.addr);
+            }
+            Op::GetElement(value) => {
+                let _ = value;
+                visit(&value.base);
+                visit(&value.index);
+            }
+            Op::GetGlobal(value) => {
+                let _ = value;
+            }
+            Op::GetMember(value) => {
+                let _ = value;
+                visit(&value.addr);
+            }
+            Op::GetMethod(value) => {
+                let _ = value;
+                visit(&value.method);
+                visit(&value.object);
+            }
+            Op::GetRuntimeMember(value) => {
+                let _ = value;
+                visit(&value.addr);
+                visit(&value.member);
+            }
+            Op::Global(value) => {
+                let _ = value;
+            }
+            Op::Goto(value) => {
+                let _ = value;
+            }
+            Op::If(value) => {
+                let _ = value;
+                visit(&value.condition);
+            }
+            Op::Inc(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::IndirectBr(value) => {
+                let _ = value;
+                visit(&value.addr);
+                for operands in &value.succ_operands {
+                    for operand in operands {
+                        visit(operand);
+                    }
+                }
+            }
+            Op::IndirectGoto(value) => {
+                let _ = value;
+                visit(&value.addr);
+            }
+            Op::InitCatchParam(value) => {
+                let _ = value;
+                visit(&value.exn_ptr);
+                visit(&value.param_addr);
+            }
+            Op::InsertMember(value) => {
+                let _ = value;
+                visit(&value.record);
+                visit(&value.value);
+            }
+            Op::IsConstant(value) => {
+                let _ = value;
+                visit(&value.val);
+            }
+            Op::IsFpClass(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Label(value) => {
+                let _ = value;
+            }
+            Op::Launder(value) => {
+                let _ = value;
+                visit(&value.arg);
+            }
+            Op::LibcMemchr(value) => {
+                let _ = value;
+                visit(&value.src);
+                visit(&value.pattern);
+                visit(&value.len);
+            }
+            Op::LibcMemcpy(value) => {
+                let _ = value;
+                visit(&value.dst);
+                visit(&value.src);
+                visit(&value.len);
+            }
+            Op::LibcMemmove(value) => {
+                let _ = value;
+                visit(&value.dst);
+                visit(&value.src);
+                visit(&value.len);
+            }
+            Op::LibcMemset(value) => {
+                let _ = value;
+                visit(&value.dst);
+                visit(&value.val);
+                visit(&value.len);
+            }
+            Op::LifetimeEnd(value) => {
+                let _ = value;
+                visit(&value.ptr);
+            }
+            Op::LifetimeStart(value) => {
+                let _ = value;
+                visit(&value.ptr);
+            }
+            Op::Llrint(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Llround(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Load(value) => {
+                let _ = value;
+                visit(&value.addr);
+            }
+            Op::LocalInit(value) => {
+                let _ = value;
+            }
+            Op::Log(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Log10(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Log2(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Lrint(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Lround(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Max(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Min(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Minus(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::Modf(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Mul(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::MulOverflow(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Nearbyint(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Not(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::Objsize(value) => {
+                let _ = value;
+                visit(&value.ptr);
+            }
+            Op::Or(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Parity(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::Popcount(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::Pow(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Prefetch(value) => {
+                let _ = value;
+                visit(&value.addr);
+            }
+            Op::PtrDiff(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::PtrStride(value) => {
+                let _ = value;
+                visit(&value.base);
+                visit(&value.stride);
+            }
+            Op::Rem(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Resume(value) => {
+                let _ = value;
+                visit(&value.eh_token);
+            }
+            Op::ResumeFlat(value) => {
+                let _ = value;
+                visit(&value.exception_ptr);
+                visit(&value.type_id);
+            }
+            Op::Return(value) => {
+                let _ = value;
+                for operand in &value.input {
+                    visit(operand);
+                }
+            }
+            Op::ReturnAddress(value) => {
+                let _ = value;
+                visit(&value.level);
+            }
+            Op::Rint(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Rotate(value) => {
+                let _ = value;
+                visit(&value.input);
+                visit(&value.amount);
+            }
+            Op::Round(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Roundeven(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Scope(value) => {
+                let _ = value;
+            }
+            Op::Select(value) => {
+                let _ = value;
+                visit(&value.condition);
+                visit(&value.true_value);
+                visit(&value.false_value);
+            }
+            Op::SetBitfield(value) => {
+                let _ = value;
+                visit(&value.addr);
+                visit(&value.src);
+            }
+            Op::Shift(value) => {
+                let _ = value;
+                visit(&value.value);
+                visit(&value.amount);
+            }
+            Op::Signbit(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::Sin(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Sinh(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Sqrt(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Stackrestore(value) => {
+                let _ = value;
+                visit(&value.ptr);
+            }
+            Op::Stacksave(value) => {
+                let _ = value;
+            }
+            Op::StdFind(value) => {
+                let _ = value;
+                visit(&value.first);
+                visit(&value.last);
+                visit(&value.pattern);
+            }
+            Op::StdStrlen(value) => {
+                let _ = value;
+                visit(&value.string);
+            }
+            Op::Store(value) => {
+                let _ = value;
+                visit(&value.value);
+                visit(&value.addr);
+            }
+            Op::Sub(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::SubOverflow(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Switch(value) => {
+                let _ = value;
+                visit(&value.condition);
+            }
+            Op::SwitchFlat(value) => {
+                let _ = value;
+                visit(&value.condition);
+                for operand in &value.default_operands {
+                    visit(operand);
+                }
+                for operands in &value.case_operands {
+                    for operand in operands {
+                        visit(operand);
+                    }
+                }
+            }
+            Op::Tan(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Tanh(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Ternary(value) => {
+                let _ = value;
+                visit(&value.cond);
+            }
+            Op::Throw(value) => {
+                let _ = value;
+                if let Some(operand) = &value.exception_ptr {
+                    visit(operand);
+                }
+            }
+            Op::TokenNone(value) => {
+                let _ = value;
+            }
+            Op::Trap(value) => {
+                let _ = value;
+            }
+            Op::Trunc(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::Try(value) => {
+                let _ = value;
+            }
+            Op::TryCall(value) => {
+                let _ = value;
+                for operand in &value.args {
+                    visit(operand);
+                }
+            }
+            Op::TryThrow(value) => {
+                let _ = value;
+                if let Some(operand) = &value.exception_ptr {
+                    visit(operand);
+                }
+            }
+            Op::Unreachable(value) => {
+                let _ = value;
+            }
+            Op::VaArg(value) => {
+                let _ = value;
+                visit(&value.arg_list);
+            }
+            Op::VaCopy(value) => {
+                let _ = value;
+                visit(&value.dst_list);
+                visit(&value.src_list);
+            }
+            Op::VaEnd(value) => {
+                let _ = value;
+                visit(&value.arg_list);
+            }
+            Op::VaStart(value) => {
+                let _ = value;
+                visit(&value.arg_list);
+            }
+            Op::VecCmp(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::VecCreate(value) => {
+                let _ = value;
+                for operand in &value.elements {
+                    visit(operand);
+                }
+            }
+            Op::VecExtract(value) => {
+                let _ = value;
+                visit(&value.vec);
+                visit(&value.index);
+            }
+            Op::VecInsert(value) => {
+                let _ = value;
+                visit(&value.vec);
+                visit(&value.value);
+                visit(&value.index);
+            }
+            Op::VecMaskedLoad(value) => {
+                let _ = value;
+                visit(&value.addr);
+                visit(&value.mask);
+                visit(&value.pass_thru);
+            }
+            Op::VecShuffle(value) => {
+                let _ = value;
+                visit(&value.vec1);
+                visit(&value.vec2);
+            }
+            Op::VecShuffleDynamic(value) => {
+                let _ = value;
+                visit(&value.vec);
+                visit(&value.indices);
+            }
+            Op::VecSplat(value) => {
+                let _ = value;
+                visit(&value.value);
+            }
+            Op::VecTernary(value) => {
+                let _ = value;
+                visit(&value.cond);
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::VtableAddressPoint(value) => {
+                let _ = value;
+            }
+            Op::VtableGetTypeInfo(value) => {
+                let _ = value;
+                visit(&value.vptr);
+            }
+            Op::VtableGetVirtualFnAddr(value) => {
+                let _ = value;
+                visit(&value.vptr);
+            }
+            Op::VtableGetVptr(value) => {
+                let _ = value;
+                visit(&value.src);
+            }
+            Op::VttAddressPoint(value) => {
+                let _ = value;
+                if let Some(operand) = &value.sym_addr {
+                    visit(operand);
+                }
+            }
+            Op::While(value) => {
+                let _ = value;
+            }
+            Op::Xor(value) => {
+                let _ = value;
+                visit(&value.lhs);
+                visit(&value.rhs);
+            }
+            Op::Yield(value) => {
+                let _ = value;
+                for operand in &value.args {
+                    visit(operand);
+                }
+            }
+            Op::Other(op) => {
+                for operand in &op.operands {
+                    visit(operand);
+                }
+            }
+        }
+    }
+    pub fn for_each_region(&self, mut visit: impl FnMut(&Region)) {
+        match self {
+            Op::Abs(value) => {
+                let _ = value;
+            }
+            Op::Acos(value) => {
+                let _ = value;
+            }
+            Op::Add(value) => {
+                let _ = value;
+            }
+            Op::AddOverflow(value) => {
+                let _ = value;
+            }
+            Op::AddressOfReturnAddress(value) => {
+                let _ = value;
+            }
+            Op::AllocException(value) => {
+                let _ = value;
+            }
+            Op::Alloca(value) => {
+                let _ = value;
+            }
+            Op::And(value) => {
+                let _ = value;
+            }
+            Op::ArrayCtor(value) => {
+                let _ = value;
+                visit(&value.body);
+                visit(&value.partial_dtor);
+            }
+            Op::ArrayDtor(value) => {
+                let _ = value;
+                visit(&value.body);
+            }
+            Op::Asin(value) => {
+                let _ = value;
+            }
+            Op::Asm(value) => {
+                let _ = value;
+            }
+            Op::Assume(value) => {
+                let _ = value;
+            }
+            Op::Atan(value) => {
+                let _ = value;
+            }
+            Op::Atan2(value) => {
+                let _ = value;
+            }
+            Op::AtomicClear(value) => {
+                let _ = value;
+            }
+            Op::AtomicCmpxchg(value) => {
+                let _ = value;
+            }
+            Op::AtomicFence(value) => {
+                let _ = value;
+            }
+            Op::AtomicFetch(value) => {
+                let _ = value;
+            }
+            Op::AtomicTestAndSet(value) => {
+                let _ = value;
+            }
+            Op::AtomicXchg(value) => {
+                let _ = value;
+            }
+            Op::Await(value) => {
+                let _ = value;
+                visit(&value.ready);
+                visit(&value.suspend);
+                visit(&value.resume);
+            }
+            Op::BaseClassAddr(value) => {
+                let _ = value;
+            }
+            Op::BaseDataMember(value) => {
+                let _ = value;
+            }
+            Op::BaseMethod(value) => {
+                let _ = value;
+            }
+            Op::BeginCatch(value) => {
+                let _ = value;
+            }
+            Op::BeginCleanup(value) => {
+                let _ = value;
+            }
+            Op::Bitreverse(value) => {
+                let _ = value;
+            }
+            Op::BlockAddress(value) => {
+                let _ = value;
+            }
+            Op::Br(value) => {
+                let _ = value;
+            }
+            Op::Brcond(value) => {
+                let _ = value;
+            }
+            Op::Break(value) => {
+                let _ = value;
+            }
+            Op::BuiltinIntCast(value) => {
+                let _ = value;
+            }
+            Op::ByteSwap(value) => {
+                let _ = value;
+            }
+            Op::Call(value) => {
+                let _ = value;
+            }
+            Op::CallLlvmIntrinsic(value) => {
+                let _ = value;
+            }
+            Op::Case(value) => {
+                let _ = value;
+                visit(&value.case_region);
+            }
+            Op::Cast(value) => {
+                let _ = value;
+            }
+            Op::CatchParam(value) => {
+                let _ = value;
+            }
+            Op::Ceil(value) => {
+                let _ = value;
+            }
+            Op::CleanupScope(value) => {
+                let _ = value;
+                visit(&value.body_region);
+                visit(&value.cleanup_region);
+            }
+            Op::ClearCache(value) => {
+                let _ = value;
+            }
+            Op::ClearPadding(value) => {
+                let _ = value;
+            }
+            Op::Clrsb(value) => {
+                let _ = value;
+            }
+            Op::Clz(value) => {
+                let _ = value;
+            }
+            Op::Cmp(value) => {
+                let _ = value;
+            }
+            Op::Cmp3way(value) => {
+                let _ = value;
+            }
+            Op::CoReturn(value) => {
+                let _ = value;
+            }
+            Op::ComplexAdd(value) => {
+                let _ = value;
+            }
+            Op::ComplexConj(value) => {
+                let _ = value;
+            }
+            Op::ComplexCreate(value) => {
+                let _ = value;
+            }
+            Op::ComplexDiv(value) => {
+                let _ = value;
+            }
+            Op::ComplexImag(value) => {
+                let _ = value;
+            }
+            Op::ComplexImagPtr(value) => {
+                let _ = value;
+            }
+            Op::ComplexMul(value) => {
+                let _ = value;
+            }
+            Op::ComplexReal(value) => {
+                let _ = value;
+            }
+            Op::ComplexRealPtr(value) => {
+                let _ = value;
+            }
+            Op::ComplexSub(value) => {
+                let _ = value;
+            }
+            Op::Condition(value) => {
+                let _ = value;
+            }
+            Op::Const(value) => {
+                let _ = value;
+            }
+            Op::ConstructCatchParam(value) => {
+                let _ = value;
+            }
+            Op::Continue(value) => {
+                let _ = value;
+            }
+            Op::Copy(value) => {
+                let _ = value;
+            }
+            Op::Copysign(value) => {
+                let _ = value;
+            }
+            Op::CoroBody(value) => {
+                let _ = value;
+                visit(&value.body);
+            }
+            Op::CoroIntrinsicAlloc(value) => {
+                let _ = value;
+            }
+            Op::CoroIntrinsicBegin(value) => {
+                let _ = value;
+            }
+            Op::CoroIntrinsicEnd(value) => {
+                let _ = value;
+            }
+            Op::CoroIntrinsicFree(value) => {
+                let _ = value;
+            }
+            Op::CoroIntrinsicId(value) => {
+                let _ = value;
+            }
+            Op::CoroIntrinsicSize(value) => {
+                let _ = value;
+            }
+            Op::Cos(value) => {
+                let _ = value;
+            }
+            Op::Cosh(value) => {
+                let _ = value;
+            }
+            Op::Cpuid(value) => {
+                let _ = value;
+            }
+            Op::Ctz(value) => {
+                let _ = value;
+            }
+            Op::Dec(value) => {
+                let _ = value;
+            }
+            Op::DeleteArray(value) => {
+                let _ = value;
+            }
+            Op::DerivedClassAddr(value) => {
+                let _ = value;
+            }
+            Op::DerivedDataMember(value) => {
+                let _ = value;
+            }
+            Op::DerivedMethod(value) => {
+                let _ = value;
+            }
+            Op::Div(value) => {
+                let _ = value;
+            }
+            Op::Do(value) => {
+                let _ = value;
+                visit(&value.body);
+                visit(&value.cond);
+            }
+            Op::DynCast(value) => {
+                let _ = value;
+            }
+            Op::EhDispatch(value) => {
+                let _ = value;
+            }
+            Op::EhInflightException(value) => {
+                let _ = value;
+            }
+            Op::EhInitiate(value) => {
+                let _ = value;
+            }
+            Op::EhLongjmp(value) => {
+                let _ = value;
+            }
+            Op::EhSetjmp(value) => {
+                let _ = value;
+            }
+            Op::EhTerminate(value) => {
+                let _ = value;
+            }
+            Op::EhTypeid(value) => {
+                let _ = value;
+            }
+            Op::EndCatch(value) => {
+                let _ = value;
+            }
+            Op::EndCleanup(value) => {
+                let _ = value;
+            }
+            Op::Exp(value) => {
+                let _ = value;
+            }
+            Op::Exp10(value) => {
+                let _ = value;
+            }
+            Op::Exp2(value) => {
+                let _ = value;
+            }
+            Op::Expect(value) => {
+                let _ = value;
+            }
+            Op::ExtractMember(value) => {
+                let _ = value;
+            }
+            Op::Fabs(value) => {
+                let _ = value;
+            }
+            Op::Fadd(value) => {
+                let _ = value;
+            }
+            Op::Fdiv(value) => {
+                let _ = value;
+            }
+            Op::Ffs(value) => {
+                let _ = value;
+            }
+            Op::Floor(value) => {
+                let _ = value;
+            }
+            Op::Fma(value) => {
+                let _ = value;
+            }
+            Op::Fmaximum(value) => {
+                let _ = value;
+            }
+            Op::Fmaxnum(value) => {
+                let _ = value;
+            }
+            Op::Fminimum(value) => {
+                let _ = value;
+            }
+            Op::Fminnum(value) => {
+                let _ = value;
+            }
+            Op::Fmod(value) => {
+                let _ = value;
+            }
+            Op::Fmul(value) => {
+                let _ = value;
+            }
+            Op::Fmuladd(value) => {
+                let _ = value;
+            }
+            Op::Fneg(value) => {
+                let _ = value;
+            }
+            Op::For(value) => {
+                let _ = value;
+                visit(&value.cond);
+                visit(&value.body);
+                visit(&value.step);
+                visit(&value.cleanup);
+            }
+            Op::FrameAddress(value) => {
+                let _ = value;
+            }
+            Op::Freeze(value) => {
+                let _ = value;
+            }
+            Op::Frem(value) => {
+                let _ = value;
+            }
+            Op::Frexp(value) => {
+                let _ = value;
+            }
+            Op::Fsub(value) => {
+                let _ = value;
+            }
+            Op::Func(value) => {
+                let _ = value;
+                visit(&value.body);
+            }
+            Op::GetBitfield(value) => {
+                let _ = value;
+            }
+            Op::GetElement(value) => {
+                let _ = value;
+            }
+            Op::GetGlobal(value) => {
+                let _ = value;
+            }
+            Op::GetMember(value) => {
+                let _ = value;
+            }
+            Op::GetMethod(value) => {
+                let _ = value;
+            }
+            Op::GetRuntimeMember(value) => {
+                let _ = value;
+            }
+            Op::Global(value) => {
+                let _ = value;
+                visit(&value.ctor_region);
+                visit(&value.dtor_region);
+            }
+            Op::Goto(value) => {
+                let _ = value;
+            }
+            Op::If(value) => {
+                let _ = value;
+                visit(&value.then_region);
+                visit(&value.else_region);
+            }
+            Op::Inc(value) => {
+                let _ = value;
+            }
+            Op::IndirectBr(value) => {
+                let _ = value;
+            }
+            Op::IndirectGoto(value) => {
+                let _ = value;
+            }
+            Op::InitCatchParam(value) => {
+                let _ = value;
+            }
+            Op::InsertMember(value) => {
+                let _ = value;
+            }
+            Op::IsConstant(value) => {
+                let _ = value;
+            }
+            Op::IsFpClass(value) => {
+                let _ = value;
+            }
+            Op::Label(value) => {
+                let _ = value;
+            }
+            Op::Launder(value) => {
+                let _ = value;
+            }
+            Op::LibcMemchr(value) => {
+                let _ = value;
+            }
+            Op::LibcMemcpy(value) => {
+                let _ = value;
+            }
+            Op::LibcMemmove(value) => {
+                let _ = value;
+            }
+            Op::LibcMemset(value) => {
+                let _ = value;
+            }
+            Op::LifetimeEnd(value) => {
+                let _ = value;
+            }
+            Op::LifetimeStart(value) => {
+                let _ = value;
+            }
+            Op::Llrint(value) => {
+                let _ = value;
+            }
+            Op::Llround(value) => {
+                let _ = value;
+            }
+            Op::Load(value) => {
+                let _ = value;
+            }
+            Op::LocalInit(value) => {
+                let _ = value;
+                visit(&value.ctor_region);
+                visit(&value.dtor_region);
+            }
+            Op::Log(value) => {
+                let _ = value;
+            }
+            Op::Log10(value) => {
+                let _ = value;
+            }
+            Op::Log2(value) => {
+                let _ = value;
+            }
+            Op::Lrint(value) => {
+                let _ = value;
+            }
+            Op::Lround(value) => {
+                let _ = value;
+            }
+            Op::Max(value) => {
+                let _ = value;
+            }
+            Op::Min(value) => {
+                let _ = value;
+            }
+            Op::Minus(value) => {
+                let _ = value;
+            }
+            Op::Modf(value) => {
+                let _ = value;
+            }
+            Op::Mul(value) => {
+                let _ = value;
+            }
+            Op::MulOverflow(value) => {
+                let _ = value;
+            }
+            Op::Nearbyint(value) => {
+                let _ = value;
+            }
+            Op::Not(value) => {
+                let _ = value;
+            }
+            Op::Objsize(value) => {
+                let _ = value;
+            }
+            Op::Or(value) => {
+                let _ = value;
+            }
+            Op::Parity(value) => {
+                let _ = value;
+            }
+            Op::Popcount(value) => {
+                let _ = value;
+            }
+            Op::Pow(value) => {
+                let _ = value;
+            }
+            Op::Prefetch(value) => {
+                let _ = value;
+            }
+            Op::PtrDiff(value) => {
+                let _ = value;
+            }
+            Op::PtrStride(value) => {
+                let _ = value;
+            }
+            Op::Rem(value) => {
+                let _ = value;
+            }
+            Op::Resume(value) => {
+                let _ = value;
+            }
+            Op::ResumeFlat(value) => {
+                let _ = value;
+            }
+            Op::Return(value) => {
+                let _ = value;
+            }
+            Op::ReturnAddress(value) => {
+                let _ = value;
+            }
+            Op::Rint(value) => {
+                let _ = value;
+            }
+            Op::Rotate(value) => {
+                let _ = value;
+            }
+            Op::Round(value) => {
+                let _ = value;
+            }
+            Op::Roundeven(value) => {
+                let _ = value;
+            }
+            Op::Scope(value) => {
+                let _ = value;
+                visit(&value.scope_region);
+            }
+            Op::Select(value) => {
+                let _ = value;
+            }
+            Op::SetBitfield(value) => {
+                let _ = value;
+            }
+            Op::Shift(value) => {
+                let _ = value;
+            }
+            Op::Signbit(value) => {
+                let _ = value;
+            }
+            Op::Sin(value) => {
+                let _ = value;
+            }
+            Op::Sinh(value) => {
+                let _ = value;
+            }
+            Op::Sqrt(value) => {
+                let _ = value;
+            }
+            Op::Stackrestore(value) => {
+                let _ = value;
+            }
+            Op::Stacksave(value) => {
+                let _ = value;
+            }
+            Op::StdFind(value) => {
+                let _ = value;
+            }
+            Op::StdStrlen(value) => {
+                let _ = value;
+            }
+            Op::Store(value) => {
+                let _ = value;
+            }
+            Op::Sub(value) => {
+                let _ = value;
+            }
+            Op::SubOverflow(value) => {
+                let _ = value;
+            }
+            Op::Switch(value) => {
+                let _ = value;
+                visit(&value.body);
+            }
+            Op::SwitchFlat(value) => {
+                let _ = value;
+            }
+            Op::Tan(value) => {
+                let _ = value;
+            }
+            Op::Tanh(value) => {
+                let _ = value;
+            }
+            Op::Ternary(value) => {
+                let _ = value;
+                visit(&value.true_region);
+                visit(&value.false_region);
+            }
+            Op::Throw(value) => {
+                let _ = value;
+            }
+            Op::TokenNone(value) => {
+                let _ = value;
+            }
+            Op::Trap(value) => {
+                let _ = value;
+            }
+            Op::Trunc(value) => {
+                let _ = value;
+            }
+            Op::Try(value) => {
+                let _ = value;
+                visit(&value.try_region);
+                for region in &value.handler_regions {
+                    visit(region);
+                }
+            }
+            Op::TryCall(value) => {
+                let _ = value;
+            }
+            Op::TryThrow(value) => {
+                let _ = value;
+            }
+            Op::Unreachable(value) => {
+                let _ = value;
+            }
+            Op::VaArg(value) => {
+                let _ = value;
+            }
+            Op::VaCopy(value) => {
+                let _ = value;
+            }
+            Op::VaEnd(value) => {
+                let _ = value;
+            }
+            Op::VaStart(value) => {
+                let _ = value;
+            }
+            Op::VecCmp(value) => {
+                let _ = value;
+            }
+            Op::VecCreate(value) => {
+                let _ = value;
+            }
+            Op::VecExtract(value) => {
+                let _ = value;
+            }
+            Op::VecInsert(value) => {
+                let _ = value;
+            }
+            Op::VecMaskedLoad(value) => {
+                let _ = value;
+            }
+            Op::VecShuffle(value) => {
+                let _ = value;
+            }
+            Op::VecShuffleDynamic(value) => {
+                let _ = value;
+            }
+            Op::VecSplat(value) => {
+                let _ = value;
+            }
+            Op::VecTernary(value) => {
+                let _ = value;
+            }
+            Op::VtableAddressPoint(value) => {
+                let _ = value;
+            }
+            Op::VtableGetTypeInfo(value) => {
+                let _ = value;
+            }
+            Op::VtableGetVirtualFnAddr(value) => {
+                let _ = value;
+            }
+            Op::VtableGetVptr(value) => {
+                let _ = value;
+            }
+            Op::VttAddressPoint(value) => {
+                let _ = value;
+            }
+            Op::While(value) => {
+                let _ = value;
+                visit(&value.cond);
+                visit(&value.body);
+                visit(&value.cleanup);
+            }
+            Op::Xor(value) => {
+                let _ = value;
+            }
+            Op::Yield(value) => {
+                let _ = value;
+            }
+            Op::Other(op) => {
+                for region in &op.regions {
+                    visit(&lower_region(region));
+                }
+            }
+        }
+    }
 }
 fn lower_abs(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
@@ -5813,6 +7553,11 @@ fn lower_call(op: &crate::ast::Operation) -> Option<Op> {
         Op::Call(calls::Call {
             result: op.results.get(0).map(|(id, _)| id.clone()),
             result_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
+            indirect_callee: op
+                .attr("callee")
+                .is_none()
+                .then(|| op.operands.first().cloned())
+                .flatten(),
             callee: op.attr("callee").cloned(),
             args: if op.attr("callee").is_some() {
                 take_variadic_operand(op, &mut __operand_index, 0)?
@@ -7771,7 +9516,7 @@ fn lower_switch_flat(op: &crate::ast::Operation) -> Option<Op> {
             case_operands: take_variadic_of_variadic(
                 op,
                 &mut __operand_index,
-                "operand_segments",
+                "case_operand_segments",
             )?,
             case_values: op_attr(op, "caseValues")?.clone(),
             case_operand_segments: op_attr(op, "case_operand_segments")?.clone(),

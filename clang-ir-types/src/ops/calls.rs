@@ -25,6 +25,7 @@
 pub struct Call {
     pub result: Option<super::ValueId>,
     pub result_ty: Option<crate::types::Type>,
+    pub indirect_callee: Option<super::ValueId>,
     /// flat symbol reference attribute
     pub callee: Option<crate::attrs::Attribute>,
     /// variadic of CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
