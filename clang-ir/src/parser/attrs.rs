@@ -131,6 +131,8 @@ impl<'a> Parser<'a> {
             "const_complex" => self.parse_cir_const_complex(),
             "global_view" => self.parse_cir_global_view(),
             "bitfield_info" => self.parse_cir_bitfield_info(),
+            "ptr" => self.parse_cir_ptr_attr(),
+            "block_addr_info" => self.parse_cir_block_addr_info_attr(),
             "zero" => self.parse_cir_typed_marker(|ty| Attribute::Zero { ty }),
             "poison" => self.parse_cir_typed_marker(|ty| Attribute::Poison { ty }),
             _ => {
@@ -371,6 +373,40 @@ impl<'a> Parser<'a> {
             offset,
             is_signed,
         })
+    }
+
+    fn parse_cir_ptr_attr(&mut self) -> Result<Attribute> {
+        self.expect(Tok::Less)?;
+        let value = if self.eat(&Tok::Ident("null".to_string())) {
+            Attribute::Int { value: 0, ty: None }
+        } else {
+            let text = self.expect_number()?;
+            let ty = self.maybe_colon_type()?;
+            Attribute::Int {
+                value: text
+                    .parse()
+                    .map_err(|_| self.err("invalid integer literal"))?,
+                ty,
+            }
+        };
+        self.expect(Tok::Greater)?;
+        self.expect(Tok::Colon)?;
+        let ty = self.parse_type()?;
+        Ok(Attribute::ConstPtr {
+            ty,
+            value: Box::new(value),
+        })
+    }
+
+    fn parse_cir_block_addr_info_attr(&mut self) -> Result<Attribute> {
+        self.expect(Tok::Less)?;
+        let func = self.expect_symbol_ref()?;
+        self.expect(Tok::Comma)?;
+        let label = self.expect_str()?;
+        self.expect(Tok::Greater)?;
+        self.expect(Tok::Colon)?;
+        let ty = self.parse_type()?;
+        Ok(Attribute::BlockAddrInfo { ty, func, label })
     }
 
     fn parse_cir_typed_marker(

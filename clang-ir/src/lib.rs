@@ -12,6 +12,7 @@ use std::path::Path;
 
 pub use ast::Module;
 pub use error::{Error, Result};
+pub use lexer::decode_escaped_bytes;
 pub use toolchain::Toolchain;
 
 pub fn parse_str(source: &str) -> Result<Module> {

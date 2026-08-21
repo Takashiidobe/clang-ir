@@ -409,7 +409,7 @@ impl<'a> Lexer<'a> {
 /// text), so callers that need byte-exact contents (e.g. `#cir.const_array<"...">`)
 /// re-decode from the token's source span via this function rather than using
 /// the lexer's own (lossy, `String`-typed) [`Tok::Str`] value.
-pub(crate) fn decode_escaped_bytes(body: &[u8]) -> Vec<u8> {
+pub fn decode_escaped_bytes(body: &[u8]) -> Vec<u8> {
     let mut out = Vec::with_capacity(body.len());
     let mut i = 0;
     while i < body.len() {
