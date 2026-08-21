@@ -198,6 +198,7 @@ impl<'a> Parser<'a> {
             }
         }
         m.resolve_named_attrs();
+        m.resolve_named_locs();
         Ok(m)
     }
 
@@ -360,7 +361,25 @@ impl<'a> Parser<'a> {
             return Ok(SourceLocation::File { file, line, column });
         }
 
-        Ok(SourceLocation::Loc(self.capture_location_body(terminators)))
+        if self.tok_is_ident("callsite") {
+            self.bump();
+            self.expect(Tok::LParen)?;
+            let spelling = self.parse_source_location_body(&[Tok::Ident("at".to_string())])?;
+            if !self.tok_is_ident("at") {
+                return Err(self.err("expected `at` in callsite location"));
+            }
+            self.bump();
+            let expansion = self.parse_source_location_body(&[Tok::RParen])?;
+            self.expect(Tok::RParen)?;
+            return Ok(SourceLocation::Callsite {
+                spelling: Box::new(spelling),
+                expansion: Box::new(expansion),
+            });
+        }
+
+        Ok(SourceLocation::Loc(
+            self.capture_location_body(terminators).trim().to_string(),
+        ))
     }
 
     fn tok_is_ident(&self, expected: &str) -> bool {
@@ -557,6 +576,55 @@ mod tests {
                     column: 2,
                 },
             ]))
+        );
+    }
+
+    #[test]
+    fn parses_callsite_locations() {
+        let module = parse_generic_module(
+            r#""cir.return"() : () -> () loc(callsite("/tmp/a.c":1:1 at "/tmp/b.c":2:2))"#,
+        )
+        .unwrap();
+        assert_eq!(
+            module.ops[0].loc,
+            Some(SourceLocation::Callsite {
+                spelling: Box::new(SourceLocation::File {
+                    file: "/tmp/a.c".to_string(),
+                    line: 1,
+                    column: 1,
+                }),
+                expansion: Box::new(SourceLocation::File {
+                    file: "/tmp/b.c".to_string(),
+                    line: 2,
+                    column: 2,
+                }),
+            })
+        );
+    }
+
+    #[test]
+    fn resolves_aliased_callsite_locations() {
+        let module = parse_generic_module(
+            r#""cir.return"() : () -> () loc(#loc2)
+#loc = loc("/tmp/a.c":1:1)
+#loc1 = loc("/tmp/b.c":2:2)
+#loc2 = loc(callsite(#loc at #loc1))"#,
+        )
+        .unwrap();
+        assert_eq!(
+            module.ops[0].loc,
+            Some(SourceLocation::Callsite {
+                spelling: Box::new(SourceLocation::File {
+                    file: "/tmp/a.c".to_string(),
+                    line: 1,
+                    column: 1,
+                }),
+                expansion: Box::new(SourceLocation::File {
+                    file: "/tmp/b.c".to_string(),
+                    line: 2,
+                    column: 2,
+                }),
+            })
         );
     }
 }

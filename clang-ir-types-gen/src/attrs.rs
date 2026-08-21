@@ -92,6 +92,20 @@ pub(crate) fn generate_attrs(
                     _ => None,
                 }
             }
+
+            pub fn as_dense_array_ints(&self) -> Option<Vec<i128>> {
+                let Self::Dialect { dialect, mnemonic, raw: Some(raw), .. } = self else {
+                    return None;
+                };
+                if dialect != "builtin" || mnemonic != "array" {
+                    return None;
+                }
+                let digits = raw.split_once(':').map_or(raw.as_str(), |(_, rest)| rest);
+                digits
+                    .split(',')
+                    .map(|part| part.trim().parse::<i128>().ok())
+                    .collect()
+            }
         }
     })
 }

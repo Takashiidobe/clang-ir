@@ -9,9 +9,15 @@ pub type ValueId = String;
 /// A source location attached to an operation.
 ///
 /// MLIR locations have a grammar of their own (`fused`, `callsite`,
-/// aliases, `unknown`). We structurally interpret the common
-/// file-line-column form and keep every other location payload verbatim in
-/// [`SourceLocation::Loc`].
+/// aliases, `unknown`). We structurally interpret the file-line-column,
+/// `fused`, and `callsite` forms; everything else (in practice, just an
+/// unresolved `#name` alias reference left over from a malformed or
+/// forward-declared alias table) keeps its raw text in
+/// [`SourceLocation::Loc`]. `Module::resolve_named_locs` replaces every
+/// `#name` reference reachable from an op's `loc` (including nested ones
+/// inside `Fused`/`Callsite`) with its definition from `loc_aliases`, so by
+/// the time a client reads `Operation::loc`, `Loc(_)` should not appear
+/// unless the alias table itself was incomplete.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SourceLocation {
@@ -21,6 +27,12 @@ pub enum SourceLocation {
         column: u32,
     },
     Fused(Vec<SourceLocation>),
+    /// `callsite(spelling at expansion)`: a macro-expanded token's spelling
+    /// location paired with the location it expanded into.
+    Callsite {
+        spelling: Box<SourceLocation>,
+        expansion: Box<SourceLocation>,
+    },
     Loc(String),
     Unknown,
 }
@@ -147,6 +159,21 @@ impl Module {
             resolve_op_attrs(op, &aliases);
         }
     }
+
+    /// Resolves every `#name` location reference reachable from `self.ops`
+    /// (including nested references inside `Fused`/`Callsite`) against
+    /// `self.loc_aliases`, replacing each in place with its definition, and
+    /// does the same within `loc_aliases` itself so alias definitions that
+    /// reference other aliases are also fully resolved.
+    pub fn resolve_named_locs(&mut self) {
+        let aliases = self.loc_aliases.clone();
+        for op in &mut self.ops {
+            resolve_op_locs(op, &aliases);
+        }
+        for loc in self.loc_aliases.values_mut() {
+            resolve_loc_in_place(loc, &aliases, 0);
+        }
+    }
 }
 
 fn resolve_op_attrs(op: &mut Operation, aliases: &BTreeMap<String, Attribute>) {
@@ -202,6 +229,73 @@ fn resolve_alias_chain(name: &str, aliases: &BTreeMap<String, Attribute>) -> Opt
         }
         match aliases.get(&current) {
             Some(Attribute::Named(next)) => current = next.clone(),
+            Some(other) => return Some(other.clone()),
+            None => return None,
+        }
+    }
+}
+
+fn resolve_op_locs(op: &mut Operation, aliases: &BTreeMap<String, SourceLocation>) {
+    if let Some(loc) = &mut op.loc {
+        resolve_loc_in_place(loc, aliases, 0);
+    }
+    for region in &mut op.regions {
+        for block in &mut region.blocks {
+            for nested in &mut block.ops {
+                resolve_op_locs(nested, aliases);
+            }
+        }
+    }
+}
+
+/// `depth` bounds recursion against a self-referential alias table (e.g. a
+/// malformed `#loc = loc(fused[#loc])`); real compiler output never nests
+/// this deep.
+fn resolve_loc_in_place(
+    loc: &mut SourceLocation,
+    aliases: &BTreeMap<String, SourceLocation>,
+    depth: usize,
+) {
+    if depth == 32 {
+        return;
+    }
+    if let SourceLocation::Loc(name) = loc
+        && let Some(name) = name.strip_prefix('#')
+        && let Some(resolved) = resolve_loc_alias_chain(name, aliases)
+    {
+        *loc = resolved;
+    }
+    match loc {
+        SourceLocation::Fused(locations) => {
+            for location in locations {
+                resolve_loc_in_place(location, aliases, depth + 1);
+            }
+        }
+        SourceLocation::Callsite {
+            spelling,
+            expansion,
+        } => {
+            resolve_loc_in_place(spelling, aliases, depth + 1);
+            resolve_loc_in_place(expansion, aliases, depth + 1);
+        }
+        _ => {}
+    }
+}
+
+fn resolve_loc_alias_chain(
+    name: &str,
+    aliases: &BTreeMap<String, SourceLocation>,
+) -> Option<SourceLocation> {
+    let mut seen = std::collections::HashSet::new();
+    let mut current = name.to_string();
+    loop {
+        if !seen.insert(current.clone()) {
+            return None;
+        }
+        match aliases.get(&current) {
+            Some(SourceLocation::Loc(next)) if next.starts_with('#') => {
+                current = next.trim_start_matches('#').to_string();
+            }
             Some(other) => return Some(other.clone()),
             None => return None,
         }
