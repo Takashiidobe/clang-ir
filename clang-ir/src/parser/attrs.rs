@@ -131,6 +131,7 @@ impl<'a> Parser<'a> {
             "const_complex" => self.parse_cir_const_complex(),
             "global_view" => self.parse_cir_global_view(),
             "bitfield_info" => self.parse_cir_bitfield_info(),
+            "fenv" => self.parse_cir_fenv_attr(),
             "ptr" => self.parse_cir_ptr_attr(),
             "block_addr_info" => self.parse_cir_block_addr_info_attr(),
             "zero" => self.parse_cir_typed_marker(|ty| Attribute::Zero { ty }),
@@ -375,6 +376,35 @@ impl<'a> Parser<'a> {
         })
     }
 
+    fn parse_cir_fenv_attr(&mut self) -> Result<Attribute> {
+        self.expect(Tok::Less)?;
+        let mut dynamic_rounding_mode = None;
+        let mut except_mode = None;
+        let mut strict_except = None;
+        if !self.at(&Tok::Greater) {
+            loop {
+                let key = self.expect_ident()?;
+                self.expect(Tok::Equal)?;
+                let value = self.expect_ident()?;
+                match key.as_str() {
+                    "dynamic_rounding_mode" => dynamic_rounding_mode = Some(value),
+                    "except_mode" => except_mode = Some(value),
+                    "strict_except" => strict_except = Some(value),
+                    other => return Err(self.err(format!("unexpected fenv field `{other}`"))),
+                }
+                if !self.eat(&Tok::Comma) {
+                    break;
+                }
+            }
+        }
+        self.expect(Tok::Greater)?;
+        Ok(Attribute::Fenv {
+            dynamic_rounding_mode,
+            except_mode,
+            strict_except,
+        })
+    }
+
     fn parse_cir_ptr_attr(&mut self) -> Result<Attribute> {
         self.expect(Tok::Less)?;
         let value = if self.eat(&Tok::Ident("null".to_string())) {
@@ -445,6 +475,37 @@ mod tests {
         assert_eq!(
             value.chars().map(u32::from).collect::<Vec<_>>(),
             [0x7f, 0xff]
+        );
+    }
+
+    #[test]
+    fn parses_fenv_attr_fields() {
+        let mut parser = Parser::new(
+            "<dynamic_rounding_mode = tonearest, except_mode = unknown, strict_except = true>",
+        )
+        .unwrap();
+        let attr = parser.parse_cir_fenv_attr().unwrap();
+        assert_eq!(
+            attr,
+            Attribute::Fenv {
+                dynamic_rounding_mode: Some("tonearest".to_string()),
+                except_mode: Some("unknown".to_string()),
+                strict_except: Some("true".to_string()),
+            }
+        );
+    }
+
+    #[test]
+    fn parses_empty_fenv_attr() {
+        let mut parser = Parser::new("<>").unwrap();
+        let attr = parser.parse_cir_fenv_attr().unwrap();
+        assert_eq!(
+            attr,
+            Attribute::Fenv {
+                dynamic_rounding_mode: None,
+                except_mode: None,
+                strict_except: None,
+            }
         );
     }
 }
