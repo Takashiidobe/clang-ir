@@ -9,6 +9,6 @@ pub use crate::enums::{
 };
 pub use crate::ops as instruction;
 pub use crate::ops::Op;
-pub use function::Function;
+pub use function::{Function, TargetFeature};
 pub use global::Global;
 pub use module::Module;

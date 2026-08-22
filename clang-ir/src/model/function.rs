@@ -2,6 +2,32 @@ use std::fmt;
 
 use crate::ast::{Attribute, Operation, Type, ValueId};
 use crate::enums::{CallingConv, GlobalLinkageKind, InlineKind, SideEffect};
+
+/// One entry of a `"cir.target-features"` list, e.g. `+ssse3` or `-avx512f`.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct TargetFeature {
+    pub name: String,
+    pub enabled: bool,
+}
+
+fn parse_target_features(raw: &str) -> Vec<TargetFeature> {
+    raw.split(',')
+        .filter(|entry| !entry.is_empty())
+        .filter_map(|entry| {
+            let (enabled, name) = match entry.split_at_checked(1)? {
+                ("+", name) => (true, name),
+                ("-", name) => (false, name),
+                _ => return None,
+            };
+            Some(TargetFeature {
+                name: name.to_string(),
+                enabled,
+            })
+        })
+        .collect()
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Function {
@@ -16,6 +42,8 @@ pub struct Function {
     pub dso_local: bool,
     pub nothrow: bool,
     pub comdat: bool,
+    pub target_cpu: Option<String>,
+    pub target_features: Vec<TargetFeature>,
     /// `None` for a declaration (no defining region, e.g. an external
     /// library function like `printf`).
     pub body: Option<crate::ops::Region>,
@@ -43,6 +71,8 @@ impl Function {
             dso_local: false,
             nothrow: false,
             comdat: false,
+            target_cpu: None,
+            target_features: Vec::new(),
             body: None,
             raw: None,
         }
@@ -116,6 +146,15 @@ impl Function {
         let comdat = op
             .attr("comdat")
             .is_some_and(|a| a.as_bool().unwrap_or(true));
+        let target_cpu = op
+            .attr("cir.target-cpu")
+            .and_then(Attribute::as_str)
+            .map(str::to_string);
+        let target_features = op
+            .attr("cir.target-features")
+            .and_then(Attribute::as_str)
+            .map(parse_target_features)
+            .unwrap_or_default();
 
         Some(Function {
             name,
@@ -129,6 +168,8 @@ impl Function {
             dso_local,
             nothrow,
             comdat,
+            target_cpu,
+            target_features,
             body,
             raw: Some(op.clone()),
         })
