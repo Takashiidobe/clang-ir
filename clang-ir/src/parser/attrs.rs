@@ -1,5 +1,5 @@
 use super::Parser;
-use crate::ast::Attribute;
+use crate::ast::{Attribute, Type};
 use crate::error::Result;
 use crate::lexer::Tok;
 
@@ -230,10 +230,26 @@ impl<'a> Parser<'a> {
         self.expect(Tok::Greater)?;
         self.expect(Tok::Colon)?;
         let ty = self.parse_type()?;
+        let trailing_zeros_num = if trailing_zeros {
+            let elts_len = match &elts {
+                Attribute::Str(s) => s.chars().count(),
+                Attribute::Array(items) => items.len(),
+                _ => 0,
+            };
+            match &ty {
+                Type::Array { size, .. } => i32::try_from(*size)
+                    .ok()
+                    .and_then(|total| total.checked_sub(i32::try_from(elts_len).ok()?))
+                    .unwrap_or(0),
+                _ => 0,
+            }
+        } else {
+            0
+        };
         Ok(Attribute::ConstArray {
             ty,
             elts: Box::new(elts),
-            trailing_zeros_num: i32::from(trailing_zeros),
+            trailing_zeros_num,
         })
     }
 
@@ -476,6 +492,20 @@ mod tests {
             value.chars().map(u32::from).collect::<Vec<_>>(),
             [0x7f, 0xff]
         );
+    }
+
+    #[test]
+    fn parses_const_array_trailing_zeros_num_from_size_gap() {
+        let mut parser =
+            Parser::new(r#"<"abc" : !cir.array<!s8i x 3>, trailing_zeros> : !cir.array<!s8i x 8>"#)
+                .unwrap();
+        let Attribute::ConstArray {
+            trailing_zeros_num, ..
+        } = parser.parse_cir_const_array().unwrap()
+        else {
+            panic!("expected a constant array")
+        };
+        assert_eq!(trailing_zeros_num, 5);
     }
 
     #[test]
