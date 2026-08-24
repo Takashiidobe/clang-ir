@@ -368,3 +368,44 @@ fn parse_builtin_ident_type(id: &str) -> Option<Type> {
     }
     None
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn parse_type(source: &str) -> Type {
+        Parser::new(source).unwrap().parse_type().unwrap()
+    }
+
+    #[test]
+    fn parsed_types_expose_structural_components() {
+        let int = parse_type("!cir.int<u, 37, bitint>");
+        let array = parse_type("!cir.array<!cir.int<u, 37, bitint> x 5>");
+        let vector = parse_type("!cir.vector<[8] x !cir.int<u, 37, bitint>>");
+        let pointer = parse_type("!cir.ptr<!cir.int<u, 37, bitint>>");
+        let function = parse_type("!cir.func<(!cir.int<u, 37, bitint>, ...) -> !cir.bool>");
+        let record = parse_type("!cir.struct<\"R\" incomplete>");
+
+        assert_eq!(array.as_array(), Some((&int, 5)));
+        assert_eq!(vector.as_vector(), Some((&int, 8, true)));
+        assert_eq!(int.as_integer(), Some((false, 37, true)));
+        assert_eq!(pointer.pointee(), Some(&int));
+        assert_eq!(
+            function.as_function(),
+            Some((&[int][..], Some(&Type::Bool), true))
+        );
+        assert_eq!(record.record_name(), Some("R"));
+    }
+
+    #[test]
+    fn structural_projections_reject_other_type_kinds() {
+        let ty = parse_type("!cir.bool");
+
+        assert_eq!(ty.as_array(), None);
+        assert_eq!(ty.as_vector(), None);
+        assert_eq!(ty.as_integer(), None);
+        assert_eq!(ty.pointee(), None);
+        assert_eq!(ty.as_function(), None);
+        assert_eq!(ty.record_name(), None);
+    }
+}

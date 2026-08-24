@@ -1,7 +1,7 @@
 use std::fmt;
 
 use crate::ast::{Attribute, Operation, Type, ValueId};
-use crate::enums::{CallingConv, GlobalLinkageKind, InlineKind, SideEffect};
+use crate::enums::{CallingConv, GlobalLinkageKind, InlineKind, SideEffect, VisibilityKind};
 
 /// One entry of a `"cir.target-features"` list, e.g. `+ssse3` or `-avx512f`.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -39,6 +39,14 @@ pub struct Function {
     pub calling_conv: CallingConv,
     pub inline_kind: Option<InlineKind>,
     pub side_effect: Option<SideEffect>,
+    pub visibility: Option<VisibilityKind>,
+    pub aliasee: Option<String>,
+    pub section: Option<String>,
+    pub noreturn: bool,
+    pub cold: bool,
+    pub hot: bool,
+    pub ctor_priority: Option<i64>,
+    pub dtor_priority: Option<i64>,
     pub dso_local: bool,
     pub nothrow: bool,
     pub comdat: bool,
@@ -68,6 +76,14 @@ impl Function {
             calling_conv: CallingConv::C,
             inline_kind: None,
             side_effect: None,
+            visibility: None,
+            aliasee: None,
+            section: None,
+            noreturn: false,
+            cold: false,
+            hot: false,
+            ctor_priority: None,
+            dtor_priority: None,
             dso_local: false,
             nothrow: false,
             comdat: false,
@@ -141,6 +157,25 @@ impl Function {
         let side_effect = op
             .attr("side_effect")
             .and_then(|a| SideEffect::try_from(a).ok());
+        let visibility = op
+            .attr("global_visibility")
+            .and_then(|a| VisibilityKind::try_from(a).ok());
+        let aliasee = super::symbol_ref_name(op.attr("aliasee"));
+        let section = op
+            .attr("section")
+            .and_then(Attribute::as_str)
+            .map(str::to_string);
+        let noreturn = op.attr("noreturn").is_some();
+        let cold = op.attr("cold").is_some();
+        let hot = op.attr("hot").is_some();
+        let ctor_priority = op
+            .attr("global_ctor_priority")
+            .and_then(Attribute::as_int)
+            .and_then(|value| i64::try_from(value).ok());
+        let dtor_priority = op
+            .attr("global_dtor_priority")
+            .and_then(Attribute::as_int)
+            .and_then(|value| i64::try_from(value).ok());
         let dso_local = op.attr("dso_local").is_some();
         let nothrow = op.attr("nothrow").is_some();
         let comdat = op
@@ -165,6 +200,14 @@ impl Function {
             calling_conv,
             inline_kind,
             side_effect,
+            visibility,
+            aliasee,
+            section,
+            noreturn,
+            cold,
+            hot,
+            ctor_priority,
+            dtor_priority,
             dso_local,
             nothrow,
             comdat,
@@ -266,5 +309,67 @@ mod tests {
         let function = Function::from_op(&op).unwrap();
 
         assert_eq!(function.params, vec![("arg".into(), signature_ty)]);
+    }
+
+    #[test]
+    fn preserves_semantic_function_metadata() {
+        let op = Operation {
+            name: "cir.func".into(),
+            results: Vec::new(),
+            operands: Vec::new(),
+            successors: Vec::new(),
+            properties: vec![
+                ("sym_name".into(), Attribute::Str("alias".into())),
+                (
+                    "function_type".into(),
+                    Attribute::Type(Type::Func {
+                        inputs: Vec::new(),
+                        optional_return_type: None,
+                        var_arg: false,
+                    }),
+                ),
+                (
+                    "global_visibility".into(),
+                    Attribute::Int { ty: None, value: 2 },
+                ),
+                ("aliasee".into(), Attribute::SymbolRef("target".into())),
+                ("section".into(), Attribute::Str("functions".into())),
+                ("noreturn".into(), Attribute::Bool(true)),
+                ("cold".into(), Attribute::Bool(true)),
+                ("hot".into(), Attribute::Bool(true)),
+                (
+                    "global_ctor_priority".into(),
+                    Attribute::Int {
+                        ty: None,
+                        value: 123,
+                    },
+                ),
+                (
+                    "global_dtor_priority".into(),
+                    Attribute::Int {
+                        ty: None,
+                        value: 456,
+                    },
+                ),
+            ],
+            regions: Vec::new(),
+            attributes: Vec::new(),
+            operand_types: Vec::new(),
+            loc: None,
+        };
+
+        let function = Function::from_op(&op).unwrap();
+
+        assert_eq!(
+            function.visibility,
+            Some(crate::enums::VisibilityKind::Protected)
+        );
+        assert_eq!(function.aliasee.as_deref(), Some("target"));
+        assert_eq!(function.section.as_deref(), Some("functions"));
+        assert!(function.noreturn);
+        assert!(function.cold);
+        assert!(function.hot);
+        assert_eq!(function.ctor_priority, Some(123));
+        assert_eq!(function.dtor_priority, Some(456));
     }
 }

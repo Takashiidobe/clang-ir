@@ -347,6 +347,50 @@ pub enum Type {
     /// A type outside the CIR-specific variants.
     Dialect { dialect: String, mnemonic: String, raw: Option<String> },
 }
+impl Type {
+    pub fn as_array(&self) -> Option<(&Type, u64)> {
+        match self {
+            Self::Array { element_type, size } => Some((element_type, *size)),
+            _ => None,
+        }
+    }
+    pub fn as_vector(&self) -> Option<(&Type, u64, bool)> {
+        match self {
+            Self::Vector { element_type, size, is_scalable } => {
+                Some((element_type, *size, is_scalable.unwrap_or(false)))
+            }
+            _ => None,
+        }
+    }
+    pub fn as_integer(&self) -> Option<(bool, u32, bool)> {
+        match self {
+            Self::Int { width, is_signed, is_bit_int } => {
+                Some((*is_signed, *width, *is_bit_int))
+            }
+            _ => None,
+        }
+    }
+    pub fn pointee(&self) -> Option<&Type> {
+        match self {
+            Self::Pointer { pointee, .. } => Some(pointee),
+            _ => None,
+        }
+    }
+    pub fn as_function(&self) -> Option<(&[Type], Option<&Type>, bool)> {
+        match self {
+            Self::Func { inputs, optional_return_type, var_arg } => {
+                Some((inputs, optional_return_type.as_deref(), *var_arg))
+            }
+            _ => None,
+        }
+    }
+    pub fn record_name(&self) -> Option<&str> {
+        match self {
+            Self::Struct { name, .. } | Self::Union { name, .. } => name.as_deref(),
+            _ => None,
+        }
+    }
+}
 impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         fn write_list(

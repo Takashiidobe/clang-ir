@@ -11,6 +11,7 @@ pub(crate) fn generate_types(
         .all_derived_definitions("CIR_Type")
         .map(generate_type_variant)
         .collect::<Result<Vec<_>, _>>()?;
+    let projection_impl = type_projection_impl();
     let display_impl = type_display_impl();
 
     Ok(quote! {
@@ -32,8 +33,63 @@ pub(crate) fn generate_types(
             Dialect { dialect: String, mnemonic: String, raw: Option<String> },
         }
 
+        #projection_impl
         #display_impl
     })
+}
+
+fn type_projection_impl() -> TokenStream {
+    quote! {
+        impl Type {
+            pub fn as_array(&self) -> Option<(&Type, u64)> {
+                match self {
+                    Self::Array { element_type, size } => Some((element_type, *size)),
+                    _ => None,
+                }
+            }
+
+            pub fn as_vector(&self) -> Option<(&Type, u64, bool)> {
+                match self {
+                    Self::Vector { element_type, size, is_scalable } => {
+                        Some((element_type, *size, is_scalable.unwrap_or(false)))
+                    }
+                    _ => None,
+                }
+            }
+
+            pub fn as_integer(&self) -> Option<(bool, u32, bool)> {
+                match self {
+                    Self::Int { width, is_signed, is_bit_int } => {
+                        Some((*is_signed, *width, *is_bit_int))
+                    }
+                    _ => None,
+                }
+            }
+
+            pub fn pointee(&self) -> Option<&Type> {
+                match self {
+                    Self::Pointer { pointee, .. } => Some(pointee),
+                    _ => None,
+                }
+            }
+
+            pub fn as_function(&self) -> Option<(&[Type], Option<&Type>, bool)> {
+                match self {
+                    Self::Func { inputs, optional_return_type, var_arg } => {
+                        Some((inputs, optional_return_type.as_deref(), *var_arg))
+                    }
+                    _ => None,
+                }
+            }
+
+            pub fn record_name(&self) -> Option<&str> {
+                match self {
+                    Self::Struct { name, .. } | Self::Union { name, .. } => name.as_deref(),
+                    _ => None,
+                }
+            }
+        }
+    }
 }
 
 fn type_display_impl() -> TokenStream {

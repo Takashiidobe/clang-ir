@@ -12,3 +12,83 @@ pub use crate::ops::Op;
 pub use function::{Function, TargetFeature};
 pub use global::Global;
 pub use module::Module;
+
+fn symbol_ref_name(attr: Option<&crate::ast::Attribute>) -> Option<String> {
+    let crate::ast::Attribute::SymbolRef(value) = attr? else {
+        return None;
+    };
+    Some(value.trim_start_matches('@').trim_matches('"').to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::ast::{Attribute, Operation, Type};
+    use crate::ops::Op;
+
+    #[test]
+    fn preserves_semantic_instruction_metadata() {
+        let call = Operation {
+            name: "cir.call".into(),
+            operands: vec!["arg".into()],
+            properties: vec![
+                ("callee".into(), Attribute::SymbolRef("callee".into())),
+                ("noreturn".into(), Attribute::Unit),
+                ("side_effect".into(), Attribute::Int { value: 0, ty: None }),
+            ],
+            operand_types: vec![Type::Int {
+                width: 32,
+                is_signed: true,
+                is_bit_int: false,
+            }],
+            results: Vec::new(),
+            successors: Vec::new(),
+            regions: Vec::new(),
+            attributes: Vec::new(),
+            loc: None,
+        };
+        let member = Operation {
+            name: "cir.get_member".into(),
+            results: vec![(
+                "member".into(),
+                Type::Pointer {
+                    pointee: Box::new(Type::Int {
+                        width: 32,
+                        is_signed: true,
+                        is_bit_int: false,
+                    }),
+                    addr_space: None,
+                },
+            )],
+            operands: vec!["record".into()],
+            properties: vec![
+                ("name".into(), Attribute::Str("field".into())),
+                ("index_attr".into(), Attribute::Int { value: 0, ty: None }),
+            ],
+            operand_types: vec![Type::Pointer {
+                pointee: Box::new(Type::Struct {
+                    members: None,
+                    name: Some("struct.Record".into()),
+                    incomplete: true,
+                    packed: false,
+                    member_kinds: Vec::new(),
+                    is_class: false,
+                }),
+                addr_space: None,
+            }],
+            successors: Vec::new(),
+            regions: Vec::new(),
+            attributes: Vec::new(),
+            loc: None,
+        };
+
+        let Some(Op::Call(call)) = Op::from_operation(&call) else {
+            panic!("call did not lower")
+        };
+        assert!(call.noreturn);
+        assert_eq!(call.arg_types.len(), 1);
+        let Some(Op::GetMember(member)) = Op::from_operation(&member) else {
+            panic!("get_member did not lower")
+        };
+        assert!(matches!(member.addr_ty, Type::Pointer { .. }));
+    }
+}

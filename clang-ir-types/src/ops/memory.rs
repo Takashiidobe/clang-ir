@@ -497,6 +497,7 @@ pub struct GetElement {
 pub struct GetMember {
     pub result: super::ValueId,
     pub result_ty: crate::types::Type,
+    pub addr_ty: crate::types::Type,
     /// CIR pointer type
     pub addr: super::ValueId,
     /// string attribute

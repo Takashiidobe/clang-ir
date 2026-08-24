@@ -654,6 +654,39 @@ fn generate_op_struct(
                 visit(operand);
             }
         });
+        let arg_types = safe_field_ident("arg_types");
+        fields.push(quote! {
+            pub #arg_types: Vec<crate::types::Type>,
+        });
+        field_inits.push(OpFieldInit {
+            field: arg_types,
+            value: quote! {
+                op.operand_types
+                    .iter()
+                    .skip(usize::from(op.attr("callee").is_none()))
+                    .cloned()
+                    .collect()
+            },
+        });
+        let noreturn = safe_field_ident("noreturn");
+        fields.push(quote! {
+            pub #noreturn: bool,
+        });
+        field_inits.push(OpFieldInit {
+            field: noreturn,
+            value: quote! { unit_attr(op, "noreturn") },
+        });
+    }
+
+    if mnemonic == "get_member" {
+        let field = safe_field_ident("addr_ty");
+        fields.push(quote! {
+            pub #field: crate::types::Type,
+        });
+        field_inits.push(OpFieldInit {
+            field,
+            value: quote! { op.operand_types.first()?.clone() },
+        });
     }
 
     if rec.has_field("arguments") {

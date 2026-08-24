@@ -15,6 +15,8 @@ pub struct Global {
     pub comdat: bool,
     pub alignment: Option<u64>,
     pub tls_model: Option<TlsModel>,
+    pub aliasee: Option<String>,
+    pub section: Option<String>,
     /// `None` for an `extern` declaration with no initializer.
     pub initial_value: Option<Attribute>,
     /// The original operation, if this `Global` came from parsing rather
@@ -39,6 +41,8 @@ impl Global {
             comdat: false,
             alignment: None,
             tls_model: None,
+            aliasee: None,
+            section: None,
             initial_value: None,
             raw: None,
         }
@@ -73,6 +77,11 @@ impl Global {
             .attr("tls_model")
             .and_then(|a| TlsModel::try_from(a).ok());
         let initial_value = op.attr("initial_value").cloned();
+        let aliasee = super::symbol_ref_name(op.attr("aliasee"));
+        let section = op
+            .attr("section")
+            .and_then(Attribute::as_str)
+            .map(str::to_string);
 
         Some(Global {
             name,
@@ -84,6 +93,8 @@ impl Global {
             comdat,
             alignment,
             tls_model,
+            aliasee,
+            section,
             initial_value,
             raw: Some(op.clone()),
         })
@@ -121,5 +132,35 @@ impl fmt::Display for Global {
             attrs.push("comdat".to_string());
         }
         writeln!(f, " [{}]", attrs.join(", "))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn preserves_semantic_global_metadata() {
+        let op = Operation {
+            name: "cir.global".into(),
+            results: Vec::new(),
+            operands: Vec::new(),
+            successors: Vec::new(),
+            properties: vec![
+                ("sym_name".into(), Attribute::Str("alias".into())),
+                ("sym_type".into(), Attribute::Type(Type::Bool)),
+                ("aliasee".into(), Attribute::SymbolRef("target".into())),
+                ("section".into(), Attribute::Str("globals".into())),
+            ],
+            regions: Vec::new(),
+            attributes: Vec::new(),
+            operand_types: Vec::new(),
+            loc: None,
+        };
+
+        let global = Global::from_op(&op).unwrap();
+
+        assert_eq!(global.aliasee.as_deref(), Some("target"));
+        assert_eq!(global.section.as_deref(), Some("globals"));
     }
 }

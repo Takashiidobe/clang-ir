@@ -12,6 +12,7 @@ pub struct Module {
     pub name: Option<String>,
     pub source_language: Option<SourceLanguage>,
     pub triple: Option<String>,
+    pub module_asm: Vec<String>,
     pub functions: Vec<Function>,
     pub globals: Vec<Global>,
     pub other: Vec<Op>,
@@ -40,6 +41,20 @@ impl Module {
             .and_then(|op| op.attr("cir.triple"))
             .and_then(Attribute::as_str)
             .map(str::to_string);
+        let module_asm = module_op
+            .and_then(|op| op.attr("cir.module_asm"))
+            .and_then(|attr| match attr {
+                Attribute::Array(values) => Some(values),
+                _ => None,
+            })
+            .map(|values| {
+                values
+                    .iter()
+                    .filter_map(Attribute::as_str)
+                    .map(str::to_string)
+                    .collect()
+            })
+            .unwrap_or_default();
 
         let mut functions = Vec::new();
         let mut globals = Vec::new();
@@ -68,6 +83,7 @@ impl Module {
             name,
             source_language,
             triple,
+            module_asm,
             functions,
             globals,
             other,
@@ -117,5 +133,38 @@ impl fmt::Display for Module {
             }
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ast::{Block, Operation, Region};
+
+    #[test]
+    fn preserves_module_assembly() {
+        let generic = GenericModule {
+            ops: vec![Operation {
+                name: "builtin.module".into(),
+                results: Vec::new(),
+                operands: Vec::new(),
+                successors: Vec::new(),
+                properties: vec![(
+                    "cir.module_asm".into(),
+                    Attribute::Array(vec![Attribute::Str(".globl symbol".into())]),
+                )],
+                regions: vec![Region {
+                    blocks: vec![Block::default()],
+                }],
+                attributes: Vec::new(),
+                operand_types: Vec::new(),
+                loc: None,
+            }],
+            ..GenericModule::default()
+        };
+
+        let module = Module::from_generic(generic);
+
+        assert_eq!(module.module_asm, vec![".globl symbol"]);
     }
 }

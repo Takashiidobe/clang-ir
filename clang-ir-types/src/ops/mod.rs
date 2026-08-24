@@ -7558,6 +7558,13 @@ fn lower_call(op: &crate::ast::Operation) -> Option<Op> {
                 .is_none()
                 .then(|| op.operands.first().cloned())
                 .flatten(),
+            arg_types: op
+                .operand_types
+                .iter()
+                .skip(usize::from(op.attr("callee").is_none()))
+                .cloned()
+                .collect(),
+            noreturn: unit_attr(op, "noreturn"),
             callee: op.attr("callee").cloned(),
             args: if op.attr("callee").is_some() {
                 take_variadic_operand(op, &mut __operand_index, 0)?
@@ -8632,6 +8639,7 @@ fn lower_get_member(op: &crate::ast::Operation) -> Option<Op> {
         Op::GetMember(memory::GetMember {
             result: op.results.get(0)?.0.clone(),
             result_ty: op.results.get(0)?.1.clone(),
+            addr_ty: op.operand_types.first()?.clone(),
             addr: take_single_operand(op, &mut __operand_index, 0)?,
             name: attr_str(op, "name")?,
             index_attr: op_attr(op, "index_attr")?.clone(),
