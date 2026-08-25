@@ -55,10 +55,6 @@ pub struct Function {
     /// `None` for a declaration (no defining region, e.g. an external
     /// library function like `printf`).
     pub body: Option<crate::ops::Region>,
-    /// The original operation, if this `Function` came from parsing rather
-    /// than being hand-built — an escape hatch for any attribute not
-    /// decoded above.
-    pub raw: Option<Operation>,
 }
 
 impl Function {
@@ -90,16 +86,20 @@ impl Function {
             target_cpu: None,
             target_features: Vec::new(),
             body: None,
-            raw: None,
         }
     }
 
-    /// Builds a `Function` from a `cir.func` operation. Only fails (returns
-    /// `None`) if the op is missing its name or function-type, which real
-    /// CIR output never does — everything else defaults sensibly.
-    pub fn from_op(op: &Operation) -> Option<Function> {
-        let name = op.attr("sym_name").and_then(Attribute::as_str)?.to_string();
-        let (inputs, output, varargs) = match op.attr("function_type")?.as_type()? {
+    pub fn from_op(op: &Operation) -> Result<Function, super::ModelError> {
+        let name = op
+            .attr("sym_name")
+            .and_then(Attribute::as_str)
+            .ok_or_else(|| super::invalid_attribute(op, "sym_name"))?
+            .to_string();
+        let function_type = op
+            .attr("function_type")
+            .and_then(Attribute::as_type)
+            .ok_or_else(|| super::invalid_attribute(op, "function_type"))?;
+        let (inputs, output, varargs) = match function_type {
             Type::Func {
                 inputs,
                 optional_return_type,
@@ -112,7 +112,7 @@ impl Function {
                     .unwrap_or(Type::Void),
                 *var_arg,
             ),
-            _ => return None,
+            _ => return Err(super::invalid_attribute(op, "function_type")),
         };
 
         let entry_args = op
@@ -141,7 +141,8 @@ impl Function {
             .regions
             .first()
             .filter(|r| !r.blocks.is_empty())
-            .map(crate::ops::lower_region);
+            .map(super::lower_region)
+            .transpose()?;
 
         let linkage = op
             .attr("linkage")
@@ -191,7 +192,7 @@ impl Function {
             .map(parse_target_features)
             .unwrap_or_default();
 
-        Some(Function {
+        Ok(Function {
             name,
             params,
             return_ty: output,
@@ -214,7 +215,6 @@ impl Function {
             target_cpu,
             target_features,
             body,
-            raw: Some(op.clone()),
         })
     }
 

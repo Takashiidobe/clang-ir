@@ -19,10 +19,6 @@ pub struct Global {
     pub section: Option<String>,
     /// `None` for an `extern` declaration with no initializer.
     pub initial_value: Option<Attribute>,
-    /// The original operation, if this `Global` came from parsing rather
-    /// than being hand-built — an escape hatch for any attribute not
-    /// decoded above.
-    pub raw: Option<Operation>,
 }
 
 impl Global {
@@ -44,16 +40,20 @@ impl Global {
             aliasee: None,
             section: None,
             initial_value: None,
-            raw: None,
         }
     }
 
-    /// Builds a `Global` from a `cir.global` operation. Only fails if the
-    /// op is missing its name or value type, which real CIR output never
-    /// does — everything else defaults sensibly.
-    pub fn from_op(op: &Operation) -> Option<Global> {
-        let name = op.attr("sym_name").and_then(Attribute::as_str)?.to_string();
-        let ty = op.attr("sym_type").and_then(Attribute::as_type)?.clone();
+    pub fn from_op(op: &Operation) -> Result<Global, super::ModelError> {
+        let name = op
+            .attr("sym_name")
+            .and_then(Attribute::as_str)
+            .ok_or_else(|| super::invalid_attribute(op, "sym_name"))?
+            .to_string();
+        let ty = op
+            .attr("sym_type")
+            .and_then(Attribute::as_type)
+            .ok_or_else(|| super::invalid_attribute(op, "sym_type"))?
+            .clone();
 
         let linkage = op
             .attr("linkage")
@@ -83,7 +83,7 @@ impl Global {
             .and_then(Attribute::as_str)
             .map(str::to_string);
 
-        Some(Global {
+        Ok(Global {
             name,
             ty,
             linkage,
@@ -96,7 +96,6 @@ impl Global {
             aliasee,
             section,
             initial_value,
-            raw: Some(op.clone()),
         })
     }
 

@@ -12,6 +12,8 @@ pub enum Error {
         col: usize,
         msg: String,
     },
+    #[error(transparent)]
+    Model(#[from] crate::model::ModelError),
     #[error("io error: {0}")]
     Io(#[from] std::io::Error),
 }

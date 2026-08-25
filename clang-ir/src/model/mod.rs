@@ -13,6 +13,52 @@ pub use function::{Function, TargetFeature};
 pub use global::Global;
 pub use module::Module;
 
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+pub enum ModelError {
+    #[error("cannot convert `{operation}`: missing or invalid `{attribute}`")]
+    InvalidAttribute {
+        operation: String,
+        attribute: &'static str,
+    },
+    #[error("cannot convert known CIR operation `{operation}`")]
+    InvalidOperation { operation: String },
+    #[error("generic module has no builtin.module operation")]
+    MissingModule,
+}
+
+pub(crate) fn invalid_attribute(op: &crate::ast::Operation, attribute: &'static str) -> ModelError {
+    ModelError::InvalidAttribute {
+        operation: op.name.clone(),
+        attribute,
+    }
+}
+
+pub(crate) fn lower_region(region: &crate::ast::Region) -> Result<crate::ops::Region, ModelError> {
+    validate_region(region)?;
+    Ok(crate::ops::lower_region(region))
+}
+
+fn validate_region(region: &crate::ast::Region) -> Result<(), ModelError> {
+    for block in &region.blocks {
+        for op in &block.ops {
+            validate_operation(op)?;
+        }
+    }
+    Ok(())
+}
+
+fn validate_operation(op: &crate::ast::Operation) -> Result<(), ModelError> {
+    if op.name.starts_with("cir.") && crate::ops::Op::from_operation(op).is_none() {
+        return Err(ModelError::InvalidOperation {
+            operation: op.name.clone(),
+        });
+    }
+    for region in &op.regions {
+        validate_region(region)?;
+    }
+    Ok(())
+}
+
 fn symbol_ref_name(attr: Option<&crate::ast::Attribute>) -> Option<String> {
     let crate::ast::Attribute::SymbolRef(value) = attr? else {
         return None;

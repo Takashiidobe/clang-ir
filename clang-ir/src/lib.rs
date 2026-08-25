@@ -29,7 +29,7 @@ pub fn parse_generic_str(source: &str) -> Result<Module> {
 }
 
 pub fn parse_generic_str_model(source: &str) -> Result<model::Module> {
-    parse_generic_str(source).map(model::Module::from_generic)
+    model::Module::from_generic(parse_generic_str(source)?).map_err(Into::into)
 }
 
 pub fn parse_file(path: impl AsRef<Path>) -> Result<Module> {
@@ -42,20 +42,20 @@ pub fn parse_file_with(toolchain: &Toolchain, path: impl AsRef<Path>) -> Result<
 }
 
 pub fn parse(source: &str) -> Result<model::Module> {
-    parse_str(source).map(model::Module::from_generic)
+    model::Module::from_generic(parse_str(source)?).map_err(Into::into)
 }
 
 pub fn parse_with(toolchain: &Toolchain, source: &str) -> Result<model::Module> {
-    parse_str_with(toolchain, source).map(model::Module::from_generic)
+    model::Module::from_generic(parse_str_with(toolchain, source)?).map_err(Into::into)
 }
 
 pub fn parse_module_file(path: impl AsRef<Path>) -> Result<model::Module> {
-    parse_file(path).map(model::Module::from_generic)
+    model::Module::from_generic(parse_file(path)?).map_err(Into::into)
 }
 
 pub fn parse_module_file_with(
     toolchain: &Toolchain,
     path: impl AsRef<Path>,
 ) -> Result<model::Module> {
-    parse_file_with(toolchain, path).map(model::Module::from_generic)
+    model::Module::from_generic(parse_file_with(toolchain, path)?).map_err(Into::into)
 }

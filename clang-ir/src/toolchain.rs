@@ -47,8 +47,13 @@ impl Toolchain {
     /// including from input that already carries it - so it's required
     /// unconditionally, not just when the caller wants locations.
     pub fn normalize_to_generic(&self, source: &str) -> Result<String> {
+        self.normalize_to_generic_with_flags(source, &[])
+    }
+
+    pub fn normalize_to_generic_with_flags(&self, source: &str, flags: &[&str]) -> Result<String> {
         let mut child = Command::new(&self.cir_opt)
             .arg("-")
+            .args(flags)
             .arg("--mlir-print-op-generic")
             .arg("--mlir-print-debuginfo")
             .stdin(Stdio::piped())
@@ -81,5 +86,41 @@ impl Toolchain {
 
         String::from_utf8(output.stdout)
             .map_err(|e| Error::Toolchain(format!("cir-opt produced non-UTF8 output: {e}")))
+    }
+}
+
+#[cfg(all(test, unix))]
+mod tests {
+    use super::*;
+    use std::os::unix::fs::PermissionsExt;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    #[test]
+    fn normalization_accepts_caller_supplied_flags() {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let dir = std::env::temp_dir().join(format!("clang-ir-toolchain-{unique}"));
+        std::fs::create_dir(&dir).unwrap();
+        let tool = dir.join("cir-opt");
+        std::fs::write(
+            &tool,
+            "#!/bin/sh\n[ \"$1\" = \"-\" ] || exit 11\n[ \"$2\" = \"--cir-flatten-cfg\" ] || exit 12\n[ \"$3\" = \"--cir-goto-solver\" ] || exit 13\n[ \"$4\" = \"--mlir-print-op-generic\" ] || exit 14\n[ \"$5\" = \"--mlir-print-debuginfo\" ] || exit 15\ncat\n",
+        )
+        .unwrap();
+        let mut permissions = std::fs::metadata(&tool).unwrap().permissions();
+        permissions.set_mode(0o755);
+        std::fs::set_permissions(&tool, permissions).unwrap();
+
+        let normalized = Toolchain::with_cir_opt(&tool)
+            .normalize_to_generic_with_flags(
+                "builtin.module {}",
+                &["--cir-flatten-cfg", "--cir-goto-solver"],
+            )
+            .unwrap();
+
+        std::fs::remove_dir_all(dir).unwrap();
+        assert_eq!(normalized, "builtin.module {}");
     }
 }
