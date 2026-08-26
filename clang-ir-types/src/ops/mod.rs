@@ -7109,2806 +7109,2342 @@ impl Op {
 }
 fn lower_abs(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Abs(arithmetic::Abs {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            min_is_poison: unit_attr(op, "min_is_poison"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Abs(arithmetic::Abs {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        min_is_poison: unit_attr(op, "min_is_poison"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_acos(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Acos(arithmetic::Acos {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Acos(arithmetic::Acos {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_add(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Add(arithmetic::Add {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            no_signed_wrap: unit_attr(op, "no_signed_wrap"),
-            no_unsigned_wrap: unit_attr(op, "no_unsigned_wrap"),
-            saturated: unit_attr(op, "saturated"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Add(arithmetic::Add {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        no_signed_wrap: unit_attr(op, "no_signed_wrap"),
+        no_unsigned_wrap: unit_attr(op, "no_unsigned_wrap"),
+        saturated: unit_attr(op, "saturated"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_add_overflow(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::AddOverflow(misc::AddOverflow {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            overflow: op.results.get(1)?.0.clone(),
-            overflow_ty: op.results.get(1)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::AddOverflow(misc::AddOverflow {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        overflow: op.results.get(1)?.0.clone(),
+        overflow_ty: op.results.get(1)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_address_of_return_address(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::AddressOfReturnAddress(misc::AddressOfReturnAddress {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::AddressOfReturnAddress(misc::AddressOfReturnAddress {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_alloc_exception(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::AllocException(exceptions::AllocException {
-            addr: op.results.get(0)?.0.clone(),
-            addr_ty: op.results.get(0)?.1.clone(),
-            size: op_attr(op, "size")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::AllocException(exceptions::AllocException {
+        addr: op.results.get(0)?.0.clone(),
+        addr_ty: op.results.get(0)?.1.clone(),
+        size: op_attr(op, "size")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_alloca(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Alloca(memory::Alloca {
-            addr: op.results.get(0)?.0.clone(),
-            addr_ty: op.results.get(0)?.1.clone(),
-            dyn_alloc_size: take_optional_operand(op, &mut __operand_index, 0),
-            name: attr_str(op, "name")?,
-            init: unit_attr(op, "init"),
-            constant: unit_attr(op, "constant"),
-            cleanup_dest_slot: unit_attr(op, "cleanup_dest_slot"),
-            alignment: attr_u64(op, "alignment")?,
-            annotations: op.attr("annotations").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Alloca(memory::Alloca {
+        addr: op.results.get(0)?.0.clone(),
+        addr_ty: op.results.get(0)?.1.clone(),
+        dyn_alloc_size: take_optional_operand(op, &mut __operand_index, 0),
+        name: attr_str(op, "name")?,
+        init: unit_attr(op, "init"),
+        constant: unit_attr(op, "constant"),
+        cleanup_dest_slot: unit_attr(op, "cleanup_dest_slot"),
+        alignment: attr_u64(op, "alignment")?,
+        annotations: op.attr("annotations").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_and(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::And(arithmetic::And {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::And(arithmetic::And {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_array_ctor(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ArrayCtor(arrays::ArrayCtor {
-            addr: take_single_operand(op, &mut __operand_index, 0)?,
-            num_elements: take_optional_operand(op, &mut __operand_index, 1),
-            body: lower_region(op.regions.get(0)?),
-            partial_dtor: lower_region(op.regions.get(1)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ArrayCtor(arrays::ArrayCtor {
+        addr: take_single_operand(op, &mut __operand_index, 0)?,
+        num_elements: take_optional_operand(op, &mut __operand_index, 1),
+        body: lower_region(op.regions.get(0)?),
+        partial_dtor: lower_region(op.regions.get(1)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_array_dtor(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ArrayDtor(arrays::ArrayDtor {
-            addr: take_single_operand(op, &mut __operand_index, 0)?,
-            num_elements: take_optional_operand(op, &mut __operand_index, 1),
-            dtor_may_throw: unit_attr(op, "dtor_may_throw"),
-            body: lower_region(op.regions.get(0)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ArrayDtor(arrays::ArrayDtor {
+        addr: take_single_operand(op, &mut __operand_index, 0)?,
+        num_elements: take_optional_operand(op, &mut __operand_index, 1),
+        dtor_may_throw: unit_attr(op, "dtor_may_throw"),
+        body: lower_region(op.regions.get(0)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_asin(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Asin(arithmetic::Asin {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Asin(arithmetic::Asin {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_asm(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Asm(misc::Asm {
-            res: op.results.get(0).map(|(id, _)| id.clone()),
-            res_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
-            asm_operands: take_variadic_of_variadic(
-                op,
-                &mut __operand_index,
-                "operands_segments",
-            )?,
-            asm_string: attr_str(op, "asm_string")?,
-            constraints: attr_str(op, "constraints")?,
-            side_effects: unit_attr(op, "side_effects"),
-            asm_flavor: crate::enums::AsmFlavor::try_from(op_attr(op, "asm_flavor")?)
-                .ok()?,
-            operand_attrs: op_attr(op, "operand_attrs")?.clone(),
-            operands_segments: op_attr(op, "operands_segments")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Asm(misc::Asm {
+        res: op.results.get(0).map(|(id, _)| id.clone()),
+        res_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
+        asm_operands: take_variadic_of_variadic(op, &mut __operand_index, "operands_segments")?,
+        asm_string: attr_str(op, "asm_string")?,
+        constraints: attr_str(op, "constraints")?,
+        side_effects: unit_attr(op, "side_effects"),
+        asm_flavor: crate::enums::AsmFlavor::try_from(op_attr(op, "asm_flavor")?).ok()?,
+        operand_attrs: op_attr(op, "operand_attrs")?.clone(),
+        operands_segments: op_attr(op, "operands_segments")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_assume(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Assume(misc::Assume {
-            predicate: take_single_operand(op, &mut __operand_index, 0)?,
-            bundle_kind: op_attr(op, "bundle_kind")?.clone(),
-            bundle_args: take_variadic_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Assume(misc::Assume {
+        predicate: take_single_operand(op, &mut __operand_index, 0)?,
+        bundle_kind: op_attr(op, "bundle_kind")?.clone(),
+        bundle_args: take_variadic_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_atan(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Atan(arithmetic::Atan {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Atan(arithmetic::Atan {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_atan2(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Atan2(arithmetic::Atan2 {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Atan2(arithmetic::Atan2 {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_atomic_clear(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::AtomicClear(atomics::AtomicClear {
-            ptr: take_single_operand(op, &mut __operand_index, 0)?,
-            mem_order: crate::enums::MemOrder::try_from(op_attr(op, "mem_order")?).ok()?,
-            alignment: op.attr("alignment").cloned(),
-            is_volatile: unit_attr(op, "is_volatile"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::AtomicClear(atomics::AtomicClear {
+        ptr: take_single_operand(op, &mut __operand_index, 0)?,
+        mem_order: crate::enums::MemOrder::try_from(op_attr(op, "mem_order")?).ok()?,
+        alignment: op.attr("alignment").cloned(),
+        is_volatile: unit_attr(op, "is_volatile"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_atomic_cmpxchg(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::AtomicCmpxchg(atomics::AtomicCmpxchg {
-            old: op.results.get(0)?.0.clone(),
-            old_ty: op.results.get(0)?.1.clone(),
-            success: op.results.get(1)?.0.clone(),
-            success_ty: op.results.get(1)?.1.clone(),
-            ptr: take_single_operand(op, &mut __operand_index, 0)?,
-            expected: take_single_operand(op, &mut __operand_index, 1)?,
-            desired: take_single_operand(op, &mut __operand_index, 2)?,
-            succ_order: crate::enums::MemOrder::try_from(op_attr(op, "succ_order")?)
-                .ok()?,
-            fail_order: crate::enums::MemOrder::try_from(op_attr(op, "fail_order")?)
-                .ok()?,
-            sync_scope: crate::enums::SyncScopeKind::try_from(op_attr(op, "sync_scope")?)
-                .ok()?,
-            alignment: op.attr("alignment").cloned(),
-            weak: unit_attr(op, "weak"),
-            is_volatile: unit_attr(op, "is_volatile"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::AtomicCmpxchg(atomics::AtomicCmpxchg {
+        old: op.results.get(0)?.0.clone(),
+        old_ty: op.results.get(0)?.1.clone(),
+        success: op.results.get(1)?.0.clone(),
+        success_ty: op.results.get(1)?.1.clone(),
+        ptr: take_single_operand(op, &mut __operand_index, 0)?,
+        expected: take_single_operand(op, &mut __operand_index, 1)?,
+        desired: take_single_operand(op, &mut __operand_index, 2)?,
+        succ_order: crate::enums::MemOrder::try_from(op_attr(op, "succ_order")?).ok()?,
+        fail_order: crate::enums::MemOrder::try_from(op_attr(op, "fail_order")?).ok()?,
+        sync_scope: crate::enums::SyncScopeKind::try_from(op_attr(op, "sync_scope")?).ok()?,
+        alignment: op.attr("alignment").cloned(),
+        weak: unit_attr(op, "weak"),
+        is_volatile: unit_attr(op, "is_volatile"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_atomic_fence(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::AtomicFence(atomics::AtomicFence {
-            ordering: crate::enums::MemOrder::try_from(op_attr(op, "ordering")?).ok()?,
-            syncscope: op
-                .attr("syncscope")
-                .and_then(|a| crate::enums::SyncScopeKind::try_from(a).ok()),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::AtomicFence(atomics::AtomicFence {
+        ordering: crate::enums::MemOrder::try_from(op_attr(op, "ordering")?).ok()?,
+        syncscope: op
+            .attr("syncscope")
+            .and_then(|a| crate::enums::SyncScopeKind::try_from(a).ok()),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_atomic_fetch(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::AtomicFetch(atomics::AtomicFetch {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            ptr: take_single_operand(op, &mut __operand_index, 0)?,
-            val: take_single_operand(op, &mut __operand_index, 1)?,
-            binop: crate::enums::AtomicFetchKind::try_from(op_attr(op, "binop")?).ok()?,
-            mem_order: crate::enums::MemOrder::try_from(op_attr(op, "mem_order")?).ok()?,
-            sync_scope: crate::enums::SyncScopeKind::try_from(op_attr(op, "sync_scope")?)
-                .ok()?,
-            is_volatile: unit_attr(op, "is_volatile"),
-            fetch_first: unit_attr(op, "fetch_first"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::AtomicFetch(atomics::AtomicFetch {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        ptr: take_single_operand(op, &mut __operand_index, 0)?,
+        val: take_single_operand(op, &mut __operand_index, 1)?,
+        binop: crate::enums::AtomicFetchKind::try_from(op_attr(op, "binop")?).ok()?,
+        mem_order: crate::enums::MemOrder::try_from(op_attr(op, "mem_order")?).ok()?,
+        sync_scope: crate::enums::SyncScopeKind::try_from(op_attr(op, "sync_scope")?).ok()?,
+        is_volatile: unit_attr(op, "is_volatile"),
+        fetch_first: unit_attr(op, "fetch_first"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_atomic_test_and_set(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::AtomicTestAndSet(atomics::AtomicTestAndSet {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            ptr: take_single_operand(op, &mut __operand_index, 0)?,
-            mem_order: crate::enums::MemOrder::try_from(op_attr(op, "mem_order")?).ok()?,
-            alignment: op.attr("alignment").cloned(),
-            is_volatile: unit_attr(op, "is_volatile"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::AtomicTestAndSet(atomics::AtomicTestAndSet {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        ptr: take_single_operand(op, &mut __operand_index, 0)?,
+        mem_order: crate::enums::MemOrder::try_from(op_attr(op, "mem_order")?).ok()?,
+        alignment: op.attr("alignment").cloned(),
+        is_volatile: unit_attr(op, "is_volatile"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_atomic_xchg(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::AtomicXchg(atomics::AtomicXchg {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            ptr: take_single_operand(op, &mut __operand_index, 0)?,
-            val: take_single_operand(op, &mut __operand_index, 1)?,
-            mem_order: crate::enums::MemOrder::try_from(op_attr(op, "mem_order")?).ok()?,
-            sync_scope: crate::enums::SyncScopeKind::try_from(op_attr(op, "sync_scope")?)
-                .ok()?,
-            is_volatile: unit_attr(op, "is_volatile"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::AtomicXchg(atomics::AtomicXchg {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        ptr: take_single_operand(op, &mut __operand_index, 0)?,
+        val: take_single_operand(op, &mut __operand_index, 1)?,
+        mem_order: crate::enums::MemOrder::try_from(op_attr(op, "mem_order")?).ok()?,
+        sync_scope: crate::enums::SyncScopeKind::try_from(op_attr(op, "sync_scope")?).ok()?,
+        is_volatile: unit_attr(op, "is_volatile"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_await(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Await(misc::Await {
-            kind: crate::enums::AwaitKind::try_from(op_attr(op, "kind")?).ok()?,
-            ready: lower_region(op.regions.get(0)?),
-            suspend: lower_region(op.regions.get(1)?),
-            resume: lower_region(op.regions.get(2)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Await(misc::Await {
+        kind: crate::enums::AwaitKind::try_from(op_attr(op, "kind")?).ok()?,
+        ready: lower_region(op.regions.get(0)?),
+        suspend: lower_region(op.regions.get(1)?),
+        resume: lower_region(op.regions.get(2)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_base_class_addr(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::BaseClassAddr(memory::BaseClassAddr {
-            base_addr: op.results.get(0)?.0.clone(),
-            base_addr_ty: op.results.get(0)?.1.clone(),
-            derived_addr: take_single_operand(op, &mut __operand_index, 0)?,
-            offset: op_attr(op, "offset")?.clone(),
-            assume_not_null: unit_attr(op, "assume_not_null"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::BaseClassAddr(memory::BaseClassAddr {
+        base_addr: op.results.get(0)?.0.clone(),
+        base_addr_ty: op.results.get(0)?.1.clone(),
+        derived_addr: take_single_operand(op, &mut __operand_index, 0)?,
+        offset: op_attr(op, "offset")?.clone(),
+        assume_not_null: unit_attr(op, "assume_not_null"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_base_data_member(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::BaseDataMember(memory::BaseDataMember {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            offset: op_attr(op, "offset")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::BaseDataMember(memory::BaseDataMember {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        offset: op_attr(op, "offset")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_base_method(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::BaseMethod(memory::BaseMethod {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            offset: op_attr(op, "offset")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::BaseMethod(memory::BaseMethod {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        offset: op_attr(op, "offset")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_begin_catch(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::BeginCatch(exceptions::BeginCatch {
-            catch_token: op.results.get(0)?.0.clone(),
-            catch_token_ty: op.results.get(0)?.1.clone(),
-            exn_ptr: op.results.get(1)?.0.clone(),
-            exn_ptr_ty: op.results.get(1)?.1.clone(),
-            eh_token: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::BeginCatch(exceptions::BeginCatch {
+        catch_token: op.results.get(0)?.0.clone(),
+        catch_token_ty: op.results.get(0)?.1.clone(),
+        exn_ptr: op.results.get(1)?.0.clone(),
+        exn_ptr_ty: op.results.get(1)?.1.clone(),
+        eh_token: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_begin_cleanup(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::BeginCleanup(exceptions::BeginCleanup {
-            cleanup_token: op.results.get(0)?.0.clone(),
-            cleanup_token_ty: op.results.get(0)?.1.clone(),
-            eh_token: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::BeginCleanup(exceptions::BeginCleanup {
+        cleanup_token: op.results.get(0)?.0.clone(),
+        cleanup_token_ty: op.results.get(0)?.1.clone(),
+        eh_token: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_bitreverse(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Bitreverse(misc::Bitreverse {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Bitreverse(misc::Bitreverse {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_block_address(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::BlockAddress(misc::BlockAddress {
-            addr: op.results.get(0)?.0.clone(),
-            addr_ty: op.results.get(0)?.1.clone(),
-            block_addr_info: op_attr(op, "block_addr_info")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::BlockAddress(misc::BlockAddress {
+        addr: op.results.get(0)?.0.clone(),
+        addr_ty: op.results.get(0)?.1.clone(),
+        block_addr_info: op_attr(op, "block_addr_info")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_br(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Br(control_flow::Br {
-            dest_operands: take_variadic_operand(op, &mut __operand_index, 0)?,
-            successors: op.successors.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Br(control_flow::Br {
+        dest_operands: take_variadic_operand(op, &mut __operand_index, 0)?,
+        successors: op.successors.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_brcond(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Brcond(control_flow::Brcond {
-            cond: take_single_operand(op, &mut __operand_index, 0)?,
-            dest_operands_true: take_variadic_operand(op, &mut __operand_index, 1)?,
-            dest_operands_false: take_variadic_operand(op, &mut __operand_index, 2)?,
-            successors: op.successors.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Brcond(control_flow::Brcond {
+        cond: take_single_operand(op, &mut __operand_index, 0)?,
+        dest_operands_true: take_variadic_operand(op, &mut __operand_index, 1)?,
+        dest_operands_false: take_variadic_operand(op, &mut __operand_index, 2)?,
+        successors: op.successors.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_break(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Break(control_flow::Break {
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Break(control_flow::Break {
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_builtin_int_cast(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::BuiltinIntCast(misc::BuiltinIntCast {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::BuiltinIntCast(misc::BuiltinIntCast {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_byte_swap(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ByteSwap(arithmetic::ByteSwap {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ByteSwap(arithmetic::ByteSwap {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_call(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Call(calls::Call {
-            result: op.results.get(0).map(|(id, _)| id.clone()),
-            result_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
-            indirect_callee: op
-                .attr("callee")
-                .is_none()
-                .then(|| op.operands.first().cloned())
-                .flatten(),
-            arg_types: op
-                .operand_types
-                .iter()
-                .skip(usize::from(op.attr("callee").is_none()))
-                .cloned()
-                .collect(),
-            noreturn: unit_attr(op, "noreturn"),
-            callee: op.attr("callee").cloned(),
-            args: if op.attr("callee").is_some() {
-                take_variadic_operand(op, &mut __operand_index, 0)?
-            } else {
-                let args = op.operands.get(1..).unwrap_or(&[]).to_vec();
-                __operand_index = op.operands.len();
-                args
-            },
-            nothrow: unit_attr(op, "nothrow"),
-            inline_kind: op
-                .attr("inline_kind")
-                .and_then(|a| crate::enums::InlineKind::try_from(a).ok()),
-            musttail: unit_attr(op, "musttail"),
-            side_effect: op_attr(op, "side_effect")?.clone(),
-            arg_attrs: op.attr("arg_attrs").cloned(),
-            res_attrs: op.attr("res_attrs").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Call(calls::Call {
+        result: op.results.get(0).map(|(id, _)| id.clone()),
+        result_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
+        indirect_callee: op
+            .attr("callee")
+            .is_none()
+            .then(|| op.operands.first().cloned())
+            .flatten(),
+        arg_types: op
+            .operand_types
+            .iter()
+            .skip(usize::from(op.attr("callee").is_none()))
+            .cloned()
+            .collect(),
+        noreturn: unit_attr(op, "noreturn"),
+        callee: op.attr("callee").cloned(),
+        args: if op.attr("callee").is_some() {
+            take_variadic_operand(op, &mut __operand_index, 0)?
+        } else {
+            let args = op.operands.get(1..).unwrap_or(&[]).to_vec();
+            __operand_index = op.operands.len();
+            args
+        },
+        nothrow: unit_attr(op, "nothrow"),
+        inline_kind: op
+            .attr("inline_kind")
+            .and_then(|a| crate::enums::InlineKind::try_from(a).ok()),
+        musttail: unit_attr(op, "musttail"),
+        side_effect: op_attr(op, "side_effect")?.clone(),
+        arg_attrs: op.attr("arg_attrs").cloned(),
+        res_attrs: op.attr("res_attrs").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_call_llvm_intrinsic(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::CallLlvmIntrinsic(calls::CallLlvmIntrinsic {
-            result: op.results.get(0).map(|(id, _)| id.clone()),
-            result_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
-            intrinsic_name: attr_str(op, "intrinsic_name")?,
-            arg_ops: take_variadic_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::CallLlvmIntrinsic(calls::CallLlvmIntrinsic {
+        result: op.results.get(0).map(|(id, _)| id.clone()),
+        result_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
+        intrinsic_name: attr_str(op, "intrinsic_name")?,
+        arg_ops: take_variadic_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_case(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Case(control_flow::Case {
-            value: op_attr(op, "value")?.clone(),
-            kind: crate::enums::CaseOpKind::try_from(op_attr(op, "kind")?).ok()?,
-            case_region: lower_region(op.regions.get(0)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Case(control_flow::Case {
+        value: op_attr(op, "value")?.clone(),
+        kind: crate::enums::CaseOpKind::try_from(op_attr(op, "kind")?).ok()?,
+        case_region: lower_region(op.regions.get(0)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_cast(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Cast(misc::Cast {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            kind: crate::enums::CastKind::try_from(op_attr(op, "kind")?).ok()?,
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Cast(misc::Cast {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        kind: crate::enums::CastKind::try_from(op_attr(op, "kind")?).ok()?,
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_catch_param(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::CatchParam(exceptions::CatchParam {
-            param: op.results.get(0).map(|(id, _)| id.clone()),
-            param_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::CatchParam(exceptions::CatchParam {
+        param: op.results.get(0).map(|(id, _)| id.clone()),
+        param_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_ceil(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Ceil(arithmetic::Ceil {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Ceil(arithmetic::Ceil {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_cleanup_scope(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::CleanupScope(control_flow::CleanupScope {
-            cleanup_kind: crate::enums::CleanupKind::try_from(
-                    op_attr(op, "cleanupKind")?,
-                )
-                .ok()?,
-            body_region: lower_region(op.regions.get(0)?),
-            cleanup_region: lower_region(op.regions.get(1)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::CleanupScope(control_flow::CleanupScope {
+        cleanup_kind: crate::enums::CleanupKind::try_from(op_attr(op, "cleanupKind")?).ok()?,
+        body_region: lower_region(op.regions.get(0)?),
+        cleanup_region: lower_region(op.regions.get(1)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_clear_cache(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ClearCache(memory::ClearCache {
-            begin: take_single_operand(op, &mut __operand_index, 0)?,
-            end: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ClearCache(memory::ClearCache {
+        begin: take_single_operand(op, &mut __operand_index, 0)?,
+        end: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_clear_padding(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ClearPadding(memory::ClearPadding {
-            arg: take_single_operand(op, &mut __operand_index, 0)?,
-            alignment: attr_u64(op, "alignment")?,
-            padding: op_attr(op, "padding")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ClearPadding(memory::ClearPadding {
+        arg: take_single_operand(op, &mut __operand_index, 0)?,
+        alignment: attr_u64(op, "alignment")?,
+        padding: op_attr(op, "padding")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_clrsb(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Clrsb(misc::Clrsb {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Clrsb(misc::Clrsb {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_clz(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Clz(misc::Clz {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            poison_zero: unit_attr(op, "poison_zero"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Clz(misc::Clz {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        poison_zero: unit_attr(op, "poison_zero"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_cmp(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Cmp(arithmetic::Cmp {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            kind: crate::enums::CmpOpKind::try_from(op_attr(op, "kind")?).ok()?,
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Cmp(arithmetic::Cmp {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        kind: crate::enums::CmpOpKind::try_from(op_attr(op, "kind")?).ok()?,
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_cmp3way(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Cmp3way(arithmetic::Cmp3way {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            info: op_attr(op, "info")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Cmp3way(arithmetic::Cmp3way {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        info: op_attr(op, "info")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_co_return(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::CoReturn(misc::CoReturn {
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::CoReturn(misc::CoReturn {
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_complex_add(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ComplexAdd(complex::ComplexAdd {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ComplexAdd(complex::ComplexAdd {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_complex_conj(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ComplexConj(complex::ComplexConj {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            operand: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ComplexConj(complex::ComplexConj {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        operand: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_complex_create(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ComplexCreate(complex::ComplexCreate {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            real: take_single_operand(op, &mut __operand_index, 0)?,
-            imag: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ComplexCreate(complex::ComplexCreate {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        real: take_single_operand(op, &mut __operand_index, 0)?,
+        imag: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_complex_div(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ComplexDiv(complex::ComplexDiv {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            range: crate::enums::ComplexRangeKind::try_from(op_attr(op, "range")?).ok()?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ComplexDiv(complex::ComplexDiv {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        range: crate::enums::ComplexRangeKind::try_from(op_attr(op, "range")?).ok()?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_complex_imag(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ComplexImag(complex::ComplexImag {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            operand: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ComplexImag(complex::ComplexImag {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        operand: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_complex_imag_ptr(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ComplexImagPtr(complex::ComplexImagPtr {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            operand: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ComplexImagPtr(complex::ComplexImagPtr {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        operand: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_complex_mul(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ComplexMul(complex::ComplexMul {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            range: crate::enums::ComplexRangeKind::try_from(op_attr(op, "range")?).ok()?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ComplexMul(complex::ComplexMul {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        range: crate::enums::ComplexRangeKind::try_from(op_attr(op, "range")?).ok()?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_complex_real(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ComplexReal(complex::ComplexReal {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            operand: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ComplexReal(complex::ComplexReal {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        operand: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_complex_real_ptr(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ComplexRealPtr(complex::ComplexRealPtr {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            operand: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ComplexRealPtr(complex::ComplexRealPtr {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        operand: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_complex_sub(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ComplexSub(complex::ComplexSub {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ComplexSub(complex::ComplexSub {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_condition(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Condition(control_flow::Condition {
-            condition: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Condition(control_flow::Condition {
+        condition: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_const(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Const(globals::Const {
-            res: op.results.get(0)?.0.clone(),
-            res_ty: op.results.get(0)?.1.clone(),
-            value: op_attr(op, "value")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Const(globals::Const {
+        res: op.results.get(0)?.0.clone(),
+        res_ty: op.results.get(0)?.1.clone(),
+        value: op_attr(op, "value")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_construct_catch_param(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ConstructCatchParam(exceptions::ConstructCatchParam {
-            eh_token: take_single_operand(op, &mut __operand_index, 0)?,
-            param_addr: take_single_operand(op, &mut __operand_index, 1)?,
-            kind: crate::enums::InitCatchKind::try_from(op_attr(op, "kind")?).ok()?,
-            copy_fn: op.attr("copy_fn").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ConstructCatchParam(exceptions::ConstructCatchParam {
+        eh_token: take_single_operand(op, &mut __operand_index, 0)?,
+        param_addr: take_single_operand(op, &mut __operand_index, 1)?,
+        kind: crate::enums::InitCatchKind::try_from(op_attr(op, "kind")?).ok()?,
+        copy_fn: op.attr("copy_fn").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_continue(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Continue(control_flow::Continue {
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Continue(control_flow::Continue {
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_copy(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Copy(memory::Copy {
-            dst: take_single_operand(op, &mut __operand_index, 0)?,
-            src: take_single_operand(op, &mut __operand_index, 1)?,
-            dst_alignment: op.attr("dst_alignment").cloned(),
-            src_alignment: op.attr("src_alignment").cloned(),
-            is_volatile: unit_attr(op, "is_volatile"),
-            skip_tail_padding: unit_attr(op, "skip_tail_padding"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Copy(memory::Copy {
+        dst: take_single_operand(op, &mut __operand_index, 0)?,
+        src: take_single_operand(op, &mut __operand_index, 1)?,
+        dst_alignment: op.attr("dst_alignment").cloned(),
+        src_alignment: op.attr("src_alignment").cloned(),
+        is_volatile: unit_attr(op, "is_volatile"),
+        skip_tail_padding: unit_attr(op, "skip_tail_padding"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_copysign(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Copysign(arithmetic::Copysign {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Copysign(arithmetic::Copysign {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_coro_body(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::CoroBody(misc::CoroBody {
-            body: lower_region(op.regions.get(0)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::CoroBody(misc::CoroBody {
+        body: lower_region(op.regions.get(0)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_coro_intrinsic_alloc(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::CoroIntrinsicAlloc(misc::CoroIntrinsicAlloc {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            id: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::CoroIntrinsicAlloc(misc::CoroIntrinsicAlloc {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        id: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_coro_intrinsic_begin(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::CoroIntrinsicBegin(misc::CoroIntrinsicBegin {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            id: take_single_operand(op, &mut __operand_index, 0)?,
-            coroframe_addr: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::CoroIntrinsicBegin(misc::CoroIntrinsicBegin {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        id: take_single_operand(op, &mut __operand_index, 0)?,
+        coroframe_addr: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_coro_intrinsic_end(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::CoroIntrinsicEnd(misc::CoroIntrinsicEnd {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            handle: take_single_operand(op, &mut __operand_index, 0)?,
-            unwind: take_single_operand(op, &mut __operand_index, 1)?,
-            result_token: take_single_operand(op, &mut __operand_index, 2)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::CoroIntrinsicEnd(misc::CoroIntrinsicEnd {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        handle: take_single_operand(op, &mut __operand_index, 0)?,
+        unwind: take_single_operand(op, &mut __operand_index, 1)?,
+        result_token: take_single_operand(op, &mut __operand_index, 2)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_coro_intrinsic_free(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::CoroIntrinsicFree(misc::CoroIntrinsicFree {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            id: take_single_operand(op, &mut __operand_index, 0)?,
-            coroframe: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::CoroIntrinsicFree(misc::CoroIntrinsicFree {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        id: take_single_operand(op, &mut __operand_index, 0)?,
+        coroframe: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_coro_intrinsic_id(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::CoroIntrinsicId(misc::CoroIntrinsicId {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            align: take_single_operand(op, &mut __operand_index, 0)?,
-            promise: take_single_operand(op, &mut __operand_index, 1)?,
-            coroaddr: take_single_operand(op, &mut __operand_index, 2)?,
-            fnaddrs: take_single_operand(op, &mut __operand_index, 3)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::CoroIntrinsicId(misc::CoroIntrinsicId {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        align: take_single_operand(op, &mut __operand_index, 0)?,
+        promise: take_single_operand(op, &mut __operand_index, 1)?,
+        coroaddr: take_single_operand(op, &mut __operand_index, 2)?,
+        fnaddrs: take_single_operand(op, &mut __operand_index, 3)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_coro_intrinsic_size(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::CoroIntrinsicSize(misc::CoroIntrinsicSize {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::CoroIntrinsicSize(misc::CoroIntrinsicSize {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_cos(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Cos(arithmetic::Cos {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Cos(arithmetic::Cos {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_cosh(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Cosh(arithmetic::Cosh {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Cosh(arithmetic::Cosh {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_cpuid(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Cpuid(misc::Cpuid {
-            cpu_info: take_single_operand(op, &mut __operand_index, 0)?,
-            function_id: take_single_operand(op, &mut __operand_index, 1)?,
-            sub_function_id: take_single_operand(op, &mut __operand_index, 2)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Cpuid(misc::Cpuid {
+        cpu_info: take_single_operand(op, &mut __operand_index, 0)?,
+        function_id: take_single_operand(op, &mut __operand_index, 1)?,
+        sub_function_id: take_single_operand(op, &mut __operand_index, 2)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_ctz(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Ctz(misc::Ctz {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            poison_zero: unit_attr(op, "poison_zero"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Ctz(misc::Ctz {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        poison_zero: unit_attr(op, "poison_zero"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_dec(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Dec(misc::Dec {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            no_signed_wrap: unit_attr(op, "no_signed_wrap"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Dec(misc::Dec {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        no_signed_wrap: unit_attr(op, "no_signed_wrap"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_delete_array(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::DeleteArray(misc::DeleteArray {
-            address: take_single_operand(op, &mut __operand_index, 0)?,
-            delete_fn: op_attr(op, "delete_fn")?.clone(),
-            delete_params: op_attr(op, "delete_params")?.clone(),
-            element_dtor: op.attr("element_dtor").cloned(),
-            dtor_may_throw: unit_attr(op, "dtor_may_throw"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::DeleteArray(misc::DeleteArray {
+        address: take_single_operand(op, &mut __operand_index, 0)?,
+        delete_fn: op_attr(op, "delete_fn")?.clone(),
+        delete_params: op_attr(op, "delete_params")?.clone(),
+        element_dtor: op.attr("element_dtor").cloned(),
+        dtor_may_throw: unit_attr(op, "dtor_may_throw"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_derived_class_addr(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::DerivedClassAddr(memory::DerivedClassAddr {
-            derived_addr: op.results.get(0)?.0.clone(),
-            derived_addr_ty: op.results.get(0)?.1.clone(),
-            base_addr: take_single_operand(op, &mut __operand_index, 0)?,
-            offset: op_attr(op, "offset")?.clone(),
-            assume_not_null: unit_attr(op, "assume_not_null"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::DerivedClassAddr(memory::DerivedClassAddr {
+        derived_addr: op.results.get(0)?.0.clone(),
+        derived_addr_ty: op.results.get(0)?.1.clone(),
+        base_addr: take_single_operand(op, &mut __operand_index, 0)?,
+        offset: op_attr(op, "offset")?.clone(),
+        assume_not_null: unit_attr(op, "assume_not_null"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_derived_data_member(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::DerivedDataMember(memory::DerivedDataMember {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            offset: op_attr(op, "offset")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::DerivedDataMember(memory::DerivedDataMember {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        offset: op_attr(op, "offset")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_derived_method(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::DerivedMethod(memory::DerivedMethod {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            offset: op_attr(op, "offset")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::DerivedMethod(memory::DerivedMethod {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        offset: op_attr(op, "offset")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_div(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Div(arithmetic::Div {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Div(arithmetic::Div {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_do(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Do(control_flow::Do {
-            body: lower_region(op.regions.get(0)?),
-            cond: lower_region(op.regions.get(1)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Do(control_flow::Do {
+        body: lower_region(op.regions.get(0)?),
+        cond: lower_region(op.regions.get(1)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_dyn_cast(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::DynCast(misc::DynCast {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            kind: crate::enums::DynamicCastKind::try_from(op_attr(op, "kind")?).ok()?,
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            info: op.attr("info").cloned(),
-            relative_layout: unit_attr(op, "relative_layout"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::DynCast(misc::DynCast {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        kind: crate::enums::DynamicCastKind::try_from(op_attr(op, "kind")?).ok()?,
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        info: op.attr("info").cloned(),
+        relative_layout: unit_attr(op, "relative_layout"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_eh_dispatch(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::EhDispatch(exceptions::EhDispatch {
-            eh_token: take_single_operand(op, &mut __operand_index, 0)?,
-            catch_types: op.attr("catch_types").cloned(),
-            default_is_catch_all: unit_attr(op, "default_is_catch_all"),
-            successors: op.successors.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::EhDispatch(exceptions::EhDispatch {
+        eh_token: take_single_operand(op, &mut __operand_index, 0)?,
+        catch_types: op.attr("catch_types").cloned(),
+        default_is_catch_all: unit_attr(op, "default_is_catch_all"),
+        successors: op.successors.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_eh_inflight_exception(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::EhInflightException(exceptions::EhInflightException {
-            exception_ptr: op.results.get(0)?.0.clone(),
-            exception_ptr_ty: op.results.get(0)?.1.clone(),
-            type_id: op.results.get(1)?.0.clone(),
-            type_id_ty: op.results.get(1)?.1.clone(),
-            cleanup: unit_attr(op, "cleanup"),
-            catch_all: unit_attr(op, "catch_all"),
-            catch_type_list: op.attr("catch_type_list").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::EhInflightException(exceptions::EhInflightException {
+        exception_ptr: op.results.get(0)?.0.clone(),
+        exception_ptr_ty: op.results.get(0)?.1.clone(),
+        type_id: op.results.get(1)?.0.clone(),
+        type_id_ty: op.results.get(1)?.1.clone(),
+        cleanup: unit_attr(op, "cleanup"),
+        catch_all: unit_attr(op, "catch_all"),
+        catch_type_list: op.attr("catch_type_list").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_eh_initiate(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::EhInitiate(exceptions::EhInitiate {
-            eh_token: op.results.get(0)?.0.clone(),
-            eh_token_ty: op.results.get(0)?.1.clone(),
-            cleanup: unit_attr(op, "cleanup"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::EhInitiate(exceptions::EhInitiate {
+        eh_token: op.results.get(0)?.0.clone(),
+        eh_token_ty: op.results.get(0)?.1.clone(),
+        cleanup: unit_attr(op, "cleanup"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_eh_longjmp(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::EhLongjmp(exceptions::EhLongjmp {
-            env: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::EhLongjmp(exceptions::EhLongjmp {
+        env: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_eh_setjmp(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::EhSetjmp(exceptions::EhSetjmp {
-            res: op.results.get(0)?.0.clone(),
-            res_ty: op.results.get(0)?.1.clone(),
-            env: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::EhSetjmp(exceptions::EhSetjmp {
+        res: op.results.get(0)?.0.clone(),
+        res_ty: op.results.get(0)?.1.clone(),
+        env: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_eh_terminate(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::EhTerminate(exceptions::EhTerminate {
-            eh_token: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::EhTerminate(exceptions::EhTerminate {
+        eh_token: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_eh_typeid(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::EhTypeid(exceptions::EhTypeid {
-            type_id: op.results.get(0)?.0.clone(),
-            type_id_ty: op.results.get(0)?.1.clone(),
-            type_sym: op_attr(op, "type_sym")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::EhTypeid(exceptions::EhTypeid {
+        type_id: op.results.get(0)?.0.clone(),
+        type_id_ty: op.results.get(0)?.1.clone(),
+        type_sym: op_attr(op, "type_sym")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_end_catch(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::EndCatch(exceptions::EndCatch {
-            catch_token: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::EndCatch(exceptions::EndCatch {
+        catch_token: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_end_cleanup(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::EndCleanup(exceptions::EndCleanup {
-            cleanup_token: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::EndCleanup(exceptions::EndCleanup {
+        cleanup_token: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_exp(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Exp(arithmetic::Exp {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Exp(arithmetic::Exp {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_exp10(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Exp10(arithmetic::Exp10 {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Exp10(arithmetic::Exp10 {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_exp2(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Exp2(arithmetic::Exp2 {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Exp2(arithmetic::Exp2 {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_expect(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Expect(misc::Expect {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            val: take_single_operand(op, &mut __operand_index, 0)?,
-            expected: take_single_operand(op, &mut __operand_index, 1)?,
-            prob: op.attr("prob").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Expect(misc::Expect {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        val: take_single_operand(op, &mut __operand_index, 0)?,
+        expected: take_single_operand(op, &mut __operand_index, 1)?,
+        prob: op.attr("prob").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_extract_member(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ExtractMember(memory::ExtractMember {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            record: take_single_operand(op, &mut __operand_index, 0)?,
-            index: op_attr(op, "index")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ExtractMember(memory::ExtractMember {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        record: take_single_operand(op, &mut __operand_index, 0)?,
+        index: op_attr(op, "index")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_fabs(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Fabs(arithmetic::Fabs {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Fabs(arithmetic::Fabs {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_fadd(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Fadd(arithmetic::Fadd {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Fadd(arithmetic::Fadd {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_fdiv(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Fdiv(arithmetic::Fdiv {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Fdiv(arithmetic::Fdiv {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_ffs(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Ffs(misc::Ffs {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Ffs(misc::Ffs {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_floor(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Floor(arithmetic::Floor {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Floor(arithmetic::Floor {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_fma(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Fma(arithmetic::Fma {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            a: take_single_operand(op, &mut __operand_index, 0)?,
-            b: take_single_operand(op, &mut __operand_index, 1)?,
-            c: take_single_operand(op, &mut __operand_index, 2)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Fma(arithmetic::Fma {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        a: take_single_operand(op, &mut __operand_index, 0)?,
+        b: take_single_operand(op, &mut __operand_index, 1)?,
+        c: take_single_operand(op, &mut __operand_index, 2)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_fmaximum(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Fmaximum(arithmetic::Fmaximum {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Fmaximum(arithmetic::Fmaximum {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_fmaxnum(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Fmaxnum(arithmetic::Fmaxnum {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Fmaxnum(arithmetic::Fmaxnum {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_fminimum(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Fminimum(arithmetic::Fminimum {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Fminimum(arithmetic::Fminimum {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_fminnum(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Fminnum(arithmetic::Fminnum {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Fminnum(arithmetic::Fminnum {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_fmod(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Fmod(arithmetic::Fmod {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Fmod(arithmetic::Fmod {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_fmul(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Fmul(arithmetic::Fmul {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Fmul(arithmetic::Fmul {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_fmuladd(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Fmuladd(arithmetic::Fmuladd {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            a: take_single_operand(op, &mut __operand_index, 0)?,
-            b: take_single_operand(op, &mut __operand_index, 1)?,
-            c: take_single_operand(op, &mut __operand_index, 2)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Fmuladd(arithmetic::Fmuladd {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        a: take_single_operand(op, &mut __operand_index, 0)?,
+        b: take_single_operand(op, &mut __operand_index, 1)?,
+        c: take_single_operand(op, &mut __operand_index, 2)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_fneg(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Fneg(arithmetic::Fneg {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Fneg(arithmetic::Fneg {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_for(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::For(control_flow::For {
-            cleanup_kind: op
-                .attr("cleanupKind")
-                .and_then(|a| crate::enums::CleanupKind::try_from(a).ok()),
-            cond: lower_region(op.regions.get(0)?),
-            body: lower_region(op.regions.get(1)?),
-            step: lower_region(op.regions.get(2)?),
-            cleanup: lower_region(op.regions.get(3)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::For(control_flow::For {
+        cleanup_kind: op
+            .attr("cleanupKind")
+            .and_then(|a| crate::enums::CleanupKind::try_from(a).ok()),
+        cond: lower_region(op.regions.get(0)?),
+        body: lower_region(op.regions.get(1)?),
+        step: lower_region(op.regions.get(2)?),
+        cleanup: lower_region(op.regions.get(3)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_frame_address(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::FrameAddress(misc::FrameAddress {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            level: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::FrameAddress(misc::FrameAddress {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        level: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_freeze(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Freeze(arithmetic::Freeze {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Freeze(arithmetic::Freeze {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_frem(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Frem(arithmetic::Frem {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Frem(arithmetic::Frem {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_frexp(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Frexp(arithmetic::Frexp {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            exp: op.results.get(1)?.0.clone(),
-            exp_ty: op.results.get(1)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Frexp(arithmetic::Frexp {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        exp: op.results.get(1)?.0.clone(),
+        exp_ty: op.results.get(1)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_fsub(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Fsub(arithmetic::Fsub {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Fsub(arithmetic::Fsub {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_func(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Func(globals::Func {
-            sym_name: attr_str(op, "sym_name")?,
-            global_visibility: unit_attr(op, "global_visibility"),
-            function_type: attr_type(op, "function_type")?,
-            builtin: unit_attr(op, "builtin"),
-            coroutine: unit_attr(op, "coroutine"),
-            inline_kind: op
-                .attr("inline_kind")
-                .and_then(|a| crate::enums::InlineKind::try_from(a).ok()),
-            lambda: unit_attr(op, "lambda"),
-            no_proto: unit_attr(op, "no_proto"),
-            dso_local: unit_attr(op, "dso_local"),
-            linkage: op_attr(op, "linkage")?.clone(),
-            calling_conv: op_attr(op, "calling_conv")?.clone(),
-            sym_visibility: op
-                .attr("sym_visibility")
-                .and_then(|a| a.as_str().map(str::to_string)),
-            comdat: unit_attr(op, "comdat"),
-            arg_attrs: op.attr("arg_attrs").cloned(),
-            res_attrs: op.attr("res_attrs").cloned(),
-            aliasee: op.attr("aliasee").cloned(),
-            side_effect: op
-                .attr("side_effect")
-                .and_then(|a| crate::enums::SideEffect::try_from(a).ok()),
-            personality: op.attr("personality").cloned(),
-            global_ctor_priority: op.attr("global_ctor_priority").cloned(),
-            global_dtor_priority: op.attr("global_dtor_priority").cloned(),
-            func_info: op.attr("func_info").cloned(),
-            annotations: op.attr("annotations").cloned(),
-            body: lower_region(op.regions.get(0)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Func(globals::Func {
+        sym_name: attr_str(op, "sym_name")?,
+        global_visibility: unit_attr(op, "global_visibility"),
+        function_type: attr_type(op, "function_type")?,
+        builtin: unit_attr(op, "builtin"),
+        coroutine: unit_attr(op, "coroutine"),
+        inline_kind: op
+            .attr("inline_kind")
+            .and_then(|a| crate::enums::InlineKind::try_from(a).ok()),
+        lambda: unit_attr(op, "lambda"),
+        no_proto: unit_attr(op, "no_proto"),
+        dso_local: unit_attr(op, "dso_local"),
+        linkage: op_attr(op, "linkage")?.clone(),
+        calling_conv: op_attr(op, "calling_conv")?.clone(),
+        sym_visibility: op
+            .attr("sym_visibility")
+            .and_then(|a| a.as_str().map(str::to_string)),
+        comdat: unit_attr(op, "comdat"),
+        arg_attrs: op.attr("arg_attrs").cloned(),
+        res_attrs: op.attr("res_attrs").cloned(),
+        aliasee: op.attr("aliasee").cloned(),
+        side_effect: op
+            .attr("side_effect")
+            .and_then(|a| crate::enums::SideEffect::try_from(a).ok()),
+        personality: op.attr("personality").cloned(),
+        global_ctor_priority: op.attr("global_ctor_priority").cloned(),
+        global_dtor_priority: op.attr("global_dtor_priority").cloned(),
+        func_info: op.attr("func_info").cloned(),
+        annotations: op.attr("annotations").cloned(),
+        body: lower_region(op.regions.get(0)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_get_bitfield(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::GetBitfield(memory::GetBitfield {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            addr: take_single_operand(op, &mut __operand_index, 0)?,
-            bitfield_info: op_attr(op, "bitfield_info")?.clone(),
-            alignment: op_attr(op, "alignment")?.clone(),
-            is_volatile: unit_attr(op, "is_volatile"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::GetBitfield(memory::GetBitfield {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        addr: take_single_operand(op, &mut __operand_index, 0)?,
+        bitfield_info: op_attr(op, "bitfield_info")?.clone(),
+        alignment: op_attr(op, "alignment")?.clone(),
+        is_volatile: unit_attr(op, "is_volatile"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_get_element(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::GetElement(memory::GetElement {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            base: take_single_operand(op, &mut __operand_index, 0)?,
-            index: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::GetElement(memory::GetElement {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        base: take_single_operand(op, &mut __operand_index, 0)?,
+        index: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_get_global(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::GetGlobal(globals::GetGlobal {
-            addr: op.results.get(0)?.0.clone(),
-            addr_ty: op.results.get(0)?.1.clone(),
-            name: op_attr(op, "name")?.clone(),
-            tls: unit_attr(op, "tls"),
-            static_local: unit_attr(op, "static_local"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::GetGlobal(globals::GetGlobal {
+        addr: op.results.get(0)?.0.clone(),
+        addr_ty: op.results.get(0)?.1.clone(),
+        name: op_attr(op, "name")?.clone(),
+        tls: unit_attr(op, "tls"),
+        static_local: unit_attr(op, "static_local"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_get_member(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::GetMember(memory::GetMember {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            addr_ty: op.operand_types.first()?.clone(),
-            addr: take_single_operand(op, &mut __operand_index, 0)?,
-            name: attr_str(op, "name")?,
-            index_attr: op_attr(op, "index_attr")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::GetMember(memory::GetMember {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        addr_ty: op.operand_types.first()?.clone(),
+        addr: take_single_operand(op, &mut __operand_index, 0)?,
+        name: attr_str(op, "name")?,
+        index_attr: op_attr(op, "index_attr")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_get_method(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::GetMethod(memory::GetMethod {
-            callee: op.results.get(0)?.0.clone(),
-            callee_ty: op.results.get(0)?.1.clone(),
-            adjusted_this: op.results.get(1)?.0.clone(),
-            adjusted_this_ty: op.results.get(1)?.1.clone(),
-            method: take_single_operand(op, &mut __operand_index, 0)?,
-            object: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::GetMethod(memory::GetMethod {
+        callee: op.results.get(0)?.0.clone(),
+        callee_ty: op.results.get(0)?.1.clone(),
+        adjusted_this: op.results.get(1)?.0.clone(),
+        adjusted_this_ty: op.results.get(1)?.1.clone(),
+        method: take_single_operand(op, &mut __operand_index, 0)?,
+        object: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_get_runtime_member(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::GetRuntimeMember(memory::GetRuntimeMember {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            addr: take_single_operand(op, &mut __operand_index, 0)?,
-            member: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::GetRuntimeMember(memory::GetRuntimeMember {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        addr: take_single_operand(op, &mut __operand_index, 0)?,
+        member: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_global(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Global(globals::Global {
-            sym_name: attr_str(op, "sym_name")?,
-            global_visibility: unit_attr(op, "global_visibility"),
-            sym_visibility: op
-                .attr("sym_visibility")
-                .and_then(|a| a.as_str().map(str::to_string)),
-            sym_type: attr_type(op, "sym_type")?,
-            linkage: crate::enums::GlobalLinkageKind::try_from(op_attr(op, "linkage")?)
-                .ok()?,
-            addr_space: op.attr("addr_space").cloned(),
-            tls_model: op
-                .attr("tls_model")
-                .and_then(|a| crate::enums::TlsModel::try_from(a).ok()),
-            tls_refs: op.attr("tls_refs").cloned(),
-            initial_value: op.attr("initial_value").cloned(),
-            comdat: unit_attr(op, "comdat"),
-            constant: unit_attr(op, "constant"),
-            dso_local: unit_attr(op, "dso_local"),
-            static_local_guard: op.attr("static_local_guard").cloned(),
-            alignment: op.attr("alignment").cloned(),
-            ast: op.attr("ast").cloned(),
-            section: op.attr("section").and_then(|a| a.as_str().map(str::to_string)),
-            annotations: op.attr("annotations").cloned(),
-            aliasee: op.attr("aliasee").cloned(),
-            strictfp: unit_attr(op, "strictfp"),
-            init_priority: op.attr("init_priority").cloned(),
-            ctor_region: lower_region(op.regions.get(0)?),
-            dtor_region: lower_region(op.regions.get(1)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Global(globals::Global {
+        sym_name: attr_str(op, "sym_name")?,
+        global_visibility: unit_attr(op, "global_visibility"),
+        sym_visibility: op
+            .attr("sym_visibility")
+            .and_then(|a| a.as_str().map(str::to_string)),
+        sym_type: attr_type(op, "sym_type")?,
+        linkage: crate::enums::GlobalLinkageKind::try_from(op_attr(op, "linkage")?).ok()?,
+        addr_space: op.attr("addr_space").cloned(),
+        tls_model: op
+            .attr("tls_model")
+            .and_then(|a| crate::enums::TlsModel::try_from(a).ok()),
+        tls_refs: op.attr("tls_refs").cloned(),
+        initial_value: op.attr("initial_value").cloned(),
+        comdat: unit_attr(op, "comdat"),
+        constant: unit_attr(op, "constant"),
+        dso_local: unit_attr(op, "dso_local"),
+        static_local_guard: op.attr("static_local_guard").cloned(),
+        alignment: op.attr("alignment").cloned(),
+        ast: op.attr("ast").cloned(),
+        section: op
+            .attr("section")
+            .and_then(|a| a.as_str().map(str::to_string)),
+        annotations: op.attr("annotations").cloned(),
+        aliasee: op.attr("aliasee").cloned(),
+        strictfp: unit_attr(op, "strictfp"),
+        init_priority: op.attr("init_priority").cloned(),
+        ctor_region: lower_region(op.regions.get(0)?),
+        dtor_region: lower_region(op.regions.get(1)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_goto(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Goto(control_flow::Goto {
-            label: attr_str(op, "label")?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Goto(control_flow::Goto {
+        label: attr_str(op, "label")?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_if(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::If(control_flow::If {
-            condition: take_single_operand(op, &mut __operand_index, 0)?,
-            then_region: lower_region(op.regions.get(0)?),
-            else_region: lower_region(op.regions.get(1)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::If(control_flow::If {
+        condition: take_single_operand(op, &mut __operand_index, 0)?,
+        then_region: lower_region(op.regions.get(0)?),
+        else_region: lower_region(op.regions.get(1)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_inc(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Inc(misc::Inc {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            no_signed_wrap: unit_attr(op, "no_signed_wrap"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Inc(misc::Inc {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        no_signed_wrap: unit_attr(op, "no_signed_wrap"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_indirect_br(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::IndirectBr(misc::IndirectBr {
-            addr: take_single_operand(op, &mut __operand_index, 0)?,
-            poison: unit_attr(op, "poison"),
-            succ_operands: take_variadic_of_variadic(
-                op,
-                &mut __operand_index,
-                "operand_segments",
-            )?,
-            operand_segments: op_attr(op, "operand_segments")?.clone(),
-            successors: op.successors.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::IndirectBr(misc::IndirectBr {
+        addr: take_single_operand(op, &mut __operand_index, 0)?,
+        poison: unit_attr(op, "poison"),
+        succ_operands: take_variadic_of_variadic(op, &mut __operand_index, "operand_segments")?,
+        operand_segments: op_attr(op, "operand_segments")?.clone(),
+        successors: op.successors.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_indirect_goto(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::IndirectGoto(control_flow::IndirectGoto {
-            addr: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::IndirectGoto(control_flow::IndirectGoto {
+        addr: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_init_catch_param(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::InitCatchParam(exceptions::InitCatchParam {
-            exn_ptr: take_single_operand(op, &mut __operand_index, 0)?,
-            param_addr: take_single_operand(op, &mut __operand_index, 1)?,
-            kind: crate::enums::InitCatchKind::try_from(op_attr(op, "kind")?).ok()?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::InitCatchParam(exceptions::InitCatchParam {
+        exn_ptr: take_single_operand(op, &mut __operand_index, 0)?,
+        param_addr: take_single_operand(op, &mut __operand_index, 1)?,
+        kind: crate::enums::InitCatchKind::try_from(op_attr(op, "kind")?).ok()?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_insert_member(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::InsertMember(memory::InsertMember {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            record: take_single_operand(op, &mut __operand_index, 0)?,
-            index: op_attr(op, "index")?.clone(),
-            value: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::InsertMember(memory::InsertMember {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        record: take_single_operand(op, &mut __operand_index, 0)?,
+        index: op_attr(op, "index")?.clone(),
+        value: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_is_constant(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::IsConstant(arithmetic::IsConstant {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            val: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::IsConstant(arithmetic::IsConstant {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        val: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_is_fp_class(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::IsFpClass(arithmetic::IsFpClass {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            flags: crate::enums::FpClassTest(attr_u64(op, "flags")?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::IsFpClass(arithmetic::IsFpClass {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        flags: crate::enums::FpClassTest(attr_u64(op, "flags")?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_label(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Label(control_flow::Label {
-            label: attr_str(op, "label")?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Label(control_flow::Label {
+        label: attr_str(op, "label")?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_launder(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Launder(misc::Launder {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            arg: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Launder(misc::Launder {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        arg: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_libc_memchr(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::LibcMemchr(stdlib::LibcMemchr {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            pattern: take_single_operand(op, &mut __operand_index, 1)?,
-            len: take_single_operand(op, &mut __operand_index, 2)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::LibcMemchr(stdlib::LibcMemchr {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        pattern: take_single_operand(op, &mut __operand_index, 1)?,
+        len: take_single_operand(op, &mut __operand_index, 2)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_libc_memcpy(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::LibcMemcpy(stdlib::LibcMemcpy {
-            dst: take_single_operand(op, &mut __operand_index, 0)?,
-            src: take_single_operand(op, &mut __operand_index, 1)?,
-            len: take_single_operand(op, &mut __operand_index, 2)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::LibcMemcpy(stdlib::LibcMemcpy {
+        dst: take_single_operand(op, &mut __operand_index, 0)?,
+        src: take_single_operand(op, &mut __operand_index, 1)?,
+        len: take_single_operand(op, &mut __operand_index, 2)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_libc_memmove(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::LibcMemmove(stdlib::LibcMemmove {
-            dst: take_single_operand(op, &mut __operand_index, 0)?,
-            src: take_single_operand(op, &mut __operand_index, 1)?,
-            len: take_single_operand(op, &mut __operand_index, 2)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::LibcMemmove(stdlib::LibcMemmove {
+        dst: take_single_operand(op, &mut __operand_index, 0)?,
+        src: take_single_operand(op, &mut __operand_index, 1)?,
+        len: take_single_operand(op, &mut __operand_index, 2)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_libc_memset(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::LibcMemset(stdlib::LibcMemset {
-            dst: take_single_operand(op, &mut __operand_index, 0)?,
-            alignment: op.attr("alignment").cloned(),
-            val: take_single_operand(op, &mut __operand_index, 1)?,
-            len: take_single_operand(op, &mut __operand_index, 2)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::LibcMemset(stdlib::LibcMemset {
+        dst: take_single_operand(op, &mut __operand_index, 0)?,
+        alignment: op.attr("alignment").cloned(),
+        val: take_single_operand(op, &mut __operand_index, 1)?,
+        len: take_single_operand(op, &mut __operand_index, 2)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_lifetime_end(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::LifetimeEnd(memory::LifetimeEnd {
-            ptr: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::LifetimeEnd(memory::LifetimeEnd {
+        ptr: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_lifetime_start(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::LifetimeStart(memory::LifetimeStart {
-            ptr: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::LifetimeStart(memory::LifetimeStart {
+        ptr: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_llrint(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Llrint(arithmetic::Llrint {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Llrint(arithmetic::Llrint {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_llround(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Llround(arithmetic::Llround {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Llround(arithmetic::Llround {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_load(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Load(memory::Load {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            addr: take_single_operand(op, &mut __operand_index, 0)?,
-            is_deref: unit_attr(op, "isDeref"),
-            is_volatile: unit_attr(op, "is_volatile"),
-            is_nontemporal: unit_attr(op, "is_nontemporal"),
-            alignment: op.attr("alignment").cloned(),
-            sync_scope: op
-                .attr("sync_scope")
-                .and_then(|a| crate::enums::SyncScopeKind::try_from(a).ok()),
-            mem_order: op
-                .attr("mem_order")
-                .and_then(|a| crate::enums::MemOrder::try_from(a).ok()),
-            invariant: unit_attr(op, "invariant"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Load(memory::Load {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        addr: take_single_operand(op, &mut __operand_index, 0)?,
+        is_deref: unit_attr(op, "isDeref"),
+        is_volatile: unit_attr(op, "is_volatile"),
+        is_nontemporal: unit_attr(op, "is_nontemporal"),
+        alignment: op.attr("alignment").cloned(),
+        sync_scope: op
+            .attr("sync_scope")
+            .and_then(|a| crate::enums::SyncScopeKind::try_from(a).ok()),
+        mem_order: op
+            .attr("mem_order")
+            .and_then(|a| crate::enums::MemOrder::try_from(a).ok()),
+        invariant: unit_attr(op, "invariant"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_local_init(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::LocalInit(globals::LocalInit {
-            global_name: op_attr(op, "globalName")?.clone(),
-            tls: unit_attr(op, "tls"),
-            ctor_region: lower_region(op.regions.get(0)?),
-            dtor_region: lower_region(op.regions.get(1)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::LocalInit(globals::LocalInit {
+        global_name: op_attr(op, "globalName")?.clone(),
+        tls: unit_attr(op, "tls"),
+        ctor_region: lower_region(op.regions.get(0)?),
+        dtor_region: lower_region(op.regions.get(1)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_log(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Log(arithmetic::Log {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Log(arithmetic::Log {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_log10(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Log10(arithmetic::Log10 {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Log10(arithmetic::Log10 {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_log2(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Log2(arithmetic::Log2 {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Log2(arithmetic::Log2 {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_lrint(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Lrint(arithmetic::Lrint {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Lrint(arithmetic::Lrint {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_lround(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Lround(arithmetic::Lround {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Lround(arithmetic::Lround {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_max(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Max(arithmetic::Max {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Max(arithmetic::Max {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_min(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Min(arithmetic::Min {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Min(arithmetic::Min {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_minus(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Minus(misc::Minus {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            no_signed_wrap: unit_attr(op, "no_signed_wrap"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Minus(misc::Minus {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        no_signed_wrap: unit_attr(op, "no_signed_wrap"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_modf(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Modf(arithmetic::Modf {
-            fractional: op.results.get(0)?.0.clone(),
-            fractional_ty: op.results.get(0)?.1.clone(),
-            integral: op.results.get(1)?.0.clone(),
-            integral_ty: op.results.get(1)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Modf(arithmetic::Modf {
+        fractional: op.results.get(0)?.0.clone(),
+        fractional_ty: op.results.get(0)?.1.clone(),
+        integral: op.results.get(1)?.0.clone(),
+        integral_ty: op.results.get(1)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_mul(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Mul(arithmetic::Mul {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            no_signed_wrap: unit_attr(op, "no_signed_wrap"),
-            no_unsigned_wrap: unit_attr(op, "no_unsigned_wrap"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Mul(arithmetic::Mul {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        no_signed_wrap: unit_attr(op, "no_signed_wrap"),
+        no_unsigned_wrap: unit_attr(op, "no_unsigned_wrap"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_mul_overflow(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::MulOverflow(misc::MulOverflow {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            overflow: op.results.get(1)?.0.clone(),
-            overflow_ty: op.results.get(1)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::MulOverflow(misc::MulOverflow {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        overflow: op.results.get(1)?.0.clone(),
+        overflow_ty: op.results.get(1)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_nearbyint(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Nearbyint(arithmetic::Nearbyint {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Nearbyint(arithmetic::Nearbyint {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_not(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Not(misc::Not {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Not(misc::Not {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_objsize(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Objsize(arithmetic::Objsize {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            ptr: take_single_operand(op, &mut __operand_index, 0)?,
-            min: unit_attr(op, "min"),
-            nullunknown: unit_attr(op, "nullunknown"),
-            dynamic: unit_attr(op, "dynamic"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Objsize(arithmetic::Objsize {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        ptr: take_single_operand(op, &mut __operand_index, 0)?,
+        min: unit_attr(op, "min"),
+        nullunknown: unit_attr(op, "nullunknown"),
+        dynamic: unit_attr(op, "dynamic"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_or(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Or(arithmetic::Or {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Or(arithmetic::Or {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_parity(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Parity(misc::Parity {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Parity(misc::Parity {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_popcount(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Popcount(misc::Popcount {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Popcount(misc::Popcount {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_pow(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Pow(arithmetic::Pow {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Pow(arithmetic::Pow {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_prefetch(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Prefetch(misc::Prefetch {
-            addr: take_single_operand(op, &mut __operand_index, 0)?,
-            locality: op_attr(op, "locality")?.clone(),
-            is_write: unit_attr(op, "isWrite"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Prefetch(misc::Prefetch {
+        addr: take_single_operand(op, &mut __operand_index, 0)?,
+        locality: op_attr(op, "locality")?.clone(),
+        is_write: unit_attr(op, "isWrite"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_ptr_diff(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::PtrDiff(memory::PtrDiff {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::PtrDiff(memory::PtrDiff {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_ptr_stride(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::PtrStride(memory::PtrStride {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            base: take_single_operand(op, &mut __operand_index, 0)?,
-            stride: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::PtrStride(memory::PtrStride {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        base: take_single_operand(op, &mut __operand_index, 0)?,
+        stride: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_rem(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Rem(arithmetic::Rem {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Rem(arithmetic::Rem {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_resume(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Resume(exceptions::Resume {
-            eh_token: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Resume(exceptions::Resume {
+        eh_token: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_resume_flat(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ResumeFlat(exceptions::ResumeFlat {
-            exception_ptr: take_single_operand(op, &mut __operand_index, 0)?,
-            type_id: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ResumeFlat(exceptions::ResumeFlat {
+        exception_ptr: take_single_operand(op, &mut __operand_index, 0)?,
+        type_id: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_return(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Return(control_flow::Return {
-            input: take_variadic_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Return(control_flow::Return {
+        input: take_variadic_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_return_address(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::ReturnAddress(misc::ReturnAddress {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            level: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::ReturnAddress(misc::ReturnAddress {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        level: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_rint(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Rint(arithmetic::Rint {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Rint(arithmetic::Rint {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_rotate(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Rotate(arithmetic::Rotate {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            amount: take_single_operand(op, &mut __operand_index, 1)?,
-            rotate_left: unit_attr(op, "rotateLeft"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Rotate(arithmetic::Rotate {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        amount: take_single_operand(op, &mut __operand_index, 1)?,
+        rotate_left: unit_attr(op, "rotateLeft"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_round(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Round(arithmetic::Round {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Round(arithmetic::Round {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_roundeven(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Roundeven(arithmetic::Roundeven {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Roundeven(arithmetic::Roundeven {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_scope(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Scope(control_flow::Scope {
-            results: op.results.get(0).map(|(id, _)| id.clone()),
-            results_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
-            scope_region: lower_region(op.regions.get(0)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Scope(control_flow::Scope {
+        results: op.results.get(0).map(|(id, _)| id.clone()),
+        results_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
+        scope_region: lower_region(op.regions.get(0)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_select(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Select(arithmetic::Select {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            condition: take_single_operand(op, &mut __operand_index, 0)?,
-            true_value: take_single_operand(op, &mut __operand_index, 1)?,
-            false_value: take_single_operand(op, &mut __operand_index, 2)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Select(arithmetic::Select {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        condition: take_single_operand(op, &mut __operand_index, 0)?,
+        true_value: take_single_operand(op, &mut __operand_index, 1)?,
+        false_value: take_single_operand(op, &mut __operand_index, 2)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_set_bitfield(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::SetBitfield(memory::SetBitfield {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            addr: take_single_operand(op, &mut __operand_index, 0)?,
-            src: take_single_operand(op, &mut __operand_index, 1)?,
-            bitfield_info: op_attr(op, "bitfield_info")?.clone(),
-            alignment: op_attr(op, "alignment")?.clone(),
-            is_volatile: unit_attr(op, "is_volatile"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::SetBitfield(memory::SetBitfield {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        addr: take_single_operand(op, &mut __operand_index, 0)?,
+        src: take_single_operand(op, &mut __operand_index, 1)?,
+        bitfield_info: op_attr(op, "bitfield_info")?.clone(),
+        alignment: op_attr(op, "alignment")?.clone(),
+        is_volatile: unit_attr(op, "is_volatile"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_shift(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Shift(arithmetic::Shift {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            value: take_single_operand(op, &mut __operand_index, 0)?,
-            amount: take_single_operand(op, &mut __operand_index, 1)?,
-            is_shiftleft: unit_attr(op, "isShiftleft"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Shift(arithmetic::Shift {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        value: take_single_operand(op, &mut __operand_index, 0)?,
+        amount: take_single_operand(op, &mut __operand_index, 1)?,
+        is_shiftleft: unit_attr(op, "isShiftleft"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_signbit(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Signbit(misc::Signbit {
-            res: op.results.get(0)?.0.clone(),
-            res_ty: op.results.get(0)?.1.clone(),
-            input: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Signbit(misc::Signbit {
+        res: op.results.get(0)?.0.clone(),
+        res_ty: op.results.get(0)?.1.clone(),
+        input: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_sin(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Sin(arithmetic::Sin {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Sin(arithmetic::Sin {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_sinh(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Sinh(arithmetic::Sinh {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Sinh(arithmetic::Sinh {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_sqrt(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Sqrt(arithmetic::Sqrt {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Sqrt(arithmetic::Sqrt {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_stackrestore(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Stackrestore(misc::Stackrestore {
-            ptr: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Stackrestore(misc::Stackrestore {
+        ptr: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_stacksave(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Stacksave(misc::Stacksave {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Stacksave(misc::Stacksave {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_std_find(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::StdFind(stdlib::StdFind {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            first: take_single_operand(op, &mut __operand_index, 0)?,
-            last: take_single_operand(op, &mut __operand_index, 1)?,
-            pattern: take_single_operand(op, &mut __operand_index, 2)?,
-            original_fn: op_attr(op, "original_fn")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::StdFind(stdlib::StdFind {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        first: take_single_operand(op, &mut __operand_index, 0)?,
+        last: take_single_operand(op, &mut __operand_index, 1)?,
+        pattern: take_single_operand(op, &mut __operand_index, 2)?,
+        original_fn: op_attr(op, "original_fn")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_std_strlen(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::StdStrlen(stdlib::StdStrlen {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            string: take_single_operand(op, &mut __operand_index, 0)?,
-            original_fn: op_attr(op, "original_fn")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::StdStrlen(stdlib::StdStrlen {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        string: take_single_operand(op, &mut __operand_index, 0)?,
+        original_fn: op_attr(op, "original_fn")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_store(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Store(memory::Store {
-            value: take_single_operand(op, &mut __operand_index, 0)?,
-            addr: take_single_operand(op, &mut __operand_index, 1)?,
-            is_volatile: unit_attr(op, "is_volatile"),
-            is_nontemporal: unit_attr(op, "is_nontemporal"),
-            alignment: op.attr("alignment").cloned(),
-            sync_scope: op
-                .attr("sync_scope")
-                .and_then(|a| crate::enums::SyncScopeKind::try_from(a).ok()),
-            mem_order: op
-                .attr("mem_order")
-                .and_then(|a| crate::enums::MemOrder::try_from(a).ok()),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Store(memory::Store {
+        value: take_single_operand(op, &mut __operand_index, 0)?,
+        addr: take_single_operand(op, &mut __operand_index, 1)?,
+        is_volatile: unit_attr(op, "is_volatile"),
+        is_nontemporal: unit_attr(op, "is_nontemporal"),
+        alignment: op.attr("alignment").cloned(),
+        sync_scope: op
+            .attr("sync_scope")
+            .and_then(|a| crate::enums::SyncScopeKind::try_from(a).ok()),
+        mem_order: op
+            .attr("mem_order")
+            .and_then(|a| crate::enums::MemOrder::try_from(a).ok()),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_sub(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Sub(arithmetic::Sub {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            no_signed_wrap: unit_attr(op, "no_signed_wrap"),
-            no_unsigned_wrap: unit_attr(op, "no_unsigned_wrap"),
-            saturated: unit_attr(op, "saturated"),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Sub(arithmetic::Sub {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        no_signed_wrap: unit_attr(op, "no_signed_wrap"),
+        no_unsigned_wrap: unit_attr(op, "no_unsigned_wrap"),
+        saturated: unit_attr(op, "saturated"),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_sub_overflow(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::SubOverflow(misc::SubOverflow {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            overflow: op.results.get(1)?.0.clone(),
-            overflow_ty: op.results.get(1)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::SubOverflow(misc::SubOverflow {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        overflow: op.results.get(1)?.0.clone(),
+        overflow_ty: op.results.get(1)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_switch(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Switch(control_flow::Switch {
-            condition: take_single_operand(op, &mut __operand_index, 0)?,
-            all_enum_cases_covered: unit_attr(op, "all_enum_cases_covered"),
-            body: lower_region(op.regions.get(0)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Switch(control_flow::Switch {
+        condition: take_single_operand(op, &mut __operand_index, 0)?,
+        all_enum_cases_covered: unit_attr(op, "all_enum_cases_covered"),
+        body: lower_region(op.regions.get(0)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_switch_flat(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::SwitchFlat(control_flow::SwitchFlat {
-            condition: take_single_operand(op, &mut __operand_index, 0)?,
-            default_operands: take_variadic_operand(op, &mut __operand_index, 1)?,
-            case_operands: take_variadic_of_variadic(
-                op,
-                &mut __operand_index,
-                "case_operand_segments",
-            )?,
-            case_values: op_attr(op, "caseValues")?.clone(),
-            case_operand_segments: op_attr(op, "case_operand_segments")?.clone(),
-            successors: op.successors.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::SwitchFlat(control_flow::SwitchFlat {
+        condition: take_single_operand(op, &mut __operand_index, 0)?,
+        default_operands: take_variadic_operand(op, &mut __operand_index, 1)?,
+        case_operands: take_variadic_of_variadic(
+            op,
+            &mut __operand_index,
+            "case_operand_segments",
+        )?,
+        case_values: op_attr(op, "caseValues")?.clone(),
+        case_operand_segments: op_attr(op, "case_operand_segments")?.clone(),
+        successors: op.successors.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_tan(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Tan(arithmetic::Tan {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Tan(arithmetic::Tan {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_tanh(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Tanh(arithmetic::Tanh {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Tanh(arithmetic::Tanh {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_ternary(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Ternary(control_flow::Ternary {
-            result: op.results.get(0).map(|(id, _)| id.clone()),
-            result_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
-            cond: take_single_operand(op, &mut __operand_index, 0)?,
-            true_region: lower_region(op.regions.get(0)?),
-            false_region: lower_region(op.regions.get(1)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Ternary(control_flow::Ternary {
+        result: op.results.get(0).map(|(id, _)| id.clone()),
+        result_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
+        cond: take_single_operand(op, &mut __operand_index, 0)?,
+        true_region: lower_region(op.regions.get(0)?),
+        false_region: lower_region(op.regions.get(1)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_throw(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Throw(exceptions::Throw {
-            exception_ptr: take_optional_operand(op, &mut __operand_index, 0),
-            type_info: op.attr("type_info").cloned(),
-            dtor: op.attr("dtor").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Throw(exceptions::Throw {
+        exception_ptr: take_optional_operand(op, &mut __operand_index, 0),
+        type_info: op.attr("type_info").cloned(),
+        dtor: op.attr("dtor").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_token_none(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::TokenNone(exceptions::TokenNone {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::TokenNone(exceptions::TokenNone {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_trap(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Trap(control_flow::Trap {
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Trap(control_flow::Trap {
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_trunc(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Trunc(arithmetic::Trunc {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Trunc(arithmetic::Trunc {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_try(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Try(exceptions::Try {
-            cleanup: unit_attr(op, "cleanup"),
-            handler_types: op_attr(op, "handler_types")?.clone(),
-            try_region: lower_region(op.regions.get(0)?),
-            handler_regions: op.regions.iter().skip(1).map(lower_region).collect(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Try(exceptions::Try {
+        cleanup: unit_attr(op, "cleanup"),
+        handler_types: op_attr(op, "handler_types")?.clone(),
+        try_region: lower_region(op.regions.get(0)?),
+        handler_regions: op.regions.iter().skip(1).map(lower_region).collect(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_try_call(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::TryCall(misc::TryCall {
-            result: op.results.get(0).map(|(id, _)| id.clone()),
-            result_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
-            callee: op.attr("callee").cloned(),
-            args: take_variadic_operand(op, &mut __operand_index, 0)?,
-            nothrow: unit_attr(op, "nothrow"),
-            inline_kind: op
-                .attr("inline_kind")
-                .and_then(|a| crate::enums::InlineKind::try_from(a).ok()),
-            musttail: unit_attr(op, "musttail"),
-            side_effect: op_attr(op, "side_effect")?.clone(),
-            arg_attrs: op.attr("arg_attrs").cloned(),
-            res_attrs: op.attr("res_attrs").cloned(),
-            successors: op.successors.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::TryCall(misc::TryCall {
+        result: op.results.get(0).map(|(id, _)| id.clone()),
+        result_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
+        callee: op.attr("callee").cloned(),
+        args: take_variadic_operand(op, &mut __operand_index, 0)?,
+        nothrow: unit_attr(op, "nothrow"),
+        inline_kind: op
+            .attr("inline_kind")
+            .and_then(|a| crate::enums::InlineKind::try_from(a).ok()),
+        musttail: unit_attr(op, "musttail"),
+        side_effect: op_attr(op, "side_effect")?.clone(),
+        arg_attrs: op.attr("arg_attrs").cloned(),
+        res_attrs: op.attr("res_attrs").cloned(),
+        successors: op.successors.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_try_throw(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::TryThrow(exceptions::TryThrow {
-            exception_ptr: take_optional_operand(op, &mut __operand_index, 0),
-            type_info: op.attr("type_info").cloned(),
-            dtor: op.attr("dtor").cloned(),
-            successors: op.successors.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::TryThrow(exceptions::TryThrow {
+        exception_ptr: take_optional_operand(op, &mut __operand_index, 0),
+        type_info: op.attr("type_info").cloned(),
+        dtor: op.attr("dtor").cloned(),
+        successors: op.successors.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_unreachable(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Unreachable(control_flow::Unreachable {
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Unreachable(control_flow::Unreachable {
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_va_arg(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VaArg(varargs::VaArg {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            arg_list: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VaArg(varargs::VaArg {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        arg_list: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_va_copy(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VaCopy(varargs::VaCopy {
-            dst_list: take_single_operand(op, &mut __operand_index, 0)?,
-            src_list: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VaCopy(varargs::VaCopy {
+        dst_list: take_single_operand(op, &mut __operand_index, 0)?,
+        src_list: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_va_end(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VaEnd(varargs::VaEnd {
-            arg_list: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VaEnd(varargs::VaEnd {
+        arg_list: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_va_start(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VaStart(varargs::VaStart {
-            arg_list: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VaStart(varargs::VaStart {
+        arg_list: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_vec_cmp(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VecCmp(vectors::VecCmp {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            kind: crate::enums::CmpOpKind::try_from(op_attr(op, "kind")?).ok()?,
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            fenv: op.attr("fenv").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VecCmp(vectors::VecCmp {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        kind: crate::enums::CmpOpKind::try_from(op_attr(op, "kind")?).ok()?,
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        fenv: op.attr("fenv").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_vec_create(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VecCreate(vectors::VecCreate {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            elements: take_variadic_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VecCreate(vectors::VecCreate {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        elements: take_variadic_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_vec_extract(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VecExtract(vectors::VecExtract {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            vec: take_single_operand(op, &mut __operand_index, 0)?,
-            index: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VecExtract(vectors::VecExtract {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        vec: take_single_operand(op, &mut __operand_index, 0)?,
+        index: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_vec_insert(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VecInsert(vectors::VecInsert {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            vec: take_single_operand(op, &mut __operand_index, 0)?,
-            value: take_single_operand(op, &mut __operand_index, 1)?,
-            index: take_single_operand(op, &mut __operand_index, 2)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VecInsert(vectors::VecInsert {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        vec: take_single_operand(op, &mut __operand_index, 0)?,
+        value: take_single_operand(op, &mut __operand_index, 1)?,
+        index: take_single_operand(op, &mut __operand_index, 2)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_vec_masked_load(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VecMaskedLoad(vectors::VecMaskedLoad {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            addr: take_single_operand(op, &mut __operand_index, 0)?,
-            mask: take_single_operand(op, &mut __operand_index, 1)?,
-            pass_thru: take_single_operand(op, &mut __operand_index, 2)?,
-            alignment: op.attr("alignment").cloned(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VecMaskedLoad(vectors::VecMaskedLoad {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        addr: take_single_operand(op, &mut __operand_index, 0)?,
+        mask: take_single_operand(op, &mut __operand_index, 1)?,
+        pass_thru: take_single_operand(op, &mut __operand_index, 2)?,
+        alignment: op.attr("alignment").cloned(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_vec_shuffle(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VecShuffle(vectors::VecShuffle {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            vec1: take_single_operand(op, &mut __operand_index, 0)?,
-            vec2: take_single_operand(op, &mut __operand_index, 1)?,
-            indices: op_attr(op, "indices")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VecShuffle(vectors::VecShuffle {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        vec1: take_single_operand(op, &mut __operand_index, 0)?,
+        vec2: take_single_operand(op, &mut __operand_index, 1)?,
+        indices: op_attr(op, "indices")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_vec_shuffle_dynamic(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VecShuffleDynamic(vectors::VecShuffleDynamic {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            vec: take_single_operand(op, &mut __operand_index, 0)?,
-            indices: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VecShuffleDynamic(vectors::VecShuffleDynamic {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        vec: take_single_operand(op, &mut __operand_index, 0)?,
+        indices: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_vec_splat(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VecSplat(vectors::VecSplat {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            value: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VecSplat(vectors::VecSplat {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        value: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_vec_ternary(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VecTernary(vectors::VecTernary {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            cond: take_single_operand(op, &mut __operand_index, 0)?,
-            lhs: take_single_operand(op, &mut __operand_index, 1)?,
-            rhs: take_single_operand(op, &mut __operand_index, 2)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VecTernary(vectors::VecTernary {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        cond: take_single_operand(op, &mut __operand_index, 0)?,
+        lhs: take_single_operand(op, &mut __operand_index, 1)?,
+        rhs: take_single_operand(op, &mut __operand_index, 2)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_vtable_address_point(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VtableAddressPoint(vtables::VtableAddressPoint {
-            addr: op.results.get(0)?.0.clone(),
-            addr_ty: op.results.get(0)?.1.clone(),
-            name: op_attr(op, "name")?.clone(),
-            address_point: op_attr(op, "address_point")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VtableAddressPoint(vtables::VtableAddressPoint {
+        addr: op.results.get(0)?.0.clone(),
+        addr_ty: op.results.get(0)?.1.clone(),
+        name: op_attr(op, "name")?.clone(),
+        address_point: op_attr(op, "address_point")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_vtable_get_type_info(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VtableGetTypeInfo(vtables::VtableGetTypeInfo {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            vptr: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VtableGetTypeInfo(vtables::VtableGetTypeInfo {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        vptr: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_vtable_get_virtual_fn_addr(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VtableGetVirtualFnAddr(vtables::VtableGetVirtualFnAddr {
+    Some(Op::VtableGetVirtualFnAddr(
+        vtables::VtableGetVirtualFnAddr {
             result: op.results.get(0)?.0.clone(),
             result_ty: op.results.get(0)?.1.clone(),
             vptr: take_single_operand(op, &mut __operand_index, 0)?,
             index: op_attr(op, "index")?.clone(),
             loc: op.loc.clone(),
-        }),
-    )
+        },
+    ))
 }
 fn lower_vtable_get_vptr(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VtableGetVptr(vtables::VtableGetVptr {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            src: take_single_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VtableGetVptr(vtables::VtableGetVptr {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        src: take_single_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_vtt_address_point(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::VttAddressPoint(vtables::VttAddressPoint {
-            addr: op.results.get(0)?.0.clone(),
-            addr_ty: op.results.get(0)?.1.clone(),
-            name: op.attr("name").cloned(),
-            sym_addr: take_optional_operand(op, &mut __operand_index, 0),
-            offset: op_attr(op, "offset")?.clone(),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::VttAddressPoint(vtables::VttAddressPoint {
+        addr: op.results.get(0)?.0.clone(),
+        addr_ty: op.results.get(0)?.1.clone(),
+        name: op.attr("name").cloned(),
+        sym_addr: take_optional_operand(op, &mut __operand_index, 0),
+        offset: op_attr(op, "offset")?.clone(),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_while(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::While(control_flow::While {
-            cleanup_kind: op
-                .attr("cleanupKind")
-                .and_then(|a| crate::enums::CleanupKind::try_from(a).ok()),
-            cond: lower_region(op.regions.get(0)?),
-            body: lower_region(op.regions.get(1)?),
-            cleanup: lower_region(op.regions.get(2)?),
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::While(control_flow::While {
+        cleanup_kind: op
+            .attr("cleanupKind")
+            .and_then(|a| crate::enums::CleanupKind::try_from(a).ok()),
+        cond: lower_region(op.regions.get(0)?),
+        body: lower_region(op.regions.get(1)?),
+        cleanup: lower_region(op.regions.get(2)?),
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_xor(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Xor(arithmetic::Xor {
-            result: op.results.get(0)?.0.clone(),
-            result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Xor(arithmetic::Xor {
+        result: op.results.get(0)?.0.clone(),
+        result_ty: op.results.get(0)?.1.clone(),
+        lhs: take_single_operand(op, &mut __operand_index, 0)?,
+        rhs: take_single_operand(op, &mut __operand_index, 1)?,
+        loc: op.loc.clone(),
+    }))
 }
 fn lower_yield(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
-    Some(
-        Op::Yield(control_flow::Yield {
-            args: take_variadic_operand(op, &mut __operand_index, 0)?,
-            loc: op.loc.clone(),
-        }),
-    )
+    Some(Op::Yield(control_flow::Yield {
+        args: take_variadic_operand(op, &mut __operand_index, 0)?,
+        loc: op.loc.clone(),
+    }))
 }
 pub fn lower_op(op: &crate::ast::Operation) -> Op {
     Op::from_operation(op).unwrap_or_else(|| Op::Other(op.clone()))
@@ -9931,10 +9467,7 @@ pub fn write_indent(f: &mut std::fmt::Formatter<'_>, level: usize) -> std::fmt::
     }
     Ok(())
 }
-pub fn write_value_list(
-    f: &mut std::fmt::Formatter<'_>,
-    ids: &[ValueId],
-) -> std::fmt::Result {
+pub fn write_value_list(f: &mut std::fmt::Formatter<'_>, ids: &[ValueId]) -> std::fmt::Result {
     for (i, id) in ids.iter().enumerate() {
         if i > 0 {
             write!(f, ", ")?;
@@ -9943,10 +9476,7 @@ pub fn write_value_list(
     }
     Ok(())
 }
-pub fn write_flags(
-    f: &mut std::fmt::Formatter<'_>,
-    flags: &[(&str, bool)],
-) -> std::fmt::Result {
+pub fn write_flags(f: &mut std::fmt::Formatter<'_>, flags: &[(&str, bool)]) -> std::fmt::Result {
     let set: Vec<&str> = flags
         .iter()
         .filter(|(_, v)| *v)
@@ -9992,11 +9522,7 @@ pub fn write_region(
     }
     Ok(())
 }
-pub fn write_op(
-    f: &mut std::fmt::Formatter<'_>,
-    op: &Op,
-    level: usize,
-) -> std::fmt::Result {
+pub fn write_op(f: &mut std::fmt::Formatter<'_>, op: &Op, level: usize) -> std::fmt::Result {
     match op {
         Op::Abs(_) => {
             write_indent(f, level)?;
@@ -10006,18 +9532,16 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "acos")
         }
-        Op::Add(
-            arithmetic::Add {
-                result,
-                result_ty,
-                lhs,
-                rhs,
-                no_signed_wrap,
-                no_unsigned_wrap,
-                saturated,
-                ..
-            },
-        ) => {
+        Op::Add(arithmetic::Add {
+            result,
+            result_ty,
+            lhs,
+            rhs,
+            no_signed_wrap,
+            no_unsigned_wrap,
+            saturated,
+            ..
+        }) => {
             write_indent(f, level)?;
             write!(f, "%{result} = add %{lhs}, %{rhs} : {result_ty}")?;
             write_flags(
@@ -10042,9 +9566,14 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "alloc.exception")
         }
-        Op::Alloca(
-            memory::Alloca { addr, addr_ty, dyn_alloc_size, name, alignment, .. },
-        ) => {
+        Op::Alloca(memory::Alloca {
+            addr,
+            addr_ty,
+            dyn_alloc_size,
+            name,
+            alignment,
+            ..
+        }) => {
             write_indent(f, level)?;
             write!(f, "%{addr} = alloca ")?;
             if let crate::types::Type::Pointer { pointee, .. } = addr_ty {
@@ -10131,12 +9660,17 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "base_method")
         }
-        Op::BeginCatch(
-            exceptions::BeginCatch { catch_token, exn_ptr, exn_ptr_ty, eh_token, .. },
-        ) => {
+        Op::BeginCatch(exceptions::BeginCatch {
+            catch_token,
+            exn_ptr,
+            exn_ptr_ty,
+            eh_token,
+            ..
+        }) => {
             write_indent(f, level)?;
             writeln!(
-                f, "%{catch_token}, %{exn_ptr} = begin_catch %{eh_token} : {exn_ptr_ty}"
+                f,
+                "%{catch_token}, %{exn_ptr} = begin_catch %{eh_token} : {exn_ptr_ty}"
             )
         }
         Op::BeginCleanup(_) => {
@@ -10159,7 +9693,9 @@ pub fn write_op(
                 writeln!(f, "br")
             }
         }
-        Op::Brcond(control_flow::Brcond { cond, successors, .. }) => {
+        Op::Brcond(control_flow::Brcond {
+            cond, successors, ..
+        }) => {
             write_indent(f, level)?;
             write!(f, "brcond %{cond}")?;
             if let Some(dest) = successors.first() {
@@ -10182,7 +9718,14 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "byte_swap")
         }
-        Op::Call(calls::Call { result, result_ty, callee, args, side_effect, .. }) => {
+        Op::Call(calls::Call {
+            result,
+            result_ty,
+            callee,
+            args,
+            side_effect,
+            ..
+        }) => {
             write_indent(f, level)?;
             if let Some(result) = result {
                 write!(f, "%{result} = ")?;
@@ -10206,7 +9749,12 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "call_llvm_intrinsic")
         }
-        Op::Case(control_flow::Case { value, kind, case_region, .. }) => {
+        Op::Case(control_flow::Case {
+            value,
+            kind,
+            case_region,
+            ..
+        }) => {
             write_indent(f, level)?;
             write!(f, "case {kind} {value} {{")?;
             writeln!(f)?;
@@ -10214,7 +9762,13 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "}}")
         }
-        Op::Cast(misc::Cast { result, result_ty, kind, src, .. }) => {
+        Op::Cast(misc::Cast {
+            result,
+            result_ty,
+            kind,
+            src,
+            ..
+        }) => {
             write_indent(f, level)?;
             writeln!(f, "%{result} = cast({kind}) %{src} : {result_ty}")
         }
@@ -10226,9 +9780,12 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "ceil")
         }
-        Op::CleanupScope(
-            control_flow::CleanupScope { cleanup_kind, body_region, cleanup_region, .. },
-        ) => {
+        Op::CleanupScope(control_flow::CleanupScope {
+            cleanup_kind,
+            body_region,
+            cleanup_region,
+            ..
+        }) => {
             write_indent(f, level)?;
             writeln!(f, "cleanup.scope {{")?;
             write_region(f, body_region, level + 1)?;
@@ -10310,7 +9867,9 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "condition %{condition}")
         }
-        Op::Const(globals::Const { res, res_ty, value, .. }) => {
+        Op::Const(globals::Const {
+            res, res_ty, value, ..
+        }) => {
             write_indent(f, level)?;
             writeln!(f, "%{res} = const {value} : {res_ty}")
         }
@@ -10524,7 +10083,9 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "fneg")
         }
-        Op::For(control_flow::For { cond, body, step, .. }) => {
+        Op::For(control_flow::For {
+            cond, body, step, ..
+        }) => {
             write_indent(f, level)?;
             writeln!(f, "for cond {{")?;
             write_region(f, cond, level + 1)?;
@@ -10569,7 +10130,12 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "get_element")
         }
-        Op::GetGlobal(globals::GetGlobal { addr, addr_ty, name, .. }) => {
+        Op::GetGlobal(globals::GetGlobal {
+            addr,
+            addr_ty,
+            name,
+            ..
+        }) => {
             write_indent(f, level)?;
             writeln!(f, "%{addr} = get_global {name} : {addr_ty}")
         }
@@ -10593,7 +10159,12 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "goto {label}")
         }
-        Op::If(control_flow::If { condition, then_region, else_region, .. }) => {
+        Op::If(control_flow::If {
+            condition,
+            then_region,
+            else_region,
+            ..
+        }) => {
             write_indent(f, level)?;
             writeln!(f, "if %{condition} {{")?;
             write_region(f, then_region, level + 1)?;
@@ -10617,9 +10188,12 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "indirect_goto %{addr}")
         }
-        Op::InitCatchParam(
-            exceptions::InitCatchParam { exn_ptr, param_addr, kind, .. },
-        ) => {
+        Op::InitCatchParam(exceptions::InitCatchParam {
+            exn_ptr,
+            param_addr,
+            kind,
+            ..
+        }) => {
             write_indent(f, level)?;
             writeln!(f, "init_catch_param {kind} %{exn_ptr} to %{param_addr}")
         }
@@ -10675,7 +10249,13 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "llround")
         }
-        Op::Load(memory::Load { result, result_ty, addr, alignment, .. }) => {
+        Op::Load(memory::Load {
+            result,
+            result_ty,
+            addr,
+            alignment,
+            ..
+        }) => {
             write_indent(f, level)?;
             write!(f, "%{result} = load %{addr} : {result_ty}")?;
             if let Some(a) = alignment {
@@ -10813,7 +10393,11 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "roundeven")
         }
-        Op::Scope(control_flow::Scope { results, scope_region, .. }) => {
+        Op::Scope(control_flow::Scope {
+            results,
+            scope_region,
+            ..
+        }) => {
             write_indent(f, level)?;
             if let Some(results) = results {
                 write!(f, "%{results} = ")?;
@@ -10867,7 +10451,12 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "std.strlen")
         }
-        Op::Store(memory::Store { value, addr, alignment, .. }) => {
+        Op::Store(memory::Store {
+            value,
+            addr,
+            alignment,
+            ..
+        }) => {
             write_indent(f, level)?;
             write!(f, "store %{value}, %{addr}")?;
             if let Some(a) = alignment {
@@ -10885,7 +10474,9 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "sub.overflow")
         }
-        Op::Switch(control_flow::Switch { condition, body, .. }) => {
+        Op::Switch(control_flow::Switch {
+            condition, body, ..
+        }) => {
             write_indent(f, level)?;
             writeln!(f, "switch %{condition} {{")?;
             write_region(f, body, level + 1)?;
@@ -10904,16 +10495,14 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "tanh")
         }
-        Op::Ternary(
-            control_flow::Ternary {
-                result,
-                result_ty,
-                cond,
-                true_region,
-                false_region,
-                ..
-            },
-        ) => {
+        Op::Ternary(control_flow::Ternary {
+            result,
+            result_ty,
+            cond,
+            true_region,
+            false_region,
+            ..
+        }) => {
             write_indent(f, level)?;
             if let Some(result) = result {
                 write!(f, "%{result} = ")?;
@@ -10946,7 +10535,12 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "trunc")
         }
-        Op::Try(exceptions::Try { cleanup, try_region, handler_regions, .. }) => {
+        Op::Try(exceptions::Try {
+            cleanup,
+            try_region,
+            handler_regions,
+            ..
+        }) => {
             write_indent(f, level)?;
             write!(f, "try")?;
             write_flags(f, &[("cleanup", *cleanup)])?;
@@ -11075,14 +10669,12 @@ pub fn write_op(
         }
     }
 }
-fn op_attr<'a>(
-    op: &'a crate::ast::Operation,
-    key: &str,
-) -> Option<&'a crate::attrs::Attribute> {
+fn op_attr<'a>(op: &'a crate::ast::Operation, key: &str) -> Option<&'a crate::attrs::Attribute> {
     op.attr(key)
 }
 fn unit_attr(op: &crate::ast::Operation, key: &str) -> bool {
-    op.attr(key).is_some_and(|a| !matches!(a, crate ::attrs::Attribute::Bool(false)))
+    op.attr(key)
+        .is_some_and(|a| !matches!(a, crate::attrs::Attribute::Bool(false)))
 }
 fn attr_str(op: &crate::ast::Operation, key: &str) -> Option<String> {
     op.attr(key).and_then(|a| a.as_str().map(str::to_string))
@@ -11092,14 +10684,20 @@ fn attr_type(op: &crate::ast::Operation, key: &str) -> Option<crate::types::Type
 }
 #[allow(dead_code)]
 fn attr_i32(op: &crate::ast::Operation, key: &str) -> Option<i32> {
-    op.attr(key).and_then(|a| a.as_int()).and_then(|v| i32::try_from(v).ok())
+    op.attr(key)
+        .and_then(|a| a.as_int())
+        .and_then(|v| i32::try_from(v).ok())
 }
 #[allow(dead_code)]
 fn attr_i64(op: &crate::ast::Operation, key: &str) -> Option<i64> {
-    op.attr(key).and_then(|a| a.as_int()).and_then(|v| i64::try_from(v).ok())
+    op.attr(key)
+        .and_then(|a| a.as_int())
+        .and_then(|v| i64::try_from(v).ok())
 }
 fn attr_u64(op: &crate::ast::Operation, key: &str) -> Option<u64> {
-    op.attr(key).and_then(|a| a.as_int()).and_then(|v| u64::try_from(v).ok())
+    op.attr(key)
+        .and_then(|a| a.as_int())
+        .and_then(|v| u64::try_from(v).ok())
 }
 fn dense_i32_array(attr: &crate::attrs::Attribute) -> Option<Vec<usize>> {
     match attr {
@@ -11110,14 +10708,14 @@ fn dense_i32_array(attr: &crate::attrs::Attribute) -> Option<Vec<usize>> {
             ..
         } if dialect == "builtin" && mnemonic == "array" => {
             let (_elem_ty, list) = raw.split_once(':')?;
-            list.split(',').map(|v| v.trim().parse::<usize>().ok()).collect()
-        }
-        crate::attrs::Attribute::Array(items) => {
-            items
-                .iter()
-                .map(|a| a.as_int().and_then(|v| usize::try_from(v).ok()))
+            list.split(',')
+                .map(|v| v.trim().parse::<usize>().ok())
                 .collect()
         }
+        crate::attrs::Attribute::Array(items) => items
+            .iter()
+            .map(|a| a.as_int().and_then(|v| usize::try_from(v).ok()))
+            .collect(),
         _ => None,
     }
 }

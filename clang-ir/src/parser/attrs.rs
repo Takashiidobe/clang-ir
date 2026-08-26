@@ -134,6 +134,7 @@ impl<'a> Parser<'a> {
             "fenv" => self.parse_cir_fenv_attr(),
             "ptr" => self.parse_cir_ptr_attr(),
             "block_addr_info" => self.parse_cir_block_addr_info_attr(),
+            "offset_pair" => self.parse_cir_offset_pair_attr(),
             "zero" => self.parse_cir_typed_marker(|ty| Attribute::Zero { ty }),
             "poison" => self.parse_cir_typed_marker(|ty| Attribute::Poison { ty }),
             _ => {
@@ -453,6 +454,21 @@ impl<'a> Parser<'a> {
         self.expect(Tok::Colon)?;
         let ty = self.parse_type()?;
         Ok(Attribute::BlockAddrInfo { ty, func, label })
+    }
+
+    fn parse_cir_offset_pair_attr(&mut self) -> Result<Attribute> {
+        self.expect(Tok::Less)?;
+        let start = self
+            .expect_number()?
+            .parse()
+            .map_err(|_| self.err("invalid offset_pair start"))?;
+        self.expect(Tok::Comma)?;
+        let end = self
+            .expect_number()?
+            .parse()
+            .map_err(|_| self.err("invalid offset_pair end"))?;
+        self.expect(Tok::Greater)?;
+        Ok(Attribute::OffsetPair { start, end })
     }
 
     fn parse_cir_typed_marker(

@@ -71,7 +71,10 @@ pub enum Type {
     /// `cir.data_member` models a pointer-to-data-member in C++. Values of this
     /// type are essentially offsets of the pointed-to member within one of its
     /// containing record.
-    DataMember { member_ty: Box<Type>, class_ty: Box<Type> },
+    DataMember {
+        member_ty: Box<Type>,
+        class_ty: Box<Type>,
+    },
     /// `!cir.double`
     /// CIR double-precision 64-bit float type
     ///
@@ -127,7 +130,11 @@ pub enum Type {
     /// !cir.func<(!s8i, !s8i) -> !s32i>
     /// !cir.func<(!s32i, ...) -> !s32i>
     /// ```
-    Func { inputs: Vec<Type>, optional_return_type: Option<Box<Type>>, var_arg: bool },
+    Func {
+        inputs: Vec<Type>,
+        optional_return_type: Option<Box<Type>>,
+        var_arg: bool,
+    },
     /// `!cir.int`
     /// Integer type with arbitrary precision up to a fixed limit
     ///
@@ -140,7 +147,11 @@ pub enum Type {
     /// `long`, `long long`, and their unsigned variations.
     ///
     /// Examples: `!cir.int<s, 32>`, `!cir.int<u, 64>`, `!cir.int<s, 128, bitint>`
-    Int { width: u32, is_signed: bool, is_bit_int: bool },
+    Int {
+        width: u32,
+        is_signed: bool,
+        is_bit_int: bool,
+    },
     /// `!cir.long_double`
     /// CIR float type for `long double`
     ///
@@ -160,7 +171,10 @@ pub enum Type {
     ///
     /// `cir.method` models the pointer-to-member-function type in C++. The layout
     /// of this type is ABI-dependent.
-    Method { member_func_ty: Box<Type>, class_ty: Box<Type> },
+    Method {
+        member_func_ty: Box<Type>,
+        class_ty: Box<Type>,
+    },
     /// `!cir.ptr`
     /// CIR pointer type
     ///
@@ -183,7 +197,10 @@ pub enum Type {
     /// !cir.ptr<!cir.int<u, 8>, target_address_space(1)>
     /// !cir.ptr<!cir.record<struct "MyStruct">, target_address_space(5)>
     /// ```
-    Pointer { pointee: Box<Type>, addr_space: Option<String> },
+    Pointer {
+        pointee: Box<Type>,
+        addr_space: Option<String>,
+    },
     /// `!cir.float`
     /// CIR single-precision 32-bit float type
     ///
@@ -343,9 +360,16 @@ pub enum Type {
     /// The builtin `index` type.
     Index,
     /// A builtin function type.
-    FunctionType { inputs: Vec<Type>, results: Vec<Type> },
+    FunctionType {
+        inputs: Vec<Type>,
+        results: Vec<Type>,
+    },
     /// A type outside the CIR-specific variants.
-    Dialect { dialect: String, mnemonic: String, raw: Option<String> },
+    Dialect {
+        dialect: String,
+        mnemonic: String,
+        raw: Option<String>,
+    },
 }
 impl Type {
     pub fn as_array(&self) -> Option<(&Type, u64)> {
@@ -356,17 +380,21 @@ impl Type {
     }
     pub fn as_vector(&self) -> Option<(&Type, u64, bool)> {
         match self {
-            Self::Vector { element_type, size, is_scalable } => {
-                Some((element_type, *size, is_scalable.unwrap_or(false)))
-            }
+            Self::Vector {
+                element_type,
+                size,
+                is_scalable,
+            } => Some((element_type, *size, is_scalable.unwrap_or(false))),
             _ => None,
         }
     }
     pub fn as_integer(&self) -> Option<(bool, u32, bool)> {
         match self {
-            Self::Int { width, is_signed, is_bit_int } => {
-                Some((*is_signed, *width, *is_bit_int))
-            }
+            Self::Int {
+                width,
+                is_signed,
+                is_bit_int,
+            } => Some((*is_signed, *width, *is_bit_int)),
             _ => None,
         }
     }
@@ -378,9 +406,11 @@ impl Type {
     }
     pub fn as_function(&self) -> Option<(&[Type], Option<&Type>, bool)> {
         match self {
-            Self::Func { inputs, optional_return_type, var_arg } => {
-                Some((inputs, optional_return_type.as_deref(), *var_arg))
-            }
+            Self::Func {
+                inputs,
+                optional_return_type,
+                var_arg,
+            } => Some((inputs, optional_return_type.as_deref(), *var_arg)),
             _ => None,
         }
     }
@@ -393,10 +423,7 @@ impl Type {
 }
 impl std::fmt::Display for Type {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        fn write_list(
-            f: &mut std::fmt::Formatter<'_>,
-            values: &[Type],
-        ) -> std::fmt::Result {
+        fn write_list(f: &mut std::fmt::Formatter<'_>, values: &[Type]) -> std::fmt::Result {
             for (i, value) in values.iter().enumerate() {
                 if i > 0 {
                     write!(f, ", ")?;
@@ -422,8 +449,12 @@ impl std::fmt::Display for Type {
                     }
                 }
             }
-            Self::Int { width, is_signed, is_bit_int } => {
-                write!(f, "{}{width}", if * is_signed { "s" } else { "u" })?;
+            Self::Int {
+                width,
+                is_signed,
+                is_bit_int,
+            } => {
+                write!(f, "{}{width}", if *is_signed { "s" } else { "u" })?;
                 if *is_bit_int {
                     write!(f, "_bitint")?;
                 }
@@ -438,7 +469,10 @@ impl std::fmt::Display for Type {
             Self::Fp80 => write!(f, "f80"),
             Self::Fp128 => write!(f, "f128"),
             Self::LongDouble { underlying } => write!(f, "long_double<{underlying}>"),
-            Self::Pointer { pointee, addr_space } => {
+            Self::Pointer {
+                pointee,
+                addr_space,
+            } => {
                 write!(f, "{pointee}*")?;
                 if let Some(raw) = addr_space {
                     write!(f, " {raw}")?;
@@ -446,10 +480,16 @@ impl std::fmt::Display for Type {
                 Ok(())
             }
             Self::Array { element_type, size } => write!(f, "{element_type}[{size}]"),
-            Self::Vector { element_type, size, .. } => {
+            Self::Vector {
+                element_type, size, ..
+            } => {
                 write!(f, "vector<{size} x {element_type}>")
             }
-            Self::Func { inputs, optional_return_type, var_arg } => {
+            Self::Func {
+                inputs,
+                optional_return_type,
+                var_arg,
+            } => {
                 write!(f, "(")?;
                 write_list(f, inputs)?;
                 if *var_arg {
@@ -471,17 +511,27 @@ impl std::fmt::Display for Type {
                 write!(f, "union {}", name.as_deref().unwrap_or("<anon>"))
             }
             Self::Complex { element_type } => write!(f, "complex<{element_type}>"),
-            Self::DataMember { member_ty, class_ty } => {
+            Self::DataMember {
+                member_ty,
+                class_ty,
+            } => {
                 write!(f, "data_member<{member_ty} in {class_ty}>")
             }
-            Self::Method { member_func_ty, class_ty } => {
+            Self::Method {
+                member_func_ty,
+                class_ty,
+            } => {
                 write!(f, "method<{member_func_ty} in {class_ty}>")
             }
             Self::VPtr => write!(f, "vptr"),
             Self::EhToken => write!(f, "eh_token"),
             Self::CleanupToken => write!(f, "cleanup_token"),
             Self::CatchToken => write!(f, "catch_token"),
-            Self::Dialect { dialect, mnemonic, raw } => {
+            Self::Dialect {
+                dialect,
+                mnemonic,
+                raw,
+            } => {
                 write!(f, "{dialect}.{mnemonic}")?;
                 if let Some(raw) = raw {
                     write!(f, "<{raw}>")?;
