@@ -134,6 +134,7 @@ impl<'a> Parser<'a> {
             "fenv" => self.parse_cir_fenv_attr(),
             "ptr" => self.parse_cir_ptr_attr(),
             "block_addr_info" => self.parse_cir_block_addr_info_attr(),
+            "block_addr_diff" => self.parse_cir_block_addr_diff_attr(),
             "offset_pair" => self.parse_cir_offset_pair_attr(),
             "zero" => self.parse_cir_typed_marker(|ty| Attribute::Zero { ty }),
             "poison" => self.parse_cir_typed_marker(|ty| Attribute::Poison { ty }),
@@ -454,6 +455,24 @@ impl<'a> Parser<'a> {
         self.expect(Tok::Colon)?;
         let ty = self.parse_type()?;
         Ok(Attribute::BlockAddrInfo { ty, func, label })
+    }
+
+    fn parse_cir_block_addr_diff_attr(&mut self) -> Result<Attribute> {
+        self.expect(Tok::Less)?;
+        let func = self.expect_symbol_ref()?;
+        self.expect(Tok::Comma)?;
+        let lhs_label = self.expect_str()?;
+        self.expect(Tok::Comma)?;
+        let rhs_label = self.expect_str()?;
+        self.expect(Tok::Greater)?;
+        self.expect(Tok::Colon)?;
+        let ty = self.parse_type()?;
+        Ok(Attribute::BlockAddrDiff {
+            ty,
+            func,
+            lhs_label,
+            rhs_label,
+        })
     }
 
     fn parse_cir_offset_pair_attr(&mut self) -> Result<Attribute> {
