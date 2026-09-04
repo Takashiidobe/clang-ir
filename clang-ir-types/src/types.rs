@@ -17,11 +17,59 @@ pub enum Type {
     /// It represents the type `std::bfloat16_t` in C++, also spelled `__bf16` in
     /// some implementations.
     Bf16,
+    /// `!cir.bitfield`
+    /// CIR bit-field access unit member type
+    ///
+    /// A run of bit-fields shares one access unit. A record has one member per
+    /// access unit, and that member has this type. The `storage_type` is the unit
+    /// the record stores, and `fields` says which bit-fields the source packed into
+    /// it, in declaration order.
+    ///
+    /// The unit answers where the bits live, and `fields` answers how the fields
+    /// were declared in the user's source code. The storage type can be narrower
+    /// than the declared type of a bit-field within it, and the fields in it need
+    /// not agree on a declared type.
+    ///
+    /// A zero-width bit-field belongs to no unit.  It is spelled as a member with
+    /// no `storage_type` and a single zero-width field, which occupies no bytes of
+    /// the record and becomes no field of the lowered LLVM struct.  Every other
+    /// member of this type owns the bytes of its unit.
+    ///
+    /// Examples:
+    ///
+    /// ```
+    ///     // struct S { int a : 4; int b : 27; };
+    ///     !rec_S = !cir.struct<"S"
+    ///         {bitfield !cir.bitfield<!u32i, [#cir.bitfield_decl<!s32i, 4>,
+    ///                                         #cir.bitfield_decl<!s32i, 27>]>}>
+    ///
+    ///     // struct M { int a : 2; long long b : 30; };
+    ///     !rec_M = !cir.struct<"M"
+    ///         {bitfield !cir.bitfield<!u32i, [#cir.bitfield_decl<!s32i, 2>,
+    ///                                         #cir.bitfield_decl<!s64i, 30>]>,
+    ///          pad !cir.array<!u8i x 4>}>
+    ///
+    ///     // struct Tail { int x; unsigned : 0; };
+    ///     !rec_Tail = !cir.struct<"Tail"
+    ///         {data !s32i,
+    ///          empty !cir.bitfield<[#cir.bitfield_decl<!u32i, 0, unnamed>]>}>
+    /// ```
+    BitField {
+        storage_type: Option<Box<Type>>,
+        fields: Option<Vec<String>>,
+    },
     /// `!cir.bool`
     /// CIR bool type
     ///
     /// `!cir.bool` represents C++ bool type.
     Bool,
+    /// `!cir.cuda_texture`
+    /// CUDA device texture reference type
+    ///
+    /// `!cir.cuda_texture` represents a CUDA built-in texture reference in CIR.
+    /// The type preserves texture semantics at the CIR level and is lowered to
+    /// the target device representation during lowering to LLVM IR.
+    CudaDeviceTexture,
     /// `!cir.catch_token`
     /// CIR catch token type
     ///
@@ -245,6 +293,9 @@ pub enum Type {
     ///     !rec_packed   = !cir.struct<"p1" packed {data !u8i, data !u8i}>
     ///     !rec_pad      = !cir.struct<"p3" {data !u8i, pad !cir.array<!u8i x 3>}>
     ///     !rec_empty    = !cir.struct<"e" {empty !u8i}>
+    ///     !rec_bits     = !cir.struct<"b"
+    ///         {bitfield !cir.bitfield<!u8i, [#cir.bitfield_decl<!s32i, 4>]>,
+    ///          empty !cir.bitfield<[#cir.bitfield_decl<!s32i, 0, unnamed>]>}>
     ///     !recursive    = !cir.struct<"Node" {data !cir.ptr<!cir.struct<"Node">>}>
     /// ```
     Struct {
@@ -281,6 +332,9 @@ pub enum Type {
     ///     !u_anonymous  = !cir.union<{data !s32i, data !u8i}>
     ///     !u_padded     = !cir.union<"U" {data !s32i, data !u8i}, padding = {!u8i}>
     ///     !u_empty      = !cir.union<"U" {empty !u8i}>
+    ///     !u_bits       = !cir.union<"U"
+    ///         {bitfield !cir.bitfield<!u8i, [#cir.bitfield_decl<!s32i, 4>]>,
+    ///          empty !cir.bitfield<!u8i, [#cir.bitfield_decl<!s32i, 3, unnamed>]>}>
     /// ```
     Union {
         members: Option<Vec<Type>>,

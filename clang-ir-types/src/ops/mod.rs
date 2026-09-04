@@ -2839,10 +2839,17 @@ pub enum Op {
     /// `len` provides a bound to the search in `src`. `result` is a pointer to
     /// found `pattern` or a null pointer.
     ///
+    /// `pattern` has the width of the target int and `len` has the width of
+    /// the target size_t. The module records these widths as
+    /// `cir.int_type_width` and `cir.size_type_width`, each a signless i32
+    /// holding a fundamental integer width, and the verifier checks the
+    /// operands against them. `src` must be a void pointer in the default
+    /// address space and `result` has the same type as `src`.
+    ///
     /// Examples:
     ///
     /// ```
-    /// %p = cir.libc.memchr(%src, %pattern, %len)
+    /// %p = cir.libc.memchr(%src, %pattern, %len) : !cir.ptr<!void>, !s32i, !u64i
     /// ```
     LibcMemchr(stdlib::LibcMemchr),
     /// `cir.libc.memcpy`
@@ -8434,6 +8441,7 @@ fn lower_global(op: &crate::ast::Operation) -> Option<Op> {
         static_local_guard: op.attr("static_local_guard").cloned(),
         alignment: op.attr("alignment").cloned(),
         ast: op.attr("ast").cloned(),
+        static_local_info: op.attr("static_local_info").cloned(),
         section: op
             .attr("section")
             .and_then(|a| a.as_str().map(str::to_string)),

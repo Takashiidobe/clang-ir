@@ -55,6 +55,46 @@ pub enum Attribute {
         name: String,
         args: Option<Box<Attribute>>,
     },
+    /// `#cir.await`
+    /// await kind
+    AwaitKind {
+        /// an enum of type AwaitKind
+        value: crate::enums::AwaitKind,
+    },
+    /// `#cir.bitfield_decl`
+    /// How the source declared one bit-field
+    ///
+    /// Records a single bit-field as its declaration wrote it: the declared type,
+    /// the number of bits the field holds, and whether the declaration named it.
+    ///
+    /// A run of bit-fields shares one access unit whose width the compiler picks,
+    /// so none of this can be recovered from the unit.  The fields in a run need
+    /// not even agree on a declared type: `struct { int a : 2; long long b : 30; }`
+    /// packs an `int` and a `long long` into a single 32-bit unit.  This attribute
+    /// is therefore per field, and `!cir.bitfield` carries one of them for every
+    /// bit-field in the unit.
+    ///
+    /// A width of zero is a zero-width bit-field, `int : 0`, which holds no bits
+    /// and exists only to end the run before it.
+    ///
+    /// `unnamed` marks a bit-field the source cannot read, `int : 3`.  It still
+    /// occupies bits of the unit, and the x86-64 classifier reads it, but it is
+    /// not a field any expression names.  Every zero-width bit-field is unnamed.
+    ///
+    /// Example:
+    /// ```
+    ///   #cir.bitfield_decl<!s32i, 4>
+    ///   #cir.bitfield_decl<!s64i, 30>
+    ///   #cir.bitfield_decl<!s32i, 3, unnamed>
+    ///   #cir.bitfield_decl<!u32i, 0, unnamed>
+    /// ```
+    BitFieldDecl {
+        /// integer or boolean type
+        declared_type: crate::types::Type,
+        width: u64,
+        /// unnamed bit-field flag
+        is_unnamed: Box<Attribute>,
+    },
     /// `#cir.bitfield_info`
     /// Represents info for a bit-field member
     ///
@@ -221,15 +261,33 @@ pub enum Attribute {
         ty: crate::types::Type,
         is_trivial: bool,
     },
+    /// `#cir.case`
+    /// case kind
+    CaseOpKind {
+        /// an enum of type CaseOpKind
+        value: crate::enums::CaseOpKind,
+    },
+    /// `#cir.cast`
+    /// cast kind
+    CastKind {
+        /// an enum of type CastKind
+        value: crate::enums::CastKind,
+    },
     /// `#cir.all`
     CatchAll,
-    /// `#cir.cleanup_kind`
+    /// `#cir.cleanup`
     /// Cleanup kind attribute
     ///
     /// Cleanup kind attributes.
     CleanupKind {
         /// an enum of type CleanupKind
         value: crate::enums::CleanupKind,
+    },
+    /// `#cir.cmp`
+    /// compare operation kind
+    CmpOpKind {
+        /// an enum of type CmpOpKind
+        value: crate::enums::CmpOpKind,
     },
     /// `#cir.cmp3way_info`
     /// Holds information about a three-way comparison operation
@@ -271,6 +329,12 @@ pub enum Attribute {
         eq: i64,
         gt: i64,
         unordered: Option<i64>,
+    },
+    /// `#cir.complex_range`
+    /// complex multiplication and division implementation
+    ComplexRangeKind {
+        /// an enum of type ComplexRangeKind
+        value: crate::enums::ComplexRangeKind,
     },
     /// `#cir.const_array`
     /// A constant array from ArrayAttr or StringRefAttr
@@ -413,6 +477,12 @@ pub enum Attribute {
         /// An attribute containing an integer value
         offset_hint: Box<Attribute>,
     },
+    /// `#cir.dynamic_cast`
+    /// dynamic cast kind
+    DynamicCastKind {
+        /// an enum of type DynamicCastKind
+        value: crate::enums::DynamicCastKind,
+    },
     /// `#cir.fp`
     /// An attribute containing a floating-point value
     ///
@@ -493,6 +563,46 @@ pub enum Attribute {
         name: String,
         priority: i32,
     },
+    /// `#cir.global_offset`
+    /// Provides constant access to a byte offset from a global
+    ///
+    /// Get the constant address that is `offset` bytes away from the address of
+    /// global `symbol`. Like `#cir.global_view`, it provides a way to access
+    /// globals from other globals and always produces a pointer, and the type of
+    /// the referenced symbol may differ from the type of the attribute.
+    ///
+    /// Whereas `#cir.global_view` navigates the type of the symbol using
+    /// subelement indices, this attribute describes a flat displacement in bytes.
+    /// It is used for the addresses that cannot be described by subelement
+    /// indices, namely addresses outside of the referenced object, such as the
+    /// one-past-the-end address of a record, and addresses that do not fall on a
+    /// subelement boundary. This mirrors the byte offset that classic codegen
+    /// applies to every constant lvalue.
+    ///
+    /// Example:
+    ///
+    /// ```
+    /// struct S { int x; };
+    /// S s;
+    /// S *p = &s + 1;
+    /// ```
+    ///
+    /// produces
+    ///
+    /// ```
+    /// cir.global external @p = #cir.global_offset<@s, 4> : !cir.ptr<!rec_S>
+    /// ```
+    ///
+    /// which lowers to
+    ///
+    /// ```
+    /// @p = global ptr getelementptr (i8, ptr @s, i64 4)
+    /// ```
+    GlobalOffset {
+        ty: crate::types::Type,
+        symbol: String,
+        offset: i64,
+    },
     /// `#cir.global_view`
     /// Provides constant access to a global address
     ///
@@ -556,6 +666,12 @@ pub enum Attribute {
         ty: crate::types::Type,
         symbol: String,
         indices: Option<Box<Attribute>>,
+    },
+    /// `#cir.init_catch`
+    /// allowed 32-bit signless integer cases: 0, 1, 2, 3, 4, 5
+    InitCatchKind {
+        /// an enum of type InitCatchKind
+        value: crate::enums::InitCatchKind,
     },
     /// `#cir.inline_kind`
     /// Inline kind attribute
@@ -785,6 +901,10 @@ pub enum Attribute {
     /// module attributes {cir.lang = cir.lang<c>} {}
     /// // Module compiled from C++.
     /// module attributes {cir.lang = cir.lang<cxx>} {}
+    /// // Module compiled from OpenCL C.
+    /// module attributes {cir.lang = cir.lang<opencl_c>} {}
+    /// // Module compiled from C++ for OpenCL.
+    /// module attributes {cir.lang = cir.lang<opencl_cxx>} {}
     /// ```
     ///
     /// Module source language attribute name is `cir.lang` is defined by
@@ -805,6 +925,46 @@ pub enum Attribute {
     /// ```
     StaticLocalGuard {
         name: String,
+    },
+    /// `#cir.static_local_info`
+    /// Static-local variable facts needed by later lowering
+    ///
+    /// Holds the subset of a static-local variable's declaration facts that
+    /// post-CIRGen lowering needs, as plain data (no `clang::VarDecl` pointer).
+    ///
+    /// - `local`: whether the variable is a block-scope (local) declaration.
+    ///   Mirrors `clang::VarDecl::isLocalVarDecl()`. The namespace-scope inline
+    ///   variables that also reach guarded initialization are not local.
+    ///
+    /// - `tls`: the thread-local storage kind (`none`, `static`, or `dynamic`).
+    ///
+    /// - `is_inline`: whether the variable is inline. Mirrors
+    ///   `clang::VarDecl::isInline()`.
+    ///
+    /// - `tsk`: the template-specialization kind (`undeclared`,
+    ///   `implicit_instantiation`, `explicit_specialization`,
+    ///   `explicit_instantiation_declaration`, or
+    ///   `explicit_instantiation_definition`).
+    ///
+    /// Example:
+    /// ```
+    /// cir.global ... @x = ...
+    ///   {static_local_info = #cir.static_local_info<
+    ///      local = true, tls = none, is_inline = false, tsk = undeclared>}
+    /// ```
+    ///
+    /// Because it stores plain data rather than a `clang::VarDecl` pointer, it
+    /// round-trips through textual CIR and stays valid once the AST is gone.
+    /// This is what lets LoweringPrepare consume these facts without a live
+    /// `clang::ASTContext`; the `$ast` `ASTVarDeclAttr` remains a separate,
+    /// live-AST handle for consumers that need arbitrary AST properties.
+    StaticLocalInfo {
+        local: bool,
+        /// an enum of type TLSKind
+        tls: crate::enums::TlsKind,
+        is_inline: bool,
+        /// an enum of type TemplateSpecializationKind
+        tsk: crate::enums::TemplateSpecializationKind,
     },
     /// `#cir.tls_model`
     /// TLS Model attribute
@@ -962,14 +1122,6 @@ pub enum Attribute {
     VTable {
         ty: crate::types::Type,
         data: Box<Attribute>,
-    },
-    /// `#cir.visibility`
-    /// Visibility attribute
-    ///
-    /// Visibility attributes.
-    Visibility {
-        /// an enum of type VisibilityKind
-        value: crate::enums::VisibilityKind,
     },
     /// `#cir.zero`
     /// Attribute to represent zero initialization

@@ -7,10 +7,17 @@
 /// `len` provides a bound to the search in `src`. `result` is a pointer to
 /// found `pattern` or a null pointer.
 ///
+/// `pattern` has the width of the target int and `len` has the width of
+/// the target size_t. The module records these widths as
+/// `cir.int_type_width` and `cir.size_type_width`, each a signless i32
+/// holding a fundamental integer width, and the verifier checks the
+/// operands against them. `src` must be a void pointer in the default
+/// address space and `result` has the same type as `src`.
+///
 /// Examples:
 ///
 /// ```
-/// %p = cir.libc.memchr(%src, %pattern, %len)
+/// %p = cir.libc.memchr(%src, %pattern, %len) : !cir.ptr<!void>, !s32i, !u64i
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -18,9 +25,9 @@ pub struct LibcMemchr {
     pub result: super::ValueId,
     pub result_ty: crate::types::Type,
     pub src: super::ValueId,
-    /// 32-bit signed integer
+    /// fundamental signed integer type
     pub pattern: super::ValueId,
-    /// 64-bit unsigned integer
+    /// fundamental unsigned integer type
     pub len: super::ValueId,
     pub loc: Option<crate::ast::SourceLocation>,
 }
@@ -113,11 +120,11 @@ pub struct LibcMemset {
 pub struct StdFind {
     pub result: super::ValueId,
     pub result_ty: crate::types::Type,
-    /// CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
+    /// CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
     pub first: super::ValueId,
-    /// CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
+    /// CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
     pub last: super::ValueId,
-    /// CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
+    /// CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
     pub pattern: super::ValueId,
     /// flat symbol reference attribute
     pub original_fn: crate::attrs::Attribute,

@@ -1926,19 +1926,35 @@ impl TryFrom<&crate::attrs::Attribute> for MemOrder {
 }
 /// what a record member holds
 ///
-/// Distinguishes a record member that holds source data from one that does
-/// not.  `pad` is storage the compiler inserted to place a later member at its
+/// `pad` is storage the compiler inserted to place a later member at its
 /// required offset, and is reusable tail padding when it trails the record.
-/// `empty` is storage the source declared that carries no data for argument
-/// passing: an unnamed bit-field unit, or a field of a record that is empty for
-/// the ABI.  Everything else, including a vtable pointer, a base subobject, and
-/// a bit-field unit with a named occupant, is `data`.
 ///
-/// A record is empty for the ABI when no member is `data`, which is vacuously
-/// true for a record with no members.  The distinction between `pad` and
-/// `empty` is load-bearing beyond that: only `pad` is reusable, so a record
-/// whose trailing member is an unnamed bit-field unit keeps that unit in its
-/// data size.
+/// `data` and `empty` both span something whose extent the source fixed: a
+/// field, a vtable pointer, or a base subobject.  They differ only on whether
+/// it holds data for argument passing.
+///
+/// `bitfield` is a bit-field access unit the source can read at least one
+/// bit-field of, and its member type is `!cir.bitfield`.  The mark is needed
+/// because a unit can be narrower than the declared type of a bit-field in it:
+/// without it, a 32-bit unit holding a bit-field of `long long` would be
+/// indistinguishable from an `unsigned` field, and clang's x86-64 lowering
+/// coerces two records that differ only in that to `i64` and `i32`.
+///
+/// A unit of nothing but unnamed bit-fields is `empty`, since no field of the
+/// source reads it, even though it still holds data for argument passing.  A
+/// zero-width bit-field is unnamed by definition, so it is always `empty`, and
+/// it is the only bit-field member that holds no such data.
+///
+/// A union's base subobject is the one exception to all of this: a single
+/// member stands in for every variant, and it takes a bit-field mark as soon
+/// as any variant is one, whatever its own storage type came from.
+///
+/// A record is empty for the ABI when no member is `data` or `bitfield`, which
+/// is trivially true for a record with no members, and when no `empty` member
+/// is an access unit of unnamed bit-fields.  The distinction between `pad` and
+/// the rest is load-bearing beyond that: only `pad` is reusable, so a record
+/// whose trailing member is a unit of unnamed bit-fields keeps that unit in
+/// its data size.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[repr(i64)]
@@ -1946,6 +1962,7 @@ pub enum RecordMemberKind {
     Data = 0i64,
     Pad = 1i64,
     Empty = 2i64,
+    BitField = 3i64,
 }
 impl TryFrom<i128> for RecordMemberKind {
     type Error = ParseEnumError;
@@ -1955,6 +1972,7 @@ impl TryFrom<i128> for RecordMemberKind {
             0i64 => Ok(Self::Data),
             1i64 => Ok(Self::Pad),
             2i64 => Ok(Self::Empty),
+            3i64 => Ok(Self::BitField),
             _ => Err(ParseEnumError::new("RecordMemberKind", value.to_string())),
         }
     }
@@ -1965,6 +1983,7 @@ impl From<RecordMemberKind> for i128 {
             RecordMemberKind::Data => i128::from(0i64),
             RecordMemberKind::Pad => i128::from(1i64),
             RecordMemberKind::Empty => i128::from(2i64),
+            RecordMemberKind::BitField => i128::from(3i64),
         }
     }
 }
@@ -1975,6 +1994,7 @@ impl std::str::FromStr for RecordMemberKind {
             "data" => Ok(Self::Data),
             "pad" => Ok(Self::Pad),
             "empty" => Ok(Self::Empty),
+            "bitfield" => Ok(Self::BitField),
             _ => Err(ParseEnumError::new("RecordMemberKind", s.to_string())),
         }
     }
@@ -1985,6 +2005,7 @@ impl std::fmt::Display for RecordMemberKind {
             Self::Data => "data",
             Self::Pad => "pad",
             Self::Empty => "empty",
+            Self::BitField => "bitfield",
         };
         write!(f, "{keyword}")
     }
@@ -2098,6 +2119,8 @@ impl TryFrom<&crate::attrs::Attribute> for SideEffect {
 pub enum SourceLanguage {
     C = 1i64,
     Cxx = 2i64,
+    OpenClc = 3i64,
+    OpenClcxx = 4i64,
 }
 impl TryFrom<i128> for SourceLanguage {
     type Error = ParseEnumError;
@@ -2106,6 +2129,8 @@ impl TryFrom<i128> for SourceLanguage {
         match value {
             1i64 => Ok(Self::C),
             2i64 => Ok(Self::Cxx),
+            3i64 => Ok(Self::OpenClc),
+            4i64 => Ok(Self::OpenClcxx),
             _ => Err(ParseEnumError::new("SourceLanguage", value.to_string())),
         }
     }
@@ -2115,6 +2140,8 @@ impl From<SourceLanguage> for i128 {
         match value {
             SourceLanguage::C => i128::from(1i64),
             SourceLanguage::Cxx => i128::from(2i64),
+            SourceLanguage::OpenClc => i128::from(3i64),
+            SourceLanguage::OpenClcxx => i128::from(4i64),
         }
     }
 }
@@ -2124,6 +2151,8 @@ impl std::str::FromStr for SourceLanguage {
         match s {
             "c" => Ok(Self::C),
             "cxx" => Ok(Self::Cxx),
+            "opencl_c" => Ok(Self::OpenClc),
+            "opencl_cxx" => Ok(Self::OpenClcxx),
             _ => Err(ParseEnumError::new("SourceLanguage", s.to_string())),
         }
     }
@@ -2133,6 +2162,8 @@ impl std::fmt::Display for SourceLanguage {
         let keyword = match self {
             Self::C => "c",
             Self::Cxx => "cxx",
+            Self::OpenClc => "opencl_c",
+            Self::OpenClcxx => "opencl_cxx",
         };
         write!(f, "{keyword}")
     }
@@ -2281,6 +2312,71 @@ impl TryFrom<&crate::attrs::Attribute> for SyncScopeKind {
         }
     }
 }
+/// thread-local storage kind
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[repr(i64)]
+pub enum TlsKind {
+    None = 0i64,
+    Static = 1i64,
+    Dynamic = 2i64,
+}
+impl TryFrom<i128> for TlsKind {
+    type Error = ParseEnumError;
+    fn try_from(value: i128) -> Result<Self, Self::Error> {
+        let value = value as i64;
+        match value {
+            0i64 => Ok(Self::None),
+            1i64 => Ok(Self::Static),
+            2i64 => Ok(Self::Dynamic),
+            _ => Err(ParseEnumError::new("TlsKind", value.to_string())),
+        }
+    }
+}
+impl From<TlsKind> for i128 {
+    fn from(value: TlsKind) -> i128 {
+        match value {
+            TlsKind::None => i128::from(0i64),
+            TlsKind::Static => i128::from(1i64),
+            TlsKind::Dynamic => i128::from(2i64),
+        }
+    }
+}
+impl std::str::FromStr for TlsKind {
+    type Err = ParseEnumError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "none" => Ok(Self::None),
+            "static" => Ok(Self::Static),
+            "dynamic" => Ok(Self::Dynamic),
+            _ => Err(ParseEnumError::new("TlsKind", s.to_string())),
+        }
+    }
+}
+impl std::fmt::Display for TlsKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let keyword = match self {
+            Self::None => "none",
+            Self::Static => "static",
+            Self::Dynamic => "dynamic",
+        };
+        write!(f, "{keyword}")
+    }
+}
+impl TryFrom<&crate::attrs::Attribute> for TlsKind {
+    type Error = ParseEnumError;
+    fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
+        match attr {
+            crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
+            crate::attrs::Attribute::CirInt { value, .. } => value
+                .parse::<i128>()
+                .map_err(|_| ParseEnumError::new("TlsKind", value.clone()))
+                .and_then(Self::try_from),
+            crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
+            other => Err(ParseEnumError::new("TlsKind", format!("{other:?}"))),
+        }
+    }
+}
 /// TLS model
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -2348,6 +2444,90 @@ impl TryFrom<&crate::attrs::Attribute> for TlsModel {
                 .and_then(Self::try_from),
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("TlsModel", format!("{other:?}"))),
+        }
+    }
+}
+/// template specialization kind
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[repr(i64)]
+pub enum TemplateSpecializationKind {
+    Undeclared = 0i64,
+    ImplicitInstantiation = 1i64,
+    ExplicitSpecialization = 2i64,
+    ExplicitInstantiationDeclaration = 3i64,
+    ExplicitInstantiationDefinition = 4i64,
+}
+impl TryFrom<i128> for TemplateSpecializationKind {
+    type Error = ParseEnumError;
+    fn try_from(value: i128) -> Result<Self, Self::Error> {
+        let value = value as i64;
+        match value {
+            0i64 => Ok(Self::Undeclared),
+            1i64 => Ok(Self::ImplicitInstantiation),
+            2i64 => Ok(Self::ExplicitSpecialization),
+            3i64 => Ok(Self::ExplicitInstantiationDeclaration),
+            4i64 => Ok(Self::ExplicitInstantiationDefinition),
+            _ => Err(ParseEnumError::new(
+                "TemplateSpecializationKind",
+                value.to_string(),
+            )),
+        }
+    }
+}
+impl From<TemplateSpecializationKind> for i128 {
+    fn from(value: TemplateSpecializationKind) -> i128 {
+        match value {
+            TemplateSpecializationKind::Undeclared => i128::from(0i64),
+            TemplateSpecializationKind::ImplicitInstantiation => i128::from(1i64),
+            TemplateSpecializationKind::ExplicitSpecialization => i128::from(2i64),
+            TemplateSpecializationKind::ExplicitInstantiationDeclaration => i128::from(3i64),
+            TemplateSpecializationKind::ExplicitInstantiationDefinition => i128::from(4i64),
+        }
+    }
+}
+impl std::str::FromStr for TemplateSpecializationKind {
+    type Err = ParseEnumError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "undeclared" => Ok(Self::Undeclared),
+            "implicit_instantiation" => Ok(Self::ImplicitInstantiation),
+            "explicit_specialization" => Ok(Self::ExplicitSpecialization),
+            "explicit_instantiation_declaration" => Ok(Self::ExplicitInstantiationDeclaration),
+            "explicit_instantiation_definition" => Ok(Self::ExplicitInstantiationDefinition),
+            _ => Err(ParseEnumError::new(
+                "TemplateSpecializationKind",
+                s.to_string(),
+            )),
+        }
+    }
+}
+impl std::fmt::Display for TemplateSpecializationKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let keyword = match self {
+            Self::Undeclared => "undeclared",
+            Self::ImplicitInstantiation => "implicit_instantiation",
+            Self::ExplicitSpecialization => "explicit_specialization",
+            Self::ExplicitInstantiationDeclaration => "explicit_instantiation_declaration",
+            Self::ExplicitInstantiationDefinition => "explicit_instantiation_definition",
+        };
+        write!(f, "{keyword}")
+    }
+}
+impl TryFrom<&crate::attrs::Attribute> for TemplateSpecializationKind {
+    type Error = ParseEnumError;
+    fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
+        match attr {
+            crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
+            crate::attrs::Attribute::CirInt { value, .. } => value
+                .parse::<i128>()
+                .map_err(|_| ParseEnumError::new("TemplateSpecializationKind", value.clone()))
+                .and_then(Self::try_from),
+            crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
+            other => Err(ParseEnumError::new(
+                "TemplateSpecializationKind",
+                format!("{other:?}"),
+            )),
         }
     }
 }

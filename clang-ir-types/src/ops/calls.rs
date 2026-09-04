@@ -30,7 +30,7 @@ pub struct Call {
     pub noreturn: bool,
     /// flat symbol reference attribute
     pub callee: Option<crate::attrs::Attribute>,
-    /// variadic of CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
+    /// variadic of CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
     pub args: Vec<super::ValueId>,
     /// unit attribute
     pub nothrow: bool,
@@ -59,7 +59,7 @@ pub struct CallLlvmIntrinsic {
     pub result_ty: Option<crate::types::Type>,
     /// string attribute
     pub intrinsic_name: String,
-    /// variadic of CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
+    /// variadic of CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
     pub arg_ops: Vec<super::ValueId>,
     pub loc: Option<crate::ast::SourceLocation>,
 }

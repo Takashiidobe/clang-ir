@@ -237,6 +237,8 @@ pub struct Global {
     pub alignment: Option<crate::attrs::Attribute>,
     /// ASTVarDeclInterface instance
     pub ast: Option<crate::attrs::Attribute>,
+    /// Static-local variable facts needed by later lowering
+    pub static_local_info: Option<crate::attrs::Attribute>,
     /// string attribute
     pub section: Option<String>,
     /// array of cir.annotation attributes
