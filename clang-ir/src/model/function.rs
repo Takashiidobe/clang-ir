@@ -52,6 +52,9 @@ pub struct Function {
     pub comdat: bool,
     pub target_cpu: Option<String>,
     pub target_features: Vec<TargetFeature>,
+    /// Per-parameter dictionary attributes as written on the `cir.func` op,
+    /// e.g. `llvm.byval` marking a large-struct-by-value parameter.
+    pub arg_attrs: Option<Attribute>,
     /// `None` for a declaration (no defining region, e.g. an external
     /// library function like `printf`).
     pub body: Option<crate::ops::Region>,
@@ -85,6 +88,7 @@ impl Function {
             comdat: false,
             target_cpu: None,
             target_features: Vec::new(),
+            arg_attrs: None,
             body: None,
         }
     }
@@ -191,6 +195,7 @@ impl Function {
             .and_then(Attribute::as_str)
             .map(parse_target_features)
             .unwrap_or_default();
+        let arg_attrs = op.attr("arg_attrs").cloned();
 
         Ok(Function {
             name,
@@ -214,6 +219,7 @@ impl Function {
             comdat,
             target_cpu,
             target_features,
+            arg_attrs,
             body,
         })
     }
