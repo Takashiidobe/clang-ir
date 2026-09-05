@@ -1,5 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::quote;
+use syn::Ident;
 use tblgen::{Record, RecordKeeper, init::TypedInit};
 
 use crate::common::*;
@@ -7,12 +8,14 @@ use crate::common::*;
 pub(crate) fn generate_types(
     keeper: &RecordKeeper<'_>,
 ) -> Result<TokenStream, Box<dyn std::error::Error>> {
-    let variants = keeper
-        .all_derived_definitions("CIR_Type")
+    let type_records: Vec<Record<'_>> = keeper.all_derived_definitions("CIR_Type").collect();
+    let variants = type_records
+        .iter()
+        .copied()
         .map(generate_type_variant)
         .collect::<Result<Vec<_>, _>>()?;
     let projection_impl = type_projection_impl();
-    let display_impl = type_display_impl();
+    let display_impl = type_display_impl(&type_records)?;
 
     Ok(quote! {
         #![allow(non_camel_case_types)]
@@ -92,8 +95,55 @@ fn type_projection_impl() -> TokenStream {
     }
 }
 
-fn type_display_impl() -> TokenStream {
-    quote! {
+const CUSTOM_DISPLAY_VARIANTS: &[&str] = &[
+    "Int",
+    "LongDouble",
+    "Pointer",
+    "Array",
+    "Vector",
+    "Func",
+    "Struct",
+    "Union",
+    "Complex",
+    "DataMember",
+    "Method",
+];
+
+fn type_variant_shape(rec: Record<'_>) -> Result<(Ident, String, bool), Box<dyn std::error::Error>> {
+    let name = rec.name()?;
+    let mnemonic = rec.str_value("mnemonic").unwrap_or(name).to_string();
+    let variant = variant_ident(rec, "Type")?;
+    let has_fields = if rec.has_field("parameters") {
+        rec.dag_value("parameters")?
+            .args()
+            .any(|(arg_name, _)| arg_name.is_some())
+    } else {
+        false
+    };
+    Ok((variant, mnemonic, has_fields))
+}
+
+fn type_display_fallback_arms(
+    type_records: &[Record<'_>],
+) -> Result<TokenStream, Box<dyn std::error::Error>> {
+    let mut arms = Vec::new();
+    for rec in type_records {
+        let (variant, mnemonic, has_fields) = type_variant_shape(*rec)?;
+        if CUSTOM_DISPLAY_VARIANTS.contains(&variant.to_string().as_str()) {
+            continue;
+        }
+        arms.push(if has_fields {
+            quote! { Self::#variant { .. } => write!(f, #mnemonic), }
+        } else {
+            quote! { Self::#variant => write!(f, #mnemonic), }
+        });
+    }
+    Ok(quote! { #(#arms)* })
+}
+
+fn type_display_impl(type_records: &[Record<'_>]) -> Result<TokenStream, Box<dyn std::error::Error>> {
+    let fallback_arms = type_display_fallback_arms(type_records)?;
+    Ok(quote! {
         impl std::fmt::Display for Type {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 fn write_list(
@@ -133,14 +183,6 @@ fn type_display_impl() -> TokenStream {
                         }
                         Ok(())
                     }
-                    Self::Bool => write!(f, "bool"),
-                    Self::Void => write!(f, "void"),
-                    Self::Single => write!(f, "float"),
-                    Self::Double => write!(f, "double"),
-                    Self::Fp16 => write!(f, "f16"),
-                    Self::Bf16 => write!(f, "bf16"),
-                    Self::Fp80 => write!(f, "f80"),
-                    Self::Fp128 => write!(f, "f128"),
                     Self::LongDouble { underlying } => write!(f, "long_double<{underlying}>"),
                     Self::Pointer { pointee, addr_space } => {
                         write!(f, "{pointee}*")?;
@@ -181,10 +223,6 @@ fn type_display_impl() -> TokenStream {
                     Self::Method { member_func_ty, class_ty } => {
                         write!(f, "method<{member_func_ty} in {class_ty}>")
                     }
-                    Self::VPtr => write!(f, "vptr"),
-                    Self::EhToken => write!(f, "eh_token"),
-                    Self::CleanupToken => write!(f, "cleanup_token"),
-                    Self::CatchToken => write!(f, "catch_token"),
                     Self::Dialect { dialect, mnemonic, raw } => {
                         write!(f, "{dialect}.{mnemonic}")?;
                         if let Some(raw) = raw {
@@ -192,10 +230,11 @@ fn type_display_impl() -> TokenStream {
                         }
                         Ok(())
                     }
+                    #fallback_arms
                 }
             }
         }
-    }
+    })
 }
 
 fn generate_type_variant(rec: Record<'_>) -> Result<TokenStream, Box<dyn std::error::Error>> {

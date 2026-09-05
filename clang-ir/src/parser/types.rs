@@ -4,6 +4,7 @@ use crate::enums::RecordMemberKind;
 use crate::error::Result;
 use crate::lexer::Tok;
 
+
 impl<'a> Parser<'a> {
     pub(super) fn parse_type(&mut self) -> Result<Type> {
         match self.tok().clone() {
@@ -72,6 +73,7 @@ impl<'a> Parser<'a> {
             "struct" => self.parse_cir_struct(),
             "union" => self.parse_cir_union(),
             "complex" => self.parse_cir_complex(),
+            "bitfield" => self.parse_cir_bitfield(),
             "data_member" => self.parse_cir_member_type(true),
             "method" => self.parse_cir_member_type(false),
             "vptr" => Ok(Type::VPtr),
@@ -224,6 +226,34 @@ impl<'a> Parser<'a> {
         })
     }
 
+    fn parse_cir_bitfield(&mut self) -> Result<Type> {
+        self.expect(Tok::Less)?;
+        let storage_type = if self.at(&Tok::LBracket) {
+            None
+        } else {
+            let ty = self.parse_type()?;
+            self.expect(Tok::Comma)?;
+            Some(Box::new(ty))
+        };
+        self.expect(Tok::LBracket)?;
+        let mut fields = Vec::new();
+        if !self.at(&Tok::RBracket) {
+            loop {
+                let field = self.parse_attribute()?;
+                fields.push(format!("#{field}"));
+                if !self.eat(&Tok::Comma) {
+                    break;
+                }
+            }
+        }
+        self.expect(Tok::RBracket)?;
+        self.expect(Tok::Greater)?;
+        Ok(Type::BitField {
+            storage_type,
+            fields: Some(fields),
+        })
+    }
+
     fn parse_cir_member_type(&mut self, data_member: bool) -> Result<Type> {
         self.expect(Tok::Less)?;
         let first = self.parse_type()?;
@@ -282,14 +312,10 @@ impl<'a> Parser<'a> {
         if self.eat(&Tok::LBrace) {
             if !self.at(&Tok::RBrace) {
                 loop {
-                    let kind = match self.expect_ident()?.as_str() {
-                        "data" => RecordMemberKind::Data,
-                        "pad" => RecordMemberKind::Pad,
-                        "empty" => RecordMemberKind::Empty,
-                        other => {
-                            return Err(self.err(format!("unknown record member kind `{other}`")));
-                        }
-                    };
+                    let keyword = self.expect_ident()?;
+                    let kind: RecordMemberKind = keyword.parse().map_err(|_| {
+                        self.err(format!("unknown record member kind `{keyword}`"))
+                    })?;
                     let ty = self.parse_type()?;
                     member_kinds.push(kind);
                     members.push(ty);

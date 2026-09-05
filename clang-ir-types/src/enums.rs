@@ -77,10 +77,12 @@ impl TryFrom<&crate::attrs::Attribute> for ArgPassingKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("ArgPassingKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("ArgPassingKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("ArgPassingKind", format!("{other:?}"))),
         }
@@ -137,10 +139,12 @@ impl TryFrom<&crate::attrs::Attribute> for AsmFlavor {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("AsmFlavor", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("AsmFlavor", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("AsmFlavor", format!("{other:?}"))),
         }
@@ -197,10 +201,12 @@ impl TryFrom<&crate::attrs::Attribute> for AssignKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("AssignKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("AssignKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("AssignKind", format!("{other:?}"))),
         }
@@ -267,15 +273,14 @@ impl TryFrom<&crate::attrs::Attribute> for AssumeBundleKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("AssumeBundleKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("AssumeBundleKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
-            other => Err(ParseEnumError::new(
-                "AssumeBundleKind",
-                format!("{other:?}"),
-            )),
+            other => Err(ParseEnumError::new("AssumeBundleKind", format!("{other:?}"))),
         }
     }
 }
@@ -390,10 +395,12 @@ impl TryFrom<&crate::attrs::Attribute> for AtomicFetchKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("AtomicFetchKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("AtomicFetchKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("AtomicFetchKind", format!("{other:?}"))),
         }
@@ -460,10 +467,12 @@ impl TryFrom<&crate::attrs::Attribute> for AwaitKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("AwaitKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("AwaitKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("AwaitKind", format!("{other:?}"))),
         }
@@ -525,15 +534,14 @@ impl TryFrom<&crate::attrs::Attribute> for CudaDeviceVarKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("CudaDeviceVarKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("CudaDeviceVarKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
-            other => Err(ParseEnumError::new(
-                "CudaDeviceVarKind",
-                format!("{other:?}"),
-            )),
+            other => Err(ParseEnumError::new("CudaDeviceVarKind", format!("{other:?}"))),
         }
     }
 }
@@ -603,10 +611,12 @@ impl TryFrom<&crate::attrs::Attribute> for CallingConv {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("CallingConv", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("CallingConv", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("CallingConv", format!("{other:?}"))),
         }
@@ -673,10 +683,12 @@ impl TryFrom<&crate::attrs::Attribute> for CaseOpKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("CaseOpKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("CaseOpKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("CaseOpKind", format!("{other:?}"))),
         }
@@ -848,10 +860,12 @@ impl TryFrom<&crate::attrs::Attribute> for CastKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("CastKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("CastKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("CastKind", format!("{other:?}"))),
         }
@@ -913,10 +927,12 @@ impl TryFrom<&crate::attrs::Attribute> for CleanupKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("CleanupKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("CleanupKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("CleanupKind", format!("{other:?}"))),
         }
@@ -1003,10 +1019,12 @@ impl TryFrom<&crate::attrs::Attribute> for CmpOpKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("CmpOpKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("CmpOpKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("CmpOpKind", format!("{other:?}"))),
         }
@@ -1068,10 +1086,12 @@ impl TryFrom<&crate::attrs::Attribute> for CmpOrdering {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("CmpOrdering", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("CmpOrdering", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("CmpOrdering", format!("{other:?}"))),
         }
@@ -1138,15 +1158,14 @@ impl TryFrom<&crate::attrs::Attribute> for ComplexRangeKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("ComplexRangeKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("ComplexRangeKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
-            other => Err(ParseEnumError::new(
-                "ComplexRangeKind",
-                format!("{other:?}"),
-            )),
+            other => Err(ParseEnumError::new("ComplexRangeKind", format!("{other:?}"))),
         }
     }
 }
@@ -1211,10 +1230,12 @@ impl TryFrom<&crate::attrs::Attribute> for CtorKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("CtorKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("CtorKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("CtorKind", format!("{other:?}"))),
         }
@@ -1271,10 +1292,12 @@ impl TryFrom<&crate::attrs::Attribute> for DynamicCastKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("DynamicCastKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("DynamicCastKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("DynamicCastKind", format!("{other:?}"))),
         }
@@ -1307,10 +1330,7 @@ impl TryFrom<i128> for FpDynamicRoundingMode {
             3i64 => Ok(Self::UpwardZero),
             4i64 => Ok(Self::ToNearestAway),
             7i64 => Ok(Self::Unknown),
-            _ => Err(ParseEnumError::new(
-                "FpDynamicRoundingMode",
-                value.to_string(),
-            )),
+            _ => Err(ParseEnumError::new("FpDynamicRoundingMode", value.to_string())),
         }
     }
 }
@@ -1358,15 +1378,19 @@ impl TryFrom<&crate::attrs::Attribute> for FpDynamicRoundingMode {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("FpDynamicRoundingMode", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new(
+                        "FpDynamicRoundingMode",
+                        value.clone(),
+                    ))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
-            other => Err(ParseEnumError::new(
-                "FpDynamicRoundingMode",
-                format!("{other:?}"),
-            )),
+            other => {
+                Err(ParseEnumError::new("FpDynamicRoundingMode", format!("{other:?}")))
+            }
         }
     }
 }
@@ -1430,10 +1454,12 @@ impl TryFrom<&crate::attrs::Attribute> for FpExceptionMode {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("FpExceptionMode", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("FpExceptionMode", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("FpExceptionMode", format!("{other:?}"))),
         }
@@ -1535,15 +1561,14 @@ impl TryFrom<&crate::attrs::Attribute> for GlobalLinkageKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("GlobalLinkageKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("GlobalLinkageKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
-            other => Err(ParseEnumError::new(
-                "GlobalLinkageKind",
-                format!("{other:?}"),
-            )),
+            other => Err(ParseEnumError::new("GlobalLinkageKind", format!("{other:?}"))),
         }
     }
 }
@@ -1618,10 +1643,12 @@ impl TryFrom<&crate::attrs::Attribute> for InitCatchKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("InitCatchKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("InitCatchKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("InitCatchKind", format!("{other:?}"))),
         }
@@ -1683,10 +1710,12 @@ impl TryFrom<&crate::attrs::Attribute> for InlineKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("InlineKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("InlineKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("InlineKind", format!("{other:?}"))),
         }
@@ -1738,10 +1767,12 @@ impl TryFrom<&crate::attrs::Attribute> for KnownFuncKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("KnownFuncKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("KnownFuncKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("KnownFuncKind", format!("{other:?}"))),
         }
@@ -1832,15 +1863,14 @@ impl TryFrom<&crate::attrs::Attribute> for LangAddressSpace {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("LangAddressSpace", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("LangAddressSpace", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
-            other => Err(ParseEnumError::new(
-                "LangAddressSpace",
-                format!("{other:?}"),
-            )),
+            other => Err(ParseEnumError::new("LangAddressSpace", format!("{other:?}"))),
         }
     }
 }
@@ -1915,10 +1945,12 @@ impl TryFrom<&crate::attrs::Attribute> for MemOrder {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("MemOrder", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("MemOrder", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("MemOrder", format!("{other:?}"))),
         }
@@ -2015,15 +2047,14 @@ impl TryFrom<&crate::attrs::Attribute> for RecordMemberKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("RecordMemberKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("RecordMemberKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
-            other => Err(ParseEnumError::new(
-                "RecordMemberKind",
-                format!("{other:?}"),
-            )),
+            other => Err(ParseEnumError::new("RecordMemberKind", format!("{other:?}"))),
         }
     }
 }
@@ -2103,10 +2134,12 @@ impl TryFrom<&crate::attrs::Attribute> for SideEffect {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("SideEffect", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("SideEffect", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("SideEffect", format!("{other:?}"))),
         }
@@ -2173,10 +2206,12 @@ impl TryFrom<&crate::attrs::Attribute> for SourceLanguage {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("SourceLanguage", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("SourceLanguage", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("SourceLanguage", format!("{other:?}"))),
         }
@@ -2303,10 +2338,12 @@ impl TryFrom<&crate::attrs::Attribute> for SyncScopeKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("SyncScopeKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("SyncScopeKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("SyncScopeKind", format!("{other:?}"))),
         }
@@ -2368,10 +2405,12 @@ impl TryFrom<&crate::attrs::Attribute> for TlsKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("TlsKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("TlsKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("TlsKind", format!("{other:?}"))),
         }
@@ -2438,10 +2477,12 @@ impl TryFrom<&crate::attrs::Attribute> for TlsModel {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("TlsModel", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("TlsModel", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("TlsModel", format!("{other:?}"))),
         }
@@ -2468,10 +2509,9 @@ impl TryFrom<i128> for TemplateSpecializationKind {
             2i64 => Ok(Self::ExplicitSpecialization),
             3i64 => Ok(Self::ExplicitInstantiationDeclaration),
             4i64 => Ok(Self::ExplicitInstantiationDefinition),
-            _ => Err(ParseEnumError::new(
-                "TemplateSpecializationKind",
-                value.to_string(),
-            )),
+            _ => {
+                Err(ParseEnumError::new("TemplateSpecializationKind", value.to_string()))
+            }
         }
     }
 }
@@ -2481,8 +2521,12 @@ impl From<TemplateSpecializationKind> for i128 {
             TemplateSpecializationKind::Undeclared => i128::from(0i64),
             TemplateSpecializationKind::ImplicitInstantiation => i128::from(1i64),
             TemplateSpecializationKind::ExplicitSpecialization => i128::from(2i64),
-            TemplateSpecializationKind::ExplicitInstantiationDeclaration => i128::from(3i64),
-            TemplateSpecializationKind::ExplicitInstantiationDefinition => i128::from(4i64),
+            TemplateSpecializationKind::ExplicitInstantiationDeclaration => {
+                i128::from(3i64)
+            }
+            TemplateSpecializationKind::ExplicitInstantiationDefinition => {
+                i128::from(4i64)
+            }
         }
     }
 }
@@ -2493,12 +2537,13 @@ impl std::str::FromStr for TemplateSpecializationKind {
             "undeclared" => Ok(Self::Undeclared),
             "implicit_instantiation" => Ok(Self::ImplicitInstantiation),
             "explicit_specialization" => Ok(Self::ExplicitSpecialization),
-            "explicit_instantiation_declaration" => Ok(Self::ExplicitInstantiationDeclaration),
-            "explicit_instantiation_definition" => Ok(Self::ExplicitInstantiationDefinition),
-            _ => Err(ParseEnumError::new(
-                "TemplateSpecializationKind",
-                s.to_string(),
-            )),
+            "explicit_instantiation_declaration" => {
+                Ok(Self::ExplicitInstantiationDeclaration)
+            }
+            "explicit_instantiation_definition" => {
+                Ok(Self::ExplicitInstantiationDefinition)
+            }
+            _ => Err(ParseEnumError::new("TemplateSpecializationKind", s.to_string())),
         }
     }
 }
@@ -2508,7 +2553,9 @@ impl std::fmt::Display for TemplateSpecializationKind {
             Self::Undeclared => "undeclared",
             Self::ImplicitInstantiation => "implicit_instantiation",
             Self::ExplicitSpecialization => "explicit_specialization",
-            Self::ExplicitInstantiationDeclaration => "explicit_instantiation_declaration",
+            Self::ExplicitInstantiationDeclaration => {
+                "explicit_instantiation_declaration"
+            }
             Self::ExplicitInstantiationDefinition => "explicit_instantiation_definition",
         };
         write!(f, "{keyword}")
@@ -2519,15 +2566,24 @@ impl TryFrom<&crate::attrs::Attribute> for TemplateSpecializationKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("TemplateSpecializationKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new(
+                        "TemplateSpecializationKind",
+                        value.clone(),
+                    ))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
-            other => Err(ParseEnumError::new(
-                "TemplateSpecializationKind",
-                format!("{other:?}"),
-            )),
+            other => {
+                Err(
+                    ParseEnumError::new(
+                        "TemplateSpecializationKind",
+                        format!("{other:?}"),
+                    ),
+                )
+            }
         }
     }
 }
@@ -2587,10 +2643,12 @@ impl TryFrom<&crate::attrs::Attribute> for VisibilityKind {
     fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
         match attr {
             crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value as i128),
-            crate::attrs::Attribute::CirInt { value, .. } => value
-                .parse::<i128>()
-                .map_err(|_| ParseEnumError::new("VisibilityKind", value.clone()))
-                .and_then(Self::try_from),
+            crate::attrs::Attribute::CirInt { value, .. } => {
+                value
+                    .parse::<i128>()
+                    .map_err(|_| ParseEnumError::new("VisibilityKind", value.clone()))
+                    .and_then(Self::try_from)
+            }
             crate::attrs::Attribute::Dialect { raw: Some(raw), .. } => raw.trim().parse(),
             other => Err(ParseEnumError::new("VisibilityKind", format!("{other:?}"))),
         }

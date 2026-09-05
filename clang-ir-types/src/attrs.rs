@@ -13,9 +13,7 @@ pub enum Attribute {
     ///
     /// Note: the AST pointer can be null when CIR is parsed from text, since
     /// there is no serialization support for AST nodes yet.
-    AstVarDecl {
-        ast: String,
-    },
+    AstVarDecl { ast: String },
     /// `#cir.address_point`
     /// Address point attribute
     ///
@@ -33,10 +31,7 @@ pub enum Attribute {
     ///                               address_point = <index = 0, offset = 2>)
     ///                              : !cir.vptr
     /// ```
-    AddressPoint {
-        index: i32,
-        offset: i32,
-    },
+    AddressPoint { index: i32, offset: i32 },
     /// `#cir.annotation`
     /// Annotation attribute for global variables and functions
     ///
@@ -51,10 +46,7 @@ pub enum Attribute {
     /// ```
     /// [#cir.annotation<"testptr", ["21", 12 : i32]>]
     /// ```
-    Annotation {
-        name: String,
-        args: Option<Box<Attribute>>,
-    },
+    Annotation { name: String, args: Option<Box<Attribute>> },
     /// `#cir.await`
     /// await kind
     AwaitKind {
@@ -161,19 +153,12 @@ pub enum Attribute {
     /// This attribute is used to represent the address of a basic block
     /// within a function. It combines the symbol reference to a function
     /// with the name of a label inside that function.
-    BlockAddrInfo {
-        ty: crate::types::Type,
-        func: String,
-        label: String,
-    },
+    BlockAddrInfo { ty: crate::types::Type, func: String, label: String },
     /// `#cir.bool`
     /// Represent true/false for !cir.bool types
     ///
     /// The BoolAttr represents a 'true' or 'false' value.
-    CirBool {
-        ty: crate::types::Type,
-        value: bool,
-    },
+    CirBool { ty: crate::types::Type, value: bool },
     /// `#cir.cu.binary_handle`
     /// Fat binary handle for device code.
     ///
@@ -183,9 +168,7 @@ pub enum Attribute {
     /// CUDA first compiles device-side code into a fat binary file. The file
     /// name is then passed into host-side code, which is used to create a handle
     /// and then generate various registration functions.
-    CudaBinaryHandle {
-        name: String,
-    },
+    CudaBinaryHandle { name: String },
     /// `#cir.cu.externally_initialized`
     /// The marked variable is externally initialized.
     ///
@@ -207,9 +190,7 @@ pub enum Attribute {
     /// names, we must record the corresponding device-side name for a stub.
     /// Preserving the device-side kernel name is crucial for performing its
     /// respective function runtime registration on the host.
-    CudaKernelName {
-        kernel_name: String,
-    },
+    CudaKernelName { kernel_name: String },
     /// `#cir.cu.var_registration`
     /// Device variable registration flags.
     CudaVarRegistrationInfo {
@@ -257,10 +238,7 @@ pub enum Attribute {
     /// Marks a function as a CXX destructor
     ///
     /// This attribute identifies a C++ destructor.
-    CxxDtor {
-        ty: crate::types::Type,
-        is_trivial: bool,
-    },
+    CxxDtor { ty: crate::types::Type, is_trivial: bool },
     /// `#cir.case`
     /// case kind
     CaseOpKind {
@@ -340,11 +318,7 @@ pub enum Attribute {
     /// A constant array from ArrayAttr or StringRefAttr
     ///
     /// An CIR array attribute is an array of literals of the specified attr types.
-    ConstArray {
-        ty: crate::types::Type,
-        elts: Box<Attribute>,
-        trailing_zeros_num: i32,
-    },
+    ConstArray { ty: crate::types::Type, elts: Box<Attribute>, trailing_zeros_num: i32 },
     /// `#cir.const_complex`
     /// An attribute that contains a constant complex value
     ///
@@ -373,10 +347,7 @@ pub enum Attribute {
     ///
     /// A pointer attribute is a literal attribute that represents an integral
     /// value of a pointer type.
-    ConstPtr {
-        ty: crate::types::Type,
-        value: Box<Attribute>,
-    },
+    ConstPtr { ty: crate::types::Type, value: Box<Attribute> },
     /// `#cir.const_record`
     /// Represents a constant record
     ///
@@ -397,19 +368,13 @@ pub enum Attribute {
     ///                                                5 : i64, #cir.null : !cir.ptr<i8>
     ///                                               }> : !cir.record<"", i8, i64, !cir.ptr<i8>>
     /// ```
-    ConstRecord {
-        ty: crate::types::Type,
-        members: Box<Attribute>,
-    },
+    ConstRecord { ty: crate::types::Type, members: Box<Attribute> },
     /// `#cir.const_vector`
     /// A constant vector from ArrayAttr
     ///
     /// A CIR vector attribute is an array of literals of the specified attribute
     /// types.
-    ConstVector {
-        ty: crate::types::Type,
-        elts: Box<Attribute>,
-    },
+    ConstVector { ty: crate::types::Type, elts: Box<Attribute> },
     /// `#cir.data_member`
     /// Holds a constant data member pointer value
     ///
@@ -431,10 +396,7 @@ pub enum Attribute {
     /// // null
     /// #cir.data_member<null> : !cir.data_member<!s32i in !rec_Point>
     /// ```
-    DataMember {
-        ty: crate::types::Type,
-        member_path: Option<String>,
-    },
+    DataMember { ty: crate::types::Type, member_path: Option<String> },
     /// `#cir.data_member_offset`
     /// Constant pointer-to-data-member given by a byte offset
     ///
@@ -449,10 +411,7 @@ pub enum Attribute {
     /// // Empty S::*p = &S::e  (e is a no_unique_address empty field at byte 1)
     /// #cir.data_member_offset<1> : !cir.data_member<!rec_Empty in !rec_S>
     /// ```
-    DataMemberOffset {
-        ty: crate::types::Type,
-        offset: u64,
-    },
+    DataMemberOffset { ty: crate::types::Type, offset: u64 },
     /// `#cir.dyn_cast_info`
     /// ABI specific information about a dynamic cast
     ///
@@ -488,10 +447,7 @@ pub enum Attribute {
     ///
     /// An fp attribute is a literal attribute that represents a floating-point
     /// value of the specified floating-point type. Supporting only CIR FP types.
-    CirFloat {
-        ty: crate::types::Type,
-        value: String,
-    },
+    CirFloat { ty: crate::types::Type, value: String },
     /// `#cir.fenv`
     /// Describes floating-point environment constraints
     ///
@@ -550,19 +506,13 @@ pub enum Attribute {
     ///
     /// Marks the function as a global constructor in the module's constructor list.
     /// It will be executed before main() is called.
-    GlobalCtor {
-        name: String,
-        priority: i32,
-    },
+    GlobalCtor { name: String, priority: i32 },
     /// `#cir.global_dtor`
     /// Marks a function as a global destructor
     ///
     /// Marks a function as a global destructor in the module dtors list.
     /// The function will be executed before the module unloading.
-    GlobalDtor {
-        name: String,
-        priority: i32,
-    },
+    GlobalDtor { name: String, priority: i32 },
     /// `#cir.global_offset`
     /// Provides constant access to a byte offset from a global
     ///
@@ -598,11 +548,7 @@ pub enum Attribute {
     /// ```
     /// @p = global ptr getelementptr (i8, ptr @s, i64 4)
     /// ```
-    GlobalOffset {
-        ty: crate::types::Type,
-        symbol: String,
-        offset: i64,
-    },
+    GlobalOffset { ty: crate::types::Type, symbol: String, offset: i64 },
     /// `#cir.global_view`
     /// Provides constant access to a global address
     ///
@@ -687,10 +633,7 @@ pub enum Attribute {
     ///
     /// An integer attribute is a literal attribute that represents an integral
     /// value of the specified integer type.
-    CirInt {
-        ty: crate::types::Type,
-        value: String,
-    },
+    CirInt { ty: crate::types::Type, value: String },
     /// `#cir.lang_address_space`
     /// Represents a language address space
     ///
@@ -758,10 +701,7 @@ pub enum Attribute {
     ///                   [#cir.offset_pair<0, 2>, #cir.offset_pair<6, 8>])
     ///                   : <rec_Type> -> ()
     /// ```
-    OffsetPair {
-        start: u64,
-        end: u64,
-    },
+    OffsetPair { start: u64, end: u64 },
     /// `#cir.cl.kernel_arg_metadata`
     /// OpenCL kernel argument metadata
     ///
@@ -818,18 +758,13 @@ pub enum Attribute {
     /// ```
     /// #cir.opt_info<level = 2, size = 0>  // -O2
     /// ```
-    OptInfo {
-        level: u32,
-        size: u32,
-    },
+    OptInfo { level: u32, size: u32 },
     /// `#cir.poison`
     /// Represent a typed poison constant
     ///
     /// The PoisonAttr represents a typed poison constant, corresponding to LLVM's
     /// notion of poison.
-    Poison {
-        ty: crate::types::Type,
-    },
+    Poison { ty: crate::types::Type },
     /// `#cir.ptr_spec`
     /// !cir.ptr data layout spec
     ///
@@ -848,12 +783,7 @@ pub enum Attribute {
     /// #dlti.dl_spec<!cir.ptr<!cir.void> =
     ///     #cir.ptr_spec<size = 64, abi = 64, preferred = 64>>
     /// ```
-    PtrSpec {
-        size: u32,
-        abi: u32,
-        preferred: u32,
-        index: u32,
-    },
+    PtrSpec { size: u32, abi: u32, preferred: u32, index: u32 },
     /// `#cir.record_layout`
     /// ABI layout metadata for a record type
     ///
@@ -923,9 +853,7 @@ pub enum Attribute {
     /// ```
     /// cir.global internal static_local_guard<"_ZGVZ3foovE1x"> @_ZZ3foovE1x = ...
     /// ```
-    StaticLocalGuard {
-        name: String,
-    },
+    StaticLocalGuard { name: String },
     /// `#cir.static_local_info`
     /// Static-local variable facts needed by later lowering
     ///
@@ -991,9 +919,7 @@ pub enum Attribute {
     /// !cir.ptr<!s32i, addrspace(target<1>)>
     /// !cir.ptr<!s32i, addrspace(target<10>)>
     /// ```
-    TargetAddressSpace {
-        value: u32,
-    },
+    TargetAddressSpace { value: u32 },
     /// `#cir.tls_wrapper_init`
     /// Wrapper and Init function names for thread local variables
     ///
@@ -1063,9 +989,7 @@ pub enum Attribute {
     ///
     /// The UndefAttr represents an undef constant, corresponding to LLVM's notion
     /// of undef.
-    Undef {
-        ty: crate::types::Type,
-    },
+    Undef { ty: crate::types::Type },
     /// `#cir.unwind`
     Unwind,
     /// `#cir.usual_delete_params`
@@ -1119,27 +1043,16 @@ pub enum Attribute {
     ///     ]> : !cir.array<!cir.ptr<!u8i> x 3>
     ///   }> : !rec_anon_struct2
     /// ```
-    VTable {
-        ty: crate::types::Type,
-        data: Box<Attribute>,
-    },
+    VTable { ty: crate::types::Type, data: Box<Attribute> },
     /// `#cir.zero`
     /// Attribute to represent zero initialization
     ///
     /// The ZeroAttr is used to indicate zero initialization on structs.
-    Zero {
-        ty: crate::types::Type,
-    },
+    Zero { ty: crate::types::Type },
     Unit,
     Bool(bool),
-    Int {
-        value: i128,
-        ty: Option<crate::types::Type>,
-    },
-    Float {
-        text: String,
-        ty: Option<crate::types::Type>,
-    },
+    Int { value: i128, ty: Option<crate::types::Type> },
+    Float { text: String, ty: Option<crate::types::Type> },
     Str(String),
     Array(Vec<Attribute>),
     Dict(Vec<(String, Attribute)>),
@@ -1198,9 +1111,7 @@ impl std::fmt::Display for Attribute {
             Self::ConstVector { elts, .. } => write!(f, "[{elts}]"),
             Self::ConstRecord { members, .. } => write!(f, "{{{members}}}"),
             Self::ConstComplex { real, imag, .. } => write!(f, "({real}, {imag})"),
-            Self::GlobalView {
-                symbol, indices, ..
-            } => {
+            Self::GlobalView { symbol, indices, .. } => {
                 write!(f, "@{symbol}")?;
                 if let Some(indices) = indices {
                     write!(f, "[{indices}]")?;
@@ -1209,12 +1120,7 @@ impl std::fmt::Display for Attribute {
             }
             Self::Zero { .. } => write!(f, "zero"),
             Self::Poison { .. } => write!(f, "poison"),
-            Self::Dialect {
-                dialect,
-                mnemonic,
-                raw,
-                ..
-            } => {
+            Self::Dialect { dialect, mnemonic, raw, .. } => {
                 write!(f, "#{dialect}.{mnemonic}")?;
                 if let Some(raw) = raw {
                     write!(f, "<{raw}>")?;
@@ -1252,22 +1158,13 @@ impl Attribute {
         }
     }
     pub fn as_dense_array_ints(&self) -> Option<Vec<i128>> {
-        let Self::Dialect {
-            dialect,
-            mnemonic,
-            raw: Some(raw),
-            ..
-        } = self
-        else {
+        let Self::Dialect { dialect, mnemonic, raw: Some(raw), .. } = self else {
             return None;
         };
         if dialect != "builtin" || mnemonic != "array" {
             return None;
         }
         let digits = raw.split_once(':').map_or(raw.as_str(), |(_, rest)| rest);
-        digits
-            .split(',')
-            .map(|part| part.trim().parse::<i128>().ok())
-            .collect()
+        digits.split(',').map(|part| part.trim().parse::<i128>().ok()).collect()
     }
 }
