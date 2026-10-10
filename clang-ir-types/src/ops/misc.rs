@@ -149,7 +149,7 @@ pub struct Assume {
     pub predicate: super::ValueId,
     /// kind of cir.assume operand bundle
     pub bundle_kind: crate::attrs::Attribute,
-    /// variadic of CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
+    /// variadic of CIR void type or CIR bool type or CIR array type or CIR vector type or CIR matrix type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device surface reference type or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
     pub bundle_args: Vec<super::ValueId>,
     pub loc: Option<crate::ast::SourceLocation>,
 }
@@ -339,9 +339,7 @@ pub struct BuiltinIntCast {
 /// ...
 /// %x = cir.cast array_to_ptrdecay %0
 ///    : !cir.ptr<!cir.array<i32 x 10>> -> !cir.ptr<i32>
-/// %y = cir.cast floating %f : !cir.double -> !cir.float {
-///   fenv = #cir.fenv<>
-/// }
+/// %y = cir.cast floating %f : !cir.double -> !cir.float fenv<>
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -350,7 +348,7 @@ pub struct Cast {
     pub result_ty: crate::types::Type,
     /// cast kind
     pub kind: crate::enums::CastKind,
-    /// CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
+    /// CIR void type or CIR bool type or CIR array type or CIR vector type or CIR matrix type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device surface reference type or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
     pub src: super::ValueId,
     /// Describes floating-point environment constraints
     pub fenv: Option<crate::attrs::Attribute>,
@@ -435,25 +433,15 @@ pub struct Clz {
 pub struct CoReturn {
     pub loc: Option<crate::ast::SourceLocation>,
 }
-/// `cir.coro.body`
-/// Region containing the user-authored coroutine body
+/// `cir.coro.intrinsic.align`
+/// Represents llvm.coro.align
 ///
-/// The `cir.coro.body` operation models the region where the user-authored
-/// coroutine code is emitted.
-///
-/// This operation serves as a structural boundary separating the coroutine
-/// setup and teardown logic (e.g. initial suspend, final suspend, and cleanup)
-/// from the user-provided statements inside the coroutine.
-///
-/// The body region contains the code corresponding to the original function
-/// body, including `co_await` and `co_return` expressions. In particular,
-/// `cir.co_return` operations inside this region mark coroutine exit points
-/// and introduce structured control flow that transfers execution to the
-/// final suspend point of the coroutine.
+/// Returns the alignment requirement, in bytes, of the coroutine frame.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct CoroBody {
-    pub body: super::Region,
+pub struct CoroIntrinsicAlign {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
     pub loc: Option<crate::ast::SourceLocation>,
 }
 /// `cir.coro.intrinsic.alloc`
@@ -486,6 +474,33 @@ pub struct CoroIntrinsicBegin {
     pub id: super::ValueId,
     /// pointer to void type
     pub coroframe_addr: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.coro.intrinsic.destroy`
+/// Represents llvm.coro.destroy
+///
+/// Destroys a suspended coroutine identified by `handle`. Destroying a
+/// coroutine that is not currently suspended is undefined behavior.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct CoroIntrinsicDestroy {
+    /// pointer to void type
+    pub handle: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.coro.intrinsic.done`
+/// Represents llvm.coro.done
+///
+/// Checks whether the coroutine identified by `handle` is currently
+/// suspended at its final suspend point. `handle` must be a handle to a
+/// suspended coroutine.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct CoroIntrinsicDone {
+    pub done: super::ValueId,
+    pub done_ty: crate::types::Type,
+    /// pointer to void type
+    pub handle: super::ValueId,
     pub loc: Option<crate::ast::SourceLocation>,
 }
 /// `cir.coro.intrinsic.end`
@@ -557,6 +572,53 @@ pub struct CoroIntrinsicId {
     pub fnaddrs: super::ValueId,
     pub loc: Option<crate::ast::SourceLocation>,
 }
+/// `cir.coro.intrinsic.noop`
+/// Represents llvm.coro.noop
+///
+/// Returns a coroutine handle to a no-op coroutine.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct CoroIntrinsicNoop {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.coro.intrinsic.promise`
+/// Represents llvm.coro.promise
+///
+/// Given a coroutine handle (if `isFromPromise` is false) or a pointer to a
+/// coroutine promise (if `isFromPromise` is true), obtains a pointer to the
+/// coroutine promise or the coroutine handle, respectively. `align` is the
+/// alignment requirement of the promise, and `isFromPromise` indicates the
+/// direction of the transformation: `true` recovers the coroutine handle
+/// from a promise pointer, `false` recovers the promise pointer from a
+/// coroutine handle. Using this op on a coroutine without a coroutine
+/// promise is undefined behavior.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct CoroIntrinsicPromise {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// pointer to void type
+    pub coroframe: super::ValueId,
+    /// integer type
+    pub align: super::ValueId,
+    /// CIR bool type
+    pub is_from_promise: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.coro.intrinsic.resume`
+/// Represents llvm.coro.resume
+///
+/// Resumes a suspended coroutine identified by `handle`. Resuming a
+/// coroutine that is not currently suspended is undefined behavior.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct CoroIntrinsicResume {
+    /// pointer to void type
+    pub handle: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
 /// `cir.coro.intrinsic.size`
 /// Represents llvm.coro.size
 ///
@@ -566,6 +628,109 @@ pub struct CoroIntrinsicId {
 pub struct CoroIntrinsicSize {
     pub result: super::ValueId,
     pub result_ty: crate::types::Type,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.coro.intrinsic.suspend`
+/// Represents llvm.coro.suspend
+///
+/// `cir.coro.intrinsic.suspend` represents the `llvm.coro.suspend` intrinsic.
+///
+/// It marks the point where execution of a switched-resume coroutine is
+/// suspended and control returns to the caller. The result value indicates
+/// how the coroutine should proceed: -1 if suspended, 0 if resumed, or 1
+/// if destroyed.
+///
+/// The `id` operand is the token produced by a `cir.coro.save` that marks
+/// the point when the coroutine state is prepared for suspension.
+///
+/// The `final` operand indicates whether this is a final suspend point.
+/// If more than one suspend point is marked final, the resume and destroy
+/// branches must lead to the same basic blocks.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct CoroIntrinsicSuspend {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// token
+    pub save: super::ValueId,
+    /// boolean type
+    pub final_: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.coro.suspend_point`
+/// Marks the point where a coroutine actually suspends
+///
+/// Terminates the `suspend` region of a `cir.await`. It has no explicit
+/// successors; the destination is determined by `CoroutineOp`
+/// according to how the suspended coroutine is subsequently handled:
+///
+/// - resume: continues execution through the `cir.await`'s `resume` region
+///   when the coroutine handle is resumed.
+///
+/// - exit: transfers directly to the enclosing `cir.coroutine`'s `exit`
+///   region when the coroutine remains suspended. The coroutine frame remains
+///   alive and no cleanups are performed.
+///
+/// - destroy: transfers through the enclosing `cir.cleanup.scope`s to the
+///   `cir.coroutine`'s `destroy` region when the coroutine handle is
+///   destroyed.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct CoroSuspendPoint {
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.coroutine`
+/// Groups a coroutine's structured suspend/resume/destroy control flow
+///
+/// `cir.coroutine` is an op consisting of seven regions: `initial_suspend`,
+/// `body`, `final_suspend`, grp (TODO),`unwind` (TODO), `destroy`, and`exit`.
+///
+/// - `initial_suspend`: the coroutine ramp/setup region. Its `cir.await` marked
+///   `init` is the ramp boundary: the coroutine frame and its associated state
+///   are established before this point, and crossing the await transfers
+///   execution to `body`.
+///
+/// - `body`: the user-written coroutine body, arbitrary CFG, zero or more
+///   `cir.await`s at any nesting depth, terminated by `cir.co_return` or a
+///   plain `cir.yield` if control simply falls off the end. This region is
+///   a structural boundary separating the coroutine's setup and teardown
+///   logic (initial suspend, final suspend, destroy) from the
+///   user-provided statements of the original function body, including
+///   `co_await` and `co_return` expressions. In particular,
+///   `cir.co_return` operations inside this region mark coroutine exit
+///   points and introduce structured control flow that transfers
+///   execution to `final_suspend`.
+///
+/// - `final_suspend`: exactly one `cir.await`, marked `final`. Nothing
+///   else. Corresponds to `co_await promise.final_suspend()`. Resuming
+///   past this point is undefined behavior in valid programs, so its
+///   `resume` edge is expected to be dead in practice, but is kept for
+///   structural symmetry with the other two suspend regions.
+///
+/// - `gro`: TODO.
+///
+/// - `unwind`: TODO.
+///
+/// - `destroy`: destroys the coroutine frame (`coro.free` + `delete`).
+///   Reached by an explicit `destroy()` call on a suspended handle, by
+///   normal completion through `final_suspend`, or by an exception
+///   escaping the coroutine. Falls through to `exit` except when reached
+///   due to an escaping exception, where it continues propagating that
+///   exception instead.
+///
+/// - `exit`: the shared return-to-caller path. Reached directly from any
+///   suspend point that isn't being destroyed (the coroutine is just
+///   pausing), and from `destroy` when it was entered via ordinary
+///   dispatch. Holds `coro.end` + the actual `cir.return`.
+///
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Coroutine {
+    pub initial_suspend: super::Region,
+    pub body: super::Region,
+    pub final_suspend: super::Region,
+    pub destroy: super::Region,
+    pub exit: super::Region,
     pub loc: Option<crate::ast::SourceLocation>,
 }
 /// `cir.cpuid`
@@ -664,14 +829,18 @@ pub struct Dec {
 /// will be translated to `cir.delete_array %ptr`.
 ///
 /// The `delete_fn` attribute specifies the operator delete function to call.
-/// The `delete_params` attribute describes the parameters needed by the
-/// operator delete call.
+/// The optional `delete_params` attribute describes the parameters needed by
+/// the operator delete call. When absent, all parameters have default values.
 ///
 /// The `element_dtor` attribute, when present, specifies the destructor to call
 /// on each array element before deallocation.
 ///
 /// The `dtor_may_throw` unit property, when present, indicates that the
 /// element destructor may throw exceptions.
+///
+/// The `element_align` attribute gives the element type's preferred
+/// alignment in bytes, which should be the same value the corresponding `new[]`
+/// uses to size its array cookie.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DeleteArray {
@@ -680,11 +849,13 @@ pub struct DeleteArray {
     /// flat symbol reference attribute
     pub delete_fn: crate::attrs::Attribute,
     /// Parameters describing the usual operator delete signature
-    pub delete_params: crate::attrs::Attribute,
+    pub delete_params: Option<crate::attrs::Attribute>,
     /// flat symbol reference attribute
     pub element_dtor: Option<crate::attrs::Attribute>,
     /// unit property
     pub dtor_may_throw: bool,
+    /// 64-bit signless integer attribute
+    pub element_align: crate::attrs::Attribute,
     pub loc: Option<crate::ast::SourceLocation>,
 }
 /// `cir.dyn_cast`
@@ -842,6 +1013,66 @@ pub struct FrameAddress {
     pub level: super::ValueId,
     pub loc: Option<crate::ast::SourceLocation>,
 }
+/// `cir.fshl`
+/// Funnel shift left
+///
+/// The `cir.fshl` operation concatenates `a` and `b` (with `a` in the high
+/// half), shifts the concatenation left by `c` bit positions, and returns the
+/// high half of the result. The shift amount is treated modulo the bitwidth
+/// of the operands.
+///
+/// All operands and the result must have the same integer type or
+/// vector-of-integer type.
+///
+/// Example:
+///
+/// ```
+/// %r = cir.fshl %a, %b, %c : !u32i
+/// %v = cir.fshl %va, %vb, %vc : !cir.vector<4 x !s32i>
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Fshl {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// integer or vector of integer type
+    pub a: super::ValueId,
+    /// integer or vector of integer type
+    pub b: super::ValueId,
+    /// integer or vector of integer type
+    pub c: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.fshr`
+/// Funnel shift right
+///
+/// The `cir.fshr` operation concatenates `a` and `b` (with `a` in the high
+/// half), shifts the concatenation right by `c` bit positions, and returns
+/// the low half of the result. The shift amount is treated modulo the bitwidth
+/// of the operands.
+///
+/// All operands and the result must have the same integer type or
+/// vector-of-integer type.
+///
+/// Example:
+///
+/// ```
+/// %r = cir.fshr %a, %b, %c : !u32i
+/// %v = cir.fshr %va, %vb, %vc : !cir.vector<4 x !s32i>
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Fshr {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// integer or vector of integer type
+    pub a: super::ValueId,
+    /// integer or vector of integer type
+    pub b: super::ValueId,
+    /// integer or vector of integer type
+    pub c: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
 /// `cir.inc`
 /// Increment an integer by one
 ///
@@ -925,6 +1156,124 @@ pub struct Launder {
     pub arg: super::ValueId,
     pub loc: Option<crate::ast::SourceLocation>,
 }
+/// `cir.matrix.column_major_load`
+/// Matrix column major load
+///
+/// The `cir.matrix.column_major_load` operation provides a representation for
+/// the `__builtin_matrix_column_major_load` builtin and corresponds to the
+/// `llvm.matrix.column.major.load` intrinsic in LLVM IR.
+///
+/// This operation performs a load of any matrix type with a stride to compute
+/// the start address of the different columns.
+///
+/// The `stride` argument is the column stride which much be greater than or equal
+/// to `row`, giving the following 2x3 matrix `[[1, 2, 3], [4, 5, 6]]` with a
+/// stride of 2, the result matrix will be `[[1, 3, 5], [2, 4, 6]]`.
+///
+/// ```
+/// %result = cir.matrix.column_major_load %ptr : <!cir.float>, %stride : !u64i,
+///   !cir.matrix<2 x 3 x !cir.float>
+///
+/// %result = cir.matrix.column_major_load %ptr : <!cir.double>, %stride : !u64i,
+///   !cir.matrix<5 x 5 x !cir.double>
+///
+/// %result = cir.matrix.column_major_load %ptr : <!cir.double>, %stride : !u64i
+///   volatile, !cir.matrix<5 x 5 x !cir.double>
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct MatrixColumnMajorLoad {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// the address to load from
+    pub value: super::ValueId,
+    /// Integer type with arbitrary precision up to a fixed limit
+    pub stride: super::ValueId,
+    /// unit attribute
+    pub is_volatile: bool,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.matrix.column_major_store`
+/// Matrix column major store
+///
+/// The `cir.matrix.column_major_store` operation provides a representation for
+/// the `__builtin_matrix_column_major_store` builtin and corresponds to the
+/// `llvm.matrix.column.major.store` intrinsic in LLVM IR.
+///
+/// This operation performs a store of data from matrix type with a stride to
+/// compute the start address of the different columns.
+///
+/// The `stride` argument is the column stride which much be greater than or equal
+/// to `row`, giving the following 2x3 matrix `[[1, 2, 3], [4, 5, 6]]` with a
+/// stride of 2, the stored data will be `[1, 3, 5, 2, 4, 6]`.
+///
+/// ```
+/// cir.matrix.column_major_store %matrix : <3 x 3 x !cir.float>,
+///   %data : <!cir.float>, %stribe : !u64i
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct MatrixColumnMajorStore {
+    /// CIR matrix type
+    pub matrix: super::ValueId,
+    /// the address to store the value
+    pub value: super::ValueId,
+    /// Integer type with arbitrary precision up to a fixed limit
+    pub stride: super::ValueId,
+    /// unit attribute
+    pub is_volatile: bool,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.matrix.extract`
+/// Extract one element from a matrix object
+///
+/// The `cir.matrix.extract` operation extracts the element at the given row
+/// and column indices from a matrix object.
+///
+/// Currently, the flatten index is a column-based index.
+///
+/// ```
+/// %rowIdx = cir.const #cir.int<1> : !u64i
+/// %columnIdx = cir.const #cir.int<2> : !u64i
+/// %element = cir.matrix.extract %matrix[%rowIdx : !u64i] [%columnIdx : !u64i]
+///   : !cir.matrix<3 x 3 x !cir.float>
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct MatrixExtract {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// CIR matrix type
+    pub matrix: super::ValueId,
+    /// fundamental integer type
+    pub row_idx: super::ValueId,
+    /// fundamental integer type
+    pub column_idx: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.matrix.transpose`
+/// Matrix transpose
+///
+/// The `cir.matrix.transpose` operation provides a representation for the
+/// `__builtin_matrix_transpose` builtin and corresponds to the
+/// `llvm.matrix.transpose` intrinsic in LLVM IR.
+///
+/// This operation performs transposition to switch the row and column
+/// indices of the matrix and returns the transposed matrix,
+///
+/// ```
+/// %result = cir.matrix.transpose %value : <3 x 2 x !cir.float>,
+///     !cir.matrix<2 x 3 x !cir.float>
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct MatrixTranspose {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// CIR matrix type
+    pub value: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
 /// `cir.minus`
 /// Integer unary minus (negation)
 ///
@@ -946,7 +1295,7 @@ pub struct Launder {
 pub struct Minus {
     pub result: super::ValueId,
     pub result_ty: crate::types::Type,
-    /// integer or vector of integer type
+    /// integer or vector of bool or integer type
     pub input: super::ValueId,
     /// unit property
     pub no_signed_wrap: bool,
@@ -1074,6 +1423,65 @@ pub struct Prefetch {
     pub locality: crate::attrs::Attribute,
     /// unit attribute
     pub is_write: bool,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.ptr_mask`
+/// Clear bits of a pointer
+///
+/// The `cir.ptr_mask` operation clears the bits of `ptr` that are not set in
+/// `mask`.  The result stays a pointer, whereas masking it as an integer
+/// would lose provenance.
+///
+/// `mask` must be exactly the target's pointer index width.
+///
+/// ```
+/// %m = cir.const #cir.int<-32> : !s64i
+/// %0 = cir.ptr_mask %p, %m : (!cir.ptr<!u8i>, !s64i) -> !cir.ptr<!u8i>
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct PtrMask {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// CIR pointer type
+    pub ptr: super::ValueId,
+    /// fundamental integer type
+    pub mask: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.register_exit_dtor`
+/// Register the destruction of a global at program or thread exit
+///
+/// The `cir.register_exit_dtor` operation registers its body to run when the
+/// storage duration of the global `object` ends: at program exit, or at
+/// thread exit when `object` is thread local.  The registration happens when
+/// the operation executes, so objects registered later are destroyed earlier.
+///
+/// It must be nested in the ctor region of a `cir.global` or
+/// `cir.local_init`, but not inside another `cir.register_exit_dtor`,
+/// typically right after the construction of a temporary whose lifetime that
+/// variable extends.  `object` must have no ctor or dtor region of its own.
+/// The body destroys `object`, which it reaches through `cir.get_global`.
+///
+/// Example:
+///
+/// ```
+/// cir.global external @r = #cir.zero : !rec_Refs ctor {
+///   %0 = cir.get_global @_ZGR1r_ : !cir.ptr<!rec_Tmp>
+///   cir.call @_ZN3TmpC1Ei(%0, %1) : (!cir.ptr<!rec_Tmp>, !s32i) -> ()
+///   cir.register_exit_dtor @_ZGR1r_ {
+///     %2 = cir.get_global @_ZGR1r_ : !cir.ptr<!rec_Tmp>
+///     cir.call @_ZN3TmpD1Ev(%2) : (!cir.ptr<!rec_Tmp>) -> ()
+///   }
+///   ...
+/// }
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct RegisterExitDtor {
+    /// flat symbol reference attribute
+    pub object: crate::attrs::Attribute,
+    pub body: super::Region,
     pub loc: Option<crate::ast::SourceLocation>,
 }
 /// `cir.return_address`
@@ -1221,20 +1629,26 @@ pub struct TryCall {
     pub result_ty: Option<crate::types::Type>,
     /// flat symbol reference attribute
     pub callee: Option<crate::attrs::Attribute>,
-    /// variadic of CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
+    /// variadic of CIR void type or CIR bool type or CIR array type or CIR vector type or CIR matrix type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device surface reference type or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
     pub args: Vec<super::ValueId>,
     /// unit attribute
     pub nothrow: bool,
-    /// Inline kind attribute
+    /// unit attribute
+    pub nounwind: bool,
+    /// unit attribute
+    pub willreturn: bool,
+    /// inline kind
     pub inline_kind: Option<crate::enums::InlineKind>,
     /// unit attribute
     pub musttail: bool,
-    /// allowed side effects of a function
-    pub side_effect: crate::attrs::Attribute,
+    /// Describes the possible memory effects of a function or callee
+    pub memory_effects: Option<crate::attrs::Attribute>,
     /// Array of dictionary attributes
     pub arg_attrs: Option<crate::attrs::Attribute>,
     /// Array of dictionary attributes
     pub res_attrs: Option<crate::attrs::Attribute>,
+    /// calling convention
+    pub calling_conv: crate::attrs::Attribute,
     pub successors: Vec<String>,
     pub loc: Option<crate::ast::SourceLocation>,
 }

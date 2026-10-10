@@ -4,7 +4,6 @@ use crate::enums::RecordMemberKind;
 use crate::error::Result;
 use crate::lexer::Tok;
 
-
 impl<'a> Parser<'a> {
     pub(super) fn parse_type(&mut self) -> Result<Type> {
         match self.tok().clone() {
@@ -313,9 +312,9 @@ impl<'a> Parser<'a> {
             if !self.at(&Tok::RBrace) {
                 loop {
                     let keyword = self.expect_ident()?;
-                    let kind: RecordMemberKind = keyword.parse().map_err(|_| {
-                        self.err(format!("unknown record member kind `{keyword}`"))
-                    })?;
+                    let kind: RecordMemberKind = keyword
+                        .parse()
+                        .map_err(|_| self.err(format!("unknown record member kind `{keyword}`")))?;
                     let ty = self.parse_type()?;
                     member_kinds.push(kind);
                     members.push(ty);

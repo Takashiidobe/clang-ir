@@ -15,9 +15,7 @@
 /// ```
 /// %eq = cir.vec.cmp(eq, %vec_a, %vec_b) : !cir.vector<4 x !s32i>, !cir.vector<4 x !s32i>
 /// %lt = cir.vec.cmp(lt, %vec_a, %vec_b) : !cir.vector<4 x !s32i>, !cir.vector<4 x !s32i>
-/// %gt = cir.vec.cmp(gt, %va, %vb) : !cir.vector<4 x !cir.float>, !cir.vector<4 x !s32i> {
-///   fenv = #cir.fenv<>
-/// }
+/// %gt = cir.vec.cmp(gt, %va, %vb) : !cir.vector<4 x !cir.float>, !cir.vector<4 x !s32i> fenv<>
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -45,7 +43,7 @@ pub struct VecCmp {
 pub struct VecCreate {
     pub result: super::ValueId,
     pub result_ty: crate::types::Type,
-    /// variadic of any cir boolean, integer, floating point or pointer type
+    /// variadic of any cir boolean, integer, floating point
     pub elements: Vec<super::ValueId>,
     pub loc: Option<crate::ast::SourceLocation>,
 }
@@ -90,7 +88,7 @@ pub struct VecInsert {
     pub result_ty: crate::types::Type,
     /// CIR vector type
     pub vec: super::ValueId,
-    /// any cir boolean, integer, floating point or pointer type
+    /// any cir boolean, integer, floating point
     pub value: super::ValueId,
     /// fundamental integer type
     pub index: super::ValueId,
@@ -127,6 +125,179 @@ pub struct VecMaskedLoad {
     pub pass_thru: super::ValueId,
     /// 64-bit signless integer attribute whose value is positive and whose value is a power of two > 0
     pub alignment: Option<crate::attrs::Attribute>,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.vec.reduce.add`
+/// Reduce a vector using add
+///
+/// Reduces the elements of a vector to a scalar of the vector element type.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct VecReduceAdd {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// vector of any of boolean type, integer type
+    pub input: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.vec.reduce.and`
+/// Reduce a vector using and
+///
+/// Reduces the elements of a vector to a scalar of the vector element type.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct VecReduceAnd {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// vector of any of boolean type, integer type
+    pub input: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.vec.reduce.fadd`
+/// Reduce a floating-point vector using fadd
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct VecReduceFadd {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type
+    pub accumulator: super::ValueId,
+    /// vector of single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type
+    pub input: super::ValueId,
+    /// fast-math flags
+    pub fastmath_flags: Option<crate::enums::FastMathFlags>,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.vec.reduce.fmax`
+/// Reduce a floating-point vector using fmax
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct VecReduceFmax {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// vector of single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type
+    pub input: super::ValueId,
+    /// fast-math flags
+    pub fastmath_flags: Option<crate::enums::FastMathFlags>,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.vec.reduce.fmin`
+/// Reduce a floating-point vector using fmin
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct VecReduceFmin {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// vector of single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type
+    pub input: super::ValueId,
+    /// fast-math flags
+    pub fastmath_flags: Option<crate::enums::FastMathFlags>,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.vec.reduce.fmul`
+/// Reduce a floating-point vector using fmul
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct VecReduceFmul {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type
+    pub accumulator: super::ValueId,
+    /// vector of single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type
+    pub input: super::ValueId,
+    /// fast-math flags
+    pub fastmath_flags: Option<crate::enums::FastMathFlags>,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.vec.reduce.mul`
+/// Reduce a vector using mul
+///
+/// Reduces the elements of a vector to a scalar of the vector element type.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct VecReduceMul {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// vector of any of boolean type, integer type
+    pub input: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.vec.reduce.or`
+/// Reduce a vector using or
+///
+/// Reduces the elements of a vector to a scalar of the vector element type.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct VecReduceOr {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// vector of any of boolean type, integer type
+    pub input: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.vec.reduce.smax`
+/// Reduce a vector using smax
+///
+/// Reduces the elements of a vector to a scalar of the vector element type.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct VecReduceSmax {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// vector of signed integer type
+    pub input: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.vec.reduce.smin`
+/// Reduce a vector using smin
+///
+/// Reduces the elements of a vector to a scalar of the vector element type.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct VecReduceSmin {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// vector of signed integer type
+    pub input: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.vec.reduce.umax`
+/// Reduce a vector using umax
+///
+/// Reduces the elements of a vector to a scalar of the vector element type.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct VecReduceUmax {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// vector of any of unsigned integer type, boolean type
+    pub input: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.vec.reduce.umin`
+/// Reduce a vector using umin
+///
+/// Reduces the elements of a vector to a scalar of the vector element type.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct VecReduceUmin {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// vector of any of unsigned integer type, boolean type
+    pub input: super::ValueId,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.vec.reduce.xor`
+/// Reduce a vector using xor
+///
+/// Reduces the elements of a vector to a scalar of the vector element type.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct VecReduceXor {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// vector of any of boolean type, integer type
+    pub input: super::ValueId,
     pub loc: Option<crate::ast::SourceLocation>,
 }
 /// `cir.vec.shuffle`
@@ -192,10 +363,11 @@ pub struct VecShuffleDynamic {
     pub loc: Option<crate::ast::SourceLocation>,
 }
 /// `cir.vec.splat`
-/// Convert a scalar into a vector
+/// Convert a scalar into a vector or matrix
 ///
-/// The `cir.vec.splat` operation creates a vector value from a scalar value.
-/// All elements of the vector have the same value, that of the given scalar.
+/// The `cir.vec.splat` operation creates a vector or matrix value from a
+/// scalar value. All elements of the result have the same value, that of the
+/// given scalar.
 ///
 /// It's a separate operation from `cir.vec.create` because more
 /// efficient LLVM IR can be generated for it, and because some optimization and
@@ -205,13 +377,14 @@ pub struct VecShuffleDynamic {
 /// ```
 /// %value = cir.const #cir.int<3> : !s32i
 /// %value_vec = cir.vec.splat %value : !s32i, !cir.vector<4 x !s32i>
+/// %value_mat = cir.vec.splat %value : !s32i, !cir.matrix<2 x 2 x !s32i>
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct VecSplat {
     pub result: super::ValueId,
     pub result_ty: crate::types::Type,
-    /// any cir boolean, integer, floating point or pointer type
+    /// any cir boolean, integer, floating point
     pub value: super::ValueId,
     pub loc: Option<crate::ast::SourceLocation>,
 }

@@ -60,6 +60,13 @@ pub enum Type {
     ///
     /// `!cir.bool` represents C++ bool type.
     Bool,
+    /// `!cir.cuda_surface`
+    /// CUDA device surface reference type
+    ///
+    /// `!cir.cuda_surface` represents a CUDA built-in surface reference in CIR.
+    /// The type preserves surface semantics at the CIR level and lowers to the NVPTX
+    /// device-side handle representation (`i64`) during lowering to LLVM IR.
+    CudaDeviceSurface,
     /// `!cir.cuda_texture`
     /// CUDA device texture reference type
     ///
@@ -199,6 +206,36 @@ pub enum Type {
     LongDouble {
         /// expects !cir.double, !cir.fp80 or !cir.fp128
         underlying: Box<Type>,
+    },
+    /// `!cir.matrix`
+    /// CIR matrix type
+    ///
+    /// The `!cir.matrix` type represents a fixed-size 2-dimensional matrix.
+    /// It takes three parameters: the element type, the number of rows,
+    /// and columns.
+    ///
+    /// Syntax:
+    ///
+    /// ```
+    /// matrix-type ::= !cir.matrix<row x colum x element-type>
+    /// size ::= (decimal-literal | `[` decimal-literal `]`)
+    /// element-type ::= float-type | integer-type | bool-type
+    /// ```
+    ///
+    /// The `element-type` must be a scalar CIR type. Zero-sized matrices are not
+    /// allowed. The `row` and `column` count must be a positive integer.
+    ///
+    /// Examples:
+    ///
+    /// ```
+    /// !cir.matrix<3 x 3 x !cir.int<u, 8>>
+    /// !cir.matrix<2 x 4 x !cir.float>
+    /// ```
+    Matrix {
+        /// any cir boolean, integer, floating point type
+        element_type: Box<Type>,
+        num_rows: u64,
+        num_columns: u64,
     },
     /// `!cir.method`
     /// CIR type that represents C++ pointer-to-member-function type
@@ -357,7 +394,7 @@ pub enum Type {
     /// ```
     /// vector-type ::= !cir.vector<size x element-type>
     /// size ::= (decimal-literal | `[` decimal-literal `]`)
-    /// element-type ::= float-type | integer-type | pointer-type
+    /// element-type ::= float-type | integer-type | bool-type
     /// ```
     ///
     /// The `element-type` must be a scalar CIR type. Zero-sized vectors are not
@@ -370,6 +407,11 @@ pub enum Type {
     /// !cir.vector<2 x !cir.float>
     /// ```
     ///
+    /// A fixed-length vector of `!cir.bool` is packed one bit per element, and its
+    /// size is rounded up to a power of two of at least one byte, so
+    /// `!cir.vector<4 x !cir.bool>` occupies one byte and
+    /// `!cir.vector<17 x !cir.bool>` occupies four.
+    ///
     /// Scalable vectors are indicated by enclosing size in square brackets.
     ///
     /// Example:
@@ -377,7 +419,7 @@ pub enum Type {
     /// !cir.vector<[4] x !cir.int<u, 8>>
     /// ```
     Vector {
-        /// any cir boolean, integer, floating point or pointer type
+        /// any cir boolean, integer, floating point
         element_type: Box<Type>,
         size: u64,
         is_scalable: Option<bool>,
@@ -530,6 +572,7 @@ impl std::fmt::Display for Type {
             Self::Bf16 => write!(f, "bf16"),
             Self::BitField { .. } => write!(f, "bitfield"),
             Self::Bool => write!(f, "bool"),
+            Self::CudaDeviceSurface => write!(f, "cuda_surface"),
             Self::CudaDeviceTexture => write!(f, "cuda_texture"),
             Self::CatchToken => write!(f, "catch_token"),
             Self::CleanupToken => write!(f, "cleanup_token"),
@@ -538,6 +581,7 @@ impl std::fmt::Display for Type {
             Self::Fp16 => write!(f, "f16"),
             Self::Fp80 => write!(f, "f80"),
             Self::Fp128 => write!(f, "f128"),
+            Self::Matrix { .. } => write!(f, "matrix"),
             Self::Single => write!(f, "float"),
             Self::VPtr => write!(f, "vptr"),
             Self::Void => write!(f, "void"),

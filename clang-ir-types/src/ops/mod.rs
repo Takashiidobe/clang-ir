@@ -75,8 +75,8 @@ pub enum Op {
     /// Integer addition
     ///
     /// The `cir.add` operation performs addition on integer operands. Both
-    /// operands and the result must have the same integer or vector-of-integer
-    /// type.
+    /// operands and the result must have the same integer, vector-of-integer or
+    /// matrix-of-integer type.
     ///
     /// The optional `nsw` (no signed wrap) and `nuw` (no unsigned wrap) unit
     /// attributes indicate that the result is poison if signed or unsigned
@@ -92,6 +92,7 @@ pub enum Op {
     /// %2 = cir.add nuw %a, %b : !u32i
     /// %3 = cir.add sat %a, %b : !s32i
     /// %4 = cir.add %va, %vb : !cir.vector<4 x !s32i>
+    /// %5 = cir.add %ma, %mb : !cir.matrix<3 x 3 x !s32i>
     /// ```
     Add(arithmetic::Add),
     /// `cir.add.overflow`
@@ -593,7 +594,7 @@ pub enum Op {
     /// ```
     /// will generate
     /// ```
-    /// %3 = cir.base_class_addr %1 : !cir.ptr<!rec_Derived> nonnull [0] -> !cir.ptr<!rec_Base>
+    /// %3 = cir.base_class_addr nonnull %1 [0] : !cir.ptr<!rec_Derived> -> !cir.ptr<!rec_Base>
     /// ```
     BaseClassAddr(memory::BaseClassAddr),
     /// `cir.base_data_member`
@@ -825,10 +826,16 @@ pub enum Op {
     /// empty. The first operand of this operation must be a pointer to the callee
     /// function. The rest operands are arguments to the callee function.
     ///
+    /// The `calling_conv` attribute specifies the calling convention used at the
+    /// call site. It defaults to `CallingConv::C`, which is omitted when printed.
+    /// Other calling conventions are printed as `cc(<mnemonic>)`, e.g.
+    /// `cc(spir_function)`.
+    ///
     /// Example:
     ///
     /// ```
     /// %0 = cir.call @foo()
+    /// cir.call @bar() cc(spir_function) : () -> ()
     /// ```
     Call(calls::Call),
     /// `cir.call_llvm_intrinsic`
@@ -906,9 +913,7 @@ pub enum Op {
     /// ...
     /// %x = cir.cast array_to_ptrdecay %0
     ///    : !cir.ptr<!cir.array<i32 x 10>> -> !cir.ptr<i32>
-    /// %y = cir.cast floating %f : !cir.double -> !cir.float {
-    ///   fenv = #cir.fenv<>
-    /// }
+    /// %y = cir.cast floating %f : !cir.double -> !cir.float fenv<>
     /// ```
     Cast(misc::Cast),
     /// `cir.catch_param`
@@ -1096,7 +1101,7 @@ pub enum Op {
     /// ```
     /// %0 = cir.cmp gt %1, %2 : !s32i
     /// %1 = cir.cmp eq %a, %b : !cir.ptr<!u8i>
-    /// %2 = cir.cmp lt %x, %y : !cir.float {fenv = #cir.fenv<>}
+    /// %2 = cir.cmp lt %x, %y : !cir.float fenv<>
     /// ```
     Cmp(arithmetic::Cmp),
     /// `cir.cmp3way`
@@ -1150,7 +1155,7 @@ pub enum Op {
     /// Example:
     ///
     /// ```
-    /// %2 = cir.complex.add %0, %1 : !cir.complex<!cir.float>
+    /// %2 = cir.complex.add %0, %1 : !cir.complex<s32i>
     /// ```
     ComplexAdd(complex::ComplexAdd),
     /// `cir.complex.conj`
@@ -1183,10 +1188,33 @@ pub enum Op {
     /// The `cir.complex.div` operation takes two complex numbers and returns
     /// their quotient.
     ///
-    /// For complex types with floating-point components, the `range` attribute
-    /// specifies the algorithm to be used when the operation is lowered to
-    /// the LLVM dialect. For division, 'improved' produces Smith's algorithms for
-    /// Complex division with no additional handling for NaN values. If 'promoted'
+    /// Example:
+    ///
+    /// ```
+    /// %2 = cir.complex.div %0, %1 : !cir.complex<s32i>
+    /// ```
+    ComplexDiv(complex::ComplexDiv),
+    /// `cir.complex.fadd`
+    /// Complex addition
+    ///
+    /// The `cir.complex.fadd` operation takes two complex numbers and returns
+    /// their sum.
+    ///
+    /// Example:
+    ///
+    /// ```
+    /// %2 = cir.complex.fadd %0, %1 : !cir.complex<!cir.float>
+    /// ```
+    ComplexFadd(complex::ComplexFadd),
+    /// `cir.complex.fdiv`
+    /// Complex division
+    ///
+    /// The `cir.complex.div` operation takes two complex numbers and returns
+    /// their quotient.
+    ///
+    /// The `range` attribute specifies the algorithm to be used when the operation
+    /// is lowered to the LLVM dialect. For division, 'improved' produces Smith's algorithms
+    /// for Complex division with no additional handling for NaN values. If 'promoted'
     /// is used, the values are promoted to a higher precision type, if possible,
     /// and the calculation is performed using the algebraic formula, with
     /// no additional handling for NaN values. We fall back on Smith's algorithm
@@ -1199,10 +1227,42 @@ pub enum Op {
     /// Example:
     ///
     /// ```
-    /// %2 = cir.complex.div %0, %1 range(basic) : !cir.complex<!cir.float>
-    /// %2 = cir.complex.div %0, %1 range(full) : !cir.complex<!cir.float>
+    /// %2 = cir.complex.fdiv %0, %1 range(basic) : !cir.complex<!cir.float>
+    /// %2 = cir.complex.fdiv %0, %1 range(full) : !cir.complex<!cir.float>
     /// ```
-    ComplexDiv(complex::ComplexDiv),
+    ComplexFdiv(complex::ComplexFdiv),
+    /// `cir.complex.fmul`
+    /// Complex multiplication
+    ///
+    /// The `cir.complex.mul` operation takes two complex numbers and returns
+    /// their product.
+    ///
+    /// The `range` attribute specifies the algorithm to be used when the operation
+    /// is lowered to the LLVM dialect. For multiplication, 'improved', 'promoted',
+    /// and 'basic' are all handled equivalently, producing the algebraic formula with no
+    /// special handling for NaN value. If 'full' is used, a runtime-library
+    /// function is called if one of the intermediate calculations produced
+    /// a NaN value.
+    ///
+    /// Example:
+    ///
+    /// ```
+    /// %2 = cir.complex.fmul %0, %1 range(basic) : !cir.complex<!cir.float>
+    /// %2 = cir.complex.fmul %0, %1 range(full) : !cir.complex<!cir.float>
+    /// ```
+    ComplexFmul(complex::ComplexFmul),
+    /// `cir.complex.fsub`
+    /// Complex subtraction
+    ///
+    /// The `cir.complex.fsub` operation takes two complex numbers and returns
+    /// their difference.
+    ///
+    /// Example:
+    ///
+    /// ```
+    /// %2 = cir.complex.fsub %0, %1 : !cir.complex<!cir.float>
+    /// ```
+    ComplexFsub(complex::ComplexFsub),
     /// `cir.complex.imag`
     /// Extract the imaginary part of a complex value
     ///
@@ -1237,19 +1297,10 @@ pub enum Op {
     /// The `cir.complex.mul` operation takes two complex numbers and returns
     /// their product.
     ///
-    /// For complex types with floating-point components, the `range` attribute
-    /// specifies the algorithm to be used when the operation is lowered to
-    /// the LLVM dialect. For multiplication, 'improved', 'promoted', and 'basic'
-    /// are all handled equivalently, producing the algebraic formula with no
-    /// special handling for NaN value. If 'full' is used, a runtime-library
-    /// function is called if one of the intermediate calculations produced
-    /// a NaN value.
-    ///
     /// Example:
     ///
     /// ```
-    /// %2 = cir.complex.mul %0, %1 range(basic) : !cir.complex<!cir.float>
-    /// %2 = cir.complex.mul %0, %1 range(full) : !cir.complex<!cir.float>
+    /// %2 = cir.complex.mul %0, %1 : !cir.complex<s32i>
     /// ```
     ComplexMul(complex::ComplexMul),
     /// `cir.complex.real`
@@ -1289,7 +1340,7 @@ pub enum Op {
     /// Example:
     ///
     /// ```
-    /// %2 = cir.complex.sub %0, %1 : !cir.complex<!cir.float>
+    /// %2 = cir.complex.sub %0, %1 : !cir.complex<s32i>
     /// ```
     ComplexSub(complex::ComplexSub),
     /// `cir.condition`
@@ -1350,9 +1401,11 @@ pub enum Op {
     /// copy of the object before `__cxa_begin_catch` is invoked.
     ///
     /// This operation takes a `!cir.eh_token` that represents the in-flight
-    /// exception and the alloca value that is used for the local copy of the
-    /// exception object. The `copy_fn` attribute is a flat symbol reference to a
-    /// `cir.func` thunk that copies the exception object to a local alloca value.
+    /// exception and the alloca value for the catch parameter. The optional
+    /// `copy_fn` attribute, present for `non_trivial_copy`, is a flat symbol
+    /// reference to a `cir.func` thunk that copies the exception object to a
+    /// local alloca value. For `reference_to_pointer`, the operation binds the
+    /// reference to the exception object itself.
     ///
     /// This operation is replaced with a target-specific representation during
     /// the EHABI lowering pass. For some targets, such as the Microsoft ABI,
@@ -1408,22 +1461,11 @@ pub enum Op {
     /// `cir.copysign` returns a value with the magnitude of the first operand
     /// and the sign of the second operand.
     Copysign(arithmetic::Copysign),
-    /// `cir.coro.body`
-    /// Region containing the user-authored coroutine body
+    /// `cir.coro.intrinsic.align`
+    /// Represents llvm.coro.align
     ///
-    /// The `cir.coro.body` operation models the region where the user-authored
-    /// coroutine code is emitted.
-    ///
-    /// This operation serves as a structural boundary separating the coroutine
-    /// setup and teardown logic (e.g. initial suspend, final suspend, and cleanup)
-    /// from the user-provided statements inside the coroutine.
-    ///
-    /// The body region contains the code corresponding to the original function
-    /// body, including `co_await` and `co_return` expressions. In particular,
-    /// `cir.co_return` operations inside this region mark coroutine exit points
-    /// and introduce structured control flow that transfers execution to the
-    /// final suspend point of the coroutine.
-    CoroBody(misc::CoroBody),
+    /// Returns the alignment requirement, in bytes, of the coroutine frame.
+    CoroIntrinsicAlign(misc::CoroIntrinsicAlign),
     /// `cir.coro.intrinsic.alloc`
     /// Represents llvm.coro.alloc
     ///
@@ -1438,6 +1480,19 @@ pub enum Op {
     /// from `coro.intrinsic.id`, and `coroframeAddr` points to the memory used
     /// for the coroutine frame. Returns the coroutine handle.
     CoroIntrinsicBegin(misc::CoroIntrinsicBegin),
+    /// `cir.coro.intrinsic.destroy`
+    /// Represents llvm.coro.destroy
+    ///
+    /// Destroys a suspended coroutine identified by `handle`. Destroying a
+    /// coroutine that is not currently suspended is undefined behavior.
+    CoroIntrinsicDestroy(misc::CoroIntrinsicDestroy),
+    /// `cir.coro.intrinsic.done`
+    /// Represents llvm.coro.done
+    ///
+    /// Checks whether the coroutine identified by `handle` is currently
+    /// suspended at its final suspend point. `handle` must be a handle to a
+    /// suspended coroutine.
+    CoroIntrinsicDone(misc::CoroIntrinsicDone),
     /// `cir.coro.intrinsic.end`
     /// Represents llvm.coro.end
     ///
@@ -1471,11 +1526,114 @@ pub enum Op {
     /// (`coro.alloc`, `coro.begin`, `coro.free`, etc.), tying them all to the
     /// same coroutine instance.
     CoroIntrinsicId(misc::CoroIntrinsicId),
+    /// `cir.coro.intrinsic.noop`
+    /// Represents llvm.coro.noop
+    ///
+    /// Returns a coroutine handle to a no-op coroutine.
+    CoroIntrinsicNoop(misc::CoroIntrinsicNoop),
+    /// `cir.coro.intrinsic.promise`
+    /// Represents llvm.coro.promise
+    ///
+    /// Given a coroutine handle (if `isFromPromise` is false) or a pointer to a
+    /// coroutine promise (if `isFromPromise` is true), obtains a pointer to the
+    /// coroutine promise or the coroutine handle, respectively. `align` is the
+    /// alignment requirement of the promise, and `isFromPromise` indicates the
+    /// direction of the transformation: `true` recovers the coroutine handle
+    /// from a promise pointer, `false` recovers the promise pointer from a
+    /// coroutine handle. Using this op on a coroutine without a coroutine
+    /// promise is undefined behavior.
+    CoroIntrinsicPromise(misc::CoroIntrinsicPromise),
+    /// `cir.coro.intrinsic.resume`
+    /// Represents llvm.coro.resume
+    ///
+    /// Resumes a suspended coroutine identified by `handle`. Resuming a
+    /// coroutine that is not currently suspended is undefined behavior.
+    CoroIntrinsicResume(misc::CoroIntrinsicResume),
     /// `cir.coro.intrinsic.size`
     /// Represents llvm.coro.size
     ///
     /// Returns the size, in bytes, of the coroutine frame.
     CoroIntrinsicSize(misc::CoroIntrinsicSize),
+    /// `cir.coro.intrinsic.suspend`
+    /// Represents llvm.coro.suspend
+    ///
+    /// `cir.coro.intrinsic.suspend` represents the `llvm.coro.suspend` intrinsic.
+    ///
+    /// It marks the point where execution of a switched-resume coroutine is
+    /// suspended and control returns to the caller. The result value indicates
+    /// how the coroutine should proceed: -1 if suspended, 0 if resumed, or 1
+    /// if destroyed.
+    ///
+    /// The `id` operand is the token produced by a `cir.coro.save` that marks
+    /// the point when the coroutine state is prepared for suspension.
+    ///
+    /// The `final` operand indicates whether this is a final suspend point.
+    /// If more than one suspend point is marked final, the resume and destroy
+    /// branches must lead to the same basic blocks.
+    CoroIntrinsicSuspend(misc::CoroIntrinsicSuspend),
+    /// `cir.coro.suspend_point`
+    /// Marks the point where a coroutine actually suspends
+    ///
+    /// Terminates the `suspend` region of a `cir.await`. It has no explicit
+    /// successors; the destination is determined by `CoroutineOp`
+    /// according to how the suspended coroutine is subsequently handled:
+    ///
+    /// - resume: continues execution through the `cir.await`'s `resume` region
+    ///   when the coroutine handle is resumed.
+    ///
+    /// - exit: transfers directly to the enclosing `cir.coroutine`'s `exit`
+    ///   region when the coroutine remains suspended. The coroutine frame remains
+    ///   alive and no cleanups are performed.
+    ///
+    /// - destroy: transfers through the enclosing `cir.cleanup.scope`s to the
+    ///   `cir.coroutine`'s `destroy` region when the coroutine handle is
+    ///   destroyed.
+    CoroSuspendPoint(misc::CoroSuspendPoint),
+    /// `cir.coroutine`
+    /// Groups a coroutine's structured suspend/resume/destroy control flow
+    ///
+    /// `cir.coroutine` is an op consisting of seven regions: `initial_suspend`,
+    /// `body`, `final_suspend`, grp (TODO),`unwind` (TODO), `destroy`, and`exit`.
+    ///
+    /// - `initial_suspend`: the coroutine ramp/setup region. Its `cir.await` marked
+    ///   `init` is the ramp boundary: the coroutine frame and its associated state
+    ///   are established before this point, and crossing the await transfers
+    ///   execution to `body`.
+    ///
+    /// - `body`: the user-written coroutine body, arbitrary CFG, zero or more
+    ///   `cir.await`s at any nesting depth, terminated by `cir.co_return` or a
+    ///   plain `cir.yield` if control simply falls off the end. This region is
+    ///   a structural boundary separating the coroutine's setup and teardown
+    ///   logic (initial suspend, final suspend, destroy) from the
+    ///   user-provided statements of the original function body, including
+    ///   `co_await` and `co_return` expressions. In particular,
+    ///   `cir.co_return` operations inside this region mark coroutine exit
+    ///   points and introduce structured control flow that transfers
+    ///   execution to `final_suspend`.
+    ///
+    /// - `final_suspend`: exactly one `cir.await`, marked `final`. Nothing
+    ///   else. Corresponds to `co_await promise.final_suspend()`. Resuming
+    ///   past this point is undefined behavior in valid programs, so its
+    ///   `resume` edge is expected to be dead in practice, but is kept for
+    ///   structural symmetry with the other two suspend regions.
+    ///
+    /// - `gro`: TODO.
+    ///
+    /// - `unwind`: TODO.
+    ///
+    /// - `destroy`: destroys the coroutine frame (`coro.free` + `delete`).
+    ///   Reached by an explicit `destroy()` call on a suspended handle, by
+    ///   normal completion through `final_suspend`, or by an exception
+    ///   escaping the coroutine. Falls through to `exit` except when reached
+    ///   due to an escaping exception, where it continues propagating that
+    ///   exception instead.
+    ///
+    /// - `exit`: the shared return-to-caller path. Reached directly from any
+    ///   suspend point that isn't being destroyed (the coroutine is just
+    ///   pausing), and from `destroy` when it was entered via ordinary
+    ///   dispatch. Holds `coro.end` + the actual `cir.return`.
+    ///
+    Coroutine(misc::Coroutine),
     /// `cir.cos`
     /// Computes the floating-point cosine value
     ///
@@ -1558,14 +1716,18 @@ pub enum Op {
     /// will be translated to `cir.delete_array %ptr`.
     ///
     /// The `delete_fn` attribute specifies the operator delete function to call.
-    /// The `delete_params` attribute describes the parameters needed by the
-    /// operator delete call.
+    /// The optional `delete_params` attribute describes the parameters needed by
+    /// the operator delete call. When absent, all parameters have default values.
     ///
     /// The `element_dtor` attribute, when present, specifies the destructor to call
     /// on each array element before deallocation.
     ///
     /// The `dtor_may_throw` unit property, when present, indicates that the
     /// element destructor may throw exceptions.
+    ///
+    /// The `element_align` attribute gives the element type's preferred
+    /// alignment in bytes, which should be the same value the corresponding `new[]`
+    /// uses to size its array cookie.
     DeleteArray(misc::DeleteArray),
     /// `cir.derived_class_addr`
     /// Get the derived class address for a class/struct
@@ -1596,7 +1758,7 @@ pub enum Op {
     /// leads to
     /// ```
     ///   %2 = cir.load %0 : !cir.ptr<!cir.ptr<!rec_A>>, !cir.ptr<!rec_A>
-    ///   %3 = cir.base_class_addr %2 : !cir.ptr<!rec_B> [0] -> !cir.ptr<!rec_A>
+    ///   %3 = cir.derived_class_addr %2 [0] : !cir.ptr<!rec_A> -> !cir.ptr<!rec_B>
     /// ```
     DerivedClassAddr(memory::DerivedClassAddr),
     /// `cir.derived_data_member`
@@ -1734,6 +1896,17 @@ pub enum Op {
     /// another type handler. The `unwind` handler is used when no handler is
     /// matched.
     ///
+    /// A handler may also be a `filter`, which carries the list of type info
+    /// symbols permitted by the dynamic exception specification of the enclosing
+    /// function. A `filter` handler has the *opposite* polarity from a `catch`
+    /// handler: its destination is taken when the in-flight exception is **not**
+    /// one of the listed types. The polarity comes from the Itanium personality
+    /// routine, which reports a filter failure by selecting the filter clause of
+    /// the landing pad. A `filter` handler therefore does not take the place of
+    /// the default destination, and a dispatch that has one always also has an
+    /// `unwind` handler, whose destination is taken when the exception is
+    /// permitted. A dispatch has at most one `filter` handler.
+    ///
     /// Example:
     ///
     /// ```
@@ -1746,6 +1919,12 @@ pub enum Op {
     /// cir.eh.dispatch %eh_token : !cir.eh_token [
     ///   catch (#cir.global_view<type @_ZTIi> : !cir.ptr<!u8i>) : ^catch_int,
     ///   unwind : ^continue_unwind
+    /// ]
+    ///
+    /// cir.eh.dispatch %eh_token : !cir.eh_token [
+    ///   filter(#cir.global_view<@_ZTIi> : !cir.ptr<!u8i>)
+    ///       : ^specification_violated,
+    ///   unwind : ^exception_permitted
     /// ]
     /// ```
     EhDispatch(exceptions::EhDispatch),
@@ -1770,6 +1949,15 @@ pub enum Op {
     /// alongside typed catches, the landing pad will contain both the typed catch
     /// clauses and a trailing `catch ptr null`.
     ///
+    /// The `filter_type_list` attribute lists the type info symbols permitted by
+    /// the dynamic exception specification of the enclosing function. It lowers to
+    /// the `filter` clause of the LLVM IR landingpad instruction. An empty list is
+    /// distinct from an absent one: it represents `throw()` and lowers to a
+    /// zero-length filter clause, which the personality routine treats as
+    /// permitting nothing. Since the exception specification encloses the whole
+    /// function body, the filter clause always comes after any catch clauses, and
+    /// it terminates the clause list in the same way that `catch_all` does.
+    ///
     /// Example:
     ///
     /// ```
@@ -1777,7 +1965,9 @@ pub enum Op {
     /// %exception_ptr, %type_id = cir.eh.inflight_exception [@_ZTIi, @_ZTIPKc]
     /// %exception_ptr, %type_id = cir.eh.inflight_exception cleanup
     /// %exception_ptr, %type_id = cir.eh.inflight_exception catch_all [@_ZTIi]
-    /// ``
+    /// %exception_ptr, %type_id = cir.eh.inflight_exception filter [@_ZTIi]
+    /// %exception_ptr, %type_id = cir.eh.inflight_exception [@_ZTIi] filter []
+    /// ```
     EhInflightException(exceptions::EhInflightException),
     /// `cir.eh.initiate`
     /// Initiate exception handling in flattened CIR
@@ -1833,15 +2023,23 @@ pub enum Op {
     /// ```
     EhSetjmp(exceptions::EhSetjmp),
     /// `cir.eh.terminate`
-    /// Terminate due to exception thrown during cleanup
+    /// Terminate due to an exception that must not escape
     ///
-    /// `cir.eh.terminate` terminates program execution when an exception is thrown
-    /// while executing cleanup code during exception unwinding. The C++ standard
-    /// requires that `std::terminate()` be called in this scenario.
+    /// `cir.eh.terminate` terminates program execution when an exception reaches a
+    /// point from which the C++ standard does not allow it to propagate, and
+    /// requires `std::terminate()` to be called instead. That happens when an
+    /// exception is thrown while executing cleanup code during unwinding, and when
+    /// an exception tries to escape a function that cannot throw.
     ///
-    /// This operation takes an `!cir.eh_token` from a `cir.eh.initiate` operation
-    /// and acts as a terminator. It is produced during CFG flattening when throwing
-    /// calls are found in EH cleanup regions.
+    /// This operation takes an `!cir.eh_token` and acts as a terminator. In
+    /// high-level CIR it appears as the only operation in the catch-all handler
+    /// region of the `cir.try` that wraps the body of a function that cannot
+    /// throw, where the token comes from the handler region's block argument. The
+    /// handler is a catch-all because such a function terminates on any escaping
+    /// exception, and it has no `cir.begin_catch` because the runtime helper this
+    /// operation lowers to performs the catch. After CFG flattening the token
+    /// comes from a `cir.eh.initiate` operation; flattening also produces this
+    /// operation for throwing calls found in EH cleanup regions.
     ///
     /// During EH ABI lowering, this is replaced with target-specific termination
     /// code. For the Itanium ABI, the `cir.eh.initiate` is lowered to
@@ -1850,6 +2048,16 @@ pub enum Op {
     /// pointer, followed by an unreachable operation.
     ///
     /// Example:
+    ///
+    /// ```
+    /// cir.try {
+    ///   ...
+    /// } catch all (%eh_token : !cir.eh_token) {
+    ///   cir.eh.terminate %eh_token : !cir.eh_token
+    /// }
+    /// ```
+    ///
+    /// And after CFG flattening:
     ///
     /// ```
     /// ^terminate_unwind:
@@ -1868,6 +2076,34 @@ pub enum Op {
     /// %type_id = cir.eh.typeid @_ZTIi
     /// ```
     EhTypeid(exceptions::EhTypeid),
+    /// `cir.eh.unexpected`
+    /// Handle an exception that violates an exception specification
+    ///
+    /// `cir.eh.unexpected` signals that the in-flight exception violated the
+    /// dynamic exception specification of the enclosing function, and that
+    /// `std::unexpected()` must be called. The C++ standard requires this when an
+    /// exception that the specification does not permit tries to escape the
+    /// function.
+    ///
+    /// This operation takes a `!cir.eh_token` and acts as a terminator. In
+    /// high-level CIR it is the only operation in the `unexpected` handler region
+    /// of a `cir.try` operation, where the token comes from the handler region's
+    /// block argument. After CFG flattening the token comes from a
+    /// `cir.eh.initiate` operation.
+    ///
+    /// Like `cir.eh.terminate`, this operation is ABI-agnostic. During EH ABI
+    /// lowering it is replaced with target-specific code. For the Itanium ABI it
+    /// becomes a call to `__cxa_call_unexpected` with the exception pointer,
+    /// followed by an unreachable operation.
+    ///
+    /// Example:
+    ///
+    /// ```
+    /// ^unexpected:
+    ///   %eh_token = cir.eh.initiate : !cir.eh_token
+    ///   cir.eh.unexpected %eh_token : !cir.eh_token
+    /// ```
+    EhUnexpected(exceptions::EhUnexpected),
     /// `cir.end_catch`
     /// End a catch handler
     ///
@@ -2007,8 +2243,8 @@ pub enum Op {
     /// Floating-point addition
     ///
     /// The `cir.fadd` operation performs floating-point addition on its operands.
-    /// Both operands and the result must have the same floating-point scalar or
-    /// vector-of-float type.
+    /// Both operands and the result must have the same floating-point scalar,
+    /// vector-of-float or matrix-of-float type.
     ///
     /// Example:
     ///
@@ -2016,6 +2252,7 @@ pub enum Op {
     /// %0 = cir.fadd %a, %b : !cir.float
     /// %1 = cir.fadd %a, %b : !cir.double
     /// %2 = cir.fadd %va, %vb : !cir.vector<4 x !cir.float>
+    /// %3 = cir.fadd %ma, %mb : !cir.matrix<3 x 3 x !cir.float>
     /// ```
     Fadd(arithmetic::Fadd),
     /// `cir.fdiv`
@@ -2276,6 +2513,42 @@ pub enum Op {
     /// Example:
     ///   %sig, %exp = cir.frexp %x : !cir.float -> !cir.float, !s32i
     Frexp(arithmetic::Frexp),
+    /// `cir.fshl`
+    /// Funnel shift left
+    ///
+    /// The `cir.fshl` operation concatenates `a` and `b` (with `a` in the high
+    /// half), shifts the concatenation left by `c` bit positions, and returns the
+    /// high half of the result. The shift amount is treated modulo the bitwidth
+    /// of the operands.
+    ///
+    /// All operands and the result must have the same integer type or
+    /// vector-of-integer type.
+    ///
+    /// Example:
+    ///
+    /// ```
+    /// %r = cir.fshl %a, %b, %c : !u32i
+    /// %v = cir.fshl %va, %vb, %vc : !cir.vector<4 x !s32i>
+    /// ```
+    Fshl(misc::Fshl),
+    /// `cir.fshr`
+    /// Funnel shift right
+    ///
+    /// The `cir.fshr` operation concatenates `a` and `b` (with `a` in the high
+    /// half), shifts the concatenation right by `c` bit positions, and returns
+    /// the low half of the result. The shift amount is treated modulo the bitwidth
+    /// of the operands.
+    ///
+    /// All operands and the result must have the same integer type or
+    /// vector-of-integer type.
+    ///
+    /// Example:
+    ///
+    /// ```
+    /// %r = cir.fshr %a, %b, %c : !u32i
+    /// %v = cir.fshr %va, %vb, %vc : !cir.vector<4 x !s32i>
+    /// ```
+    Fshr(misc::Fshr),
     /// `cir.fsub`
     /// Floating-point subtraction
     ///
@@ -2332,6 +2605,10 @@ pub enum Op {
     /// The `personality` attribute specifies the personality function to use for
     /// exception handling. This is a symbol reference to the personality function
     /// (e.g., `@__gxx_personality_v0` for C++ exceptions).
+    ///
+    /// The 'comdat' attribute marks the function as belonging to a COMDAT group.
+    /// This attribute includes an optional 'group' name, which if not provided,
+    /// results in the function's symbol name being used.
     ///
     /// Example:
     ///
@@ -2567,10 +2844,11 @@ pub enum Op {
     /// Symbol visibility in `sym_visibility` is defined in terms of MLIR's visibility
     /// and verified to be in accordance to `linkage`.
     ///
-    /// The `static_local_guard` attribute indicates that this global represents a
-    /// function-local static variable that requires guarded initialization
-    /// (e.g., C++ static local variables with non-constant initializers).
-    /// It contains the mangled name of the guard variable.
+    /// The `dynamic_init_guard` attribute indicates that this global requires
+    /// guarded dynamic initialization via the Itanium `__cxa_guard_*` protocol
+    /// (e.g., C++ static local variables with non-constant initializers, or
+    /// namespace-scope variables with vague linkage such as weak/linkonce_odr
+    /// inline variables). It contains the mangled name of the guard variable.
     ///
     /// The `strictfp` attribute indicates that the dynamic initialization emitted
     /// into the `ctorRegion`/`dtorRegion` runs under a constrained floating-point
@@ -2734,6 +3012,16 @@ pub enum Op {
     /// the Itanium C++ ABI may emit a load and store for scalar/pointer catch
     /// types, an aggregate copy for record types, or a call to a copy
     /// constructor when one is required).
+    ///
+    /// A catch parameter that is a reference to a pointer uses the
+    /// `reference_to_record_pointer` kind when the pointer's source-level pointee
+    /// type is a record (class, struct, or union), and `reference_to_pointer`
+    /// otherwise. A reference to any other type uses `reference`.
+    ///
+    /// A `reference_to_pointer` or `non_trivial_copy` operation requires its catch
+    /// handler to start with a `cir.construct_catch_param` of the same kind on the
+    /// same parameter. When the handler starts with a `cir.construct_catch_param`
+    /// on the parameter of the operation, the two must have the same kind.
     ///
     /// Example:
     ///
@@ -3081,6 +3369,80 @@ pub enum Op {
     /// `cir.lround` rounds a floating-point value to the nearest integer value,
     /// rounding halfway cases away from zero, and returns the result as a `long`.
     Lround(arithmetic::Lround),
+    /// `cir.matrix.column_major_load`
+    /// Matrix column major load
+    ///
+    /// The `cir.matrix.column_major_load` operation provides a representation for
+    /// the `__builtin_matrix_column_major_load` builtin and corresponds to the
+    /// `llvm.matrix.column.major.load` intrinsic in LLVM IR.
+    ///
+    /// This operation performs a load of any matrix type with a stride to compute
+    /// the start address of the different columns.
+    ///
+    /// The `stride` argument is the column stride which much be greater than or equal
+    /// to `row`, giving the following 2x3 matrix `[[1, 2, 3], [4, 5, 6]]` with a
+    /// stride of 2, the result matrix will be `[[1, 3, 5], [2, 4, 6]]`.
+    ///
+    /// ```
+    /// %result = cir.matrix.column_major_load %ptr : <!cir.float>, %stride : !u64i,
+    ///   !cir.matrix<2 x 3 x !cir.float>
+    ///
+    /// %result = cir.matrix.column_major_load %ptr : <!cir.double>, %stride : !u64i,
+    ///   !cir.matrix<5 x 5 x !cir.double>
+    ///
+    /// %result = cir.matrix.column_major_load %ptr : <!cir.double>, %stride : !u64i
+    ///   volatile, !cir.matrix<5 x 5 x !cir.double>
+    /// ```
+    MatrixColumnMajorLoad(misc::MatrixColumnMajorLoad),
+    /// `cir.matrix.column_major_store`
+    /// Matrix column major store
+    ///
+    /// The `cir.matrix.column_major_store` operation provides a representation for
+    /// the `__builtin_matrix_column_major_store` builtin and corresponds to the
+    /// `llvm.matrix.column.major.store` intrinsic in LLVM IR.
+    ///
+    /// This operation performs a store of data from matrix type with a stride to
+    /// compute the start address of the different columns.
+    ///
+    /// The `stride` argument is the column stride which much be greater than or equal
+    /// to `row`, giving the following 2x3 matrix `[[1, 2, 3], [4, 5, 6]]` with a
+    /// stride of 2, the stored data will be `[1, 3, 5, 2, 4, 6]`.
+    ///
+    /// ```
+    /// cir.matrix.column_major_store %matrix : <3 x 3 x !cir.float>,
+    ///   %data : <!cir.float>, %stribe : !u64i
+    /// ```
+    MatrixColumnMajorStore(misc::MatrixColumnMajorStore),
+    /// `cir.matrix.extract`
+    /// Extract one element from a matrix object
+    ///
+    /// The `cir.matrix.extract` operation extracts the element at the given row
+    /// and column indices from a matrix object.
+    ///
+    /// Currently, the flatten index is a column-based index.
+    ///
+    /// ```
+    /// %rowIdx = cir.const #cir.int<1> : !u64i
+    /// %columnIdx = cir.const #cir.int<2> : !u64i
+    /// %element = cir.matrix.extract %matrix[%rowIdx : !u64i] [%columnIdx : !u64i]
+    ///   : !cir.matrix<3 x 3 x !cir.float>
+    /// ```
+    MatrixExtract(misc::MatrixExtract),
+    /// `cir.matrix.transpose`
+    /// Matrix transpose
+    ///
+    /// The `cir.matrix.transpose` operation provides a representation for the
+    /// `__builtin_matrix_transpose` builtin and corresponds to the
+    /// `llvm.matrix.transpose` intrinsic in LLVM IR.
+    ///
+    /// This operation performs transposition to switch the row and column
+    /// indices of the matrix and returns the transposed matrix,
+    ///
+    /// ```
+    /// %result = cir.matrix.transpose %value : <3 x 2 x !cir.float>,
+    ///     !cir.matrix<2 x 3 x !cir.float>
+    /// ```
+    MatrixTranspose(misc::MatrixTranspose),
     /// `cir.max`
     /// Integer maximum
     ///
@@ -3316,6 +3678,20 @@ pub enum Op {
     /// %7 = cir.ptr_diff %0, %1 : !cir.ptr<!u64i> -> !u64i
     /// ```
     PtrDiff(memory::PtrDiff),
+    /// `cir.ptr_mask`
+    /// Clear bits of a pointer
+    ///
+    /// The `cir.ptr_mask` operation clears the bits of `ptr` that are not set in
+    /// `mask`.  The result stays a pointer, whereas masking it as an integer
+    /// would lose provenance.
+    ///
+    /// `mask` must be exactly the target's pointer index width.
+    ///
+    /// ```
+    /// %m = cir.const #cir.int<-32> : !s64i
+    /// %0 = cir.ptr_mask %p, %m : (!cir.ptr<!u8i>, !s64i) -> !cir.ptr<!u8i>
+    /// ```
+    PtrMask(misc::PtrMask),
     /// `cir.ptr_stride`
     /// Pointer access with stride
     ///
@@ -3328,6 +3704,34 @@ pub enum Op {
     /// %3 = cir.ptr_stride %1, %2 : (!cir.ptr<i32>, i32) -> !cir.ptr<i32>
     /// ```
     PtrStride(memory::PtrStride),
+    /// `cir.register_exit_dtor`
+    /// Register the destruction of a global at program or thread exit
+    ///
+    /// The `cir.register_exit_dtor` operation registers its body to run when the
+    /// storage duration of the global `object` ends: at program exit, or at
+    /// thread exit when `object` is thread local.  The registration happens when
+    /// the operation executes, so objects registered later are destroyed earlier.
+    ///
+    /// It must be nested in the ctor region of a `cir.global` or
+    /// `cir.local_init`, but not inside another `cir.register_exit_dtor`,
+    /// typically right after the construction of a temporary whose lifetime that
+    /// variable extends.  `object` must have no ctor or dtor region of its own.
+    /// The body destroys `object`, which it reaches through `cir.get_global`.
+    ///
+    /// Example:
+    ///
+    /// ```
+    /// cir.global external @r = #cir.zero : !rec_Refs ctor {
+    ///   %0 = cir.get_global @_ZGR1r_ : !cir.ptr<!rec_Tmp>
+    ///   cir.call @_ZN3TmpC1Ei(%0, %1) : (!cir.ptr<!rec_Tmp>, !s32i) -> ()
+    ///   cir.register_exit_dtor @_ZGR1r_ {
+    ///     %2 = cir.get_global @_ZGR1r_ : !cir.ptr<!rec_Tmp>
+    ///     cir.call @_ZN3TmpD1Ev(%2) : (!cir.ptr<!rec_Tmp>) -> ()
+    ///   }
+    ///   ...
+    /// }
+    /// ```
+    RegisterExitDtor(misc::RegisterExitDtor),
     /// `cir.rem`
     /// Integer remainder
     ///
@@ -3982,6 +4386,23 @@ pub enum Op {
     /// into the body of the cleanup scope. This ensures that all paths out of the
     /// catch handler will execute the end_catch operation.
     ///
+    /// A `cir.try` operation may instead have a `filter` handler paired with an
+    /// `unexpected` handler, which together implement the dynamic exception
+    /// specification of the enclosing function. The `filter` handler lists the
+    /// permitted type info symbols and holds the path taken when the in-flight
+    /// exception is permitted, which is a `cir.resume` that continues unwinding
+    /// to the caller. The `unexpected` handler holds the path taken when the
+    /// specification is violated, which is a `cir.eh.unexpected`. An empty
+    /// permitted type list represents `throw()`, which permits nothing, so the
+    /// filter handler region holds a `cir.unreachable` instead. Like `unwind`,
+    /// and unlike a catch handler, neither region begins with `cir.begin_catch`.
+    ///
+    /// The two handlers must appear together, with the filter first, and must be
+    /// the only handlers on the operation. The try operation created for an
+    /// exception specification wraps the entire function body, and each try
+    /// statement written in the source becomes a separate `cir.try` operation
+    /// nested inside it.
+    ///
     /// Example:
     ///
     /// ```
@@ -4001,6 +4422,20 @@ pub enum Op {
     ///   cir.yield
     /// } unwind (%eh_token : !cir.eh_token) {
     ///   cir.resume %eh_token : !cir.eh_token
+    /// }
+    /// ```
+    ///
+    /// Example of a `void f() throw(int)` exception specification:
+    ///
+    /// ```
+    /// cir.try {
+    ///   cir.call exception @function() : () -> ()
+    ///   cir.yield
+    /// } filter [#cir.global_view<@_ZTIi> : !cir.ptr<!u8i>]
+    ///     (%eh_token : !cir.eh_token) {
+    ///   cir.resume %eh_token : !cir.eh_token
+    /// } unexpected (%eh_token.1 : !cir.eh_token) {
+    ///   cir.eh.unexpected %eh_token.1 : !cir.eh_token
     /// }
     /// ```
     Try(exceptions::Try),
@@ -4199,9 +4634,7 @@ pub enum Op {
     /// ```
     /// %eq = cir.vec.cmp(eq, %vec_a, %vec_b) : !cir.vector<4 x !s32i>, !cir.vector<4 x !s32i>
     /// %lt = cir.vec.cmp(lt, %vec_a, %vec_b) : !cir.vector<4 x !s32i>, !cir.vector<4 x !s32i>
-    /// %gt = cir.vec.cmp(gt, %va, %vb) : !cir.vector<4 x !cir.float>, !cir.vector<4 x !s32i> {
-    ///   fenv = #cir.fenv<>
-    /// }
+    /// %gt = cir.vec.cmp(gt, %va, %vb) : !cir.vector<4 x !cir.float>, !cir.vector<4 x !s32i> fenv<>
     /// ```
     VecCmp(vectors::VecCmp),
     /// `cir.vec.create`
@@ -4255,6 +4688,63 @@ pub enum Op {
     ///      : !cir.ptr<i32>, <4xi1>, <4xi32> -> <4xi32>
     /// ```
     VecMaskedLoad(vectors::VecMaskedLoad),
+    /// `cir.vec.reduce.add`
+    /// Reduce a vector using add
+    ///
+    /// Reduces the elements of a vector to a scalar of the vector element type.
+    VecReduceAdd(vectors::VecReduceAdd),
+    /// `cir.vec.reduce.and`
+    /// Reduce a vector using and
+    ///
+    /// Reduces the elements of a vector to a scalar of the vector element type.
+    VecReduceAnd(vectors::VecReduceAnd),
+    /// `cir.vec.reduce.fadd`
+    /// Reduce a floating-point vector using fadd
+    VecReduceFadd(vectors::VecReduceFadd),
+    /// `cir.vec.reduce.fmax`
+    /// Reduce a floating-point vector using fmax
+    VecReduceFmax(vectors::VecReduceFmax),
+    /// `cir.vec.reduce.fmin`
+    /// Reduce a floating-point vector using fmin
+    VecReduceFmin(vectors::VecReduceFmin),
+    /// `cir.vec.reduce.fmul`
+    /// Reduce a floating-point vector using fmul
+    VecReduceFmul(vectors::VecReduceFmul),
+    /// `cir.vec.reduce.mul`
+    /// Reduce a vector using mul
+    ///
+    /// Reduces the elements of a vector to a scalar of the vector element type.
+    VecReduceMul(vectors::VecReduceMul),
+    /// `cir.vec.reduce.or`
+    /// Reduce a vector using or
+    ///
+    /// Reduces the elements of a vector to a scalar of the vector element type.
+    VecReduceOr(vectors::VecReduceOr),
+    /// `cir.vec.reduce.smax`
+    /// Reduce a vector using smax
+    ///
+    /// Reduces the elements of a vector to a scalar of the vector element type.
+    VecReduceSmax(vectors::VecReduceSmax),
+    /// `cir.vec.reduce.smin`
+    /// Reduce a vector using smin
+    ///
+    /// Reduces the elements of a vector to a scalar of the vector element type.
+    VecReduceSmin(vectors::VecReduceSmin),
+    /// `cir.vec.reduce.umax`
+    /// Reduce a vector using umax
+    ///
+    /// Reduces the elements of a vector to a scalar of the vector element type.
+    VecReduceUmax(vectors::VecReduceUmax),
+    /// `cir.vec.reduce.umin`
+    /// Reduce a vector using umin
+    ///
+    /// Reduces the elements of a vector to a scalar of the vector element type.
+    VecReduceUmin(vectors::VecReduceUmin),
+    /// `cir.vec.reduce.xor`
+    /// Reduce a vector using xor
+    ///
+    /// Reduces the elements of a vector to a scalar of the vector element type.
+    VecReduceXor(vectors::VecReduceXor),
     /// `cir.vec.shuffle`
     /// Combine two vectors using indices passed as constant integers
     ///
@@ -4296,10 +4786,11 @@ pub enum Op {
     /// ```
     VecShuffleDynamic(vectors::VecShuffleDynamic),
     /// `cir.vec.splat`
-    /// Convert a scalar into a vector
+    /// Convert a scalar into a vector or matrix
     ///
-    /// The `cir.vec.splat` operation creates a vector value from a scalar value.
-    /// All elements of the vector have the same value, that of the given scalar.
+    /// The `cir.vec.splat` operation creates a vector or matrix value from a
+    /// scalar value. All elements of the result have the same value, that of the
+    /// given scalar.
     ///
     /// It's a separate operation from `cir.vec.create` because more
     /// efficient LLVM IR can be generated for it, and because some optimization and
@@ -4309,6 +4800,7 @@ pub enum Op {
     /// ```
     /// %value = cir.const #cir.int<3> : !s32i
     /// %value_vec = cir.vec.splat %value : !s32i, !cir.vector<4 x !s32i>
+    /// %value_mat = cir.vec.splat %value : !s32i, !cir.matrix<2 x 2 x !s32i>
     /// ```
     VecSplat(vectors::VecSplat),
     /// `cir.vec.ternary`
@@ -4610,6 +5102,10 @@ impl Op {
             "complex.conj" => lower_complex_conj(op),
             "complex.create" => lower_complex_create(op),
             "complex.div" => lower_complex_div(op),
+            "complex.fadd" => lower_complex_fadd(op),
+            "complex.fdiv" => lower_complex_fdiv(op),
+            "complex.fmul" => lower_complex_fmul(op),
+            "complex.fsub" => lower_complex_fsub(op),
             "complex.imag" => lower_complex_imag(op),
             "complex.imag_ptr" => lower_complex_imag_ptr(op),
             "complex.mul" => lower_complex_mul(op),
@@ -4622,13 +5118,21 @@ impl Op {
             "continue" => lower_continue(op),
             "copy" => lower_copy(op),
             "copysign" => lower_copysign(op),
-            "coro.body" => lower_coro_body(op),
+            "coro.intrinsic.align" => lower_coro_intrinsic_align(op),
             "coro.intrinsic.alloc" => lower_coro_intrinsic_alloc(op),
             "coro.intrinsic.begin" => lower_coro_intrinsic_begin(op),
+            "coro.intrinsic.destroy" => lower_coro_intrinsic_destroy(op),
+            "coro.intrinsic.done" => lower_coro_intrinsic_done(op),
             "coro.intrinsic.end" => lower_coro_intrinsic_end(op),
             "coro.intrinsic.free" => lower_coro_intrinsic_free(op),
             "coro.intrinsic.id" => lower_coro_intrinsic_id(op),
+            "coro.intrinsic.noop" => lower_coro_intrinsic_noop(op),
+            "coro.intrinsic.promise" => lower_coro_intrinsic_promise(op),
+            "coro.intrinsic.resume" => lower_coro_intrinsic_resume(op),
             "coro.intrinsic.size" => lower_coro_intrinsic_size(op),
+            "coro.intrinsic.suspend" => lower_coro_intrinsic_suspend(op),
+            "coro.suspend_point" => lower_coro_suspend_point(op),
+            "coroutine" => lower_coroutine(op),
             "cos" => lower_cos(op),
             "cosh" => lower_cosh(op),
             "cpuid" => lower_cpuid(op),
@@ -4648,6 +5152,7 @@ impl Op {
             "eh.setjmp" => lower_eh_setjmp(op),
             "eh.terminate" => lower_eh_terminate(op),
             "eh.typeid" => lower_eh_typeid(op),
+            "eh.unexpected" => lower_eh_unexpected(op),
             "end_catch" => lower_end_catch(op),
             "end_cleanup" => lower_end_cleanup(op),
             "exp" => lower_exp(op),
@@ -4674,6 +5179,8 @@ impl Op {
             "freeze" => lower_freeze(op),
             "frem" => lower_frem(op),
             "frexp" => lower_frexp(op),
+            "fshl" => lower_fshl(op),
+            "fshr" => lower_fshr(op),
             "fsub" => lower_fsub(op),
             "func" => lower_func(op),
             "get_bitfield" => lower_get_bitfield(op),
@@ -4709,6 +5216,10 @@ impl Op {
             "log2" => lower_log2(op),
             "lrint" => lower_lrint(op),
             "lround" => lower_lround(op),
+            "matrix.column_major_load" => lower_matrix_column_major_load(op),
+            "matrix.column_major_store" => lower_matrix_column_major_store(op),
+            "matrix.extract" => lower_matrix_extract(op),
+            "matrix.transpose" => lower_matrix_transpose(op),
             "max" => lower_max(op),
             "min" => lower_min(op),
             "minus" => lower_minus(op),
@@ -4724,7 +5235,9 @@ impl Op {
             "pow" => lower_pow(op),
             "prefetch" => lower_prefetch(op),
             "ptr_diff" => lower_ptr_diff(op),
+            "ptr_mask" => lower_ptr_mask(op),
             "ptr_stride" => lower_ptr_stride(op),
+            "register_exit_dtor" => lower_register_exit_dtor(op),
             "rem" => lower_rem(op),
             "resume" => lower_resume(op),
             "resume.flat" => lower_resume_flat(op),
@@ -4771,6 +5284,19 @@ impl Op {
             "vec.extract" => lower_vec_extract(op),
             "vec.insert" => lower_vec_insert(op),
             "vec.masked_load" => lower_vec_masked_load(op),
+            "vec.reduce.add" => lower_vec_reduce_add(op),
+            "vec.reduce.and" => lower_vec_reduce_and(op),
+            "vec.reduce.fadd" => lower_vec_reduce_fadd(op),
+            "vec.reduce.fmax" => lower_vec_reduce_fmax(op),
+            "vec.reduce.fmin" => lower_vec_reduce_fmin(op),
+            "vec.reduce.fmul" => lower_vec_reduce_fmul(op),
+            "vec.reduce.mul" => lower_vec_reduce_mul(op),
+            "vec.reduce.or" => lower_vec_reduce_or(op),
+            "vec.reduce.smax" => lower_vec_reduce_smax(op),
+            "vec.reduce.smin" => lower_vec_reduce_smin(op),
+            "vec.reduce.umax" => lower_vec_reduce_umax(op),
+            "vec.reduce.umin" => lower_vec_reduce_umin(op),
+            "vec.reduce.xor" => lower_vec_reduce_xor(op),
             "vec.shuffle" => lower_vec_shuffle(op),
             "vec.shuffle.dynamic" => lower_vec_shuffle_dynamic(op),
             "vec.splat" => lower_vec_splat(op),
@@ -4847,7 +5373,7 @@ impl Op {
             }
             Op::Await(_value) => {}
             Op::BaseClassAddr(value) => {
-                visit(&value.base_addr, &value.base_addr_ty);
+                visit(&value.result, &value.result_ty);
             }
             Op::BaseDataMember(value) => {
                 visit(&value.result, &value.result_ty);
@@ -4927,6 +5453,18 @@ impl Op {
             Op::ComplexDiv(value) => {
                 visit(&value.result, &value.result_ty);
             }
+            Op::ComplexFadd(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ComplexFdiv(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ComplexFmul(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::ComplexFsub(value) => {
+                visit(&value.result, &value.result_ty);
+            }
             Op::ComplexImag(value) => {
                 visit(&value.result, &value.result_ty);
             }
@@ -4955,12 +5493,18 @@ impl Op {
             Op::Copysign(value) => {
                 visit(&value.result, &value.result_ty);
             }
-            Op::CoroBody(_value) => {}
+            Op::CoroIntrinsicAlign(value) => {
+                visit(&value.result, &value.result_ty);
+            }
             Op::CoroIntrinsicAlloc(value) => {
                 visit(&value.result, &value.result_ty);
             }
             Op::CoroIntrinsicBegin(value) => {
                 visit(&value.result, &value.result_ty);
+            }
+            Op::CoroIntrinsicDestroy(_value) => {}
+            Op::CoroIntrinsicDone(value) => {
+                visit(&value.done, &value.done_ty);
             }
             Op::CoroIntrinsicEnd(value) => {
                 visit(&value.result, &value.result_ty);
@@ -4971,9 +5515,21 @@ impl Op {
             Op::CoroIntrinsicId(value) => {
                 visit(&value.result, &value.result_ty);
             }
+            Op::CoroIntrinsicNoop(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::CoroIntrinsicPromise(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::CoroIntrinsicResume(_value) => {}
             Op::CoroIntrinsicSize(value) => {
                 visit(&value.result, &value.result_ty);
             }
+            Op::CoroIntrinsicSuspend(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::CoroSuspendPoint(_value) => {}
+            Op::Coroutine(_value) => {}
             Op::Cos(value) => {
                 visit(&value.result, &value.result_ty);
             }
@@ -4989,7 +5545,7 @@ impl Op {
             }
             Op::DeleteArray(_value) => {}
             Op::DerivedClassAddr(value) => {
-                visit(&value.derived_addr, &value.derived_addr_ty);
+                visit(&value.result, &value.result_ty);
             }
             Op::DerivedDataMember(value) => {
                 visit(&value.result, &value.result_ty);
@@ -5020,6 +5576,7 @@ impl Op {
             Op::EhTypeid(value) => {
                 visit(&value.type_id, &value.type_id_ty);
             }
+            Op::EhUnexpected(_value) => {}
             Op::EndCatch(_value) => {}
             Op::EndCleanup(_value) => {}
             Op::Exp(value) => {
@@ -5092,6 +5649,12 @@ impl Op {
             Op::Frexp(value) => {
                 visit(&value.result, &value.result_ty);
                 visit(&value.exp, &value.exp_ty);
+            }
+            Op::Fshl(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::Fshr(value) => {
+                visit(&value.result, &value.result_ty);
             }
             Op::Fsub(value) => {
                 visit(&value.result, &value.result_ty);
@@ -5171,6 +5734,16 @@ impl Op {
             Op::Lround(value) => {
                 visit(&value.result, &value.result_ty);
             }
+            Op::MatrixColumnMajorLoad(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::MatrixColumnMajorStore(_value) => {}
+            Op::MatrixExtract(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::MatrixTranspose(value) => {
+                visit(&value.result, &value.result_ty);
+            }
             Op::Max(value) => {
                 visit(&value.result, &value.result_ty);
             }
@@ -5216,9 +5789,13 @@ impl Op {
             Op::PtrDiff(value) => {
                 visit(&value.result, &value.result_ty);
             }
+            Op::PtrMask(value) => {
+                visit(&value.result, &value.result_ty);
+            }
             Op::PtrStride(value) => {
                 visit(&value.result, &value.result_ty);
             }
+            Op::RegisterExitDtor(_value) => {}
             Op::Rem(value) => {
                 visit(&value.result, &value.result_ty);
             }
@@ -5332,6 +5909,45 @@ impl Op {
                 visit(&value.result, &value.result_ty);
             }
             Op::VecMaskedLoad(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecReduceAdd(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecReduceAnd(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecReduceFadd(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecReduceFmax(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecReduceFmin(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecReduceFmul(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecReduceMul(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecReduceOr(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecReduceSmax(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecReduceSmin(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecReduceUmax(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecReduceUmin(value) => {
+                visit(&value.result, &value.result_ty);
+            }
+            Op::VecReduceXor(value) => {
                 visit(&value.result, &value.result_ty);
             }
             Op::VecShuffle(value) => {
@@ -5484,7 +6100,7 @@ impl Op {
             }
             Op::BaseClassAddr(value) => {
                 let _ = value;
-                visit(&value.derived_addr);
+                visit(&value.src_addr);
             }
             Op::BaseDataMember(value) => {
                 let _ = value;
@@ -5600,8 +6216,6 @@ impl Op {
             }
             Op::ComplexAdd(value) => {
                 let _ = value;
-                visit(&value.lhs);
-                visit(&value.rhs);
             }
             Op::ComplexConj(value) => {
                 let _ = value;
@@ -5614,8 +6228,18 @@ impl Op {
             }
             Op::ComplexDiv(value) => {
                 let _ = value;
-                visit(&value.lhs);
-                visit(&value.rhs);
+            }
+            Op::ComplexFadd(value) => {
+                let _ = value;
+            }
+            Op::ComplexFdiv(value) => {
+                let _ = value;
+            }
+            Op::ComplexFmul(value) => {
+                let _ = value;
+            }
+            Op::ComplexFsub(value) => {
+                let _ = value;
             }
             Op::ComplexImag(value) => {
                 let _ = value;
@@ -5627,8 +6251,6 @@ impl Op {
             }
             Op::ComplexMul(value) => {
                 let _ = value;
-                visit(&value.lhs);
-                visit(&value.rhs);
             }
             Op::ComplexReal(value) => {
                 let _ = value;
@@ -5640,8 +6262,6 @@ impl Op {
             }
             Op::ComplexSub(value) => {
                 let _ = value;
-                visit(&value.lhs);
-                visit(&value.rhs);
             }
             Op::Condition(value) => {
                 let _ = value;
@@ -5668,7 +6288,7 @@ impl Op {
                 visit(&value.lhs);
                 visit(&value.rhs);
             }
-            Op::CoroBody(value) => {
+            Op::CoroIntrinsicAlign(value) => {
                 let _ = value;
             }
             Op::CoroIntrinsicAlloc(value) => {
@@ -5679,6 +6299,14 @@ impl Op {
                 let _ = value;
                 visit(&value.id);
                 visit(&value.coroframe_addr);
+            }
+            Op::CoroIntrinsicDestroy(value) => {
+                let _ = value;
+                visit(&value.handle);
+            }
+            Op::CoroIntrinsicDone(value) => {
+                let _ = value;
+                visit(&value.handle);
             }
             Op::CoroIntrinsicEnd(value) => {
                 let _ = value;
@@ -5698,7 +6326,31 @@ impl Op {
                 visit(&value.coroaddr);
                 visit(&value.fnaddrs);
             }
+            Op::CoroIntrinsicNoop(value) => {
+                let _ = value;
+            }
+            Op::CoroIntrinsicPromise(value) => {
+                let _ = value;
+                visit(&value.coroframe);
+                visit(&value.align);
+                visit(&value.is_from_promise);
+            }
+            Op::CoroIntrinsicResume(value) => {
+                let _ = value;
+                visit(&value.handle);
+            }
             Op::CoroIntrinsicSize(value) => {
+                let _ = value;
+            }
+            Op::CoroIntrinsicSuspend(value) => {
+                let _ = value;
+                visit(&value.save);
+                visit(&value.final_);
+            }
+            Op::CoroSuspendPoint(value) => {
+                let _ = value;
+            }
+            Op::Coroutine(value) => {
                 let _ = value;
             }
             Op::Cos(value) => {
@@ -5729,7 +6381,7 @@ impl Op {
             }
             Op::DerivedClassAddr(value) => {
                 let _ = value;
-                visit(&value.base_addr);
+                visit(&value.src_addr);
             }
             Op::DerivedDataMember(value) => {
                 let _ = value;
@@ -5775,6 +6427,10 @@ impl Op {
             }
             Op::EhTypeid(value) => {
                 let _ = value;
+            }
+            Op::EhUnexpected(value) => {
+                let _ = value;
+                visit(&value.eh_token);
             }
             Op::EndCatch(value) => {
                 let _ = value;
@@ -5892,6 +6548,18 @@ impl Op {
             Op::Frexp(value) => {
                 let _ = value;
                 visit(&value.src);
+            }
+            Op::Fshl(value) => {
+                let _ = value;
+                visit(&value.a);
+                visit(&value.b);
+                visit(&value.c);
+            }
+            Op::Fshr(value) => {
+                let _ = value;
+                visit(&value.a);
+                visit(&value.b);
+                visit(&value.c);
             }
             Op::Fsub(value) => {
                 let _ = value;
@@ -6046,6 +6714,27 @@ impl Op {
                 let _ = value;
                 visit(&value.src);
             }
+            Op::MatrixColumnMajorLoad(value) => {
+                let _ = value;
+                visit(&value.value);
+                visit(&value.stride);
+            }
+            Op::MatrixColumnMajorStore(value) => {
+                let _ = value;
+                visit(&value.matrix);
+                visit(&value.value);
+                visit(&value.stride);
+            }
+            Op::MatrixExtract(value) => {
+                let _ = value;
+                visit(&value.matrix);
+                visit(&value.row_idx);
+                visit(&value.column_idx);
+            }
+            Op::MatrixTranspose(value) => {
+                let _ = value;
+                visit(&value.value);
+            }
             Op::Max(value) => {
                 let _ = value;
                 visit(&value.lhs);
@@ -6113,10 +6802,18 @@ impl Op {
                 visit(&value.lhs);
                 visit(&value.rhs);
             }
+            Op::PtrMask(value) => {
+                let _ = value;
+                visit(&value.ptr);
+                visit(&value.mask);
+            }
             Op::PtrStride(value) => {
                 let _ = value;
                 visit(&value.base);
                 visit(&value.stride);
+            }
+            Op::RegisterExitDtor(value) => {
+                let _ = value;
             }
             Op::Rem(value) => {
                 let _ = value;
@@ -6332,6 +7029,60 @@ impl Op {
                 visit(&value.addr);
                 visit(&value.mask);
                 visit(&value.pass_thru);
+            }
+            Op::VecReduceAdd(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::VecReduceAnd(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::VecReduceFadd(value) => {
+                let _ = value;
+                visit(&value.accumulator);
+                visit(&value.input);
+            }
+            Op::VecReduceFmax(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::VecReduceFmin(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::VecReduceFmul(value) => {
+                let _ = value;
+                visit(&value.accumulator);
+                visit(&value.input);
+            }
+            Op::VecReduceMul(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::VecReduceOr(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::VecReduceSmax(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::VecReduceSmin(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::VecReduceUmax(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::VecReduceUmin(value) => {
+                let _ = value;
+                visit(&value.input);
+            }
+            Op::VecReduceXor(value) => {
+                let _ = value;
+                visit(&value.input);
             }
             Op::VecShuffle(value) => {
                 let _ = value;
@@ -6562,6 +7313,18 @@ impl Op {
             Op::ComplexDiv(value) => {
                 let _ = value;
             }
+            Op::ComplexFadd(value) => {
+                let _ = value;
+            }
+            Op::ComplexFdiv(value) => {
+                let _ = value;
+            }
+            Op::ComplexFmul(value) => {
+                let _ = value;
+            }
+            Op::ComplexFsub(value) => {
+                let _ = value;
+            }
             Op::ComplexImag(value) => {
                 let _ = value;
             }
@@ -6598,14 +7361,19 @@ impl Op {
             Op::Copysign(value) => {
                 let _ = value;
             }
-            Op::CoroBody(value) => {
+            Op::CoroIntrinsicAlign(value) => {
                 let _ = value;
-                visit(&value.body);
             }
             Op::CoroIntrinsicAlloc(value) => {
                 let _ = value;
             }
             Op::CoroIntrinsicBegin(value) => {
+                let _ = value;
+            }
+            Op::CoroIntrinsicDestroy(value) => {
+                let _ = value;
+            }
+            Op::CoroIntrinsicDone(value) => {
                 let _ = value;
             }
             Op::CoroIntrinsicEnd(value) => {
@@ -6617,8 +7385,31 @@ impl Op {
             Op::CoroIntrinsicId(value) => {
                 let _ = value;
             }
+            Op::CoroIntrinsicNoop(value) => {
+                let _ = value;
+            }
+            Op::CoroIntrinsicPromise(value) => {
+                let _ = value;
+            }
+            Op::CoroIntrinsicResume(value) => {
+                let _ = value;
+            }
             Op::CoroIntrinsicSize(value) => {
                 let _ = value;
+            }
+            Op::CoroIntrinsicSuspend(value) => {
+                let _ = value;
+            }
+            Op::CoroSuspendPoint(value) => {
+                let _ = value;
+            }
+            Op::Coroutine(value) => {
+                let _ = value;
+                visit(&value.initial_suspend);
+                visit(&value.body);
+                visit(&value.final_suspend);
+                visit(&value.destroy);
+                visit(&value.exit);
             }
             Op::Cos(value) => {
                 let _ = value;
@@ -6677,6 +7468,9 @@ impl Op {
                 let _ = value;
             }
             Op::EhTypeid(value) => {
+                let _ = value;
+            }
+            Op::EhUnexpected(value) => {
                 let _ = value;
             }
             Op::EndCatch(value) => {
@@ -6759,6 +7553,12 @@ impl Op {
                 let _ = value;
             }
             Op::Frexp(value) => {
+                let _ = value;
+            }
+            Op::Fshl(value) => {
+                let _ = value;
+            }
+            Op::Fshr(value) => {
                 let _ = value;
             }
             Op::Fsub(value) => {
@@ -6873,6 +7673,18 @@ impl Op {
             Op::Lround(value) => {
                 let _ = value;
             }
+            Op::MatrixColumnMajorLoad(value) => {
+                let _ = value;
+            }
+            Op::MatrixColumnMajorStore(value) => {
+                let _ = value;
+            }
+            Op::MatrixExtract(value) => {
+                let _ = value;
+            }
+            Op::MatrixTranspose(value) => {
+                let _ = value;
+            }
             Op::Max(value) => {
                 let _ = value;
             }
@@ -6918,8 +7730,15 @@ impl Op {
             Op::PtrDiff(value) => {
                 let _ = value;
             }
+            Op::PtrMask(value) => {
+                let _ = value;
+            }
             Op::PtrStride(value) => {
                 let _ = value;
+            }
+            Op::RegisterExitDtor(value) => {
+                let _ = value;
+                visit(&value.body);
             }
             Op::Rem(value) => {
                 let _ = value;
@@ -7065,6 +7884,45 @@ impl Op {
                 let _ = value;
             }
             Op::VecMaskedLoad(value) => {
+                let _ = value;
+            }
+            Op::VecReduceAdd(value) => {
+                let _ = value;
+            }
+            Op::VecReduceAnd(value) => {
+                let _ = value;
+            }
+            Op::VecReduceFadd(value) => {
+                let _ = value;
+            }
+            Op::VecReduceFmax(value) => {
+                let _ = value;
+            }
+            Op::VecReduceFmin(value) => {
+                let _ = value;
+            }
+            Op::VecReduceFmul(value) => {
+                let _ = value;
+            }
+            Op::VecReduceMul(value) => {
+                let _ = value;
+            }
+            Op::VecReduceOr(value) => {
+                let _ = value;
+            }
+            Op::VecReduceSmax(value) => {
+                let _ = value;
+            }
+            Op::VecReduceSmin(value) => {
+                let _ = value;
+            }
+            Op::VecReduceUmax(value) => {
+                let _ = value;
+            }
+            Op::VecReduceUmin(value) => {
+                let _ = value;
+            }
+            Op::VecReduceXor(value) => {
                 let _ = value;
             }
             Op::VecShuffle(value) => {
@@ -7423,9 +8281,9 @@ fn lower_base_class_addr(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
     Some(
         Op::BaseClassAddr(memory::BaseClassAddr {
-            base_addr: op.results.get(0)?.0.clone(),
-            base_addr_ty: op.results.get(0)?.1.clone(),
-            derived_addr: take_single_operand(op, &mut __operand_index, 0)?,
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            src_addr: take_single_operand(op, &mut __operand_index, 0)?,
             offset: op_attr(op, "offset")?.clone(),
             assume_not_null: unit_attr(op, "assume_not_null"),
             loc: op.loc.clone(),
@@ -7581,13 +8439,16 @@ fn lower_call(op: &crate::ast::Operation) -> Option<Op> {
                 args
             },
             nothrow: unit_attr(op, "nothrow"),
+            nounwind: unit_attr(op, "nounwind"),
+            willreturn: unit_attr(op, "willreturn"),
             inline_kind: op
                 .attr("inline_kind")
                 .and_then(|a| crate::enums::InlineKind::try_from(a).ok()),
             musttail: unit_attr(op, "musttail"),
-            side_effect: op_attr(op, "side_effect")?.clone(),
+            memory_effects: op.attr("memory_effects").cloned(),
             arg_attrs: op.attr("arg_attrs").cloned(),
             res_attrs: op.attr("res_attrs").cloned(),
+            calling_conv: op_attr(op, "calling_conv")?.clone(),
             loc: op.loc.clone(),
         }),
     )
@@ -7599,6 +8460,9 @@ fn lower_call_llvm_intrinsic(op: &crate::ast::Operation) -> Option<Op> {
             result: op.results.get(0).map(|(id, _)| id.clone()),
             result_ty: op.results.get(0).map(|(_, ty)| ty.clone()),
             intrinsic_name: attr_str(op, "intrinsic_name")?,
+            fastmath_flags: op
+                .attr("fastmath_flags")
+                .and_then(|a| crate::enums::FastMathFlags::try_from(a).ok()),
             arg_ops: take_variadic_operand(op, &mut __operand_index, 0)?,
             loc: op.loc.clone(),
         }),
@@ -7749,8 +8613,8 @@ fn lower_complex_add(op: &crate::ast::Operation) -> Option<Op> {
         Op::ComplexAdd(complex::ComplexAdd {
             result: op.results.get(0)?.0.clone(),
             result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
+            lhs: op_attr(op, "lhs")?.clone(),
+            rhs: op_attr(op, "rhs")?.clone(),
             loc: op.loc.clone(),
         }),
     )
@@ -7784,9 +8648,58 @@ fn lower_complex_div(op: &crate::ast::Operation) -> Option<Op> {
         Op::ComplexDiv(complex::ComplexDiv {
             result: op.results.get(0)?.0.clone(),
             result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
+            lhs: op_attr(op, "lhs")?.clone(),
+            rhs: op_attr(op, "rhs")?.clone(),
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_complex_fadd(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::ComplexFadd(complex::ComplexFadd {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            lhs: op_attr(op, "lhs")?.clone(),
+            rhs: op_attr(op, "rhs")?.clone(),
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_complex_fdiv(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::ComplexFdiv(complex::ComplexFdiv {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            lhs: op_attr(op, "lhs")?.clone(),
+            rhs: op_attr(op, "rhs")?.clone(),
             range: crate::enums::ComplexRangeKind::try_from(op_attr(op, "range")?).ok()?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_complex_fmul(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::ComplexFmul(complex::ComplexFmul {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            lhs: op_attr(op, "lhs")?.clone(),
+            rhs: op_attr(op, "rhs")?.clone(),
+            range: crate::enums::ComplexRangeKind::try_from(op_attr(op, "range")?).ok()?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_complex_fsub(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::ComplexFsub(complex::ComplexFsub {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            lhs: op_attr(op, "lhs")?.clone(),
+            rhs: op_attr(op, "rhs")?.clone(),
             loc: op.loc.clone(),
         }),
     )
@@ -7819,9 +8732,8 @@ fn lower_complex_mul(op: &crate::ast::Operation) -> Option<Op> {
         Op::ComplexMul(complex::ComplexMul {
             result: op.results.get(0)?.0.clone(),
             result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
-            range: crate::enums::ComplexRangeKind::try_from(op_attr(op, "range")?).ok()?,
+            lhs: op_attr(op, "lhs")?.clone(),
+            rhs: op_attr(op, "rhs")?.clone(),
             loc: op.loc.clone(),
         }),
     )
@@ -7854,8 +8766,8 @@ fn lower_complex_sub(op: &crate::ast::Operation) -> Option<Op> {
         Op::ComplexSub(complex::ComplexSub {
             result: op.results.get(0)?.0.clone(),
             result_ty: op.results.get(0)?.1.clone(),
-            lhs: take_single_operand(op, &mut __operand_index, 0)?,
-            rhs: take_single_operand(op, &mut __operand_index, 1)?,
+            lhs: op_attr(op, "lhs")?.clone(),
+            rhs: op_attr(op, "rhs")?.clone(),
             loc: op.loc.clone(),
         }),
     )
@@ -7927,11 +8839,12 @@ fn lower_copysign(op: &crate::ast::Operation) -> Option<Op> {
         }),
     )
 }
-fn lower_coro_body(op: &crate::ast::Operation) -> Option<Op> {
+fn lower_coro_intrinsic_align(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
     Some(
-        Op::CoroBody(misc::CoroBody {
-            body: lower_region(op.regions.get(0)?),
+        Op::CoroIntrinsicAlign(misc::CoroIntrinsicAlign {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
             loc: op.loc.clone(),
         }),
     )
@@ -7955,6 +8868,26 @@ fn lower_coro_intrinsic_begin(op: &crate::ast::Operation) -> Option<Op> {
             result_ty: op.results.get(0)?.1.clone(),
             id: take_single_operand(op, &mut __operand_index, 0)?,
             coroframe_addr: take_single_operand(op, &mut __operand_index, 1)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_coro_intrinsic_destroy(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::CoroIntrinsicDestroy(misc::CoroIntrinsicDestroy {
+            handle: take_single_operand(op, &mut __operand_index, 0)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_coro_intrinsic_done(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::CoroIntrinsicDone(misc::CoroIntrinsicDone {
+            done: op.results.get(0)?.0.clone(),
+            done_ty: op.results.get(0)?.1.clone(),
+            handle: take_single_operand(op, &mut __operand_index, 0)?,
             loc: op.loc.clone(),
         }),
     )
@@ -7998,12 +8931,77 @@ fn lower_coro_intrinsic_id(op: &crate::ast::Operation) -> Option<Op> {
         }),
     )
 }
+fn lower_coro_intrinsic_noop(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::CoroIntrinsicNoop(misc::CoroIntrinsicNoop {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_coro_intrinsic_promise(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::CoroIntrinsicPromise(misc::CoroIntrinsicPromise {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            coroframe: take_single_operand(op, &mut __operand_index, 0)?,
+            align: take_single_operand(op, &mut __operand_index, 1)?,
+            is_from_promise: take_single_operand(op, &mut __operand_index, 2)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_coro_intrinsic_resume(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::CoroIntrinsicResume(misc::CoroIntrinsicResume {
+            handle: take_single_operand(op, &mut __operand_index, 0)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
 fn lower_coro_intrinsic_size(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
     Some(
         Op::CoroIntrinsicSize(misc::CoroIntrinsicSize {
             result: op.results.get(0)?.0.clone(),
             result_ty: op.results.get(0)?.1.clone(),
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_coro_intrinsic_suspend(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::CoroIntrinsicSuspend(misc::CoroIntrinsicSuspend {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            save: take_single_operand(op, &mut __operand_index, 0)?,
+            final_: take_single_operand(op, &mut __operand_index, 1)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_coro_suspend_point(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::CoroSuspendPoint(misc::CoroSuspendPoint {
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_coroutine(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::Coroutine(misc::Coroutine {
+            initial_suspend: lower_region(op.regions.get(0)?),
+            body: lower_region(op.regions.get(1)?),
+            final_suspend: lower_region(op.regions.get(2)?),
+            destroy: lower_region(op.regions.get(3)?),
+            exit: lower_region(op.regions.get(4)?),
             loc: op.loc.clone(),
         }),
     )
@@ -8073,9 +9071,10 @@ fn lower_delete_array(op: &crate::ast::Operation) -> Option<Op> {
         Op::DeleteArray(misc::DeleteArray {
             address: take_single_operand(op, &mut __operand_index, 0)?,
             delete_fn: op_attr(op, "delete_fn")?.clone(),
-            delete_params: op_attr(op, "delete_params")?.clone(),
+            delete_params: op.attr("delete_params").cloned(),
             element_dtor: op.attr("element_dtor").cloned(),
             dtor_may_throw: unit_attr(op, "dtor_may_throw"),
+            element_align: op_attr(op, "element_align")?.clone(),
             loc: op.loc.clone(),
         }),
     )
@@ -8084,9 +9083,9 @@ fn lower_derived_class_addr(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
     Some(
         Op::DerivedClassAddr(memory::DerivedClassAddr {
-            derived_addr: op.results.get(0)?.0.clone(),
-            derived_addr_ty: op.results.get(0)?.1.clone(),
-            base_addr: take_single_operand(op, &mut __operand_index, 0)?,
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            src_addr: take_single_operand(op, &mut __operand_index, 0)?,
             offset: op_attr(op, "offset")?.clone(),
             assume_not_null: unit_attr(op, "assume_not_null"),
             loc: op.loc.clone(),
@@ -8176,6 +9175,7 @@ fn lower_eh_inflight_exception(op: &crate::ast::Operation) -> Option<Op> {
             cleanup: unit_attr(op, "cleanup"),
             catch_all: unit_attr(op, "catch_all"),
             catch_type_list: op.attr("catch_type_list").cloned(),
+            filter_type_list: op.attr("filter_type_list").cloned(),
             loc: op.loc.clone(),
         }),
     )
@@ -8227,6 +9227,15 @@ fn lower_eh_typeid(op: &crate::ast::Operation) -> Option<Op> {
             type_id: op.results.get(0)?.0.clone(),
             type_id_ty: op.results.get(0)?.1.clone(),
             type_sym: op_attr(op, "type_sym")?.clone(),
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_eh_unexpected(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::EhUnexpected(exceptions::EhUnexpected {
+            eh_token: take_single_operand(op, &mut __operand_index, 0)?,
             loc: op.loc.clone(),
         }),
     )
@@ -8551,6 +9560,32 @@ fn lower_frexp(op: &crate::ast::Operation) -> Option<Op> {
         }),
     )
 }
+fn lower_fshl(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::Fshl(misc::Fshl {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            a: take_single_operand(op, &mut __operand_index, 0)?,
+            b: take_single_operand(op, &mut __operand_index, 1)?,
+            c: take_single_operand(op, &mut __operand_index, 2)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_fshr(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::Fshr(misc::Fshr {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            a: take_single_operand(op, &mut __operand_index, 0)?,
+            b: take_single_operand(op, &mut __operand_index, 1)?,
+            c: take_single_operand(op, &mut __operand_index, 2)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
 fn lower_fsub(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
     Some(
@@ -8584,18 +9619,21 @@ fn lower_func(op: &crate::ast::Operation) -> Option<Op> {
             sym_visibility: op
                 .attr("sym_visibility")
                 .and_then(|a| a.as_str().map(str::to_string)),
-            comdat: unit_attr(op, "comdat"),
+            comdat: op.attr("comdat").and_then(|a| a.as_str().map(str::to_string)),
+            alignment: op.attr("alignment").cloned(),
+            preferred_alignment: op.attr("preferred_alignment").cloned(),
             arg_attrs: op.attr("arg_attrs").cloned(),
             res_attrs: op.attr("res_attrs").cloned(),
             aliasee: op.attr("aliasee").cloned(),
-            side_effect: op
-                .attr("side_effect")
-                .and_then(|a| crate::enums::SideEffect::try_from(a).ok()),
+            memory_effects: op.attr("memory_effects").cloned(),
             personality: op.attr("personality").cloned(),
             global_ctor_priority: op.attr("global_ctor_priority").cloned(),
             global_dtor_priority: op.attr("global_dtor_priority").cloned(),
             func_info: op.attr("func_info").cloned(),
             annotations: op.attr("annotations").cloned(),
+            uwtable: op
+                .attr("uwtable")
+                .and_then(|a| crate::enums::UnwindTableKind::try_from(a).ok()),
             body: lower_region(op.regions.get(0)?),
             loc: op.loc.clone(),
         }),
@@ -8698,13 +9736,13 @@ fn lower_global(op: &crate::ast::Operation) -> Option<Op> {
                 .and_then(|a| crate::enums::TlsModel::try_from(a).ok()),
             tls_refs: op.attr("tls_refs").cloned(),
             initial_value: op.attr("initial_value").cloned(),
-            comdat: unit_attr(op, "comdat"),
+            comdat: op.attr("comdat").and_then(|a| a.as_str().map(str::to_string)),
             constant: unit_attr(op, "constant"),
             dso_local: unit_attr(op, "dso_local"),
-            static_local_guard: op.attr("static_local_guard").cloned(),
+            dynamic_init_guard: op.attr("dynamic_init_guard").cloned(),
             alignment: op.attr("alignment").cloned(),
             ast: op.attr("ast").cloned(),
-            static_local_info: op.attr("static_local_info").cloned(),
+            dynamic_init_info: op.attr("dynamic_init_info").cloned(),
             section: op.attr("section").and_then(|a| a.as_str().map(str::to_string)),
             annotations: op.attr("annotations").cloned(),
             aliasee: op.attr("aliasee").cloned(),
@@ -8816,7 +9854,7 @@ fn lower_is_fp_class(op: &crate::ast::Operation) -> Option<Op> {
             result: op.results.get(0)?.0.clone(),
             result_ty: op.results.get(0)?.1.clone(),
             src: take_single_operand(op, &mut __operand_index, 0)?,
-            flags: crate::enums::FpClassTest(attr_u64(op, "flags")?),
+            flags: crate::enums::FpClassTest::try_from(op_attr(op, "flags")?).ok()?,
             loc: op.loc.clone(),
         }),
     )
@@ -8861,6 +9899,8 @@ fn lower_libc_memcpy(op: &crate::ast::Operation) -> Option<Op> {
             dst: take_single_operand(op, &mut __operand_index, 0)?,
             src: take_single_operand(op, &mut __operand_index, 1)?,
             len: take_single_operand(op, &mut __operand_index, 2)?,
+            dst_alignment: op.attr("dst_alignment").cloned(),
+            src_alignment: op.attr("src_alignment").cloned(),
             loc: op.loc.clone(),
         }),
     )
@@ -9020,6 +10060,55 @@ fn lower_lround(op: &crate::ast::Operation) -> Option<Op> {
             result_ty: op.results.get(0)?.1.clone(),
             src: take_single_operand(op, &mut __operand_index, 0)?,
             fenv: op.attr("fenv").cloned(),
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_matrix_column_major_load(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::MatrixColumnMajorLoad(misc::MatrixColumnMajorLoad {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            value: take_single_operand(op, &mut __operand_index, 0)?,
+            stride: take_single_operand(op, &mut __operand_index, 1)?,
+            is_volatile: unit_attr(op, "is_volatile"),
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_matrix_column_major_store(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::MatrixColumnMajorStore(misc::MatrixColumnMajorStore {
+            matrix: take_single_operand(op, &mut __operand_index, 0)?,
+            value: take_single_operand(op, &mut __operand_index, 1)?,
+            stride: take_single_operand(op, &mut __operand_index, 2)?,
+            is_volatile: unit_attr(op, "is_volatile"),
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_matrix_extract(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::MatrixExtract(misc::MatrixExtract {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            matrix: take_single_operand(op, &mut __operand_index, 0)?,
+            row_idx: take_single_operand(op, &mut __operand_index, 1)?,
+            column_idx: take_single_operand(op, &mut __operand_index, 2)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_matrix_transpose(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::MatrixTranspose(misc::MatrixTranspose {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            value: take_single_operand(op, &mut __operand_index, 0)?,
             loc: op.loc.clone(),
         }),
     )
@@ -9208,6 +10297,18 @@ fn lower_ptr_diff(op: &crate::ast::Operation) -> Option<Op> {
         }),
     )
 }
+fn lower_ptr_mask(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::PtrMask(misc::PtrMask {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            ptr: take_single_operand(op, &mut __operand_index, 0)?,
+            mask: take_single_operand(op, &mut __operand_index, 1)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
 fn lower_ptr_stride(op: &crate::ast::Operation) -> Option<Op> {
     let mut __operand_index = 0usize;
     Some(
@@ -9216,6 +10317,16 @@ fn lower_ptr_stride(op: &crate::ast::Operation) -> Option<Op> {
             result_ty: op.results.get(0)?.1.clone(),
             base: take_single_operand(op, &mut __operand_index, 0)?,
             stride: take_single_operand(op, &mut __operand_index, 1)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_register_exit_dtor(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::RegisterExitDtor(misc::RegisterExitDtor {
+            object: op_attr(op, "object")?.clone(),
+            body: lower_region(op.regions.get(0)?),
             loc: op.loc.clone(),
         }),
     )
@@ -9640,13 +10751,16 @@ fn lower_try_call(op: &crate::ast::Operation) -> Option<Op> {
             callee: op.attr("callee").cloned(),
             args: take_variadic_operand(op, &mut __operand_index, 0)?,
             nothrow: unit_attr(op, "nothrow"),
+            nounwind: unit_attr(op, "nounwind"),
+            willreturn: unit_attr(op, "willreturn"),
             inline_kind: op
                 .attr("inline_kind")
                 .and_then(|a| crate::enums::InlineKind::try_from(a).ok()),
             musttail: unit_attr(op, "musttail"),
-            side_effect: op_attr(op, "side_effect")?.clone(),
+            memory_effects: op.attr("memory_effects").cloned(),
             arg_attrs: op.attr("arg_attrs").cloned(),
             res_attrs: op.attr("res_attrs").cloned(),
+            calling_conv: op_attr(op, "calling_conv")?.clone(),
             successors: op.successors.clone(),
             loc: op.loc.clone(),
         }),
@@ -9771,6 +10885,163 @@ fn lower_vec_masked_load(op: &crate::ast::Operation) -> Option<Op> {
             mask: take_single_operand(op, &mut __operand_index, 1)?,
             pass_thru: take_single_operand(op, &mut __operand_index, 2)?,
             alignment: op.attr("alignment").cloned(),
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_vec_reduce_add(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::VecReduceAdd(vectors::VecReduceAdd {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            input: take_single_operand(op, &mut __operand_index, 0)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_vec_reduce_and(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::VecReduceAnd(vectors::VecReduceAnd {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            input: take_single_operand(op, &mut __operand_index, 0)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_vec_reduce_fadd(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::VecReduceFadd(vectors::VecReduceFadd {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            accumulator: take_single_operand(op, &mut __operand_index, 0)?,
+            input: take_single_operand(op, &mut __operand_index, 1)?,
+            fastmath_flags: op
+                .attr("fastmath_flags")
+                .and_then(|a| crate::enums::FastMathFlags::try_from(a).ok()),
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_vec_reduce_fmax(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::VecReduceFmax(vectors::VecReduceFmax {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            input: take_single_operand(op, &mut __operand_index, 0)?,
+            fastmath_flags: op
+                .attr("fastmath_flags")
+                .and_then(|a| crate::enums::FastMathFlags::try_from(a).ok()),
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_vec_reduce_fmin(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::VecReduceFmin(vectors::VecReduceFmin {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            input: take_single_operand(op, &mut __operand_index, 0)?,
+            fastmath_flags: op
+                .attr("fastmath_flags")
+                .and_then(|a| crate::enums::FastMathFlags::try_from(a).ok()),
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_vec_reduce_fmul(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::VecReduceFmul(vectors::VecReduceFmul {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            accumulator: take_single_operand(op, &mut __operand_index, 0)?,
+            input: take_single_operand(op, &mut __operand_index, 1)?,
+            fastmath_flags: op
+                .attr("fastmath_flags")
+                .and_then(|a| crate::enums::FastMathFlags::try_from(a).ok()),
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_vec_reduce_mul(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::VecReduceMul(vectors::VecReduceMul {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            input: take_single_operand(op, &mut __operand_index, 0)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_vec_reduce_or(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::VecReduceOr(vectors::VecReduceOr {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            input: take_single_operand(op, &mut __operand_index, 0)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_vec_reduce_smax(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::VecReduceSmax(vectors::VecReduceSmax {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            input: take_single_operand(op, &mut __operand_index, 0)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_vec_reduce_smin(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::VecReduceSmin(vectors::VecReduceSmin {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            input: take_single_operand(op, &mut __operand_index, 0)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_vec_reduce_umax(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::VecReduceUmax(vectors::VecReduceUmax {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            input: take_single_operand(op, &mut __operand_index, 0)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_vec_reduce_umin(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::VecReduceUmin(vectors::VecReduceUmin {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            input: take_single_operand(op, &mut __operand_index, 0)?,
+            loc: op.loc.clone(),
+        }),
+    )
+}
+fn lower_vec_reduce_xor(op: &crate::ast::Operation) -> Option<Op> {
+    let mut __operand_index = 0usize;
+    Some(
+        Op::VecReduceXor(vectors::VecReduceXor {
+            result: op.results.get(0)?.0.clone(),
+            result_ty: op.results.get(0)?.1.clone(),
+            input: take_single_operand(op, &mut __operand_index, 0)?,
             loc: op.loc.clone(),
         }),
     )
@@ -10290,6 +11561,22 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "complex.div")
         }
+        Op::ComplexFadd(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "complex.fadd")
+        }
+        Op::ComplexFdiv(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "complex.fdiv")
+        }
+        Op::ComplexFmul(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "complex.fmul")
+        }
+        Op::ComplexFsub(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "complex.fsub")
+        }
         Op::ComplexImag(_) => {
             write_indent(f, level)?;
             writeln!(f, "complex.imag")
@@ -10338,9 +11625,9 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "copysign")
         }
-        Op::CoroBody(_) => {
+        Op::CoroIntrinsicAlign(_) => {
             write_indent(f, level)?;
-            writeln!(f, "coro.body")
+            writeln!(f, "coro.intrinsic.align")
         }
         Op::CoroIntrinsicAlloc(_) => {
             write_indent(f, level)?;
@@ -10349,6 +11636,14 @@ pub fn write_op(
         Op::CoroIntrinsicBegin(_) => {
             write_indent(f, level)?;
             writeln!(f, "coro.intrinsic.begin")
+        }
+        Op::CoroIntrinsicDestroy(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "coro.intrinsic.destroy")
+        }
+        Op::CoroIntrinsicDone(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "coro.intrinsic.done")
         }
         Op::CoroIntrinsicEnd(_) => {
             write_indent(f, level)?;
@@ -10362,9 +11657,33 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "coro.intrinsic.id")
         }
+        Op::CoroIntrinsicNoop(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "coro.intrinsic.noop")
+        }
+        Op::CoroIntrinsicPromise(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "coro.intrinsic.promise")
+        }
+        Op::CoroIntrinsicResume(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "coro.intrinsic.resume")
+        }
         Op::CoroIntrinsicSize(_) => {
             write_indent(f, level)?;
             writeln!(f, "coro.intrinsic.size")
+        }
+        Op::CoroIntrinsicSuspend(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "coro.intrinsic.suspend")
+        }
+        Op::CoroSuspendPoint(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "coro.suspend_point")
+        }
+        Op::Coroutine(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "coroutine")
         }
         Op::Cos(_) => {
             write_indent(f, level)?;
@@ -10447,6 +11766,10 @@ pub fn write_op(
         Op::EhTypeid(_) => {
             write_indent(f, level)?;
             writeln!(f, "eh.typeid")
+        }
+        Op::EhUnexpected(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "eh.unexpected")
         }
         Op::EndCatch(exceptions::EndCatch { catch_token, .. }) => {
             write_indent(f, level)?;
@@ -10560,6 +11883,14 @@ pub fn write_op(
         Op::Frexp(_) => {
             write_indent(f, level)?;
             writeln!(f, "frexp")
+        }
+        Op::Fshl(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "fshl")
+        }
+        Op::Fshr(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "fshr")
         }
         Op::Fsub(_) => {
             write_indent(f, level)?;
@@ -10717,6 +12048,22 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "lround")
         }
+        Op::MatrixColumnMajorLoad(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "matrix.column_major_load")
+        }
+        Op::MatrixColumnMajorStore(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "matrix.column_major_store")
+        }
+        Op::MatrixExtract(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "matrix.extract")
+        }
+        Op::MatrixTranspose(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "matrix.transpose")
+        }
         Op::Max(_) => {
             write_indent(f, level)?;
             writeln!(f, "max")
@@ -10777,9 +12124,17 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "ptr_diff")
         }
+        Op::PtrMask(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "ptr_mask")
+        }
         Op::PtrStride(_) => {
             write_indent(f, level)?;
             writeln!(f, "ptr_stride")
+        }
+        Op::RegisterExitDtor(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "register_exit_dtor")
         }
         Op::Rem(_) => {
             write_indent(f, level)?;
@@ -11018,6 +12373,58 @@ pub fn write_op(
         Op::VecMaskedLoad(_) => {
             write_indent(f, level)?;
             writeln!(f, "vec.masked_load")
+        }
+        Op::VecReduceAdd(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "vec.reduce.add")
+        }
+        Op::VecReduceAnd(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "vec.reduce.and")
+        }
+        Op::VecReduceFadd(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "vec.reduce.fadd")
+        }
+        Op::VecReduceFmax(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "vec.reduce.fmax")
+        }
+        Op::VecReduceFmin(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "vec.reduce.fmin")
+        }
+        Op::VecReduceFmul(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "vec.reduce.fmul")
+        }
+        Op::VecReduceMul(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "vec.reduce.mul")
+        }
+        Op::VecReduceOr(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "vec.reduce.or")
+        }
+        Op::VecReduceSmax(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "vec.reduce.smax")
+        }
+        Op::VecReduceSmin(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "vec.reduce.smin")
+        }
+        Op::VecReduceUmax(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "vec.reduce.umax")
+        }
+        Op::VecReduceUmin(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "vec.reduce.umin")
+        }
+        Op::VecReduceXor(_) => {
+            write_indent(f, level)?;
+            writeln!(f, "vec.reduce.xor")
         }
         Op::VecShuffle(_) => {
             write_indent(f, level)?;

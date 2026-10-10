@@ -62,6 +62,10 @@ pub struct Const {
 /// exception handling. This is a symbol reference to the personality function
 /// (e.g., `@__gxx_personality_v0` for C++ exceptions).
 ///
+/// The 'comdat' attribute marks the function as belonging to a COMDAT group.
+/// This attribute includes an optional 'group' name, which if not provided,
+/// results in the function's symbol name being used.
+///
 /// Example:
 ///
 /// ```
@@ -103,7 +107,7 @@ pub struct Func {
     pub builtin: bool,
     /// unit attribute
     pub coroutine: bool,
-    /// Inline kind attribute
+    /// inline kind
     pub inline_kind: Option<crate::enums::InlineKind>,
     /// unit attribute
     pub lambda: bool,
@@ -117,16 +121,20 @@ pub struct Func {
     pub calling_conv: crate::attrs::Attribute,
     /// string attribute
     pub sym_visibility: Option<String>,
-    /// unit attribute
-    pub comdat: bool,
+    /// string attribute
+    pub comdat: Option<String>,
+    /// 64-bit signless integer attribute
+    pub alignment: Option<crate::attrs::Attribute>,
+    /// 64-bit signless integer attribute
+    pub preferred_alignment: Option<crate::attrs::Attribute>,
     /// Array of dictionary attributes
     pub arg_attrs: Option<crate::attrs::Attribute>,
     /// Array of dictionary attributes
     pub res_attrs: Option<crate::attrs::Attribute>,
     /// flat symbol reference attribute
     pub aliasee: Option<crate::attrs::Attribute>,
-    /// allowed side effects of a function
-    pub side_effect: Option<crate::enums::SideEffect>,
+    /// Describes the possible memory effects of a function or callee
+    pub memory_effects: Option<crate::attrs::Attribute>,
     /// flat symbol reference attribute
     pub personality: Option<crate::attrs::Attribute>,
     /// 32-bit signless integer attribute whose minimum value is 101 whose maximum value is 65535
@@ -137,6 +145,8 @@ pub struct Func {
     pub func_info: Option<crate::attrs::Attribute>,
     /// array of cir.annotation attributes
     pub annotations: Option<crate::attrs::Attribute>,
+    /// Encodes the unwind table kind for a function.
+    pub uwtable: Option<crate::enums::UnwindTableKind>,
     pub body: super::Region,
     pub loc: Option<crate::ast::SourceLocation>,
 }
@@ -189,10 +199,11 @@ pub struct GetGlobal {
 /// Symbol visibility in `sym_visibility` is defined in terms of MLIR's visibility
 /// and verified to be in accordance to `linkage`.
 ///
-/// The `static_local_guard` attribute indicates that this global represents a
-/// function-local static variable that requires guarded initialization
-/// (e.g., C++ static local variables with non-constant initializers).
-/// It contains the mangled name of the guard variable.
+/// The `dynamic_init_guard` attribute indicates that this global requires
+/// guarded dynamic initialization via the Itanium `__cxa_guard_*` protocol
+/// (e.g., C++ static local variables with non-constant initializers, or
+/// namespace-scope variables with vague linkage such as weak/linkonce_odr
+/// inline variables). It contains the mangled name of the guard variable.
 ///
 /// The `strictfp` attribute indicates that the dynamic initialization emitted
 /// into the `ctorRegion`/`dtorRegion` runs under a constrained floating-point
@@ -219,26 +230,26 @@ pub struct Global {
     pub linkage: crate::enums::GlobalLinkageKind,
     /// MemorySpaceAttrInterface instance
     pub addr_space: Option<crate::attrs::Attribute>,
-    /// TLS Model attribute
+    /// TLS model
     pub tls_model: Option<crate::enums::TlsModel>,
     /// Wrapper and Init function names for thread local variables
     pub tls_refs: Option<crate::attrs::Attribute>,
     /// any attribute
     pub initial_value: Option<crate::attrs::Attribute>,
-    /// unit property
-    pub comdat: bool,
+    /// string attribute
+    pub comdat: Option<String>,
     /// unit property
     pub constant: bool,
     /// unit property
     pub dso_local: bool,
-    /// Guard variable name for static local variables
-    pub static_local_guard: Option<crate::attrs::Attribute>,
+    /// Guard variable name for guarded dynamic initialization
+    pub dynamic_init_guard: Option<crate::attrs::Attribute>,
     /// 64-bit signless integer attribute
     pub alignment: Option<crate::attrs::Attribute>,
     /// ASTVarDeclInterface instance
     pub ast: Option<crate::attrs::Attribute>,
-    /// Static-local variable facts needed by later lowering
-    pub static_local_info: Option<crate::attrs::Attribute>,
+    /// Variable facts needed by guarded dynamic initialization lowering
+    pub dynamic_init_info: Option<crate::attrs::Attribute>,
     /// string attribute
     pub section: Option<String>,
     /// array of cir.annotation attributes

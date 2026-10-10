@@ -47,8 +47,54 @@ pub enum Attribute {
     /// [#cir.annotation<"testptr", ["21", 12 : i32]>]
     /// ```
     Annotation { name: String, args: Option<Box<Attribute>> },
+    /// `#cir.asm_flavor`
+    /// ATT or Intel
+    /// Enum cases:
+    /// * x86_att (`x86_att`)
+    /// * x86_intel (`x86_intel`)
+    AsmFlavor {
+        /// an enum of type AsmFlavor
+        value: crate::enums::AsmFlavor,
+    },
+    /// `#cir.assume_bundle`
+    /// kind of cir.assume operand bundle
+    /// Enum cases:
+    /// * None (`None`)
+    /// * align (`Align`)
+    /// * separate_storage (`SeparateStorage`)
+    /// * dereferenceable (`Dereferenceable`)
+    AssumeBundleKind {
+        /// an enum of type AssumeBundleKind
+        value: crate::enums::AssumeBundleKind,
+    },
+    /// `#cir.atomic_fetch`
+    /// Binary opcode for atomic fetch-and-update operations
+    /// Enum cases:
+    /// * add (`Add`)
+    /// * sub (`Sub`)
+    /// * and (`And`)
+    /// * xor (`Xor`)
+    /// * or (`Or`)
+    /// * nand (`Nand`)
+    /// * max (`Max`)
+    /// * min (`Min`)
+    /// * uinc_wrap (`UIncWrap`)
+    /// * udec_wrap (`UDecWrap`)
+    /// * maximum (`Maximum`)
+    /// * minimum (`Minimum`)
+    /// * maximum_num (`MaximumNum`)
+    /// * minimum_num (`MinimumNum`)
+    AtomicFetchKind {
+        /// an enum of type AtomicFetchKind
+        value: crate::enums::AtomicFetchKind,
+    },
     /// `#cir.await`
     /// await kind
+    /// Enum cases:
+    /// * init (`Init`)
+    /// * user (`User`)
+    /// * yield (`Yield`)
+    /// * final (`Final`)
     AwaitKind {
         /// an enum of type AwaitKind
         value: crate::enums::AwaitKind,
@@ -159,16 +205,6 @@ pub enum Attribute {
     ///
     /// The BoolAttr represents a 'true' or 'false' value.
     CirBool { ty: crate::types::Type, value: bool },
-    /// `#cir.cu.binary_handle`
-    /// Fat binary handle for device code.
-    ///
-    /// This attribute is attached to the ModuleOp and records the binary file
-    /// name passed to host.
-    ///
-    /// CUDA first compiles device-side code into a fat binary file. The file
-    /// name is then passed into host-side code, which is used to create a handle
-    /// and then generate various registration functions.
-    CudaBinaryHandle { name: String },
     /// `#cir.cu.externally_initialized`
     /// The marked variable is externally initialized.
     ///
@@ -239,14 +275,57 @@ pub enum Attribute {
     ///
     /// This attribute identifies a C++ destructor.
     CxxDtor { ty: crate::types::Type, is_trivial: bool },
+    /// `#cir.calling_conv`
+    /// calling convention
+    /// Enum cases:
+    /// * c (`C`)
+    /// * ptx_kernel (`PTXKernel`)
+    /// * spir_function (`SpirFunction`)
+    /// * spir_kernel (`SpirKernel`)
+    /// * amdgpu_kernel (`AMDGPUKernel`)
+    CallingConv {
+        /// an enum of type CallingConv
+        value: crate::enums::CallingConv,
+    },
     /// `#cir.case`
     /// case kind
+    /// Enum cases:
+    /// * default (`Default`)
+    /// * equal (`Equal`)
+    /// * anyof (`Anyof`)
+    /// * range (`Range`)
     CaseOpKind {
         /// an enum of type CaseOpKind
         value: crate::enums::CaseOpKind,
     },
     /// `#cir.cast`
     /// cast kind
+    /// Enum cases:
+    /// * bitcast (`bitcast`)
+    /// * array_to_ptrdecay (`array_to_ptrdecay`)
+    /// * member_ptr_to_bool (`member_ptr_to_bool`)
+    /// * int_to_ptr (`int_to_ptr`)
+    /// * ptr_to_int (`ptr_to_int`)
+    /// * ptr_to_bool (`ptr_to_bool`)
+    /// * integral (`integral`)
+    /// * int_to_bool (`int_to_bool`)
+    /// * int_to_float (`int_to_float`)
+    /// * float_to_int (`float_to_int`)
+    /// * float_to_bool (`float_to_bool`)
+    /// * bool_to_int (`bool_to_int`)
+    /// * floating (`floating`)
+    /// * float_to_complex (`float_to_complex`)
+    /// * float_complex_to_real (`float_complex_to_real`)
+    /// * float_complex_to_bool (`float_complex_to_bool`)
+    /// * float_complex (`float_complex`)
+    /// * float_complex_to_int_complex (`float_complex_to_int_complex`)
+    /// * int_to_complex (`int_to_complex`)
+    /// * int_complex_to_real (`int_complex_to_real`)
+    /// * int_complex_to_bool (`int_complex_to_bool`)
+    /// * int_complex (`int_complex`)
+    /// * int_complex_to_float_complex (`int_complex_to_float_complex`)
+    /// * address_space (`address_space`)
+    /// * bool_to_float (`bool_to_float`)
     CastKind {
         /// an enum of type CastKind
         value: crate::enums::CastKind,
@@ -254,15 +333,26 @@ pub enum Attribute {
     /// `#cir.all`
     CatchAll,
     /// `#cir.cleanup`
-    /// Cleanup kind attribute
-    ///
-    /// Cleanup kind attributes.
+    /// cleanup kind
+    /// Enum cases:
+    /// * normal (`Normal`)
+    /// * eh (`EH`)
+    /// * all (`All`)
     CleanupKind {
         /// an enum of type CleanupKind
         value: crate::enums::CleanupKind,
     },
     /// `#cir.cmp`
     /// compare operation kind
+    /// Enum cases:
+    /// * lt (`lt`)
+    /// * le (`le`)
+    /// * gt (`gt`)
+    /// * ge (`ge`)
+    /// * eq (`eq`)
+    /// * ne (`ne`)
+    /// * one (`one`)
+    /// * uno (`uno`)
     CmpOpKind {
         /// an enum of type CmpOpKind
         value: crate::enums::CmpOpKind,
@@ -310,6 +400,11 @@ pub enum Attribute {
     },
     /// `#cir.complex_range`
     /// complex multiplication and division implementation
+    /// Enum cases:
+    /// * full (`Full`)
+    /// * improved (`Improved`)
+    /// * promoted (`Promoted`)
+    /// * basic (`Basic`)
     ComplexRangeKind {
         /// an enum of type ComplexRangeKind
         value: crate::enums::ComplexRangeKind,
@@ -438,16 +533,131 @@ pub enum Attribute {
     },
     /// `#cir.dynamic_cast`
     /// dynamic cast kind
+    /// Enum cases:
+    /// * ptr (`Ptr`)
+    /// * ref (`Ref`)
     DynamicCastKind {
         /// an enum of type DynamicCastKind
         value: crate::enums::DynamicCastKind,
     },
+    /// `#cir.dynamic_init_guard`
+    /// Guard variable name for guarded dynamic initialization
+    ///
+    /// Contains the mangled guard variable name for guarded dynamic
+    /// initialization. This covers both function-local static variables and
+    /// namespace-scope variables with vague linkage (e.g. weak/linkonce_odr
+    /// inline variables), which both use the Itanium `__cxa_guard_*` protocol.
+    /// See `DynamicInitInfoAttr` for the facts that distinguish the two.
+    ///
+    /// Example:
+    /// ```
+    /// cir.global internal dynamic_init_guard<"_ZGVZ3foovE1x"> @_ZZ3foovE1x = ...
+    /// ```
+    DynamicInitGuard { name: String },
+    /// `#cir.dynamic_init_info`
+    /// Variable facts needed by guarded dynamic initialization lowering
+    ///
+    /// Holds the subset of a guarded-dynamic-initialization variable's
+    /// declaration facts that post-CIRGen lowering needs, as plain data (no
+    /// `clang::VarDecl` pointer). Always accompanies a `DynamicInitGuardAttr`,
+    /// and applies equally to function-local statics and to namespace-scope
+    /// variables with vague linkage (e.g. weak/linkonce_odr inline variables).
+    ///
+    /// - `local`: whether the variable is a block-scope (local) declaration.
+    ///   Mirrors `clang::VarDecl::isLocalVarDecl()`. The namespace-scope inline
+    ///   variables that also reach guarded initialization are not local.
+    ///
+    /// - `tls`: the thread-local storage kind (`none`, `static`, or `dynamic`).
+    ///
+    /// - `is_inline`: whether the variable is inline. Mirrors
+    ///   `clang::VarDecl::isInline()`.
+    ///
+    /// - `tsk`: the template-specialization kind (`undeclared`,
+    ///   `implicit_instantiation`, `explicit_specialization`,
+    ///   `explicit_instantiation_declaration`, or
+    ///   `explicit_instantiation_definition`).
+    ///
+    /// Example:
+    /// ```
+    /// cir.global ... @x = ...
+    ///   dynamic_init_info<local = true, tls = none, is_inline = false,
+    ///                     tsk = undeclared>
+    /// ```
+    ///
+    /// Because it stores plain data rather than a `clang::VarDecl` pointer, it
+    /// round-trips through textual CIR and stays valid once the AST is gone.
+    /// This is what lets LoweringPrepare consume these facts without a live
+    /// `clang::ASTContext`; the `$ast` `ASTVarDeclAttr` remains a separate,
+    /// live-AST handle for consumers that need arbitrary AST properties.
+    DynamicInitInfo {
+        local: bool,
+        /// an enum of type TLSKind
+        tls: crate::enums::TlsKind,
+        is_inline: bool,
+        /// an enum of type TemplateSpecializationKind
+        tsk: crate::enums::TemplateSpecializationKind,
+    },
+    /// `#cir.eh_filter`
+    /// Dynamic exception specification filter handler
+    ///
+    /// Identifies the handler of a `cir.try` operation that is reached when the
+    /// in-flight exception is permitted by the dynamic exception specification of
+    /// the enclosing function. The attribute carries the list of type info symbols
+    /// naming the permitted types. An empty list represents `throw()`, which
+    /// permits nothing.
+    EhFilter { permitted_types: Box<Attribute> },
+    /// `#cir.eh_unexpected`
+    /// Dynamic exception specification unexpected exception handler
+    ///
+    /// Identifies the handler of a `cir.try` operation that is reached when the
+    /// in-flight exception is not permitted by the dynamic exception specification
+    /// of the enclosing function.
+    EhUnexpected,
     /// `#cir.fp`
     /// An attribute containing a floating-point value
     ///
     /// An fp attribute is a literal attribute that represents a floating-point
     /// value of the specified floating-point type. Supporting only CIR FP types.
     CirFloat { ty: crate::types::Type, value: String },
+    /// `#cir.fp_class`
+    /// floating-point class test flags
+    /// Enum cases:
+    /// * fcNone (`None`)
+    /// * fcSNan (`SignalingNaN`)
+    /// * fcQNan (`QuietNaN`)
+    /// * fcNegInf (`NegativeInfinity`)
+    /// * fcNegNormal (`NegativeNormal`)
+    /// * fcNegSubnormal (`NegativeSubnormal`)
+    /// * fcNegZero (`NegativeZero`)
+    /// * fcPosZero (`PositiveZero`)
+    /// * fcPosSubnormal (`PositiveSubnormal`)
+    /// * fcPosNormal (`PositiveNormal`)
+    /// * fcPosInf (`PositiveInfinity`)
+    /// * fcNan (`Nan`)
+    /// * fcInf (`Infinity`)
+    /// * fcNormal (`Normal`)
+    /// * fcSubnormal (`Subnormal`)
+    /// * fcZero (`Zero`)
+    /// * fcPosFinite (`PositiveFinite`)
+    /// * fcNegFinite (`NegativeFinite`)
+    /// * fcFinite (`Finite`)
+    /// * fcPositive (`Positive`)
+    /// * fcNegative (`Negative`)
+    /// * fcAllFlags (`All`)
+    FpClassTest {
+        /// an enum of type FPClassTest
+        value: crate::enums::FpClassTest,
+    },
+    /// `#cir.fastmath`
+    /// fast-math flags
+    ///
+    /// Describes fast-math flags for CIR operations. This attribute is shared by
+    /// operations with floating-point semantics and is not specific to LLVM intrinsic
+    /// calls.
+    FastMathFlags {
+        /// an enum of type FastMathFlags
+        value: crate::enums::FastMathFlags,
+    },
     /// `#cir.fenv`
     /// Describes floating-point environment constraints
     ///
@@ -506,13 +716,31 @@ pub enum Attribute {
     ///
     /// Marks the function as a global constructor in the module's constructor list.
     /// It will be executed before main() is called.
-    GlobalCtor { name: String, priority: i32 },
+    GlobalCtor { name: String, priority: i32, associated: Option<String> },
     /// `#cir.global_dtor`
     /// Marks a function as a global destructor
     ///
     /// Marks a function as a global destructor in the module dtors list.
     /// The function will be executed before the module unloading.
-    GlobalDtor { name: String, priority: i32 },
+    GlobalDtor { name: String, priority: i32, associated: Option<String> },
+    /// `#cir.linkage`
+    /// linkage kind
+    /// Enum cases:
+    /// * external (`ExternalLinkage`)
+    /// * available_externally (`AvailableExternallyLinkage`)
+    /// * linkonce (`LinkOnceAnyLinkage`)
+    /// * linkonce_odr (`LinkOnceODRLinkage`)
+    /// * weak (`WeakAnyLinkage`)
+    /// * weak_odr (`WeakODRLinkage`)
+    /// * appending (`AppendingLinkage`)
+    /// * internal (`InternalLinkage`)
+    /// * cir_private (`PrivateLinkage`)
+    /// * extern_weak (`ExternalWeakLinkage`)
+    /// * common (`CommonLinkage`)
+    GlobalLinkageKind {
+        /// an enum of type GlobalLinkageKind
+        value: crate::enums::GlobalLinkageKind,
+    },
     /// `#cir.global_offset`
     /// Provides constant access to a byte offset from a global
     ///
@@ -597,30 +825,45 @@ pub enum Attribute {
     ///   int b;
     /// };
     /// ```
+    /// `address_point` marks a vtable address point: `symbol` is a vtable and
+    /// `indices` are the vtable within the group and the address point within
+    /// it. As in classic codegen, it lowers to an `inbounds` GEP whose `inrange`
+    /// spans that one vtable.
+    ///
     /// VTT for B in CIR:
     /// ```
     /// cir.global linkonce_odr @_ZTT1B = #cir.const_array<[
-    ///           #cir.global_view<@_ZTV1B, [0 : i32, 3 : i32]> : !cir.ptr<!u8i>]>
-    ///                : !cir.array<!cir.ptr<!u8i> x 1>
+    ///           #cir.global_view<@_ZTV1B, [0 : i32, 3 : i32], address_point>
+    ///                : !cir.ptr<!u8i>]> : !cir.array<!cir.ptr<!u8i> x 1>
     /// ```
     /// VTT for B in LLVM IR:
     /// ```
     /// @_ZTT1B = linkonce_odr global [1 x ptr] [ptr getelementptr inbounds
-    ///           ({ [3 x ptr] }, ptr @_ZTV1B, i32 0, i32 0, i32 3)], align 8
+    ///           inrange(-24, 0) (i8, ptr @_ZTV1B, i64 24)], align 8
     /// ```
     GlobalView {
         ty: crate::types::Type,
         symbol: String,
         indices: Option<Box<Attribute>>,
+        address_point: bool,
     },
     /// `#cir.init_catch`
-    /// allowed 32-bit signless integer cases: 0, 1, 2, 3, 4, 5
+    /// allowed i32 cases: 0, 1, 2, 3, 4, 5, 6, 7
+    /// Enum cases:
+    /// * reference (`Reference`)
+    /// * pointer (`Pointer`)
+    /// * scalar (`Scalar`)
+    /// * objc (`Objc`)
+    /// * trivial_copy (`TrivialCopy`)
+    /// * non_trivial_copy (`NonTrivialCopy`)
+    /// * reference_to_pointer (`ReferenceToPointer`)
+    /// * reference_to_record_pointer (`ReferenceToRecordPointer`)
     InitCatchKind {
         /// an enum of type InitCatchKind
         value: crate::enums::InitCatchKind,
     },
-    /// `#cir.inline_kind`
-    /// Inline kind attribute
+    /// `#cir.inline`
+    /// inline kind
     /// Inline Kind attributes.  `no_inline` and `always_inline`
     ///    spellings correspond to the attributes of the same name, and `inline_hint`
     ///      is the `inline` keyword in the language.
@@ -651,6 +894,106 @@ pub enum Attribute {
     LangAddressSpace {
         /// an enum of type LangAddressSpace
         value: crate::enums::LangAddressSpace,
+    },
+    /// `#cir.lowering_lang_options`
+    /// LangOptions facts that post-CIRGen lowering consumes
+    ///
+    /// Serializes the subset of `clang::LangOptions` that post-CIRGen lowering
+    /// reads, as plain data, so a reloaded `.cir` module lowers the same way it
+    /// was compiled without a live `clang::LangOptions`. Only LangOpts flags with
+    /// no triple/module representation live here; target-derived facts (size_t
+    /// width, CXXABI, fp formats, etc.) are rebuilt from `cir.triple` instead.
+    ///
+    /// Each bool field mirrors the like-named `LangOptions` member: `exceptions`,
+    /// `threadsafe_statics`, `cuda`, `cuda_is_device`, `hip`, `gpu_rdc`,
+    /// `openmp` (`LangOpts.OpenMP != 0`; only its on/off state matters), and
+    /// `openmp_is_target_device`. `clang_abi_compat` is an `i32` mirroring
+    /// `LangOptions::ClangABI`; it is an `i32` rather than a CIR enum because
+    /// `ClangABI` gains an enumerator every Clang release (see
+    /// `clang/Basic/ABIVersions.def`), and the ordinal round-trips fine within a
+    /// single toolchain.
+    ///
+    /// Example:
+    /// ```
+    /// module attributes {cir.lowering_lang_options = #cir.lowering_lang_options<
+    ///   exceptions = false, threadsafe_statics = true, cuda = false,
+    ///   cuda_is_device = false, hip = false, gpu_rdc = false, openmp = false,
+    ///   openmp_is_target_device = false, clang_abi_compat = 17>} { }
+    /// ```
+    LoweringLangOptions {
+        exceptions: bool,
+        threadsafe_statics: bool,
+        cuda: bool,
+        cuda_is_device: bool,
+        hip: bool,
+        gpu_rdc: bool,
+        openmp: bool,
+        openmp_is_target_device: bool,
+        clang_abi_compat: i32,
+    },
+    /// `#cir.max_work_group_size`
+    /// Maximum kernel work-group size
+    ///
+    /// Stores the maximum work-group size of a kernel, emitted to LLVM IR as
+    /// `max_work_group_size` function metadata.
+    MaxWorkGroupSize { x: u32, y: u32, z: u32 },
+    /// `#cir.mem_order`
+    /// Memory order according to C++11 memory model
+    /// Enum cases:
+    /// * relaxed (`Relaxed`)
+    /// * consume (`Consume`)
+    /// * acquire (`Acquire`)
+    /// * release (`Release`)
+    /// * acq_rel (`AcquireRelease`)
+    /// * seq_cst (`SequentiallyConsistent`)
+    MemOrder {
+        /// an enum of type MemOrder
+        value: crate::enums::MemOrder,
+    },
+    /// `#cir.memory_effects`
+    /// Describes the possible memory effects of a function or callee
+    ///
+    /// Specifies the possible memory effects of a function or callee.  Memory
+    /// is divided into classes, each carrying its own access, so that a promise
+    /// about one class need not be a promise about all of them:
+    ///
+    /// - `other`: the access for every location not named by one of the other
+    ///   parameters, including locations with no class of their own such as
+    ///   globals and captured pointers.
+    /// - `arg_mem`: accesses based on the function's pointer arguments.
+    /// - `inaccessible_mem`: accesses to memory the current module cannot reach,
+    ///   often used to model the control dependencies of intrinsics.
+    /// - `errno_mem`: accesses to the `errno` variable.
+    /// - `target_mem0`, `target_mem1`: target-specific state.
+    ///
+    /// The classes and their meanings match the LLVM dialect's
+    /// `#llvm.memory_effects`, which lowering converts this attribute to.
+    ///
+    /// An absent attribute means the effects are unknown, which is the
+    /// conservative default and what a function with no memory annotation gets.
+    /// Lowering leaves such a function with no memory attribute at all.
+    ///
+    /// Example:
+    /// ```
+    /// #cir.memory_effects<other = read, arg_mem = readwrite,
+    ///                     inaccessible_mem = none, errno_mem = none,
+    ///                     target_mem0 = none, target_mem1 = none>
+    /// ```
+    ///
+    /// The attribute has no keyword syntax, so on an operation it is written in
+    /// the attribute dictionary:
+    ///
+    /// ```
+    /// cir.func private @f() attributes {memory_effects = #cir.memory_effects<...>}
+    /// %0 = cir.call @f() {memory_effects = #cir.memory_effects<...>} : () -> !s32i
+    /// ```
+    MemoryEffects {
+        other: String,
+        arg_mem: String,
+        inaccessible_mem: String,
+        errno_mem: String,
+        target_mem0: String,
+        target_mem1: String,
     },
     /// `#cir.method`
     /// Holds a constant pointer-to-member-function value
@@ -687,6 +1030,42 @@ pub enum Attribute {
         ty: crate::types::Type,
         symbol: Option<String>,
         vtable_offset: Option<u64>,
+    },
+    /// `#cir.offload`
+    /// Offload kind of a module in an offload container
+    ///
+    /// Marks a module nested inside an offload container - identified by the
+    /// `cir.offload.container` unit attribute - as either the host module (carrying
+    /// `cir.offload.kind = #cir.offload<host>`) or one of the device modules
+    /// (carrying `cir.offload.kind = #cir.offload<device>`) of the offload
+    /// container. This creates a tiered module layout, where a singular offload
+    /// container contains a single host module and one or more device modules,
+    /// granting the offload merge/split pipeline passes the cross-boundary view.
+    ///
+    /// Example:
+    /// ```mlir
+    /// module attributes {cir.offload.container} {
+    ///   module @host attributes {cir.offload.kind = #cir.offload<host>} {}
+    ///   module @device1 attributes {cir.offload.kind = #cir.offload<device>} {}
+    ///   module @device2 attributes {cir.offload.kind = #cir.offload<device>} {}
+    /// }
+    /// ```
+    ///
+    /// Note: In order to simplify offload passes, the offload container module
+    /// requires that the first module inside it is the host module and the rest
+    /// of the modules are device modules.
+    ///
+    /// The nested modules are plain `builtin.module` ops rather than a dedicated
+    /// container op, so that the existing module infrastructure applies to them
+    /// unchanged; the layout above is enforced by the CIR dialect attribute
+    /// verifier, following the `gpu.container_module` precedent.
+    ///
+    /// The attribute names `cir.offload.container` and `cir.offload.kind` are
+    /// defined by the `getOffloadContainerAttrName` and `getOffloadKindAttrName`
+    /// methods in the CIRDialect class.
+    OffloadKind {
+        /// an enum of type OffloadKind
+        value: crate::enums::OffloadKind,
     },
     /// `#cir.offset_pair`
     /// Offset Pair attribute
@@ -725,6 +1104,25 @@ pub enum Attribute {
         /// string array attribute or null
         name: Box<Attribute>,
     },
+    /// `#cir.cl.version`
+    /// OpenCL version
+    ///
+    /// Represents an OpenCL language version preserved as module metadata.
+    ///
+    /// The `cir.cl.cxx.version` module attribute requires a companion
+    /// `cir.cl.version` attribute specifying the compatible OpenCL version.
+    ///
+    /// Example:
+    /// ```
+    /// // Module compiled from OpenCL C 1.2.
+    /// module attributes {cir.cl.version = #cir.cl.version<1, 2>} {}
+    /// // Module compiled from C++ for OpenCL 2021.
+    /// module attributes {
+    ///   cir.cl.cxx.version = #cir.cl.version<2021, 0>,
+    ///   cir.cl.version = #cir.cl.version<3, 0>
+    /// } {}
+    /// ```
+    OpenClVersion { major: i32, minor: i32 },
     /// `#cir.opt_info`
     /// A module-level attribute that holds the optimization information
     ///
@@ -843,59 +1241,31 @@ pub enum Attribute {
         /// an enum of type SourceLanguage
         value: crate::enums::SourceLanguage,
     },
-    /// `#cir.static_local_guard`
-    /// Guard variable name for static local variables
-    ///
-    /// Contains the mangled guard variable name for static local variable
-    /// initialization.
-    ///
-    /// Example:
-    /// ```
-    /// cir.global internal static_local_guard<"_ZGVZ3foovE1x"> @_ZZ3foovE1x = ...
-    /// ```
-    StaticLocalGuard { name: String },
-    /// `#cir.static_local_info`
-    /// Static-local variable facts needed by later lowering
-    ///
-    /// Holds the subset of a static-local variable's declaration facts that
-    /// post-CIRGen lowering needs, as plain data (no `clang::VarDecl` pointer).
-    ///
-    /// - `local`: whether the variable is a block-scope (local) declaration.
-    ///   Mirrors `clang::VarDecl::isLocalVarDecl()`. The namespace-scope inline
-    ///   variables that also reach guarded initialization are not local.
-    ///
-    /// - `tls`: the thread-local storage kind (`none`, `static`, or `dynamic`).
-    ///
-    /// - `is_inline`: whether the variable is inline. Mirrors
-    ///   `clang::VarDecl::isInline()`.
-    ///
-    /// - `tsk`: the template-specialization kind (`undeclared`,
-    ///   `implicit_instantiation`, `explicit_specialization`,
-    ///   `explicit_instantiation_declaration`, or
-    ///   `explicit_instantiation_definition`).
-    ///
-    /// Example:
-    /// ```
-    /// cir.global ... @x = ...
-    ///   {static_local_info = #cir.static_local_info<
-    ///      local = true, tls = none, is_inline = false, tsk = undeclared>}
-    /// ```
-    ///
-    /// Because it stores plain data rather than a `clang::VarDecl` pointer, it
-    /// round-trips through textual CIR and stays valid once the AST is gone.
-    /// This is what lets LoweringPrepare consume these facts without a live
-    /// `clang::ASTContext`; the `$ast` `ASTVarDeclAttr` remains a separate,
-    /// live-AST handle for consumers that need arbitrary AST properties.
-    StaticLocalInfo {
-        local: bool,
-        /// an enum of type TLSKind
-        tls: crate::enums::TlsKind,
-        is_inline: bool,
-        /// an enum of type TemplateSpecializationKind
-        tsk: crate::enums::TemplateSpecializationKind,
+    /// `#cir.sync_scope`
+    /// sync scope kind
+    /// Enum cases:
+    /// * single_thread (`SingleThread`)
+    /// * system (`System`)
+    /// * device (`Device`)
+    /// * workgroup (`Workgroup`)
+    /// * wavefront (`Wavefront`)
+    /// * cluster (`Cluster`)
+    /// * hip_single_thread (`HIPSingleThread`)
+    /// * hip_system (`HIPSystem`)
+    /// * hip_agent (`HIPAgent`)
+    /// * hip_workgroup (`HIPWorkgroup`)
+    /// * hip_wavefront (`HIPWavefront`)
+    /// * hip_cluster (`HIPCluster`)
+    /// * opencl_work_group (`OpenCLWorkGroup`)
+    /// * opencl_device (`OpenCLDevice`)
+    /// * opencl_all_svm_devices (`OpenCLAllSVMDevices`)
+    /// * opencl_sub_group (`OpenCLSubGroup`)
+    SyncScopeKind {
+        /// an enum of type SyncScopeKind
+        value: crate::enums::SyncScopeKind,
     },
     /// `#cir.tls_model`
-    /// TLS Model attribute
+    /// TLS model
     ///
     ///  The TLS mode for the global, which comes from either the
     /// `tls_model` attribute, or `-ftls-model` flag.
@@ -992,6 +1362,18 @@ pub enum Attribute {
     Undef { ty: crate::types::Type },
     /// `#cir.unwind`
     Unwind,
+    /// `#cir.uwtable`
+    /// Encodes the unwind table kind for a function.
+    ///
+    /// This mirrors the UWTableKindEnum in The LLVM dialect,
+    /// and is passed through to the llvm dialect. According to the LLVM
+    /// documentation:
+    ///     The ‘uwtable’ attribute is about the ABI or the user mandating an /
+    ///         entry in the unwind table.
+    UnwindTableKind {
+        /// an enum of type UnwindTableKind
+        value: crate::enums::UnwindTableKind,
+    },
     /// `#cir.usual_delete_params`
     /// Parameters describing the usual operator delete signature
     ///

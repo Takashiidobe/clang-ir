@@ -109,7 +109,9 @@ const CUSTOM_DISPLAY_VARIANTS: &[&str] = &[
     "Method",
 ];
 
-fn type_variant_shape(rec: Record<'_>) -> Result<(Ident, String, bool), Box<dyn std::error::Error>> {
+fn type_variant_shape(
+    rec: Record<'_>,
+) -> Result<(Ident, String, bool), Box<dyn std::error::Error>> {
     let name = rec.name()?;
     let mnemonic = rec.str_value("mnemonic").unwrap_or(name).to_string();
     let variant = variant_ident(rec, "Type")?;
@@ -141,7 +143,9 @@ fn type_display_fallback_arms(
     Ok(quote! { #(#arms)* })
 }
 
-fn type_display_impl(type_records: &[Record<'_>]) -> Result<TokenStream, Box<dyn std::error::Error>> {
+fn type_display_impl(
+    type_records: &[Record<'_>],
+) -> Result<TokenStream, Box<dyn std::error::Error>> {
     let fallback_arms = type_display_fallback_arms(type_records)?;
     Ok(quote! {
         impl std::fmt::Display for Type {

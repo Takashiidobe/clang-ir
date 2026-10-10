@@ -73,15 +73,15 @@ pub struct Alloca {
 /// ```
 /// will generate
 /// ```
-/// %3 = cir.base_class_addr %1 : !cir.ptr<!rec_Derived> nonnull [0] -> !cir.ptr<!rec_Base>
+/// %3 = cir.base_class_addr nonnull %1 [0] : !cir.ptr<!rec_Derived> -> !cir.ptr<!rec_Base>
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BaseClassAddr {
-    pub base_addr: super::ValueId,
-    pub base_addr_ty: crate::types::Type,
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
     /// CIR pointer type
-    pub derived_addr: super::ValueId,
+    pub src_addr: super::ValueId,
     /// index attribute
     pub offset: crate::attrs::Attribute,
     /// unit attribute
@@ -272,15 +272,15 @@ pub struct Copy {
 /// leads to
 /// ```
 ///   %2 = cir.load %0 : !cir.ptr<!cir.ptr<!rec_A>>, !cir.ptr<!rec_A>
-///   %3 = cir.base_class_addr %2 : !cir.ptr<!rec_B> [0] -> !cir.ptr<!rec_A>
+///   %3 = cir.derived_class_addr %2 [0] : !cir.ptr<!rec_A> -> !cir.ptr<!rec_B>
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DerivedClassAddr {
-    pub derived_addr: super::ValueId,
-    pub derived_addr_ty: crate::types::Type,
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
     /// CIR pointer type
-    pub base_addr: super::ValueId,
+    pub src_addr: super::ValueId,
     /// index attribute
     pub offset: crate::attrs::Attribute,
     /// unit attribute
@@ -638,7 +638,7 @@ pub struct InsertMember {
     pub record: super::ValueId,
     /// 64-bit signless integer attribute
     pub index: crate::attrs::Attribute,
-    /// CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
+    /// CIR void type or CIR bool type or CIR array type or CIR vector type or CIR matrix type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device surface reference type or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
     pub value: super::ValueId,
     pub loc: Option<crate::ast::SourceLocation>,
 }
@@ -886,7 +886,7 @@ pub struct SetBitfield {
     pub result_ty: crate::types::Type,
     /// the address to store the value
     pub addr: super::ValueId,
-    /// CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
+    /// CIR void type or CIR bool type or CIR array type or CIR vector type or CIR matrix type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device surface reference type or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
     pub src: super::ValueId,
     /// Represents info for a bit-field member
     pub bitfield_info: crate::attrs::Attribute,
@@ -922,7 +922,7 @@ pub struct SetBitfield {
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Store {
-    /// CIR void type or CIR bool type or CIR array type or CIR vector type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
+    /// CIR void type or CIR bool type or CIR array type or CIR vector type or CIR matrix type or Integer type with arbitrary precision up to a fixed limit or single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type or CIR pointer type or CIR function type or CIR struct/class type or CIR union type or CIR bit-field access unit member type or CIR complex type or CIR type that is used for the vptr member of C++ objects or CUDA device surface reference type or CUDA device texture reference type or CIR type that represents a pointer-to-data-member in C++ or CIR type that represents C++ pointer-to-member-function type or CIR exception handling token type or CIR cleanup token type or CIR catch token type
     pub value: super::ValueId,
     /// the address to store the value
     pub addr: super::ValueId,

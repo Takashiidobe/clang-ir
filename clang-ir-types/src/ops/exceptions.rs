@@ -150,9 +150,11 @@ pub struct CatchParam {
 /// copy of the object before `__cxa_begin_catch` is invoked.
 ///
 /// This operation takes a `!cir.eh_token` that represents the in-flight
-/// exception and the alloca value that is used for the local copy of the
-/// exception object. The `copy_fn` attribute is a flat symbol reference to a
-/// `cir.func` thunk that copies the exception object to a local alloca value.
+/// exception and the alloca value for the catch parameter. The optional
+/// `copy_fn` attribute, present for `non_trivial_copy`, is a flat symbol
+/// reference to a `cir.func` thunk that copies the exception object to a
+/// local alloca value. For `reference_to_pointer`, the operation binds the
+/// reference to the exception object itself.
 ///
 /// This operation is replaced with a target-specific representation during
 /// the EHABI lowering pass. For some targets, such as the Microsoft ABI,
@@ -171,7 +173,7 @@ pub struct ConstructCatchParam {
     pub eh_token: super::ValueId,
     /// CIR pointer type
     pub param_addr: super::ValueId,
-    /// allowed 32-bit signless integer cases: 0, 1, 2, 3, 4, 5
+    /// allowed i32 cases: 0, 1, 2, 3, 4, 5, 6, 7
     pub kind: crate::enums::InitCatchKind,
     /// flat symbol reference attribute
     pub copy_fn: Option<crate::attrs::Attribute>,
@@ -195,6 +197,17 @@ pub struct ConstructCatchParam {
 /// another type handler. The `unwind` handler is used when no handler is
 /// matched.
 ///
+/// A handler may also be a `filter`, which carries the list of type info
+/// symbols permitted by the dynamic exception specification of the enclosing
+/// function. A `filter` handler has the *opposite* polarity from a `catch`
+/// handler: its destination is taken when the in-flight exception is **not**
+/// one of the listed types. The polarity comes from the Itanium personality
+/// routine, which reports a filter failure by selecting the filter clause of
+/// the landing pad. A `filter` handler therefore does not take the place of
+/// the default destination, and a dispatch that has one always also has an
+/// `unwind` handler, whose destination is taken when the exception is
+/// permitted. A dispatch has at most one `filter` handler.
+///
 /// Example:
 ///
 /// ```
@@ -207,6 +220,12 @@ pub struct ConstructCatchParam {
 /// cir.eh.dispatch %eh_token : !cir.eh_token [
 ///   catch (#cir.global_view<type @_ZTIi> : !cir.ptr<!u8i>) : ^catch_int,
 ///   unwind : ^continue_unwind
+/// ]
+///
+/// cir.eh.dispatch %eh_token : !cir.eh_token [
+///   filter(#cir.global_view<@_ZTIi> : !cir.ptr<!u8i>)
+///       : ^specification_violated,
+///   unwind : ^exception_permitted
 /// ]
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -242,6 +261,15 @@ pub struct EhDispatch {
 /// alongside typed catches, the landing pad will contain both the typed catch
 /// clauses and a trailing `catch ptr null`.
 ///
+/// The `filter_type_list` attribute lists the type info symbols permitted by
+/// the dynamic exception specification of the enclosing function. It lowers to
+/// the `filter` clause of the LLVM IR landingpad instruction. An empty list is
+/// distinct from an absent one: it represents `throw()` and lowers to a
+/// zero-length filter clause, which the personality routine treats as
+/// permitting nothing. Since the exception specification encloses the whole
+/// function body, the filter clause always comes after any catch clauses, and
+/// it terminates the clause list in the same way that `catch_all` does.
+///
 /// Example:
 ///
 /// ```
@@ -249,7 +277,9 @@ pub struct EhDispatch {
 /// %exception_ptr, %type_id = cir.eh.inflight_exception [@_ZTIi, @_ZTIPKc]
 /// %exception_ptr, %type_id = cir.eh.inflight_exception cleanup
 /// %exception_ptr, %type_id = cir.eh.inflight_exception catch_all [@_ZTIi]
-/// ``
+/// %exception_ptr, %type_id = cir.eh.inflight_exception filter [@_ZTIi]
+/// %exception_ptr, %type_id = cir.eh.inflight_exception [@_ZTIi] filter []
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EhInflightException {
@@ -263,6 +293,8 @@ pub struct EhInflightException {
     pub catch_all: bool,
     /// flat symbol ref array attribute
     pub catch_type_list: Option<crate::attrs::Attribute>,
+    /// flat symbol ref array attribute
+    pub filter_type_list: Option<crate::attrs::Attribute>,
     pub loc: Option<crate::ast::SourceLocation>,
 }
 /// `cir.eh.initiate`
@@ -341,15 +373,23 @@ pub struct EhSetjmp {
     pub loc: Option<crate::ast::SourceLocation>,
 }
 /// `cir.eh.terminate`
-/// Terminate due to exception thrown during cleanup
+/// Terminate due to an exception that must not escape
 ///
-/// `cir.eh.terminate` terminates program execution when an exception is thrown
-/// while executing cleanup code during exception unwinding. The C++ standard
-/// requires that `std::terminate()` be called in this scenario.
+/// `cir.eh.terminate` terminates program execution when an exception reaches a
+/// point from which the C++ standard does not allow it to propagate, and
+/// requires `std::terminate()` to be called instead. That happens when an
+/// exception is thrown while executing cleanup code during unwinding, and when
+/// an exception tries to escape a function that cannot throw.
 ///
-/// This operation takes an `!cir.eh_token` from a `cir.eh.initiate` operation
-/// and acts as a terminator. It is produced during CFG flattening when throwing
-/// calls are found in EH cleanup regions.
+/// This operation takes an `!cir.eh_token` and acts as a terminator. In
+/// high-level CIR it appears as the only operation in the catch-all handler
+/// region of the `cir.try` that wraps the body of a function that cannot
+/// throw, where the token comes from the handler region's block argument. The
+/// handler is a catch-all because such a function terminates on any escaping
+/// exception, and it has no `cir.begin_catch` because the runtime helper this
+/// operation lowers to performs the catch. After CFG flattening the token
+/// comes from a `cir.eh.initiate` operation; flattening also produces this
+/// operation for throwing calls found in EH cleanup regions.
 ///
 /// During EH ABI lowering, this is replaced with target-specific termination
 /// code. For the Itanium ABI, the `cir.eh.initiate` is lowered to
@@ -358,6 +398,16 @@ pub struct EhSetjmp {
 /// pointer, followed by an unreachable operation.
 ///
 /// Example:
+///
+/// ```
+/// cir.try {
+///   ...
+/// } catch all (%eh_token : !cir.eh_token) {
+///   cir.eh.terminate %eh_token : !cir.eh_token
+/// }
+/// ```
+///
+/// And after CFG flattening:
 ///
 /// ```
 /// ^terminate_unwind:
@@ -388,6 +438,40 @@ pub struct EhTypeid {
     pub type_id_ty: crate::types::Type,
     /// flat symbol reference attribute
     pub type_sym: crate::attrs::Attribute,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.eh.unexpected`
+/// Handle an exception that violates an exception specification
+///
+/// `cir.eh.unexpected` signals that the in-flight exception violated the
+/// dynamic exception specification of the enclosing function, and that
+/// `std::unexpected()` must be called. The C++ standard requires this when an
+/// exception that the specification does not permit tries to escape the
+/// function.
+///
+/// This operation takes a `!cir.eh_token` and acts as a terminator. In
+/// high-level CIR it is the only operation in the `unexpected` handler region
+/// of a `cir.try` operation, where the token comes from the handler region's
+/// block argument. After CFG flattening the token comes from a
+/// `cir.eh.initiate` operation.
+///
+/// Like `cir.eh.terminate`, this operation is ABI-agnostic. During EH ABI
+/// lowering it is replaced with target-specific code. For the Itanium ABI it
+/// becomes a call to `__cxa_call_unexpected` with the exception pointer,
+/// followed by an unreachable operation.
+///
+/// Example:
+///
+/// ```
+/// ^unexpected:
+///   %eh_token = cir.eh.initiate : !cir.eh_token
+///   cir.eh.unexpected %eh_token : !cir.eh_token
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct EhUnexpected {
+    /// CIR exception handling token type
+    pub eh_token: super::ValueId,
     pub loc: Option<crate::ast::SourceLocation>,
 }
 /// `cir.end_catch`
@@ -475,6 +559,16 @@ pub struct EndCleanup {
 /// types, an aggregate copy for record types, or a call to a copy
 /// constructor when one is required).
 ///
+/// A catch parameter that is a reference to a pointer uses the
+/// `reference_to_record_pointer` kind when the pointer's source-level pointee
+/// type is a record (class, struct, or union), and `reference_to_pointer`
+/// otherwise. A reference to any other type uses `reference`.
+///
+/// A `reference_to_pointer` or `non_trivial_copy` operation requires its catch
+/// handler to start with a `cir.construct_catch_param` of the same kind on the
+/// same parameter. When the handler starts with a `cir.construct_catch_param`
+/// on the parameter of the operation, the two must have the same kind.
+///
 /// Example:
 ///
 /// ```
@@ -491,7 +585,7 @@ pub struct InitCatchParam {
     pub exn_ptr: super::ValueId,
     /// CIR pointer type
     pub param_addr: super::ValueId,
-    /// allowed 32-bit signless integer cases: 0, 1, 2, 3, 4, 5
+    /// allowed i32 cases: 0, 1, 2, 3, 4, 5, 6, 7
     pub kind: crate::enums::InitCatchKind,
     pub loc: Option<crate::ast::SourceLocation>,
 }
@@ -635,6 +729,23 @@ pub struct TokenNone {
 /// into the body of the cleanup scope. This ensures that all paths out of the
 /// catch handler will execute the end_catch operation.
 ///
+/// A `cir.try` operation may instead have a `filter` handler paired with an
+/// `unexpected` handler, which together implement the dynamic exception
+/// specification of the enclosing function. The `filter` handler lists the
+/// permitted type info symbols and holds the path taken when the in-flight
+/// exception is permitted, which is a `cir.resume` that continues unwinding
+/// to the caller. The `unexpected` handler holds the path taken when the
+/// specification is violated, which is a `cir.eh.unexpected`. An empty
+/// permitted type list represents `throw()`, which permits nothing, so the
+/// filter handler region holds a `cir.unreachable` instead. Like `unwind`,
+/// and unlike a catch handler, neither region begins with `cir.begin_catch`.
+///
+/// The two handlers must appear together, with the filter first, and must be
+/// the only handlers on the operation. The try operation created for an
+/// exception specification wraps the entire function body, and each try
+/// statement written in the source becomes a separate `cir.try` operation
+/// nested inside it.
+///
 /// Example:
 ///
 /// ```
@@ -656,12 +767,26 @@ pub struct TokenNone {
 ///   cir.resume %eh_token : !cir.eh_token
 /// }
 /// ```
+///
+/// Example of a `void f() throw(int)` exception specification:
+///
+/// ```
+/// cir.try {
+///   cir.call exception @function() : () -> ()
+///   cir.yield
+/// } filter [#cir.global_view<@_ZTIi> : !cir.ptr<!u8i>]
+///     (%eh_token : !cir.eh_token) {
+///   cir.resume %eh_token : !cir.eh_token
+/// } unexpected (%eh_token.1 : !cir.eh_token) {
+///   cir.eh.unexpected %eh_token.1 : !cir.eh_token
+/// }
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Try {
     /// unit attribute
     pub cleanup: bool,
-    /// catch all or unwind or global view array attribute
+    /// catch all, unwind, eh filter, eh unexpected or global view array attribute
     pub handler_types: crate::attrs::Attribute,
     pub try_region: super::Region,
     pub handler_regions: Vec<super::Region>,

@@ -9,17 +9,17 @@
 /// Example:
 ///
 /// ```
-/// %2 = cir.complex.add %0, %1 : !cir.complex<!cir.float>
+/// %2 = cir.complex.add %0, %1 : !cir.complex<s32i>
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ComplexAdd {
     pub result: super::ValueId,
     pub result_ty: crate::types::Type,
-    /// CIR complex type
-    pub lhs: super::ValueId,
-    /// CIR complex type
-    pub rhs: super::ValueId,
+    /// complex of integer type
+    pub lhs: crate::attrs::Attribute,
+    /// complex of integer type
+    pub rhs: crate::attrs::Attribute,
     pub loc: Option<crate::ast::SourceLocation>,
 }
 /// `cir.complex.conj`
@@ -70,10 +70,53 @@ pub struct ComplexCreate {
 /// The `cir.complex.div` operation takes two complex numbers and returns
 /// their quotient.
 ///
-/// For complex types with floating-point components, the `range` attribute
-/// specifies the algorithm to be used when the operation is lowered to
-/// the LLVM dialect. For division, 'improved' produces Smith's algorithms for
-/// Complex division with no additional handling for NaN values. If 'promoted'
+/// Example:
+///
+/// ```
+/// %2 = cir.complex.div %0, %1 : !cir.complex<s32i>
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct ComplexDiv {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// complex of integer type
+    pub lhs: crate::attrs::Attribute,
+    /// complex of integer type
+    pub rhs: crate::attrs::Attribute,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.complex.fadd`
+/// Complex addition
+///
+/// The `cir.complex.fadd` operation takes two complex numbers and returns
+/// their sum.
+///
+/// Example:
+///
+/// ```
+/// %2 = cir.complex.fadd %0, %1 : !cir.complex<!cir.float>
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct ComplexFadd {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// complex of single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type
+    pub lhs: crate::attrs::Attribute,
+    /// complex of single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type
+    pub rhs: crate::attrs::Attribute,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.complex.fdiv`
+/// Complex division
+///
+/// The `cir.complex.div` operation takes two complex numbers and returns
+/// their quotient.
+///
+/// The `range` attribute specifies the algorithm to be used when the operation
+/// is lowered to the LLVM dialect. For division, 'improved' produces Smith's algorithms
+/// for Complex division with no additional handling for NaN values. If 'promoted'
 /// is used, the values are promoted to a higher precision type, if possible,
 /// and the calculation is performed using the algebraic formula, with
 /// no additional handling for NaN values. We fall back on Smith's algorithm
@@ -86,20 +129,74 @@ pub struct ComplexCreate {
 /// Example:
 ///
 /// ```
-/// %2 = cir.complex.div %0, %1 range(basic) : !cir.complex<!cir.float>
-/// %2 = cir.complex.div %0, %1 range(full) : !cir.complex<!cir.float>
+/// %2 = cir.complex.fdiv %0, %1 range(basic) : !cir.complex<!cir.float>
+/// %2 = cir.complex.fdiv %0, %1 range(full) : !cir.complex<!cir.float>
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct ComplexDiv {
+pub struct ComplexFdiv {
     pub result: super::ValueId,
     pub result_ty: crate::types::Type,
-    /// CIR complex type
-    pub lhs: super::ValueId,
-    /// CIR complex type
-    pub rhs: super::ValueId,
+    /// complex of single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type
+    pub lhs: crate::attrs::Attribute,
+    /// complex of single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type
+    pub rhs: crate::attrs::Attribute,
     /// complex multiplication and division implementation
     pub range: crate::enums::ComplexRangeKind,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.complex.fmul`
+/// Complex multiplication
+///
+/// The `cir.complex.mul` operation takes two complex numbers and returns
+/// their product.
+///
+/// The `range` attribute specifies the algorithm to be used when the operation
+/// is lowered to the LLVM dialect. For multiplication, 'improved', 'promoted',
+/// and 'basic' are all handled equivalently, producing the algebraic formula with no
+/// special handling for NaN value. If 'full' is used, a runtime-library
+/// function is called if one of the intermediate calculations produced
+/// a NaN value.
+///
+/// Example:
+///
+/// ```
+/// %2 = cir.complex.fmul %0, %1 range(basic) : !cir.complex<!cir.float>
+/// %2 = cir.complex.fmul %0, %1 range(full) : !cir.complex<!cir.float>
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct ComplexFmul {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// complex of single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type
+    pub lhs: crate::attrs::Attribute,
+    /// complex of single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type
+    pub rhs: crate::attrs::Attribute,
+    /// complex multiplication and division implementation
+    pub range: crate::enums::ComplexRangeKind,
+    pub loc: Option<crate::ast::SourceLocation>,
+}
+/// `cir.complex.fsub`
+/// Complex subtraction
+///
+/// The `cir.complex.fsub` operation takes two complex numbers and returns
+/// their difference.
+///
+/// Example:
+///
+/// ```
+/// %2 = cir.complex.fsub %0, %1 : !cir.complex<!cir.float>
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct ComplexFsub {
+    pub result: super::ValueId,
+    pub result_ty: crate::types::Type,
+    /// complex of single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type
+    pub lhs: crate::attrs::Attribute,
+    /// complex of single float type or double float type or f16 type or bf16 type or f80 type or f128 type or long double type
+    pub rhs: crate::attrs::Attribute,
     pub loc: Option<crate::ast::SourceLocation>,
 }
 /// `cir.complex.imag`
@@ -152,31 +249,20 @@ pub struct ComplexImagPtr {
 /// The `cir.complex.mul` operation takes two complex numbers and returns
 /// their product.
 ///
-/// For complex types with floating-point components, the `range` attribute
-/// specifies the algorithm to be used when the operation is lowered to
-/// the LLVM dialect. For multiplication, 'improved', 'promoted', and 'basic'
-/// are all handled equivalently, producing the algebraic formula with no
-/// special handling for NaN value. If 'full' is used, a runtime-library
-/// function is called if one of the intermediate calculations produced
-/// a NaN value.
-///
 /// Example:
 ///
 /// ```
-/// %2 = cir.complex.mul %0, %1 range(basic) : !cir.complex<!cir.float>
-/// %2 = cir.complex.mul %0, %1 range(full) : !cir.complex<!cir.float>
+/// %2 = cir.complex.mul %0, %1 : !cir.complex<s32i>
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ComplexMul {
     pub result: super::ValueId,
     pub result_ty: crate::types::Type,
-    /// CIR complex type
-    pub lhs: super::ValueId,
-    /// CIR complex type
-    pub rhs: super::ValueId,
-    /// complex multiplication and division implementation
-    pub range: crate::enums::ComplexRangeKind,
+    /// complex of integer type
+    pub lhs: crate::attrs::Attribute,
+    /// complex of integer type
+    pub rhs: crate::attrs::Attribute,
     pub loc: Option<crate::ast::SourceLocation>,
 }
 /// `cir.complex.real`
@@ -232,16 +318,16 @@ pub struct ComplexRealPtr {
 /// Example:
 ///
 /// ```
-/// %2 = cir.complex.sub %0, %1 : !cir.complex<!cir.float>
+/// %2 = cir.complex.sub %0, %1 : !cir.complex<s32i>
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ComplexSub {
     pub result: super::ValueId,
     pub result_ty: crate::types::Type,
-    /// CIR complex type
-    pub lhs: super::ValueId,
-    /// CIR complex type
-    pub rhs: super::ValueId,
+    /// complex of integer type
+    pub lhs: crate::attrs::Attribute,
+    /// complex of integer type
+    pub rhs: crate::attrs::Attribute,
     pub loc: Option<crate::ast::SourceLocation>,
 }
