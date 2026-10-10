@@ -939,7 +939,6 @@ fn generate_op_display_arm(
                 result_ty,
                 callee,
                 args,
-                side_effect,
                 ..
             }) => {
                 write_indent(f, level)?;
@@ -955,9 +954,6 @@ fn generate_op_display_arm(
                 write!(f, ")")?;
                 if let Some(ty) = result_ty {
                     write!(f, " : {ty}")?;
-                }
-                if let Ok(se) = crate::enums::SideEffect::try_from(side_effect) {
-                    write!(f, " [{se}]")?;
                 }
                 writeln!(f)
             }

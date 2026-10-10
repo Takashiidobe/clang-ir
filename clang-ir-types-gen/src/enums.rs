@@ -57,6 +57,12 @@ pub(crate) fn generate_enums(
 ) -> Result<TokenStream, Box<dyn std::error::Error>> {
     let mut enums = BTreeMap::new();
     for class in [
+        "CIR_I32Enum",
+        "CIR_I64Enum",
+        "CIR_I32BitEnum",
+        "I32Enum",
+        "I64Enum",
+        "I32BitEnum",
         "CIR_I32EnumAttr",
         "CIR_I64EnumAttr",
         "CIR_I32BitEnumAttr",
@@ -76,6 +82,55 @@ pub(crate) fn generate_enums(
     for rec in enums.values().copied() {
         defs.push(generate_enum_def(rec)?);
     }
+    let side_effect = quote! {
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+        #[repr(i64)]
+        pub enum SideEffect {
+            All = 0,
+            Pure = 1,
+            Const = 2,
+        }
+
+        impl TryFrom<i128> for SideEffect {
+            type Error = ParseEnumError;
+
+            fn try_from(value: i128) -> Result<Self, Self::Error> {
+                match value {
+                    0 => Ok(Self::All),
+                    1 => Ok(Self::Pure),
+                    2 => Ok(Self::Const),
+                    _ => Err(ParseEnumError::new("SideEffect", value.to_string())),
+                }
+            }
+        }
+
+        impl TryFrom<&crate::attrs::Attribute> for SideEffect {
+            type Error = ParseEnumError;
+
+            fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
+                match attr {
+                    crate::attrs::Attribute::Int { value, .. } => Self::try_from(*value),
+                    crate::attrs::Attribute::CirInt { value, .. } => value
+                        .parse::<i128>()
+                        .map_err(|_| ParseEnumError::new("SideEffect", value.clone()))
+                        .and_then(Self::try_from),
+                    other => Err(ParseEnumError::new("SideEffect", format!("{other:?}"))),
+                }
+            }
+        }
+
+        impl std::fmt::Display for SideEffect {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                let name = match self {
+                    Self::All => "all",
+                    Self::Pure => "pure",
+                    Self::Const => "const",
+                };
+                write!(f, "{name}")
+            }
+        }
+    };
 
     Ok(quote! {
         #![allow(non_camel_case_types)]
@@ -102,6 +157,7 @@ pub(crate) fn generate_enums(
         impl std::error::Error for ParseEnumError {}
 
         #(#defs)*
+        #side_effect
     })
 }
 
@@ -124,9 +180,12 @@ fn generate_enum_def(rec: Record<'_>) -> Result<TokenStream, Box<dyn std::error:
         cases.push((variant, value, keyword.to_string()));
     }
 
-    let is_bit_enum = record_classes(rec)?
-        .iter()
-        .any(|c| c == "CIR_I32BitEnumAttr" || c == "I32BitEnumAttr");
+    let is_bit_enum = record_classes(rec)?.iter().any(|c| {
+        matches!(
+            c.as_str(),
+            "CIR_I32BitEnum" | "I32BitEnum" | "CIR_I32BitEnumAttr" | "I32BitEnumAttr"
+        )
+    });
 
     if is_bit_enum {
         let variants = cases.iter().map(|(v, value, _)| {
@@ -142,6 +201,31 @@ fn generate_enum_def(rec: Record<'_>) -> Result<TokenStream, Box<dyn std::error:
 
             impl #enum_ident {
                 #(#variants)*
+            }
+
+            impl TryFrom<&crate::attrs::Attribute> for #enum_ident {
+                type Error = ParseEnumError;
+
+                fn try_from(attr: &crate::attrs::Attribute) -> Result<Self, Self::Error> {
+                    match attr {
+                        crate::attrs::Attribute::#enum_ident { value } => Ok(*value),
+                        crate::attrs::Attribute::Int { value, .. } => {
+                            u64::try_from(*value)
+                                .map(Self)
+                                .map_err(|_| ParseEnumError::new(stringify!(#enum_ident), value.to_string()))
+                        }
+                        crate::attrs::Attribute::CirInt { value, .. } => {
+                            value
+                                .parse::<u64>()
+                                .map(Self)
+                                .map_err(|_| ParseEnumError::new(stringify!(#enum_ident), value.clone()))
+                        }
+                        other => Err(ParseEnumError::new(
+                            stringify!(#enum_ident),
+                            format!("{other:?}"),
+                        )),
+                    }
+                }
             }
         })
     } else {

@@ -11461,7 +11461,7 @@ pub fn write_op(
             write_indent(f, level)?;
             writeln!(f, "byte_swap")
         }
-        Op::Call(calls::Call { result, result_ty, callee, args, side_effect, .. }) => {
+        Op::Call(calls::Call { result, result_ty, callee, args, .. }) => {
             write_indent(f, level)?;
             if let Some(result) = result {
                 write!(f, "%{result} = ")?;
@@ -11475,9 +11475,6 @@ pub fn write_op(
             write!(f, ")")?;
             if let Some(ty) = result_ty {
                 write!(f, " : {ty}")?;
-            }
-            if let Ok(se) = crate::enums::SideEffect::try_from(side_effect) {
-                write!(f, " [{se}]")?;
             }
             writeln!(f)
         }

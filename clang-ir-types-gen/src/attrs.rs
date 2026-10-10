@@ -149,10 +149,13 @@ fn attribute_display_impl() -> TokenStream {
                     Self::ConstVector { elts, .. } => write!(f, "[{elts}]"),
                     Self::ConstRecord { members, .. } => write!(f, "{{{members}}}"),
                     Self::ConstComplex { real, imag, .. } => write!(f, "({real}, {imag})"),
-                    Self::GlobalView { symbol, indices, .. } => {
+                    Self::GlobalView { symbol, indices, address_point, .. } => {
                         write!(f, "@{symbol}")?;
                         if let Some(indices) = indices {
                             write!(f, "[{indices}]")?;
+                        }
+                        if *address_point {
+                            write!(f, ", address_point")?;
                         }
                         Ok(())
                     }

@@ -310,22 +310,32 @@ impl<'a> Parser<'a> {
         self.expect(Tok::Less)?;
         let symbol = self.expect_symbol_ref()?;
         let mut indices = Vec::new();
+        let mut address_point = false;
         if self.eat(&Tok::Comma) {
-            self.expect(Tok::LBracket)?;
-            if !self.at(&Tok::RBracket) {
-                loop {
-                    let n = self.expect_number()?;
-                    let value: i128 = n
-                        .parse()
-                        .map_err(|_| self.err("invalid global_view index"))?;
-                    indices.push(value);
-                    let _ = self.maybe_colon_type()?;
-                    if !self.eat(&Tok::Comma) {
-                        break;
+            if self.eat(&Tok::LBracket) {
+                if !self.at(&Tok::RBracket) {
+                    loop {
+                        let n = self.expect_number()?;
+                        let value: i128 = n
+                            .parse()
+                            .map_err(|_| self.err("invalid global_view index"))?;
+                        indices.push(value);
+                        let _ = self.maybe_colon_type()?;
+                        if !self.eat(&Tok::Comma) {
+                            break;
+                        }
                     }
                 }
+                self.expect(Tok::RBracket)?;
             }
-            self.expect(Tok::RBracket)?;
+            if !self.at(&Tok::Greater) {
+                self.eat(&Tok::Comma);
+                let field = self.expect_ident()?;
+                if field != "address_point" {
+                    return Err(self.err(format!("unexpected global_view field `{field}`")));
+                }
+                address_point = true;
+            }
         }
         self.expect(Tok::Greater)?;
         let ty = self.maybe_colon_type()?.unwrap_or(crate::ast::Type::Void);
@@ -343,6 +353,7 @@ impl<'a> Parser<'a> {
             ty,
             symbol,
             indices,
+            address_point,
         })
     }
 
